@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FooFoo — Build Knowledge</title>
+<style>
+  :root {
+    --bg:#f7f6f3; --surface:#ffffff; --surface2:#f2f1ee;
+    --border:#e4e2dc; --border2:#d0cec7;
+    --text:#1a1917; --text2:#6b6860; --text3:#9e9b94;
+    --blue:#1a56db; --blue-bg:#eff4ff; --blue-border:#c3d4fa;
+    --teal:#0e7a5a; --teal-bg:#e8f8f2; --teal-border:#a3dfc9;
+    --purple:#5145b8; --purple-bg:#f0effe; --purple-border:#c8c4f4;
+    --amber:#92500a; --amber-bg:#fef8ec; --amber-border:#f5d68a;
+    --green:#166534; --green-bg:#f0fdf4; --green-border:#86efac;
+    --orange:#9a3412; --orange-bg:#fff7ed; --orange-border:#fdba74;
+    --sidebar-w:220px; --radius:8px; --radius-sm:5px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;display:flex;min-height:100vh}
+
+  #sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+  .sidebar-logo .app-name{font-size:15px;font-weight:600}
+  .sidebar-logo .app-sub{font-size:11px;color:var(--text3);margin-top:2px}
+  .sidebar-section{padding:10px 10px 4px}
+  .sidebar-section-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);padding:0 6px;margin-bottom:4px}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13px;transition:background .12s,color .12s;user-select:none}
+  .nav-item:hover{background:var(--surface2);color:var(--text)}
+  .nav-item.active{background:var(--blue-bg);color:var(--blue);font-weight:500}
+  .nav-item .nav-icon{font-size:14px;flex-shrink:0}
+  .nav-item .nav-badge{margin-left:auto;font-size:10px;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--text3)}
+  .nav-item.active .nav-badge{background:var(--blue-border);color:var(--blue)}
+  .sidebar-divider{border:none;border-top:1px solid var(--border);margin:6px 10px}
+
+  #main{flex:1;overflow-y:auto;padding:28px 32px;max-width:860px}
+  .page-header{margin-bottom:24px}
+  .page-title{font-size:22px;font-weight:600;margin-bottom:4px}
+  .page-subtitle{font-size:13px;color:var(--text2);line-height:1.6}
+
+  .session-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:20px}
+  .session-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+  .session-card-title{font-size:16px;font-weight:600}
+  .session-card-meta{font-size:11px;color:var(--text3);text-align:right;line-height:1.7}
+  .session-card-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px}
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .stat{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+  .stat-n{font-size:20px;font-weight:600}
+  .stat-l{font-size:11px;color:var(--text3);margin-top:2px}
+
+  .view-tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid var(--border)}
+  .view-tab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s,border-color .12s;user-select:none;white-space:nowrap}
+  .view-tab:hover{color:var(--text)}
+  .view-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+  .view-pane{display:none}.view-pane.active{display:block}
+
+  .swim-lane{display:flex;margin-bottom:10px}
+  .swim-label{width:100px;flex-shrink:0;display:flex;align-items:flex-start;justify-content:flex-end;padding:14px 12px 12px 0}
+  .swim-label-inner{text-align:right}
+  .swim-label-title{font-size:11px;font-weight:600;color:var(--text2)}
+  .swim-label-sub{font-size:10px;color:var(--text3);margin-top:1px}
+  .swim-body{flex:1;border-radius:var(--radius);border:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+  .lane-blue .swim-body{background:var(--blue-bg);border-color:var(--blue-border)}
+  .lane-teal .swim-body{background:var(--teal-bg);border-color:var(--teal-border)}
+  .lane-amber .swim-body{background:var(--amber-bg);border-color:var(--amber-border)}
+  .swim-step{display:flex;align-items:flex-start;gap:8px;padding:2px 0}
+  .step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px}
+  .num-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+  .num-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
+  .num-teal{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
+  .num-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+  .step-content{flex:1}
+  .step-title-row{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+  .step-title{font-size:13px;font-weight:500}
+  .step-desc{font-size:12px;color:var(--text2);line-height:1.5}
+  .swim-arrow{text-align:center;font-size:11px;color:var(--text3);padding:4px 0;padding-left:112px}
+
+  .tag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;flex-shrink:0}
+  .tag-new{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+  .tag-mod{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+  .tag-db{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
+  .tag-cfg{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+
+  .detail-item{margin-bottom:8px}
+  .detail-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:border-color .12s,border-radius .12s;user-select:none}
+  .detail-row:hover{border-color:var(--border2)}
+  .detail-row.open{border-color:var(--blue-border);border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+  .detail-left{display:flex;align-items:center;gap:8px}
+  .detail-name{font-size:13px;font-weight:500;font-family:'SF Mono','Fira Code',monospace}
+  .detail-name.plain{font-family:inherit}
+  .detail-chevron{font-size:12px;color:var(--text3);transition:transform .15s}
+  .detail-chevron.open{transform:rotate(180deg)}
+  .detail-drawer{display:none;background:var(--surface2);border:1px solid var(--blue-border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);padding:12px 14px;margin-bottom:8px}
+  .detail-drawer.open{display:block}
+  .dd-label{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;margin-top:12px}
+  .dd-label:first-child{margin-top:0}
+  .dd-text{font-size:13px;color:var(--text2);line-height:1.6}
+  .dd-flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px}
+  .dd-node{font-size:11px;padding:3px 9px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border);color:var(--text2);white-space:nowrap}
+  .dd-arrow{font-size:11px;color:var(--text3)}
+  .dd-code{font-family:'SF Mono','Fira Code',monospace;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text2);line-height:1.8;margin-top:5px}
+  .dd-hl{color:#92400e;font-weight:600;background:#fef3c7;padding:1px 3px;border-radius:3px}
+  .dd-why{padding:8px 12px;border-left:3px solid var(--teal-border);background:var(--teal-bg);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-top:5px}
+  .dd-why-q{font-size:11px;font-weight:600;color:var(--teal);margin-bottom:3px}
+  .dd-why-a{font-size:12px;color:var(--text2);line-height:1.5}
+
+  .arch-section{margin-bottom:20px}
+  .arch-section-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .arch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:7px}
+  .arch-node{position:relative;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);cursor:default;transition:border-color .12s,background .12s}
+  .arch-node[onclick]{cursor:pointer}
+  .arch-node[onclick]:hover{border-color:var(--border2);background:var(--surface2)}
+  .arch-node[onclick]::after{content:"↗";position:absolute;top:8px;right:10px;color:var(--text3);font-size:11px}
+  .arch-node.is-new{border-color:var(--teal-border);background:var(--teal-bg)}
+  .arch-node.is-mod{border-color:var(--orange-border);background:var(--orange-bg)}
+  .arch-node-name{font-size:12px;font-weight:600;font-family:'SF Mono','Fira Code',monospace;margin-bottom:2px}
+  .arch-node-name.plain{font-family:inherit}
+  .arch-node-desc{font-size:11px;color:var(--text3);line-height:1.4}
+  .arch-legend{display:flex;gap:12px;margin-bottom:12px}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+  .legend-dot{width:10px;height:10px;border-radius:2px}
+
+  .timeline-row{display:flex;gap:0}
+  .tl-date{width:80px;flex-shrink:0;padding:12px 14px 0 0;text-align:right;font-size:11px;color:var(--text3);line-height:1.5}
+  .tl-spine{width:1px;background:var(--border);flex-shrink:0;position:relative}
+  .tl-dot{position:absolute;top:16px;left:-5px;width:11px;height:11px;border-radius:50%;border:2px solid var(--bg)}
+  .tl-content{flex:1;padding:8px 0 24px 18px}
+  .tl-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:5px}
+  .tl-title{font-size:14px;font-weight:600;margin-bottom:5px}
+  .tl-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
+  .tl-chip{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:border-color .1s}
+  .tl-chip:hover{border-color:var(--blue-border);color:var(--blue)}
+  .tl-note{font-size:12px;color:var(--text2);line-height:1.5}
+
+  .next-box{margin-top:20px;padding:12px 16px;border:1px dashed var(--border2);border-radius:var(--radius);background:var(--surface)}
+  .next-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+  .next-text{font-size:13px;color:var(--text2);line-height:1.6}
+
+  .files-table{width:100%;border-collapse:collapse;font-size:13px}
+  .files-table th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border)}
+  .files-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .fr-file{font-family:'SF Mono','Fira Code',monospace;font-size:12px}
+  .fr-session{color:var(--text3);font-size:12px;white-space:nowrap}
+  .fr-desc{color:var(--text2);font-size:12px}
+
+  .decision-item{padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;background:var(--surface)}
+  .decision-q{font-size:13px;font-weight:500;margin-bottom:4px}
+  .decision-a{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:6px}
+  .decision-meta{font-size:11px;color:var(--text3)}
+
+  .empty-pane{text-align:center;padding:48px 24px;color:var(--text3)}
+  .empty-pane h3{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:6px}
+  .empty-pane p{font-size:13px;line-height:1.6}
+
+  /* ── Feature flows tab (per-session) ── */
+  .ff-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .ff-tab{padding:9px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:13px;font-weight:500;color:var(--text);cursor:pointer;transition:border-color .12s,color .12s;user-select:none}
+  .ff-tab:hover{border-color:var(--border2)}
+  .ff-tab.active{border-color:#1a56db;color:#1a56db}
+  .ff-meta{font-size:13px;color:var(--text2);margin-bottom:14px}
+  .ff-step{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;background:var(--surface);overflow:hidden}
+  .ff-step-header{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;user-select:none}
+  .ff-step-num{width:24px;height:24px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text2);flex-shrink:0}
+  .ff-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:10px;flex-shrink:0}
+  .ff-step-title{font-size:14px;font-weight:600;color:var(--text);flex:1}
+  .ff-chevron{font-size:12px;color:var(--text3);flex-shrink:0}
+  .ff-step-body{display:none;padding:0 16px 16px 60px}
+  .ff-step.open .ff-step-body{display:block}
+  .ff-section-label{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);margin:14px 0 6px}
+  .ff-section-label:first-child{margin-top:0}
+  .ff-desc{font-size:13px;color:var(--text2);line-height:1.6}
+  .ff-codeflow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .ff-code-chip{font-family:'SF Mono','Fira Code',monospace;font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--text)}
+  .ff-code-arrow{font-size:12px;color:var(--text3)}
+  .ff-files-touched{display:flex;flex-direction:column;gap:7px}
+  .ff-file-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ff-file-chip{font-family:'SF Mono','Fira Code',monospace;font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 9px;color:var(--text)}
+  .ff-file-desc{font-size:12px;color:var(--text2)}
+  .ff-api-row,.ff-db-row{font-size:12px;color:var(--text2);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .ff-api-name,.ff-db-name{font-family:'SF Mono','Fira Code',monospace;font-weight:600;color:var(--text);flex-shrink:0}
+  .ff-deepdive{margin-top:14px;text-align:center}
+  .ff-deepdive-btn{padding:10px 18px;border-radius:8px;border:1px solid var(--blue-border);background:var(--blue-bg);color:var(--blue);font-size:13px;font-weight:600;cursor:pointer}
+  .ff-deepdive-btn:hover{background:var(--blue-border)}
+
+  @media(max-width:640px){#sidebar{display:none}#main{padding:20px 16px}.stat-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<script>
+function showPage(id){
+  document.querySelectorAll('.page-content').forEach(p=>p.style.display='none');
+  const pg=document.getElementById('page-'+id);
+  if(pg) pg.style.display='block';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    const oc=n.getAttribute('onclick')||'';
+    if(oc.includes("'"+id+"'"))n.classList.add('active');
+  });
+}
+function switchView(session,view){
+  const pg=document.getElementById('page-'+session);
+  if(!pg)return;
+  pg.querySelectorAll('.view-pane').forEach(p=>p.classList.remove('active'));
+  pg.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+  const vp=document.getElementById(session+'-'+view);
+  if(vp)vp.classList.add('active');
+  if(event&&event.target)event.target.classList.add('active');
+}
+// Jump from swim lane step → detail drawer (F13)
+function jumpDetail(session,id){
+  switchView(session,'detail',null);
+  setTimeout(()=>{
+    const dr=document.getElementById('draw-'+session+'-'+id);
+    if(dr&&!dr.classList.contains('open'))toggleDetail(session+'-'+id);
+    const rw=document.getElementById('row-'+session+'-'+id);
+    if(rw)rw.scrollIntoView({behavior:'smooth',block:'start'});
+  },60);
+}
+// Jump from an architecture tile → its Module Reference entry (F24)
+function jumpModule(id){
+  showPage('modules');
+  setTimeout(()=>{
+    const dr=document.getElementById('draw-mod-'+id);
+    if(dr&&!dr.classList.contains('open'))toggleDetail('mod-'+id);
+    const rw=document.getElementById('row-mod-'+id);
+    if(rw)rw.scrollIntoView({behavior:'smooth',block:'start'});
+  },60);
+}
+function toggleDetail(id){
+  const dr=document.getElementById('draw-'+id);
+  const ch=document.getElementById('chev-'+id);
+  if(!dr||!ch)return;
+  const row=ch.closest('.detail-row');
+  const isOpen=dr.classList.contains('open');
+  dr.classList.toggle('open',!isOpen);
+  row&&row.classList.toggle('open',!isOpen);
+  ch.classList.toggle('open',!isOpen);
+}
+
+// ── Feature flows tab (per-session) ──
+// Renders a flows[] array (see references/session-block-template.md) into rootId.
+// Called once per session from that session's own inline <script>, e.g.:
+//   renderFeatureFlows('s3-flows', FEATURE_FLOWS_S3);
+function renderFeatureFlows(rootId, flows){
+  const root=document.getElementById(rootId);
+  if(!root||!flows||!flows.length)return;
+  const layerMeta={
+    'Phone':{bg:'#E6F1FB',color:'#0C447C'},
+    'App logic':{bg:'#E1F5EE',color:'#085041'},
+    'Middleware':{bg:'#FAEEDA',color:'#633806'},
+    'Server':{bg:'#FFF0F0',color:'#791F1F'},
+    'Database':{bg:'#EEEDFE',color:'#3C3489'},
+    'Service':{bg:'#FAECE7',color:'#712B13'}
+  };
+  const tagMeta={
+    'UI':{bg:'#E6F1FB',color:'#0C447C'},
+    'HOOK':{bg:'#E1F5EE',color:'#085041'},
+    'API':{bg:'#FAEEDA',color:'#633806'},
+    'DB':{bg:'#EEEDFE',color:'#3C3489'},
+    'SDK':{bg:'#FAECE7',color:'#712B13'},
+    'POLICY':{bg:'#FBEAF0',color:'#72243E'}
+  };
+  function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function pill(text,meta){
+    const m=meta[text]||{bg:'#f2f1ee',color:'#6b6860'};
+    return '<span class="ff-pill" style="background:'+m.bg+';color:'+m.color+'">'+esc(text)+'</span>';
+  }
+  let html='<div class="ff-tabs">';
+  flows.forEach((f,i)=>{html+='<div class="ff-tab'+(i===0?' active':'')+'" data-ff-tab="'+i+'">'+esc(f.label)+'</div>';});
+  html+='</div>';
+  flows.forEach((f,i)=>{
+    html+='<div class="ff-panel" data-ff-panel="'+i+'" style="'+(i===0?'':'display:none')+'">';
+    html+='<div class="ff-meta">'+esc(f.label)+' · '+f.steps.length+' steps · click any step to see the code files and data flow</div>';
+    f.steps.forEach((s,si)=>{
+      const uid=rootId+'-f'+i+'-s'+si;
+      html+='<div class="ff-step" id="'+uid+'">';
+      html+='<div class="ff-step-header" onclick="toggleFeatureStep(\''+uid+'\')">';
+      html+='<div class="ff-step-num">'+(si+1)+'</div>';
+      html+=pill(s.layer,layerMeta);
+      if(s.tag)html+=pill(s.tag,tagMeta);
+      html+='<div class="ff-step-title">'+esc(s.title)+'</div>';
+      html+='<span class="ff-chevron" id="'+uid+'-chev">▾</span>';
+      html+='</div>';
+      html+='<div class="ff-step-body" id="'+uid+'-body">';
+      html+='<div class="ff-desc">'+esc(s.desc)+'</div>';
+      if(s.codeFlow&&s.codeFlow.length){
+        html+='<div class="ff-section-label">Code flow</div><div class="ff-codeflow">';
+        s.codeFlow.forEach(c=>{
+          if(c.chip!=null)html+='<span class="ff-code-chip">'+esc(c.chip)+'</span>';
+          else if(c.label!=null)html+='<span class="ff-code-arrow">→ '+esc(c.label)+'</span>';
+        });
+        html+='</div>';
+      }
+      if(s.files&&s.files.length){
+        html+='<div class="ff-section-label">Files touched</div><div class="ff-files-touched">';
+        s.files.forEach(fl=>{
+          html+='<div class="ff-file-row"><span class="ff-file-chip">📄 '+esc(fl.path)+'</span><span class="ff-file-desc">'+esc(fl.desc)+'</span></div>';
+        });
+        html+='</div>';
+      }
+      if(s.api){
+        html+='<div class="ff-section-label">API contract</div><div class="ff-api-row"><span class="ff-api-name">'+esc(s.api.endpoint)+'</span><span>'+esc(s.api.note)+'</span></div>';
+      }
+      if(s.db){
+        html+='<div class="ff-section-label">Database</div><div class="ff-db-row"><span class="ff-db-name">'+esc(s.db.table)+' · '+esc(s.db.op)+'</span><span>'+esc(s.db.note)+'</span></div>';
+      }
+      html+='</div></div>';
+    });
+    html+='<div class="ff-deepdive"><button class="ff-deepdive-btn" onclick="deepDiveFeature(\''+esc(f.label).replace(/'/g,"\\'")+'\')">🔎 Deep-dive: error handling &amp; edge cases for '+esc(f.label)+'</button></div>';
+    html+='</div>';
+  });
+  root.innerHTML=html;
+  root.querySelectorAll('.ff-tab').forEach(tab=>{
+    tab.addEventListener('click',function(){
+      const idx=this.getAttribute('data-ff-tab');
+      root.querySelectorAll('.ff-tab').forEach(t=>t.classList.remove('active'));
+      this.classList.add('active');
+      root.querySelectorAll('.ff-panel').forEach(p=>{p.style.display=(p.getAttribute('data-ff-panel')===idx)?'':'none';});
+    });
+  });
+}
+function toggleFeatureStep(uid){
+  const body=document.getElementById(uid+'-body');
+  const chev=document.getElementById(uid+'-chev');
+  const step=document.getElementById(uid);
+  if(!body||!chev||!step)return;
+  const isOpen=step.classList.contains('open');
+  step.classList.toggle('open',!isOpen);
+  chev.textContent=isOpen?'▾':'▴';
+}
+function deepDiveFeature(featureLabel){
+  const prompt='Go deeper on error handling and edge cases for the "'+featureLabel+'" feature flow documented in KNOWLEDGE.html — what can fail at each step, and how is/should it be handled?';
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(prompt).then(()=>{
+      alert('Prompt copied to clipboard — paste it into Claude Code to go deeper:\n\n'+prompt);
+    }).catch(()=>{alert(prompt);});
+  }else{
+    alert(prompt);
+  }
+}
+</script>
+
+
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="app-name">FooFoo</div>
+    <div class="app-sub">Build knowledge base</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Overview</div>
+    <div class="nav-item" onclick="showPage('arch-full')">
+      <span class="nav-icon">🗺</span> App architecture
+    </div>
+    <div class="nav-item" onclick="showPage('timeline-full')">
+      <span class="nav-icon">📅</span> Build timeline
+    </div>
+    <div class="nav-item" onclick="showPage('flow')">
+      <span class="nav-icon">🔀</span> System flow
+    </div>
+  </div>
+
+  <hr class="sidebar-divider">
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Sessions</div>
+    <div class="nav-item active" onclick="showPage('s1')">
+      <span class="nav-icon">📦</span> S1 · Repo restructure
+      <span class="nav-badge">Jul 13</span>
+    </div>
+    <!-- NAV_INJECT -->
+  </div>
+
+  <hr class="sidebar-divider">
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Reference</div>
+    <div class="nav-item" onclick="showPage('modules')">
+      <span class="nav-icon">🧩</span> Modules
+      <span class="nav-badge">4</span>
+    </div>
+    <div class="nav-item" onclick="showPage('files')">
+      <span class="nav-icon">📁</span> Files register
+      <span class="nav-badge">20</span>
+    </div>
+    <div class="nav-item" onclick="showPage('db')">
+      <span class="nav-icon">🗄</span> Database schema
+    </div>
+    <div class="nav-item" onclick="showPage('decisions')">
+      <span class="nav-icon">💡</span> Key decisions
+      <span class="nav-badge">7</span>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- ── Architecture page ── -->
+  <div id="page-arch-full" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">App architecture</div>
+      <div class="page-subtitle">FooFoo — AI-powered meal decision assistant for Indian households. No app code exists yet; the repository currently holds the complete documentation, database migration set, and seed data that Phase 7 implementation will build from. Teal = new this session · Amber = modified.</div>
+    </div>
+    <div class="arch-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal-bg);border:1px solid var(--teal-border)"></div> New this session</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange-bg);border:1px solid var(--orange-border)"></div> Modified</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--surface);border:1px solid var(--border)"></div> Existing</div>
+    </div>
+    <div class="arch-section">
+      <div class="arch-section-title">📱 Phone — screens</div>
+      <div class="arch-grid" id="arch-phone">
+        <!-- ARCH_PHONE_INJECT -->
+      </div>
+    </div>
+    <div class="arch-section">
+      <div class="arch-section-title">🧠 App Logic — repositories, hooks &amp; config</div>
+      <div class="arch-grid" id="arch-applogic">
+        <div class="arch-node is-new" onclick="jumpModule('claude-skills')">
+          <div class="arch-node-name">.claude/skills/</div>
+          <div class="arch-node-desc">Org-standard AI working rules · S1</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('docs-tree')">
+          <div class="arch-node-name">docs/</div>
+          <div class="arch-node-desc">All project documentation, by purpose · S1</div>
+        </div>
+        <!-- ARCH_APPLOGIC_INJECT -->
+      </div>
+    </div>
+    <div class="arch-section">
+      <div class="arch-section-title">🗄 Database — tables</div>
+      <div class="arch-grid" id="arch-db">
+        <div class="arch-node is-new" onclick="jumpModule('database-tree')">
+          <div class="arch-node-name">database/</div>
+          <div class="arch-node-desc">Migrations, rollbacks, seeds, validation · S1</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('data-source')">
+          <div class="arch-node-name">data/source/</div>
+          <div class="arch-node-desc">Raw seed spreadsheets (CSV/XLSX) · S1</div>
+        </div>
+        <!-- ARCH_DB_INJECT -->
+      </div>
+    </div>
+    <div class="arch-section">
+      <div class="arch-section-title">☁️ Server — functions</div>
+      <div class="arch-grid" id="arch-server">
+        <!-- ARCH_SERVER_INJECT -->
+      </div>
+    </div>
+    <div class="arch-section">
+      <div class="arch-section-title">🔌 Services</div>
+      <div class="arch-grid" id="arch-services">
+        <!-- ARCH_SERVICES_INJECT -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ── System flow page ── -->
+  <div id="page-flow" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">System flow</div>
+      <div class="page-subtitle">How a request actually travels through the app, step by step — click any step to see its full explanation.</div>
+    </div>
+    <div class="empty-pane"><h3>No runtime flows yet</h3><p>The app has no running code yet — flow diagrams will appear here once Phase 7 implementation begins.</p></div>
+    <!-- FLOWS_INJECT -->
+  </div>
+
+  <!-- ── Timeline page ── -->
+  <div id="page-timeline-full" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Build timeline</div>
+      <div class="page-subtitle">Every session in order. Click any chip to open that session's full doc.</div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 13, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S1</span>
+        <div class="tl-title">Repository architecture freeze — restructure</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s1')">docs/ tree</span>
+          <span class="tl-chip" onclick="showPage('s1')">database/ tree</span>
+          <span class="tl-chip" onclick="showPage('s1')">data/source/</span>
+          <span class="tl-chip" onclick="showPage('s1')">.claude/skills</span>
+          <span class="tl-chip" onclick="showPage('s1')">KNOWLEDGE.html</span>
+        </div>
+        <div class="tl-note">All 134 recovered documents moved from the flat doc-garage/ folder into a purpose-built docs/database/data tree, classified by reading each file's actual content. Still pending: CLAUDE.md, docs/README.md, templates and runbooks (their exact wording was never supplied), the 19 missing rollback scripts, and execution proof for WP-4B/WP-4DB.</div>
+      </div>
+    </div>
+    <!-- TIMELINE_INJECT -->
+  </div>
+
+  <!-- ── Modules ── -->
+  <div id="page-modules" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Modules</div>
+      <div class="page-subtitle">What each piece of code or database table is actually for, in plain English — click an architecture tile to jump straight to its entry here.</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-mod-docs-tree" onclick="toggleDetail('mod-docs-tree')">
+        <div class="detail-left">
+          <span class="tag tag-new">New</span>
+          <span class="detail-name">docs/</span>
+        </div>
+        <span class="detail-chevron" id="chev-mod-docs-tree">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-mod-docs-tree">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">The single home for every project document, organised by what each document is for rather than where it happened to be saved. A reader looking for "why does this product exist" goes to one folder; "how is it built" to another; "what work was proposed vs. what was proven done" to two clearly separated folders.</div>
+        <div class="dd-label">Files / tables in this module</div>
+        <div class="dd-text">
+          <code>docs/product/</code> — what FooFoo is, for whom, market, revenue, legal (6 docs)<br>
+          <code>docs/architecture/</code> — how it's built: PRD, schema, security, API contract, recommendation-engine design (16 docs)<br>
+          <code>docs/governance/</code> — standing rules and registers that apply going forward: APDF framework, AGRs, Baseline/Gap/Risk registers, Architecture Freeze (14 docs)<br>
+          <code>docs/project-history/work-packages/</code> — proposed work with acceptance criteria (11 docs)<br>
+          <code>docs/project-history/certificates/</code> — proof that work was actually executed, with real results (8 docs)<br>
+          <code>docs/project-history/</code> — point-in-time session handoffs (3 docs)<br>
+          <code>docs/research/</code> — the Batch 1–6 data discovery/canonicalization pipeline records (21 docs)<br>
+          <code>docs/roadmaps/</code> — forward-looking plans (4 docs)<br>
+          <code>docs/visuals/</code> — interactive HTML explainers (4 files)<br>
+          <code>docs/runbooks/</code> — reserved, empty until Founder supplies the 5 runbook texts
+        </div>
+        <div class="dd-label">How it helps the app</div>
+        <div class="dd-text">Before this, all 134 recovered files sat in one flat "doc-garage" dump — nobody could tell an approved rule from a stale proposal. Now the folder itself tells you how much to trust a document.</div>
+        <div class="dd-label">Last touched</div>
+        <div class="dd-text">S1 · Jul 13</div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-mod-database-tree" onclick="toggleDetail('mod-database-tree')">
+        <div class="detail-left">
+          <span class="tag tag-db">DB</span>
+          <span class="detail-name">database/</span>
+        </div>
+        <span class="detail-chevron" id="chev-mod-database-tree">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-mod-database-tree">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">Every SQL file the project owns, split by job: scripts that build the database structure, scripts that undo them, scripts that load starter data, and scripts that check everything is healthy.</div>
+        <div class="dd-label">Files / tables in this module</div>
+        <div class="dd-text">
+          <code>database/migrations/</code> — 22 structural scripts (the frozen 001–020 baseline plus fixes 027, 028)<br>
+          <code>database/rollback/</code> — only the 2 rollbacks that genuinely exist (027, 028); the 19 missing ones for 001–019 were deliberately NOT faked<br>
+          <code>database/seeds/</code> — 3 starter-data loaders (100–102)<br>
+          <code>database/validation/</code> — 5 health-check suites (900–904) plus the WP-3D Check-2 fix reference snippet
+        </div>
+        <div class="dd-label">How it helps the app</div>
+        <div class="dd-text">The live Supabase database was built from these exact files. Keeping structure, undo, data, and checks separate means a risky change can never be confused with a safe one.</div>
+        <div class="dd-label">Last touched</div>
+        <div class="dd-text">S1 · Jul 13</div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-mod-data-source" onclick="toggleDetail('mod-data-source')">
+        <div class="detail-left">
+          <span class="tag tag-db">DB</span>
+          <span class="detail-name">data/source/</span>
+        </div>
+        <span class="detail-chevron" id="chev-mod-data-source">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-mod-data-source">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">The original spreadsheets (dishes, ingredients, cuisines, personas, regional food data) that all seed data was derived from during the Batch 1–6 research process. Kept as read-only source of truth.</div>
+        <div class="dd-label">Files / tables in this module</div>
+        <div class="dd-text">
+          <code>dishes.xlsx</code> — 810 dishes, the core content catalogue<br>
+          <code>Indian_Meal_Cohort_Persona_DB_v3.xlsx</code> — household persona research (Batch 1's source)<br>
+          <code>ingredients_v5.csv</code>, <code>ingredient_aliases_v2.csv</code>, <code>term_synonyms_v2.csv</code> — ingredient knowledge<br>
+          <code>cuisines_v4.csv</code>, <code>cuisine_groups_v4 2.csv</code>, <code>tags_v4.csv</code> — cuisine and tag taxonomies<br>
+          <code>dish_combos_v2_20260520.csv</code>, <code>dish_combo_items_v2_20260520.csv</code> — meal combinations<br>
+          <code>region_food_affinity.csv</code> — regional food intelligence (Batch 6's source)
+        </div>
+        <div class="dd-label">How it helps the app</div>
+        <div class="dd-text">If a seed value is ever questioned, these files are the evidence trail back to where the number came from.</div>
+        <div class="dd-label">Last touched</div>
+        <div class="dd-text">S1 · Jul 13</div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-mod-claude-skills" onclick="toggleDetail('mod-claude-skills')">
+        <div class="detail-left">
+          <span class="tag tag-cfg">Config</span>
+          <span class="detail-name">.claude/skills/</span>
+        </div>
+        <span class="detail-chevron" id="chev-mod-claude-skills">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-mod-claude-skills">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">The organisation's standing working rules for AI sessions in this repo: how to keep this knowledge book updated every session, how to document code as it's written, and how to debug from evidence instead of guesses.</div>
+        <div class="dd-label">Files / tables in this module</div>
+        <div class="dd-text">
+          <code>session-knowledge-doc/SKILL.md</code> (+2 templates) — the rules for maintaining this very file<br>
+          <code>coding-standards-enforcer/SKILL.md</code> — documentation and logging standards for all future code<br>
+          <code>debug-root-cause/SKILL.md</code> — evidence-first debugging discipline
+        </div>
+        <div class="dd-label">How it helps the app</div>
+        <div class="dd-text">Any future Claude Code session in this repo picks up the same standards automatically instead of relying on someone remembering to ask.</div>
+        <div class="dd-label">Last touched</div>
+        <div class="dd-text">S1 · Jul 13</div>
+      </div>
+    </div>
+    <!-- MODULES_INJECT -->
+  </div>
+
+  <!-- ── Files register ── -->
+  <div id="page-files" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Files register</div>
+      <div class="page-subtitle">Every file Claude has created or modified, with the session it was introduced. S1's 134 moved documents are registered by destination folder — no file content was changed, only locations.</div>
+    </div>
+    <table class="files-table">
+      <thead><tr><th>File</th><th>Type</th><th>Session</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td class="fr-file">.claude/skills/session-knowledge-doc/ (3 files)</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S1</td><td class="fr-desc">Knowledge book skill + its 2 HTML templates, installed from dotfiles</td></tr>
+        <tr><td class="fr-file">.claude/skills/coding-standards-enforcer/SKILL.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S1</td><td class="fr-desc">Org coding/documentation standard, installed from dotfiles</td></tr>
+        <tr><td class="fr-file">.claude/skills/debug-root-cause/SKILL.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S1</td><td class="fr-desc">Evidence-first debugging discipline, installed from dotfiles</td></tr>
+        <tr><td class="fr-file">KNOWLEDGE.html</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S1</td><td class="fr-desc">This knowledge book, initialised</td></tr>
+        <tr><td class="fr-file">docs/product/ (6 docs)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">DOC-01/02/03/07/08/09 — product brief, market, personas, GTM, revenue, legal</td></tr>
+        <tr><td class="fr-file">docs/architecture/ (16 docs + 1 sidecar)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">DOC-04/05/06/10, DOC-P3-02→08 design docs, RE-DOC-01→04</td></tr>
+        <tr><td class="fr-file">docs/governance/ (14 docs)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">APDF framework, AGR-005/006, Baseline/Gap/Risk registers, Architecture Freeze + Decision Review, DOC-P3-09/10/12</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/ (11 files)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">REPO-BOOT-01/02, REPO-WP-02/03/03D/04B/04DA/04DB/04DC + WP-3D fix snippet copy</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/ (8 docs)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">REPO-BOOT-03 migration certification, DOC-P3-05 Part B/C/D completion summaries, regression validation, P3-03 + P3-08 readiness gates</td></tr>
+        <tr><td class="fr-file">docs/project-history/ (3 docs)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">Engineering Handover package + 2 session handoffs (point-in-time state records)</td></tr>
+        <tr><td class="fr-file">docs/research/ (21 docs)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">Batch 1–6 pipeline packages, Discovery Execution Register, Knowledge Acquisition, PIR, Project Checkpoint</td></tr>
+        <tr><td class="fr-file">docs/roadmaps/ (4 docs)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">Project Roadmap, PM-SUPP-01 (md + docx), RE-DOC-05 Evolution Roadmap</td></tr>
+        <tr><td class="fr-file">docs/visuals/ (4 files)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">Design System Explorer + 3 RE interactive HTML explainers</td></tr>
+        <tr><td class="fr-file">database/migrations/ (22 SQL + 1 sidecar)</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S1</td><td class="fr-desc">Frozen 001–020 baseline + migrations 027, 028</td></tr>
+        <tr><td class="fr-file">database/rollback/ (2 SQL)</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S1</td><td class="fr-desc">027 + 028 rollbacks only — 001–019 rollbacks do not exist and were not faked</td></tr>
+        <tr><td class="fr-file">database/seeds/ (3 SQL)</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S1</td><td class="fr-desc">Seed loaders 100, 101, 102</td></tr>
+        <tr><td class="fr-file">database/validation/ (6 SQL)</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S1</td><td class="fr-desc">Validation suites 900–904 + WP-3D Check-2 fix reference</td></tr>
+        <tr><td class="fr-file">data/source/ (11 data files + 1 sidecar)</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S1</td><td class="fr-desc">Original CSV/XLSX spreadsheets all seed data derives from</td></tr>
+        <tr><td class="fr-file">doc-garage/ (removed)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">Emptied by the moves above, then deleted — zero files lost</td></tr>
+        <tr><td class="fr-file">engineering/templates/, docs/runbooks/</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S1</td><td class="fr-desc">Reserved folders — stay empty (and invisible to git) until Founder supplies the template/runbook texts</td></tr>
+        <!-- FILES_INJECT -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── DB schema ── -->
+  <div id="page-db" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Database schema</div>
+      <div class="page-subtitle">Current state of all tables and columns. Updated whenever a migration runs.</div>
+    </div>
+    <div class="empty-pane"><h3>No schema change this session</h3><p>The live Supabase database (28 applied migrations, ~62 tables) was untouched — S1 only reorganised the SQL files in the repo. This page fills in when a future session changes the schema.</p></div>
+  </div>
+
+  <!-- ── Decisions log ── -->
+  <div id="page-decisions" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Key decisions log</div>
+      <div class="page-subtitle">Every significant architectural decision made, and why.</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why classify by reading every document instead of trusting filenames?</div>
+      <div class="decision-a">Filenames lie in this repo. Example: REPO-WP-03D is titled "Certification" but its content says "DESIGNED — awaiting Founder approval to execute" — it's a proposal, so it went to work-packages/, not certificates/. Only content proves whether work was proposed or actually done.</div>
+      <div class="decision-meta">S1 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why were CLAUDE.md, docs/README.md, the 4 templates and 5 runbooks NOT created?</div>
+      <div class="decision-a">The instruction demanded their content be pasted verbatim from "Sections 4–7" of a Principal Engineer specification — but those sections were never provided, and a search of both this repo and Google Drive found no document containing them. Writing made-up content and labelling it "verbatim Founder-approved" would be a false record, so these were skipped and flagged instead.</div>
+      <div class="decision-meta">S1 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why does database/rollback/ hold only 2 files when there are 22 migrations?</div>
+      <div class="decision-a">Only the 027 and 028 rollbacks actually exist. Creating placeholder rollbacks for 001–019 would make the gap invisible while making it worse — the restructure instruction explicitly forbade it, and the gap stays on record (it's WP-3A's job).</div>
+      <div class="decision-meta">S1 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Where should AGR-005/006 live — project-history (as their own headers say) or governance?</div>
+      <div class="decision-a">docs/governance/. Their headers predate this restructure and pointed at the old flat project-history plan; the new architecture explicitly names AGRs as governance documents (standing decisions that apply forward). The newer Founder-approved rule wins over the stale header.</div>
+      <div class="decision-meta">S1 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">What to do with the duplicate WP-3D_Check2_Fix_Reference.sql (two identical copies)?</div>
+      <div class="decision-a">Both kept (nothing may be deleted): one in database/validation/ as the proposed patch to the 900 validation script, the duplicate alongside its parent work package in work-packages/. Noted so a future hygiene pass can consciously de-duplicate.</div>
+      <div class="decision-meta">S1 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why keep the three junk .DS_Store files?</div>
+      <div class="decision-a">The validation rule was "file count before == file count after, nothing deleted." They're macOS artifacts with zero value — they were moved along with their sibling files and flagged for deletion in a future, explicitly-approved hygiene commit rather than silently dropped now.</div>
+      <div class="decision-meta">S1 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Where do skills install from, now that apverse-labs is gone?</div>
+      <div class="decision-a">ankitmittal-madman/dotfiles. The global rules still say apverse-labs/dotfiles, but that GitHub org was lost with the original repo — the same skills now live under the personal account. The global CLAUDE.md should be updated to match.</div>
+      <div class="decision-meta">S1 · Jul 13</div>
+    </div>
+    <!-- DECISIONS_INJECT -->
+  </div>
+
+  <!-- ── Session 1 ── -->
+  <div id="page-s1" class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">S1 · Repository architecture freeze — restructure</div>
+      <div class="page-subtitle">Every recovered project document was read, classified by what it actually is, and moved into a purpose-built folder tree — so anyone can now tell approved rules, design docs, proposals, and proof-of-work apart at a glance.</div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 13, 2026<br>134 files moved · 6 created</div>
+      </div>
+      <div class="session-card-desc">The flat doc-garage/ dump (134 files recovered after the original repository was lost) was dissolved into a structured tree: docs/ split by document purpose, database/ split by SQL job, data/source/ for the original spreadsheets. Every file was opened and classified by its content, not its filename; git history was preserved on every move; nothing was deleted. The three always-on AI working skills were installed, and this knowledge book was created. Four deliverables (CLAUDE.md, docs/README.md, templates, runbooks) are deliberately absent — their exact required wording was never supplied.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">134</div><div class="stat-l">Files moved</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">15</div><div class="stat-l">Folders created</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Files deleted</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">6</div><div class="stat-l">Files created</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s1','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s1','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s1','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s1-swim" class="view-pane active">
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">repo files</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s1','skills')">
+            <div class="step-num num-purple">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Working-rules skills installed</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">The three standing AI-session rules (knowledge book, coding standards, evidence-based debugging) were fetched from the dotfiles repo and committed here, so every future session applies them automatically.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s1','docs-tree')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">All 97 documents read and re-homed by purpose</span><span class="tag tag-mod">Moved</span></div>
+              <div class="step-desc">Every markdown, Word and HTML document was opened, its purpose determined from its own header and body, and moved into docs/ — product, architecture, governance, research, roadmaps, visuals, or project-history (proposals separated from proof-of-execution).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ SQL and data files sorted the same way</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">SQL files</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s1','database-tree')">
+            <div class="step-num num-teal">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">SQL sorted into migrations / rollback / seeds / validation</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">33 SQL files split by job using their numbering convention and header comments. The rollback folder honestly holds only the 2 rollbacks that exist — the 19 missing ones were not faked.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s1','data-source')">
+            <div class="step-num num-teal">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Raw spreadsheets preserved in data/source/</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">The 11 original CSV/XLSX files that all seed data was derived from, kept as the read-only evidence trail.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s1','validation')">
+            <div class="step-num num-teal">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Everything validated, committed, pushed</span><span class="tag tag-cfg">Verified</span></div>
+              <div class="step-desc">134 files before = 134 after, zero collisions, zero broken links, doc-garage removed only after confirmed empty, all moves recorded as clean renames in git history.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Founder to supply the exact Section 4–7 texts so CLAUDE.md, docs/README.md, the 4 engineering templates and 5 runbooks can be written verbatim. Still open from before: the 19 missing rollback scripts for migrations 001–019 (WP-3A), and execution certificates for WP-4B and WP-4DB.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s1-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s1-skills" onclick="toggleDetail('s1-skills')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">.claude/skills/ — 3 skills installed</span>
+          </div>
+          <span class="detail-chevron" id="chev-s1-skills">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s1-skills">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Installs the organisation's three always-on working rules into this repo so every future AI session follows them without being asked: keep this knowledge book updated, document code as it's written, and debug from real evidence.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">session starts</span><span class="dd-arrow">→</span>
+            <span class="dd-node">skills auto-load</span><span class="dd-arrow">→</span>
+            <span class="dd-node">standards applied to all work</span><span class="dd-arrow">→</span>
+            <span class="dd-node">knowledge book updated at close</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">gh api repos/ankitmittal-madman/dotfiles/...</span>  ← fetched from the personal dotfiles repo, because the apverse-labs org referenced in the global rules no longer exists</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why commit skills into the project repo at all?</div>
+            <div class="dd-why-a">So the rules travel with the repo — any machine, any session, any collaborator gets identical AI working standards without depending on one person's local setup.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s1-docs-tree" onclick="toggleDetail('s1-docs-tree')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Moved</span>
+            <span class="detail-name">docs/ — 97 documents classified by content</span>
+          </div>
+          <span class="detail-chevron" id="chev-s1-docs-tree">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s1-docs-tree">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Separates documents by what they are for: why the product exists (product), how it's built (architecture), rules that bind future work (governance), the data-research trail (research), plans (roadmaps), interactive explainers (visuals), and history — with proposals (work-packages) kept strictly apart from proof of execution (certificates).</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">open file</span><span class="dd-arrow">→</span>
+            <span class="dd-node">read header + status</span><span class="dd-arrow">→</span>
+            <span class="dd-node">match against folder purpose table</span><span class="dd-arrow">→</span>
+            <span class="dd-node">git mv (history kept)</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">Status: DESIGNED — awaiting Founder approval to execute</span>  ← this one line inside "REPO-WP-03D_Seed_Readiness_Certification" is why a file named "Certification" was filed as a work package, not a certificate</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why keep proposals and certificates in separate folders?</div>
+            <div class="dd-why-a">This project was burned before by "described" being mistaken for "verified." The folder boundary makes that mistake structurally hard: if it's in certificates/, it happened, with evidence; if it's in work-packages/, it's a plan.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why do filenames still say "Copy of _ACTIVE__…"?</div>
+            <div class="dd-why-a">Renaming was out of scope — the instruction was to move files with history preserved, and DOC-P3-09 §06E forbids renaming documents without Founder direction. A future approved hygiene pass can clean the prefixes.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s1-database-tree" onclick="toggleDetail('s1-database-tree')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">database/ — 33 SQL files by job</span>
+          </div>
+          <span class="detail-chevron" id="chev-s1-database-tree">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s1-database-tree">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Splits the SQL by what it does to the database: build it (migrations 001–020, 027, 028), undo it (rollback), fill it with starter data (seeds 100–102), or check its health (validation 900–904).</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">read SQL header comment</span><span class="dd-arrow">→</span>
+            <span class="dd-node">confirm number range matches job</span><span class="dd-arrow">→</span>
+            <span class="dd-node">git mv to matching folder</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">database/rollback/ → 2 files only</span>  ← the 19 missing rollbacks for 001–019 were deliberately NOT placeholder-created; the gap stays visible</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not fake the missing rollbacks to "complete" the folder?</div>
+            <div class="dd-why-a">An empty-looking gap that's honest beats a full-looking folder that's a lie. A placeholder rollback that doesn't actually reverse its migration would fail exactly when it's needed most — during an emergency.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s1-data-source" onclick="toggleDetail('s1-data-source')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">data/source/ — 11 raw data files</span>
+          </div>
+          <span class="detail-chevron" id="chev-s1-data-source">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s1-data-source">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Preserves the original spreadsheets (810 dishes, ingredients, cuisines, personas, regional food data) that the Batch 1–6 research pipeline analysed and the seed SQL was generated from.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">spreadsheet</span><span class="dd-arrow">→</span>
+            <span class="dd-node">Batch 1–6 research (docs/research/)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">seed SQL (database/seeds/)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">live database</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">dishes.xlsx — sheet dishes_810</span>  ← the core content catalogue; its other sheet (Sheet1) is excluded by standing Founder directive</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why keep raw spreadsheets in a code repository?</div>
+            <div class="dd-why-a">They're the evidence trail. When a seed value is questioned ("why is Poha marked vegan?"), the answer must be traceable back to source data, not to anyone's memory.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s1-validation" onclick="toggleDetail('s1-validation')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Verified</span>
+            <span class="detail-name">Validation + commit (a99c5e0)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s1-validation">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s1-validation">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Proves the restructure lost nothing: exact file-count and filename match before vs. after, no two files landed on the same path, no document links broke, and three randomly re-read documents matched their folder's stated purpose.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">count + name match</span><span class="dd-arrow">→</span>
+            <span class="dd-node">collision scan</span><span class="dd-arrow">→</span>
+            <span class="dd-node">link scan</span><span class="dd-arrow">→</span>
+            <span class="dd-node">3-doc spot re-read</span><span class="dd-arrow">→</span>
+            <span class="dd-node">commit + push</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">134 files changed, 0 insertions(+), 0 deletions(-)</span>  ← git's own confirmation that every move was a pure rename — no content changed anywhere</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why git mv instead of copy + delete?</div>
+            <div class="dd-why-a">git mv keeps each file's change history connected across the move. Copy+delete would make every document look brand-new, orphaning the recovery-audit trail this repo depends on.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Founder to supply the exact Section 4–7 texts (CLAUDE.md, docs/README.md, 4 templates, 5 runbooks). Open gaps carried forward: rollbacks 001–019, execution certificates for WP-4B/WP-4DB.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s1-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S1 = [
+      {
+        id: 'repo-restructure',
+        label: 'Repository restructure',
+        steps: [
+          {
+            layer: 'App logic',
+            tag: 'POLICY',
+            title: 'Read and classify every document by content',
+            desc: 'All 134 files in doc-garage were opened and matched against the folder responsibility table — status lines like "DESIGNED — awaiting approval" decided placement, never the filename.',
+            codeFlow: [ {chip:'doc-garage/ (now removed)'}, {label:'classified into'}, {chip:'docs/'}, {label:'and'}, {chip:'database/'} ],
+            files: [
+              {path:'docs/project-history/work-packages/REPO-WP-03D_Seed_Readiness_Certification_v1_0.md', desc:'Named "Certification" but content says DESIGNED — filed as a work package'},
+              {path:'docs/project-history/certificates/REPO-BOOT-03_Repository_Migration_Certification_v1_0.md', desc:'Genuine certificate — documents the executed repo migration with evidence'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Database',
+            tag: 'DB',
+            title: 'Sort SQL by job',
+            desc: 'Structural scripts, rollbacks, seed loaders and validation suites each got their own folder, matching the numbering convention (001–020 / rollback pairs / 100s / 900s).',
+            codeFlow: [ {chip:'database/migrations/'}, {label:'undone by'}, {chip:'database/rollback/'}, {label:'checked by'}, {chip:'database/validation/900_structural_validation.sql'} ],
+            files: [
+              {path:'database/rollback/027_routing_rules_show_question_key_nullable_rollback.sql', desc:'One of only 2 real rollbacks — 001-019 rollbacks are still missing'},
+              {path:'database/seeds/101_seed_reference_data_framework.sql', desc:'Seed loader (known shape-incompatibility with slot text[] still unfixed)'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Service',
+            tag: 'SDK',
+            title: 'Validate, commit, push',
+            desc: 'File counts matched exactly (134 = 134), zero deletions, and git recorded all moves as clean renames in commit a99c5e0, pushed to GitHub.',
+            codeFlow: [ {chip:'git mv'}, {label:'validated'}, {chip:'git commit a99c5e0'}, {label:'pushed to'}, {chip:'github.com/ankitmittal-madman/foofoo-v3'} ],
+            files: [
+              {path:'KNOWLEDGE.html', desc:'This knowledge book, created to record the session'}
+            ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s1-flows', window.FEATURE_FLOWS_S1);
+    </script>
+
+  </div><!-- /page-s1 -->
+
+  <!-- ── Session pages injected here ── -->
+  <!-- SESSIONS_INJECT -->
+
+</main>
+
+</body>
+</html>
