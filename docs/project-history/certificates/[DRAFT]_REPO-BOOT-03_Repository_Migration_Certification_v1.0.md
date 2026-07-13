@@ -83,7 +83,7 @@ This document, once Founder-approved, closes the Repository Recovery effort. WP-
 
 ## 14. Versioning & Placement
 
-`REPO-BOOT-03_Repository_Migration_Certification_v1_0.md` → intended for `docs/project-history/` (a folder that, per this same recovery process, does not yet exist in the repository — `doc-garage/Repo Setup/` is the closest live analog and is recommended as the interim placement) once committed.
+`[DRAFT]_REPO-BOOT-03_Repository_Migration_Certification_v1.0.md` → intended for `docs/project-history/` (a folder that, per this same recovery process, does not yet exist in the repository — `doc-garage/Repo Setup/` is the closest live analog and is recommended as the interim placement) once committed.
 
 **This document has not yet been committed or pushed.** No write credentials (PAT or GitHub connector) are available in this session. Founder action required: either provide write access, or commit this file manually.
 

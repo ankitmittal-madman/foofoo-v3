@@ -40,6 +40,18 @@ Header: Status / Version / Date / Placement / Supersedes / (Dependencies if any)
 Body: Executive Summary → numbered sections → Critical Self-Review →
 Versioning & Placement → Founder Sign-off (blank line, always last)
 
+## Naming Standard (ratified WP-5AA — mandatory, never violate)
+See docs/governance/[ACTIVE]_Repository_Naming_Standard_v1.0.md (authoritative).
+Documents: [STATUS]_Document_Name_vMAJOR.MINOR.md where STATUS is exactly one of
+ACTIVE / DRAFT / FROZEN / SUPERSEDED / ARCHIVED (the five DOC-P3-09 §06E values).
+Version is a single dot (v1.0, v1.20) — never v1_0, 1.0, or v1.
+SQL: NNN_description.sql (migrations, matching the live Supabase ledger),
+NNN_description_rollback.sql, 1NN_ seeds, 9NN_ validation — no status prefix, no version.
+Certificates/Runbooks/Templates: [ACTIVE]_REPO-CERT-NNN_/RUNBOOK_/TEMPLATE_Name_vX.Y.md.
+Never create a file that violates this. Choose STATUS from the document's own header;
+if the status is a non-token lifecycle word or is ambiguous, STOP and ask — never guess.
+Bulk-renaming existing files requires explicit Founder authorization (as WP-5AA gave).
+
 ## Version & Lifecycle Rules
 Never delete a superseded document — stamp SUPERSEDED BY vX.Y with a
 changelog note, keep both (see docs/project-history/work-packages/

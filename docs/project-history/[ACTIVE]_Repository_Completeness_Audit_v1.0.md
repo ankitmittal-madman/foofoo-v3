@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Forensic audit, report only (no fix, no recovery performed)
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/project-history/Repository_Completeness_Audit_v1_0.md
+**Placement:** docs/project-history/[ACTIVE]_Repository_Completeness_Audit_v1.0.md
 **Supersedes:** None — first Repository Completeness Audit
 **Dependencies:** Reads-only against repository state at commit `4148ce3` (HEAD == origin/main, clean tree). Companion documents: Repository_Recovery_Backlog_v1_0, Repository_Recovery_Roadmap_v1_0, Repository_Recovery_Decision_Log_v1_0, Repository_Recovery_Risk_Register_v1_0, Repository_Recovery_Work_Package_Plan_v1_0.
 
@@ -105,7 +105,7 @@ Frozen set intact (DOC-P3-04, DOC-P3-05 a–d, DOC-P3-06/07/08 per Baseline Regi
 
 ## Versioning & Placement
 
-`Repository_Completeness_Audit_v1_0.md` → `docs/project-history/`. New file; supersedes nothing. Future revisions increment the version and cite this one; this file is never edited in place per DOC-P3-09 §06E.
+`[ACTIVE]_Repository_Completeness_Audit_v1.0.md` → `docs/project-history/`. New file; supersedes nothing. Future revisions increment the version and cite this one; this file is never edited in place per DOC-P3-09 §06E.
 
 ## Founder Sign-off
 

@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Backlog, report only
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/governance/Repository_Recovery_Backlog_v1_0.md
+**Placement:** docs/governance/[ACTIVE]_Repository_Recovery_Backlog_v1.0.md
 **Supersedes:** None — first Repository Recovery Backlog
 **Dependencies:** Repository_Completeness_Audit_v1_0 (source of every item). Parallels the existing Governance Improvement Backlog (DOC-P3-12) in form: nothing is removed; every item carries a recovery-feasibility class.
 
@@ -55,7 +55,7 @@ None identified. The original Git commit *history* of the lost `apverse-labs` re
 
 ## Versioning & Placement
 
-`Repository_Recovery_Backlog_v1_0.md` → `docs/governance/`. New file; supersedes nothing.
+`[ACTIVE]_Repository_Recovery_Backlog_v1.0.md` → `docs/governance/`. New file; supersedes nothing.
 
 ## Founder Sign-off
 

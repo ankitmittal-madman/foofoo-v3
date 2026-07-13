@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Roadmap, report only (no work package executed)
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/roadmaps/Repository_Recovery_Roadmap_v1_0.md
+**Placement:** docs/roadmaps/[ACTIVE]_Repository_Recovery_Roadmap_v1.0.md
 **Supersedes:** None — first Repository Recovery Roadmap
 **Dependencies:** Repository_Completeness_Audit_v1_0, Repository_Recovery_Backlog_v1_0, Repository_Recovery_Risk_Register_v1_0, Repository_Recovery_Decision_Log_v1_0, Repository_Recovery_Work_Package_Plan_v1_0.
 
@@ -66,7 +66,7 @@ Three PIR decisions, DPDP age-gate, IDR-001 master data — product/architecture
 
 ## Versioning & Placement
 
-`Repository_Recovery_Roadmap_v1_0.md` → `docs/roadmaps/`. New file; supersedes nothing.
+`[ACTIVE]_Repository_Recovery_Roadmap_v1.0.md` → `docs/roadmaps/`. New file; supersedes nothing.
 
 ## Founder Sign-off
 

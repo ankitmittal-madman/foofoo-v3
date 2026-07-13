@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Evidence register, report only
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/project-history/Migration_Recovery_Evidence_Register_v1_0.md
+**Placement:** docs/project-history/[ACTIVE]_Migration_Recovery_Evidence_Register_v1.0.md
 **Supersedes:** None
 **Dependencies:** Migration_Recovery_Report_v1_0.
 
@@ -59,7 +59,7 @@ REPO-WP-02 (§7.6 addendum, commit 4ed5e91); REPO-WP-03 v1.0/v1.1 (26/26 count, 
 
 ## Versioning & Placement
 
-`Migration_Recovery_Evidence_Register_v1_0.md` → `docs/project-history/`. New file.
+`[ACTIVE]_Migration_Recovery_Evidence_Register_v1.0.md` → `docs/project-history/`. New file.
 
 ## Founder Sign-off
 

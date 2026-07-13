@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Risk register, report only
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/governance/Repository_Recovery_Risk_Register_v1_0.md
+**Placement:** docs/governance/[ACTIVE]_Repository_Recovery_Risk_Register_v1.0.md
 **Supersedes:** None — first Repository Recovery Risk Register
 **Dependencies:** Repository_Completeness_Audit_v1_0, Repository_Recovery_Backlog_v1_0. Scoped to recovery risk only; the product/technical Risk Register (PM-SUPP-02) is unaffected and not superseded.
 
@@ -49,7 +49,7 @@ Product/launch risks (DPDP age-gate, cold-start quality, dish-DB completeness) r
 
 ## Versioning & Placement
 
-`Repository_Recovery_Risk_Register_v1_0.md` → `docs/governance/`. New file; supersedes nothing.
+`[ACTIVE]_Repository_Recovery_Risk_Register_v1.0.md` → `docs/governance/`. New file; supersedes nothing.
 
 ## Founder Sign-off
 

@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Conflict report (WP-5AA halted at the mandatory STOP clause; NO renames performed)
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/governance/Repository_Naming_Conflict_Report_v1_0.md
+**Placement:** docs/governance/[ACTIVE]_Repository_Naming_Conflict_Report_v1.0.md
 **Supersedes:** None — first Naming Conflict Report
 **Dependencies:** CLAUDE.md; DOC-P3-09 §06E; Project Baseline Register v1.5; Repository_Completeness_Audit_v1_0; Repository_Recovery_Decision_Log_v1_0 (RD-05). Produced instead of executing normalization, per WP-5AA Step "Authoritative Sources": *"If any standards conflict, STOP and produce a conflict report instead of making changes."*
 
@@ -38,7 +38,7 @@ The filename token cannot simply be preserved, because the scan proves it is wro
 | `Copy of _ACTIVE__DOC-P3-07_..._v1_2.md` | ACTIVE | "ACTIVE — APPROVED — FROZEN" | [FROZEN] |
 | `Copy of _ACTIVE__DOC-P3-08_..._v1_1.md` | ACTIVE | "ACTIVE — APPROVED AND FROZEN" | [FROZEN] |
 | `REPO-WP-03_..._v1.0.md` | (none) | "⚠️ SUPERSEDED BY v1.1" | [SUPERSEDED] |
-| `Copy of _ACTIVE__APDF_Framework_Base_v1.md` | ACTIVE | superseded by vNext Addendum | [SUPERSEDED]? |
+| `[SUPERSEDED]_APDF_Framework_Base_v1.0.md` | ACTIVE | superseded by vNext Addendum | [SUPERSEDED]? |
 | `Copy of _ACTIVE__APDF_..._vNext_Addendum_v2_0.md` | ACTIVE | "Draft — Ready for Founder Review" | [DRAFT] |
 | `_ACTIVE__Batch1_Discovery_..._FROZEN.md` | ACTIVE + FROZEN suffix | "APPROVED — ACTIVE — FROZEN" | [FROZEN] |
 | `_ACTIVE__Batch2_Mapping_..._v1_0.md` | ACTIVE | "Draft — Ready for Founder Review" | [DRAFT] |
@@ -94,7 +94,7 @@ This extends WP-5AA's `[ACTIVE]`-only pattern to the four other §06E statuses s
 
 ## 5. Clean, Zero-Conflict Subset (executable immediately on narrow approval)
 
-**Migration SQL `001`–`020`** carry an `[ACTIVE]_` prefix and a spaced ` 1.x` version that the canonical SQL convention forbids and that mismatches the live migration ledger (which names them bare, e.g. `001_extensions_and_schema_setup`). Renaming `"[ACTIVE]_001_extensions_and_schema_setup 1.0.sql"` → `"001_extensions_and_schema_setup.sql"` (via `git mv`) involves **no status token** and aligns the repo with `list_migrations`. This bucket alone has zero §06E conflict and can proceed the moment the Founder approves it — recommended as WP-5AA's first executed step. (Also fixes the `008_content_core1.1.sql` missing-underscore typo → `008_content_core.sql`.)
+**Migration SQL `001`–`020`** carry an `[ACTIVE]_` prefix and a spaced ` 1.x` version that the canonical SQL convention forbids and that mismatches the live migration ledger (which names them bare, e.g. `001_extensions_and_schema_setup`). Renaming `"001_extensions_and_schema_setup.sql"` → `"001_extensions_and_schema_setup.sql"` (via `git mv`) involves **no status token** and aligns the repo with `list_migrations`. This bucket alone has zero §06E conflict and can proceed the moment the Founder approves it — recommended as WP-5AA's first executed step. (Also fixes the `008_content_core1.1.sql` missing-underscore typo → `008_content_core.sql`.)
 
 ## 6. Appendix — Full DESIGNED Rename/Status Map
 
@@ -126,7 +126,7 @@ This extends WP-5AA's `[ACTIVE]`-only pattern to the four other §06E statuses s
 
 ## Versioning & Placement
 
-`Repository_Naming_Conflict_Report_v1_0.md` → `docs/governance/`. New, additive file; supersedes nothing; renames nothing.
+`[ACTIVE]_Repository_Naming_Conflict_Report_v1.0.md` → `docs/governance/`. New, additive file; supersedes nothing; renames nothing.
 
 ## Founder Sign-off
 

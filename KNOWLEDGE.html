@@ -1019,7 +1019,7 @@ function deepDiveFeature(featureLabel){
             codeFlow: [ {chip:'doc-garage/ (now removed)'}, {label:'classified into'}, {chip:'docs/'}, {label:'and'}, {chip:'database/'} ],
             files: [
               {path:'docs/project-history/work-packages/REPO-WP-03D_Seed_Readiness_Certification_v1_0.md', desc:'Named "Certification" but content says DESIGNED — filed as a work package'},
-              {path:'docs/project-history/certificates/REPO-BOOT-03_Repository_Migration_Certification_v1_0.md', desc:'Genuine certificate — documents the executed repo migration with evidence'}
+              {path:'docs/project-history/certificates/[DRAFT]_REPO-BOOT-03_Repository_Migration_Certification_v1.0.md', desc:'Genuine certificate — documents the executed repo migration with evidence'}
             ],
             api: null,
             db: null
@@ -1266,6 +1266,35 @@ function deepDiveFeature(featureLabel){
     </script>
 
   </div><!-- /page-s2 -->
+
+  <!-- ── Session 3 ── -->
+  <div id="page-s3" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S3 · Recovery sprint + repository naming normalization</div>
+      <div class="page-subtitle">The missing database history was recovered from the live database, and the whole repository was renamed onto one governed naming standard — with git history preserved and the genuinely-ambiguous files honestly left alone.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built across this session's work packages</div>
+        <div class="session-card-meta">July 13, 2026<br>WP-5A · WP-5B · WP-5AA</div>
+      </div>
+      <div class="session-card-desc">
+        <b>WP-5A</b> produced the forensic Repository Completeness Audit and five recovery-planning documents — proving the repo could not rebuild its own database (migrations 021–026 were missing).
+        <b>WP-5B</b> recovered those six migration files by reading the live Supabase schema read-only and cross-checking repository evidence; every recovered file is headed "RECONSTRUCTED FROM EVIDENCE" and the database was never modified. It also surfaced three further applied-but-missing migrations (pf1_security_hardening, 103_production_cuisines, 103_production_ingredients) as new findings.
+        <b>WP-5AA</b> first STOPPED on a genuine conflict (the naming convention vs. DOC-P3-09 §06E), produced a conflict report, and — once the Founder explicitly ratified the standard and authorized renaming — normalized the whole repository: 75 files renamed via git mv onto the single <code>[STATUS]_Name_vX.Y</code> / bare-<code>NNN_description.sql</code> standard, references rewritten so nothing breaks, and 42 files (lifecycle-word statuses + binary .docx/.html) honestly left as documented exceptions. CLAUDE.md now enforces the naming standard for every future session.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">6</div><div class="stat-l">Migrations recovered</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">75</div><div class="stat-l">Files renamed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Files deleted / DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">42</div><div class="stat-l">Documented exceptions</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Founder to (1) answer whether ChatGPT holds original 021–026 / WP-4B/4DB artifacts, (2) ratify the DESIGNED→[DRAFT] / EXECUTED→[FROZEN] / RESOLVED→[ACTIVE] mapping to normalize the REPO-WP/AGR series and completion summaries, (3) approve a .docx→.md conversion WP. Still open: WP-5C rollback recovery (rollbacks 001–026), WP-4B/4DB execution certificates, and the newly-found pf1/103_* migrations.</div>
+      </div>
+    </div>
+  </div><!-- /page-s3 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->

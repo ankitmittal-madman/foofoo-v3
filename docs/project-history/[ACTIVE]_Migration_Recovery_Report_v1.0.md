@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Recovery executed (repository artifacts only; database NOT modified)
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/project-history/Migration_Recovery_Report_v1_0.md
+**Placement:** docs/project-history/[ACTIVE]_Migration_Recovery_Report_v1.0.md
 **Supersedes:** None — first Migration Recovery Report
 **Dependencies:** Repository_Completeness_Audit_v1_0 (identified the gap, RR-01), Repository_Recovery_Work_Package_Plan_v1_0 (defines WP-5B). Companions: Migration_Recovery_Evidence_Register_v1_0, Migration_Recovery_Decision_Log_v1_0, Migration_Recovery_Validation_Report_v1_0.
 
@@ -62,7 +62,7 @@ No rollback files authored (WP-5C). WP-4B / WP-4DB not re-run. Architecture unch
 
 ## Versioning & Placement
 
-`Migration_Recovery_Report_v1_0.md` → `docs/project-history/`. New file; supersedes nothing.
+`[ACTIVE]_Migration_Recovery_Report_v1.0.md` → `docs/project-history/`. New file; supersedes nothing.
 
 ## Founder Sign-off
 

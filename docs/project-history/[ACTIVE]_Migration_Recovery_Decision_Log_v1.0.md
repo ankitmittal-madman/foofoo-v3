@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Decision log
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/project-history/Migration_Recovery_Decision_Log_v1_0.md
+**Placement:** docs/project-history/[ACTIVE]_Migration_Recovery_Decision_Log_v1.0.md
 **Supersedes:** None
 **Dependencies:** Migration_Recovery_Report_v1_0, Migration_Recovery_Evidence_Register_v1_0.
 
@@ -37,7 +37,7 @@ Every engineering decision taken during WP-5B recovery, its rationale, its rever
 
 ## Versioning & Placement
 
-`Migration_Recovery_Decision_Log_v1_0.md` → `docs/project-history/`. New file.
+`[ACTIVE]_Migration_Recovery_Decision_Log_v1.0.md` → `docs/project-history/`. New file.
 
 ## Founder Sign-off
 

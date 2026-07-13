@@ -3,7 +3,7 @@
 **Status:** ACTIVE — Decision log (open decisions awaiting Founder; no decision executed)
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/governance/Repository_Recovery_Decision_Log_v1_0.md
+**Placement:** docs/governance/[ACTIVE]_Repository_Recovery_Decision_Log_v1.0.md
 **Supersedes:** None — first Repository Recovery Decision Log
 **Dependencies:** Repository_Completeness_Audit_v1_0, Repository_Recovery_Backlog_v1_0, Repository_Recovery_Risk_Register_v1_0.
 
@@ -38,7 +38,7 @@ The three PIR architecture decisions (cuisine persistence, tag-vector confirmati
 
 ## Versioning & Placement
 
-`Repository_Recovery_Decision_Log_v1_0.md` → `docs/governance/`. New file; supersedes nothing. Rows are appended and status-updated in future versions, never deleted.
+`[ACTIVE]_Repository_Recovery_Decision_Log_v1.0.md` → `docs/governance/`. New file; supersedes nothing. Rows are appended and status-updated in future versions, never deleted.
 
 ## Founder Sign-off
 
