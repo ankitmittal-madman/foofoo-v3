@@ -382,6 +382,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🛠</span> S6 · Validation remediation
       <span class="nav-badge">Jul 13</span>
     </div>
+    <div class="nav-item" onclick="showPage('s7')">
+      <span class="nav-icon">🗄</span> S7 · Clean-room execution
+      <span class="nav-badge">Jul 13</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -544,6 +548,21 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s6')">WP-5E</span>
         </div>
         <div class="tl-note">Fixed the two problems S5 found. The sample-data file (seed 101) now stores meal-slots the way the migrated schema expects (as lists, with the old "addon" value becoming "snack") — restoring a fix that was made last year but lost when the repo was rebuilt. The self-test (validation 900) now expects the correct 62 tables, derived from the build scripts themselves rather than a stale document. Only those two files changed; no migrations, schema, or database touched. Health nudged up within YELLOW — two blockers cleared, three remain (missing production scripts, run-proof, and a live rebuild test).</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 13, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S7</span>
+        <div class="tl-title">Clean-room execution validation (WP-5F2)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s7')">migrations run</span>
+          <span class="tl-chip" onclick="showPage('s7')">seeds run</span>
+          <span class="tl-chip" onclick="showPage('s7')">rollback run</span>
+          <span class="tl-chip" onclick="showPage('s7')">WP-5F2</span>
+        </div>
+        <div class="tl-note">Actually ran the whole database blueprint on a throwaway local database (never production): all 28 build scripts applied cleanly (62 tables), all 3 sample-data files loaded (proving last session's fix works for real), the self-tests ran, and all 28 undo scripts reversed everything back to empty. A long-standing security question was finally answered by direct measurement: a stray permission does exist, but row-level security still blocks the write (0 rows changed) — so data is safe, and the proper fix is the missing production security script (WP-5D). Health: still YELLOW but the core is now proven-by-execution GREEN. Repository files unchanged — this was a test run, not an edit.</div>
       </div>
     </div>
     <!-- TIMELINE_INJECT -->
@@ -730,6 +749,12 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5E_Engineering_Decision_Log_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S6</td><td class="fr-desc">WP-5E decisions (WED-01..09)</td></tr>
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5E_Evidence_Register_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S6</td><td class="fr-desc">WP-5E evidence (E-01..15)</td></tr>
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5E_Validation_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S6</td><td class="fr-desc">Post-correction re-validation + health before/after</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5F2_CleanRoom_Execution_Validation_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">WP-5F2 work package (execution-only)</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5F2_Execution_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">Full execution results (migrations/seeds/validation/rollback)</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-003_WP-5F2_CleanRoom_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">WP-5F2 execution certificate</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5F2_Validation_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">Regression check + execution-based health</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5F2_Evidence_Register_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">Raw execution evidence + compat bootstrap</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5F2_Decision_Log_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">WP-5F2 decisions (F2D-01..10)</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1399,7 +1424,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s5 -->
 
   <!-- ── Session 6 ── -->
-  <div id="page-s6" class="page-content" style="display:block">
+  <div id="page-s6" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S6 · Validation remediation (WP-5E)</div>
       <div class="page-subtitle">The two defects the last session found are now fixed — using only what the repository itself already proves — so the database blueprint's sample-data and self-test layers finally match the build scripts.</div>
@@ -1424,6 +1449,33 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s6 -->
+
+  <!-- ── Session 7 ── -->
+  <div id="page-s7" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S7 · Clean-room execution validation (WP-5F2)</div>
+      <div class="page-subtitle">We stopped reasoning about the database blueprint and actually ran it — from empty, all the way up and all the way back down — on a disposable local database that never touched production.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was proven this session</div>
+        <div class="session-card-meta">July 13, 2026<br>WP-5F2</div>
+      </div>
+      <div class="session-card-desc">
+        Every prior session checked the blueprint <i>on paper</i>. This session <b>executed</b> it on a throwaway PostgreSQL database inside the workspace — <b>never</b> Supabase, <b>never</b> production. From an empty database: all <b>28 build scripts</b> applied in order with no errors (producing 62 tables); all <b>3 sample-data files</b> loaded successfully — which is the real proof that Session 6's fix works, because the old version would have failed to load here; the <b>self-tests</b> ran; and all <b>28 undo scripts</b> reversed everything back to a completely empty database. So the repository can genuinely build itself up and tear itself back down. A security question open since earlier work was finally settled by direct measurement: a leftover permission does let the app role <i>attempt</i> to edit protected data, but row-level security still blocks it (the edit changed <b>0 rows</b>) — so real data is safe today; the clean fix is the one production security script still missing from the repo. The self-tests themselves showed a few stale spots (one check silently verifies nothing; a couple expect outdated counts) — noted for a later cleanup, not fixed here. No repository files were changed — this was a test run.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">28/28</div><div class="stat-l">Migrations applied</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">28/28</div><div class="stat-l">Rollbacks to empty</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">3/3</div><div class="stat-l">Seeds loaded</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Repo / prod changes</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Answer to "Can WP-5D begin?": <b>YES</b>. The build, seed and rollback layers are now proven by execution, giving WP-5D a verified baseline — and this session produced a concrete reason it's needed (the missing production security script that closes the leftover-permission gap). Recommended: <b>WP-5D — Production Migration Recovery</b> (recover the 3 applied-but-missing scripts, incl. pf1_security_hardening), then <b>WP-5G — Repository Green Certification</b> (a final live run on a real disposable Supabase environment + sign-off). Also fold the stale self-test fixes (WP-04DA) into that live work since they need a database. Not started — awaiting Founder approval.</div>
+      </div>
+    </div>
+  </div><!-- /page-s7 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
