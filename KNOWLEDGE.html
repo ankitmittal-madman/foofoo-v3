@@ -366,8 +366,12 @@ function deepDiveFeature(featureLabel){
 
   <div class="sidebar-section">
     <div class="sidebar-section-label">Sessions</div>
-    <div class="nav-item active" onclick="showPage('s1')">
+    <div class="nav-item" onclick="showPage('s1')">
       <span class="nav-icon">📦</span> S1 · Repo restructure
+      <span class="nav-badge">Jul 13</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s2')">
+      <span class="nav-icon">⚙️</span> S2 · Governance docs
       <span class="nav-badge">Jul 13</span>
     </div>
     <!-- NAV_INJECT -->
@@ -379,18 +383,18 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">4</span>
+      <span class="nav-badge">5</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">20</span>
+      <span class="nav-badge">26</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">7</span>
+      <span class="nav-badge">11</span>
     </div>
   </div>
 </nav>
@@ -420,6 +424,10 @@ function deepDiveFeature(featureLabel){
         <div class="arch-node is-new" onclick="jumpModule('claude-skills')">
           <div class="arch-node-name">.claude/skills/</div>
           <div class="arch-node-desc">Org-standard AI working rules · S1</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('repo-governance')">
+          <div class="arch-node-name">CLAUDE.md + README</div>
+          <div class="arch-node-desc">Repo operating rules &amp; doc index · S2</div>
         </div>
         <div class="arch-node is-new" onclick="jumpModule('docs-tree')">
           <div class="arch-node-name">docs/</div>
@@ -486,6 +494,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s1')">KNOWLEDGE.html</span>
         </div>
         <div class="tl-note">All 134 recovered documents moved from the flat doc-garage/ folder into a purpose-built docs/database/data tree, classified by reading each file's actual content. Still pending: CLAUDE.md, docs/README.md, templates and runbooks (their exact wording was never supplied), the 19 missing rollback scripts, and execution proof for WP-4B/WP-4DB.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 13, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#e8f8f2;color:#0e7a5a">S2</span>
+        <div class="tl-title">Repository governance documents + .DS_Store cleanup</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s2')">CLAUDE.md</span>
+          <span class="tl-chip" onclick="showPage('s2')">docs/README.md</span>
+          <span class="tl-chip" onclick="showPage('s2')">.gitignore</span>
+        </div>
+        <div class="tl-note">Committed the Founder-supplied repository operating guide (CLAUDE.md) and documentation index (docs/README.md); untracked the 3 junk .DS_Store files behind a new .gitignore. The 3 templates and 4 runbooks are still blocked — their exact content has not been supplied yet.</div>
       </div>
     </div>
     <!-- TIMELINE_INJECT -->
@@ -600,6 +622,29 @@ function deepDiveFeature(featureLabel){
         <div class="dd-text">S1 · Jul 13</div>
       </div>
     </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-mod-repo-governance" onclick="toggleDetail('mod-repo-governance')">
+        <div class="detail-left">
+          <span class="tag tag-cfg">Config</span>
+          <span class="detail-name">CLAUDE.md + docs/README.md + .gitignore</span>
+        </div>
+        <span class="detail-chevron" id="chev-mod-repo-governance">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-mod-repo-governance">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">The repository's front door. CLAUDE.md tells every AI session how to operate here — sync first, invoke skills, place documents by content not filename, never mark work complete without a certificate, never fabricate. docs/README.md is the one-page index telling any reader which folder answers which question. .gitignore keeps macOS junk files out of version control.</div>
+        <div class="dd-label">Files / tables in this module</div>
+        <div class="dd-text">
+          <code>CLAUDE.md</code> — session protocol, folder placement rules, versioning/lifecycle rules, AI behaviour rules (Founder-authored)<br>
+          <code>docs/README.md</code> — documentation index: which folder to start in, plus the standing open-gaps notice<br>
+          <code>.gitignore</code> — excludes .DS_Store from tracking
+        </div>
+        <div class="dd-label">How it helps the app</div>
+        <div class="dd-text">Without this, every new session re-derives (or worse, guesses) the repo's rules. Now the rules are versioned in the repo itself, and the two known engineering gaps are stated where nobody can miss them.</div>
+        <div class="dd-label">Last touched</div>
+        <div class="dd-text">S2 · Jul 13</div>
+      </div>
+    </div>
     <!-- MODULES_INJECT -->
   </div>
 
@@ -632,6 +677,11 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">data/source/ (11 data files + 1 sidecar)</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S1</td><td class="fr-desc">Original CSV/XLSX spreadsheets all seed data derives from</td></tr>
         <tr><td class="fr-file">doc-garage/ (removed)</td><td><span class="tag tag-mod">Moved</span></td><td class="fr-session">S1</td><td class="fr-desc">Emptied by the moves above, then deleted — zero files lost</td></tr>
         <tr><td class="fr-file">engineering/templates/, docs/runbooks/</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S1</td><td class="fr-desc">Reserved folders — stay empty (and invisible to git) until Founder supplies the template/runbook texts</td></tr>
+        <tr><td class="fr-file">CLAUDE.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S2</td><td class="fr-desc">Repository operating guide — Founder-provided content, committed exactly as supplied</td></tr>
+        <tr><td class="fr-file">docs/README.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S2</td><td class="fr-desc">Documentation index — supplied as docs/READ.md, renamed to the specified path, content unchanged</td></tr>
+        <tr><td class="fr-file">.gitignore</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S2</td><td class="fr-desc">Excludes .DS_Store from version control</td></tr>
+        <tr><td class="fr-file">data/source/.DS_Store, database/migrations/.DS_Store, docs/architecture/.DS_Store</td><td><span class="tag tag-mod">Removed</span></td><td class="fr-session">S2</td><td class="fr-desc">Untracked from git (disk copies remain, now ignored)</td></tr>
+        <tr><td class="fr-file">KNOWLEDGE.html</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S2</td><td class="fr-desc">Session 2 documented</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -687,11 +737,31 @@ function deepDiveFeature(featureLabel){
       <div class="decision-a">ankitmittal-madman/dotfiles. The global rules still say apverse-labs/dotfiles, but that GitHub org was lost with the original repo — the same skills now live under the personal account. The global CLAUDE.md should be updated to match.</div>
       <div class="decision-meta">S1 · Jul 13</div>
     </div>
+    <div class="decision-item">
+      <div class="decision-q">The sync gate said "stop if tree not clean" — why proceed with untracked files present?</div>
+      <div class="decision-a">The two untracked files (CLAUDE.md, docs/READ.md) were themselves the content this session was asked to commit — the Founder had just placed them. Aborting because the inputs existed would be following the letter of the gate against its purpose. Reported transparently instead.</div>
+      <div class="decision-meta">S2 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">The instruction said create docs/README.md, but the supplied file was named docs/READ.md — what happened?</div>
+      <div class="decision-a">Treated READ.md as the provided README content (it is unmistakably a documentation index starting "Start here") and renamed it to the specified path, byte-identical. No content was invented; only the filename changed to match the instruction.</div>
+      <div class="decision-meta">S2 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why are the 3 templates and 4 runbooks still not written?</div>
+      <div class="decision-a">Their exact content was again not included in the instructions, and the package explicitly forbids generating substitutes and labelling them as Principal Engineer content. Skipped and reported by name, same as last session.</div>
+      <div class="decision-meta">S2 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why do the .DS_Store files still exist on disk after "removal"?</div>
+      <div class="decision-a">The instructed method was git rm --cached + .gitignore, which removes them from version control but not from disk. They're now invisible to git and can't return; the disk copies are harmless leftovers on this one machine.</div>
+      <div class="decision-meta">S2 · Jul 13</div>
+    </div>
     <!-- DECISIONS_INJECT -->
   </div>
 
   <!-- ── Session 1 ── -->
-  <div id="page-s1" class="page-content">
+  <div id="page-s1" class="page-content" style="display:none">
 
     <div class="page-header">
       <div class="page-title">S1 · Repository architecture freeze — restructure</div>
@@ -985,6 +1055,216 @@ function deepDiveFeature(featureLabel){
     </script>
 
   </div><!-- /page-s1 -->
+
+  <!-- ── Session 2 ── -->
+  <div id="page-s2" class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">S2 · Repository governance documents</div>
+      <div class="page-subtitle">The repository now carries its own rulebook — the Founder-supplied operating guide and documentation index were committed, and macOS junk files were removed from version control.</div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 13, 2026<br>6 files touched</div>
+      </div>
+      <div class="session-card-desc">The Founder placed two files in the workspace: CLAUDE.md (the repository operating guide) and docs/READ.md (the documentation index). Both were committed exactly as supplied — the index renamed to its specified path docs/README.md, content untouched. The three tracked .DS_Store junk files flagged in S1 were removed from version control behind a new .gitignore. The 3 engineering templates and 4 runbooks remain deliberately unwritten: their exact content still hasn't been supplied, and inventing it is forbidden.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">2</div><div class="stat-l">Docs committed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">1</div><div class="stat-l">Config file</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">3</div><div class="stat-l">Junk untracked</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">7</div><div class="stat-l">Still blocked</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s2','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s2','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s2','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s2-swim" class="view-pane active">
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">repo files</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s2','claude-md')">
+            <div class="step-num num-purple">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">CLAUDE.md committed at repo root</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">The Founder-authored operating guide — session protocol, document placement rules, lifecycle rules, and AI behaviour rules — is now versioned in the repository itself.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s2','readme')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">docs/README.md committed</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">The one-page documentation index (supplied as READ.md, renamed to the specified path). It tells any reader which folder answers which question, and restates the two open engineering gaps.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s2','gitignore')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">.DS_Store junk removed from version control</span><span class="tag tag-cfg">Config</span></div>
+              <div class="step-desc">The 3 macOS junk files that rode along in S1's move were untracked and a .gitignore now blocks them permanently.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Founder to supply the exact text for the 7 still-missing files: 3 engineering templates (work package, certificate, AGR) and 4 runbooks (claude-session-bootstrap, repository-recovery, git-workflow, migration-authoring). Also still open: rollbacks 001–019, WP-4B/WP-4DB execution certificates, and the "Copy of _ACTIVE__" naming cleanup (needs explicit approval).</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s2-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s2-claude-md" onclick="toggleDetail('s2-claude-md')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">CLAUDE.md</span>
+          </div>
+          <span class="detail-chevron" id="chev-s2-claude-md">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s2-claude-md">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Every AI session in this repo now reads the same rulebook first: sync before working, place documents by content not filename, never delete superseded versions, and never mark a work package COMPLETED without a matching certificate.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">session opens</span><span class="dd-arrow">→</span>
+            <span class="dd-node">CLAUDE.md read first</span><span class="dd-arrow">→</span>
+            <span class="dd-node">docs/README.md for orientation</span><span class="dd-arrow">→</span>
+            <span class="dd-node">only task-relevant docs opened</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">A Work Package's Status may only read COMPLETED if a companion certificate exists</span>  ← the single rule that prevents "described" being mistaken for "done" — this project's most expensive historical failure mode</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why was this committed exactly as supplied instead of being improved?</div>
+            <div class="dd-why-a">The instruction demanded the Principal Engineer's exact content, no paraphrasing. The file was committed byte-for-byte as the Founder placed it.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s2-readme" onclick="toggleDetail('s2-readme')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">docs/README.md</span>
+          </div>
+          <span class="detail-chevron" id="chev-s2-readme">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s2-readme">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A one-page map of the docs/ tree: which folder holds what, and which document to start with in each. It also permanently restates the two open engineering gaps so no reader can assume they were fixed by the restructure.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">supplied as docs/READ.md</span><span class="dd-arrow">→</span>
+            <span class="dd-node">renamed to docs/README.md</span><span class="dd-arrow">→</span>
+            <span class="dd-node">content byte-identical</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">Known open gaps — not resolved by any restructure</span>  ← the Founder chose to carry the gap notice inside the index itself, so it travels with the documentation</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why rename the file instead of keeping READ.md?</div>
+            <div class="dd-why-a">The instruction specified the path docs/README.md; the supplied file was unmistakably that content under a near-miss filename. Renaming used the provided content at the required path without inventing anything. The rename is reported, not silent.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s2-gitignore" onclick="toggleDetail('s2-gitignore')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Config</span>
+            <span class="detail-name">.gitignore + 3× .DS_Store untracked</span>
+          </div>
+          <span class="detail-chevron" id="chev-s2-gitignore">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s2-gitignore">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Removes the three macOS Finder junk files from version control and blocks any .DS_Store from ever being committed again. Their disk copies remain on this machine (the instructed method only untracks), but git no longer sees them.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">git rm --cached ×3</span><span class="dd-arrow">→</span>
+            <span class="dd-node">.gitignore created</span><span class="dd-arrow">→</span>
+            <span class="dd-node">git check-ignore verified ×3</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">.DS_Store</span>  ← one pattern in .gitignore covers every folder, current and future</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why weren't these deleted back in S1?</div>
+            <div class="dd-why-a">S1's validation rule was "file count before == after, nothing deleted," so they were moved and flagged instead. This session had explicit approval to remove them — the flag worked exactly as intended.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Supply exact content for the 3 templates + 4 runbooks. Open gaps carried forward: rollbacks 001–019, WP-4B/WP-4DB execution certificates, "Copy of _ACTIVE__" naming cleanup.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s2-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S2 = [
+      {
+        id: 'repo-governance',
+        label: 'Repository governance docs',
+        steps: [
+          {
+            layer: 'App logic',
+            tag: 'POLICY',
+            title: 'Commit the Founder-supplied operating documents',
+            desc: 'CLAUDE.md was already at its target path; the documentation index arrived as docs/READ.md and was renamed to the specified docs/README.md. Both committed with content byte-identical to what was supplied.',
+            codeFlow: [ {chip:'CLAUDE.md'}, {label:'points readers to'}, {chip:'docs/README.md'}, {label:'which indexes'}, {chip:'docs/'} ],
+            files: [
+              {path:'CLAUDE.md', desc:'Repository operating guide — session protocol, placement and lifecycle rules'},
+              {path:'docs/README.md', desc:'Documentation index with the standing open-gaps notice'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'App logic',
+            tag: 'POLICY',
+            title: 'Untrack macOS junk files',
+            desc: 'The 3 .DS_Store files were removed from git tracking and a .gitignore now prevents any from being committed again.',
+            codeFlow: [ {chip:'.gitignore'}, {label:'blocks'}, {chip:'**/.DS_Store'} ],
+            files: [
+              {path:'.gitignore', desc:'One pattern: .DS_Store'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Service',
+            tag: 'SDK',
+            title: 'Push and verify',
+            desc: 'Commit 115fca0 pushed to GitHub; fresh fetch confirmed HEAD matches origin/main with a clean tree.',
+            codeFlow: [ {chip:'git commit 115fca0'}, {label:'pushed to'}, {chip:'github.com/ankitmittal-madman/foofoo-v3'} ],
+            files: [
+              {path:'KNOWLEDGE.html', desc:'This knowledge book, updated with Session 2'}
+            ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s2-flows', window.FEATURE_FLOWS_S2);
+    </script>
+
+  </div><!-- /page-s2 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
