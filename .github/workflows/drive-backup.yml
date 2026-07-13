@@ -1,6 +1,6 @@
 name: Backup to Google Drive Foofoo - v3
 on: 
-  workflow_dispatch: # This enables the manual "Run workflow" button
+  workflow_dispatch:
 
 jobs:
   drive-backup:
@@ -14,9 +14,15 @@ jobs:
       - name: Create ZIP Archive
         run: |
           TIMESTAMP=$(date +'%Y-%m-%d_%H-%M')
-          ZIP_NAME="backup-${TIMESTAMP}.zip"
+          # Extracts just the repository name (e.g., "dotfiles") from the default GitHub variable
+          REPO_NAME=$(basename $GITHUB_REPOSITORY)
+          
+          # Combines the repo name and timestamp for the final file name
+          ZIP_NAME="${REPO_NAME}-backup-${TIMESTAMP}.zip"
+          
           shopt -s dotglob
           zip -r $ZIP_NAME * -x "$ZIP_NAME"
+          
           echo "FILENAME=${ZIP_NAME}" >> $GITHUB_ENV
 
       - name: Upload to Google Drive via OAuth
