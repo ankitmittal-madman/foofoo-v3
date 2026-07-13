@@ -390,6 +390,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔐</span> S8 · Production parity
       <span class="nav-badge">Jul 13</span>
     </div>
+    <div class="nav-item" onclick="showPage('s9')">
+      <span class="nav-icon">🔐</span> S9 · Parity complete (Option B)
+      <span class="nav-badge">Jul 13</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -581,6 +585,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s8')">WP-5D</span>
         </div>
         <div class="tl-note">Compared the repository's build scripts against the live production database (read-only, never modified). Production has 3 scripts the repo lacks: one real security fix (pf1 — the exact fix for the leftover-permission gap found earlier) and two production data loads (real cuisines & ingredients — intentionally kept out of the repo). The security fix's exact text was recovered as evidence, but it can't be added yet: it depends on a hidden auto-security helper that lives only in production and clashes with the repo's deliberate security design — a call only the Founder can make. Parity is 96.6%; one decision away from complete. Repository files unchanged this session.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 13, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#5145b8"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#f0effe;color:#5145b8">S9</span>
+        <div class="tl-title">Production parity completed — Option B (WP-5D)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s9')">migration 029</span>
+          <span class="tl-chip" onclick="showPage('s9')">Option B</span>
+          <span class="tl-chip" onclick="showPage('s9')">100% canonical parity</span>
+        </div>
+        <div class="tl-note">The Founder chose Option B, so the missing production security fix (pf1) was added to the repo as migration 029 — verbatim, with only the one line that touches the production-only auto-security helper commented out and fully documented. A clean-room run proved it: 001→029 builds, 029→001 tears back down to empty, and the fix actually closes the leftover-permission gap (write access to protected columns is now removed, read kept). The hidden auto-security helper stays an operational overlay, never repo architecture. Canonical migration parity is now 100%. Kept lean: one completion document + one required certificate.</div>
       </div>
     </div>
     <!-- TIMELINE_INJECT -->
@@ -779,6 +797,10 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5D_Validation_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">Rebuildability preserved; regression cross-check</td></tr>
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5D_Production_Parity_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">96.6% parity; exhaustive remaining differences</td></tr>
         <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-004_WP-5D_Production_Parity_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">WP-5D execution certificate (read-only prod introspection)</td></tr>
+        <tr><td class="fr-file mono">database/migrations/029_pf1_security_hardening.sql</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S9</td><td class="fr-desc">Canonical pf1 recovery (Option B; rls_auto_enable line quarantined)</td></tr>
+        <tr><td class="fr-file mono">database/rollback/029_pf1_security_hardening_rollback.sql</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S9</td><td class="fr-desc">Paired rollback for 029 (preserves 29/29 invariant)</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5D_Production_Parity_Completion_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S9</td><td class="fr-desc">Consolidated WP-5D completion (decision, overlay, verification, parity)</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-005_WP-5D_Completion_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S9</td><td class="fr-desc">WP-5D completion execution certificate</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1502,7 +1524,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s7 -->
 
   <!-- ── Session 8 ── -->
-  <div id="page-s8" class="page-content" style="display:block">
+  <div id="page-s8" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S8 · Production parity recovery (WP-5D)</div>
       <div class="page-subtitle">We checked the repository's database blueprint against what's actually running in production — and found it's one deliberate decision away from being a complete, faithful source of truth.</div>
@@ -1527,6 +1549,33 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s8 -->
+
+  <!-- ── Session 9 ── -->
+  <div id="page-s9" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S9 · Production parity completed — Option B (WP-5D)</div>
+      <div class="page-subtitle">The last engineering gap between the repository and production is closed: the missing security fix is now in the repo, and the production-only automation is documented and deliberately kept out.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was completed this session</div>
+        <div class="session-card-meta">July 13, 2026<br>WP-5D · Option B</div>
+      </div>
+      <div class="session-card-desc">
+        The Founder reviewed Session 8's findings and chose <b>Option B</b>: the repository stays the single source of truth, and production's hidden "auto-enable-security" helper stays a production-only operational tool — never part of the repo's blueprint. So this session added the one genuinely missing engineering script, <b>migration 029</b> (the production security fix "pf1"), copied exactly from production — with only the single line that references that production-only helper <b>commented out and fully explained</b>, so the repo still builds cleanly from scratch. We proved it on a throwaway database: build 001→029 works, tear-down 029→001 returns to empty, and the fix genuinely closes the leftover-permission gap found earlier (the app role can no longer write the protected columns, only read them). The two production data files (real cuisines & ingredients) stay out of the repo by design. Every remaining difference between repo and production is now classified with nothing unexplained. Per the Founder's "keep it lean" instruction, this was documented in <b>one</b> completion write-up plus the <b>one</b> certificate governance requires — not the six separate reports of last session.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">100%</div><div class="stat-l">Canonical parity</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">029</div><div class="stat-l">Migration added</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">29/29</div><div class="stat-l">Build & rollback</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">2</div><div class="stat-l">Docs (lean)</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">The repository is now the complete engineering source of truth and rebuilds deterministically without any production-only object. <b>READY FOR WP-5G</b> — Repository Green Certification: a final live build-and-compare on a real disposable Supabase environment, plus a full byte-level schema diff, then formal sign-off. Not started — awaiting Founder go-ahead. (Two cosmetic/optional items remain for whenever convenient: the 027/028 filename-prefix normalization, and folding the earlier stale self-test fixes (WP-04DA) into the live WP-5G run.)</div>
+      </div>
+    </div>
+  </div><!-- /page-s9 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->

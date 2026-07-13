@@ -1,10 +1,10 @@
 # WP-5D — Production Parity Recovery v1.0
 
-**Status:** ACTIVE — executed (analysis + read-only production introspection; STEP-6 STOP on the one canonical recovery, pending a Founder architecture decision)
+**Status:** SUPERSEDED (investigation phase) — its STEP-6 STOP and open recommendations are resolved by the Founder's Option B and closed in [ACTIVE]_WP-5D_Production_Parity_Completion_v1.0. Retained as the WP-5D investigation history. Read-only, factual findings herein remain valid.
 **Version:** v1.0
 **Date:** 2026-07-13
 **Placement:** docs/project-history/work-packages/[ACTIVE]_WP-5D_Production_Parity_Recovery_v1.0.md
-**Supersedes:** None
+**Supersedes:** None. **Superseded by:** [ACTIVE]_WP-5D_Production_Parity_Completion_v1.0 (Founder Option B, 2026-07-13).
 **Dependencies:** WP-5B/5C/5E/5F/5F2; production project `slsqtlygeekdppuyiiff`. Companions: WP-5D Evidence Register, Engineering Decision Log, Validation Report, Production Parity Report, REPO-CERT-004.
 
 ---
