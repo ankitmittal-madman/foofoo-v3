@@ -1,0 +1,23 @@
+name,display_name,display_order,description,is_active,is_updated,last_update_date,is_review
+north_indian,North Indian,1,"Punjabi, Kashmiri, Rajasthani, Bihari & more",Y,N,,Y
+south_indian,South Indian,2,"Tamil, Kerala, Andhra, Karnataka & more",Y,N,,Y
+east_indian,East Indian,3,"Bengali, Odia, Assamese & more",Y,N,,Y
+west_indian,West Indian,4,"Maharashtrian, Gujarati, Goan, Parsi & more",Y,N,,Y
+central_indian,Central Indian,5,"Madhya Pradesh, Indori, Chhattisgarhi",Y,N,,Y
+northeast_indian,Northeast Indian,6,"Naga, Manipuri, Sikkimese & more",Y,N,,Y
+mughlai_nawabi,Mughlai / Nawabi,7,"Biryanis, kebabs, kormas — Mughal & Nawabi traditions",Y,N,,Y
+street_food,Street Food / Chaat,8,"Chaat, vada pav, pav bhaji, kathi rolls & more",Y,N,,Y
+chinese_asian,Chinese / Indo-Chinese,9,"Hakka noodles, manchurian, momos, fried rice",Y,N,,Y
+continental,Continental,10,"Grilled meats, soups, salads, sandwiches",Y,N,,Y
+italian,Italian,11,"Pasta, pizza, risotto",Y,N,,Y
+american,American,12,"Burgers, fries, BBQ, pancakes",Y,N,,Y
+mediterranean,Mediterranean,13,"Grain bowls, grilled meats, olive oil based",Y,N,,Y
+anglo_indian,Anglo Indian,14,"Railway curry, mulligatawny, jhal frezi — colonial fusion",Y,N,,Y
+thai,Thai,15,"Pad thai, curries, tom yum, som tam",Y,N,,Y
+japanese,Japanese,16,"Sushi, ramen, tempura, teriyaki",Y,N,,Y
+korean,Korean,17,"Kimchi, bibimbap, Korean fried chicken",Y,N,,Y
+middle_eastern,Middle Eastern,18,"Hummus, falafel, shawarma, kebab platters",Y,N,,Y
+bhutanese,Bhutanese,19,"Ema datshi, phaksha paa. Chilli + cheese focused.",Y,N,,Y
+burmese,Burmese,20,"Mohinga, khow suey, tea leaf salad. SE Asian + Indian fusion.",Y,N,,Y
+mexican,Mexican,21,"Tacos, burritos, quesadillas. Corn + beans + chilli.",Y,N,,Y
+vietnamese,Vietnamese,22,"Pho, banh mi, spring rolls. Fresh herbs + light broths.",Y,N,,Y

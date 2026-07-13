@@ -1,0 +1,261 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**DOC-04  ·  Product Requirements Document — v1.1**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **CHANGE NOTICE — v1.0 → v1.1**
+
+| **Version 1.1 changes (June 2026):** Features moved out of MVP (phase TBD — founder to confirm phases at next planning session): F-24: Order Instead CTA (deeplinks to Swiggy/Zomato) F-27: Auto-generated grocery list F-28: Ingredient check-off in grocery list F-46: Freemium tier visible (₹0 during trial) F-50: Referral programme F-57: Daily email digest (13 metrics) **New feature added to MVP:** F-59: My Meals tab — cooking history and recently planned dishes (replaces Grocery tab in nav bar) *Clarification — F-37 (Morning notification) STAYS in MVP. The founder referenced **'**F37 - Grocery List**'** but F-37 in the PRD is the morning push notification. The grocery list feature is F-27, which has been moved out per above.* User stories removed: US-11 (Order Instead), US-14 (Grocery list), US-16 (Referral). |
+| --- |
+
+# **01  Document purpose ****&**** scope**
+
+This PRD defines what will be built, for whom, in what priority order, and to what standard. It is the handoff document from the PM layer to the engineering layer. Engineering does not begin implementation until this document is signed off.
+
+| **Field** | **Value** |
+| --- | --- |
+| **Product name** | Foofoo (working name — flexible) |
+| **Platform** | Android + iOS (React Native, Expo — single codebase) |
+| **Primary user** | Meera — family meal planner (P0). See DOC-03. |
+| **MVP goal** | 500 DAU within 90 days of launch |
+| **Budget** | Under ₹25,000 total (see DOC-01 Section 09) |
+| **Engineering approach** | AI-assisted development using Claude Code — no external developers |
+| **Backend** | Supabase (auth, DB, Edge Functions, storage) — free tier for MVP |
+| **Document version** | 1.1 — see Change Notice above for what changed from v1.0 |
+
+# **02  The product pipeline — how Foofoo thinks**
+
+Before features are defined, every engineer must understand this pipeline. Features are the surface. This is the engine beneath every recommendation.
+
+| **Step 1 — Onboarding captures household signals** 5 natural questions → household_profile: main cohort, sub-cohort, home state, current city, diet type, member segments, cook capability, class preference swipes. **Step 2 — Cohort/persona assignment (silent)** household_profile → assign_persona() → persona_assignment with confidence score. 41 backend personas × 36 states. User never sees this. **Step 3 — 7-day meal CLASS plan generated** persona_assignment → generate_class_plan() → week_plan: 7 days × 3 slots × class codes. Classes are types of meals, not dishes. **Step 4 — Member add-ons attached** member_segments[] → generate_addons() → addon_slots. Infant add-on ≠ family meal replacement. Always a separate object. **Step 5 — Class → dish expansion + scoring** Hard constraints first → score via genome + regional + context + history → rank → return top 8. **Step 6 — User interaction → feedback loop** Every swipe, lock, never, rating → logged → updates class and dish-level affinity weights → next plan is more accurate. |
+| --- |
+
+| **Non-negotiable rule: the engine NEVER recommends a dish directly from cuisine preference. Class plan always comes first. Dish selection is always expansion within a class.** |
+| --- |
+
+# **03  Feature registry — complete product scope (v1.1)**
+
+**⚠️  6 features moved out of MVP in v1.1.** Features marked 'Phase TBD' remain in scope for a future phase — founder to confirm exact phase at next planning session.
+
+| **#** | **Feature** | **Phase** | **Persona** | **Priority** |
+| --- | --- | --- | --- | --- |
+| **F-01** | Household cohort selection screen (5 options) | MVP | All | P0 |
+| **F-02** | Dynamic branching — kids age bands, elder needs, health overlays | MVP | Meera, Priya | P0 |
+| **F-03** | Home state + current city capture (always separate fields) | MVP | All | P0 |
+| **F-04** | Diet type selection (Veg/Non-veg/Egg/Vegan/Jain) — hard constraint | MVP | All | P0 |
+| **F-05** | Allergen exclusion via ingredient autocomplete (integer ID matching) | MVP | Meera, Priya | P0 |
+| **F-06** | Cook capability selection (4 levels) | MVP | All | P0 |
+| **F-07** | Class preference swipe (6–8 class thumbnails at onboarding) | MVP | All | P1 |
+| **F-08** | Profile setup (name, notification time, family member names) | MVP | All | P0 |
+| **F-09** | Skip handling with cold-start defaults (per RE-DOC-04) | MVP | All | P0 |
+| **F-10** | Day View — 3 meal cards (Breakfast, Lunch, Dinner) | MVP | All | P0 |
+| **F-11** | Swipe carousel — 8 ranked alternatives per slot | MVP | All | P0 |
+| **F-12** | Meal card — photo, name, cuisine, time, simple calories | MVP | All | P0 |
+| **F-13** | Member add-on row — secondary display below family meal card | MVP | Meera, Priya | P0 |
+| **F-14** | Combo card display (e.g. Chole Bhature as single unit) | MVP | All | P1 |
+| **F-15** | Never gesture — long press down → permanent demotion | MVP | All | P0 |
+| **F-16** | Not Today gesture — long press up → skip today only | MVP | All | P0 |
+| **F-17** | Lock gesture — protects slot from refresh | MVP | All | P0 |
+| **F-18** | Plus icon — add dish to different date | MVP | All | P1 |
+| **F-19** | Pull-to-refresh — regenerates unlocked slots only | MVP | All | P0 |
+| **F-20** | Week View — 7-day plan grid | MVP | Meera | P1 |
+| **F-21** | Meal Detail Page — dish hero, description, key attributes | MVP | All | P0 |
+| **F-22** | Simple ingredient list (what you need, not full recipe) | MVP | All | P0 |
+| **F-23** | Cook this button — marks dish as planned | MVP | All | P0 |
+| **F-24** | ⚠️ Order Instead CTA — deeplinks to Swiggy/Zomato | Phase TBD | Riya | P1 |
+| **F-25** | Nutrition summary (calories, protein, carbs, fat) | MVP | Arun, Riya | P1 |
+| **F-26** | Full step-by-step recipe with quantities | Phase 0.5 | All | P1 |
+| **F-27** | ⚠️ Grocery list — auto-generated from locked/planned dishes | Phase TBD | Meera | P1 |
+| **F-28** | ⚠️ Ingredient check-off in grocery list | Phase TBD | Meera | P1 |
+| **F-29** | Smart grocery list — deduplicated, quantified, by category | Phase 0.5 | Meera | P1 |
+| **F-30** | Full-text dish search | MVP | All | P1 |
+| **F-31** | Filter by cuisine, diet, meal type, cook time | MVP | All | P1 |
+| **F-32** | Explore feed — seasonal, festive, regional curated content | Phase 1 | All | P2 |
+| **F-33** | Profile — edit household composition, diet, allergens | MVP | All | P0 |
+| **F-34** | Preferences — cook capability, notification time, city | MVP | All | P0 |
+| **F-35** | Cooking history / diary | Phase 1 | Arun, Meera | P2 |
+| **F-36** | Family profiles — separate member management | Phase 1.5 | Meera | P2 |
+| **F-37** | Morning notification — breakfast preview at configured time | MVP | All | P0 |
+| **F-38** | Evening prep reminder | Phase 0.5 | Meera | P2 |
+| **F-59** | My Meals tab — cooking history and recently planned dishes. Read-only view grouped by date. | MVP | Meera, Arun | P1 |
+| **F-39** | RE v1 — class-first plan generation from cohort matrix | MVP | All | P0 |
+| **F-40** | RE v2 — personal history learning from interaction signals | Sprint 6 | All | P0 |
+| **F-41** | Mood selector (user-facing context input) | Phase 1 | All | P2 |
+| **F-42** | Calorie targeting toggle | Phase 1 | Arun, Riya | P2 |
+| **F-43** | Fitness mode — boosts protein-dense dish scoring | Phase 1 | Arun | P2 |
+| **F-44** | RE v3 — cluster-based seeding for new users | Phase 2 | All | P2 |
+| **F-45** | Festival and seasonal calendar awareness | Phase 2 | All | P3 |
+| **F-46** | ⚠️ Freemium tier — visible, ₹0 during 90-day trial | Phase TBD | All | P0 |
+| **F-47** | Premium tier ₹99/month — ad-free, insights, analytics | Phase 1.5 | All | P1 |
+| **F-48** | Premium Plus ₹149/month — family profiles, health profiles | Phase 1.5 | Meera, Priya | P1 |
+| **F-49** | Ad placement (free tier) | Phase 1.5 | — | P2 |
+| **F-50** | ⚠️ Referral programme — 15 days free Premium per referral | Phase TBD | All | P1 |
+| **F-51** | Google Sign-In / Apple Sign-In | Phase 0.5 | All | P1 |
+| **F-52** | Blinkit/Zepto grocery ordering | Phase 3 | Meera | P3 |
+| **F-53** | Zomato/Swiggy API ordering integration | Phase 3 | Riya | P3 |
+| **F-54** | Pantry management — track what you have at home | Phase 0.5 | Meera | P2 |
+| **F-55** | PostHog product analytics | MVP | Internal | P0 |
+| **F-56** | Sentry error monitoring | MVP | Internal | P0 |
+| **F-57** | ⚠️ Daily email digest — 13 key metrics to founder | Phase TBD | Internal | P0 |
+| **F-58** | Admin CMS — add/edit dishes, manage cohort matrix | MVP | Internal | P0 |
+
+| ⚠️ features are moved out of MVP in v1.1. Exact phase assignment for Phase TBD features to be confirmed by founder. All other phases unchanged from v1.0. |
+| --- |
+
+# **04  User stories — MVP (v1.1 — 13 stories)**
+
+**3 user stories removed in v1.1: **US-11 (Order Instead), US-14 (Grocery list), US-16 (Referral). 13 MVP user stories remain.
+
+## **Onboarding**
+
+| **US-01 — As Meera:** I want to tell the app who is in my household so that it builds a meal plan for my whole family, not just me. *Acceptance: household_profile JSON matches RE-DOC-01 contract. All 5 cohort paths complete without error.* |
+| --- |
+
+| **US-02 — As Meera:** I want to tell the app my home state and current city separately so it understands both my food roots and where I live now. *Acceptance: home_state and current_city stored as separate DB fields. MP user in Pune gets MP-weighted class plan, not Pune defaults. Verified by test case.* |
+| --- |
+
+| **US-03 — As any user:** I want to skip any onboarding question without the app breaking. *Acceptance: every screen has visible Skip. Skipped diet type triggers safe omnivore default with LOW confidence. Allergens never guessed.* |
+| --- |
+
+| **US-04 — As Priya:** I want to tell the app I have an infant so I receive postpartum add-ons alongside my family's normal meals. *Acceptance: INFANT in member_segments triggers addon_slots. Add-on renders as secondary row — never as replacement.* |
+| --- |
+
+## **Home UX ****&**** plan generation**
+
+| **US-05 — As any user:** I want to open the app each morning and immediately see today's meal plan without searching or configuring anything. *Acceptance: plan renders within 3 seconds on budget Android. Loading skeleton shown while generating. Empty state never shown without explanation.* |
+| --- |
+
+| **US-06 — As Meera:** I want to swipe through 8 alternatives for any meal slot without losing the rest of my plan. *Acceptance: carousel shows 8 ranked alternatives. Selecting updates only that slot. All other slots unchanged.* |
+| --- |
+
+| **US-07 — As Meera:** I want to lock my breakfast so it doesn't change when I refresh. *Acceptance: lock icon long-press marks slot as locked. Locked indicator visible. Pull-to-refresh skips locked slots. Lock persists across sessions until explicitly removed.* |
+| --- |
+
+| **US-08 — As any user:** I want to permanently remove a dish I hate so it never appears again. *Acceptance: long press + drag down triggers Never. Toast confirmation. Dish added to never_list. RE removes it from all future candidate sets immediately.* |
+| --- |
+
+| **US-09 — As Meera:** I want to see my infant daughter's add-on meal displayed separately so I know what to prepare alongside the main meal. *Acceptance: INFANT in member_segments: add-on row renders below relevant meal cards. Visually distinct. Only shown when member_segments is non-empty.* |
+| --- |
+
+## **Meal detail**
+
+| **US-10 — As any user:** I want to see the ingredients I need for a dish so I know if I can cook it with what I have. *Acceptance: Meal Detail shows dish photo, name, cuisine, cook time, difficulty, simple ingredient list with rough quantities. Sourced from dish DB.* |
+| --- |
+
+## **Search ****&**** notifications**
+
+| **US-12 — As any user:** I want to only see dishes that match my diet type — never see meals that violate my restrictions. *Acceptance: diet constraint applied as hard filter BEFORE scoring. Vegetarian user**'**s candidate set has zero non-veg dishes. SQL safety-gate returns 0 violations.* |
+| --- |
+
+| **US-13 — As any user:** I want to search for a dish by name so I can add something I'm craving even if it wasn't suggested. *Acceptance: search returns results within 500ms. Covers dish name and key attributes. Selecting result opens Meal Detail.* |
+| --- |
+
+| **US-15 — As any user:** I want a morning notification showing my breakfast so I'm reminded to open Foofoo before I start deciding what to eat. *Acceptance: notification fires at user-configured time (default 7 AM). Shows dish name, thumbnail, one-line description. Tap opens app to Day View directly.* |
+| --- |
+
+## **My Meals tab (new in v1.1)**
+
+| **US-17 — As Meera / Arun:** I want to see what I've planned and cooked recently so I can track my meal patterns and avoid unintentional repetition. *Acceptance: My Meals tab shows dishes planned or locked, grouped by date, most recent first. Read-only in MVP. Tapping a dish opens Meal Detail. Empty state shown for new users. Minimum 30 days of history shown.* |
+| --- |
+
+# **05  Non-functional requirements**
+
+| **Requirement** | **Specification** | **Priority** |
+| --- | --- | --- |
+| **Plan generation speed** | < 3 seconds end-to-end on budget Android (4GB RAM, Snapdragon 680 equivalent) | P0 |
+| **Carousel swipe latency** | < 100ms visual response to swipe gesture | P0 |
+| **Search result latency** | < 500ms from query to results rendered | P1 |
+| **App cold start time** | < 2 seconds from tap to home screen | P0 |
+| **API response time p95** | < 800ms for all Edge Function calls | P0 |
+| **Offline capability** | Today's plan cached locally. Offline banner shown. Actions queued and synced on reconnect. | P0 |
+| **Crash-free rate** | < 0.5% crash rate per session on both platforms | P0 |
+| **Allergen/diet constraint integrity** | SQL safety-gate queries return 0 violations after every RE change — non-negotiable P0 release blocker | P0 |
+| **Android compatibility** | Android 8.0+ (API 26+) — covers 95%+ of active Android devices in India | P0 |
+| **iOS compatibility** | iOS 14.0+ — covers 95%+ of active iPhones in India | P0 |
+| **Screen size support** | Works 5.0" to 6.7". No horizontal scroll on any screen. | P0 |
+| **Row Level Security** | All Supabase tables have RLS enabled. Users read/write own data only. | P0 |
+| **Secrets management** | Zero hardcoded secrets in committed code. All credentials in environment variables. | P0 |
+| **DPDP Act 2023 compliance** | Granular consent at signup. Data export within 72h. Account deletion within 72h. | P0 |
+| **Dish database minimum** | 500+ dishes fully tagged (genome, diet flags, allergen flags, class codes, photo) before launch | P0 |
+| **Free tier infrastructure** | All infra runs on free tiers until 500 DAU — no paid infra before that milestone | P0 |
+
+# **06  Feature phasing roadmap (v1.1)**
+
+**Note: **Features F-24, F-27, F-28, F-46, F-50, F-57 are 'Phase TBD'. They will be assigned to a specific phase at the next planning session. They are not in MVP.
+
+| **Phase** | **Timeline** | **Go/no-go criteria** | **Revenue** |
+| --- | --- | --- | --- |
+| **MVP — Soft launch** | Weeks 1–14 build + 90-day test | 5 of 8 MVP metrics hit. Zero constraint violations. | ₹0 — fully free. No freemium tier displayed (F-46 deferred). |
+| **Phase 0.5 — Full product** | Weeks 15–20 | 500 DAU sustained 14 days | ₹0 — free period continues |
+| **Phase TBD — Deferred features** | TBD | Founder to assign at next planning session | F-24, F-27, F-28, F-46, F-50, F-57 assigned here |
+| **Phase 1 — Public launch** | Weeks 21–28 | D7 retention > 30%, acceptance > 40% | Ads live (if F-46 activated). Premium visible. |
+| **Phase 1.5 — Monetisation** | Weeks 29–36 | 1,000 DAU, D30 retention > 25% | Premium + Ads active |
+| **Phase 2 — Depth** | Weeks 37–50 | ₹1L MRR, 5,000 DAU | All streams scaling |
+| **Phase 3 — Partnerships** | Year 2 | 10,000 DAU, PMF confirmed | Partnerships + all streams |
+
+# **07  Success metrics**
+
+***If 500 DAU is hit by Day 90 — the MVP worked. Everything else is signal, not the verdict.***
+
+| **Metric** | **Target Day 90** | **Target Day 180** | **What failure means** |
+| --- | --- | --- | --- |
+| **Daily Active Users (primary)** | 500 | 2,000 | Habit loop not forming |
+| **Day 0 cold-start acceptance** | >25% | >35% | RE class-first pipeline failing |
+| **Suggestion acceptance rate** | >40% | >50% | Genome or regional intelligence miscalibrated |
+| **Day 7 retention** | >30% | >35% | No habit after first week |
+| **Day 30 retention** | >20% | >28% | Product not sticky enough |
+| **Onboarding completion** | >70% | >75% | Too much friction — cut a screen |
+| **Never rate** | <15% | <10% | Wrong dishes for household/region |
+| **App store rating** | >4.0 stars | >4.2 stars | Quality or reliability issue |
+
+# **08  Explicit out of scope — MVP (v1.1)**
+
+**Updated in v1.1: **6 features moved from MVP to Phase TBD added to this list.
+
+| **Excluded** | **Unlock trigger** | **Reason** |
+| --- | --- | --- |
+| **F-24: Order Instead CTA (Swiggy/Zomato deeplink)** | Phase TBD | Partnership conversation needed; deep link adds complexity without clear MVP learning |
+| **F-27: Auto-generated grocery list** | Phase TBD | Defers grocery features to a single phase; simplifies MVP scope |
+| **F-28: Ingredient check-off** | Phase TBD | Depends on F-27; moved out together |
+| **F-46: Freemium tier visible** | Phase TBD | No monetisation signalling in MVP; app is simply free during the test period |
+| **F-50: Referral programme** | Phase TBD | Referral mechanics require premium tier (F-46) to be active first |
+| **F-57: Daily email digest** | Phase TBD | PostHog dashboard provides sufficient founder visibility during MVP; email digest adds engineering overhead |
+| **F-26: Full step-by-step recipes** | Phase 0.5 | Core value is the decision, not the instruction |
+| **F-29: Smart grocery list** | Phase 0.5 | Grocery features consolidated post-MVP |
+| **F-51: Social login** | Phase 0.5 | Email auth sufficient for MVP |
+| **F-41: Mood selector UI** | Phase 1 | Weather works silently from Day 1 |
+| **F-53: Zomato/Swiggy API integration** | Phase 3 | Partnership agreement needed |
+| **Premium paywall activation** | Phase 1.5 | Never paywall before habit is formed |
+| **Social / sharing features** | Phase 3 | Solo utility first |
+| **Full health profiles** | Phase 2 | Requires validated nutritional data |
+| **B2B / corporate** | Year 2 | Different sales motion entirely |
+
+# **09  Product risks**
+
+| **Risk** | **Likelihood** | **Impact** | **Mitigation** |
+| --- | --- | --- | --- |
+| **Dish database incomplete at launch** | High | Critical | Phase gate: launch only after 500 dishes tagged and validated. No shortcuts. |
+| **Cold-start plan quality fails Day 0** | Medium | High | RE v1 must use class-first pipeline. Unit test cold-start paths for all 5 cohorts. |
+| **Onboarding drop-off ****>**** 30%** | Medium | High | Test each screen independently. Cut any screen with > 30% drop-off. |
+| **Hard constraint violation (diet/allergen)** | Low | Critical | SQL safety-gate queries after every RE change. Must return 0 violations. |
+| **App store rejection** | Medium | High | Review Apple/Google guidelines before submission. No health claims without medical disclaimer. |
+
+# **10  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-04 · Product Requirements Document |
+| **Version** | 1.1 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Changes from v1.0** | 6 features moved to Phase TBD. 1 new feature added (F-59 My Meals). 3 user stories removed (US-11, US-14, US-16). 1 new user story added (US-17). |
+| **Feature count** | 59 features across all phases. 30 in MVP (down from 35 in v1.0). |
+| **User stories** | 13 MVP user stories with acceptance criteria (down from 16 in v1.0). |
+| **Next document** | DOC-05 v1.1 · Information Architecture & Screen Inventory |
+
+Founder sign-off: ___________________________     Date: _______________

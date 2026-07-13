@@ -1,0 +1,137 @@
+state_code,dish_name,affinity_score,source,is_active,is_updated,last_update_date,is_review
+PB,Butter Chicken,0.95,regional,Y,N,,N
+PB,Dal Makhani,0.9,regional,Y,N,,N
+PB,Sarson Ka Saag,0.95,regional,Y,N,,N
+PB,Chole Bhature,0.85,regional,Y,N,,N
+PB,Tandoori Chicken,0.9,regional,Y,N,,N
+DL,Chole Bhature,0.95,regional,Y,N,,N
+DL,Pani Puri,0.8,regional,Y,N,,N
+DL,Chaat Papdi,0.85,regional,Y,N,,N
+DL,Bedmi Puri,0.9,regional,Y,N,,N
+DL,Nihari,0.85,regional,Y,N,,N
+UP,Puri,0.85,regional,Y,N,,N
+UP,Khichdi,0.9,regional,Y,N,,N
+UP,Tahiri,0.85,regional,Y,N,,N
+UP,Banarasi Chaat,0.8,regional,Y,N,,N
+UP,Galouti Kebab,0.9,regional,Y,N,,N
+RJ,Dal Baati,0.95,regional,Y,N,,N
+RJ,Laal Maas,0.9,regional,Y,N,,N
+RJ,Gatte Ki Sabzi,0.85,regional,Y,N,,N
+RJ,Pyaaz Ki Kachori,0.9,regional,Y,N,,N
+RJ,Ghevar,0.85,regional,Y,N,,N
+MH,Vada Pav,0.95,regional,Y,N,,N
+MH,Misal Pav,0.9,regional,Y,N,,N
+MH,Pav Bhaji,0.9,regional,Y,N,,N
+MH,Puran Poli,0.85,regional,Y,N,,N
+MH,Poha,0.85,regional,Y,N,,N
+GJ,Dhokla,0.95,regional,Y,N,,N
+GJ,Thepla,0.9,regional,Y,N,,N
+GJ,Undhiyu,0.9,regional,Y,N,,N
+GJ,Fafda Jalebi,0.85,regional,Y,N,,N
+GJ,Khandvi,0.85,regional,Y,N,,N
+TN,Idli,0.95,regional,Y,N,,N
+TN,Masala Dosa,0.95,regional,Y,N,,N
+TN,Sambar,0.95,regional,Y,N,,N
+TN,Curd Rice,0.9,regional,Y,N,,N
+TN,Filter Coffee,0.95,regional,Y,N,,N
+KL,Appam with Stew,0.9,regional,Y,N,,N
+KL,Kerala Fish Curry,0.95,regional,Y,N,,N
+KL,Puttu,0.9,regional,Y,N,,N
+KL,Sadya Thali,0.95,regional,Y,N,,N
+KL,Banana Chips,0.85,regional,Y,N,,N
+KA,Bisi Bele Bath,0.9,regional,Y,N,,N
+KA,Ragi Mudde,0.85,regional,Y,N,,N
+KA,Mysore Pak,0.9,regional,Y,N,,N
+KA,Akki Rotti,0.85,regional,Y,N,,N
+KA,Neer Dosa,0.85,regional,Y,N,,N
+WB,Machher Jhol,0.95,regional,Y,N,,N
+WB,Shorshe Ilish,0.95,regional,Y,N,,N
+WB,Rasgulla,0.95,regional,Y,N,,N
+WB,Mishti Doi,0.9,regional,Y,N,,N
+WB,Kosha Mangsho,0.9,regional,Y,N,,N
+TS,Hyderabadi Chicken Biryani,0.95,regional,Y,N,,N
+TS,Double Ka Meetha,0.85,regional,Y,N,,N
+TS,Sarva Pindi,0.8,regional,Y,N,,N
+TS,Irani Chai,0.9,regional,Y,N,,N
+TS,Mirchi Ka Salan,0.85,regional,Y,N,,N
+AP,Pesarattu,0.9,regional,Y,N,,N
+AP,Gongura Chicken,0.9,regional,Y,N,,N
+AP,Pulihora,0.85,regional,Y,N,,N
+AP,Andhra Chicken Curry,0.9,regional,Y,N,,N
+AP,Gutti Vankaya,0.85,regional,Y,N,,N
+GA,Goan Fish Curry,0.95,regional,Y,N,,N
+GA,Vindaloo (Pork),0.9,regional,Y,N,,N
+GA,Bebinca,0.85,regional,Y,N,,N
+GA,Xacuti (Chicken),0.85,regional,Y,N,,N
+GA,Ros Omelette,0.8,regional,Y,N,,N
+BR,Litti Chokha,0.95,regional,Y,N,,N
+BR,Sattu Paratha,0.9,regional,Y,N,,N
+BR,Thekua,0.85,regional,Y,N,,N
+BR,Dal Pitha,0.8,regional,Y,N,,N
+BR,Chana Ghugni,0.8,regional,Y,N,,N
+JK,Rogan Josh,0.95,regional,Y,N,,N
+JK,Dum Aloo (Kashmiri),0.9,regional,Y,N,,N
+JK,Kahwa,0.9,regional,Y,N,,N
+JK,Gushtaba,0.85,regional,Y,N,,N
+JK,Yakhni,0.9,regional,Y,N,,N
+OD,Dalma,0.95,regional,Y,N,,N
+OD,Pakhala Bhaat,0.9,regional,Y,N,,N
+OD,Chhena Poda,0.9,regional,Y,N,,N
+OD,Rasabali,0.85,regional,Y,N,,N
+OD,Machha Besara,0.85,regional,Y,N,,N
+AS,Masor Tenga,0.95,regional,Y,N,,N
+AS,Aloo Pitika,0.85,regional,Y,N,,N
+AS,Duck Curry (Assamese),0.85,regional,Y,N,,N
+AS,Pork with Bamboo Shoot,0.8,regional,Y,N,,N
+AS,Til Pitha,0.85,regional,Y,N,,N
+NL,Smoked Pork with Bamboo Shoot,0.95,regional,Y,N,,N
+NL,Naga Pork Curry,0.9,regional,Y,N,,N
+NL,Axone Chutney,0.85,regional,Y,N,,N
+NL,Galho,0.8,regional,Y,N,,N
+NL,Raja Mirchi Chutney,0.85,regional,Y,N,,N
+MN,Eromba,0.95,regional,Y,N,,N
+MN,Singju,0.9,regional,Y,N,,N
+MN,Kangshoi,0.85,regional,Y,N,,N
+MN,Chamthong,0.85,regional,Y,N,,N
+MN,Paknam,0.8,regional,Y,N,,N
+SK,Gundruk Soup,0.9,regional,Y,N,,N
+SK,Sel Roti,0.9,regional,Y,N,,N
+SK,Phagshapa,0.85,regional,Y,N,,N
+SK,Chhurpi Soup,0.8,regional,Y,N,,N
+SK,Kinema Curry,0.85,regional,Y,N,,N
+ML,Jadoh,0.95,regional,Y,N,,N
+ML,Tungrymbai,0.85,regional,Y,N,,N
+ML,Dohneiiong,0.9,regional,Y,N,,N
+ML,Nakham Bitchi,0.8,regional,Y,N,,N
+MP,Daal Bafla,0.9,regional,Y,N,,N
+MP,Bhopali Biryani,0.85,regional,Y,N,,N
+MP,Bhutte Ka Kees (Indori),0.9,regional,Y,N,,N
+MP,Garadu Chaat,0.85,regional,Y,N,,N
+MP,Indori Poha,0.9,regional,Y,N,,N
+CT,Fara,0.9,regional,Y,N,,N
+CT,Bore Baasi,0.85,regional,Y,N,,N
+CT,Aamat,0.85,regional,Y,N,,N
+CT,Angakar Roti,0.8,regional,Y,N,,N
+CT,Dubki Kadhi,0.8,regional,Y,N,,N
+HP,Dham Thali,0.95,regional,Y,N,,N
+HP,Madra (Chana),0.9,regional,Y,N,,N
+HP,Siddu,0.85,regional,Y,N,,N
+HP,Babru,0.8,regional,Y,N,,N
+HP,Chha Gosht,0.85,regional,Y,N,,N
+UK,Kafuli,0.9,regional,Y,N,,N
+UK,Bal Mithai,0.9,regional,Y,N,,N
+UK,Bhatt Ki Churkani,0.85,regional,Y,N,,N
+UK,Chainsoo,0.85,regional,Y,N,,N
+UK,Phaanu,0.85,regional,Y,N,,N
+JH,Dhuska,0.85,regional,Y,N,,N
+JH,Rugda (Mushroom),0.8,regional,Y,N,,N
+JH,Litti Chokha,0.85,regional,Y,N,,N
+TR,Mui Borok,0.9,regional,Y,N,,N
+TR,Berma,0.85,regional,Y,N,,N
+TR,Wahan Mosdeng,0.85,regional,Y,N,,N
+MZ,Bai,0.9,regional,Y,N,,N
+MZ,Sawhchiar,0.85,regional,Y,N,,N
+MZ,Koat Pitha,0.8,regional,Y,N,,N
+AR,Thukpa (Arunachali),0.9,regional,Y,N,,N
+AR,Pika Pila,0.85,regional,Y,N,,N
+AR,Lukter,0.8,regional,Y,N,,N

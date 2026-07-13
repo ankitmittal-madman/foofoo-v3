@@ -1,0 +1,250 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**FooFoo Project  ·  Session Handoff Document**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **Session overview**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Date** | June 2026 |
+| **Session type** | Full PM layer completion + Engineering Architecture (DOC-10) |
+| **Documents produced** | 24 files (9 PM docs, 5 RE docs, 2 supplementary, 4 HTML visuals, 1 tech architecture, 2 .md files, 1 handoff doc) |
+| **PM layer status** | COMPLETE — all 9 PM documents drafted and validated |
+| **Engineering layer status** | DOC-10 complete (1,076 paragraphs). DOC-11 through DOC-17 not yet started. |
+| **Next session must begin** | DOC-11 — Database Schema |
+
+***Any new session or Claude Code agent reads this document first — before anything else.***
+
+# **01  Product in one paragraph**
+
+| **Foofoo** An AI-powered meal decision assistant for Indian households. Solves the daily 'aaj kya banaye?' problem. Every morning, the app shows a personalised Breakfast / Lunch / Dinner plan built for the household — accounting for home state, current city, diet type, allergens, household members (infant, elder, diabetic), and cook capability. The user swipes, locks, or swaps. The AI learns. The plan gets better. **Positioning: ***"**Zomato solved how to get food. We solve what to eat.**"* **Primary persona: **Meera — 32, family meal planner, Mumbai, cooks 3 meals a day. **MVP goal: **500 DAU within 90 days of launch. **Budget: **Under ₹25,000 total. |
+| --- |
+
+# **02  Complete document inventory**
+
+## **PM Layer — all complete (DRAFT, pending founder sign-off)**
+
+| **Doc** | **Title** | **Version** | **Paragraphs** | **Key content** |
+| --- | --- | --- | --- | --- |
+| **DOC-01** | Product Brief | v1.1 | — | Vision, 4-layer RE science, ₹25K budget, 500 DAU goal |
+| **DOC-02** | Market Research | v1.0 | — | TAM/SAM/SOM, 5 tailwinds, competitor map, whitespace proof |
+| **DOC-03** | User Personas | v1.0 | — | 5 personas (Meera P0 → Priya P2b), day-in-the-life, journey maps |
+| **DOC-04** | PRD | v1.1 | 672 | 59 features F-01 to F-59, 13 MVP user stories, NFRs, phasing |
+| **DOC-05** | Information Architecture | v1.2 | 472 | 35 MVP screens, 5 flows, swipe-reveal gesture, deep links |
+| **DOC-06** | UI/UX Design System | v1.1 | 560 | Cream/Green/Saffron palette, 11 components, Figma-replaceable |
+| **DOC-07** | Go-To-Market | v1.0 | 417 | 5-phase GTM, ₹0 MVP launch, persona messaging, ASO strategy |
+| **DOC-08** | Revenue & Monetisation | v1.0 | 396 | Freemium ₹99/₹149, 3-year projections, unit economics |
+| **DOC-09** | Legal & Compliance | v1.0 | 282 | DPDP 2023, entity setup, app store compliance, 30-item checklist |
+
+## **RE Document Set — all complete**
+
+| **Doc** | **Title** | **Version** |
+| --- | --- | --- |
+| **RE-DOC-01** | Architecture & Module Design | v1.0 |
+| **RE-DOC-02** | The Four Layers (Genome, Food Graph, Household Intelligence, Contextual) | v1.0 |
+| **RE-DOC-03** | Meal Class Taxonomy & Scoring Algorithm | v1.0 |
+| **RE-DOC-04** | Cold Start, Variety Guard & Suppression Rules | v1.0 |
+| **RE-DOC-05** | Evolution Roadmap & Testing (4-state model, ML path, safety gates) | v1.0 |
+
+## **Supplementary PM — complete in dual format (.docx + .md)**
+
+| **Doc** | **Title** | **Formats** | **Key content** |
+| --- | --- | --- | --- |
+| **PM-SUPP-01** | Product Roadmap | docx + .md | 8 phases, full F-01 to F-59 feature-to-phase map, RE evolution by phase |
+| **PM-SUPP-02** | Consolidated Risk Register | docx + .md | 30 risks across 6 categories, likelihood × impact scoring, 3 release blockers |
+
+## **Engineering Layer — in progress**
+
+| **Doc** | **Title** | **Status** |
+| --- | --- | --- |
+| **DOC-10** | Technical Architecture | ✅ COMPLETE — 1,076 paragraphs. Uploaded to Google Drive. |
+| **DOC-11** | Database Schema | ⬜ NOT STARTED — NEXT |
+| **DOC-12** | API Contract Specification | ⬜ Not started |
+| **DOC-13** | Onboarding Answer-to-Feature Mapping | ⬜ Not started |
+| **DOC-14** | Sprint Plan (execution-plan.md) | ⬜ Not started |
+| **DOC-15** | QA & Testing Specification | ⬜ Not started |
+| **DOC-16** | Content & Data Operations Plan | ⬜ Not started |
+| **DOC-17** | Deployment & Launch Runbook | ⬜ Not started |
+
+## **Interactive HTML Visuals — complete**
+
+| **File** | **Companion to** | **What it shows** |
+| --- | --- | --- |
+| **RE-Visual-01_Pipeline_Explorer.html** | RE-DOC-01/02 | Clickable 4-layer pipeline, Day 0 → Day 60+ weight bar animation |
+| **RE-Visual-02_ColdStart_Scoring.html** | RE-DOC-03/04 | Live scoring simulator, variety grid, Not Today decay chart |
+| **RE-Visual-03_Evolution_Map.html** | RE-DOC-05 | 4-state model cards, phase timeline, ML upgrade path |
+| **DOC-06-Visual_Design_System_Explorer.html** | DOC-06 | Live color swatches, type scale, working phone mockup, draggable gesture demo |
+
+# **03  Key decisions — with rationale**
+
+## **Product decisions**
+
+| **ID** | **Decision** | **Rationale** |
+| --- | --- | --- |
+| **D-001** | 6 features deferred to Phase TBD: F-24 (Order Instead CTA), F-27 (Grocery list), F-28 (Ingredient check-off), F-46 (Freemium tier visible), F-50 (Referral), F-57 (Daily email digest) | Simplify MVP scope. Grocery features consolidated. No monetisation signalling before habit forms. Referral requires freemium first. Founder to assign exact phases next planning session. |
+| **D-002** | F-59 My Meals tab added to MVP — replaces Grocery tab in 5-tab nav bar | Cooking history is genuinely useful in MVP and needs no external integration. Grocery tab depended on F-27/F-28 which are deferred. |
+| **D-003** | Onboarding updated from prototype analysis: OB-00 (conversational intro, no skip) added. OB-03 includes migration duration slider. OB-07 is left/right card swipe with visible ♥/✕ buttons. OB-08b (plan preview) added. | Prototype showed more engaging onboarding. Migration duration feeds RE city overlay weight. Left/right swipe more intuitive. Plan preview creates aha moment before user enters the app. |
+| **D-004** | OB-07 dish preference pool: Indian-only. Idli Sambar, Poha, Aloo Paratha, Rajma Chawal, Masala Dosa, Paneer Butter Masala, Chole Bhature, Dal Makhani, Khichdi, Biryani. No Pizza. No Pasta. | Foofoo is Indian-first. Western dishes produce RE signals the cohort matrix cannot use. Showing Pizza sets wrong product expectation. |
+| **D-005** | Long-press gesture removed from entire product. Replaced: swipe left on card → reveal Not Today (amber) + Never (red) buttons. Carousel now via tap on swap icon, not left swipe. | Long-press is a hidden gesture with no affordance. Swipe-reveal is platform-native (iOS Mail, Gmail, WhatsApp). Every action now has a visible entry point. |
+| **D-006** | DOC-06 is structural specification only. When Figma designs arrive, they override: color palette, typography, component aesthetics, imagery. They do NOT override: wireframes, gesture spec, spacing system. | Founder working on Figma separately. DOC-06 provides engineering defaults and structural authority in the interim. |
+| **D-007** | Document format going forward: .docx primary + .md companion for GitHub. Both produced simultaneously for all new documents. | docx for sharing and review. .md for GitHub as source of truth. |
+
+## **Architecture decisions (locked in DOC-10)**
+
+| **ADR** | **Decision** | **Rationale** |
+| --- | --- | --- |
+| **ADR-001** | React Native + Expo SDK 52+ as mobile framework. TypeScript strict mode. | Single codebase iOS + Android. Best AI coding agent support. Expo eliminates native build complexity. Strict mode for allergen data safety. |
+| **ADR-002** | Supabase as entire backend. ap-south-1 (Mumbai) region. | PostgreSQL mandatory for RE queries. Free tier adequate to 500 DAU. Open-source exit path. Mumbai = lowest latency for Indian users. |
+| **ADR-003** | RE implemented as Supabase Edge Functions at MVP (not separate microservice). RE has its own schema (re_engine) and versioned API endpoints. | Zero additional infrastructure. Adjacent to DB (low latency for RE queries). Migration to dedicated service planned for Phase 3 if scale demands it. |
+| **ADR-004** | TanStack Query v5 for all server state. | Purpose-built for async server data. MMKV persister for offline plan cache. Background refresh, deduplication, stale-while-revalidate built in. |
+| **ADR-005** | MMKV for all local persistence (not AsyncStorage). | 10× faster. Synchronous reads for offline plan display (no flicker). Supports encryption for DPDP compliance. |
+| **ADR-006** | Expo Router v3 for navigation. | File = route. Maps directly to DOC-05 screen IDs. Deep linking automatic. |
+| **ADR-007** | FlashList (Shopify) over FlatList for all scrollable lists. | 5× less blank flash on fast scroll. Significantly better on Pixel 3a reference device. |
+| **ADR-008** | OneSignal for push notifications. | Single SDK for iOS + Android. Scheduling built in for 7 AM IST delivery. Free tier adequate for MVP. |
+| **ADR-009** | TypeScript strict mode throughout. No @ts-ignore. No any except documented. | Allergen data is safety-critical. A type error could surface a dish containing an excluded allergen. |
+
+## **RE architecture decisions (non-negotiable)**
+
+| **Decision** | **What it means** | **What violates it** |
+| --- | --- | --- |
+| **Class-first architecture — non-negotiable** | Pipeline: cohort → meal class plan → dish expansion. Never dish-first. Never cuisine-first. | Any code that suggests a dish without first assigning a meal class code from the cohort matrix. |
+| **RE isolation** | No RE logic in the React Native app. App talks to RE only via /v1/ API contract. | Embedding scoring weights, class codes, or cohort logic anywhere in the app codebase. |
+| **Cohort matrix in DB, not hardcoded** | re_engine.cohort_matrix table. Auto-recalibrates weekly. New class = human decision. | Hardcoding class weights or cohort assignments in TypeScript/SQL that bypasses the matrix. |
+| **Three SQL safety gate queries are release blockers** | Diet violations, allergen violations, Jain violations — all must return 0 rows before any deploy. | Advancing a sprint or merging to any branch if any query returns > 0 rows. |
+| **Annotation columns renamed, never dropped** | Deprecated columns get _FounderInfoOnly suffix. They stay in the schema. | Dropping a column in any migration. |
+
+# **04  Constraints and assumptions locked in**
+
+## **Constraints — cannot change without explicit founder decision**
+
+| **#** | **Constraint** | **Source** |
+| --- | --- | --- |
+| **C-01** | Budget: ₹25,000 total. No paid infrastructure before 500 DAU. | DOC-01 |
+| **C-02** | MVP free period: 90 days non-negotiable. No paywall before Day 90. | DOC-08 |
+| **C-03** | Indian-only dish pool in OB-07. No Pizza, Pasta, or Western dishes. | D-004 this session |
+| **C-04** | RE safety gate queries must return 0 violations before any release. | RE-DOC-05 |
+| **C-05** | Claude Code NEVER commits to main without explicit founder approval. | DOC-10, memories |
+| **C-06** | Service role key (SUPABASE_SERVICE_ROLE_KEY) only in Edge Functions. Never in client. | ADR-009 |
+| **C-07** | RLS enabled on every Supabase table. No exceptions. | DOC-10 |
+| **C-08** | TypeScript strict mode. No @ts-ignore. No any (except documented exceptions). | ADR-009 |
+| **C-09** | All DB timestamps stored as timestamptz (UTC). Plan dates computed in IST (UTC+5:30). | DOC-10 |
+| **C-10** | Annotation columns renamed with _FounderInfoOnly suffix — never dropped. | Memories |
+| **C-11** | RE logic lives only in Edge Functions. Not in the React Native app. | RE-DOC-01 |
+| **C-12** | Reference performance test device: Pixel 3a (4GB RAM, Snapdragon 670, Android 12). | DOC-10 |
+| **C-13** | Figma visual decisions override DOC-06 when delivered. Structural wireframes remain. | D-006 this session |
+| **C-14** | Supabase region: ap-south-1 (Mumbai). | DOC-10 |
+| **C-15** | Hard-stop and report if expected folders/files not found. Do not create speculatively. | Memories, Claude Code discipline |
+
+## **Assumptions locked in**
+
+| **#** | **Assumption** | **Watch for** |
+| --- | --- | --- |
+| **A-01** | Supabase free tier handles 500 DAU without upgrade. | Alert at 70% capacity — upgrade path is Supabase Pro ($25/month). |
+| **A-02** | OneSignal, PostHog, Sentry, OpenWeatherMap free tiers adequate through Phase 1. | Monitor usage monthly from launch. |
+| **A-03** | RE pipeline executes in < 800ms in Edge Functions. | Load test on Pixel 3a before launch. Morning cron pre-generates plans so app reads from cache. |
+| **A-04** | 500 dishes fully tagged before launch. | This is a content gate, not an assumption to relax. Launch blocked if not met. |
+| **A-05** | Foofoo trademark available (Class 42 + 35) on IP India database. | Check pending. File before public launch. |
+| **A-06** | Legal entity (Private Limited) can be incorporated before launch. | DOC-09 legal checklist has full steps. |
+
+# **05  Open questions — pending founder decision**
+
+| **#** | **Question** | **Impact if unresolved** | **Priority** |
+| --- | --- | --- | --- |
+| **OQ-01** | Phase assignment for F-24, F-27, F-28, F-46, F-50, F-57 (currently Phase TBD) | Roadmap gaps. DOC-04, DOC-05, DOC-07, DOC-08 have TBD placeholders. | High |
+| **OQ-02** | Figma design delivery timeline | DOC-06 visual decisions remain provisional until Figma arrives. | Medium |
+| **OQ-03** | Legal entity type — LLP or Private Limited? | IP ownership, investor readiness. DOC-09 entity setup section pending. | High |
+| **OQ-04** | App name — is 'Foofoo' final or still a working name? | Trademark filing, app store listing. Cannot file trademark on a working name. | High |
+| **OQ-05** | DOC-11 Database Schema scope — include current RE staging DB state or start fresh? | Determines how much schema archaeology is needed before writing the schema doc. | High — next session |
+| **OQ-06** | Google Drive upload of DOC-10 — confirmed success? | File management only. | Low |
+| **OQ-07** | Migration duration slider in OB-03 — 4-step pill selector or continuous slider? | Minor DOC-05 and DOC-06 update needed to confirm. | Low |
+
+# **06  Next steps — ordered**
+
+## **Engineering documents (next 7 sessions)**
+
+| **Priority** | **Document** | **What it covers** | **Source documents to use** |
+| --- | --- | --- | --- |
+| **1 — NEXT** | DOC-11 · Database Schema | Every table, column, data type, constraint, index, RLS policy. Two schemas: public (app data) and re_engine (RE data). Also: migration file numbering convention. | DOC-10 Section 05, RE-DOC-01 through RE-DOC-05, DOC-04 PRD feature list |
+| **2** | DOC-12 · API Contract Specification | Every Edge Function endpoint. Request/response JSON shapes. Error formats. Auth requirements. Rate limits. Versioning (/v1/ → /v2/). | DOC-10 Section 05, RE-DOC-01 API contract section |
+| **3** | DOC-13 · Onboarding Answer-to-Feature Mapping | Every OB screen question → backend field stored → RE impact → confidence score change. Critical for Claude Code to implement onboarding correctly. | DOC-05 v1.2, RE-DOC-01, RE-DOC-02 |
+| **4** | DOC-14 · Sprint Plan (execution-plan.md) | 14-week build. Sprint-by-sprint tasks, dependencies, definition of done. This is the execution-plan.md requested by founder. | DOC-04 PRD, DOC-05 IA, DOC-10 Tech Arch |
+| **5** | DOC-15 · QA & Testing Specification | Test types (unit, integration, E2E, RE safety gate). Device matrix. Acceptance criteria per sprint. Safety gate SQL in CI. | DOC-04 NFRs, RE-DOC-05 |
+| **6** | DOC-16 · Content & Data Operations Plan | 500-dish database build plan. Tagging workflow. Photo sourcing (original / licensed stock / CC). Quality gate checklist. | DOC-04 F-58 (Admin CMS), RE-DOC-02 (dish genome dimensions) |
+| **7** | DOC-17 · Deployment & Launch Runbook | Environments, EAS build profiles, CI/CD pipeline, go-live checklist, rollback plan. | DOC-10 Section 10 (CI/CD) |
+
+## **After engineering documents complete**
+
+| **Step** | **Action** |
+| --- | --- |
+| **8** | Begin Claude Code build — Sprint 1: project scaffolding, repo structure, Expo setup, Supabase connection, basic auth flow. |
+| **9** | Founder: phase assignment for Phase TBD features (F-24, F-27, F-28, F-46, F-50, F-57). |
+| **10** | Legal: entity incorporation (DOC-09 has full checklist). Private Limited recommended. |
+| **11** | Legal: trademark filing for Foofoo (Class 42 + Class 35) before public launch. |
+| **12** | Content: begin 500-dish database build per DOC-16 plan. |
+
+# **07  Claude Code operating rules — read before every build session**
+
+These rules apply to every Claude Code session without exception. Paste this section into every Claude Code prompt.
+
+| **RULE 1 — Production deploys require explicit founder approval** Never commit or push to main or develop without the founder saying 'approved' or equivalent in the conversation. Hard stop. **RULE 2 — Hard stop on missing files** If expected folders or files are not found, stop and report. Do not create them speculatively. **RULE 3 — RE safety gates after every RE change** After any change to RE-related code: run the three SQL safety gate queries. All must return 0 rows. If any returns > 0: block, report, do not advance. **RULE 4 — Service role key isolation** SUPABASE_SERVICE_ROLE_KEY goes in Edge Functions only. Never in React Native code. Never committed to git. **RULE 5 — TypeScript strict mode** Zero TypeScript errors before any commit. No @ts-ignore comments. **RULE 6 — Annotation columns renamed, never dropped** When deprecating a DB column, rename it with _FounderInfoOnly suffix. Never write a migration that drops a column. **RULE 7 — Prompts must be self-contained** Every Claude Code prompt must include all context needed for that session — file paths, schema state, relevant doc sections. Sessions lose context between runs. |
+| --- |
+
+# **08  Tech stack — quick reference**
+
+| **Layer** | **Technology** | **Version** | **Notes** |
+| --- | --- | --- | --- |
+| **Mobile framework** | React Native + Expo | SDK 52+ | Single codebase iOS + Android |
+| **Language** | TypeScript | 5.x | Strict mode — no exceptions |
+| **Navigation** | Expo Router | v3 | File-based, deep links automatic |
+| **Animations** | React Native Reanimated | v3 | UI thread — 60fps mandatory |
+| **Gestures** | React Native Gesture Handler | v2 | Works with Reanimated v3 |
+| **Server state** | TanStack Query | v5 | MMKV persister for offline |
+| **Client state** | Zustand | v4 | UI state, gesture state |
+| **Local storage** | MMKV | Latest | 10× AsyncStorage. Encrypted. Sync reads. |
+| **Backend** | Supabase | Latest | ap-south-1 (Mumbai). PostgreSQL 15. |
+| **Edge Functions** | Deno TypeScript | Via Supabase | RE module, events, onboarding, health |
+| **Push notifications** | OneSignal | Free tier | Scheduling, segmentation built in |
+| **Analytics** | PostHog | Free tier | 1M events/month free |
+| **Error monitoring** | Sentry | Free tier | 5K errors/month free |
+| **Weather** | OpenWeatherMap | Free tier | 1K calls/day free |
+| **Image CDN** | Cloudinary | Free tier | 25GB bandwidth/month |
+| **Builds** | EAS (Expo) | Free tier | 30 builds/month free |
+| **CI/CD** | GitHub Actions | Free tier | TypeScript + lint + tests + safety gates |
+
+| **Environment** | **Branch** | **Supabase project** | **Approval required** |
+| --- | --- | --- | --- |
+| **Local development** | Any feature branch | foofoo-staging (local CLI) | No |
+| **Staging** | apverse-labs-RE | foofoo-staging (kwypxyqxojauhiehuirz) | No |
+| **Production** | main | foofoo-mvp (ufgfznpqixplcbhmsqqw) | YES — explicit founder approval always |
+
+# **09  Critical risk blockers — must resolve before launch**
+
+| **Risk ID** | **Risk** | **Status** | **Action** |
+| --- | --- | --- | --- |
+| **R-007** | SQL safety gate queries return 0 violations — allergen constraint | Must build | Release blocker. Build into CI pipeline from Sprint 1. |
+| **R-011** | Allergen violation reaches user with severe allergy | Mitigated by R-007 + disclaimer | Allergen disclaimer in OB-05. Safety gate prevents violations. |
+| **R-018** | App store rejection at submission | Pending | Legal review + Apple guidelines check (Section 5.1) before submission. 2-week buffer. |
+| **R-006** | Dish database incomplete at launch | Content gate | Launch blocked if fewer than 500 dishes fully tagged with photo, ingredients, class code. |
+| **R-027** | Dish content quality insufficient | Content gate | Pre-launch audit: photo quality, ingredient accuracy, class code verification. |
+| **R-019** | DPDP Act 2023 compliance gap post-launch | Pending legal | Privacy Policy + ToS + consent mechanism must be complete before app store submission. |
+
+# **10  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | Session Handoff — FooFoo Project |
+| **Date** | June 2026 |
+| **Total files produced this session** | 24 files across PM layer, RE docs, supplementary docs, HTML visuals, engineering architecture, and this handoff |
+| **PM layer** | COMPLETE (DOC-01 through DOC-09 + RE-DOC-01 through RE-DOC-05 + PM-SUPP-01 + PM-SUPP-02) |
+| **Engineering layer** | DOC-10 complete (1,076 paragraphs). DOC-11 through DOC-17 pending. |
+| **Founder sign-off status** | All documents in DRAFT — pending formal sign-off |
+| **Next action** | DOC-11 Database Schema — begin next session |
+| **Critical open items** | Phase TBD feature assignment (OQ-01). Legal entity choice (OQ-03). App name final decision (OQ-04). |
+
+Founder sign-off: ___________________________     Date: _______________

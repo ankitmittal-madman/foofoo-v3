@@ -1,0 +1,291 @@
+# \[ACTIVE\]\_Project\_Baseline\_Register\_v1.5
+
+**Status:** ACTIVE **Version:** v1.5 **Date:** 2026-07-01 **Supersedes:** \[ACTIVE\]\_Project\_Baseline\_Register\_v1.4 **Reason for revision:** DOC-P3-08 v1.1 (Integration & Infrastructure Architecture) is now ACTIVE — APPROVED — FROZEN, completing all 8 mandatory APDF Phase 3 documents. This register is updated to catalogue it and to formally record Phase 3 completion. **Targeted addition only — no full re-scan performed.** **Approved By:** Pending Founder sign-off **Current Phase:** APDF Phase 3 (Solution Architecture) — governance stabilized; DOC-P3-08 readiness reconfirmed (see `[ACTIVE]_DOC-P3-08_Readiness_Report_v1_1`) **Source Documents Referenced:** Project Baseline Register v1.3 (unchanged carry-forward for everything except the new section below) **Downstream Documents Dependent On This Register:** Every future document produced for this project, including DOC-P3-08 and all Phase 4 service-layer documents
+
+---
+
+## Correction/Addition Notice — v1.2 → v1.3
+
+This register's Step 2 table (last updated in v1.2) predates three documents that now exist and are ACTIVE: `DOC-P3-05 Part (d)` (seed/validation completion, carrying IDR-001), `DOC-P3-06` (API Contract Specification, v1.2, APPROVED/FROZEN), and `DOC-P3-07` (Security Architecture, v1.2, APPROVED/FROZEN). v1.2's own Step 6 (M-3) still read "Part (d) not yet produced — still accurate," which is now stale. This revision closes that staleness for these three specific documents only. **No other v1.2 finding, conflict (C-1 through C-11), or gap (G-3 through G-6) was re-checked in this revision** — they are carried forward exactly as v1.2 left them, per the narrow scope of this update.
+
+---
+
+---
+
+## Correction Notice — what changed from v1.0 and why
+
+Before the fresh inventory, this section documents the two corrections explicitly, since silently fixing a prior register without explaining the error would undermine the whole point of this exercise.
+
+| Prior finding (v1.0) | Correction | Why the original finding was wrong |
+| :---- | :---- | :---- |
+| **M-2** — "RE-DOC-01 through 05 'v1.1 amendment' content... does not exist as files." | **Removed. This was a false finding.** | Direct text search across DOC-P3-02, DOC-P3-03, and the Context Baseline Readiness document for "RE-DOC...v1.1", "RE\_V2\_Summary", "three-level cohort hierarchy," and similar phrases found **zero genuine citations** of a separate "RE-DOC v1.1" document anywhere in the project files. Every "v1.1" match found was DOC-P3-02's *own* version number (CDM v1.1), misread as a reference to RE-DOC versioning. The phrase "RE\_V2\_Summary §3" exists only in this assistant's standing conversational memory (a past user instruction about BUILD-02), never in any project file. There was never a filed "RE v1.1" to lose — the v1.0 register mistook earlier in-session draft conversation for evidence of a prior filed version. |
+| **M-4** — "RE-Visual-04 (Data Architecture visual) was referenced... but only three RE-Visual HTML files exist." | **Removed. This was a false finding.** | Direct search for "Visual-04" and "RE-Visual-04" across every project file returned zero matches anywhere. There is no in-file reference to a fourth visual ever having existed. The project correctly has exactly 3 RE-Visual HTML files (01, 02, 03), and that is the complete, correct set — not a shortfall. |
+
+**Both corrections were verified by direct grep/text search against actual file contents in this session, not by re-trusting memory.** This is recorded here as the register's own self-correction history — exactly the kind of audit trail Step 9's governance discipline is meant to produce.
+
+---
+
+## Step 1 — Document Discovery and Inventory (re-scanned)
+
+### 1.1 — PM / Product / Research layer
+
+| Doc ID | Document Name | Version | Status | Purpose | Phase | Last Referenced By |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| DOC-01 | Product Brief | v1.1 (only one version now present — v1.0 duplicate cleared) | ACTIVE | Founding vision, four-layer model | Phase 0 | DOC-P3-02, DOC-P3-03 |
+| DOC-02 | Market Research | v1.0 | ACTIVE | Market sizing | Phase 0 | DOC-01 |
+| DOC-03 | User Personas | v1.0 | ACTIVE | Personas \+ cohort mappings | Phase 0 | DOC-P3-02, DOC-P3-03 |
+| DOC-04 | PRD | v1.1 (only one version now present) | ACTIVE | Feature registry, 6-step pipeline | Phase 1 | DOC-P3-03 |
+| PM-SUPP-01 | Roadmap | v1.0 (.docx and .md, both present, confirmed byte-identical to their `_ACTIVE_`\-prefixed twins) | ACTIVE | Phase sequencing | Phase 1 | — |
+| PM-SUPP-02 | Risk Register | v1.0 (.docx and .md, confirmed identical to twins) | ACTIVE | Risk identification | Phase 1 | — |
+| 12\_MVP\_Sprint\_Plan, 15\_Pitch\_Deck, Complete\_Feature\_Inventory, 04\_Budget | — | unversioned | **STILL UNKNOWN** — these four files were not in this re-scan's directory listing at all; **they appear to have been removed from project storage** since v1.0. Confirmed absent, not just unreferenced. | — | — |  |
+
+### 1.2 — UX / Design layer
+
+| Doc ID | Document Name | Version | Status | Purpose | Phase |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| DOC-05 | Information Architecture | v1.2 ACTIVE; v1.1 still present unprefixed, no `_ACTIVE_` twin (correctly left as a plain reference copy, not competing for ACTIVE status) | ACTIVE \= v1.2 | 35 screens, navigation, gestures | Phase 2 |
+| DOC-06 | UX Design System | v1.1 ACTIVE; **v1.0 still present as a plain unprefixed file with no `_ACTIVE_` twin** — correctly demoted, no longer competing for ACTIVE status | ACTIVE \= v1.1 | Design tokens, OB-07/C-11 specs | Phase 2 |
+| DOC-06-Visual\_Design\_System\_Explorer | HTML companion | unversioned | ACTIVE | Visual reference | Phase 2 |
+
+**Finding:** DOC-05 and DOC-06's superseded versions are now correctly de-prefixed (no `_ACTIVE_` marker on the old copies) — this is exactly the hygiene pattern the v1.0 register recommended (G-3-equivalent for these two docs), already actioned. No conflict remains for either.
+
+### 1.3 — Recommendation Engine concept layer (corrected per the notice above)
+
+| Doc ID | Document Name | Version | Status | Purpose | Phase |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| RE-DOC-01 | Architecture | v1.0 — **the only version that exists or has ever existed as a file** | ACTIVE | Module boundary, API contract | Phase 3 |
+| RE-DOC-02 | Four Layers | v1.0 — only version | ACTIVE | 20 genome dimensions | Phase 3 |
+| RE-DOC-03 | Class Taxonomy & Scoring | v1.0 — only version | ACTIVE | FinalScore formula | Phase 3 |
+| RE-DOC-04 | Cold Start, Variety, Suppression | v1.0 — only version | ACTIVE | Confidence ladder, MMR | Phase 3 |
+| RE-DOC-05 | Evolution Roadmap | v1.0 — only version | ACTIVE | 4-state model, seed gates | Phase 3 |
+| RE-Visual-01/02/03 | Pipeline Explorer / Cold Start / Evolution Map | unversioned, **exactly 3 files — this is the complete, correct set** | ACTIVE | Interactive companions | Phase 3 |
+
+### 1.4 — Solution Architecture layer (Phase 3, P3-0x series) — re-scanned
+
+| Doc ID | Document Name | Version on disk | Status | Last Referenced By |
+| :---- | :---- | :---- | :---- | :---- |
+| DOC-P3-02 | Conceptual Domain Model | **v1.1 — now present and confirmed** (`_ACTIVE__DOC-P3-02_Conceptual_Domain_Model_v1_md.docx`, header explicitly reads "Version: 1.1") | **ACTIVE — G-1 closed** | DOC-P3-03, DOC-P3-03A, DOC-P3-04 |
+| DOC-P3-03 | Business Logic Specification | v1.0 — **exactly one file now, prior duplicate cleared** | ACTIVE | DOC-P3-03A, DOC-P3-04 |
+| DOC-P3-03A | Logic Governance & Execution Matrix | v1.0 — single file | ACTIVE | DOC-P3-04 |
+| DOC-P3-04 | Data Architecture & ERD | v1.3 — **exactly one file now, the two superseded `.docx` duplicates (plain v1 and v1.2) are gone** | **ACTIVE — C-1 closed** | DOC-P3-05 Part (a), all migrations |
+| DOC-P3-05 Part (a) | Implementation Readiness & Migration Strategy | v1.2 — **exactly one file now, the superseded v1.1 `.docx` is gone** | **ACTIVE — C-2 closed** | All migration files |
+| DOC-P3-05 Part (b) Summary | Core Schema Completion Summary | v1.0-equivalent (filename `_1_0.md`) — **exactly one file now, the older un-suffixed/unresolved-AGR-001 copy is gone** | **ACTIVE — C-3 closed** | Architecture Gap Register |
+| DOC-P3-05 Part (c) Summary | Operational Tables Completion Summary | v1.0 — single file | ACTIVE | Architecture Gap Register |
+| DOC-P3-05 Regression Validation | AGR-002/003 Regression Report | v1.0 — single file | ACTIVE | Architecture Gap Register |
+| DOC-P3-05 Architecture Gap Register | Living gap tracker | v1.0 — single file | ACTIVE | This Baseline Register |
+| P3-03 Context Baseline & Readiness | Pre-write validation for DOC-P3-03 | v1.0 — single file, newly visible in this re-scan | ACTIVE (historical/supporting) | DOC-P3-03 |
+| P3-03 Logic Inventory & Quality Gate | Logic inventory pre-write validation | v1.0 — single file, newly visible in this re-scan | ACTIVE (historical/supporting) | DOC-P3-03 |
+| Migration files `001`–`020` | SQL migration \+ rollback pairs | **See Step 3 below — partially resolved, some true duplicates remain (harmless), one filename typo remains** | Mostly ACTIVE, one cosmetic issue | — |
+| APDF\_Framework | Methodology | v1.0 — single file | ACTIVE | All P3-0x documents |
+| SESSION\_HANDOFF-4 / SESSION\_HANDOFF v1.0 | Session continuity docs | Two different documents (not duplicates — `.md` and `.docx` differ in actual content per filename pattern, not verified line-by-line in this pass) | ACTIVE — **not fully verified, see new finding below** | — |
+
+**New finding (not in v1.0 register):** `_ACTIVE__SESSION_HANDOFF-4.md` and `_ACTIVE__SESSION_HANDOFF_v1_0-1.docx` are two differently-named session handoff documents, not a clean version pair (the naming doesn't follow "same name, different version" — it's "-4" vs "v1\_0-1", which are different numbering schemes entirely). This was not flagged in v1.0 and is added now. See Step 3, new Conflict C-10.
+
+---
+
+## Step 2 — Authoritative Document Checklist (carried forward unchanged from v1.1)
+
+| Doc ID | Approved Version | File Name | Status |
+| :---- | :---- | :---- | :---- |
+| DOC-01 | v1.1 | `_ACTIVE__DOC-01_Product_Brief_v1_1.docx` | ✅ Unambiguous |
+| DOC-02 | v1.0 | `_ACTIVE__DOC-02_Market_Research_v1_0.docx` | ✅ Unambiguous |
+| DOC-03 | v1.0 | `_ACTIVE__DOC-03_User_Personas_v1_0.docx` | ✅ Unambiguous |
+| DOC-04 | v1.1 | `_ACTIVE__DOC-04_PRD_v1_1.docx` | ✅ Unambiguous |
+| DOC-05 | v1.2 | `_ACTIVE__DOC-05_Information_Architecture_v1_2.docx` | ✅ Unambiguous (v1.1 demoted, no `_ACTIVE_` tag) |
+| DOC-06 | v1.1 | `_ACTIVE__DOC-06_UX_Design_System_v1_1.docx` | ✅ Unambiguous (v1.0 demoted, no `_ACTIVE_` tag) |
+| DOC-07 | v1.0 | `_ACTIVE__DOC-07_GTM_v1_0.docx` | ✅ Unambiguous |
+| DOC-08 | v1.0 | `_ACTIVE__DOC-08_Revenue_v1_0.docx` | ✅ Unambiguous |
+| DOC-09 | v1.0 | `_ACTIVE__DOC-09_Legal_v1_0.docx` | ✅ Unambiguous |
+| DOC-10 | v1.0 | `_ACTIVE__DOC-10_Technical_Architecture_v1_0.docx` | ✅ Unambiguous *(still carries the open G-4 amendment-note recommendation — see Open Gaps)* |
+| PM-SUPP-01 | v1.0 | `_ACTIVE__PM-SUPP-01_Roadmap_v1_0.docx` (or `.md` — confirmed identical content) | ✅ Unambiguous |
+| PM-SUPP-02 | v1.0 | `_ACTIVE__PM-SUPP-02_Risk_Register_v1_0.docx` (or `.md` — confirmed identical) | ✅ Unambiguous |
+| RE-DOC-01 | v1.0 | `_ACTIVE__RE-DOC-01_Architecture.docx` | ✅ Unambiguous — **this is the only version that has ever existed** |
+| RE-DOC-02 | v1.0 | `_ACTIVE__RE-DOC-02_Four_Layers.docx` | ✅ Unambiguous |
+| RE-DOC-03 | v1.0 | `_ACTIVE__RE-DOC-03_Class_Taxonomy_Scoring.docx` | ✅ Unambiguous |
+| RE-DOC-04 | v1.0 | `_ACTIVE__RE-DOC-04_ColdStart_Variety_Suppression.docx` | ✅ Unambiguous |
+| RE-DOC-05 | v1.0 | `_ACTIVE__RE-DOC-05_Evolution_Roadmap.docx` | ✅ Unambiguous |
+| RE-Visual-01/02/03 | n/a | `_ACTIVE__RE-Visual-01/02/03_*.html` | ✅ Unambiguous — **complete set, no 4th file ever existed** |
+| DOC-P3-02 | v1.1 | `_ACTIVE__DOC-P3-02_Conceptual_Domain_Model_v1_md.docx` | ✅ **Now present — previously the one Critical gap (G-1), now resolved** |
+| DOC-P3-03 | v1.0 | `_ACTIVE__DOC-P3-03_Business_Logic_Specification_v1.md` | ✅ Unambiguous |
+| DOC-P3-03A | v1.0 | `_ACTIVE__DOC-P3-03A_Logic_Governance_Matrix_v1_md.docx` | ✅ Unambiguous |
+| DOC-P3-04 | v1.3 | `_ACTIVE__DOC-P3-04_Data_Architecture_ERD_v1_3.md` | ✅ Unambiguous — only one file remains |
+| DOC-P3-05 Part (a) | v1.2 | `_ACTIVE__DOC-P3-05_Part_A_Readiness_Migration_Strategy_v1_2.md` | ✅ Unambiguous — only one file remains |
+| DOC-P3-05 Part (b) Summary | (AGR-001-resolved content) | `_ACTIVE__DOC-P3-05_Part_B_Completion_Summary_1_0.md` | ✅ Unambiguous — only one file remains |
+| DOC-P3-05 Part (c) Summary | v1.0 | `_ACTIVE__DOC-P3-05_Part_C_Completion_Summary.md` | ✅ Unambiguous |
+| DOC-P3-05 Regression Validation | v1.0 | `_ACTIVE__DOC-P3-05_Regression_Validation_AGR002_003.md` | ✅ Unambiguous |
+| Architecture Gap Register | v1.0 | `_ACTIVE__DOC-P3-05_Architecture_Gap_Register.md` | ✅ Unambiguous |
+| P3-03 Context Baseline & Readiness | v1.0 | `_ACTIVE__P3-03_Context_Baseline_Readiness.md` | ✅ Unambiguous (supporting document) |
+| P3-03 Logic Inventory & Quality Gate | v1.0 | `_ACTIVE__P3-03_Logic_Inventory_QualityGate.md` | ✅ Unambiguous (supporting document) |
+| **DOC-P3-05 Part (d) Summary** *(new in v1.3)* | v1.0 | `_ACTIVE__DOC-P3-05_Part_D_Completion_Summary.md` | ✅ Unambiguous — seed/validation framework complete, IDR-001 (missing source spreadsheet) disclosed and open |
+| **DOC-P3-06** *(new in v1.3)* | **v1.2** | `_ACTIVE__DOC-P3-06_API_Contract_Specification_v1_2.md` | ✅ Unambiguous — **APPROVED — ACTIVE — FROZEN**, session #028 |
+| **DOC-P3-07** *(new in v1.3)* | **v1.2** | `_ACTIVE__DOC-P3-07_Security_Architecture_v1_2.md` | ✅ Unambiguous — **APPROVED — ACTIVE — FROZEN**, session #030. Carries one open AGR (AGR-P3-07-001, age-verification implementation omission relative to DOC-10 — freeze does not close this AGR) |
+| **DOC-P3-08** *(new in v1.5)* | **v1.1** | `_ACTIVE__DOC-P3-08_Integration_and_Infrastructure_Architecture_v1_1.md` | ✅ Unambiguous — **APPROVED — ACTIVE — FROZEN**, session #033. Completes all 8 mandatory APDF Phase 3 documents. Zero open AGRs; one open non-blocking DCR (DCR-P3-08-002, free-tier figure re-verification) |
+| Migration `001` | v1.0 | Either copy (confirmed identical) — recommend keeping `_1_0.sql` suffix, deleting unsuffixed | ⚠️ Harmless duplicate remains |
+| Migration `002` | v1.0 | Either copy (confirmed identical) | ⚠️ Harmless duplicate remains |
+| Migration `003` | v1.1 | `_ACTIVE__003_reference_tier1_1_1.sql` | ✅ Unambiguous — only one file remains |
+| Migration `004` | v1.0 | Either copy (confirmed identical) | ⚠️ Harmless duplicate remains |
+| Migration `005` | v1.0 | Either copy (confirmed identical) | ⚠️ Harmless duplicate remains |
+| Migration `006` | v1.0 | Either copy (confirmed identical) | ⚠️ Harmless duplicate remains |
+| Migration `007` | v1.0 | Either copy (confirmed identical) | ⚠️ Harmless duplicate remains |
+| Migration `008` | v1.1 | `_ACTIVE__008_content_core1_1.sql` | ⚠️ **Only one file now (the broken AGR-001 version is gone — good), but the filename typo (missing underscore) is still present** |
+| Migration `009` | v1.0 | Either copy (confirmed identical) | ⚠️ Harmless duplicate remains |
+| Migration `010` | v1.1 | `_ACTIVE__010_trigger_functions_and_triggers_1_1.sql` | ✅ Unambiguous — only one file remains |
+| Migration `011` | v1.1 | `_ACTIVE__011_planning_tables_1_1.sql` | ✅ Unambiguous — only one file remains |
+| Migration `012` | v1.0 | `_ACTIVE__012_interaction_audit_appendonly_1_0.sql` | ✅ Unambiguous |
+| Migration `013` | v1.0 | `_ACTIVE__013_config_tables_1_0.sql` | ✅ Unambiguous |
+| Migration `014` | v1.0 | `_ACTIVE__014_persona_assignment_and_priors_1_0.sql` | ✅ Unambiguous |
+| Migration `015` | v1.1 | `_ACTIVE__015_operational_audit_public_1_1.sql` | ✅ Unambiguous — only one file remains |
+| Migration `016` | v1.0 | `_ACTIVE__016_dish_features_1_0.sql` | ✅ Unambiguous |
+| Migration `017` | v1.0 | `_ACTIVE__017_initial_partitions_1_0.sql` | ✅ Unambiguous |
+| Migration `018` | v1.1 | `_ACTIVE__018_meal_classes_mirror_sync_1_1.sql` | ✅ Unambiguous — only one file remains |
+| Migration `019` | v1.0 | `_ACTIVE__019_rls_policies_1_0.sql` | ✅ Unambiguous |
+| Migration `020` | v1.0 | `_ACTIVE__020_indexes_1_0.sql` | ✅ Unambiguous |
+| APDF Framework | v1.0 | `_ACTIVE__APDF_Framework_v1.md` | ✅ Unambiguous |
+
+---
+
+## Step 3 — Version Conflicts Detected (re-assessed)
+
+| \# | Conflict | Classification | Status vs. v1.0 |
+| :---- | :---- | :---- | :---- |
+| C-1 | DOC-P3-04 three-file conflict | Critical | **✅ RESOLVED** — only one file remains on disk |
+| C-2 | DOC-P3-05 Part (a) two-file conflict | Critical | **✅ RESOLVED** — only one file remains |
+| C-3 | DOC-P3-05 Part (b) Summary two-file, inverted-naming conflict | High | **✅ RESOLVED** — only one file remains |
+| C-4 | Six migration files (`003`,`008`,`010`,`011`,`015`,`018`) multi-version | Critical | **✅ MOSTLY RESOLVED** — all six now have exactly one version on disk |
+| C-5 | `008_content_core1_1.sql` missing underscore in filename | Medium | **⚠️ STILL OPEN** — the typo persists; content is correct (verified) but the filename hygiene issue (risk to automated `*_1_1.sql` discovery patterns) remains |
+| C-6 | Part (a) v1.2 header says "Implements: DOC-P3-04 v1.2" while body discusses v1.3 | Medium | **⚠️ STILL OPEN** — not addressed by file cleanup; this requires an in-document text edit, not a file deletion. Recommend in Open Gaps below. |
+| C-7 | DOC-P3-02 missing entirely | Critical | **✅ RESOLVED** — file now present, confirmed v1.1 |
+| C-8 | DOC-01/DOC-04 v1.0/v1.1 ambiguity | Low | **✅ RESOLVED** — both now have only one version on disk |
+| C-9 | Four unversioned PM/GTM-adjacent files with unknown status | Low | **✅ RESOLVED differently than expected** — re-scan shows these four files (sprint plan, pitch deck, feature inventory, budget) are **no longer present in the project directory at all.** Their ambiguity is moot because they were removed, not because their status was clarified. Recorded here for completeness — if they are needed later, they will need to be re-uploaded and freshly classified. |
+| **C-10 (NEW)** | `_ACTIVE__SESSION_HANDOFF-4.md` and `_ACTIVE__SESSION_HANDOFF_v1_0-1.docx` use two unrelated naming/numbering schemes for what may be the same logical document at different points in time, or may be two genuinely different documents — **not disambiguated in this pass.** | **Medium — new finding** | Open. Content of both not yet compared line-by-line in this session. Recommend a dedicated comparison before relying on either as a "current state" reference. |
+| **C-11 (NEW)** | Seven migration files (`001`,`002`,`004`,`005`,`006`,`007`,`009`) still have two on-disk copies each (one suffixed `_1_0`, one not). Confirmed byte-identical by direct diff — **not a content conflict**, but still a filename-hygiene duplicate. | **Low — new finding, downgraded from what C-4 implied** | Open but low-risk: since content is verified identical, picking either copy is safe. Recommend deletion of the unsuffixed copies purely for tidiness, consistent with the v1.0 register's original G-3 recommendation, which was only partially completed. |
+
+---
+
+## Step 4 — Cross-Reference Validation Report (re-run)
+
+| Check | Result |
+| :---- | :---- |
+| ACTIVE documents reference the latest approved version of prerequisites | **Now fully confirmable for DOC-P3-04 and Part (a)** — single-file status removes the retrieval ambiguity that made this "cannot be fully confirmed" in v1.0. |
+| Superseded version explicitly cited anywhere | No instance found, consistent with v1.0's finding. |
+| Broken references | **The one confirmed instance from v1.0 (DOC-P3-02 missing) is now closed.** Zero broken references remain. |
+| Section references valid | Re-confirmed for DOC-P3-04 v1.3 ↔ DOC-P3-05 Part (a) v1.2 ↔ migration file headers — all consistent. |
+| Internal version consistency within a single document | **C-6 still open** (Part (a) v1.2's header/body mismatch) — this is a content-edit task, not a file-retrieval risk, and was correctly distinguished as such in v1.0; it remains the one unresolved item in this check. |
+
+---
+
+## Step 5 — Responsibility Overlap Detection (re-confirmed, no change)
+
+All findings from v1.0 stand unchanged on re-inspection: the Part (b)/(c) summaries vs. the Gap Register overlap is intentional, the RE-DOC vs. P3-0x layering is intentional, and the DOC-10 vs. DOC-P3-04 schema-naming overlap is the one **unintentional, still-unresolved** item — DOC-10 has received **zero** amendment note in this re-scan (confirmed: zero matches for "DOC-P3-04," "deferred," or "superseded" anywhere in its text). This remains open as G-4.
+
+---
+
+## Step 6 — Missing or Orphan Documents (re-assessed)
+
+| ID | Finding | Status vs v1.0 |
+| :---- | :---- | :---- |
+| M-1 | DOC-P3-02 missing | **✅ RESOLVED** — file now present |
+| M-2 | RE-DOC "v1.1 amendments" missing | **❌ WITHDRAWN — false finding, see Correction Notice above** |
+| M-3 | Part (d) not yet produced | **✅ RESOLVED in v1.3** — `DOC-P3-05 Part (d) Summary` confirmed ACTIVE and catalogued in Step 2. Carries IDR-001 (missing source spreadsheet) as a disclosed, non-blocking limitation — not a reason this finding stays open |
+| M-4 | RE-Visual-04 missing | **❌ WITHDRAWN — false finding, see Correction Notice above** |
+| M-5 | Orphan documents (sprint plan, pitch deck, etc.) | Superseded by C-9's finding — these files are now absent entirely, not merely orphaned |
+| **M-6 (NEW)** | Two newly-visible supporting documents — `P3-03_Context_Baseline_Readiness` and `P3-03_Logic_Inventory_QualityGate` — were not catalogued in the v1.0 register at all (they existed on disk then too, but were missed in that pass). Both are now correctly catalogued in Step 1.4 above. | New finding, now closed by inclusion in this register |
+
+---
+
+## Step 7 — Implementation Readiness Validation (re-run)
+
+| Requirement | v1.0 Status | v1.1 Status |
+| :---- | :---- | :---- |
+| Every prerequisite document for the current phase exists | ❌ No (DOC-P3-02 missing) | ✅ **Yes** |
+| Every prerequisite is the latest approved version | ⚠️ Ambiguous (C-1, C-2) | ✅ **Yes — single-file status confirmed for all P3-0x documents** |
+| No unresolved document conflict remains | ❌ No (9 conflicts) | ⚠️ **Mostly — 4 minor items remain (C-5, C-6, C-10, C-11), zero Critical or High remain** |
+| No version ambiguity exists | ❌ No | ✅ **Yes, for all ACTIVE document selection. Filename-hygiene duplicates (C-11) are confirmed content-identical, so they create no ambiguity about which content is correct, only mild directory clutter.** |
+| No document dependency is broken | ❌ No (M-1) | ✅ **Yes** |
+| Working from one authoritative source of truth | ❌ Not yet | ✅ **Yes** |
+
+**This step now passes, with minor observations.** This is a materially better result than v1.0, driven by real cleanup work, not by relaxed criteria.
+
+---
+
+## Step 8 — Final Baseline Decision (re-issued)
+
+### ✅ Baseline Approved
+
+**Reasoning:** Every Critical and High-severity finding from v1.0 (C-1, C-2, C-3, C-4, C-7) is now resolved by confirmed file cleanup. The two false findings (M-2, M-4) are formally withdrawn. What remains are four Medium/Low items (C-5 filename typo, C-6 header/body mismatch, C-10 unclear session-handoff relationship, C-11 harmless duplicate files) — none of which block safe implementation of DOC-P3-05 Part (d). This is the first "Approved" (not "Approved with Observations," not "Rejected") decision this register has issued.
+
+### Final list of ACTIVE documents for all remaining project work
+
+Use the Step 2 table above as the authoritative reference. In short: every P3-0x document, every RE-DOC (v1.0, complete set), every RE-Visual (3 files, complete set), and migration files `001`–`020` using whichever copy is listed in Step 2 (preferring the `_1_X`\-suffixed copy where both exist).
+
+### Open items carried forward (none blocking)
+
+| Gap ID | Description | Recommended action |
+| :---- | :---- | :---- |
+| **G-3 (residual)** | Filename typo on migration `008` (C-5); 7 harmless duplicate migration files (C-11) | Low-effort cleanup whenever convenient — rename `008_content_core1_1.sql` → `008_content_core_1_1.sql`; delete the 7 unsuffixed migration duplicates |
+| **G-4** | DOC-10 still has no amendment note deferring schema authority to DOC-P3-04 | Recommend a short addendum the next time DOC-10 is opened for any reason |
+| **G-5 (new)** | Part (a) v1.2's header line still says "Implements: DOC-P3-04 v1.2" (C-6) | One-line text correction; recommend fixing in the same pass as any future Part (a) revision |
+| **G-6 (new)** | SESSION\_HANDOFF-4 vs SESSION\_HANDOFF\_v1\_0-1 relationship unclear (C-10) | Recommend a dedicated comparison pass before treating either as a reliable "current state" snapshot |
+
+None of G-3, G-4, G-5, or G-6 block Part (d). They are housekeeping, not architecture or implementation risk.
+
+---
+
+## Step 9 — Versioning Standard (unchanged, reaffirmed)
+
+The naming and header standard adopted in v1.0 remains in force without modification. This document is itself filed under it: `[ACTIVE]_Project_Baseline_Register_v1.2`, superseding `v1.1` per the rule it establishes.
+
+---
+
+## Step 10 — Schema and Migration Layer Freeze (Permanent Rule, added v1.2)
+
+**Effective immediately, from this point onward:**
+
+The database schema and migration layer — DOC-P3-04 (Data Architecture & ERD, latest ACTIVE version) and DOC-P3-05 Parts (a) through (d) (Implementation Readiness, Core Schema, Operational Objects, Seed/Validation) in their latest ACTIVE versions per this register — **are frozen.**
+
+**What this means in practice:**
+
+1. **Every future service** that consumes this database — Edge Functions, REST/GraphQL APIs, the recommendation engine's runtime code, background/scheduled jobs, AI pipelines, or any other consumer — **must treat the schema exactly as defined.** No service may assume a column, table, trigger, or constraint exists, is named, or behaves differently than what DOC-P3-04/DOC-P3-05 actually specify.  
+     
+2. **No service may silently redefine the data model.** This includes, without limitation: adding a column via an ad hoc migration outside the numbered `NNN_description.sql` sequence; changing a column's type, nullability, or default to suit application convenience; adding a new table to hold data that "should have" been modeled differently; bypassing a trigger's derived-column protection (the REVOKE statements from file `008`) by writing through a service-role connection instead of respecting the intended write path; or altering an RLS policy to relax access for a new feature.  
+     
+3. **If a future service genuinely requires a schema change** — a new column, a new table, a changed constraint, a new trigger, anything DOC-P3-04 does not already provide — **it must first raise one of:**  
+     
+   - **An Architecture Gap Report (AGR)**, if the need reveals that the *existing approved architecture* is incomplete, inconsistent, or incorrect (the same AGR discipline already established and tracked in `[ACTIVE]_DOC-P3-05_Architecture_Gap_Register`).  
+   - **A Schema Evolution Request (SER)** — a new artifact type, introduced by this rule — if the existing architecture is correct and complete for its own purposes, but a *new* capability (a new feature, a new phase of the product, a new service) requires the schema to grow. This is the expected, planned path for the many future capabilities DOC-P3-04 §12 (Schema Evolution Strategy) already anticipated — cluster-based cold start, Learning-to-Rank, mood selector, festival activation, multi-profile households, etc. Raising a SER when that time comes is not a failure of the current architecture; it is the correct, designed-for mechanism for extending it.
+
+   
+
+4. **Either report must be reviewed and approved before any schema modification is made.** No AI session, no service implementation, no "quick fix" may modify `public` or `re_engine` schema objects outside of this approval path — even if the modification seems small, obviously correct, or urgently needed. The same discipline already enforced throughout DOC-P3-05's four parts (raise, classify, get approval, then act) now extends permanently to every future consumer of this database, not just to the migration-authoring process itself.  
+     
+5. **This register must be updated whenever an AGR or SER results in an approved schema change.** The change gets a new DOC-P3-04/DOC-P3-05 version, that version becomes the new ACTIVE entry in Step 2 above, and the prior version is marked superseded — exactly the same discipline already governing every other document in this project.
+
+**Why this rule exists:** DOC-P3-04 and DOC-P3-05 represent 6 sessions of architecture-first discipline — a Conceptual Domain Model, a Business Logic Specification, a Governance Matrix, a Data Architecture with a documented Gap Register, and a 4-part implementation that closed every gap it found rather than papering over it. That discipline is only worth what it protects going forward. The moment a Phase 4 service is allowed to quietly add a column because it's faster than raising a request, this project returns to exactly the undisciplined, assumption-laden state the original APDF framework request (session \#028) was created to prevent.
+
+---
+
+## Step 11 — Frozen Documents vs. Mutable Governance Documents (new in v1.4)
+
+| Frozen Documents | Mutable Governance Documents |
+|---|---|
+| DOC-P3-04 (Data Architecture & ERD v1.3) | Project Baseline Register |
+| DOC-P3-05 Parts (a)–(d) | Engineering Handover Package |
+| DOC-P3-06 (API Contract Specification v1.2) | Architecture Gap Register |
+| DOC-P3-07 (Security Architecture v1.2) | |
+| DOC-P3-08 (Integration & Infrastructure Architecture v1.1) | |
+
+**Frozen documents define architecture. Mutable governance documents track project state but never redefine architecture.**
+
+A frozen document may only be changed by an approved AGR, DCR, SER, or IDR, or by explicit Founder instruction reopening it (Step 10's discipline, now confirmed to apply identically across all five frozen documents above, not DOC-P3-04/05 alone). A mutable governance document may be appended to or revised freely to reflect current project state — indexing an AGR, updating a phase snapshot, adding a catalogue row — without that append ever constituting a change to the architecture itself.
+
+---
+
+## Step 12 — APDF Phase 3 Formal Completion `(new in v1.5)`
+
+**APDF Phase 3 (Solution Architecture) is formally complete.** All 8 mandatory Phase 3 documents (DOC-P3-01 through DOC-P3-08) now exist and are ACTIVE. Five carry the highest architectural risk and are frozen under change control: DOC-P3-04, DOC-P3-05 (a–d), DOC-P3-06, DOC-P3-07, and now **DOC-P3-08 v1.1**. All mandatory Phase 3 deliverables are now ACTIVE, APPROVED, and FROZEN. Remaining work (Knowledge Integration / Phase 3.5 and Phase 4 implementation) proceeds from this frozen architectural baseline.
+
+Two independent items remain open and do not block this completion declaration: IDR-001 (missing seed source data, resolves via Phase 3.5) and AGR-P3-07-001 (age-verification implementation omission, requires Founder direction, launch-blocking but not Phase-3-blocking).
+
+---
+
+**Founder sign-off — v1.5 (DOC-P3-08 v1.1 catalogued as APPROVED/ACTIVE/FROZEN; APDF Phase 3 formally declared complete per Step 12; nothing from v1.4 modified, removed, or re-verified):** _______________________ Date: ___________

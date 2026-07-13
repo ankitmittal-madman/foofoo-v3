@@ -1,0 +1,121 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**DOC-09  ·  Legal ****&**** Compliance Checklist**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **01  Overview — legal priorities for Foofoo**
+
+Foofoo operates in three legal domains simultaneously: Indian company law (entity setup), digital product law (DPDP Act 2023, IT Act), and consumer/app store law (Play Store, App Store, advertising standards). This checklist is the minimum legal foundation required before launch. It is not a substitute for professional legal advice — engage a startup-focused lawyer in India before launch.
+
+| **Critical deadline: **DPDP Act 2023 compliance and app store terms compliance must be complete BEFORE the app is published on either store. These are not optional — violation risks app removal and regulatory action. |
+| --- |
+
+# **02  Entity setup**
+
+| **Item** | **Status** | **Action required** | **Deadline** |
+| --- | --- | --- | --- |
+| **Choose legal structure (LLP vs Private Limited)** | **⬜ Pending** | Decision required. Private Limited recommended for investor readiness and IP ownership clarity. LLP is simpler and cheaper for pure bootstrap. | Before launch |
+| **Incorporate entity with MCA (Ministry of Corporate Affairs)** | **⬜ Pending** | File SPICe+ form online. Director DIN required. DSC required. ~₹5,000–10,000 via professional. | Before launch |
+| **Open current account** | **⬜ Pending** | Required for any revenue and for developer account billing. Open after entity incorporation. | Before revenue |
+| **GST registration** | **⬜ Pending** | Required when revenue exceeds ₹20L/year. Not required at MVP launch. Plan for it at Phase 1.5. | Before ₹20L ARR |
+| **Co-founder agreement signed** | **⬜ Pending** | Equity split, vesting schedule (4-year vest, 1-year cliff is standard), IP assignment, decision-making authority, exit clauses. | Before launch |
+| **IP assignment from founders to entity** | **⬜ Pending** | All IP created by founders must be formally assigned to the company, not held personally. Standard clause in co-founder agreement. | Before launch |
+
+# **03  Digital Personal Data Protection (DPDP) Act 2023**
+
+The DPDP Act 2023 is India's primary data privacy law. It applies to all digital products that process personal data of Indian residents. Non-compliance risks fines up to ₹250 crore. The following items are mandatory before launch.
+
+| **Item** | **Status** | **Action required** | **Deadline** |
+| --- | --- | --- | --- |
+| **Privacy Policy published** | **⬜ Pending** | Must be accessible from app and app store listing. Must include: what data is collected, why, how long it is retained, how to request deletion, and contact details of the Data Fiduciary (your company). | Before app store submission |
+| **Terms of Service published** | **⬜ Pending** | Covers: acceptable use, liability limitations, subscription terms (auto-renewal, cancellation), governing law (Indian law), dispute resolution. | Before app store submission |
+| **Consent mechanism at signup** | **⬜ Pending** | Explicit, granular consent for each data category. Cannot be bundled — health/dietary data requires separate consent from account data. Pre-ticked boxes are not valid consent under DPDP. | Before launch |
+| **Data minimisation — collect only what RE needs** | **⬜ Pending** | Each data field collected must be justified. DOC-04 NFR specifies: only data that materially changes the meal plan is collected. Document this justification. | Before launch |
+| **Data export within 72 hours of request** | **⬜ Pending** | User must be able to request all their data. Build export endpoint (household profile + interaction history + plan history). | Before launch |
+| **Account deletion within 72 hours of request** | **⬜ Pending** | Full data purge on deletion. Not soft-delete — permanent erasure from all tables. Test this before launch. | Before launch |
+| **Data retention policy documented** | **⬜ Pending** | Interaction logs: retained for RE learning (2 years maximum). Plan history: retained until deletion. Anonymous aggregate data: may be retained permanently. | Before launch |
+| **Minor protection — no users under 13** | **⬜ Pending** | DPDP has strict protections for minors. Add age gate at signup. If user indicates they are a minor, block account creation. | Before launch |
+| **Data Fiduciary registration (if applicable)** | **⬜ Pending** | Significant Data Fiduciaries must register with the Data Protection Board. At MVP scale, unlikely to apply — but monitor as user base grows. | Monitor post-launch |
+
+# **04  App store compliance**
+
+| **Item** | **Status** | **Action required** | **Deadline** |
+| --- | --- | --- | --- |
+| **Google Play Developer Program Policy — health ****&**** fitness** | **⬜ Pending** | If any health claims are made (e.g. 'improves nutrition'), medical disclaimer required. Foofoo avoids health claims in MVP — verify no health language in screenshots or description. | Before Play submission |
+| **Apple App Store Review Guidelines — Section 5.1 (Privacy)** | **⬜ Pending** | All data collection must be disclosed in App Privacy section in App Store Connect. Map every data field to Apple's categories: Usage Data, Identifiers, Health & Fitness (if applicable), User Content. | Before iOS submission |
+| **App Privacy Nutrition Labels (iOS)** | **⬜ Pending** | Fill accurately in App Store Connect. Dietary preferences may fall under Health & Fitness category — declare clearly. False declarations risk app removal. | Before iOS submission |
+| **Data Safety section (Android)** | **⬜ Pending** | Fill data safety form in Play Console. Declare all data collected, whether it is shared with third parties, and whether it is encrypted. | Before Play submission |
+| **Push notification permission handling** | **⬜ Pending** | iOS: must request permission explicitly via system dialogue before sending any push. Android 13+: same. Never send push without explicit permission. | Before launch |
+| **In-app purchase setup (for premium subscription)** | **⬜ Pending** | Both stores take 15–30% commission. Register subscription products in App Store Connect and Play Console before Phase 1.5 monetisation. Test sandbox purchases thoroughly. | Before Phase 1.5 |
+| **Content rating — confirm appropriate rating** | **⬜ Pending** | Foofoo should receive a 'Everyone' / '3+' rating on both stores. Verify no content in the app triggers a higher rating (violence, adult content, etc.). | Before submission |
+
+# **05  Product-specific legal requirements**
+
+| **Item** | **Status** | **Action required** | **Deadline** |
+| --- | --- | --- | --- |
+| **Allergen liability disclaimer** | **⬜ Pending** | Foofoo's allergen exclusion is a filtering tool, not a medical guarantee. Add disclaimer: 'Foofoo's allergen filtering is a convenience feature. Always verify dish ingredients independently if you have a severe allergy or medical condition.' Include in onboarding and Privacy Policy. | Before launch |
+| **No medical advice disclaimer** | **⬜ Pending** | Foofoo does not provide medical, nutritional, or dietary advice. Any health-adjacent feature (calorie targeting, postpartum overlay) must include: 'This is for informational purposes only and is not a substitute for professional medical advice.' | Before Phase 1 (when health features added) |
+| **Recipe content IP — dish database** | **⬜ Pending** | Dish names, preparation methods, and ingredient lists must be original content or properly licensed. Do not copy recipes verbatim from copyrighted sources. Ingredient lists (as a list of ingredients) are generally not copyrightable; full recipes with specific instructions may be. | Before content launch |
+| **Food photography IP** | **⬜ Pending** | All dish photos must be original (hired photographer), properly licensed (stock with commercial license), or Creative Commons with correct attribution. Document license for every photo in the database. | Before launch |
+| **Brand trademark — Foofoo name** | **⬜ Pending** | Check trademark availability on IP India database for Class 42 (computer services) and Class 35 (advertising/marketing). File application before public launch to establish priority date. Cost: ~₹10,000 via agent. | Before public launch |
+| **Referral programme compliance** | **⬜ Pending** | Referral programmes must comply with Consumer Protection Act 2019. Cannot be structured as a pyramid scheme. Foofoo's 1:1 referral (one referrer, one referee) is compliant. Document mechanics in Terms of Service. | Before F-50 activation |
+| **Advertising Standards Council of India (ASCI) guidelines** | **⬜ Pending** | Any paid advertising must comply with ASCI guidelines. Food product advertising has specific rules — no misleading health claims. Review any ad copy before publishing. | Before Phase 1 paid ads |
+
+# **06  Ongoing compliance calendar**
+
+| **Frequency** | **Compliance task** | **Who** | **When to start** |
+| --- | --- | --- | --- |
+| **Before every major release** | RE safety gate queries (diet/allergen/Jain) must return 0 violations | Engineering | Sprint 1 |
+| **Before every release** | Review any new data collection for DPDP compliance | Founder | Sprint 1 |
+| **Monthly** | Review app store policy updates (both stores update policies quarterly) | Founder | Month 1 |
+| **Monthly** | Review ASCI complaints and guidelines if running paid ads | Founder | Phase 1.5 |
+| **Quarterly** | Audit data retention — purge logs older than policy allows | Engineering | Month 3 |
+| **Annually** | Renew Apple Developer account (₹8,700) | Founder | Month 12 |
+| **Annually** | Trademark renewal and watch service | Founder / Legal | Year 1 |
+| **On any data breach** | DPDP Act requires notification to Data Protection Board within 72 hours | Founder + Legal | If occurs |
+| **On reaching 50 lakh (5M) users** | Assess whether Significant Data Fiduciary status applies | Founder + Legal | Year 2–3 (if scale achieved) |
+
+# **07  Legal budget estimate**
+
+| **Item** | **Estimated cost** | **When** |
+| --- | --- | --- |
+| **Entity incorporation (Private Limited via CA/agent)** | ₹8,000–15,000 | Before launch |
+| **Co-founder agreement (lawyer review)** | ₹5,000–10,000 | Before launch |
+| **Privacy Policy + Terms of Service (lawyer draft)** | ₹5,000–15,000 | Before launch |
+| **Trademark filing — Foofoo (Class 42 + 35)** | ₹10,000–15,000 (via agent) | Before public launch |
+| **GST registration (when applicable)** | ₹2,000–5,000 (via CA) | Before ₹20L ARR |
+| **Annual Apple developer account** | ₹8,700/year | Before iOS launch |
+| **Annual legal retainer (compliance review)** | ₹10,000–20,000/year | Year 1 onward |
+| **Total one-time legal cost** | ₹28,000–55,000 | Before + at launch |
+| **Total annual ongoing** | ₹20,000–30,000 | Ongoing |
+
+| **Budget note: **Most legal costs can be deferred. The minimum required before Play Store/App Store submission is: Privacy Policy, Terms of Service, and DPDP consent mechanism. These three can be drafted for under ₹15,000 and are non-negotiable. Everything else can be phased. |
+| --- |
+
+# **08  Recommended legal contacts (types, not specific firms)**
+
+| **Need** | **Type of professional** | **Cost range** | **How to find** |
+| --- | --- | --- | --- |
+| **Entity incorporation** | CA (Chartered Accountant) or company registration agent | ₹8,000–15,000 | Referral from startup community. Avoid general CAs — find one who has incorporated startups. |
+| **Privacy Policy + ToS drafting** | Startup-focused lawyer (IP + tech law background) | ₹5,000–15,000 | LegalWiz, Vakilsearch, or referral. Specify: DPDP-aware, mobile app experience. |
+| **Trademark filing** | IP lawyer or trademark agent | ₹10,000–15,000 (filing + agent fees) | IP India portal lists registered agents. Referral from other founders is best. |
+| **General startup legal advice** | Startup-focused law firm (Chennai, Mumbai, Bengaluru all have strong options) | ₹5,000–10,000/hour for senior counsel | iSPIRT, Nasscom, or YourStory founder community for referrals. |
+
+# **09  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-09 · Legal & Compliance Checklist |
+| **Version** | 1.0 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Disclaimer** | This document is a checklist and framework, not legal advice. Engage a qualified Indian startup lawyer before launch. |
+| **Non-negotiable before launch** | Privacy Policy + Terms of Service + DPDP consent mechanism + allergen disclaimer + app store data disclosures |
+| **Next document** | DOC-10 · Technical Architecture (Engineering layer begins) |
+
+Founder sign-off: ___________________________     Date: _______________

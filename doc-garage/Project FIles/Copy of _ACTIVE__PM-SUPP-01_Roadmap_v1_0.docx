@@ -1,0 +1,174 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**PM-SUPP-01  ·  Product Roadmap**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **01  How to read this roadmap**
+
+Phases are gates, not timelines. A phase does not begin until the previous phase passes its go/no-go criteria. Phase TBD features (F-24, F-27, F-28, F-46, F-50, F-57) will be assigned at the next planning session.
+
+# **02  Phase overview**
+
+| **Phase** | **Timeline** | **Goal** | **DAU target** | **Revenue** |
+| --- | --- | --- | --- | --- |
+| **MVP — Soft launch** | Wks 1–14 build + 90-day test | Validate: do users come back daily? | 0 → 500 | ₹0 — fully free |
+| **Phase 0.5 — Full product** | Weeks 15–20 | Full feature set on both stores | 500 → 2,000 | ₹0 — free period |
+| **Phase TBD — Deferred** | TBD | F-24,F-27,F-28,F-46,F-50,F-57 assigned | TBD | TBD |
+| **Phase 1 — Public launch** | Weeks 21–28 | Public launch + content marketing | 2,000 → 10,000 | Ads + Premium visible |
+| **Phase 1.5 — Monetisation** | Weeks 29–36 | Paywall activates (Day 90+) | 10,000 → 30,000 | Premium + Ads |
+| **Phase 2 — Depth** | Weeks 37–50 | Health profiles + RE v3 + cluster | 30,000 → 75,000 | All subscription tiers |
+| **Phase 3 — Partnerships** | Year 2 | Zomato/Swiggy + grocery | 75,000 → 200,000 | Affiliate + subscriptions |
+| **Year 2+ — Scale** | Year 2+ | Full ML + B2B exploration | 200,000+ | All streams |
+
+# **03  Phase detail**
+
+## **MVP — Soft launch (Weeks 1–14 build + 90 days)**
+
+|  | **Detail** |
+| --- | --- |
+| **Goal** | Prove one thing: daily habit formation. 500 DAU is the verdict. |
+| **Key features** | F-01 to F-23, F-25, F-30–F-31, F-33–F-34, F-37, F-39, F-55–F-56, F-58, F-59 |
+| **RE version** | classfirst_v1 (rule-based, cohort priors, MMR variety, bandit exploration) |
+| **Unlock trigger** | 5 of 8 MVP metrics hit at Day 90. Zero RE constraint violations. |
+| **Revenue** | ₹0. All users free. |
+
+## **Phase 0.5 (Weeks 15–20)**
+
+|  | **Detail** |
+| --- | --- |
+| **Goal** | Full product depth. iOS + Android. Recipes. Pantry. |
+| **Key features** | F-26 (recipes), F-29 (smart grocery), F-38 (evening notification), F-51 (social login), F-54 (pantry) |
+| **RE version** | classfirst_v1 continued |
+| **Unlock trigger** | 500 DAU sustained 14 consecutive days |
+| **Revenue** | ₹0. Free period continues. |
+
+## **Phase TBD — Deferred features**
+
+| **Features awaiting phase assignment: **F-24 (Order Instead CTA), F-27 (grocery list), F-28 (ingredient check-off), F-46 (freemium tier visible), F-50 (referral programme), F-57 (daily email digest). Assign at next planning session. |
+| --- |
+
+## **Phase 1 — Public launch (Weeks 21–28)**
+
+|  | **Detail** |
+| --- | --- |
+| **Goal** | Open to public. Content marketing. Mood selector. Calorie targeting. |
+| **Key features** | F-32 (explore), F-35 (diary), F-40 (RE v2 personal learning), F-41 (mood selector), F-42 (calorie targeting), F-43 (fitness mode) |
+| **RE version** | classfirst_v2 (+ personal history learning) |
+| **Unlock trigger** | D7 retention > 30%, acceptance rate > 40% |
+| **Revenue** | Ads go live (free tier). Premium visible. |
+
+## **Phase 1.5 — Monetisation (Weeks 29–36)**
+
+|  | **Detail** |
+| --- | --- |
+| **Goal** | Paywall activates. Family profiles. Full freemium model. |
+| **Key features** | F-36 (family profiles), F-47 (Premium ₹99), F-48 (Premium Plus ₹149), F-49 (ads optimised) |
+| **RE version** | classfirst_v2 continued |
+| **Unlock trigger** | 1,000 DAU. D30 retention > 25%. |
+| **Revenue** | Premium ₹99/month + Premium Plus ₹149/month + Ads |
+
+## **Phase 2 — Depth (Weeks 37–50)**
+
+|  | **Detail** |
+| --- | --- |
+| **Goal** | Health profiles. Festival calendar. RE cluster mode. |
+| **Key features** | F-44 (RE v3 cluster), F-45 (festival calendar), health profiles, meal insights dashboard |
+| **RE version** | cluster_v1 (cluster-based cold start when base > 5K DAU) |
+| **Unlock trigger** | ₹1L MRR. 5,000 DAU. |
+| **Revenue** | All subscription tiers. Affiliate prep. |
+
+## **Phase 3 — Partnerships (Year 2)**
+
+|  | **Detail** |
+| --- | --- |
+| **Goal** | Zomato/Swiggy API. Grocery delivery. Social features. |
+| **Key features** | F-52 (Blinkit/Zepto), F-53 (Zomato/Swiggy API), social/sharing features, B2B exploration |
+| **RE version** | ltr_v1 (Learning-to-Rank) — if 10K+ labeled events |
+| **Unlock trigger** | 10,000 DAU. Product-market fit confirmed. |
+| **Revenue** | Affiliate commissions + all subscription tiers |
+
+# **04  Complete feature-to-phase map**
+
+| **Feature ID** | **Feature** | **Phase** | **Persona** | **Priority** |
+| --- | --- | --- | --- | --- |
+| **F-01 to F-09** | Onboarding (all 9 screens + skip handling) | MVP | All | P0 |
+| **F-10 to F-14** | Home Day View (cards, carousel, add-on, combo) | MVP | All | P0–P1 |
+| **F-15 to F-19** | Gestures (swipe-reveal Never/Not Today, lock, plus, refresh) | MVP | All | P0–P1 |
+| **F-20** | Week View | MVP | Meera | P1 |
+| **F-21 to F-23** | Meal Detail (page, ingredients, cook this) | MVP | All | P0 |
+| **F-24** | Order Instead CTA (Swiggy/Zomato deeplink) | Phase TBD | Riya | P1 |
+| **F-25** | Nutrition summary | MVP | Arun, Riya | P1 |
+| **F-26** | Full step-by-step recipes | Phase 0.5 | All | P1 |
+| **F-27** | Grocery list (auto-generated) | Phase TBD | Meera | P1 |
+| **F-28** | Ingredient check-off | Phase TBD | Meera | P1 |
+| **F-29** | Smart grocery list (deduplicated) | Phase 0.5 | Meera | P1 |
+| **F-30 to F-31** | Search + filters | MVP | All | P1 |
+| **F-32** | Explore feed | Phase 1 | All | P2 |
+| **F-33 to F-34** | Profile editing (household, preferences) | MVP | All | P0 |
+| **F-35** | Cooking history / diary | Phase 1 | Arun, Meera | P2 |
+| **F-36** | Family profiles | Phase 1.5 | Meera | P2 |
+| **F-37** | Morning notification | MVP | All | P0 |
+| **F-38** | Evening prep reminder | Phase 0.5 | Meera | P2 |
+| **F-39** | RE v1 (class-first, cohort priors) | MVP | All | P0 |
+| **F-40** | RE v2 (personal history learning) | Sprint 6 within MVP | All | P0 |
+| **F-41** | Mood selector UI | Phase 1 | All | P2 |
+| **F-42** | Calorie targeting toggle | Phase 1 | Arun, Riya | P2 |
+| **F-43** | Fitness mode (protein scoring boost) | Phase 1 | Arun | P2 |
+| **F-44** | RE v3 (cluster-based cold start) | Phase 2 | All | P2 |
+| **F-45** | Festival and seasonal calendar | Phase 2 | All | P3 |
+| **F-46** | Freemium tier visible (₹0 trial) | Phase TBD | All | P0 |
+| **F-47** | Premium ₹99/month | Phase 1.5 | All | P1 |
+| **F-48** | Premium Plus ₹149/month | Phase 1.5 | Meera, Priya | P1 |
+| **F-49** | Ad placement (free tier) | Phase 1.5 | — | P2 |
+| **F-50** | Referral programme | Phase TBD | All | P1 |
+| **F-51** | Social login (Google, Apple) | Phase 0.5 | All | P1 |
+| **F-52** | Grocery delivery (Blinkit/Zepto) | Phase 3 | Meera | P3 |
+| **F-53** | Food ordering (Zomato/Swiggy API) | Phase 3 | Riya | P3 |
+| **F-54** | Pantry management | Phase 0.5 | Meera | P2 |
+| **F-55 to F-56** | PostHog analytics + Sentry monitoring | MVP | Internal | P0 |
+| **F-57** | Daily email digest (13 metrics) | Phase TBD | Internal | P0 |
+| **F-58** | Admin CMS (dishes, cohort matrix) | MVP | Internal | P0 |
+| **F-59** | My Meals tab (planning history) | MVP | Meera, Arun | P1 |
+
+# **05  RE evolution by phase**
+
+| **RE version** | **Phase** | **Algorithm** | **Impact on users** |
+| --- | --- | --- | --- |
+| **classfirst_v1** | MVP launch | Rule-based. Cohort priors. MMR variety. Bandit. | Day-0 acceptance > 25% target. Cold-start baseline. |
+| **classfirst_v2** | Sprint 6 (within MVP) | + Personal history learning. Weights auto-adjust. | Day-7 acceptance improvement 8–12%. |
+| **classfirst_v3** | Phase 1 | + Dish embeddings (Word2Vec). | Cross-cuisine discovery improves. Serendipity +15%. |
+| **cluster_v1** | Phase 2 | + Cluster-based cold start. | New user Day-0 acceptance: > 25% → > 35%. |
+| **ltr_v1** | Phase 3 | Learning-to-Rank. Breaking change → /v2 API. | Overall acceptance +10–15%. |
+| **ml_v1** | Year 2+ | Two-tower + neural ranking + CF (ALS). | Full personalisation at scale. |
+
+# **06  Revenue milestones**
+
+| **Phase** | **Revenue event** | **Target metric** | **Dependency** |
+| --- | --- | --- | --- |
+| **MVP** | ₹0. Build the product. | 500 DAU at Day 90 | Product quality + habit loop |
+| **Phase 0.5** | ₹0. Extend the product. | 2,000 MAU | ASO + organic word-of-mouth |
+| **Phase 1** | Ads go live (free tier). | ₹8–15/free user/month | Ad network + DAU scale |
+| **Phase 1.5** | Paywall: ₹99 + ₹149. | 3–5% conversion → ₹60K–2L MRR | 90-day free period complete |
+| **Phase 2** | Subscriptions scale. | ₹4L–12.5L MRR | 5,000+ DAU + affiliate prep |
+| **Phase 3** | Affiliate commissions. | ₹12.5L–30L MRR | Partnership agreements |
+| **Year 2+** | All streams + B2B. | ₹30L+ MRR | Product-market fit confirmed |
+
+# **07  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | PM-SUPP-01 · Product Roadmap |
+| **Version** | 1.0 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Source documents** | DOC-04 PRD v1.1, DOC-08 Revenue, RE-DOC-05 |
+| **Phase TBD** | F-24, F-27, F-28, F-46, F-50, F-57 require founder phase assignment |
+| **Companion file** | PM-SUPP-01_Roadmap.md (GitHub version) |
+| **Next** | PM-SUPP-02 · Consolidated Risk Register |
+
+Founder sign-off: ___________________________     Date: _______________

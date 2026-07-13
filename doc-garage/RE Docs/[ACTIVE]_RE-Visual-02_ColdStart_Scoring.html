@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foofoo RE — Cold Start & Scoring Visualizer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0f1117;color:#e8e8e8;padding:24px;min-height:100vh}
+h1{font-size:22px;color:#fff;margin-bottom:4px}
+.sub{font-size:13px;color:#888;margin-bottom:24px}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:700px){.panels{grid-template-columns:1fr}}
+.panel{background:#151820;border-radius:12px;padding:20px;border:1px solid #2a2d3a}
+.panel-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:16px}
+/* Confidence meter */
+.conf-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.conf-label{font-size:12px;color:#ccc;min-width:120px}
+.conf-bar-bg{flex:1;height:10px;background:#1e2530;border-radius:5px;overflow:hidden}
+.conf-bar{height:100%;border-radius:5px;transition:width 0.6s}
+.conf-val{font-size:12px;min-width:36px;text-align:right;color:#1D9E75}
+/* Slider */
+.slider-wrap{margin-bottom:16px}
+.slider-label{display:flex;justify-content:space-between;margin-bottom:6px}
+.slider-label span:first-child{font-size:13px;color:#ccc}
+.slider-label span:last-child{font-size:13px;color:#1D9E75;font-weight:700}
+input[type=range]{width:100%;accent-color:#1D9E75}
+/* Weight breakdown */
+.weights{display:flex;flex-direction:column;gap:8px}
+.w-row{display:flex;align-items:center;gap:8px}
+.w-name{font-size:12px;color:#ccc;min-width:120px}
+.w-bar-bg{flex:1;height:18px;background:#1e2530;border-radius:4px;overflow:hidden;position:relative}
+.w-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;transition:width 0.5s}
+.w-bar span{font-size:10px;font-weight:700;color:rgba(255,255,255,0.9);white-space:nowrap}
+.w-val{font-size:12px;min-width:36px;text-align:right;color:#888}
+/* Score simulator */
+.sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sim-item{background:#1e2530;border-radius:8px;padding:10px}
+.sim-item-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.sim-item-val{font-size:13px;color:#fff}
+.sim-item-val input[type=range]{width:100%;margin-top:4px}
+.score-display{background:#0a1a0f;border:1px solid #1A5C38;border-radius:10px;padding:16px;text-align:center}
+.score-big{font-size:48px;font-weight:700;color:#1D9E75}
+.score-label{font-size:12px;color:#888;margin-top:4px}
+.score-breakdown{margin-top:12px;display:flex;flex-direction:column;gap:4px;text-align:left}
+.sc-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid #1e2530}
+.sc-row span:first-child{color:#888}
+.sc-row span:last-child{color:#1D9E75;font-family:monospace}
+/* Variety grid */
+.vg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.vg-header{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.vg-header div{font-size:9px;text-align:center;color:#555;text-transform:uppercase}
+.vg-cell{height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;text-align:center;line-height:1.2;padding:2px;cursor:pointer;transition:all 0.2s;border:1px solid transparent}
+.vg-cell:hover{transform:scale(1.05)}
+.vg-cell.ok{background:#0f2a1c;color:#1D9E75;border-color:#1A5C38}
+.vg-cell.warn{background:#2a1a00;color:#EF9F27;border-color:#854F0B}
+.vg-cell.bad{background:#1a0d0d;color:#E24B4A;border-color:#A32D2D}
+.vg-legend{display:flex;gap:12px;margin-top:8px}
+.vg-li{display:flex;align-items:center;gap:5px;font-size:10px;color:#888}
+.vg-dot{width:8px;height:8px;border-radius:2px}
+/* Suppression */
+.supp-timeline{position:relative;margin-top:8px}
+.supp-day{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.supp-day-num{font-size:10px;color:#666;min-width:40px}
+.supp-day-bar-bg{flex:1;height:14px;background:#1e2530;border-radius:4px;overflow:hidden}
+.supp-day-bar{height:100%;border-radius:4px;transition:width 0.4s;display:flex;align-items:center;padding-left:6px}
+.supp-day-bar span{font-size:9px;color:#fff;font-weight:700}
+.supp-day-val{font-size:11px;min-width:36px;text-align:right}
+</style>
+</head>
+<body>
+<h1>Foofoo RE — Cold Start & Scoring Visualizer</h1>
+<p class="sub">Interact with the controls to see how the RE behaves at different stages and how scores are computed.</p>
+
+<div class="panels">
+
+  <!-- Cold start confidence -->
+  <div class="panel">
+    <div class="panel-title">Cold start confidence ladder</div>
+    <div class="slider-wrap">
+      <div class="slider-label"><span>User interactions</span><span id="interactLabel">0</span></div>
+      <input type="range" min="0" max="200" value="0" oninput="updateColdStart(this.value)">
+    </div>
+    <div class="weights" id="weightBars">
+      <div class="w-row"><div class="w-name">Cohort prior</div><div class="w-bar-bg"><div class="w-bar" id="w_cohort" style="background:#854F0B;width:55%"><span>55%</span></div></div><div class="w-val" id="wv_cohort">0.55</div></div>
+      <div class="w-row"><div class="w-name">Content match</div><div class="w-bar-bg"><div class="w-bar" id="w_content" style="background:#1A5C38;width:20%"><span>20%</span></div></div><div class="w-val" id="wv_content">0.20</div></div>
+      <div class="w-row"><div class="w-name">Personal history</div><div class="w-bar-bg"><div class="w-bar" id="w_history" style="background:#4A3FA0;width:0%"><span></span></div></div><div class="w-val" id="wv_history">0.00</div></div>
+      <div class="w-row"><div class="w-name">Context fit</div><div class="w-bar-bg"><div class="w-bar" id="w_context" style="background:#993C1D;width:15%"><span>15%</span></div></div><div class="w-val" id="wv_context">0.15</div></div>
+      <div class="w-row"><div class="w-name">Exploration</div><div class="w-bar-bg"><div class="w-bar" id="w_explore" style="background:#185FA5;width:10%"><span>10%</span></div></div><div class="w-val" id="wv_explore">0.10</div></div>
+    </div>
+    <div style="margin-top:16px">
+      <div style="font-size:11px;color:#666;margin-bottom:8px">CONFIDENCE SCORES</div>
+      <div class="conf-row"><div class="conf-label">Onboarding complete</div><div class="conf-bar-bg"><div class="conf-bar" id="cb_ob" style="background:#1D9E75;width:65%"></div></div><div class="conf-val" id="cv_ob">0.65</div></div>
+      <div class="conf-row"><div class="conf-label">Onboarding skipped</div><div class="conf-bar-bg"><div class="conf-bar" id="cb_sk" style="background:#E24B4A;width:35%"></div></div><div class="conf-val" id="cv_sk">0.35</div></div>
+      <div class="conf-row"><div class="conf-label">Overall confidence</div><div class="conf-bar-bg"><div class="conf-bar" id="cb_ov" style="background:#1D9E75;width:65%"></div></div><div class="conf-val" id="cv_ov">0.65</div></div>
+    </div>
+  </div>
+
+  <!-- Score simulator -->
+  <div class="panel">
+    <div class="panel-title">Dish score simulator</div>
+    <div class="sim-grid">
+      <div class="sim-item"><div class="sim-item-label">Cohort match</div><div class="sim-item-val"><input type="range" min="0" max="100" value="80" oninput="calcScore()"> <span id="sv_cohort">0.80</span></div></div>
+      <div class="sim-item"><div class="sim-item-label">Genome content match</div><div class="sim-item-val"><input type="range" min="0" max="100" value="70" oninput="calcScore()"> <span id="sv_content">0.70</span></div></div>
+      <div class="sim-item"><div class="sim-item-label">Personal history signal</div><div class="sim-item-val"><input type="range" min="0" max="100" value="0" oninput="calcScore()"> <span id="sv_history">0.00</span></div></div>
+      <div class="sim-item"><div class="sim-item-label">Context fit</div><div class="sim-item-val"><input type="range" min="0" max="120" value="90" oninput="calcScore()"> <span id="sv_context">0.90</span></div></div>
+      <div class="sim-item"><div class="sim-item-label">Exploration bonus</div><div class="sim-item-val"><input type="range" min="0" max="15" value="5" oninput="calcScore()"> <span id="sv_explore">0.05</span></div></div>
+      <div class="sim-item"><div class="sim-item-label">Not Today penalty</div><div class="sim-item-val"><input type="range" min="0" max="80" value="0" oninput="calcScore()"> <span id="sv_penalty">0.00</span></div></div>
+    </div>
+    <div class="score-display">
+      <div class="score-big" id="scoreBig">0.74</div>
+      <div class="score-label">Final dish score (0–1.2)</div>
+      <div class="score-breakdown" id="scoreBreakdown"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="panels">
+
+  <!-- Variety guard -->
+  <div class="panel">
+    <div class="panel-title">7-day variety guard — dinner slot</div>
+    <p style="font-size:12px;color:#888;margin-bottom:10px">Click cells to toggle. Red = variety violation (same cuisine 3+ days). Orange = warning. Green = ok.</p>
+    <div class="vg-header">
+      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    </div>
+    <div class="vg" id="varietyGrid"></div>
+    <div class="vg-legend">
+      <div class="vg-li"><div class="vg-dot" style="background:#0f2a1c;border:1px solid #1A5C38"></div>OK — varied</div>
+      <div class="vg-li"><div class="vg-dot" style="background:#2a1a00;border:1px solid #854F0B"></div>Warning — 2nd same</div>
+      <div class="vg-li"><div class="vg-dot" style="background:#1a0d0d;border:1px solid #A32D2D"></div>Violation — 3rd same</div>
+    </div>
+  </div>
+
+  <!-- Not Today decay -->
+  <div class="panel">
+    <div class="panel-title">Not Today suppression decay</div>
+    <p style="font-size:12px;color:#888;margin-bottom:12px">P(t) = 0.80 × e<sup>-0.35t</sup> — penalty fades over 7 days</p>
+    <div class="supp-timeline" id="suppTimeline"></div>
+    <div style="margin-top:12px;font-size:12px;color:#555">Compare: Never gesture = permanent suppression (no decay). Not Today = temporal suppression (fades within a week).</div>
+  </div>
+
+</div>
+
+<script>
+// Cold start weight ladder
+function lerp(a,b,t){return a+(b-a)*t;}
+var tiers=[
+  {n:0,   cohort:55,content:20,history:0, context:15,explore:10,ob:0.65,sk:0.35,ov:0.65},
+  {n:10,  cohort:35,content:25,history:15,context:15,explore:10,ob:0.72,sk:0.45,ov:0.70},
+  {n:50,  cohort:20,content:25,history:35,context:15,explore:5, ob:0.82,sk:0.55,ov:0.80},
+  {n:150, cohort:10,content:20,history:50,context:15,explore:5, ob:0.91,sk:0.70,ov:0.89},
+  {n:200, cohort:5, content:15,history:65,context:15,explore:0, ob:0.96,sk:0.80,ov:0.94},
+];
+function getTierVals(n){
+  for(var i=0;i<tiers.length-1;i++){
+    var a=tiers[i],b=tiers[i+1];
+    if(n>=a.n&&n<=b.n){
+      var t=(n-a.n)/(b.n-a.n);
+      return {cohort:Math.round(lerp(a.cohort,b.cohort,t)),content:Math.round(lerp(a.content,b.content,t)),
+        history:Math.round(lerp(a.history,b.history,t)),context:Math.round(lerp(a.context,b.context,t)),
+        explore:Math.round(lerp(a.explore,b.explore,t)),ob:lerp(a.ob,b.ob,t).toFixed(2),
+        sk:lerp(a.sk,b.sk,t).toFixed(2),ov:lerp(a.ov,b.ov,t).toFixed(2)};
+    }
+  }
+  return tiers[tiers.length-1];
+}
+function setBar(id,pct,valId,val){
+  var bar=document.getElementById(id);
+  bar.style.width=pct+'%';
+  bar.querySelector('span').textContent=pct>5?pct+'%':'';
+  document.getElementById(valId).textContent='0.'+String(pct).padStart(2,'0');
+  if(valId==='wv_history'&&pct===0)document.getElementById(valId).textContent='0.00';
+  if(valId==='wv_explore'&&pct===0)document.getElementById(valId).textContent='0.00';
+}
+function updateColdStart(n){
+  document.getElementById('interactLabel').textContent=n;
+  var v=getTierVals(parseInt(n));
+  setBar('w_cohort',v.cohort,'wv_cohort',v.cohort);
+  setBar('w_content',v.content,'wv_content',v.content);
+  setBar('w_history',v.history,'wv_history',v.history);
+  setBar('w_context',v.context,'wv_context',v.context);
+  setBar('w_explore',v.explore,'wv_explore',v.explore);
+  document.getElementById('cb_ob').style.width=(v.ob*100)+'%';
+  document.getElementById('cv_ob').textContent=v.ob;
+  document.getElementById('cb_sk').style.width=(v.sk*100)+'%';
+  document.getElementById('cv_sk').textContent=v.sk;
+  document.getElementById('cb_ov').style.width=(v.ov*100)+'%';
+  document.getElementById('cv_ov').textContent=v.ov;
+  // update wv labels properly
+  document.getElementById('wv_cohort').textContent=(v.cohort/100).toFixed(2);
+  document.getElementById('wv_content').textContent=(v.content/100).toFixed(2);
+  document.getElementById('wv_history').textContent=(v.history/100).toFixed(2);
+  document.getElementById('wv_context').textContent=(v.context/100).toFixed(2);
+  document.getElementById('wv_explore').textContent=(v.explore/100).toFixed(2);
+  calcScore();
+}
+
+// Score simulator
+var w={cohort:0.55,content:0.20,history:0.00,context:0.15,explore:0.10};
+function calcScore(){
+  var inputs=document.querySelectorAll('.sim-grid input[type=range]');
+  var vals=[];
+  inputs.forEach(function(inp,i){vals.push(parseFloat(inp.value)/100);});
+  // update display labels
+  document.getElementById('sv_cohort').textContent=vals[0].toFixed(2);
+  document.getElementById('sv_content').textContent=vals[1].toFixed(2);
+  document.getElementById('sv_history').textContent=vals[2].toFixed(2);
+  document.getElementById('sv_context').textContent=(vals[3]*1.2).toFixed(2);
+  document.getElementById('sv_explore').textContent=vals[4].toFixed(2);
+  document.getElementById('sv_penalty').textContent=vals[5].toFixed(2);
+  // get current weights from tier
+  var n=parseInt(document.querySelector('input[type=range]').value)||0;
+  var tw=getTierVals(n);
+  var wc=tw.cohort/100,wn=tw.content/100,wh=tw.history/100,wx=tw.context/100,we=tw.explore/100;
+  var score=wc*vals[0]+wn*vals[1]+wh*vals[2]+wx*vals[3]*1.2+we*vals[4]-vals[5];
+  score=Math.max(0,Math.min(1.2,score));
+  document.getElementById('scoreBig').textContent=score.toFixed(2);
+  var color=score>0.8?'#1D9E75':score>0.6?'#EF9F27':'#E24B4A';
+  document.getElementById('scoreBig').style.color=color;
+  var bd=document.getElementById('scoreBreakdown');
+  bd.innerHTML=[
+    ['Cohort prior','+'+(wc*vals[0]).toFixed(3)],
+    ['Content match','+'+(wn*vals[1]).toFixed(3)],
+    ['Personal history','+'+(wh*vals[2]).toFixed(3)],
+    ['Context fit','+'+(wx*vals[3]*1.2).toFixed(3)],
+    ['Exploration','+'+(we*vals[4]).toFixed(3)],
+    ['Not Today penalty','-'+vals[5].toFixed(3)],
+    ['Final score',score.toFixed(3)]
+  ].map(function(r,i){
+    return '<div class="sc-row"><span>'+r[0]+'</span><span style="color:'+(i===6?color:'#1D9E75')+'">'+r[1]+'</span></div>';
+  }).join('');
+}
+
+// Variety grid
+var cuisines=['North Indian','South Indian','Bengali','Gujarati','Mughlai','Rajasthani','Street'];
+var colors=['#1A5C38','#0F6E56','#993C1D','#854F0B','#4A3FA0','#185FA5','#3B6D11'];
+var plan=['North Indian','South Indian','Bengali','North Indian','North Indian','Gujarati','Mughlai'];
+function buildGrid(){
+  var g=document.getElementById('varietyGrid');
+  g.innerHTML='';
+  // count occurrences up to each day
+  plan.forEach(function(cuisine,i){
+    var countBefore=plan.slice(0,i+1).filter(function(c){return c===cuisine;}).length;
+    var cls=countBefore>=3?'bad':countBefore===2?'warn':'ok';
+    var ci=cuisines.indexOf(cuisine);
+    var div=document.createElement('div');
+    div.className='vg-cell '+cls;
+    div.textContent=cuisine.replace(' Indian','').replace('athi','').substring(0,6);
+    div.title=cuisine+' (day '+(i+1)+', count:'+countBefore+')';
+    div.onclick=function(){
+      var next=(ci+1)%cuisines.length;
+      plan[i]=cuisines[next];
+      buildGrid();
+    };
+    g.appendChild(div);
+  });
+}
+buildGrid();
+
+// Suppression timeline
+function buildSuppTimeline(){
+  var t=document.getElementById('suppTimeline');
+  var P0=0.80,lam=0.35;
+  var days=[0,1,2,3,5,7,10,14];
+  t.innerHTML='';
+  days.forEach(function(d){
+    var penalty=P0*Math.exp(-lam*d);
+    var pct=Math.round(penalty*100);
+    var color=pct>50?'#E24B4A':pct>20?'#EF9F27':'#1D9E75';
+    var div=document.createElement('div');
+    div.className='supp-day';
+    div.innerHTML='<div class="supp-day-num">Day '+d+'</div>'+
+      '<div class="supp-day-bar-bg"><div class="supp-day-bar" style="background:'+color+';width:'+pct+'%"><span>'+pct+'%</span></div></div>'+
+      '<div class="supp-day-val" style="color:'+color+'">'+penalty.toFixed(2)+'</div>';
+    t.appendChild(div);
+  });
+}
+buildSuppTimeline();
+
+// Initialize
+calcScore();
+</script>
+</body>
+</html>

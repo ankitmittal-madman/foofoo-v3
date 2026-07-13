@@ -1,0 +1,168 @@
+ingredient_name,alias,language,is_active,is_updated,last_update_date,is_review
+turmeric,haldi,hindi,Y,N,,Y
+red_chilli_powder,laal mirch,hindi,Y,N,,Y
+cumin_seeds,jeera,hindi,Y,N,,Y
+coriander_powder,dhaniya powder,hindi,Y,N,,Y
+garam_masala,garam masala,hindi,Y,N,,Y
+mustard_seeds,rai,hindi,Y,N,,Y
+mustard_seeds,sarson,hindi,Y,N,,Y
+fenugreek_seeds,methi dana,hindi,Y,N,,Y
+asafoetida,hing,hindi,Y,N,,Y
+black_pepper,kali mirch,hindi,Y,N,,Y
+cardamom_green,elaichi,hindi,Y,N,,Y
+cinnamon,dalchini,hindi,Y,N,,Y
+clove,laung,hindi,Y,N,,Y
+bay_leaf,tej patta,hindi,Y,N,,Y
+fennel_seeds,saunf,hindi,Y,N,,Y
+ajwain,ajwain,hindi,Y,N,,Y
+nigella_seeds,kalonji,hindi,Y,N,,Y
+star_anise,chakra phool,hindi,Y,N,,Y
+nutmeg,jaiphal,hindi,Y,N,,Y
+mace,javitri,hindi,Y,N,,Y
+kashmiri_chilli,kashmiri mirch,hindi,Y,N,,Y
+dry_red_chilli,sookhi laal mirch,hindi,Y,N,,Y
+saffron,kesar,hindi,Y,N,,Y
+kasuri_methi,kasuri methi,hindi,Y,N,,Y
+chaat_masala,chaat masala,hindi,Y,N,,Y
+amchur,amchoor,hindi,Y,N,,Y
+anardana,anardana,hindi,Y,N,,Y
+sambar_powder,sambar podi,tamil,Y,N,,Y
+curry_leaves,kadi patta,hindi,Y,N,,Y
+curry_leaves,kariveppilai,tamil,Y,N,,Y
+potato,aloo,hindi,Y,N,,Y
+onion,pyaaz,hindi,Y,N,,Y
+tomato,tamatar,hindi,Y,N,,Y
+cauliflower,gobhi,hindi,Y,N,,Y
+capsicum,shimla mirch,hindi,Y,N,,Y
+green_chilli,hari mirch,hindi,Y,N,,Y
+ginger,adrak,hindi,Y,N,,Y
+garlic,lehsun,hindi,Y,N,,Y
+spinach,palak,hindi,Y,N,,Y
+eggplant,baingan,hindi,Y,N,,Y
+okra,bhindi,hindi,Y,N,,Y
+bottle_gourd,lauki,hindi,Y,N,,Y
+bottle_gourd,dudhi,marathi,Y,N,,Y
+bitter_gourd,karela,hindi,Y,N,,Y
+pumpkin,kaddu,hindi,Y,N,,Y
+radish,mooli,hindi,Y,N,,Y
+carrot,gajar,hindi,Y,N,,Y
+cucumber,kheera,hindi,Y,N,,Y
+french_beans,beans,english,Y,N,,Y
+drumstick,sahjan,hindi,Y,N,,Y
+drumstick,murungakkai,tamil,Y,N,,Y
+raw_banana,kachcha kela,hindi,Y,N,,Y
+sweet_potato,shakarkandi,hindi,Y,N,,Y
+mushroom,kumbh,hindi,Y,N,,Y
+corn,makka,hindi,Y,N,,Y
+broccoli,broccoli,english,Y,N,,Y
+baby_corn,baby corn,english,Y,N,,Y
+spring_onion,hara pyaaz,hindi,Y,N,,Y
+coriander_leaves,dhaniya,hindi,Y,N,,Y
+coriander_leaves,cilantro,english,Y,N,,Y
+mint_leaves,pudina,hindi,Y,N,,Y
+fenugreek_leaves,methi,hindi,Y,N,,Y
+mustard_greens,sarson ka saag,hindi,Y,N,,Y
+wheat_flour,atta,hindi,Y,N,,Y
+refined_flour,maida,hindi,Y,N,,Y
+rice_regular,chawal,hindi,Y,N,,Y
+rice_basmati,basmati chawal,hindi,Y,N,,Y
+semolina,suji,hindi,Y,N,,Y
+semolina,rava,tamil,Y,N,,Y
+gram_flour,besan,hindi,Y,N,,Y
+rice_flour,chawal ka atta,hindi,Y,N,,Y
+cornmeal,makki ka atta,hindi,Y,N,,Y
+cornmeal,corn flour,english,Y,N,,Y
+jowar_flour,jowar atta,hindi,Y,N,,Y
+bajra_flour,bajra atta,hindi,Y,N,,Y
+ragi_flour,nachni,marathi,Y,N,,Y
+rice_flattened,poha,hindi,Y,N,,Y
+rice_flattened,chivda,marathi,Y,N,,Y
+vermicelli,sevaiyan,hindi,Y,N,,Y
+vermicelli,semiya,tamil,Y,N,,Y
+tapioca,sabudana,hindi,Y,N,,Y
+noodles,noodles,english,Y,N,,Y
+toor_dal,arhar dal,hindi,Y,N,,Y
+toor_dal,tuvaram paruppu,tamil,Y,N,,Y
+moong_dal,moong dal,hindi,Y,N,,Y
+moong_dal,pasi paruppu,tamil,Y,N,,Y
+chana_dal,chana dal,hindi,Y,N,,Y
+urad_dal,urad dal,hindi,Y,N,,Y
+urad_dal,ulundu,tamil,Y,N,,Y
+masoor_dal,masoor dal,hindi,Y,N,,Y
+black_lentil,sabut urad,hindi,Y,N,,Y
+kidney_beans,rajma,hindi,Y,N,,Y
+chickpeas,chole,hindi,Y,N,,Y
+chickpeas,kabuli chana,hindi,Y,N,,Y
+green_peas,matar,hindi,Y,N,,Y
+paneer,paneer,hindi,Y,N,,Y
+paneer,cottage cheese,english,Y,N,,Y
+curd,dahi,hindi,Y,N,,Y
+curd,yogurt,english,Y,N,,Y
+ghee,ghee,hindi,Y,N,,Y
+ghee,clarified butter,english,Y,N,,Y
+butter,makhan,hindi,Y,N,,Y
+cream,malai,hindi,Y,N,,Y
+milk,doodh,hindi,Y,N,,Y
+khoya,mawa,hindi,Y,N,,Y
+cheese,cheese,english,Y,N,,Y
+mozzarella,mozzarella,english,Y,N,,Y
+condensed_milk,condensed milk,english,Y,N,,Y
+chicken,murgh,hindi,Y,N,,Y
+mutton,gosht,hindi,Y,N,,Y
+mutton,bakra,hindi,Y,N,,Y
+egg,anda,hindi,Y,N,,Y
+fish_generic,machhi,hindi,Y,N,,Y
+fish_generic,meen,tamil,Y,N,,Y
+prawns,jhinga,hindi,Y,N,,Y
+prawns,chingri,bengali,Y,N,,Y
+prawns,kolambi,marathi,Y,N,,Y
+almond,badam,hindi,Y,N,,Y
+cashew,kaju,hindi,Y,N,,Y
+pistachio,pista,hindi,Y,N,,Y
+raisins,kishmish,hindi,Y,N,,Y
+peanut,moongphali,hindi,Y,N,,Y
+peanut,singdana,marathi,Y,N,,Y
+walnut,akhrot,hindi,Y,N,,Y
+coconut_fresh,nariyal,hindi,Y,N,,Y
+coconut_fresh,thengai,tamil,Y,N,,Y
+coconut_desiccated,sookha nariyal,hindi,Y,N,,Y
+coconut_milk,nariyal ka doodh,hindi,Y,N,,Y
+jaggery,gur,hindi,Y,N,,Y
+jaggery,bella,kannada,Y,N,,Y
+tamarind,imli,hindi,Y,N,,Y
+tamarind,puli,tamil,Y,N,,Y
+sugar,cheeni,hindi,Y,N,,Y
+salt,namak,hindi,Y,N,,Y
+vegetable_oil,tel,hindi,Y,N,,Y
+mustard_oil,sarson ka tel,hindi,Y,N,,Y
+coconut_oil,nariyal tel,hindi,Y,N,,Y
+sesame_oil,til ka tel,hindi,Y,N,,Y
+olive_oil,olive oil,english,Y,N,,Y
+lemon,nimbu,hindi,Y,N,,Y
+kokum,kokum,konkani,Y,N,,Y
+rose_water,gulab jal,hindi,Y,N,,Y
+soy_sauce,soy sauce,english,Y,N,,Y
+vinegar,sirka,hindi,Y,N,,Y
+tofu,tofu,hindi,Y,Y,20-05-2026,Y
+lemongrass,lemongrass,hindi,Y,Y,20-05-2026,Y
+oregano,oregano,hindi,Y,Y,20-05-2026,Y
+rice_flour,chawal ka aata,hindi,Y,Y,20-05-2026,Y
+jowar_flour,jowar ka aata,hindi,Y,Y,20-05-2026,Y
+bajra_flour,bajre ka aata,hindi,Y,Y,20-05-2026,Y
+kokum,kokam,hindi,Y,Y,20-05-2026,Y
+raw_papaya,kachcha papita,hindi,Y,Y,20-05-2026,Y
+panko_breadcrumbs,breadcrumbs,hindi,Y,Y,20-05-2026,Y
+pork,suar ka maans,hindi,Y,Y,20-05-2026,Y
+lamb,memne ka maans,hindi,Y,Y,20-05-2026,Y
+sesame_oil,til ka tel,hindi,Y,Y,20-05-2026,Y
+soy_sauce,soya sauce,hindi,Y,Y,20-05-2026,Y
+noodles,noodles,hindi,Y,Y,20-05-2026,Y
+pasta,pasta,hindi,Y,Y,20-05-2026,Y
+olive_oil,jaitun ka tel,hindi,Y,Y,20-05-2026,Y
+mozzarella,mozzarella,hindi,Y,Y,20-05-2026,Y
+vinegar,sirka,hindi,Y,Y,20-05-2026,Y
+cornmeal,makke ka aata,hindi,Y,Y,20-05-2026,Y
+spring_onion,hara pyaaz,hindi,Y,Y,20-05-2026,Y
+mushroom,mushroom,hindi,Y,Y,20-05-2026,Y
+broccoli,broccoli,hindi,Y,Y,20-05-2026,Y
+baby_corn,baby corn,hindi,Y,Y,20-05-2026,Y

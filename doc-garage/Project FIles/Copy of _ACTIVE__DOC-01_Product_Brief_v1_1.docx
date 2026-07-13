@@ -1,0 +1,210 @@
+**FOOFOO**
+
+AI-Powered Meal Decision Assistant
+
+────────────────────────────────────
+
+**DOC-01  ·  One-Page Product Brief**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+| *The founding document. Every product decision traces back here.* |
+| --- |
+
+# **01  The problem**
+
+***"******Aaj khaane mein kya banaye?******"***
+
+This question repeats three times a day, seven days a week, for hundreds of millions of Indian households. It is not a small question. It carries the weight of nutrition, budget, family preference, available ingredients, how much time there is, who is eating, what was eaten yesterday, and whether the diabetic elder needs something different from the children.
+
+Three forces make this problem hard to solve:
+
+| **Decision fatigue** The average Indian family makes 1,095 meal decisions per year — before accounting for household members with different needs. Each decision pulls from memory, available ingredients, the energy level of the cook, and yesterday's meals. This is a genuine cognitive tax, repeated daily without relief. |
+| --- |
+
+| **Meal planning is structurally complex** For a family, a single meal decision must balance: dietary restrictions of every member, nutritional variety across the week, ingredients already at home, cooking time available, regional food identity, seasonal availability, and whether it is a weekday or weekend. No human can optimise all of this consciously. Most stop trying and repeat the same 10 dishes. |
+| --- |
+
+| **No existing app understands the Indian household** Zomato and Swiggy solve HOW to get food, not WHAT to eat. HealthifyMe tracks what you already ate. Recipe apps assume you already know what you want to cook. Diet apps impose plans designed by nutritionists for a generic user. None of these products understand that a Madhya Pradesh family now living in Mumbai is not the same as a Tamil Nadu family in the same city — and that a household with a toddler, a working parent, and a diabetic elder cannot be served by one generic plan. |
+| --- |
+
+# **02  The solution**
+
+Foofoo is an AI meal decision assistant that builds a personalised daily and weekly meal plan for your household — knowing your region, your family composition, your food identity, and your habits — and then helps you cook it at home or order it online.
+
+**The core loop is simple: **open the app each morning, see today's meal plan already built for your household, swipe through alternatives if you want, lock what you like, cook or order. The AI learns from every interaction — silently, without forms or surveys — and gets more accurate every day.
+
+***Zomato solved how to get food. Foofoo solves what to eat.***
+
+What makes Foofoo fundamentally different from everything that exists today is not a feature. It is the underlying science that connects users, households, dishes, and context into a single intelligent system — built specifically for the Indian meal reality.
+
+# **03  The science — how Foofoo actually thinks**
+
+Most recommendation engines answer one question: what did people like this user choose before? That approach produces good suggestions for Netflix movies or Spotify songs because a user's history is sufficient signal. It fails for meals because a meal decision is not primarily about personal taste — it is about household reality: who is eating, what is available, what day it is, what region you come from, and what your body needs.
+
+Foofoo is built on four layers of science that work together. Each layer wraps the one inside it. No layer operates alone.
+
+| **Layer 1  ·  ****Meal genome — what every dish actually is** *Every dish is encoded across 20 dimensions that explain cross-cuisine compatibility* Spice level, texture, cooking method, primary taste, meal occasion, protein type, cook time, difficulty, calories, regional origin, and 10 more — all tagged for every dish before launch. This is the Netflix parallel: Netflix does not tag movies as 'action' or 'comedy'. They tag mood, moral ambiguity, dialogue density, visual darkness. Foofoo does the same for food — not 'North Indian' but steamed, fermented, light, mild, morning, vegetarian. Result: a user who likes Idli and Dhokla — apparently different cuisines — gets Appam suggested because the genome reveals all three share the same deep attributes. The engine finds the WHY behind preference, not just the WHAT. The meal genome is the moat. Building 500 dishes tagged across 20 dimensions is months of work. Nobody else has it for Indian food. |
+| --- |
+
+| **Layer 2  ·  ****Food graph — how dishes, ingredients and people connect** *Dishes, ingredients, allergens, households and occasions are nodes. Relationships are edges.* When Meera's son is identified as allergic to peanuts during onboarding, that signal propagates through the graph to every dish that contains any ingredient derived from peanuts — automatically, without manual curation. The graph also handles substitution: if a dish requires an ingredient the household never buys, the engine finds the structurally closest alternative. If a combo meal has one rejected component, the graph replaces just that component without disturbing the rest. This is the safety layer. A genome tells the engine what a dish is. The graph tells it whether that dish is safe and appropriate for this household on this day. The food graph grows with every interaction. Household preferences become graph edges. The engine becomes more accurate the more it is used. |
+| --- |
+
+| **Layer 3  ·  ****Household food intelligence — one plan for a real family** *The science of what a specific household will eat, when, and why — treated as one unit* This is Foofoo's most important differentiator and the layer no competitor has built. A household is not a collection of individual users. It is a unit with a primary cook, shared meals, common constraints, and member-specific needs. The engine generates one primary meal plan for the household, then attaches member-specific add-ons: the infant gets dal-rice mash alongside the family's dal-sabzi-roti. The diabetic elder gets a low-sugar side. The postpartum mother gets a recovery component. None of these override the family meal. They augment it. Home state and current city are always stored as separate signals. A Madhya Pradesh family living in Mumbai is not a generic Mumbai family. Their food identity is layered: home state roots, current city exposure, migration duration, and the gap between aspirational and habitual eating. 41 backend personas mapped to 36 Indian states. The user never sees these — they answer 5 natural questions. The engine resolves their household silently. |
+| --- |
+
+| **Layer 4  ·  ****Contextual meal science — right meal for right moment** *How mood, weather, weekday rhythm, occasion, and season determine what feels right* A Monday morning is not a Sunday afternoon. A rainy day in Mumbai calls for different food than a dry summer morning. Holi week has different food patterns than a regular Wednesday. These are not edge cases — they are the texture of daily Indian meal life. Context signals work silently in the background from Day 1: weather API, weekday/weekend classification, time of day. The user never configures these. They simply notice that the suggestions feel eerily appropriate. Weekday plans are biased toward speed and repeatability — dal-chawal, quick sabzi, simple breakfasts. Weekend plans allow regional specials, slow-cooked dishes, and celebration foods. This cadence is built into the class plan engine, not applied as a filter after the fact. The mood selector (Phase 1) makes context explicit. Festival calendar awareness (Phase 2) makes it culturally deep. But the contextual layer works from Day 1 even without these — the engine reads time and weather and adjusts automatically. |
+| --- |
+
+## **How the four layers work together**
+
+The layers are concentric, not parallel. Every meal suggestion passes through all four before it reaches the user:
+
+| **Context **sets the frame: it is a rainy Tuesday, 7 AM, in Mumbai. **Household **resolves who this plan is for: a family of four, MP origin, working parent cooks, infant daughter, no peanuts. **Food graph **filters: removes any dish with peanut-derived ingredients, identifies appropriate add-on for infant. **Meal genome **scores survivors: rainy morning → warm, comfort food bias. Tuesday → quick cook time. MP origin → boost for chila, poha, dal. Result: ranked slate of 8 dishes for breakfast. |
+| --- |
+
+The user sees: a breakfast card showing Poha with a simple ingredient list. They have no idea that 4 layers of reasoning produced that suggestion. It just feels right.
+
+# **04  Primary user — who this is built for**
+
+**Every MVP feature must pass one test: **"Would Meera use this daily?" If the answer is no, it does not ship.
+
+| **Meera — the family meal planner** |  |
+| --- | --- |
+| **Age ****&**** city** | 32 years old, Pune. Originally from Bhopal. |
+| **Household** | Husband (works in IT), daughter aged 5, son aged 8. Joint family context — parents-in-law visit frequently. |
+| **Role** | Primary cook and meal planner for the household. Makes 2–3 meals daily, 7 days a week. |
+| **Daily pain** | Decides meals on the spot, every day, with no plan. Repeats the same 8–10 dishes. Feels guilty about the repetition. Gets asked 'aaj kya banaye?' before she has even thought about it. |
+| **Current workaround** | Scrolls YouTube recipe videos for 20 minutes. Asks her mother on WhatsApp. Occasionally orders Swiggy out of exhaustion and guilt. |
+| **Trigger to open Foofoo** | 7 AM, kitchen, before the household wakes up. Needs a plan before the day begins. |
+| **Retention hook** | Within 2 weeks, the app knows her household. Suggestions feel like they come from someone who understands her family — MP-rooted, Pune-living, one young child, quick weekday meals, regional specials on Sundays. |
+| **Willingness to pay** | ₹99/month if it genuinely removes the daily planning burden. She already spends ₹300 on one Swiggy order she places out of indecision. |
+| **V2 household profile** | MC_FAMILY → SC_COUPLE_WITH_SCHOOL_CHILD. Home state: Madhya Pradesh. Current city: Pune. Diet: vegetarian. Cook capability: confident. Member: school child (age 5 add-on). |
+
+**Secondary users **(served well by the MVP, not designed for it):
+
+- Riya — urban solo professional, 28, Mumbai. Orders food 4–5 times/week, wants 20-second meal decisions before opening Swiggy.
+
+- Arun — fitness-focused solo, 24, Bangalore. Needs macro-aware suggestions, wants high-protein plans that still feel like Indian food.
+
+# **05  What Foofoo is — and is not**
+
+| **Foofoo is** An AI meal decision engine for Indian households A household-aware weekly and daily meal planner A food intelligence system built on Indian cuisine science A 'cook or order' decision layer that complements Zomato and Swiggy A product that learns from behaviour, not just surveys | **Foofoo is not** A food delivery platform (Zomato/Swiggy complement it) A recipe app (dish cards + ingredients in MVP, full recipes later) A calorie tracker or health monitoring app A diet planning service with nutritionist-designed plans A social food platform (community is Phase 3, not MVP) |
+| --- | --- |
+
+# **06  MVP boundary — what ships at launch**
+
+The MVP ships exactly enough to answer one question: do users come back daily because the AI meal suggestions are genuinely useful for their household? Everything on the MVP list serves that question. Everything not on the list is deferred.
+
+| **MVP — ships at launch** | **Phase — deferred** | **Why deferred** |
+| --- | --- | --- |
+| **Household-first onboarding (cohort + state + diet + members)** | – | Core — cannot defer |
+| **AI 7-day class-first meal plan per household** | – | Core — cannot defer |
+| **Swipe carousel (8 alternatives per slot)** | – | Core — cannot defer |
+| **Never / Not Today / Lock / Plus gestures** | – | Core — cannot defer |
+| **500+ Indian dishes with simple ingredient lists** | – | Core — cannot defer |
+| **Passive feedback loop (interactions train the AI silently)** | – | Core — cannot defer |
+| **Grocery list auto-generated from plan** | – | Core — cannot defer |
+| **Morning push notification with plan preview** | – | Core — cannot defer |
+| **Android + iOS launch (React Native single codebase)** | – | Both from Day 1 |
+| **Full step-by-step recipes** | Phase 0.5 | Core value is the decision, not the instruction |
+| **Pantry / ingredient inventory** | Phase 0.5 | Adds complexity; not required to validate core loop |
+| **Mood selector (visible UI)** | Phase 1 | Weather signal works silently from Day 1 |
+| **Order online (Zomato/Swiggy integration)** | Phase 3 | Partnership conversation needed; deep links sufficient |
+| **Premium paywall active** | Phase 1.5 | Visible at ₹0 during 90-day free period |
+| **Social / sharing features** | Phase 3 | Solo utility first; community is a moat, not a feature |
+
+# **07  The one metric**
+
+| **500 Daily Active Users within 90 days of launch** *DAU proves habit formation — not curiosity, not downloads. 500 people opening the app every single day because it is genuinely useful.* |
+| --- |
+
+| **Supporting metric** | **Target (Day 90)** | **What failure tells us** |
+| --- | --- | --- |
+| **Suggestion acceptance rate** | > 40% of shown suggestions acted on | AI recommendations are not relevant — genome or household layer broken |
+| **Cold-start Day 0 acceptance** | > 25% for users with minimal onboarding | Class-first plan not working — revert to dish-first and debug |
+| **Day 7 retention** | > 30% of signups return on Day 7 | No habit loop forming — morning notification or plan quality failing |
+| **Onboarding completion** | > 70% complete all screens | Onboarding too long or confusing — cut questions |
+| **Never rate** | < 15% of shown dishes permanently dismissed | Household or regional intelligence miscalibrated |
+| **App store rating** | > 4.0 stars | Product quality issue — investigate immediately |
+
+**Decision rule: **500+ DAU → proceed to Phase 1 with investment. 250–500 DAU → fix suggestion quality before scaling. Below 250 → fundamental rethink. No paid marketing before 500 DAU is achieved.
+
+# **08  The knowledge foundation — what must be built before code**
+
+The four-layer engine is only as good as the data it runs on. Before any application code is written, the following knowledge base must be assembled from secondary research. This is not content work — it is the scientific foundation of the product.
+
+| **Knowledge area** | **What must be researched and codified** |
+| --- | --- |
+| **Dish genome database** | 500+ Indian dishes tagged across 20 dimensions: spice level, texture, cooking method, primary taste, meal occasion, protein type, cook time, difficulty, calories, macros, regional origin, season suitability, dietary compatibility, combo pairings, and 6 additional dimensions. Every attribute derived from food science, not opinion. |
+| **Regional food identity map** | 36 Indian states/UTs mapped to: staple breakfast classes, staple lunch/dinner classes, non-veg consumption patterns by day/occasion, festival food calendars, seasonal food patterns, and migration food adaptation (what changes when an MP family moves to Mumbai vs what stays rooted). |
+| **Indian household composition model** | 41 household persona types covering: solo professionals, couples, families with young children, multi-generational homes, elderly-only households, households with special health needs (diabetic, pregnancy, postpartum, recovery). Each persona mapped to meal planning patterns, cook capability, time pressure, and nutritional priority. |
+| **Meal class taxonomy** | Hierarchical classification of Indian meals into classes before dishes: BF_LIGHT_GRAIN (poha, upma, chila) vs BF_STUFFED_FLATBREAD (paratha varieties) vs BF_SOUTH_FERMENTED (idli, dosa, uttapam). Classes determine the type of meal; dishes are instances within a class. Prevents the engine from suggesting biryani for breakfast. |
+| **Ingredient master with flags** | Every ingredient tagged with: is_veg, is_vegan, is_jain_compatible, allergen_flags (nuts, dairy, gluten, shellfish, egg), seasonal availability, and regional availability. Allergen propagation through the food graph is automatic — no manual dish-level tagging needed. |
+| **Context-meal affinity data** | What meal types are appropriate for: rainy vs dry weather, summer vs winter, morning vs evening, weekday vs weekend, pre-festival vs festival vs post-festival, and different time-pressure levels. Built from food science and cultural patterns, validated post-launch through acceptance signals. |
+
+This knowledge base is assembled primarily from secondary research before MVP launch, and refined continuously through revealed user behaviour after launch. It is Foofoo's core intellectual asset and the reason the product cannot be easily replicated by a competitor starting from scratch.
+
+# **09  Budget constraint**
+
+| Total budget: **under ₹25,000  ***· Hard constraint, not a target. Every architecture decision must work on free tiers.* Development is entirely AI-assisted using Claude Code. No agency, no freelancer, no external engineer. The founder is the product manager, QA, and product owner. Claude Code is the engineering team. |
+| --- |
+
+| **Expense** | **Cost** | **Notes** |
+| --- | --- | --- |
+| **Google Play developer** | ₹2,100 one-time | Required Day 1 |
+| **Apple developer account** | ₹8,700/year | Required for iOS Day 1 |
+| **Domain name** | ₹800–1,200/year | Referral links and future web |
+| **Claude Pro (includes Claude Code)** | ₹1,700/month × 4 = ₹6,800 | Primary development tool for the entire MVP |
+| **Supabase (backend + DB + auth)** | ₹0 during MVP | Free tier covers MVP scale comfortably |
+| **OneSignal (push notifications)** | ₹0 during MVP | Free tier covers MVP scale |
+| **PostHog (analytics)** | ₹0 during MVP | Free tier covers MVP scale |
+| **OpenWeatherMap API** | ₹0 during MVP | Free tier covers MVP call volume |
+| **Cloudinary (dish images)** | ₹0 during MVP | Free tier covers 500 dish images |
+| **Marketing during MVP** | ₹0 | Invite-only, organic only — no paid acquisition |
+| **Contingency** | ₹2,000–3,000 | Buffer for unexpected costs |
+| **Total** | ₹20,400–22,800 | Within ₹25,000 constraint |
+
+# **10  Product inspiration**
+
+These five products are not competitors. They are the standard of execution Foofoo holds itself to in different dimensions:
+
+| **Product** | **What Foofoo learns from it** |
+| --- | --- |
+| **Netflix** | Content cards as the primary UI unit. Progressive personalisation that starts broad on Day 1 and becomes eerily accurate by Month 3. The algorithm is the product — the interface is just the surface. Foofoo's meal cards are the Netflix tile. The RE engine is the Netflix recommendation system. |
+| **Instagram** | The swipe/scroll as the primary interaction. Visual-first content that communicates in one glance without reading. Infinite alternatives that feel effortless to browse. Foofoo's swipe carousel is the Instagram scroll — the user should feel the same frictionless exploration. |
+| **Tasty** | Food content designed for a phone screen in a kitchen — propped up, hands busy, quick to scan. Video-first dish presentation that makes food feel achievable. Foofoo's dish cards should feel as appetising as a Tasty video thumbnail. |
+| **Noom** | Onboarding that feels like a conversation, not a form. Progressive commitment — small questions early, deeper engagement as trust builds. Habit formation through daily touchpoints rather than one-time utility. Foofoo's onboarding is designed on the same principle: 5 natural questions that unlock a powerful household profile. |
+| **Zomato** | Deep understanding of the Indian market. Localisation that goes beyond language — festivals, regional food culture, tier-2 city behaviour, the specific way Indians use their phones while cooking. Foofoo needs to understand India at least as deeply as Zomato does — and go deeper where it counts: the household, not just the restaurant. |
+
+# **11  Deliberate exclusions — what we are not building yet**
+
+These are not missing features. They are intentional decisions with documented triggers for when they unlock:
+
+| **Excluded** | **Why excluded** | **Unlock trigger** |
+| --- | --- | --- |
+| **Full step-by-step recipes** | Core value is the meal decision, not the cooking instruction. Dish cards + simple ingredients prove the concept. | Phase 0.5 — after MVP launch validation |
+| **Zomato / Swiggy API ordering** | Partnership conversations take time. Deep links sufficient for Day 1 proof of concept. | Phase 3 — after partnership agreement |
+| **Mood selector UI** | Weather and weekday signals work silently from Day 1. Visible mood selector adds friction before trust is established. | Phase 1 — after habit loop is proven |
+| **Premium paywall activation** | Paywall visible but ₹0 during 90-day free period. Activating before habit forms destroys conversion. | Phase 1.5 — after 90-day free period ends |
+| **Social and community features** | Foofoo is a solo utility first. Community is a switching-cost moat, not a launch feature. | Phase 3 — after 10,000+ MAU |
+| **Grocery delivery (Blinkit/Zepto)** | Ingredient checklist is sufficient. Delivery integration requires API partnership. | Phase 3 — after food ordering partnership proven |
+| **Health profiles (pregnancy, recovery)** | Requires validated medical data. Phase 2 with proper nutritional review. | Phase 2 — with nutritionist validation |
+| **B2B / corporate meal planning** | Different sales motion, different product entirely. | Year 2 — after consumer product-market fit proven |
+
+# **12  Document sign-off**
+
+This document is the founding brief. No subsequent document is written until this is signed. Any change to the problem statement, primary user, core science, or the one metric requires a version increment and explicit founder decision.
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-01 · One-Page Product Brief |
+| **Version** | 1.0 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **App name** | Foofoo (flexible — may change; all references use this placeholder) |
+| **Platform** | Android + iOS from Day 1 (React Native single codebase) |
+| **Next document** | DOC-02 · Market Research & Competitive Analysis |
+| **Hard gate** | DOC-02 is not started until this document is signed |
+
+Founder sign-off: ___________________________     Date: _______________

@@ -1,0 +1,188 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**DOC-05  ·  Information Architecture ****&**** Screen Inventory — v1.2**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **CHANGE NOTICE — v1.1 → v1.2**
+
+| **Source: Onboarding prototype analysis + founder feedback on long-press gesture** **Screens added to MVP:** OB-00: Conversational intro — stats engagement screen before first onboarding question OB-08b: Single-day plan preview — today's 3 meals shown at end of onboarding (bridges to H-01) **Screens updated:** OB-03: Now includes migration duration slider — feeds RE city overlay weight calculation OB-07: Left/right card swipe with visible action buttons replaces vertical class thumbnail swipe **Gesture system — breaking change:** Long-press + drag REMOVED from entire product — was not discoverable or intuitive REPLACED: swipe left on card reveals Not Today (amber) and Never (red) action buttons Carousel now accessed via tap on swap icon in action bar — left swipe is reserved for action reveal Screen count: 35 (up from 33). Flow 1 and Flow 3 updated. |
+| --- |
+
+# **01  Navigation model (v1.2 — unchanged from v1.1)**
+
+| **Tab** | **Icon** | **Destination** | **Notes** |
+| --- | --- | --- | --- |
+| **Home** | Meal card | Day View (today's plan) | Primary tab. Push notification deeplinks here. |
+| **Week** | Calendar grid | Week View (7-day plan) | Tap any day to open. |
+| **Search** | Magnifying glass | Search home | Full-text dish search + filters. |
+| **My Meals** | Clock / history icon | My Meals home | Cooking history by date. |
+| **Profile** | Person icon | Profile & settings | Household, preferences, notifications. |
+
+# **02  Complete screen hierarchy (v1.2)**
+
+**v1.2 changes: **OB-00 and OB-08b added. OB-03 and OB-07 updated. H-01, H-06, H-07 gesture model updated.
+
+## **Auth ****&**** splash (A-screens — unchanged)**
+
+| **ID** | **Screen name** | **Entry points** | **Exit points** | **States** | **Persona** |
+| --- | --- | --- | --- | --- | --- |
+| A-01 | Splash screen | App launch | A-02 (auto) | Single state | All |
+| A-02 | Welcome / intro | A-01 | A-03, A-04 | Single state | All |
+| A-03 | Sign up | A-02 | OB-00 (success), A-03 (error) | Default, loading, error | All |
+| A-04 | Sign in | A-02 | H-01 (success), A-04 (error) | Default, loading, error | All |
+| A-05 | Forgot password | A-04 | A-04 on submit | Default, loading, success, error | All |
+
+## **Onboarding (OB-screens — 10 screens in v1.2)**
+
+**v1.2: **OB-00 and OB-08b added. OB-03 includes migration duration. OB-07 is left/right swipe.
+
+| **ID** | **Screen name** | **Entry points** | **Exit points** | **States** | **Persona** |
+| --- | --- | --- | --- | --- | --- |
+| OB-00 | Conversational intro — stats engagement [NEW] | A-03 post signup | OB-01 (tap Continue) | Single state. No skip. Avatar + stats bubbles. Pure engagement. | All |
+| OB-01 | Who is this for? (main cohort) | OB-00 | OB-02 | Default, skip top-right | All |
+| OB-02 | Household details (dynamic branch) | OB-01 | OB-03 | Branch A: kids ages. B: elder. C: health. | Meera, Priya |
+| OB-03 | Home state + city + migration duration [UPDATED] | OB-02 | OB-04 | State dropdown, city dropdown, slider: < 1yr / 1–3yr / 3–7yr / 7yr+. Skip. | All |
+| OB-04 | Diet type selection | OB-03 | OB-05 | 5 chips. Skip | All |
+| OB-05 | Allergen exclusions | OB-04 | OB-06 | Autocomplete against dish DB. Multi-select chips. Skip. | Meera, Priya |
+| OB-06 | Cook capability | OB-05 | OB-07 | 4 options. Skip | All |
+| OB-07 | Dish preference swipe — left/right [UPDATED] | OB-06 | OB-08 | Indian dish cards. Right = YES (class liked). Left = NOPE. Visible heart and X buttons below card. Skip all. | All |
+| OB-08 | Profile setup (name, notification, member names) | OB-07 | OB-08b | Name, notification time, member names. Skip. | All |
+| OB-08b | Single-day plan preview [NEW] | OB-08 | H-01 (tap Start) | Today's 3 meal cards. Swap icon active. Looks good! CTA. No skip. | All |
+
+## **Home (H-screens — gesture model updated)**
+
+**v1.2: **H-01 swipe-left now reveals action buttons (Not Today, Never). Carousel (H-03) accessed via swap icon tap. H-06 and H-07 entry points updated.
+
+| **ID** | **Screen name** | **Entry points** | **Exit points** | **States** | **Persona** |
+| --- | --- | --- | --- | --- | --- |
+| H-01 | Day View — today | Tab bar Home, push notification, OB-08b | H-02 (tap card), H-03 (tap swap icon), H-06/H-07 (swipe-left reveal) | Loading, populated, empty/error, offline cached, add-on row visible | All |
+| H-02 | Meal Detail Page | H-01, S-02, MM-02 | H-01 (back) | Default, loading, offline | All |
+| H-03 | Swipe carousel (8 alternatives) | H-01 — tap swap icon in action bar | H-01 (select or dismiss) | Default, selecting. NOT accessed via left swipe. | All |
+| H-04 | Order Instead deeplink [Phase TBD] | H-02 (future) | External app | Not built in MVP | Riya |
+| H-05 | Member add-on detail | H-01 (tap add-on row) | H-01 (back) | Default, loading | Meera, Priya |
+| H-06 | Not Today confirmation [UPDATED ENTRY] | H-01 swipe-left reveal + tap Not Today button | H-01 (confirmed/cancelled) | Bottom sheet: dish + Skip today / Cancel | All |
+| H-07 | Never confirmation [UPDATED ENTRY] | H-01 swipe-left reveal + tap Never button | H-01 (confirmed/cancelled) | Bottom sheet: dish + Remove forever / Cancel | All |
+| H-08 | Add to date modal | H-01 tap plus icon | H-01 (date selected) | Date picker bottom sheet | All |
+| H-09 | Day View — past/future date | W-01, H-08 | H-01, H-02 | Same states as H-01 | All |
+
+## **All other screen groups — unchanged from v1.1**
+
+W-01, MM-01, MM-02, S-01 through S-03, P-01 through P-08 are unchanged from v1.1.
+
+# **03  Universal screen states — unchanged**
+
+| **State** | **What shows** | **Applies to** |
+| --- | --- | --- |
+| **Loading** | Skeleton placeholder matching content shape | All data-dependent screens |
+| **Populated** | Full content rendered | All screens |
+| **Empty** | Illustration + text + primary CTA. Never blank white. | H-01, W-01, MM-01, S-02, P-05 |
+| **Error** | Error message + retry button | All data-dependent screens |
+| **Offline (cached)** | Offline banner. Cached content. Network actions disabled. | H-01, H-09, W-01 |
+| **Offline (no cache)** | Offline illustration + connect prompt | H-01 (new user, never loaded) |
+| **Constraint conflict** | Friendly message + link to edit profile | H-01 (RE returns empty slate) |
+
+# **04  Deep link structure — unchanged from v1.1**
+
+| **Deep link** | **Destination** | **Source** |
+| --- | --- | --- |
+| **foofoo://home** | H-01 (today) | Morning push notification |
+| **foofoo://home?date=YYYY-MM-DD** | H-09 (specific date) | Prep reminder notification |
+| **foofoo://meal/{dish_id}** | H-02 (meal detail) | WhatsApp share, future social |
+| **foofoo://mymeals** | MM-01 | Future: weekly recap notification |
+| **foofoo://profile/never** | P-05 | Notification: review your never list |
+| **foofoo://referral/{code} [Phase TBD]** | A-03 (future) | Referral programme when F-50 activates |
+
+# **05  Critical user flow maps (v1.2)**
+
+**v1.2: **Flow 1 updated (OB-00, OB-08b added). Flow 3 updated (swipe-reveal replaces long-press).
+
+## **Flow 1 — New user to first plan (UPDATED)**
+
+| **Step** | **Screen** | **User action** | **System output** |
+| --- | --- | --- | --- |
+| **1** | **A-02 Welcome** | Taps Get started | Navigate to A-03 Sign up |
+| **2** | **A-03 Sign up** | Enters email + password | Account created. Navigate to OB-00. |
+| **3** | **OB-00 Conversational intro** | Reads: '1,095 meal decisions a year — we'll take those off your plate.' Taps Continue. | No data collected. Pure engagement. Navigate to OB-01. |
+| **4** | **OB-01 Cohort** | Selects Family with kids | MC_FAMILY. Navigate to OB-02 kids branch. |
+| **5** | **OB-02 Household** | Selects school child age bands (ages 8 and 5) | member_segments = [SCHOOL_CHILD]. OB-03. |
+| **6** | **OB-03 State + city + duration** | Selects Madhya Pradesh, Pune, 3–7 years in city | home_state, current_city, migration_years stored. RE city overlay weight = medium. OB-04. |
+| **7** | **OB-04 to OB-07** | Completes diet, allergens, cook capability, dish swipes | All preference signals stored. OB-08. |
+| **8** | **OB-08 Profile** | Enters name Meera, sets 7 AM notification | Profile stored. RE generates plan in background. Navigate to OB-08b. |
+| **9** | **OB-08b Plan preview** | Sees today's 3 meal cards — the first view of the AI's work. Taps swap on lunch. Selects alternative. Taps Looks good! | Plan confirmed. Navigate to H-01 with same plan pre-loaded. |
+| **10** | **H-01 Day View** | Full Day View with tab bar. Same plan from preview. | Onboarding complete. First session active. |
+
+## **Flow 2 — Daily use loop (unchanged — see v1.1)**
+
+Flow 2 unchanged from v1.1.
+
+## **Flow 3a — Not Today (UPDATED — swipe-reveal)**
+
+| **Step** | **Screen** | **User action** | **System output** |
+| --- | --- | --- | --- |
+| **1** | **H-01 Day View** | Swipes left on lunch meal card | Card slides 80px left. Not Today (amber) and Never (red) buttons emerge from right edge. |
+| **2** | **H-01 action revealed** | Taps Not Today (amber, clock icon) | H-06 bottom sheet: dish name + Skip today / Cancel |
+| **3** | **H-06 Not Today sheet** | Taps Skip today | Sheet closes. Card snaps back. Slot regenerates. Toast: Lunch skipped for today. |
+| **4** | **RE background** | Event: dish_not_today logged | Penalty P(t) = 0.80 × e^(-0.35t) applied. Dish returns to normal in ~7 days. |
+
+## **Flow 3b — Never (UPDATED — swipe-reveal)**
+
+| **Step** | **Screen** | **User action** | **System output** |
+| --- | --- | --- | --- |
+| **1** | **H-01 Day View** | Swipes left on dinner meal card | Not Today + Never buttons emerge. |
+| **2** | **H-01 action revealed** | Taps Never (red, trash icon) | H-07 bottom sheet: dish photo + Remove forever / Cancel |
+| **3** | **H-07 Never sheet** | Taps Remove forever | Sheet closes. Toast: [Dish] removed. Slot regenerates immediately. |
+| **4** | **RE background** | Event: dish_never logged | Dish added to never_list. Excluded from all future candidate sets permanently. |
+
+## **Flow 4 — My Meals first view (unchanged — see v1.1)**
+
+Flow 4 unchanged from v1.1.
+
+# **06  Gesture specification (v1.2 — BREAKING CHANGE)**
+
+**Long-press completely removed. **Every action now has a visible, discoverable entry point. Swipe-reveal is native to iOS and Android — users already know it from Mail, Gmail, WhatsApp without instruction.
+
+| **Gesture** | **How triggered** | **Action** | **Why this is better** |
+| --- | --- | --- | --- |
+| **Tap card body** | Single tap on card (not icon area) | Open Meal Detail (H-02) | Obvious. Works from day 1. |
+| **Tap swap icon** | Tap refresh/swap icon in action bar | Open carousel (H-03) with 8 alternatives | Icon is always visible. Label shown for first 3 uses. |
+| **Swipe left on card** | 40px leftward displacement | Reveal Not Today (amber) + Never (red) buttons | Platform-native. User already knows this from Mail and Gmail. |
+| **Tap Not Today button** | After swipe-reveal | Open H-06 confirmation sheet | Visible button. Amber + clock icon. 48px touch target. |
+| **Tap Never button** | After swipe-reveal | Open H-07 confirmation sheet | Visible button. Red + trash icon. 48px touch target. |
+| **Tap anywhere else** | After swipe-reveal | Cancel: card snaps back | Standard dismiss behaviour. |
+| **Tap lock icon** | Single tap on lock in action bar | Lock / unlock slot | Always visible. Fills green when locked. |
+| **Tap plus icon** | Single tap on + in action bar | Add to different date (H-08) | Always visible. |
+| **Pull down on screen** | Standard pull-to-refresh | Refresh unlocked slots only | Native. Locked slots unchanged. |
+
+| **What changed and why: **Long-press requires users to discover an invisible gesture, hold for exactly the right duration, and then drag in a specific direction. Three sequential discoveries with zero visual affordance. The swipe-reveal pattern requires one discoverable gesture (swipe left, which is standard) and then presents visible, labelled buttons. The barrier to action drops from three steps to two — and both steps are standard platform patterns. |
+| --- |
+
+# **07  Screen count (v1.2)**
+
+| **Group** | **MVP screens** | **Change from v1.1** |
+| --- | --- | --- |
+| **Auth ****&**** splash** | 5 (A-01 to A-05) | No change |
+| **Onboarding** | 10 (OB-00 to OB-08b) | Added OB-00 (intro) + OB-08b (plan preview). OB-03 and OB-07 updated. |
+| **Home** | 8 MVP (H-04 Phase TBD) | Gesture model updated. No screens added/removed. |
+| **Week View, My Meals, Search** | 6 screens total | No change |
+| **Profile** | 6 MVP (P-06, P-07 Phase TBD) | No change |
+| **TOTAL MVP** | 35 screens | Up from 33 in v1.1 (+2 onboarding) |
+
+# **08  Sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-05 · Information Architecture & Screen Inventory |
+| **Version** | 1.2 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Screen count** | 35 MVP screens |
+| **Gesture system** | Long-press removed. Swipe-reveal is the new standard. No hidden gestures remain. |
+| **Source for this version** | foofoo_onboarding_prototype.html analysis + founder feedback |
+| **Next** | DOC-06 v1.1 (updated simultaneously with same gesture changes) |
+
+Founder sign-off: ___________________________     Date: _______________

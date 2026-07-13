@@ -1,0 +1,192 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**DOC-06  ·  UI/UX Design System ****&**** Wireframes — v1.1**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **IMPORTANT — Figma design replaceability**
+
+| **This document defines structure, spacing, interaction, and proposed default tokens. It is not a final visual design.** When Figma designs are delivered, they supersede all visual decisions in this document: Color palette — Figma overrides DOC-06 colors. The semantic token names remain valid; values update to Figma's choices. Typography — Figma overrides typeface, weights, and scale. The type style names (display-dish, label-slot, etc.) remain valid. Component aesthetics — Figma overrides corner radii, shadows, imagery treatment, iconography. Illustrations and imagery — Figma governs completely. **What Figma does NOT override:** Structural wireframes — screen zone hierarchy, layout, information density. These remain authoritative. Gesture specification — swipe-reveal, tap targets, action bar layout. Structural, not visual. Spacing system — 4px base unit and the 9 spacing tokens. Figma should align to these or propose explicit overrides. Screen inventory and navigation model — screen IDs, entry/exit points, and states defined in DOC-05. Accessibility requirements — WCAG touch targets, contrast ratios, reduced-motion support. |
+| --- |
+
+# **CHANGE NOTICE — v1.0 → v1.1**
+
+| **Changes in v1.1:** Figma replaceability note added (see section above) — design tokens are proposals until Figma signs off C-03 (Gesture Zones) replaced by C-03 (Swipe-Reveal Action Buttons) — long-press fully removed C-11 (Migration Duration Slider) added — new onboarding component for OB-03 C-07 (OB-07 dish preference swipe) updated — now left/right card swipe with visible action buttons from prototype H-01 wireframe updated — action bar now shows swap icon explicitly; left swipe = action reveal OB-00 wireframe added — conversational intro screen OB-08b wireframe added — single-day plan preview |
+| --- |
+
+# **01  Design philosophy — three principles (unchanged)**
+
+| **Principle** | **What it means** | **What it rules out** |
+| --- | --- | --- |
+| **Warm and grounded** | The app lives in a kitchen at 7 AM. It should feel like a confident friend who knows your family's food — not a health dashboard or a tech product. | Clinical white backgrounds. Cold blue accents. Icon-heavy interfaces. Dense data tables on the home screen. |
+| **Card is the product** | Every feature exists to serve one interaction: the user seeing the right meal card at the right moment. The home screen is three cards. | Dashboards. Menus buried in navigation. Information architecture that obscures the plan. |
+| **Gestures as language** | Swipe, lock, swap, never — these are physical actions mapping to emotional states. Every action has a visible entry point. No hidden gestures. | Long-press. Shake-to-undo. Any gesture with no visual affordance. |
+
+# **02  Brand personality — three adjectives (unchanged)**
+
+**Warm. Confident. Grounded. **These adjectives govern every visual decision until Figma files arrive.
+
+| **Figma note: **The visual expression of these adjectives is open for Figma to interpret. The adjectives themselves are non-negotiable product requirements. |
+| --- |
+
+# **03  Color system — proposed defaults (Figma may override)**
+
+| **Status: proposed. **These are the default colors for development until Figma delivers. Figma overrides take effect immediately when delivered. The semantic token names remain unchanged. |
+| --- |
+
+| **Token** | **Proposed hex** | **Usage rule** |
+| --- | --- | --- |
+| **color.background.primary** | #FAFAF5 (Cream) | App background — warm, not white. Makes food photography look appetising. |
+| **color.background.surface** | #FFFFFF (White) | Card surfaces only. Lifts above cream background. |
+| **color.background.secondary** | #F0EDE6 (Stone) | Inputs, secondary panels, unselected filter chips. |
+| **color.brand.primary** | #1A5C38 (Forest Green) | Primary CTAs, tab bar active, section headers, lock state. |
+| **color.brand.accent** | #E8910A (Saffron) | SPARINGLY: swap icon on first use, AI confidence dot, plan preview CTA, onboarding progress indicator. |
+| **color.text.primary** | #1C1C1E (Charcoal) | All headings and body text. |
+| **color.text.secondary** | #6B6B6B (Stone Gray) | Metadata, labels, descriptions, timestamps. |
+| **color.gesture.reveal.nottoday** | #F59E0B (Amber) | Not Today swipe-reveal button background. |
+| **color.gesture.reveal.never** | #E53935 (Red) | Never swipe-reveal button background. |
+| **color.gesture.lock** | #1A5C38 (Green) | Lock state indicator on locked cards. |
+| **color.feedback.success** | #1D9E75 | Success toasts, check states. |
+| **color.feedback.error** | #DC3545 | Error states only. |
+
+# **04  Typography — proposed defaults (Figma may override)**
+
+| **Proposed typeface: **Plus Jakarta Sans via expo-google-fonts. Figma may specify a different typeface — the type style names (display-dish, label-slot, etc.) are the stable contract, not the specific font family. |
+| --- |
+
+| **Style name** | **Size** | **Weight** | **Used for** |
+| --- | --- | --- | --- |
+| **display-dish** | 24px | SemiBold 600 | Dish name on meal card — the most important text in the app |
+| **display-section** | 20px | Bold 700 | Day header, screen titles |
+| **heading-1** | 18px | SemiBold 600 | Card section titles, modal headers |
+| **heading-2** | 16px | SemiBold 600 | Sub-section titles, list headers |
+| **body-large** | 16px | Regular 400 | Primary body copy, ingredient list |
+| **body-medium** | 14px | Regular 400 | Secondary descriptions |
+| **label-slot** | 11px · 1px tracking | Medium 500 · ALL CAPS | BREAKFAST / LUNCH / DINNER slot labels |
+| **label-cuisine** | 11px · 0.5px tracking | Medium 500 · ALL CAPS | Cuisine tag on card |
+| **meta-data** | 12px | Regular 400 | Cook time, calories, timestamps |
+| **button-primary** | 16px | SemiBold 600 | Primary buttons |
+| **caption** | 11px · 0.2px tracking | Regular 400 | Legal, footnotes, version |
+
+# **05  Spacing system — 4px base unit (unchanged)**
+
+| **Token** | **Value** | **Usage** |
+| --- | --- | --- |
+| **space.1** | 4px | Icon inner padding |
+| **space.2** | 8px | Between metadata items, tags |
+| **space.3** | 12px | Between cards, chip padding |
+| **space.4** | 16px | Screen margin, card padding, list item padding |
+| **space.5** | 20px | Between major screen sections |
+| **space.6** | 24px | Modal header, section title margin |
+| **space.7** | 32px | Above screen title / day header |
+| **space.8** | 40px | Onboarding vertical sections |
+| **space.9** | 48px | Bottom safe area above tab bar |
+
+# **06  Component library (v1.1 — C-03 and C-07 updated, C-11 added)**
+
+| **C-01 · Meal Card** *The most important component. Unchanged from v1.0.* **Container** White surface, 16px border radius, 0 2px 8px rgba(0,0,0,0.08) shadow. Full width minus 32px margin. **Food photo zone** 56% of card height. resizeMode=cover. Gradient overlay bottom: rgba(0,0,0,0) → rgba(0,0,0,0.4). **Slot label** Above card. 11px Plus Jakarta Sans Medium, ALL CAPS, #6B6B6B. **Dish name** 24px Plus Jakarta Sans SemiBold, #1C1C1E. Single line, truncated. **Metadata row** Cuisine tag + cook time + calories. 12px. **Action bar** Left: Lock icon. Center: Swap icon (🔄, replaces old gesture hint). Right: Plus icon. All 24px, 48×48px touch targets. **Lock state** Green top border 4px. Green fill on lock icon. Subtle green tint background #F8FBF9. **Add-on row** If member_segments non-empty: secondary row with saffron 'For [Name]:' + add-on dish name. **Swipe-reveal state** On left swipe: card translates left 80px. Two buttons emerge from right edge. See C-03. |
+| --- |
+
+| **C-02 · Swipe Carousel** *Accessed via tap on swap icon (🔄) in meal card action bar. NOT via left swipe (v1.1 change).* **Entry** Swap icon tap. Card expands slightly. Carousel slides in from right. **Alternative card** Smaller version of C-01. 80% width. Left/right padding shows adjacent cards. **RE reason tag** Below dish name on each alternative: 'Regional favourite', 'Quick cook', 'Based on your taste'. 11px, #6B6B6B, italic. **Position indicator** 8 dots below carousel. Active = green filled. **Selection** Tap card = select + close. Main slot updates. Haptic. **Dismiss** Swipe down or tap outside = dismiss. Original suggestion remains. |
+| --- |
+
+| **C-03 · Swipe-Reveal Action Buttons [UPDATED — replaces long-press]** *Revealed by swiping left on a meal card. The only way to access Not Today and Never.* **Trigger** 40px leftward displacement on meal card. No press-and-hold required. **Not Today button** Amber (#F59E0B). Clock icon (24px). Label: 'Not Today'. 48px tall. Fills ~40% of revealed width. **Never button** Red (#E53935). Trash icon (24px). Label: 'Never'. 48px tall. Fills ~40% of revealed width. **Cancel** Tap anywhere else on screen = card snaps back. No action taken. **Not Today tap** Opens H-06 bottom sheet: dish name + 'Skip today / Cancel'. **Never tap** Opens H-07 bottom sheet: dish photo + 'Remove forever / Cancel'. Requires explicit confirmation before acting. **Edge safety** Left 40px of card is excluded from swipe trigger to prevent conflict with Android back gesture. **Why swipe-reveal** Platform-native pattern (iOS Mail, Gmail, WhatsApp). No instruction needed. Both actions visible and labelled once revealed. |
+| --- |
+
+| **C-04 · Bottom Tab Bar** *Unchanged from v1.0. 5 tabs.* **Tabs** Home · Week · Search · My Meals · Profile **Height** 56px + bottom safe area **Active state** Icon + label in #1A5C38. Filled icon variant. **Inactive state** Icon + label in #B0B0AD. Outline icon variant. **Background** White #FFFFFF. 1px top border #E8E8E4. |
+| --- |
+
+| **C-05 · Onboarding Selection Chip** *Used on OB-01 through OB-08. Unchanged from v1.0.* **Default** White bg, 1px #E8E8E4 border, 12px radius, 16px h-padding, 14px v-padding. 16px Medium, #1C1C1E. **Selected** #1A5C38 bg, white text, no border. Instant state change. **Layout** Wrap layout. Minimum 2 per row on standard phone width. |
+| --- |
+
+| **C-06 · Toast Notification** *Unchanged from v1.0.* **Position** 16px above tab bar. Centred. **Style** White bg, 12px radius, shadow. Green left border for success. Red for error. **Duration** 2.5s. Slides up 200ms. Auto-dismisses. |
+| --- |
+
+| **C-07 · OB-07 Dish Preference Swipe [UPDATED from prototype]** *Left/right card swipe for dish preferences. Replaces vertical class thumbnail swipe from v1.0.* **Cards shown** Indian dish cards with photo (not class thumbnails). Each card visually represents a meal class but shows a real dish. Rajma Chawal → LUNCH_CURRY_ROTI class. Idli Sambar → BF_SOUTH_FERMENTED class. **Swipe right (YES)** Card flies off right. Stamps 'YES' stamp. RE signal: user likes this dish's meal class. Next card slides in. **Swipe left (NOPE)** Card flies off left. Stamps 'NOPE' stamp. RE signal: user dislikes this meal class. **Visible action buttons** Below the card: large ✕ button (left, red) and large ♥ button (right, green). Tapping either fires the same signal as the corresponding swipe. No gesture required. **Number of cards** 8–10 dish cards. Covers the major meal classes. **Dish pool — Indian only** Idli Sambar · Poha · Aloo Paratha · Rajma Chawal · Masala Dosa · Paneer Butter Masala · Chole Bhature · Dal Makhani · Khichdi · Biryani. No Western dishes. **Skip** 'Skip all' text link top-right. Skipping produces no class preference signals — cold start defaults apply. **RE mapping** Each swipe → class_preference_swipes[] stored. YES = class affinity boost. NOPE = class affinity penalty. Applied to cohort matrix weights for this user. |
+| --- |
+
+| **C-08 · Bottom Sheet Modal** *Unchanged from v1.0.* **Handle** 32×4px gray pill, centered, 8px from top. **Background** White. 20px top border radius. Shadow 0 -4px 24px rgba(0,0,0,0.12). **Backdrop** rgba(0,0,0,0.4). Tap backdrop to dismiss. **Animation** Slides up 280ms spring. |
+| --- |
+
+| **C-09 · Day Header** *Unchanged from v1.0.* **Content** Left: 'Today' + date. Right: Week view chevron. **AI dot** 6px saffron dot right of 'Today' when plan freshly generated. Disappears after first open. |
+| --- |
+
+| **C-10 · Member Add-on Row** *Unchanged from v1.0.* **Visibility** Only rendered when member_segments is non-empty. **Content** 'For [Name]:' in 11px saffron + add-on dish in 12px #6B6B6B. **Not swipeable** Add-ons do not have carousel alternatives. No swipe actions on add-on row. |
+| --- |
+
+| **C-11 · Migration Duration Slider [NEW — from prototype]** *Added to OB-03. Captures how long user has lived in current city. Feeds RE city overlay weight.* **Screen** OB-03: Home state + current city + migration duration. **Label** 'How long have you lived in [current city]?' **Options** 4 step slider: Less than 1 year / 1–3 years / 3–7 years / 7+ years. Stepped, not continuous. **Visual** Pill-step selector (not a continuous slider). User taps one of 4 options. Selected = green fill. **RE impact** < 1 year → migration_years = 0.5 → city overlay weight = LOW (0.15). 1–3 years → weight = MEDIUM-LOW (0.30). 3–7 years → weight = MEDIUM (0.50). 7+ years → weight = HIGH (0.70). Higher weight = more city food influence in class plan. **Skip** If skipped: migration_years = null → RE uses 3-year default (medium weight). Confidence score –0.04. **Why this matters** A Madhya Pradesh family who moved to Mumbai 6 months ago should get mostly MP food with light Mumbai exposure. One that moved 10 years ago should get a more balanced plan. This slider makes that distinction possible. |
+| --- |
+
+# **07  Motion principles (v1.1 — swipe-reveal animation added)**
+
+| **Animation** | **Duration** | **Easing** | **Notes** |
+| --- | --- | --- | --- |
+| **Card swipe-reveal** | 180ms | Ease-out | Card slides left 80px. Buttons emerge from right with slight scale-up. |
+| **Swipe-reveal cancel** | 150ms | Ease-in (spring back) | Card snaps back to original position. Slightly faster than reveal. |
+| **Not Today / Never button tap** | 80ms | Ease | Button scales to 0.96 on tap. Confirmation sheet slides up. |
+| **Screen push navigation** | 300ms | Spring: stiffness 180, damping 20 | Standard React Navigation stack |
+| **Bottom sheet open** | 280ms | Spring: stiffness 200, damping 22 |  |
+| **Bottom sheet close** | 200ms | Ease-in | Faster on exit than entry. |
+| **Swap card (OB-07)** | 260ms | Spring: stiffness 160, damping 18 | Card flies off. YES/NOPE stamp fades in with card. |
+| **Toast slide up** | 200ms | Spring | From bottom. Energetic. |
+| **Skeleton shimmer** | 1200ms | Linear, looping |  |
+| **Lock icon fill** | 200ms | Ease | Outline → filled on lock. |
+| **Swipe carousel entry** | 200ms | Spring | New alternatives slide in from right. |
+
+| **Reduced motion: **All animations must respect system Reduce Motion setting. Replace spring animations with instant state changes or 100ms opacity fades. Swipe-reveal: works without animation — card snaps to revealed position instantly. |
+| --- |
+
+# **08  Screen wireframe specifications (v1.1)**
+
+**v1.1 additions: **OB-00 and OB-08b added. OB-07 updated. H-01 action bar and swipe behaviour updated.
+
+## **New onboarding screens**
+
+| **OB-00 · Conversational intro — stats engagement [NEW]** *No skip. Engagement before questions. Sets the tone.* **Background** White screen — calm, focused. **Avatar** 74px circular avatar, green background, fork+bowl emoji. Centred. 60px from top. **Stat bubble 1** Chat bubble style. Mint green background, rounded corners. Text: 'Did you know? The average family makes 1,095 meal decisions a year.' 17px body, 20px line height. **Stat bubble 2** Same style, staggered entry (200ms after bubble 1). 'That's 3 times a day, every single day — before you've even had your coffee.' **Conclusion bubble** 'Let's take those off your plate. This takes 2 minutes.' — tone: confident, warm, specific. **Continue CTA** Full-width green button at bottom. 'Let's go'. No skip option. First screen with no exit — user must tap Continue or leave the app. **Progress bar** Not shown on OB-00. Appears from OB-01 onward. |
+| --- |
+
+| **OB-03 · Home state + current city + migration duration [UPDATED]** *Captures regional identity as two separate signals plus migration context.* **Header** 'Where are you from, and where do you live now?' 24px SemiBold. **Home state** 'Your food roots'. Dropdown: 36 Indian states/UTs. Searchable. Required field — no skip without confirming a value or explicitly skipping. **Current city** 'Your current city'. Dropdown: major cities, with free-text option. Separate from home state. **Migration duration (C-11)** 'How long have you lived in [city]?' 4-step pill selector: < 1 year / 1–3 years / 3–7 years / 7+ years. Appears after current city is selected. **RE impact note** Not shown to user. Internally: migration duration sets city overlay weight in the RE class plan. **Skip behaviour** If skipped: home state = null, current city from device locale, migration = 3yr default. Confidence –0.08. |
+| --- |
+
+| **OB-07 · Dish preference swipe — left/right [UPDATED from prototype]** *Most engaging onboarding screen. Visual, fast, low friction.* **Header** 'What kind of meals do you love?' 24px SemiBold. **Sub-text** 'Swipe right if you'd eat it, left if not. No wrong answers.' 14px, #6B6B6B. **Dish card** Full-width. Food photo background (56% of visible height). Dish name in 20px SemiBold at bottom. Meal class code NOT shown. **YES stamp** Green stamp overlay. Slides in as card moves right. **NOPE stamp** Red stamp overlay. Slides in as card moves left. **Visible buttons** Below card: large ✕ button (red, left) and large ♥ button (green, right). Both 56px height. No gesture required. **Card count** 10 dish cards. 1–2 per major meal class. **Indian-only dish pool** Idli Sambar, Poha, Aloo Paratha, Rajma Chawal, Masala Dosa, Paneer Butter Masala, Chole Bhature, Dal Makhani, Khichdi, Chicken Biryani (non-veg users). **Progress** Card counter: '3 of 10' below action buttons. **Skip** 'Skip all' top-right link. Cold-start defaults apply. |
+| --- |
+
+| **OB-08b · Single-day plan preview [NEW]** *The aha moment. User sees the AI**'**s first output before leaving onboarding.* **Header** 'Your plan for today — what do you think?' 20px Bold. Saffron AI dot right of header. **Sub-text** 'Swap anything you don't like. Your plan gets smarter every day.' 13px, #6B6B6B. **3 meal cards** Same C-01 cards as H-01. Breakfast / Lunch / Dinner. Photo, dish name, metadata, action bar with swap icon. **Swap icon active** Swap icon in action bar is tappable. Opens a simplified carousel (H-03). User can swap one dish before confirming. **Lock icon** Active and tappable. User can lock a slot. **Swipe-reveal** Active — user can already use swipe-left to access Not Today / Never. Teaches the interaction. **Member add-on row** If applicable. Shown exactly as it will appear in H-01. **CTA** Full-width green button at bottom. 'Looks good — let's go!' Navigates to H-01 with this plan pre-loaded. **No skip** This screen has no skip. User must tap the CTA to proceed. The plan is already generated — viewing it is instant. |
+| --- |
+
+## **Home Day View (H-01) — action bar and swipe updated**
+
+| **H-01 · Day View — Today [GESTURE MODEL UPDATED]** *Three meal cards. Every action has a visible entry point.* **Status bar** Dark content on cream. **Day header (C-09)** 'Today · Tuesday 24 June'. AI dot. Week arrow right. **BREAKFAST label** 11px ALL CAPS, #6B6B6B. 20px top margin. **Breakfast meal card** Photo zone (56%). Dish name 24px SemiBold. Metadata row. Action bar: Lock icon (left) + Swap icon 🔄 (center, tappable → H-03 carousel) + Plus icon (right). **Swipe left on card** Slides card left 80px. Reveals Not Today (amber) and Never (red) buttons from right edge. No long-press. **Member add-on row** If member_segments: saffron 'For [Name]:' + add-on dish name below breakfast card. **LUNCH and DINNER** Same structure as breakfast card. **Bottom padding** 48px above tab bar. **Offline banner** If offline: info-blue top border + 'Showing your last saved plan.' |
+| --- |
+
+# **09  Accessibility requirements (unchanged from v1.0)**
+
+| **Requirement** | **Standard** | **Implementation** |
+| --- | --- | --- |
+| **Touch target minimum** | 48×48px | All icons wrapped in 48×48px touchable zones |
+| **Colour contrast — body text** | 4.5:1 minimum | #1C1C1E on #FAFAF5: 16.2:1. #6B6B6B on #FAFAF5: 5.8:1. |
+| **Screen reader** | All images need alt text | Food photo: alt = dish name. Icons: accessibilityLabel on all icon buttons. |
+| **Reduced motion** | System setting respected | All animations reduced to instant state changes or 100ms opacity fades. |
+| **Font scaling** | Up to 200% | Use relative units (sp). Test layout at 200% font scale. |
+| **Error identification** | Never colour-only | Always pair error colour with icon and text. |
+| **Language** | en-IN locale | Date format: DD Month YYYY. Currency: ₹. |
+
+# **10  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-06 · UI/UX Design System & Wireframes |
+| **Version** | 1.1 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Figma status** | Pending. Figma overrides visual decisions when delivered. Structural wireframes and gesture spec remain authoritative. |
+| **Gesture model** | Long-press removed. Swipe-reveal is the standard. No hidden gestures in the product. |
+| **Components** | 11 components (C-01 to C-11). C-03 updated. C-07 updated. C-11 new. |
+| **Screens specified** | 35 MVP screens per DOC-05 v1.2. New wireframes: OB-00, OB-08b. Updated: OB-03, OB-07, H-01. |
+| **Next** | DOC-07 · Go-To-Market Strategy |
+
+Founder sign-off: ___________________________     Date: _______________

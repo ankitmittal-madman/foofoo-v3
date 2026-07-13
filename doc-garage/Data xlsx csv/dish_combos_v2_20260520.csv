@@ -1,0 +1,36 @@
+combo_name,combo_slug,meal_types,cuisine,combo_type,is_active,is_updated,last_update_date,is_review
+Chole Bhature,chole-bhature,"breakfast,lunch,dinner",punjabi,inseparable,Y,N,,Y
+Rajma Chawal,rajma-chawal,"lunch,dinner",punjabi,base_with_sides,Y,N,,Y
+Dal Chawal,dal-chawal,"lunch,dinner",punjabi,base_with_sides,Y,N,,Y
+Idli Sambar,idli-sambar,"breakfast,snacks",tamil,base_with_sides,Y,N,,Y
+Masala Dosa Set,masala-dosa-set,"breakfast,lunch,dinner",udupi,base_with_sides,Y,N,,Y
+Dosa Sambar,dosa-sambar,"breakfast,snacks",udupi,base_with_sides,Y,N,,Y
+Medu Vada Sambar,medu-vada-sambar,"breakfast,snacks",tamil,base_with_sides,Y,N,,Y
+Dal Baati Churma,dal-baati-churma,"lunch,dinner",rajasthani,inseparable,Y,N,,Y
+Sarson Ka Saag Makki Ki Roti,sarson-saag-makki-roti,"lunch,dinner",punjabi,inseparable,Y,N,,Y
+Poha Jalebi,poha-jalebi,breakfast,indori,inseparable,Y,N,,Y
+Chole Kulche,chole-kulche,"breakfast,lunch,dinner",delhi,base_with_sides,Y,N,,Y
+Puri Aloo,puri-aloo,breakfast,up,base_with_sides,Y,N,,Y
+Bedmi Puri Aloo,bedmi-puri-aloo,breakfast,delhi,inseparable,Y,N,,Y
+Kerala Rice Meals,kerala-rice-meals,"lunch,dinner",kerala,thali,Y,N,,Y
+Hyderabadi Biryani Set,hyderabadi-biryani-set,"lunch,dinner",hyderabadi,base_with_sides,Y,N,,Y
+Puttu Kadala,puttu-kadala,breakfast,kerala,inseparable,Y,N,,Y
+Paratha Curd Pickle,paratha-curd-pickle,breakfast,punjabi,base_with_sides,Y,N,,Y
+Matar Kulcha,matar-kulcha,breakfast,delhi,inseparable,Y,N,,Y
+Chole Bhature (Delhi),chole-bhature-delhi,"breakfast,lunch,dinner",delhi,inseparable,Y,N,,Y
+Nihari Kulcha,nihari-kulcha,breakfast,awadhi,inseparable,Y,N,,Y
+Pav Bhaji Set,pav-bhaji-set,"lunch,dinner,snacks",maharashtrian,inseparable,Y,N,,Y
+Thali Meals (South Indian),south-indian-thali,"lunch,dinner",tamil,thali,Y,N,,Y
+Sadya Thali,onam-sadya,lunch,kerala,thali,Y,N,,Y
+Dahi Vada Set,dahi-vada-set,snacks,delhi,base_with_sides,Y,N,,Y
+Chole Tikki Set,chole-tikki-set,snacks,delhi,base_with_sides,Y,N,,Y
+Roti Sabzi,roti-sabzi,"lunch,dinner",punjabi,base_with_sides,Y,N,,Y
+Uttapam Set,uttapam-set,"breakfast,snacks",tamil,base_with_sides,Y,N,,Y
+Vada Sambar,vada-sambar,"breakfast,snacks",tamil,base_with_sides,Y,N,,Y
+Keema Pav,keema-pav-combo,"breakfast,lunch,dinner",street_food_generic,inseparable,Y,N,,Y
+Biryani Raita,biryani-raita,"lunch,dinner",mughlai,base_with_sides,Y,N,,Y
+Chholar Dal with Luchi,chholar-dal-with-luchi,"breakfast,lunch",bengali,base_with_sides,Y,Y,20-05-2026,Y
+Daal Bafla,daal-bafla,"lunch,dinner",madhya_pradesh,base_with_sides,Y,Y,20-05-2026,Y
+Pithla Bhakri,pithla-bhakri,"lunch,dinner",maharashtrian,base_with_sides,Y,Y,20-05-2026,Y
+Dal Pakwan,dal-pakwan,breakfast,sindhi,base_with_sides,Y,Y,20-05-2026,Y
+Zunka Bhakri,zunka-bhakri,"lunch,dinner",maharashtrian,base_with_sides,Y,Y,20-05-2026,Y

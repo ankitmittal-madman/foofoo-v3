@@ -1,0 +1,167 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**DOC-08  ·  Revenue ****&**** Monetisation Strategy**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **01  Monetisation philosophy**
+
+***Never paywall before the habit forms. Earn the right to charge.***
+
+The single biggest monetisation mistake a consumer app can make is activating a paywall before users have experienced the product's value enough to miss it. Foofoo's monetisation is sequenced around the habit loop, not around the business need for revenue. The 90-day free period is not generosity — it is the minimum time required for a meal planning habit to form and for the AI to learn the household well enough to be genuinely indispensable.
+
+| **Principle** | **What it means in practice** |
+| --- | --- |
+| **Habit first, paywall second** | Premium tier is visible from Day 1 but priced ₹0 for 90 days. Users see what they'll eventually pay for. Trust is built before the ask. |
+| **Free tier must be genuinely useful** | A free user who sees an ad gets the same quality plan as a premium user. Free is not broken — it's just ad-supported. Users upgrade for convenience and depth, not to access core value. |
+| **Every paid feature earns its price** | No feature is behind a paywall simply because we can lock it. Each premium feature must demonstrably improve the user's daily experience enough that the price feels low. |
+| **Price anchored to Indian market reality** | ₹99/month is less than one Swiggy order. ₹149/month is less than two. Pricing is framed against the daily behaviour it replaces, not against Western app pricing. |
+
+# **02  Freemium tier design**
+
+## **Three tiers**
+
+| **Feature** | **Free** | **Premium ₹99/mo** | **Premium Plus ₹149/mo** |
+| --- | --- | --- | --- |
+| **Personalised daily meal plan** | ✅ | ✅ | ✅ |
+| **Swipe carousel (8 alternatives)** | ✅ | ✅ | ✅ |
+| **Never / Not Today / Lock gestures** | ✅ | ✅ | ✅ |
+| **Full-text dish search** | ✅ | ✅ | ✅ |
+| **Simple ingredient list** | ✅ | ✅ | ✅ |
+| **Nutrition summary (basic)** | ✅ | ✅ | ✅ |
+| **Morning push notification** | ✅ | ✅ | ✅ |
+| **My Meals tab (history)** | ✅ | ✅ | ✅ |
+| **Ads between meal cards** | Yes | No | No |
+| **Full step-by-step recipes (Phase 0.5)** | Limited (3/week) | Unlimited | Unlimited |
+| **Meal insights ****&**** analytics** | ❌ | ✅ | ✅ |
+| **Pantry system (Phase 0.5)** | ❌ | ✅ | ✅ |
+| **Cooking history ****&**** diary (Phase 1)** | ❌ | ✅ | ✅ |
+| **Advanced calorie targeting (Phase 1)** | ❌ | ✅ | ✅ |
+| **Grocery list auto-generation (Phase TBD)** | ❌ | ✅ | ✅ |
+| **Family profiles (Phase 1.5)** | ❌ | ❌ | ✅ |
+| **Health profiles — pregnancy, recovery (Phase 2)** | ❌ | ❌ | ✅ |
+| **Member-level analytics** | ❌ | ❌ | ✅ |
+| **Priority RE updates (new features first)** | ❌ | ❌ | ✅ |
+
+## **Pricing rationale**
+
+| **₹99/month Premium — the ****'****one Swiggy order****'**** benchmark** The average Swiggy order for a family is ₹300–450. If Foofoo prevents even one impulse Swiggy order per month by having a plan ready, it pays for itself. This is the exact framing used in premium conversion messaging. Not 'save money on food' — 'save the cost of one bad ordering decision.' **₹149/month Premium Plus — the ****'****family planning tool****'**** benchmark** Meera manages 3 meals × 4 family members × 7 days = 84 meal decisions per week. At ₹149/month, Foofoo costs ₹1.78 per meal decision eliminated. Premium Plus is for users who have a complex household (multiple members with different needs) and for whom the time saving is measurable in hours per week, not minutes. |
+| --- |
+
+# **03  Revenue model — all streams**
+
+| **Stream** | **Description** | **When active** | **Revenue potential** |
+| --- | --- | --- | --- |
+| **Subscription — Premium ₹99/month** | Ad-free, meal insights, pantry, diary, calorie targeting, grocery list. | Phase 1.5 (Day 90+) | Primary long-term revenue driver |
+| **Subscription — Premium Plus ₹149/month** | Everything in Premium + family profiles, health profiles, member analytics. | Phase 1.5 (Day 90+) | Higher ARPU for complex households |
+| **In-app advertising** | Banner ads between meal cards for free users. Contextual food-adjacent categories (grocery, kitchenware, healthy snacks). | Phase 1.5 (concurrent with premium) | Secondary. Monetises free users. |
+| **Affiliate — grocery delivery** | Commission on orders placed via Blinkit/Zepto from Foofoo grocery list. | Phase 3 | 3–5% commission per order |
+| **Affiliate — food delivery** | Commission on Zomato/Swiggy orders placed via Foofoo 'Order Instead' CTA. | Phase 3 | 1–2% commission per order |
+| **B2B — corporate wellness** | Meal planning for corporate canteens or employee wellness programmes. | Year 2 | Different sales motion — out of consumer scope |
+
+# **04  Financial projections — 3-year model**
+
+Projections are conservative estimates based on organic-only growth through Phase 1 and modest paid marketing in Phase 1.5+. All figures in INR.
+
+## **Year 1 — validation and habit formation**
+
+| **Month** | **DAU** | **MAU** | **Paying users** | **MRR** | **Notes** |
+| --- | --- | --- | --- | --- | --- |
+| **Month 1–3 (MVP)** | 50→500 | 500→3,000 | 0 | ₹0 | Free period. All users on free tier. |
+| **Month 4 (Phase 0.5)** | 500→1,000 | 3,000→8,000 | 0 | ₹0 | Free period continues. |
+| **Month 5–6 (Phase 1)** | 1,000→2,000 | 8,000→18,000 | 0 | ₹0 | Free period. Premium visible at ₹0. |
+| **Month 7 (Phase 1.5 — paywall activates)** | 2,000→3,000 | 18,000→30,000 | 600–900 (3%) | ₹60,000–90,000 | First revenue. Referral drives conversion. |
+| **Month 8** | 3,000→4,000 | 30,000→45,000 | 900–1,800 | ₹90,000–1,80,000 | Paid marketing begins (small). |
+| **Month 9–12** | 4,000→8,000 | 45,000→100,000 | 1,800–4,000 | ₹1,80,000–4,00,000 | Scale begins if metrics hold. |
+
+## **Year 2 — growth and monetisation depth**
+
+| **Quarter** | **DAU** | **Paying users** | **MRR** | **ARR run rate** |
+| --- | --- | --- | --- | --- |
+| **Q1 (Phase 2 begins)** | 8,000→15,000 | 4,000→7,500 | ₹4,00,000–7,50,000 | ₹48L–90L |
+| **Q2** | 15,000→25,000 | 7,500→12,500 | ₹7,50,000–12,50,000 | ₹90L–1.5Cr |
+| **Q3 (Phase 3 begins)** | 25,000→40,000 | 12,500→20,000 | ₹12,50,000–20,00,000 | ₹1.5Cr–2.4Cr |
+| **Q4** | 40,000→60,000 | 20,000→30,000 | ₹20,00,000–30,00,000 | ₹2.4Cr–3.6Cr |
+
+## **Year 3 — scale**
+
+| **Scenario** | **DAU** | **Paying users** | **ARR** |
+| --- | --- | --- | --- |
+| **Conservative (organic only)** | 60,000–100,000 | 30,000–50,000 | ₹3.6Cr–6Cr |
+| **Base (small paid marketing)** | 100,000–200,000 | 50,000–100,000 | ₹6Cr–12Cr |
+| **Optimistic (strong PMF + marketing)** | 200,000–500,000 | 100,000–250,000 | ₹12Cr–30Cr |
+
+# **05  Unit economics**
+
+| **Metric** | **MVP phase** | **Phase 1.5** | **Year 2 target** |
+| --- | --- | --- | --- |
+| **CAC (Customer Acquisition Cost)** | ₹0 (organic only) | ₹50–150 (referral + light paid) | ₹100–300 (paid mix) |
+| **ARPU (Average Revenue Per User — paying)** | — | ₹108/month (blended ₹99 + ₹149) | ₹115/month (Premium Plus mix increasing) |
+| **LTV estimate (12-month)** | — | ₹900–1,100 (avg 8–10 months paid) | ₹1,200–1,500 (as retention improves) |
+| **LTV:CAC ratio** | — | 6:1–22:1 | 4:1–15:1 (as CAC rises with paid) |
+| **Payback period** | — | < 2 months | 2–3 months |
+| **Gross margin (subscription)** | — | ~85% (infrastructure stays on free tiers) | ~80% (infrastructure costs rise with scale) |
+| **Ad revenue per free user** | — | ₹8–15/month (Indian CPM rates) | ₹12–20/month |
+
+| **Key insight on CAC: **During the MVP and Phase 0.5, CAC is effectively ₹0 because all users come through personal referral and organic channels. The referral programme (when F-50 activates) keeps CAC below ₹150 for a long time because the reward is premium days, not cash. This is the most capital-efficient acquisition model available for a consumer app in India. |
+| --- |
+
+# **06  Premium conversion strategy**
+
+## **The conversion funnel**
+
+| **Stage** | **Trigger** | **Mechanic** |
+| --- | --- | --- |
+| **Free trial (Day 0–90)** | Automatic — all users start here | No paywall. Full value visible. Premium badge on locked features. |
+| **Awareness (Day 14–60)** | User sees premium features labelled in UI | Meal insights tab shows 'Premium' label. Family profile shows 'Premium Plus'. No prompt yet. |
+| **Intent signal (Day 60–90)** | User taps a Premium feature | First prompt: 'This is a Premium feature. You have [N] days of free access remaining. Upgrade anytime.' |
+| **Conversion prompt (Day 85–90)** | Free period ending soon | In-app notification 7 days before: 'Your free Premium period ends in 7 days. Keep your ad-free plan for ₹99/month.' |
+| **Conversion (Day 90)** | Free period ends | Single clear screen: Free vs Premium vs Premium Plus. UPI autopay. 1-tap activation. |
+| **Retention (Day 90+)** | Ongoing | Premium users see no ads. Premium Plus users get family analytics. Referral rewards stack. |
+
+## **Conversion messaging at Day 90**
+
+| **For Meera (Premium Plus target):** *'**Your family**'**s plan has been running for 90 days. Foofoo now knows [member names], your home state preferences, and [N] dishes your family loves. Keep all of this — and unlock family analytics, member profiles, and the full grocery list — for ₹149/month.**'* **For Riya (Premium target):** *'**You**'**ve saved [N] Swiggy decisions this month. Keep Foofoo ad-free and unlock meal insights for ₹99/month — less than one order.**'* |
+| --- |
+
+# **07  Budget — full financial picture**
+
+| **Category** | **MVP (Month 1–6)** | **Phase 1 (Month 7–12)** | **Year 2** |
+| --- | --- | --- | --- |
+| **Infrastructure (Supabase, hosting, APIs)** | ₹0 (free tiers) | ₹2,000–5,000/month | ₹5,000–20,000/month |
+| **Development tools (Claude Pro)** | ₹1,700/month | ₹3,400/month (2 seats) | ₹5,000–10,000/month |
+| **App store accounts** | ₹10,800 one-time | — | ₹8,700/year (Apple renewal) |
+| **Marketing** | ₹0 | ₹5,000–15,000/month | ₹30,000–100,000/month |
+| **Content (dish photos, food styling)** | ₹0 (stock/sourced) | ₹5,000–10,000 | ₹20,000–50,000 |
+| **Legal (entity, contracts, compliance)** | ₹15,000–25,000 one-time | — | ₹10,000/year (compliance) |
+| **Total monthly burn** | ₹1,700/month | ₹15,000–35,000/month | ₹60,000–2,00,000/month |
+| **Funding required** | ₹25,000 (personal) | ₹1–3L (from early revenue + personal) | Revenue-funded or raise |
+
+# **08  Risks and mitigations**
+
+| **Risk** | **Likelihood** | **Impact** | **Mitigation** |
+| --- | --- | --- | --- |
+| **Conversion rate below 2% at Day 90** | Medium | High — delays revenue | Extend free period by 30 days. Investigate which premium features drive intent. Add more value before paywall. |
+| **Ad revenue too low to sustain free tier** | Medium | Medium — model pressure | Indian CPM is low (₹50–150 per 1,000 impressions). Do not depend on ads — subscription is primary. Ads are supplementary. |
+| **Apple App Store commission (30%)** | Certain | High — margin impact | Offer annual subscription (lower monthly effective price) via website / UPI to bypass App Store billing where legal. |
+| **Users leave at Day 90 paywall** | Medium | High — retention drop | 90-day habit is strong. Personalised conversion message referencing household history reduces churn. Referral reward reduces price objection. |
+| **Premium Plus features insufficient to justify ₹149** | Low | Medium | Launch Premium Plus only when 3+ features are fully built. Never launch with 1 locked feature as the premium differentiation. |
+
+# **09  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-08 · Revenue & Monetisation Strategy |
+| **Version** | 1.0 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Free period** | 90 days — non-negotiable. Do not activate paywall before Day 90. |
+| **Pricing** | ₹99/month Premium · ₹149/month Premium Plus |
+| **Year 1 revenue target** | ₹1L–4L MRR by Month 12 |
+| **Next document** | DOC-09 · Legal & Compliance Checklist |
+
+Founder sign-off: ___________________________     Date: _______________

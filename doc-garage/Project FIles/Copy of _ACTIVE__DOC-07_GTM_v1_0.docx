@@ -1,0 +1,206 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**DOC-07  ·  Go-To-Market Strategy**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **01  GTM philosophy**
+
+***Launch quietly. Learn fast. Scale only when the product earns it.***
+
+Foofoo's GTM is not a marketing plan — it is a learning plan. The MVP launch is a controlled market test with one question: do users come back daily because the AI meal suggestions are genuinely useful for their household? Every GTM decision before 500 DAU is calibrated to learning speed, not growth rate. Paid marketing before product-market fit is money spent accelerating churn.
+
+| **Phase** | **DAU target** | **Marketing posture** | **Spend** |
+| --- | --- | --- | --- |
+| **MVP — Soft launch** | 0 → 500 | Invite-only. Zero paid. Learning only. | ₹0 |
+| **Phase 0.5 — Public launch** | 500 → 2,000 | Organic. ASO. WhatsApp word-of-mouth. | ₹0–2,000 |
+| **Phase 1 — Growth** | 2,000 → 10,000 | Content + influencers + referral (when F-50 activates). | ₹5,000–15,000/month |
+| **Phase 1.5 — Monetisation** | 10,000 → 30,000 | Paid digital. Premium conversion campaigns. | ₹15,000–40,000/month |
+| **Phase 2 — Scale** | 30,000+ | All channels. Performance marketing. | Budget from revenue |
+
+# **02  MVP soft launch — 0 to 500 DAU**
+
+## **Objective**
+
+Answer one question: do users open Foofoo every morning because it makes their meal decisions genuinely easier? 500 DAU is the answer. Not installs. Not signups. Daily active users — people who come back every day.
+
+## **Launch parameters**
+
+| **Parameter** | **Value** | **Rationale** |
+| --- | --- | --- |
+| **Access model** | Invite-only with personal referral code | Quality over quantity. Forces founders to recruit the right users, not random downloaders. |
+| **Target user count** | 100–300 users | Enough to see patterns. Small enough to talk to every user personally. |
+| **Target cities** | Mumbai, Bengaluru, Pune — Tier 1 first | Known social networks. Founders can recruit personally. Dense smartphone penetration. |
+| **Duration** | 90 days of active use | Day 1 → Day 90 retention tells the retention story. Shorter periods are misleading. |
+| **Paid spend** | ₹0 | No paid marketing before product-market fit. Every user acquired cheaply in this phase must be a real signal. |
+| **Platform** | Android first (even though iOS is MVP) | Google Play review is faster. First 100 users on Android. iOS submission follows within 2 weeks. |
+
+## **How to get the first 300 users with ₹0**
+
+| **Source** | **Approach** | **Expected users** | **Quality signal** |
+| --- | --- | --- | --- |
+| **Founders****'**** personal network** | Direct WhatsApp to family, friends, colleagues who match Meera or Riya persona. Not generic blasts — personal asks. | 50–80 | Highest. Will give honest feedback. |
+| **Housing society WhatsApp groups** | Message apartment complex groups in Mumbai, Pune, Bengaluru. Frame as 'I built this for families like ours — would you try it?' | 30–60 | High. Meera persona match. |
+| **Professional network (LinkedIn)** | Targeted posts for PMs, engineers, startup founders — early adopter mindset. | 20–40 | Medium. Riya persona match. |
+| **College alumni networks** | WhatsApp alumni groups. Frame for young professionals. Vikram + Riya personas. | 20–40 | Medium. |
+| **Friends of friends (referral from Day 1)** | Referral mechanics active from Day 1. Each early user can bring 2–3 more. | 30–80 | High. Same social graph. |
+| **Total** |  | 150–300 users | Quality-first. No spray-and-pray. |
+
+## **MVP go/no-go criteria — proceed to Phase 0.5 when 5 of 8 hit**
+
+| **Metric** | **Target** | **Failure action** |
+| --- | --- | --- |
+| **Daily Active Users** | 500 at Day 90 | Below 250: product rethink. 250–500: fix before scaling. |
+| **Day-0 cold-start acceptance** | ≥ 25% of suggestions accepted on first day | RE class-first pipeline broken. Debug before any marketing. |
+| **Suggestion acceptance rate** | ≥ 40% | Genome or regional intelligence miscalibrated. |
+| **Day 7 retention** | ≥ 30% | Habit loop not forming. Check notification + plan quality. |
+| **Onboarding completion** | ≥ 70% | Too many questions. Cut a screen. |
+| **Never rate** | ≤ 15% | Wrong dishes for household. Check cohort matrix. |
+| **App store rating** | ≥ 4.0 | Quality issue. Fix before any marketing. |
+| **Critical bugs** | ≤ 3 open P0/P1 | Fix all before public launch. |
+
+# **03  Messaging — what we say and to whom**
+
+## **Primary positioning statement**
+
+| **'****Stop deciding. Let Foofoo build your family****'****s meals.****'** *Every morning, your household**'**s meal plan is ready — built for your family, your region, your habits.* |
+| --- |
+
+## **Persona-specific messaging**
+
+| **Persona** | **Core pain in their words** | **Our message** | **Trigger hook** |
+| --- | --- | --- | --- |
+| **Meera (family planner)** | 'I cook 3 meals a day and still don't know what I'm making until I'm standing in the kitchen.' | 'Your family's weekly plan — ready before you open your eyes.' | Housing society groups. Morning routine content. Homemaker forums. |
+| **Riya (solo professional)** | 'I spend more time deciding what to order than actually eating.' | 'Stop scrolling Swiggy for 20 minutes. Foofoo decides in 10 seconds.' | LinkedIn. Instagram. Young professionals WhatsApp groups. |
+| **Arun (fitness)** | 'Every nutrition app gives me Western food. I eat Indian. They don't understand.' | 'High-protein Indian meals. Your macros. Your food culture.' | Gym WhatsApp groups. Fitness Instagram. Reddit r/IndiaFitness. |
+| **Vikram (student)** | 'Recipe apps assume I have a kitchen. I have a hot plate.' | 'Meals that actually work in a hostel. No cooker needed.' | College WhatsApp groups. Instagram. Word of mouth. |
+
+## **What NOT to say**
+
+| **Avoid** | **Why** | **Say instead** |
+| --- | --- | --- |
+| **'****AI-powered personalised meal intelligence****'** | Corporate jargon. Nobody talks like this. | 'Foofoo figures out what your family likes to eat' |
+| **'****Disrupting the meal planning space****'** | Startup cliché. Means nothing to Meera. | 'The daily question of what to cook — answered' |
+| **'****We use machine learning to...****'** | Users do not care how it works. | 'The more you use it, the better it knows your family' |
+| **Any health claim without medical backing** | Legal risk under DPDP and consumer protection law. | Focus on convenience and variety, not health outcomes |
+| **Comparing directly to Zomato/Swiggy** | Positions us as a competitor to our future partners. | 'Use Foofoo to decide. Use Zomato to order.' |
+
+# **04  Channel strategy by phase**
+
+## **MVP (₹0) — personal and organic only**
+
+| **Channel** | **Tactic** | **Target persona** | **Expected reach** |
+| --- | --- | --- | --- |
+| **WhatsApp personal** | Founders directly message 100+ contacts. Personalised, not broadcast. | All | 50–80 users |
+| **Housing society groups** | Message in apartment complex WhatsApp groups. Family-friendly framing. | Meera | 30–60 users |
+| **LinkedIn founder post** | Authentic story: 'I built this to solve my family's daily meal decision problem.' No pitch. | Riya, Arun | 20–40 users |
+| **In-app referral (active Day 1)** | Every user has a referral link. Share via WhatsApp. 15 days Premium reward (when F-50 activates). | All | Multiplier on above |
+
+## **Phase 0.5 — organic + ASO**
+
+| **Channel** | **Tactic** | **Goal** |
+| --- | --- | --- |
+| **App Store Optimisation** | Keywords: 'meal planner India', 'aaj kya banaye', 'Indian family meal plan', 'what to cook today India'. Screenshot 1: Day View with Indian dishes. Screenshot 2: 'Your family's plan, every morning'. | Rank in top 5 for 'meal planner India' |
+| **WhatsApp sharing mechanics** | 'Share your meal plan' card — users can share today's plan as an image via WhatsApp. Natural conversation starter. | Organic referral velocity |
+| **Google Play featuring** | Submit for 'Apps we love' + 'Indian apps' editorial feature. High-quality screenshots, strong rating. | Free distribution |
+| **Founder content on LinkedIn/Twitter** | Weekly authentic posts: product learnings, user stories, meal planning insights. Not marketing — genuine product building in public. | Founder brand + early adopter reach |
+
+## **Phase 1 — content + influencers**
+
+| **Channel** | **Tactic** | **Budget** | **Persona target** |
+| --- | --- | --- | --- |
+| **Instagram Reels** | 'Aaj kya banaye?' problem content. Show the daily frustration. Then show Foofoo's answer. 20–30 sec format. | ₹0 (organic first) | Meera, Riya |
+| **Food micro-influencers** | 20–30 creators with 10K–100K followers. Indian home cooking niche. Authentic product use, not scripted ads. | ₹500–2,000 per creator | Meera |
+| **YouTube Shorts** | 'What my family ate this week — planned by AI' format. Real household, real plan. | ₹0 (organic) | Meera |
+| **Fitness Instagram** | Reels showing protein-rich Indian meal plans. Targets Arun persona. | ₹0 (organic) | Arun |
+| **College ambassador programme** | 1 ambassador per campus in 10 target colleges. Campus WhatsApp groups, mess board posters. | ₹500/campus/month | Vikram |
+
+## **Content pillars — what to create**
+
+| **Pillar** | **Content angle** | **Format** | **Frequency** |
+| --- | --- | --- | --- |
+| **The problem** | 'Aaj kya banaye?' relatability. The 20-minute scroll. The guilt of ordering again. | Reel, meme, text post | 3×/week |
+| **The reveal** | 'Here's what Foofoo planned for my family this week.' Show the actual plan. | Reel, carousel | 2×/week |
+| **Regional pride** | 'Foofoo knows Maharashtrian food isn't just vada pav.' State-specific dish features. | Carousel, short video | 1×/week |
+| **The household angle** | 'Infant add-on. Diabetic elder. Working parent. One plan for everyone.' | Reel | 1×/week |
+| **User stories** | Short testimonials from real users. 'It takes me 20 seconds now.' | Quote card, story | 2×/week |
+
+# **05  Referral programme (when F-50 activates — Phase TBD)**
+
+The referral programme is designed but not active in MVP. It activates when F-50 is confirmed in a phase. All mechanics below are locked and ready to implement.
+
+| **Element** | **Specification** |
+| --- | --- |
+| **Referrer reward** | 15 days free Premium per successful referral. Stackable. Max 180 days (12 referrals). |
+| **Referee reward** | 15 days free Premium on signup via referral link. |
+| **Activation trigger** | Referee must complete onboarding AND have 1 active session (opened app, saw plan). |
+| **Share mechanic** | Primary: WhatsApp share button with pre-written message. Secondary: copy link. Tertiary: Instagram story card (shows week's plan as visual). |
+| **Referral link format** | foofoo.app/r/{unique_code} — short, shareable, trackable. |
+| **Pre-written WhatsApp message** | 'I've been using Foofoo to plan my family's meals — it actually knows what we like. Try it free: [link]' — personal, not corporate. |
+| **Viral hook** | 'Share your week's meal plan' card — users share their actual plan as a visual. Drives curiosity without explaining the product. |
+| **Anti-gaming** | Self-referral blocked. Same device + same IP = rejected. Minimum 24 hours between referee signup and reward crediting. |
+
+# **06  App store strategy**
+
+| **Element** | **Specification** |
+| --- | --- |
+| **App name** | Foofoo — Meal Planner (flexibility to update name when brand finalised) |
+| **Subtitle (iOS)** | 'Your family's meals, every morning' |
+| **Short description (Play)** | 'AI builds your household's daily meal plan. Indian food, your region, your family.' |
+| **Primary keyword cluster** | meal planner India, aaj kya banaye, Indian meal plan, what to cook today, family meal planner, Indian recipe planner |
+| **Secondary keyword cluster** | vegetarian meal plan India, Marathi food, Punjabi meal plan, meal decision app, dinner ideas India |
+| **Screenshot 1** | Day View: three Indian meal cards on cream background. Caption: 'Your family's plan — every morning, automatically.' |
+| **Screenshot 2** | OB-07 dish swipe: beautiful Indian dish cards. Caption: 'Swipe to teach us what you love.' |
+| **Screenshot 3** | Member add-on row: family dinner with infant add-on. Caption: 'Plans built for your whole household.' |
+| **Screenshot 4** | OB-08b plan preview: first plan reveal. Caption: 'From your region. For your family. Ready in 2 minutes.' |
+| **App icon** | Green background (#1A5C38). Fork and bowl mark. Name 'foofoo' below. Warm, recognisable at 60px. |
+| **Rating strategy** | Prompt for rating at Day 14 (after habit forms). Never on Day 1. In-app prompt: 'Enjoying your plans? Rate us — it helps other families find Foofoo.' |
+
+# **07  Launch day checklist**
+
+For MVP soft launch. Not a public launch — an invite-only release.
+
+| **Step** | **Owner** | **When** | **Done?** |
+| --- | --- | --- | --- |
+| **Google Play production release approved** | Engineering | T–7 days | ☐ |
+| **Apple App Store submission approved** | Engineering | T–14 days (Apple is slower) | ☐ |
+| **First 50 personal WhatsApp messages sent** | Founders | T–0 (launch day) | ☐ |
+| **Invite codes generated for first 100 users** | Engineering | T–0 | ☐ |
+| **PostHog analytics verified (events firing)** | Engineering | T–0 | ☐ |
+| **Sentry error monitoring active** | Engineering | T–0 | ☐ |
+| **Morning push notification tested on both platforms** | Engineering | T–1 | ☐ |
+| **Onboarding tested end-to-end on physical Android + iOS device** | Founders | T–1 | ☐ |
+| **RE safety gate queries return 0 violations** | Engineering | T–0 | ☐ |
+| **First 500 dishes in database with photos** | Content | T–0 | ☐ |
+| **Support email set up (support@foofoo.app or equivalent)** | Founders | T–0 | ☐ |
+| **User feedback channel ready (WhatsApp group or Typeform)** | Founders | T–0 | ☐ |
+
+# **08  Competitive response plan**
+
+If a well-funded competitor enters the meal decision category during our MVP phase, this is the response playbook.
+
+| **Scenario** | **Likelihood** | **Response** |
+| --- | --- | --- |
+| **Zomato/Swiggy adds ****'****what to eat****'**** feature** | Medium | Accelerate. Their feature will be restaurant-centric, not home-cooking-centric. Double down on household intelligence and regional depth — neither can be replicated in months. |
+| **HealthifyMe pivots to proactive meal planning** | Medium | Their positioning (health goals, premium pricing ₹999+/month) is different. We own the everyday household utility space. Continue building the RE moat. |
+| **New funded startup enters meal decision space** | Low | Copy cannot replicate the dish genome database (months of research) or the 41-persona cohort matrix. Execute faster. Referral and household data are compounding moats. |
+| **Global meal kit player enters India** | Very low | Meal kits are a different product (ingredient delivery + recipe). Foofoo is the decision layer. Complementary, not competing. |
+
+# **09  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-07 · Go-To-Market Strategy |
+| **Version** | 1.0 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Budget (MVP phase)** | ₹0 marketing spend |
+| **First 300 users** | Personal network + housing societies + referral |
+| **Go/no-go criteria** | 5 of 8 metrics hit at Day 90 |
+| **Next document** | DOC-08 · Revenue & Monetisation Strategy |
+
+Founder sign-off: ___________________________     Date: _______________

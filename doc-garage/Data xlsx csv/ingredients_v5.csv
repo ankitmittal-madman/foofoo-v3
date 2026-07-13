@@ -1,0 +1,192 @@
+name,display_name,category,diet_type,is_allergen,allergen_type,is_jain_compatible,is_vegan,common_unit,is_common,is_active,description,is_updated,last_update_date,is_review
+turmeric,Turmeric (Haldi),spice,veg,N,,Y,Y,tsp,Y,Y,Base spice in almost all Indian cooking. Anti-inflammatory. Yellow colour.,N,,N
+cumin_seeds,Cumin Seeds (Jeera),spice,veg,N,,Y,Y,tsp,Y,Y,Whole or ground. Tempering staple. Earthy warm flavour.,N,,N
+coriander_powder,Coriander Powder (Dhaniya),spice,veg,N,,Y,Y,tsp,Y,Y,Ground coriander seeds. Mild citrusy warmth. Used in most gravies.,N,,N
+red_chilli_powder,Red Chilli Powder (Lal Mirch),spice,veg,N,,Y,Y,tsp,Y,Y,Heat source. Kashmiri chilli for colour without heat. Regular for heat.,N,,N
+garam_masala,Garam Masala,spice,veg,N,,Y,Y,tsp,Y,Y,Warm spice blend. Cardamom cinnamon clove pepper bay leaf. Finishing spice.,N,,N
+black_pepper,Black Pepper (Kali Mirch),spice,veg,N,,Y,Y,tsp,Y,Y,Whole or ground. Sharp heat different from chilli. Common in South Indian.,N,,N
+cardamom_green,Green Cardamom (Elaichi),spice,veg,N,,Y,Y,pieces,Y,Y,Aromatic pods. Used in both savoury and sweet. Chai essential.,N,,N
+cardamom_black,Black Cardamom (Badi Elaichi),spice,veg,N,,Y,Y,pieces,N,Y,Smoky aromatic. Used in biryanis and meat curries and garam masala.,N,,N
+cinnamon,Cinnamon (Dalchini),spice,veg,N,,Y,Y,pieces,Y,Y,Sweet warm bark. Biryani pulao chai desserts.,N,,N
+clove,Clove (Laung),spice,veg,N,,Y,Y,pieces,Y,Y,Intense aromatic. Used whole in rice dishes gravies chai.,N,,N
+bay_leaf,Bay Leaf (Tej Patta),spice,veg,N,,Y,Y,pieces,Y,Y,Aromatic leaf for tempering. Rice dal curries. Removed before serving.,N,,N
+fennel_seeds,Fennel Seeds (Saunf),spice,veg,N,,Y,Y,tsp,N,Y,Sweet anise flavour. Kashmiri cuisine staple. Also mouth freshener.,N,,N
+fenugreek_seeds,Fenugreek Seeds (Methi Dana),spice,veg,N,,Y,Y,tsp,N,Y,Slightly bitter. Used in tempering and pickles.,N,,N
+kasuri_methi,Kasuri Methi (Dried Fenugreek),spice,veg,N,,Y,Y,tsp,N,Y,Dried fenugreek leaves. Finishing flavour for butter chicken and dal makhani.,N,,N
+mustard_seeds,Mustard Seeds (Rai/Sarson),spice,veg,Y,mustard,Y,Y,tsp,Y,Y,Tempering staple in South Indian and Bengali cooking. Pungent when popped.,N,,N
+asafoetida,Asafoetida (Hing),spice,veg,N,,Y,Y,pinch,Y,Y,Pungent resin. Jain/veg cooking substitute for onion-garlic. Tiny pinch goes far.,N,,N
+nigella_seeds,Nigella Seeds (Kalonji),spice,veg,N,,Y,Y,tsp,N,Y,Black onion seeds. Used in naan pickles Bengali panch phoron.,N,,N
+ajwain,Ajwain (Carom Seeds),spice,veg,N,,Y,Y,tsp,N,Y,Thymol flavour. Parathas pakoras digestive aid. Strong — use sparingly.,N,,N
+amchur,Amchur (Dry Mango Powder),spice,veg,N,,Y,Y,tsp,N,Y,Tangy souring agent. Chaat chole dry sabzis. Alternative to lemon.,N,,N
+chaat_masala,Chaat Masala,spice,veg,N,,Y,Y,tsp,N,Y,Tangy spice blend. Amchur black salt cumin. Chaat fruits snacks.,N,,N
+kashmiri_chilli,Kashmiri Red Chilli,spice,veg,N,,Y,Y,tsp,N,Y,Bright red colour with mild heat. Rogan josh tandoori marinades.,N,,N
+nutmeg,Nutmeg (Jaiphal),spice,veg,N,,Y,Y,pinch,N,Y,Warm sweet spice. Used sparingly in garam masala and Mughlai dishes.,N,,N
+mace,Mace (Javitri),spice,veg,N,,Y,Y,pinch,N,Y,Outer covering of nutmeg. Delicate warm flavour. Awadhi and Mughlai cuisine.,N,,N
+star_anise,Star Anise (Chakri Phool),spice,veg,N,,Y,Y,pieces,N,Y,Liquorice-like. Chettinad cuisine biryani Chinese cooking.,N,,N
+saffron,Saffron (Kesar),spice,veg,N,,Y,Y,pinch,N,Y,Most expensive spice. Biryani kheer Kashmiri dishes. Colour and aroma.,N,,N
+poppy_seeds,Poppy Seeds (Khus Khus),spice,veg,N,,Y,Y,tsp,N,Y,White seeds. Bengali curries Mughlai gravies thickening agent.,N,,N
+dry_red_chilli,Dry Red Chilli (Sukhi Lal Mirch),spice,veg,N,,Y,Y,pieces,Y,Y,Whole dried chillies. Tempering chutneys South Indian sambar.,N,,N
+black_salt,Black Salt (Kala Namak),spice,veg,N,,Y,Y,tsp,N,Y,Sulphurous flavour. Chaat raita vegan egg substitute flavouring.,N,,N
+tamarind,Tamarind (Imli),spice,veg,N,,Y,Y,grams,N,Y,Sour pulp. Sambar rasam chutneys chaat. South Indian and street food essential.,N,,N
+kokum,Kokum,spice,veg,N,,Y,Y,pieces,N,Y,Sour dried fruit. Konkani and Goan souring agent. Sol kadhi.,N,,N
+curry_powder,Curry Powder,spice,veg,N,,Y,Y,tsp,N,Y,Generic spice blend. More common in Anglo-Indian and continental cooking.,N,,N
+panch_phoron,Panch Phoron,spice,veg,N,,Y,Y,tsp,N,Y,Bengali five-spice mix. Cumin nigella fennel fenugreek mustard.,N,,N
+sambar_powder,Sambar Powder,spice,veg,N,,Y,Y,tsp,N,Y,South Indian spice blend for sambar.,N,,N
+anardana,Anardana (Pomegranate Seeds),spice,veg,N,,Y,Y,tsp,N,Y,Dried pomegranate seeds. Tangy. Chole and Punjabi dishes.,N,,N
+salt,Salt (Namak),spice,veg,N,,Y,Y,tsp,Y,Y,Universal seasoning. Present in virtually every dish.,N,,N
+chilli_flakes,Chilli Flakes,spice,veg,N,,Y,Y,tsp,N,Y,Pizza pasta Indo-Chinese marinades. Mild heat with texture.,N,,N
+onion,Onion (Pyaaz),vegetable,veg,N,,N,Y,grams,Y,Y,Base of most Indian gravies. Not Jain-compatible. Used raw in salads.,N,,N
+tomato,Tomato (Tamatar),vegetable,veg,N,,Y,Y,pieces,Y,Y,Gravy base with onion. Used in most North and South Indian curries.,N,,N
+potato,Potato (Aloo),vegetable,veg,N,,N,Y,grams,Y,Y,Most versatile Indian vegetable. Root veg — not Jain-compatible.,N,,N
+cauliflower,Cauliflower (Gobhi),vegetable,veg,N,,Y,Y,grams,Y,Y,Gobi aloo gobi paratha gobi manchurian. Winter staple.,N,,N
+green_peas,Green Peas (Matar),vegetable,veg,N,,Y,Y,grams,Y,Y,Matar paneer aloo matar pulao. Seasonal but frozen available year-round.,N,,N
+okra,Okra (Bhindi),vegetable,veg,N,,Y,Y,grams,Y,Y,Bhindi masala kurkuri bhindi. Slimy when cut — dry cooking preferred.,N,,N
+eggplant,Eggplant (Baingan),vegetable,veg,N,,Y,Y,grams,Y,Y,Baingan bharta bharli vangi brinjal curry. Versatile.,N,,N
+capsicum,Capsicum (Shimla Mirch),vegetable,veg,N,,Y,Y,pieces,N,Y,Bell pepper. Stuffed stir-fried Indo-Chinese paneer tikka.,N,,N
+green_chilli,Green Chilli (Hari Mirch),vegetable,veg,N,,Y,Y,pieces,Y,Y,Fresh heat source. Tempering garnish chutneys. Used in almost everything.,N,,N
+bottle_gourd,Bottle Gourd (Lauki/Dudhi),vegetable,veg,N,,Y,Y,grams,N,Y,Mild flavour. Lauki ki sabzi kofta halwa. Light and digestible.,N,,N
+ridge_gourd,Ridge Gourd (Turai/Tori),vegetable,veg,N,,Y,Y,grams,N,Y,Light summer vegetable. Stir-fried or in dal.,N,,N
+bitter_gourd,Bitter Gourd (Karela),vegetable,veg,N,,Y,Y,grams,N,Y,Bitter flavour. Karela sabzi chips. Health food.,N,,N
+drumstick,Drumstick (Sahjan/Moringa),vegetable,veg,N,,Y,Y,pieces,N,Y,Long pods. Sambar essential. Also used in curries. Highly nutritious.,N,,N
+raw_banana,Raw Banana (Kaccha Kela),vegetable,veg,N,,Y,Y,pieces,N,Y,Unripe banana used as vegetable. Chips sabzi South Indian curries.,N,,N
+jackfruit_raw,Raw Jackfruit (Kathal),vegetable,veg,N,,Y,Y,grams,N,Y,Meat substitute texture. Kathal ki sabzi biryani. East and South India.,N,,N
+pumpkin,Pumpkin (Kaddu),vegetable,veg,N,,Y,Y,grams,N,Y,Kaddu ki sabzi halwa. Mildly sweet. North and East Indian staple.,N,,N
+cabbage,Cabbage (Patta Gobhi),vegetable,veg,N,,Y,Y,grams,N,Y,Stir-fry sabzi coleslaw manchurian. Year-round availability.,N,,N
+cucumber,Cucumber (Kheera),vegetable,veg,N,,Y,Y,pieces,N,Y,Raita salad sandwich. Cooling. Rarely cooked in Indian cuisine.,N,,N
+radish,Radish (Mooli),vegetable,veg,N,,N,Y,grams,N,Y,Root vegetable — not Jain. Mooli paratha salad pickles.,N,,N
+carrot,Carrot (Gajar),vegetable,veg,N,,N,Y,grams,N,Y,Root vegetable — not Jain. Gajar halwa mixed veg salad pickles.,N,,N
+beetroot,Beetroot (Chukandar),vegetable,veg,N,,N,Y,grams,N,Y,Root vegetable — not Jain. South Indian poriyal halwa salad.,N,,N
+sweet_potato,Sweet Potato (Shakarkandi),vegetable,veg,N,,N,Y,grams,N,Y,Root vegetable — not Jain. Chaat roasted sabzi. Winter street food.,N,,N
+turnip,Turnip (Shalgam),vegetable,veg,N,,N,Y,grams,N,Y,Root vegetable — not Jain. Shalgam ki sabzi pickles. Winter vegetable.,N,,N
+mushroom,Mushroom (Khumbi),vegetable,veg,N,,N,Y,grams,N,Y,Not Jain-compatible (fungus). Mushroom masala biryani soup stir-fry.,N,,N
+corn,Corn (Makka/Bhutta),vegetable,veg,N,,Y,Y,pieces,N,Y,Makki ki roti bhutta corn soup. Monsoon street food.,N,,N
+french_beans,French Beans (Beans),vegetable,veg,N,,Y,Y,grams,N,Y,Stir-fry poriyal mixed veg. Year-round availability.,N,,N
+broccoli,Broccoli,vegetable,veg,N,,Y,Y,grams,N,Y,Stir-fry soup salad. Growing in urban Indian kitchens.,N,,N
+baby_corn,Baby Corn,vegetable,veg,N,,Y,Y,grams,N,Y,Indo-Chinese dishes stir-fry manchurian. Restaurant staple.,N,,N
+spring_onion,Spring Onion (Hara Pyaaz),vegetable,veg,N,,N,Y,bunch,N,Y,Garnish stir-fry Indo-Chinese. Not Jain (onion family).,N,,N
+spinach,Spinach (Palak),leafy_green,veg,N,,Y,Y,bunch,Y,Y,Palak paneer palak dal saag. Iron-rich. Year-round.,N,,N
+fenugreek_leaves,Fenugreek Leaves (Methi),leafy_green,veg,N,,Y,Y,bunch,N,Y,Methi paratha methi sabzi methi chicken. Slightly bitter aromatic.,N,,N
+mustard_greens,Mustard Greens (Sarson),leafy_green,veg,N,,Y,Y,bunch,N,Y,Sarson ka saag. Winter Punjabi staple. Paired with makki ki roti.,N,,N
+amaranth_leaves,Amaranth Leaves (Chaulai),leafy_green,veg,N,,Y,Y,bunch,N,Y,Chaulai ki sabzi. Nutritious. Common in UP Bihar Maharashtra.,N,,N
+curry_leaves,Curry Leaves (Kadi Patta),herb_aromatic,veg,N,,Y,Y,leaves,Y,Y,Tempering essential in South Indian cooking. Sambhar rasam chutney.,N,,N
+coriander_leaves,Coriander Leaves (Dhaniya Patti),herb_aromatic,veg,N,,Y,Y,bunch,Y,Y,Most used garnish in Indian cooking. Chutneys curries rice dishes.,N,,N
+mint_leaves,Mint Leaves (Pudina),herb_aromatic,veg,N,,Y,Y,bunch,N,Y,Green chutney biryani raita cooling drinks. Fresh aromatic herb.,N,,N
+ginger,Ginger (Adrak),herb_aromatic,veg,N,,N,Y,grams,Y,Y,Root — not Jain. Base paste with garlic. Chai gravies marinades.,N,,N
+garlic,Garlic (Lahsun),herb_aromatic,veg,N,,N,Y,grams,Y,Y,Not Jain-compatible. Ginger-garlic paste base. Most non-Jain Indian cooking.,N,,N
+lemongrass,Lemongrass,herb_aromatic,veg,N,,Y,Y,pieces,N,Y,Thai curries soups teas. Growing in Indian fusion cooking.,N,,N
+oregano,Oregano,herb_aromatic,veg,N,,Y,Y,tsp,N,Y,Pizza pasta Italian seasoning. Common in urban Indian kitchens.,N,,N
+paan_leaves,Paan Leaves (Betel Leaf),herb_aromatic,veg,N,,Y,Y,pieces,N,Y,Paan paan-flavoured kulfi paan shots. Cultural significance.,N,,N
+banana_leaf,Banana Leaf,herb_aromatic,veg,N,,Y,Y,pieces,N,Y,Serving plate in South India. Also used to wrap and steam food.,N,,N
+toor_dal,Toor Dal (Arhar),lentil_legume,veg,N,,Y,Y,grams,Y,Y,Most common dal in India. Sambar dal fry dal tadka.,N,,N
+chana_dal,Chana Dal (Split Chickpea),lentil_legume,veg,N,,Y,Y,grams,Y,Y,Chana dal fry puran poli filling kadhi pakora base. Nutty flavour.,N,,N
+moong_dal,Moong Dal (Split Green Gram),lentil_legume,veg,N,,Y,Y,grams,Y,Y,Light and easy to digest. Moong dal tadka khichdi cheela halwa.,N,,N
+urad_dal,Urad Dal (Black Gram),lentil_legume,veg,N,,Y,Y,grams,Y,Y,Dal makhani idli-dosa batter medu vada. Creamy texture when cooked.,N,,N
+masoor_dal,Masoor Dal (Red Lentil),lentil_legume,veg,N,,Y,Y,grams,Y,Y,Quick-cooking. Everyday dal in North and East India.,N,,N
+chickpeas,Chickpeas (Chole/Kabuli Chana),lentil_legume,veg,N,,Y,Y,grams,Y,Y,Chole bhature chana masala hummus chaat. Protein-rich.,N,,N
+kidney_beans,Kidney Beans (Rajma),lentil_legume,veg,N,,Y,Y,grams,Y,Y,Rajma chawal. North Indian comfort food. Must be pressure-cooked.,N,,N
+black_eyed_peas,Black-Eyed Peas (Lobia),lentil_legume,veg,N,,Y,Y,grams,N,Y,Lobia curry salad. Common in Punjabi and South Indian cooking.,N,,N
+green_gram_whole,Green Gram Whole (Sabut Moong),lentil_legume,veg,N,,Y,Y,grams,N,Y,Sprouted moong salad sabut moong dal. High protein.,N,,N
+black_chickpeas,Black Chickpeas (Kala Chana),lentil_legume,veg,N,,Y,Y,grams,N,Y,Chana chaat kala chana curry. More earthy than kabuli chana.,N,,N
+val_dal,Val Dal (Field Bean),lentil_legume,veg,N,,Y,Y,grams,N,Y,Gujarati and Maharashtrian dal. Usal amti.,N,,N
+moth_beans,Moth Beans (Matki),lentil_legume,veg,N,,Y,Y,grams,N,Y,Misal pav base sprouted salad. Maharashtrian staple.,N,,N
+horse_gram,Horse Gram (Kulthi),lentil_legume,veg,N,,Y,Y,grams,N,Y,South Indian rasam Maharashtrian usal. High protein earthy.,N,,N
+black_lentil,Black Lentil (Sabut Urad),lentil_legume,veg,N,,Y,Y,grams,N,Y,Dal makhani base. Whole black gram. Slow-cooked with rajma.,N,,N
+tofu,Tofu,lentil_legume,veg,Y,soy,Y,Y,grams,N,Y,Vegan protein. Stir-fry curry scramble. Growing in urban India.,N,,N
+rice_basmati,Basmati Rice,grain_flour,veg,N,,Y,Y,grams,Y,Y,Long grain aromatic. Biryani pulao jeera rice. Premium rice.,N,,N
+rice_regular,Regular Rice (Chawal),grain_flour,veg,N,,Y,Y,grams,Y,Y,Everyday rice. Steamed curd rice khichdi. Staple across India.,N,,N
+rice_flattened,Flattened Rice (Poha),grain_flour,veg,N,,Y,Y,grams,N,Y,Poha chivda. Quick breakfast. Indore and Maharashtra staple.,N,,N
+rice_puffed,Puffed Rice (Murmura),grain_flour,veg,N,,Y,Y,grams,N,Y,Bhel puri jhalmuri chivda. Light snack base.,N,,N
+wheat_flour,Whole Wheat Flour (Atta),grain_flour,veg,Y,gluten,Y,Y,grams,Y,Y,Roti paratha puri. Daily staple across North India.,N,,N
+refined_flour,Refined Flour (Maida),grain_flour,veg,Y,gluten,Y,Y,grams,N,Y,Naan bhatura samosa jalebi cakes. White flour.,N,,N
+gram_flour,Gram Flour (Besan),grain_flour,veg,N,,Y,Y,grams,Y,Y,Pakora kadhi chilla laddoo sev. Chickpea-based. Gluten-free.,N,,N
+semolina,Semolina (Suji/Rava),grain_flour,veg,Y,gluten,Y,Y,grams,N,Y,Upma halwa rava dosa sheera. Wheat derivative.,N,,N
+cornmeal,Cornmeal (Makki ka Atta),grain_flour,veg,N,,Y,Y,grams,N,Y,Makki ki roti. Punjabi winter staple with sarson ka saag.,N,,N
+ragi_flour,Ragi Flour (Finger Millet),grain_flour,veg,N,,Y,Y,grams,N,Y,Ragi mudde ragi dosa porridge. Karnataka staple. High calcium.,N,,N
+bajra_flour,Bajra Flour (Pearl Millet),grain_flour,veg,N,,Y,Y,grams,N,Y,Bajra roti khichdi. Rajasthan and Gujarat winter staple.,N,,N
+jowar_flour,Jowar Flour (Sorghum),grain_flour,veg,N,,Y,Y,grams,N,Y,Jolada rotti bhakri. Maharashtra and Karnataka. Gluten-free millet.,N,,N
+sattu,Sattu (Roasted Gram Flour),grain_flour,veg,N,,Y,Y,grams,N,Y,Sattu paratha sattu drink litti filling. Bihar and UP staple.,N,,N
+bread,Bread (Pav/Slice),grain_flour,veg,Y,gluten,Y,Y,pieces,N,Y,Pav bhaji vada pav bread pakora sandwich. Bakery staple.,N,,N
+vermicelli,Vermicelli (Sevai/Semiya),grain_flour,veg,Y,gluten,Y,Y,grams,N,Y,Upma payasam sheer khurma sevai pulao.,N,,N
+oats,Oats,grain_flour,veg,Y,gluten,Y,Y,grams,N,Y,Porridge oats chilla health food. Growing in urban India.,N,,N
+tapioca,Tapioca (Sabudana),grain_flour,veg,N,,Y,Y,grams,N,Y,Sabudana khichdi vada kheer. Fasting food across India.,N,,N
+rice_flour,Rice Flour (Chawal ka Atta),grain_flour,veg,N,,Y,Y,grams,N,Y,Appam neer dosa modak murukku. South Indian. Gluten-free.,N,,N
+idli_rava,Idli Rava,grain_flour,veg,N,,Y,Y,grams,N,Y,Parboiled rice granules for idli batter. South Indian breakfast base.,N,,N
+pasta,Pasta,grain_flour,veg,Y,gluten,Y,Y,grams,N,Y,Italian dishes adapted Indian style. Urban staple.,N,,N
+noodles,Noodles,grain_flour,veg,Y,gluten,Y,Y,grams,N,Y,Hakka noodles maggi chow mein. Indo-Chinese and instant snack.,N,,N
+panko_breadcrumbs,Breadcrumbs (Panko),grain_flour,veg,Y,gluten,Y,Y,grams,N,Y,Cutlets coating for frying tikkis. Crispy coating agent.,N,,N
+spring_roll_wrapper,Spring Roll Wrapper,grain_flour,veg,Y,gluten,Y,Y,pieces,N,Y,Spring rolls samosa-style wraps. Indo-Chinese appetizer.,N,,N
+maida_biscuit,Biscuit / Rusk,grain_flour,veg,Y,gluten,Y,N,pieces,N,Y,Chai companion dessert base. Contains dairy usually.,N,,N
+milk,Milk (Doodh),dairy,veg,Y,dairy,Y,N,ml,Y,Y,Base for chai kheer paneer rabri lassi. Most used dairy product.,N,,N
+curd,Curd / Yogurt (Dahi),dairy,veg,Y,dairy,Y,N,grams,Y,Y,Raita kadhi marinades lassi mishti doi. Daily staple.,N,,N
+paneer,Paneer (Cottage Cheese),dairy,veg,Y,dairy,Y,N,grams,N,Y,Paneer butter masala palak paneer tikka. Vegetarian protein staple.,N,,N
+cream,Cream (Malai),dairy,veg,Y,dairy,Y,N,ml,N,Y,Finishing touch for gravies and desserts.,N,,N
+butter,Butter (Makhan),dairy,veg,Y,dairy,Y,N,grams,Y,Y,Pav bhaji butter chicken maska bun paranthas.,N,,N
+ghee,Ghee (Clarified Butter),dairy,veg,Y,dairy,Y,N,tsp,Y,Y,Cooking fat tempering sweets dal finish. Sacred in Indian cooking.,N,,N
+cheese,Cheese,dairy,veg,Y,dairy,Y,N,grams,N,Y,Pizza grilled sandwich pasta. Growing usage in urban Indian cooking.,N,,N
+khoya,Khoya / Mawa,dairy,veg,Y,dairy,Y,N,grams,N,Y,Reduced milk solids. Gulab jamun barfi peda halwa. Sweet-making essential.,N,,N
+condensed_milk,Condensed Milk,dairy,veg,Y,dairy,Y,N,ml,N,Y,Quick desserts rabri shortcut ice cream mithai.,N,,N
+buttermilk,Buttermilk (Chaas),dairy,veg,Y,dairy,Y,N,ml,N,Y,Cooling drink. Chaas mattha. Digestive. Summer staple.,N,,N
+yogurt_hung,Hung Curd (Chakka Dahi),dairy,veg,Y,dairy,Y,N,grams,N,Y,Shrikhand thick raita marinades. Strained yogurt.,N,,N
+mozzarella,Mozzarella Cheese,dairy,veg,Y,dairy,Y,N,grams,N,Y,Pizza pasta garlic bread. Stretchy melting cheese.,N,,N
+chicken,Chicken (Murgh),meat,non_veg,N,,N,N,grams,Y,Y,Most consumed meat in India. Curry biryani tandoori tikka kebab.,N,,N
+mutton,Mutton / Goat (Gosht),meat,non_veg,N,,N,N,grams,N,Y,Rogan josh biryani keema nihari korma. Premium meat.,N,,N
+lamb,Lamb,meat,non_veg,N,,N,N,grams,N,Y,Similar to mutton but younger animal. Kebabs chops curries.,N,,N
+pork,Pork,meat,non_veg,N,,N,N,grams,N,Y,Goan vindaloo sorpotel Naga smoked pork. Regional.,N,,N
+beef,Beef,meat,non_veg,N,,N,N,grams,N,Y,Kerala beef fry Goan beef curry. Regional and community-specific.,N,,N
+fish_generic,Fish (Machhi),seafood,non_veg,Y,fish,N,N,grams,N,Y,Machher jhol fish fry fish curry. Bengali Goan Kerala staple.,N,,N
+prawns,Prawns (Jhinga),seafood,non_veg,Y,shellfish,N,N,grams,N,Y,Prawn curry tandoori prawns. Coastal cuisines.,N,,N
+crab,Crab (Kekda),seafood,non_veg,Y,shellfish,N,N,grams,N,Y,Crab curry crab masala. Coastal — Goan Mangalorean Kerala.,N,,N
+pomfret,Pomfret,seafood,non_veg,Y,fish,N,N,pieces,N,Y,Fried pomfret tawa fry. Premium Indian fish. Mumbai and coastal.,N,,N
+rohu,Rohu,seafood,non_veg,Y,fish,N,N,grams,N,Y,Bengali fish curry staple. Machher jhol rohu kalia.,N,,N
+hilsa,Hilsa (Ilish),seafood,non_veg,Y,fish,N,N,pieces,N,Y,Shorshe ilish — Bengali delicacy. Seasonal monsoon. Premium.,N,,N
+surmai,Surmai (King Mackerel),seafood,non_veg,Y,fish,N,N,grams,N,Y,Fish fry curry. Popular in Maharashtra and Goa.,N,,N
+bangda,Bangda (Mackerel),seafood,non_veg,Y,fish,N,N,pieces,N,Y,Fried bangda curry. Affordable coastal fish.,N,,N
+egg,Egg (Anda),egg,egg,Y,egg_allergen,N,N,pieces,Y,Y,Omelette egg curry anda bhurji boiled egg cakes. Universal protein.,N,,N
+mustard_oil,Mustard Oil (Sarson Tel),oil_fat,veg,Y,mustard,Y,Y,ml,Y,Y,Bengali and North Indian cooking base. Pungent. Pickles fish.,N,,N
+coconut_oil,Coconut Oil (Nariyal Tel),oil_fat,veg,N,,Y,Y,ml,N,Y,Kerala and South Indian cooking base.,N,,N
+vegetable_oil,Vegetable Oil (Refined),oil_fat,veg,N,,Y,Y,ml,Y,Y,Generic cooking oil. Soybean sunflower canola blends. Most common.,N,,N
+sesame_oil,Sesame Oil (Til Ka Tel),oil_fat,veg,Y,sesame,Y,Y,ml,N,Y,South Indian tempering Chinese cooking pickles. Nutty flavour.,N,,N
+groundnut_oil,Groundnut Oil (Moongfali Tel),oil_fat,veg,Y,peanuts,Y,Y,ml,N,Y,Gujarati and Maharashtrian cooking. Deep frying.,N,,N
+olive_oil,Olive Oil,oil_fat,veg,N,,Y,Y,ml,N,Y,Salads continental Mediterranean cooking. Growing in urban India.,N,,N
+cashew,Cashew (Kaju),dry_fruit,veg,Y,tree_nuts,Y,Y,grams,N,Y,Gravy base barfi garnish. Cashew paste for Mughlai gravies.,N,,N
+almond,Almond (Badam),dry_fruit,veg,Y,tree_nuts,Y,Y,grams,N,Y,Badam milk garnish barfi halwa. Soaked almonds — health food.,N,,N
+pistachio,Pistachio (Pista),dry_fruit,veg,Y,tree_nuts,Y,Y,grams,N,Y,Garnish for sweets kulfi biryani. Premium nut.,N,,N
+walnut,Walnut (Akhrot),dry_fruit,veg,Y,tree_nuts,Y,Y,grams,N,Y,Kashmiri cuisine salads desserts.,N,,N
+peanut,Peanut (Moongfali),dry_fruit,veg,Y,peanuts,Y,Y,grams,N,Y,Chutney chikki poha topping Maharashtrian cooking. Cheap protein.,N,,N
+coconut_fresh,Coconut Fresh (Nariyal),coconut,veg,N,,Y,Y,grams,N,Y,Chutney South Indian gravies sweets. Fresh grated or coconut milk.,N,,N
+coconut_desiccated,Coconut Desiccated (Sookha Nariyal),coconut,veg,N,,Y,Y,grams,N,Y,Laddoo barfi chutney powder. Dried grated coconut.,N,,N
+coconut_milk,Coconut Milk (Nariyal Doodh),coconut,veg,N,,Y,Y,ml,N,Y,Kerala curries appam stew Thai curries payasam. Vegan milk alternative.,N,,N
+coconut_cream,Coconut Cream,coconut,veg,N,,Y,Y,ml,N,Y,Rich version of coconut milk. Curries desserts smoothies.,N,,N
+dried_coconut,Dried Coconut (Copra),coconut,veg,N,,Y,Y,grams,N,Y,Coconut chutney Maharashtrian masala laddoo oil extraction.,N,,N
+sesame_seeds,Sesame Seeds (Til),seed,veg,Y,sesame,Y,Y,tsp,N,Y,Til laddoo chutney garnish til rice. Makar Sankranti special.,N,,N
+flax_seeds,Flax Seeds (Alsi),seed,veg,N,,Y,Y,tsp,N,Y,Health food smoothies laddoo. Growing in health-conscious kitchens.,N,,N
+melon_seeds,Melon Seeds (Magaz),seed,veg,N,,Y,Y,grams,N,Y,Garnish for sweets Mughlai gravies. Light nutty flavour.,N,,N
+dry_fruits_mixed,Mixed Dry Fruits,dry_fruit,veg,Y,tree_nuts,Y,Y,grams,N,Y,Garnish for sweets biryani kheer. Festive essential.,N,,N
+lemon,Lemon (Nimbu),vegetable,veg,N,,Y,Y,pieces,Y,Y,Lemon rice nimbu pani garnish marinades. Universal souring agent.,N,,N
+mango_raw,Raw Mango (Kacchi Kairi),vegetable,veg,N,,Y,Y,grams,N,Y,Aam panna pickle dal chutney. Summer staple.,N,,N
+mango_ripe,Ripe Mango (Aam),fruit,veg,N,,Y,Y,pieces,N,Y,Aamras mango lassi mango kulfi desserts. King of fruits.,N,,N
+banana_ripe,Ripe Banana (Kela),fruit,veg,N,,Y,Y,pieces,N,Y,Banana chips (Kerala) sheera smoothie. Offered in temples.,N,,N
+pomegranate,Pomegranate (Anaar),fruit,veg,N,,Y,Y,grams,N,Y,Garnish raita chaat juice. Fresh arils as topping.,N,,N
+dates,Dates (Khajoor),dry_fruit,veg,N,,Y,Y,pieces,N,Y,Sheer khurma energy balls chutneys. Natural sweetener.,N,,N
+raisins,Raisins (Kishmish),dry_fruit,veg,N,,Y,Y,grams,N,Y,Pulao biryani garnish halwa laddoo. Sweet dried fruit.,N,,N
+raw_papaya,Raw Papaya,fruit,veg,N,,Y,Y,grams,N,Y,Meat tenderizer (galouti kebab) papaya salad sabzi.,N,,N
+tutti_frutti,Tutti Frutti,fruit,veg,N,,Y,Y,grams,N,Y,Ice cream biscuits bread bakery items. Candied papaya cubes.,N,,N
+sugar,Sugar (Cheeni),sweetener,veg,N,,Y,Y,grams,Y,Y,Universal sweetener. Chai desserts syrups chutneys.,N,,N
+jaggery,Jaggery (Gur),sweetener,veg,N,,Y,Y,grams,N,Y,Puran poli gur ka halwa chikki. Unrefined cane sugar.,N,,N
+jaggery_liquid,Liquid Jaggery (Kakvi),sweetener,veg,N,,Y,Y,ml,N,Y,Maharashtrian sweetener. Puran poli modak goda masala companion.,N,,N
+honey,Honey (Shahad),sweetener,veg,N,,Y,N,ml,N,Y,Not vegan (bee product). Drinks dressings desserts Ayurvedic use.,N,,N
+soy_sauce,Soy Sauce,condiment,veg,Y,soy,Y,Y,ml,N,Y,Indo-Chinese cooking essential. Fried rice noodles manchurian.,N,,N
+vinegar,Vinegar (Sirka),condiment,veg,N,,Y,Y,ml,N,Y,Goan cooking pickles Indo-Chinese. Acetic acid souring agent.,N,,N
+tomato_ketchup,Tomato Ketchup,condiment,veg,N,,Y,Y,ml,N,Y,Condiment for samosa pakora sandwich. Not a cooking ingredient.,N,,N
+pickle_generic,Pickle (Achaar),condiment,veg,N,,Y,Y,grams,N,Y,Mango lime chilli mixed pickles. Meal accompaniment.,N,,N
+rose_water,Rose Water (Gulab Jal),condiment,veg,N,,Y,Y,ml,N,Y,Gulab jamun biryani Mughlai sweets sherbets. Floral flavouring.,N,,N
+kewra_water,Kewra Water,condiment,veg,N,,Y,Y,ml,N,Y,Pandanus flower extract. Biryani Awadhi sweets Mughlai finishing.,N,,N
+green_chutney,Green Chutney (Hari Chutney),condiment,veg,N,,N,Y,grams,N,Y,Mint-coriander chutney. Chaat sandwiches snacks. Contains garlic — not Jain.,N,,N
+tamarind_chutney,Tamarind Chutney (Imli Chutney),condiment,veg,N,,Y,Y,grams,N,Y,Sweet-sour. Chaat samosa dahi vada. Tamarind jaggery spices.,N,,N
+food_colour,Food Colour,condiment,veg,N,,Y,Y,ml,N,Y,Biryani sweets jalebi. Artificial or natural.,N,,N
+agar_agar,Agar Agar (China Grass),condiment,veg,N,,Y,Y,grams,N,Y,Vegetarian gelatin substitute. Puddings jellies falooda.,N,,N
+supari,Supari (Betel Nut),condiment,veg,N,,N,Y,pieces,N,Y,Paan accompaniment. Used in paan-flavoured desserts.,N,,N
+water,Water (Paani),condiment,veg,N,,Y,Y,ml,Y,Y,Cooking medium. Gravies dals rice dough. Most basic ingredient.,N,,N
+charoli,Charoli,dry_fruit,veg,N,,Y,Y,pieces,Y,Y,Small nutty seed used in sweets and gravies,N,,N
+white_pepper,White Pepper,spice,veg,N,,Y,Y,tsp,Y,Y,Milder pepper used in soups and continental dishes,N,,N
+pineapple,Pineapple,fruit,veg,N,,Y,Y,pieces,N,Y,Tropical fruit used in sweet-sour dishes,N,,N

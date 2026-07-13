@@ -1,0 +1,75 @@
+combo_name,dish_name,role,is_default,is_swappable,sort_order,is_active,is_updated,last_update_date,is_review
+Chole Bhature,Chole,primary,Y,N,1,Y,N,,Y
+Chole Bhature,Bhatura,bread,Y,N,2,Y,N,,Y
+Rajma Chawal,Rajma,primary,Y,N,1,Y,N,,Y
+Rajma Chawal,Jeera Rice,carb_base,Y,Y,2,Y,N,,Y
+Rajma Chawal,Phulka,carb_base,N,Y,3,Y,N,,Y
+Dal Chawal,Dal Tadka,primary,Y,Y,1,Y,N,,Y
+Dal Chawal,Jeera Rice,carb_base,Y,Y,2,Y,N,,Y
+Dal Chawal,Phulka,carb_base,N,Y,3,Y,N,,Y
+Idli Sambar,Idli,primary,Y,N,1,Y,N,,Y
+Idli Sambar,Sambar,accompaniment,Y,N,2,Y,N,,Y
+Idli Sambar,Coconut Chutney,condiment,Y,N,3,Y,N,,Y
+Masala Dosa Set,Masala Dosa,primary,Y,N,1,Y,N,,Y
+Masala Dosa Set,Sambar,accompaniment,Y,N,2,Y,N,,Y
+Masala Dosa Set,Coconut Chutney,condiment,Y,N,3,Y,N,,Y
+Dosa Sambar,Plain Dosa,primary,Y,N,1,Y,N,,Y
+Dosa Sambar,Sambar,accompaniment,Y,N,2,Y,N,,Y
+Dosa Sambar,Coconut Chutney,condiment,Y,N,3,Y,N,,Y
+Medu Vada Sambar,Medu Vada,primary,Y,N,1,Y,N,,Y
+Medu Vada Sambar,Sambar,accompaniment,Y,N,2,Y,N,,Y
+Medu Vada Sambar,Coconut Chutney,condiment,Y,N,3,Y,N,,Y
+Dal Baati Churma,Dal Baati,primary,Y,N,1,Y,N,,Y
+Dal Baati Churma,Churma,dessert,N,N,2,Y,N,,Y
+Sarson Ka Saag Makki Ki Roti,Sarson Ka Saag,primary,Y,N,1,Y,N,,Y
+Sarson Ka Saag Makki Ki Roti,Makki Ki Roti,bread,Y,N,2,Y,N,,Y
+Poha Jalebi,Indori Poha,primary,Y,N,1,Y,N,,Y
+Poha Jalebi,Jalebi,dessert,Y,N,2,Y,N,,Y
+Chole Kulche,Chole,primary,Y,N,1,Y,N,,Y
+Chole Kulche,Kulcha,bread,Y,Y,2,Y,N,,Y
+Chole Kulche,Naan,bread,N,Y,3,Y,N,,Y
+Puri Aloo,Puri,bread,Y,N,1,Y,N,,Y
+Puri Aloo,Aloo Sabzi (Delhi style),primary,Y,N,2,Y,N,,Y
+Bedmi Puri Aloo,Bedmi Puri,bread,Y,N,1,Y,N,,Y
+Bedmi Puri Aloo,Aloo Sabzi (Delhi style),accompaniment,Y,N,2,Y,N,,Y
+Kerala Rice Meals,Steamed Rice,carb_base,Y,N,1,Y,N,,Y
+Kerala Rice Meals,Sambar,accompaniment,Y,N,2,Y,N,,Y
+Kerala Rice Meals,Rasam,accompaniment,Y,N,3,Y,N,,Y
+Kerala Rice Meals,Parippu Curry,accompaniment,Y,N,4,Y,N,,Y
+Kerala Rice Meals,Avial (Kerala),accompaniment,N,N,5,Y,N,,Y
+Hyderabadi Biryani Set,Hyderabadi Chicken Biryani,primary,Y,Y,1,Y,N,,Y
+Hyderabadi Biryani Set,Hyderabadi Mutton Biryani,primary,N,Y,2,Y,N,,Y
+Hyderabadi Biryani Set,Mirchi Ka Salan,accompaniment,Y,N,3,Y,N,,Y
+Puttu Kadala,Puttu,primary,Y,N,1,Y,N,,Y
+Puttu Kadala,Kadala Curry,accompaniment,Y,N,2,Y,N,,Y
+Paratha Curd Pickle,Aloo Paratha,primary,Y,Y,1,Y,N,,Y
+Paratha Curd Pickle,Gobhi Paratha,primary,N,Y,2,Y,N,,Y
+Paratha Curd Pickle,Paneer Paratha,primary,N,Y,3,Y,N,,Y
+Paratha Curd Pickle,Lassi (Salted),beverage,N,N,4,Y,N,,Y
+Matar Kulcha,Matar Kulcha,standalone,Y,N,1,Y,N,,Y
+Nihari Kulcha,Nahari Kulcha,standalone,Y,N,1,Y,N,,Y
+Pav Bhaji Set,Pav Bhaji (Delhi style),standalone,Y,N,1,Y,N,,Y
+Thali Meals (South Indian),Thali Meals (South Indian),standalone,Y,N,1,Y,N,,Y
+Sadya Thali,Sadya Thali,standalone,Y,N,1,Y,N,,Y
+Dahi Vada Set,Dahi Bhalla,primary,Y,N,1,Y,N,,Y
+Chole Tikki Set,Chole Tikki,primary,Y,N,1,Y,N,,Y
+Roti Sabzi,Phulka,bread,Y,Y,1,Y,N,,Y
+Roti Sabzi,Aloo Gobhi,primary,Y,Y,2,Y,N,,Y
+Uttapam Set,Uttapam,primary,Y,N,1,Y,N,,Y
+Uttapam Set,Sambar,accompaniment,Y,N,2,Y,N,,Y
+Uttapam Set,Coconut Chutney,condiment,Y,N,3,Y,N,,Y
+Vada Sambar,Medu Vada,primary,Y,N,1,Y,N,,Y
+Vada Sambar,Sambar,accompaniment,Y,N,2,Y,N,,Y
+Keema Pav,Keema Pav,standalone,Y,N,1,Y,N,,Y
+Biryani Raita,Biryani (Mughlai Chicken),primary,Y,Y,1,Y,N,,Y
+Biryani Raita,Lucknowi Biryani,primary,N,Y,2,Y,N,,Y
+Chholar Dal with Luchi,Chholar Dal,primary,Y,N,1,Y,Y,20-05-2026,Y
+Chholar Dal with Luchi,Luchi,bread,N,Y,2,Y,Y,20-05-2026,Y
+Daal Bafla,Dal (Mixed),primary,Y,N,1,Y,Y,20-05-2026,Y
+Daal Bafla,Bafla,bread,N,Y,2,Y,Y,20-05-2026,Y
+Pithla Bhakri,Pithla,primary,Y,N,1,Y,Y,20-05-2026,Y
+Pithla Bhakri,Bhakri,bread,N,Y,2,Y,Y,20-05-2026,Y
+Dal Pakwan,Dal (Sindhi),primary,Y,N,1,Y,Y,20-05-2026,Y
+Dal Pakwan,Pakwan,bread,N,Y,2,Y,Y,20-05-2026,Y
+Zunka Bhakri,Zunka,primary,Y,N,1,Y,Y,20-05-2026,Y
+Zunka Bhakri,Bhakri,bread,N,Y,2,Y,Y,20-05-2026,Y

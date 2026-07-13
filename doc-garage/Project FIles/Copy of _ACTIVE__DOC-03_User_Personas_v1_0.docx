@@ -1,0 +1,267 @@
+**FOOFOO**
+
+AI-Powered Meal Decision Assistant
+
+────────────────────────────────────
+
+**DOC-03  ·  User Personas ****&**** Journey Maps**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+| *Every feature decision is tested against one question: which persona does this serve, and would they use it daily?* |
+| --- |
+
+# **01  How Foofoo personas work**
+
+Foofoo has two layers of user understanding that operate simultaneously and serve different purposes:
+
+| **Layer** | **Audience** | **What it contains** | **Used for** |
+| --- | --- | --- | --- |
+| **Qualitative personas (this document)** | Product, Design, Marketing, Engineering | 5 named archetypes with full day-in-the-life context, before/after states, and journey maps | Feature prioritisation, UX decisions, marketing messaging, test case design |
+| **Backend cohort system (V2 RE engine)** | Engineering, Data | 41 backend personas mapped to 36 states, household types, and diet patterns | Recommendation engine segmentation, plan generation, cold-start defaults |
+
+The user never sees backend personas. They answer 5 natural onboarding questions. The engine silently maps their answers to one of 41 personas and begins generating plans. The qualitative personas in this document represent the most common archetypes within that mapping.
+
+| **The five personas, by priority:** Meera — The family meal planner (P0 — MVP is built for her) Riya — The busy solo professional (P1a — highest daily engagement potential) Arun — The fitness-focused solo (P1b — highest premium conversion potential) Vikram — The college student (P2a — highest referral velocity) Priya — The health-conscious new mother (P2b — highest willingness to pay for Premium Plus) |
+| --- |
+
+# **02  Persona 1 — Meera, the family meal planner**
+
+| **Priority: P0  ·  Every MVP feature is tested against: ****'****Would Meera use this daily?****'**** If the answer is no, it does not ship.** |
+| --- |
+
+| **Meera** *The family meal planner — 32, Pune* |
+| --- |
+| **Age ****&**** city** | 32 years old, Pune. Originally from Bhopal, Madhya Pradesh. |
+| **Household** | Husband (IT professional, works long hours), daughter aged 5, son aged 8. In-laws visit for 2–3 months/year. |
+| **Occupation** | Primary homemaker and part-time work-from-home (data entry). Manages all household meals. |
+| **Income** | Household income ₹1.2–1.8L/month. Food budget ₹18,000–22,000/month. |
+| **Devices** | Android smartphone (mid-range). WhatsApp is her primary communication channel. |
+| **V2 cohort** | MC_FAMILY → SC_COUPLE_WITH_SCHOOL_CHILD. Home state: Madhya Pradesh. Current city: Pune. |
+| **Diet** | Vegetarian. No major allergies. In-laws are strict vegetarian during Navratri. |
+| **Cook capability** | Confident cook — cooks 2–3 meals daily, 7 days a week, from scratch. |
+
+## **Day in the life — before Foofoo**
+
+| **Time** | **What Meera does** | **What she feels** |
+| --- | --- | --- |
+| **6:30 AM** | Wakes up. Immediately starts thinking: 'Aaj kya banaye?' No plan. Opens YouTube, searches 'easy breakfast recipe'. 15 minutes gone. | Anxious, slightly resentful. This happens every single day. |
+| **7:00 AM** | Settles for poha — again — because it's safe and quick. Kids complain it's the same thing. | Guilty. Boring. Like she's failed already. |
+| **9:30 AM** | School run done. Thinks about lunch. Husband messages asking what's for lunch. She hasn't decided. | Pressured. Annoyed at the question she has no answer for. |
+| **10:00 AM** | Scrolls Instagram recipe reels. Finds something interesting but realises she doesn't have half the ingredients. | Defeated. Opens Swiggy to check if ordering is cheaper. |
+| **12:30 PM** | Makes dal-chawal — the backup meal when she can't decide. Kids eat it. Nobody complains but nobody's excited. | Resigned. It's fine. Just fine. |
+| **4:00 PM** | Starts worrying about dinner. Texts mother in Bhopal for a suggestion. Gets a recipe she doesn't have the time for. | Exhausted. It's a daily cycle with no system. |
+| **7:00 PM** | Makes sabzi-roti. Reasonable meal. Husband says 'it's good.' Kids want something different. | Tired but relieved it's over. Dreads tomorrow morning. |
+
+## **Day in the life — with Foofoo (Day 30)**
+
+| **Time** | **What Meera does** | **What she feels** |
+| --- | --- | --- |
+| **6:30 AM** | Phone notification: 'Your family's meals for today are ready.' Opens Foofoo. Sees Methi Thepla (breakfast — it knows she makes quick flatbreads on weekdays), Dal Palak + Roti (lunch), Aloo Matar Sabzi + Rice (dinner). | Calm. Relieved. The decision is already made. |
+| **6:35 AM** | Doesn't like the dinner suggestion — used aloo yesterday. Swipes to see alternatives. Picks Paneer Bhurji + Roti. Locks it. | Satisfied. It took 5 minutes including thinking. |
+| **6:40 AM** | Checks grocery list. Needs fresh paneer. Messages husband to pick up on his way home. | In control. Day is planned before it starts. |
+| **12:00 PM** | Cooks lunch exactly as planned. No deliberation, no searching. | Efficient. Lunch in 25 minutes, no decision overhead. |
+| **7:00 PM** | Dinner is Paneer Bhurji + Roti — planned since morning. Cooks without thinking about it. | Proud. Kids love paneer. Husband asks why dinner feels more 'intentional' lately. |
+| **8:00 PM** | Swipes tomorrow's breakfast in 2 minutes before bed. Done. | Empowered. First time she has a plan before the day starts. |
+
+## **Journey map — Meera****'****s first 30 days**
+
+| **Day 1 Download** | **Day 1 First plan** | **Day 3–7 Building trust** | **Day 14 Habit formed** | **Day 30 Retained** |
+| --- | --- | --- | --- | --- |
+| Hears about Foofoo from housing society WhatsApp group. Downloads. Completes onboarding in 4 minutes. | Opens app. Sees first day's meal plan — feels regional (Poha, Dal Bati style for MP origin). Surprised it isn't generic North Indian. | Uses app daily. Swipes a few meals she doesn't want. Locks breakfast slot (Poha every weekday). Never-lists baingan — hates it. | Opens app before getting out of bed. Shares a meal plan screenshot to housing society WhatsApp: 'This app is amazing.' | Cannot imagine meal planning without Foofoo. Notices Premium features (meal insights, family analytics). Considers upgrading. |
+| *Curious but sceptical. Has tried recipe apps before.* | *Intrigued. **'**How does it know I like these?**'* | *Building habit. Checking app before deciding what to cook.* | *Loyal. Evangelist. Refers 3 neighbours.* | *Dependent in a good way. Sees value in Premium.* |
+| Onboarding captures: family of 4, MP origin, Pune, vegetarian, confident cook, school-age kids. | Class-first engine uses MC_FAMILY + MP home state to generate first plan. Cold-start confidence score: 0.72. | RE logs: lock signal on breakfast, Never on baingan. Adjusts class weights. Confidence score rises to 0.84. | Referral event logged. RE now personalised: no baingan, MP-weighted dishes, school-child add-on active. | Premium upgrade prompt shown. 90-day free period means no pressure. Seeds conversion intent. |
+
+## **Before / after — Meera**
+
+| **Before Foofoo** Spends 15–20 minutes deciding every morning Repeats same 8–10 dishes in rotation Feels guilty about boring meals Makes last-minute Swiggy orders out of indecision No system — pure reactive daily stress | **After Foofoo** Plan is ready before she wakes up Genuine variety driven by regional intelligence Cooks confidently with a plan Swiggy order is a choice, not an escape First time she has a system for meals |
+| --- | --- |
+
+## **What Meera needs for Premium conversion**
+
+Meera's free-to-premium trigger is not price — it is value density. She upgrades when she sees that Premium unlocks family analytics ('which dishes do my kids accept vs reject'), weekly meal insights ('your family ate 4 paneer dishes this week — here are alternatives'), and family profile management (managing in-laws' Navratri constraints separately). Target: Phase 1.5 activation.
+
+# **03  Persona 2 — Riya, the busy solo professional**
+
+| **Priority: P1a  ·  Highest daily engagement potential. Her use pattern (daily, quick, decisive) validates the core loop faster than any other persona.** |
+| --- |
+
+| **Riya** *The busy solo professional — 28, Mumbai* |
+| --- |
+| **Age ****&**** city** | 28 years old, Mumbai (Bandra). Originally from Jaipur, Rajasthan. |
+| **Household** | Lives alone. Nuclear. No dependents. |
+| **Occupation** | Product Manager at a Series B startup. 10+ hour workdays, frequent WFH. |
+| **Income** | ₹18–24L/year. Food budget ₹12,000–16,000/month — of which ₹7,000–9,000 is Swiggy/Zomato. |
+| **Devices** | iPhone (latest model) + Android work phone. Heavy app user. UPI autopay for 6+ subscriptions. |
+| **V2 cohort** | MC_SOLO → SC_WORKING_PROFESSIONAL. Home state: Rajasthan. Current city: Mumbai. |
+| **Diet** | Vegetarian. No allergies. Occasionally eats eggs. Tries to eat healthy but doesn't track calories. |
+| **Cook capability** | Intermediate — can cook but rarely does. 'Cook' means assembling rather than making from scratch. |
+
+## **Day in the life — before Foofoo**
+
+| **Time** | **What Riya does** | **What she feels** |
+| --- | --- | --- |
+| **8:00 AM** | Wakes up. Immediately checks Slack. No breakfast plan. Skips it or grabs whatever's in the fridge. | Busy, distracted. Food is not a priority at 8 AM. |
+| **1:00 PM** | Lunch meeting ends. Starving. Opens Swiggy. Scrolls for 18 minutes. Biryani? Too heavy. Salad? Too expensive. Orders the same thali she orders every Tuesday. | Decision fatigue. Annoyed at herself for being predictable. |
+| **8:30 PM** | Work done. Opens Zomato. Scrolls. Nothing looks right. Orders a burger because it's easy. | Guilt. She wanted to cook something. Just didn't know what. |
+| **9:00 PM** | Eats while watching Netflix. Thinks: 'I should cook more. But I never know what to make.' | Resolved to do better. Won't. Same tomorrow. |
+
+## **Day in the life — with Foofoo (Day 14)**
+
+| **Time** | **What Riya does** | **What she feels** |
+| --- | --- | --- |
+| **7:50 AM** | Notification: 'Your breakfast for today — Besan Chila. 3 ingredients. 10 minutes.' Opens app. Locks it. Adds eggs to the ingredient list. | Impressed. Decided in 20 seconds. Rajasthan-influenced breakfast without being a cliché. |
+| **12:50 PM** | Check app for lunch suggestion before opening Swiggy. Sees: Dal Makhani + Jeera Rice. Doesn't have time to cook. Taps 'Order instead'. Foofoo deeplinks to Swiggy with the dish pre-searched. | Efficient. Still used Swiggy, but the decision was made in 10 seconds, not 18 minutes. |
+| **8:15 PM** | Opens app for dinner. Sees Paneer Tikka Wrap — quick, uses leftover paneer in the fridge. Cooks it in 15 minutes. | Proud. Actually cooked. App used her pantry context. |
+
+## **What makes Riya unique as a persona**
+
+Riya's interaction pattern is different from Meera's. She is not planning a family — she is solving a daily solo decision. Her key behaviours: quick morning check (under 60 seconds), frequent 'order instead' taps rather than cooking, and high swipe activity as she browses alternatives. Her engagement proves the core loop works for the non-cooking use case — Foofoo as the decision layer before Swiggy, not as a cooking guide.
+
+| **Before Foofoo** 18-minute Swiggy scroll to decide what to order Guilt about ordering the same thing again Eats well when she has time, badly when busy No connection between what she eats and how she feels | **After Foofoo** Meal decision in under 60 seconds Orders intentionally — chose that dish, not the default Occasionally cooks because the decision is already made Starts noticing patterns in what she actually likes |
+| --- | --- |
+
+# **04  Persona 3 — Arun, the fitness-focused solo**
+
+| **Priority: P1b  ·  Highest premium conversion potential. Fitness users have the clearest articulated need and the strongest willingness to pay for a product that demonstrably helps them hit goals.** |
+| --- |
+
+| **Arun** *The fitness-focused solo — 24, Bengaluru* |
+| --- |
+| **Age ****&**** city** | 24 years old, Bengaluru (Koramangala). Originally from Coimbatore, Tamil Nadu. |
+| **Household** | Lives alone, PG accommodation with basic kitchen (hob, no oven). |
+| **Occupation** | Software developer, 2 years experience. Gym 5 days/week, 6:00–7:30 AM. |
+| **Income** | ₹12–16L/year. Food budget ₹8,000–10,000/month. Spends ₹2,000/month on protein supplements. |
+| **Devices** | Android mid-range. Uses MyFitnessPal but frustrated by poor Indian food data. |
+| **V2 cohort** | MC_SOLO → SC_FITNESS_FOCUSED + O_HIGH_PROTEIN_OVERLAY. Home state: Tamil Nadu. Current city: Bengaluru. |
+| **Diet** | Non-vegetarian but prefers South Indian base foods. Needs 150g+ protein/day for muscle building. |
+| **Cook capability** | Intermediate — can cook simple meals but limited by PG kitchen and time after gym. |
+
+## **Core pain point**
+
+Arun knows he needs high protein. He knows Indian food can provide it — eggs, paneer, dal, chicken, fish. What he cannot figure out is which combination of Indian meals gives him 150g protein daily without eating boiled chicken breast twice a day. Every nutrition app he tries gives him Western meal suggestions. MyFitnessPal's Indian food database is incomplete for home-cooked food. He ends up eating the same 5 meals on rotation because they're the ones he's calculated manually.
+
+## **What Arun needs from Foofoo**
+
+- Protein-first meal suggestions that still feel like real Indian food — not generic 'grilled chicken + salad'
+
+- Calorie and macro display on every dish card — non-negotiable
+
+- South Indian food bias in suggestions (he eats dosa, idli, sambar, rasam — not just dal-chawal)
+
+- Quick cook suggestions — post-gym breakfast in under 15 minutes with his basic kitchen setup
+
+- Equipment-aware recommendations — no suggestions requiring a pressure cooker or oven
+
+## **Arun****'****s phase unlock path**
+
+| **Phase** | **Feature Arun gets** | **Why it converts him** |
+| --- | --- | --- |
+| **MVP** | South Indian dish bias from Tamil Nadu home state. Basic dish cards with simple macros. | First time an app suggests idli-sambar as a valid high-protein breakfast. |
+| **Phase 1** | Calorie targeting toggle. Fitness mode (boosts protein-dense dish scoring). Macro breakdown in Meal Detail. | Can now see his protein intake across the day from Indian food. Replaces MyFitnessPal. |
+| **Phase 1.5** | Premium tier — full nutrition analytics. Weekly protein trend. Smart meal sequencing for training days vs rest days. | Pays ₹99/month because the analytics are worth it. No equivalent in the market. |
+
+| **Before Foofoo** Eats same 5 meals on rotation — safe but boring Manually calculates macros in a spreadsheet MyFitnessPal doesn't know what 'pesarattu' is Buys expensive supplements because he can't hit protein from food alone | **After Foofoo** South Indian high-protein suggestions he actually wants to eat Macros visible on every card — no spreadsheet App understands his food culture and his fitness goal Learns which Indian dishes hit his targets — reduces supplement spend |
+| --- | --- |
+
+# **05  Persona 4 — Vikram, the college student**
+
+| **Priority: P2a  ·  Highest referral velocity. College students are India****'****s most powerful word-of-mouth network. One engaged user on a campus creates 20–50 downloads.** |
+| --- |
+
+| **Vikram** *The college student — 20, Delhi* |
+| --- |
+| **Age ****&**** city** | 20 years old, Delhi (hostel, Karol Bagh area). Originally from Varanasi, Uttar Pradesh. |
+| **Household** | Hostel room. Basic kitchen: electric hot plate, electric kettle. No pressure cooker, no mixer. |
+| **Occupation** | 3rd year engineering student. 6 roommates, all from different states. |
+| **Income** | ₹8,000–10,000/month pocket money from parents. Food budget ₹3,000–4,000/month. |
+| **Devices** | Android budget phone. Heavy WhatsApp and Instagram user. Uses UPI for all payments. |
+| **V2 cohort** | MC_SOLO → SC_STUDENT_HOSTEL + O_SIMPLE_EQUIPMENT_OVERLAY. Home state: Uttar Pradesh. Current city: Delhi. |
+| **Diet** | Non-vegetarian but eats whatever is available. Budget is the primary constraint. |
+| **Cook capability** | Beginner — can make basic things on a hot plate. Limited by equipment and skill. |
+
+## **The equipment overlay — why this matters for Vikram**
+
+The O_SIMPLE_EQUIPMENT_OVERLAY is a hard filter applied to all of Vikram's suggestions. If a dish requires a pressure cooker (rajma, chole), an oven (baked dishes), a mixer (chutneys, smoothies), or more than one pan simultaneously, it is filtered out before scoring. This is not a preference — it is a capability constraint. Suggesting Rajasthani Dal Baati to a student with a hot plate and a kettle destroys trust in one interaction. The overlay prevents this.
+
+Vikram's suggestions: Instant Maggi upgrades (adding egg, vegetables), poha (kettle-soaked), bread-egg preparations, packaged dal with rice (hot plate), curd rice (no cooking needed). These feel humble but they are exactly right for his context. An app that respects his constraints earns his loyalty and his referrals.
+
+## **Vikram****'****s referral value**
+
+Vikram's hostel has 400 students. If 3% of them download Foofoo from his referral link in month 1, that is 12 users with zero marketing spend. College WhatsApp groups, Instagram story shares of funny or relatable meal plans, and the social proof of 'my roommate showed me this app' are Vikram's contribution to Foofoo's growth model.
+
+| **Before Foofoo** Eats hostel mess food 2x/day — bored and sometimes disgusted Can't cook recipes he finds online — wrong equipment Overspends on canteen when he can't figure out what to make Skips breakfast because deciding is harder than skipping | **After Foofoo** Suggestions that actually work on his hot plate Budget-first sorting — sees ₹30–50 meals first Breakfast in 10 minutes with 3 hostel-available ingredients Shares meal plan with roommates — group cooking moments |
+| --- | --- |
+
+# **06  Persona 5 — Priya, the health-conscious new mother**
+
+| **Priority: P2b  ·  Highest willingness to pay for Premium Plus. The postpartum/pregnancy use case is underserved and high-stakes — users in this context have both the need and the means to pay.** |
+| --- |
+
+| **Priya** *The health-conscious new mother — 30, Chennai* |
+| --- |
+| **Age ****&**** city** | 30 years old, Chennai. Originally from Chennai — home state and current city are the same. |
+| **Household** | Husband (works in finance), infant daughter (3 months old). Lives with mother-in-law. |
+| **Occupation** | On maternity leave from IT job. Returns to work in 3 months. |
+| **Income** | Household income ₹2L+/month. Food budget ₹20,000–25,000/month. |
+| **Devices** | iPhone. Active health app user — uses HealthifyMe for calorie tracking. |
+| **V2 cohort** | MC_FAMILY → SC_COUPLE_WITH_INFANT + O_POSTPARTUM_OVERLAY. Home state: Tamil Nadu. Current city: Chennai. |
+| **Diet** | Non-vegetarian. South Indian food identity. Has lactation-support dietary requirements. |
+| **Cook capability** | Confident cook. Mother-in-law also cooks. Joint cooking household. |
+
+## **The postpartum overlay — Foofoo****'****s most nuanced feature**
+
+The O_POSTPARTUM_OVERLAY is a member add-on, not a replacement for the family meal plan. This is the critical architectural distinction from V2. Every existing app that attempts to serve postpartum nutrition converts the entire user's diet into a postpartum plan — methi ladoo for breakfast, moringa soup for lunch, ajwain water for dinner. This is medically informed but practically useless for a family household.
+
+Foofoo's approach: the primary family meal (South Indian, Tamil-rooted, normal food) remains unchanged. The postpartum overlay generates add-on components for Priya's slots:
+
+- Breakfast add-on: warm methi ladoo or sesame til laddoo (lactation support, traditional South Indian postpartum)
+
+- Lunch add-on: extra calcium-rich side (ragi porridge, drumstick sambar prioritised)
+
+- Dinner add-on: turmeric milk or ajwain water
+
+The family eats normal food. Priya gets her postpartum support alongside it. Nobody's meal plan is replaced by a medical diet. This is a household product, not a clinical one.
+
+## **Why Priya converts to Premium Plus**
+
+Priya is already paying ₹999/month for HealthifyMe. She understands the value of a health-aware food app. Foofoo's Premium Plus at ₹149/month is a fraction of that price, and it solves a different problem: the family meal decision, not individual calorie tracking. The postpartum feature alone — if it works correctly — is worth ₹149/month to a new mother who previously had to manually research what to add to her daily meals.
+
+| **Before Foofoo** Every app gives her a 'postpartum diet plan' that replaces her normal food — she doesn't want that Has to manually add postpartum foods to her daily normal meals Mother-in-law suggests traditional foods but they're not always practical to cook HealthifyMe tracks calories but doesn't understand she's also feeding a family | **After Foofoo** Family eats normal South Indian meals. Priya gets postpartum add-ons alongside — not instead One plan covers the whole household including her recovery needs Traditional postpartum foods surfaced in culturally appropriate forms (Tamil region defaults) Uses Foofoo for family meal planning; HealthifyMe for individual calorie tracking — complementary |
+| --- | --- |
+
+# **07  Persona priority matrix ****&**** feature mapping**
+
+| **Persona** | **MVP feature** | **Phase 1** | **Phase 1.5** | **Phase 2** | **Revenue priority** |
+| --- | --- | --- | --- | --- | --- |
+| **Meera — Family planner** | Household plan, member add-ons, regional identity | Family profile UI, weekly variety insights | Family analytics, Premium Plus features | Multi-gen profiles, pantry system | Medium CAC, high LTV — word-of-mouth in housing societies |
+| **Riya — Solo professional** | Quick plan, 'order instead' CTA, swipe speed | Mood selector, faster morning UX | Premium tier (ads-free, insights) | Voice assistant, 'cooking for guests' mode | Low CAC (social), medium LTV — high churn risk if not habitual |
+| **Arun — Fitness solo** | South Indian dish bias, basic macros | Fitness mode, calorie targeting, macro breakdown | Full nutrition analytics, training-day planning | Health profiles, dietician access | Medium CAC, high LTV — pays for performance |
+| **Vikram — Student** | Equipment overlay, budget-first suggestions, hostel-friendly meals | Student mode (quick, cheap, minimal equipment) | Premium via referral stacking (free months) | Batch cooking suggestions for hostel | Low CAC (referral), low LTV — converts when earning |
+| **Priya — New mother** | Postpartum overlay, family plan with add-ons | Health profiles (pregnancy, postpartum) | Premium Plus (household + health profiles) | Dietician access, recovery meal plans | Low CAC (recommendation from doctor/community), very high LTV |
+
+# **08  How to use these personas — the product test questions**
+
+Every feature decision, every design choice, and every sprint prioritisation should be run through the following questions. If a feature cannot answer at least one of them, it should not be in the MVP.
+
+| **Test question** | **What it screens for** | **Who applies it** |
+| --- | --- | --- |
+| **Would Meera use this daily?** | Core loop quality — does it solve the recurring daily problem or is it a one-time feature? | Product, Engineering |
+| **Would Riya use this in under 60 seconds?** | Speed and friction — is the interaction fast enough for a high-frequency, low-time user? | Design, Engineering |
+| **Does this make Arun****'****s macro tracking easier?** | Depth and intelligence — does the feature add measurable value for a data-oriented user? | Product, Data |
+| **Would Vikram****'****s hostel roommates hear about this?** | Virality and shareability — is this a feature people talk about? | Marketing, Product |
+| **Does this respect Priya****'****s household complexity without medicalising her meals?** | Household intelligence — does the feature serve the whole household, not just one member? | Product, Engineering |
+
+# **09  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-03 · User Personas & Journey Maps |
+| **Version** | 1.0 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Primary persona** | Meera — family meal planner. MVP is built for her. |
+| **Backend cohort reference** | V2 source: Indian_Meal_Cohort_Persona_DB_v3.xlsx — 41 personas, 36 states |
+| **Next document** | DOC-04 · Product Requirements Document (PRD) |
+
+Founder sign-off: ___________________________     Date: _______________

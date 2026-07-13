@@ -1,0 +1,16 @@
+-- Migration: 018_meal_classes_mirror_sync.sql
+-- Status: RETIRED — intentionally empty as of DOC-P3-05 Part (a) v1.2 (AGR-002 resolution)
+--
+-- This file originally created public.meal_classes and a deferred FK on plan_slots.class_code.
+-- Both responsibilities were relocated: meal_classes now created directly in file 003
+-- (where it always logically belonged, per Part (a) Phase 5.1's original narrative), and the
+-- plan_slots.class_code FK is now declared inline in file 011 at table-creation time, matching
+-- DOC-P3-04 v1.3 §03.13 exactly with no workaround needed.
+--
+-- This file's number is intentionally retained as an empty placeholder rather than deleted or
+-- reused for a different object, so that no other file in the 001-020 sequence needs to be
+-- renumbered. It exists purely to preserve numbering continuity and historical traceability of
+-- the AGR-002 gap report. It performs no action against the database.
+--
+-- See: DOC-P3-05 Part (a) v1.2, Phase 16 (AGR-002/AGR-003 Resolution) for full detail.
+-- See: DOC-P3-05 Architecture Gap Register, entry AGR-002.

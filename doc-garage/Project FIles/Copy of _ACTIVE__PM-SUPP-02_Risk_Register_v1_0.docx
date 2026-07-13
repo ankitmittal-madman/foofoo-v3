@@ -1,0 +1,137 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**PM-SUPP-02  ·  Consolidated Risk Register**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **01  Risk register overview**
+
+All product, technical, market, legal, financial, and operational risks consolidated from DOC-01, DOC-02, DOC-04, DOC-07, DOC-08, DOC-09, and RE-DOC-05. This is the single source of truth for risk tracking. Review at every sprint boundary and before any phase gate.
+
+| **Scoring methodology:** Likelihood: 1 (Very Low) · 2 (Low) · 3 (Medium) · 4 (High) · 5 (Very High) Impact: 1 (Negligible) · 2 (Minor) · 3 (Moderate) · 4 (Major) · 5 (Critical) Score = Likelihood × Impact. Score ≥ 15: Critical (red). Score 8–14: High (orange). Score < 8: Manageable (green). |
+| --- |
+
+| **Risk category** | **Count** | **Highest score** | **Owner** |
+| --- | --- | --- | --- |
+| **Product** | 6 | 16 (R-006 dish database) | Engineering + Content |
+| **Technical / RE** | 6 | 25 (R-011 allergen violation) | Engineering |
+| **Market / competitive** | 5 | 9 (R-015 competitor entry) | Founder |
+| **Legal / compliance** | 5 | 20 (R-020 DPDP gap) | Founder + Legal |
+| **Financial** | 4 | 12 (R-024 conversion < 2%) | Founder |
+| **Operational** | 4 | 9 (R-027 content quality) | Content team |
+| **Total** | 30 risks tracked | — | — |
+
+# **02  Product risks**
+
+Risks arising from product design decisions, user behaviour, and product-market fit.
+
+| **ID** | **Category** | **Risk** | **Like** | **Impact** | **Score** | **Mitigation** | **Trigger** | **Owner** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **R-001** | Product | Cold-start plan quality fails Day 0 — users see generic suggestions on first use | 4 | 4 | **16** | RE v1 must use class-first pipeline. Unit test cold-start paths for all 5 cohorts before launch. Monitor Day-0 acceptance rate daily for first 14 days. | Day-0 acceptance rate < 20% for 3 consecutive days | Engineering |
+| **R-002** | Product | Onboarding drop-off > 30% at any single screen | 4 | 3 | **12** | Test each OB screen independently in beta. Cut any screen with > 30% drop-off. OB-00 (no skip) is highest risk — validate engagement before hardening. | Funnel analytics show > 30% drop at any step | Product |
+| **R-003** | Product | Never rate > 25% in first 30 days — RE suggestions are fundamentally wrong for the cohort | 3 | 4 | **12** | Monitor cohort-level never rates. If a specific cohort (e.g. South Indian vegetarian) has elevated never rate, recalibrate that cohort's class matrix manually. | Never rate > 25% for any cohort for 7 consecutive days | Engineering |
+| **R-004** | Product | Habit loop fails — users open app but don't return after Day 7 | 3 | 5 | **15** | Morning notification is the retention mechanism. A/B test notification copy. If Day-7 retention < 20%, investigate whether plan quality or notification drives the drop. | Day-7 retention < 20% across all cohorts | Product |
+| **R-005** | Product | OB-08b plan preview creates wrong expectation — user expects higher quality than RE v1 delivers | 3 | 3 | **9** | Preview uses real RE v1 output. No mock or curated plan. If preview quality is insufficient, improve RE before showing preview rather than curating the preview. | User rates plan preview as 'not relevant' > 40% of the time | Product |
+| **R-006** | Product | Dish database incomplete or low quality at launch — photos missing, ingredients wrong | 4 | 4 | **16** | Phase gate: launch only after 500 dishes fully tagged with photo, ingredients, class code, genome tags. No shortcuts. Content audit 2 weeks before launch. | Content audit identifies > 50 dishes with missing photos or ingredients | Content + Engineering |
+
+# **03  Technical / RE risks**
+
+Risks arising from the recommendation engine, infrastructure, and technical implementation.
+
+| **ID** | **Category** | **Risk** | **Like** | **Impact** | **Score** | **Mitigation** | **Trigger** | **Owner** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **R-007** | Technical | Hard constraint violation — allergen or diet exclusion fails, user sees dish they cannot eat | 1 | 5 | **5** | SQL safety-gate queries must return 0 violations before every deploy. Automated. Non-negotiable release blocker. Integer-based allergen matching cannot be bypassed by text variation. | Any safety-gate query returns > 0 rows | Engineering |
+| **R-008** | Technical | RE response time > 3 seconds on budget Android device | 3 | 4 | **12** | Load test on reference device (4GB RAM, Snapdragon 680) before launch. Cache plan for morning notification. Background generation before user opens app. | P95 plan generation > 3 seconds in production for 2+ consecutive days | Engineering |
+| **R-009** | Technical | App crash rate > 1% — frequent crashes destroy trust and app store rating | 2 | 4 | **8** | Sentry error monitoring from Day 1. Zero known P0 crashes before launch. Test on physical Android 8, 10, 12 and iOS 14, 16 devices. | Crash rate > 0.5% per session for 48 consecutive hours | Engineering |
+| **R-010** | Technical | RE confidence score consistently < 0.4 — insufficient onboarding data for quality plans | 3 | 3 | **9** | Monitor confidence score distribution across users. If median confidence < 0.5 at Day 7, investigate onboarding completion and cohort matrix quality. | Median confidence score < 0.5 at Day 7 for users who completed onboarding | Engineering |
+| **R-011** | Technical | Allergen violation reaches a user with a severe allergy — product liability and trust risk | 1 | 5 | **5** | Duplicate of R-007. Isolated because the consequence is not just technical failure but potential physical harm and legal liability. Allergen disclaimer in onboarding. Safety gate as release blocker. | Any user reports seeing a dish containing their excluded allergen | Engineering + Founder |
+| **R-012** | Technical | Free tier infrastructure (Supabase) hits limits before 500 DAU — unexpected paid infrastructure cost | 2 | 3 | **6** | Model capacity before launch: 500 users × 90 days × interactions. Supabase free tier: 500MB DB, 1GB storage. Monitor weekly. Alert at 70% of free tier limit. | Supabase usage exceeds 70% of free tier limits before 500 DAU | Engineering |
+
+# **04  Market / competitive risks**
+
+Risks arising from the competitive landscape and market dynamics.
+
+| **ID** | **Category** | **Risk** | **Like** | **Impact** | **Score** | **Mitigation** | **Trigger** | **Owner** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **R-013** | Market | Zomato or Swiggy builds a 'what to eat' feature inside their existing app | 3 | 4 | **12** | Accelerate. Their feature will be restaurant-centric, not home-cooking-centric. Double down on household intelligence. Dish genome + 41 persona model cannot be replicated in months. | Zomato/Swiggy announces meal planning feature | Founder |
+| **R-014** | Market | HealthifyMe pivots to proactive meal planning for households | 2 | 3 | **6** | Their positioning (health goals, ₹999+/month) targets a different user. Foofoo owns everyday household utility. Continue building household intelligence moat. | HealthifyMe launches household meal planning product | Founder |
+| **R-015** | Market | New funded startup enters the meal decision category directly | 2 | 3 | **6** | Dish genome database (months of research) and cohort matrix (41 personas × 36 states) are not replicable quickly. Execute faster. User data is a compounding moat. | New competitor raises funding for meal decision product | Founder |
+| **R-016** | Market | App store discovery is slow — organic installs insufficient to reach 500 DAU | 4 | 3 | **12** | ASO optimisation from Day 1. Personal network launch (100+ direct WhatsApp contacts). Housing society groups. Word-of-mouth is primary. App store is supplementary. | Month 2 install rate < 50/week from organic sources | Founder |
+| **R-017** | Market | Target users (Meera persona) do not find the product through organic channels | 3 | 3 | **9** | Meera is in housing society WhatsApp groups, homemaker forums, parenting groups. Target these specifically, not generic tech channels. Personal recommendation from a trusted person is the primary acquisition mechanic. | Beta users are predominantly Riya or Vikram persona — Meera underrepresented | Founder |
+
+# **05  Legal / compliance risks**
+
+Risks arising from regulatory requirements, IP, and app store policies.
+
+| **ID** | **Category** | **Risk** | **Like** | **Impact** | **Score** | **Mitigation** | **Trigger** | **Owner** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **R-018** | Legal | App store rejection — Apple or Google rejects the app at submission | 3 | 4 | **12** | Review Apple guidelines Section 5.1 (privacy) and 3.1.1 (in-app purchase) before submission. No health claims without medical disclaimer. Test in-app purchase sandbox. Budget 2-week buffer for Apple review. | App store returns rejection notice | Engineering + Founder |
+| **R-019** | Legal | DPDP Act 2023 compliance gap found post-launch — missing consent, inadequate deletion | 2 | 5 | **10** | Privacy Policy + Terms of Service + DPDP consent mechanism must be complete before launch. Legal review before submission. Data export and deletion endpoints tested. | Regulatory enquiry or user complaint about data handling | Founder + Legal |
+| **R-020** | Legal | Allergen liability — user with severe allergy claims product caused harm | 1 | 5 | **5** | Allergen disclaimer in onboarding (not buried in ToS). Medical disclaimer on any health-adjacent feature. RE safety gate prevents allergen violations in suggestions. Legal review of disclaimer wording before launch. | User complaint or legal notice related to allergen | Founder + Legal |
+| **R-021** | Legal | Dish content IP violation — recipe or photo sourced without proper licence | 2 | 4 | **8** | All dish photos must be original, licensed stock, or Creative Commons commercial. Ingredient lists (not full recipes) are generally not copyrightable. Document licence for every photo in database before launch. | DMCA takedown notice or IP dispute | Content + Founder |
+| **R-022** | Legal | Trademark dispute over 'Foofoo' name | 2 | 3 | **6** | File trademark application (Class 42 + 35) before public launch to establish priority date. Check IP India database. Cost ~₹10,000–15,000 via agent. | Cease and desist letter from existing 'Foofoo' trademark holder | Founder + Legal |
+
+# **06  Financial risks**
+
+Risks arising from monetisation, pricing, and unit economics.
+
+| **ID** | **Category** | **Risk** | **Like** | **Impact** | **Score** | **Mitigation** | **Trigger** | **Owner** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **R-023** | Financial | Premium conversion rate < 2% at Day 90 — revenue model fails | 3 | 4 | **12** | 90-day free period builds habit. Personalised conversion message referencing household history. Referral rewards reduce price objection. If < 2%: extend free period 30 days and investigate feature gaps. | Conversion rate < 2% at Day 90 with > 500 DAU | Founder |
+| **R-024** | Financial | Users churn at Day 90 paywall — habit not sticky enough to survive monetisation | 3 | 4 | **12** | The 90-day free period is non-negotiable for exactly this reason. Never activate paywall early. Personalised conversion message. Referral stacking gives users a clear path to free Premium. | D90 → D120 retention drops > 30% when paywall activates | Founder |
+| **R-025** | Financial | Apple App Store 30% commission erodes margin significantly | 5 | 3 | **15** | Certain risk — Apple takes 30% on in-app purchases. Mitigation: (a) offer annual subscription at lower monthly rate, (b) explore UPI payment via website for upgrades (legal in India for external purchases outside app store for non-iOS-exclusive goods), (c) accept as cost of iOS distribution. | n/a — certain, not a trigger | Founder |
+| **R-026** | Financial | Infrastructure costs escalate before revenue covers them | 2 | 3 | **6** | Free tier capacity model built before launch. Alert at 70% of free tier. If free tier is insufficient before revenue: Supabase Pro is $25/month — affordable at 500+ DAU if monetised even at 2%. | Monthly infrastructure cost exceeds ₹2,000 before ₹2,000 monthly revenue | Engineering + Founder |
+
+# **07  Operational risks**
+
+Risks arising from content operations, team capacity, and day-to-day execution.
+
+| **ID** | **Category** | **Risk** | **Like** | **Impact** | **Score** | **Mitigation** | **Trigger** | **Owner** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **R-027** | Operational | Dish content quality insufficient — bad photos, incorrect ingredients, wrong class tags | 4 | 4 | **16** | Pre-launch content audit. Every dish: photo quality check (minimum 800×600px, well-lit), ingredient accuracy check (tested against actual recipe), class code verification (correct meal slot). 2 weeks before launch. | Content audit fails > 10% of dishes in any category | Content + Founder |
+| **R-028** | Operational | Claude Code produces incorrect RE implementation — class-first rule violated | 3 | 4 | **12** | Every Claude Code RE build session must reference RE-DOC-00 non-negotiable rules. Safety gate queries run after every RE change. Human review of class-to-dish expansion logic before each sprint closes. | Safety gate returns violations OR dishes appear in wrong meal slots | Engineering + Founder |
+| **R-029** | Operational | Founder bandwidth constraint — both founders unavailable simultaneously | 2 | 4 | **8** | Document all architectural decisions in ADRs before building. All prompts are self-contained (per DOC-24 AI coding agent guidelines). Claude Code can continue work from documented state even if founder is unavailable for a sprint. | Both founders unavailable for > 5 consecutive working days | Founder |
+| **R-030** | Operational | User support volume overwhelms founders at launch — no support system ready | 3 | 2 | **6** | Set up support email before launch. Create FAQ document. WhatsApp group for beta users. At MVP scale (< 300 users), founders can handle support directly. Set up Typeform for structured feedback. | > 20 support requests per day that require individual responses | Founder |
+
+# **08  Risk heat map — summary**
+
+All 30 risks plotted by likelihood and impact. Focus attention on the top-right quadrant (high likelihood + high impact).
+
+| **Score** | **Risk IDs** | **Category** | **Immediate action required?** |
+| --- | --- | --- | --- |
+| **20–25 (Critical)** | R-007, R-011, R-020 (allergen/DPDP) | Technical + Legal | Yes — these are release blockers. Cannot launch without resolution. |
+| **15–19 (High)** | R-001, R-004, R-006, R-025, R-027 | Product + Financial + Operational | Yes — address before or at launch. |
+| **10–14 (Medium)** | R-002, R-003, R-008, R-012, R-013, R-016, R-018, R-019, R-023, R-024, R-028 | Various | Monitor. Have mitigation plan ready. Review at each sprint gate. |
+| **<**** 10 (Manageable)** | R-005, R-009, R-010, R-014, R-015, R-017, R-021, R-022, R-026, R-029, R-030 | Various | Monitor quarterly. Activate mitigation if trigger fires. |
+
+| **Top 3 risks requiring immediate action: **R-007/R-011 (allergen violation — safety gate must be built and tested before launch). R-006 (dish database completeness — content audit gate before launch). R-018 (app store rejection — legal and policy review before submission). |
+| --- |
+
+# **09  Review schedule**
+
+| **Frequency** | **Who reviews** | **What they check** | **Action** |
+| --- | --- | --- | --- |
+| **Before every sprint closes** | Engineering lead + Founder | All Critical and High risks. Safety gate query status. Content audit status. | Block sprint if any Critical risk is unmitigated. |
+| **Before every phase gate** | Both founders | All risks. Update likelihood/impact based on new data. Add new risks identified. | Do not proceed to next phase if any Critical or High risk is unmitigated without a documented exception. |
+| **Monthly post-launch** | Both founders | Full register. Update status. Remove resolved risks. Add new ones. | Escalate any risk that moves from Manageable to High within a month. |
+| **On trigger event** | Relevant owner | The specific risk whose trigger has fired | Execute mitigation plan immediately. Document outcome. |
+
+# **10  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | PM-SUPP-02 · Consolidated Risk Register |
+| **Version** | 1.0 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Total risks** | 30 risks across 6 categories |
+| **Critical (score ≥ 15)** | R-001, R-004, R-006, R-007, R-011, R-019 (allergen+DPDP), R-025 (Apple commission), R-027 (content quality) |
+| **Release blockers** | R-007, R-011, R-018 — cannot launch without these resolved |
+| **Sources** | DOC-01, DOC-02, DOC-04, DOC-07, DOC-08, DOC-09, RE-DOC-05 |
+| **Next document** | DOC-10 · Technical Architecture (Engineering layer begins) |
+
+Founder sign-off: ___________________________     Date: _______________

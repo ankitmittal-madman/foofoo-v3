@@ -1,0 +1,112 @@
+category,value,display_value,tier,is_user_facing,description,is_updated,last_update_date,is_review
+meal_type,breakfast,Breakfast,tier_1,Y,Morning meal. Typically lighter or quick-prep unless weekend/special.,N,,N
+meal_type,lunch,Lunch,tier_1,Y,Midday meal. Usually the heaviest meal in Indian households.,N,,N
+meal_type,dinner,Dinner,tier_1,Y,Evening meal. Often lighter than lunch in Indian context.,N,,N
+meal_type,snacks,Snacks,tier_1,Y,Light bites between meals. Samosa pakora dhokla chaat namkeen evening tea snacks.,N,,N
+dish_category,whole_meal,Whole Meal,tier_1,Y,Primary dish in a meal. Carries the meal — not a side.,N,,N
+dish_category,bread,Bread / Roti,tier_1,Y,Flatbreads and rotis. Phulka,N,,N
+dish_category,rice,Rice Dish,tier_1,Y,Plain or flavoured rice. Jeera rice,N,,N
+dish_category,dal_lentil,Dal / Lentil,tier_1,Y,Lentil-based dishes. Dal tadka,N,,N
+dish_category,curry,Curry / Gravy,tier_1,Y,Wet gravy dishes. Paneer butter masala,N,,N
+dish_category,dry_sabzi,Dry Sabzi,tier_1,Y,Dry vegetable preparations. Aloo gobhi,N,,N
+dish_category,salad_raita,Salad / Raita,tier_1,Y,Fresh accompaniments. Kachumber,N,,N
+dish_category,chaat,Chaat,tier_1,Y,Tangy-spicy street food snacks. Pani puri,N,,N
+dish_category,kebab,Kebab,tier_1,Y,Grilled or pan-fried protein preparations. Seekh,N,,N
+dish_category,biryani_pulao,Biryani / Pulao,tier_1,Y,Layered or cooked rice with protein/veg. Biryani,N,,N
+dish_category,sweet_dessert,Sweet / Dessert,tier_1,Y,Sweet dishes. Gulab jamun,N,,N
+dish_category,beverage,Beverage,tier_1,Y,Drinks. Chai,N,,N
+dish_category,condiment_chutney,Condiment / Chutney,tier_1,Y,Accompaniments. Green chutney,N,,N
+dish_category,soup,Soup,tier_1,Y,Liquid starters. Shorba,N,,N
+dish_category,paratha_roti,Paratha / Stuffed Roti,tier_1,Y,Stuffed or layered flatbreads. Aloo paratha,N,,N
+dish_category,dosa_idli,Dosa / Idli / Fermented,tier_1,Y,South Indian fermented batter items. Dosa,N,,N
+dish_category,noodle_pasta,Noodle / Pasta,tier_1,Y,Noodle and pasta dishes. Hakka noodles,N,,N
+dish_category,egg_dish,Egg Dish,tier_1,Y,Egg-centric preparations. Omelette,N,,N
+dish_category,snack_starter,Snack / Starter,tier_1,Y,Light bites and starters. Samosa,N,,N
+dish_category,thali_combo,Thali / Combo,tier_1,Y,Multi-item meal set. South Indian thali,N,,N
+cooking_method,deep_fried,Deep Fried,tier_2,Y,Submerged in oil. Puri,N,,N
+cooking_method,shallow_fried,Shallow Fried,tier_2,Y,Cooked in thin layer of oil. Tikki,N,,N
+cooking_method,stir_fried,Stir Fried,tier_2,Y,Quick high-heat tossing. Bhindi masala,N,,N
+cooking_method,steamed,Steamed,tier_2,Y,Cooked with steam. Idli,N,,N
+cooking_method,boiled,Boiled,tier_2,Y,Cooked in water. Dal,N,,N
+cooking_method,grilled,Grilled,tier_2,Y,Direct heat on grate. Grilled chicken,N,,N
+cooking_method,roasted,Roasted,tier_2,Y,Dry heat in oven or open flame. Baingan bharta,N,,N
+cooking_method,baked,Baked,tier_2,Y,Oven-cooked. Naan,N,,N
+cooking_method,tandoor,Tandoor,tier_2,Y,Clay oven cooking. Tandoori chicken,N,,N
+cooking_method,dum_cooked,Dum Cooked,tier_2,Y,Slow sealed pot cooking. Biryani,N,,N
+cooking_method,pressure_cooked,Pressure Cooked,tier_2,N,Pressure cooker method. Dal,N,,N
+cooking_method,sauteed,Sautéed,tier_2,N,Pan-cooked in some fat. Sabzi,N,,N
+cooking_method,tempered,Tempered (Tadka),tier_2,N,Hot oil with whole spices poured over. Tadka dal,N,,N
+cooking_method,raw,Raw / No Cook,tier_2,Y,No cooking involved. Salads,N,,N
+cooking_method,smoked,Smoked,tier_2,Y,Smoke-infused. Dhungar technique,N,,N
+cooking_method,fermented_cook,Fermented,tier_2,Y,Fermented batter or ingredient. Dosa,N,,N
+primary_taste,savoury,Savoury,tier_2,Y,Salty and umami-leaning. Most main courses and curries.,N,,N
+primary_taste,sweet,Sweet,tier_2,Y,Sugar/jaggery dominant. Desserts,N,,N
+primary_taste,sour,Sour,tier_2,Y,Tangy and acidic. Tamarind-based,N,,N
+primary_taste,bitter,Bitter,tier_2,N,Bitter notes. Karela,N,,N
+primary_taste,umami,Umami,tier_2,N,Deep savoury richness. Slow-cooked dals,N,,N
+primary_taste,tangy,Tangy,tier_2,Y,Sour with a punch. Chaat,N,,N
+primary_taste,spicy_hot,Spicy Hot,tier_2,Y,Chilli heat forward. Andhra curries,N,,N
+texture,crispy,Crispy,tier_2,Y,Shatters on bite. Papad,N,,N
+texture,crunchy,Crunchy,tier_2,Y,Firm bite with resistance. Sev,N,,N
+texture,soft,Soft,tier_2,Y,Yields easily. Idli,N,,N
+texture,chewy,Chewy,tier_2,Y,Needs sustained chewing. Naan,N,,N
+texture,flaky,Flaky,tier_2,Y,Separates in thin layers. Parotta,N,,N
+texture,smooth,Smooth,tier_2,Y,No texture variation. Dal makhani,N,,N
+texture,grainy,Grainy,tier_2,N,Gritty fine particles. Suji halwa,N,,N
+texture,crumbly,Crumbly,tier_2,N,Falls apart easily. Nankhatai,N,,N
+texture,dense,Dense,tier_2,N,Compact and heavy. Laddoo,N,,N
+texture,fluffy,Fluffy,tier_2,Y,Light and airy. Idli,N,,N
+texture,sticky,Sticky,tier_2,N,Adheres to surfaces. Jalebi syrup,N,,N
+texture,layered,Layered,tier_2,Y,Visible stacked layers. Biryani,N,,N
+richness,plain,Plain,tier_2,Y,No added fat richness. Phulka,N,,N
+richness,light,Light,tier_2,Y,Minimal fat. Poha,N,,N
+richness,buttery,Buttery,tier_2,Y,Butter-forward. Butter chicken,N,,N
+richness,creamy,Creamy,tier_2,Y,Cream/cashew/coconut milk based. Shahi paneer,N,,N
+richness,oily,Oily,tier_2,N,Visible oil. Some pickles,N,,N
+richness,ghee_rich,Ghee Rich,tier_2,Y,Ghee-forward. Dal makhani,N,,N
+richness,coconut_rich,Coconut Rich,tier_2,Y,Coconut milk/oil dominant. Kerala curries,N,,N
+mouthfeel,silky,Silky,tier_3,N,Smooth glide on palate. Well-blended gravies,N,,N
+mouthfeel,velvety,Velvety,tier_3,N,Rich smooth coating. Rabri,N,,N
+mouthfeel,mealy,Mealy,tier_3,N,Soft and slightly powdery. Overcooked beans,N,,N
+mouthfeel,pasty,Pasty,tier_3,N,Thick and sticking to palate. Thick halwa,N,,N
+mouthfeel,waxy,Waxy,tier_3,N,Smooth and slightly slippery. Certain paneer,N,,N
+mouthfeel,gritty,Gritty,tier_3,N,Small particles felt on tongue. Rava/suji based,N,,N
+mouthfeel,juicy,Juicy,tier_3,Y,Releases liquid on bite. Kebabs,N,,N
+mouthfeel,dry,Dry,tier_3,N,Absorbs moisture from mouth. Dry snacks,N,,N
+mouthfeel,moist,Moist,tier_3,N,Pleasantly wet without dripping. Cake,N,,N
+mouthfeel,gelatinous,Gelatinous,tier_3,N,Wobbly jelly-like. Nihari,N,,N
+aroma_profile,smoky,Smoky,tier_3,Y,Smoke or char aroma. Dhungar technique,N,,N
+aroma_profile,earthy,Earthy,tier_3,N,Soil-like warmth. Mushrooms,N,,N
+aroma_profile,floral,Floral,tier_3,N,Flower-like fragrance. Rose water sweets,N,,N
+aroma_profile,citrusy,Citrusy,tier_3,N,Lemon/lime/orange notes. Lemon rice,N,,N
+aroma_profile,herby,Herby,tier_3,N,Fresh herb aroma. Coriander-heavy dishes,N,,N
+aroma_profile,pungent,Pungent,tier_3,N,Sharp strong smell. Raw onion,N,,N
+aroma_profile,mild,Mild,tier_3,N,Subtle or neutral aroma. Plain rice,N,,N
+aroma_profile,roasted_aroma,Roasted,tier_3,N,Toasted nutty warmth. Dry roasted spices,N,,N
+aroma_profile,fermented_aroma,Fermented,tier_3,N,Tangy fermented smell. Dosa batter,N,,N
+aroma_profile,sweet_aroma,Sweet Aroma,tier_3,N,Sugary caramel warmth. Jalebi,N,,N
+aroma_profile,nutty,Nutty,tier_3,N,Nut-like warmth. Til/sesame dishes,N,,N
+fermentation,none,None,tier_3,N,No fermentation involved. Most cooked dishes.,N,,N
+fermentation,light,Light,tier_3,N,Brief fermentation. Dosa/idli batter (overnight),N,,N
+fermentation,medium,Medium,tier_3,N,Extended fermentation. Kanji,N,,N
+fermentation,heavy,Heavy,tier_3,N,Long fermentation. Axone,N,,N
+serving_temp,hot,Hot,tier_3,Y,Served steaming. Most curries,N,,N
+serving_temp,warm,Warm,tier_3,Y,Slightly cooled from hot. Paratha,N,,N
+serving_temp,room_temp,Room Temperature,tier_3,Y,No heating or cooling needed. Most sweets,N,,N
+serving_temp,chilled,Chilled,tier_3,Y,Refrigerated before serving. Raita,N,,N
+serving_temp,frozen,Frozen,tier_3,Y,Served frozen. Kulfi,N,,N
+weather_affinity,hot_weather,Hot Weather,tier_2,N,Best suited for summer. Light,N,,N
+weather_affinity,cold_weather,Cold Weather,tier_2,N,Best in winter. Warm heavy dishes. Gajar halwa,N,,N
+weather_affinity,rainy,Rainy / Monsoon,tier_2,N,Monsoon comfort food. Pakora,N,,N
+weather_affinity,all_weather,All Weather,tier_2,N,No seasonal preference. Dal-roti,N,,N
+allergen,gluten,Gluten,tier_1,Y,Wheat,N,,N
+allergen,dairy,Dairy,tier_1,Y,Milk,N,,N
+allergen,tree_nuts,Tree Nuts,tier_1,Y,Almonds,N,,N
+allergen,peanuts,Peanuts,tier_1,Y,Peanuts and groundnuts. Chutney,N,,N
+allergen,soy,Soy,tier_1,Y,Soy sauce,N,,N
+allergen,sesame,Sesame,tier_1,Y,Til/sesame seeds and oil. Ladoo,N,,N
+allergen,shellfish,Shellfish,tier_1,Y,Prawns,N,,N
+allergen,fish,Fish,tier_1,Y,All fish varieties. Bengali,N,,N
+allergen,egg_allergen,Egg,tier_1,Y,Eggs in any form. Omelette,N,,N
+allergen,mustard,Mustard,tier_1,Y,Mustard seeds and oil. Bengali,N,,N
+allergen,none,None,tier_1,Y,No common allergens present. Tag for explicit confirmation — not left blank.,N,,N

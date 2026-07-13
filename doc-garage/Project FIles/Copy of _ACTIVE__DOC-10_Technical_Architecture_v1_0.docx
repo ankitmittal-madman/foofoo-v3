@@ -1,0 +1,391 @@
+**FOOFOO RE**
+
+Recommendation Engine Document Set
+
+────────────────────────────────────
+
+**DOC-10  ·  Technical Architecture**
+
+Version 1.0  ·  Confidential  ·  June 2026
+
+# **01  Architecture principles**
+
+Six principles govern every technical decision in Foofoo. When two valid approaches conflict, the principles resolve the conflict. They are ordered by priority — the first principle outranks the last.
+
+| **#** | **Principle** | **What it means in practice** | **What it rules out** |
+| --- | --- | --- | --- |
+| **1** | Free tier first | Every infrastructure choice must run on free tiers until 500 DAU. No paid infrastructure decision is valid before that milestone. | Any architecture that requires a paid service at launch — regardless of technical merit. |
+| **2** | RE is sovereign | The Recommendation Engine is a standalone module. The app talks to RE only via the versioned API contract. No RE logic lives in the app codebase. | Embedding scoring weights, class codes, or cohort logic anywhere in the React Native app. |
+| **3** | Offline by default | The user must be able to see today's plan without internet. The app should never show a blank screen when offline. | Architectures that require live API calls for basic plan display. |
+| **4** | Security is not an afterthought | RLS on every table from the first migration. Service role key never in client code. Secrets only in environment variables. | Shortcuts like skipping RLS for 'internal' tables or storing API keys in source code. |
+| **5** | Performance is a feature | 60fps gesture animations, < 3s plan generation, < 100ms swipe response. These are NFRs with the same priority as functional requirements. | Any UI component or network call that blocks the main JS thread during gesture animations. |
+| **6** | Build for replacement | Every external service dependency must be replaceable with 2 weeks of engineering work. No proprietary lock-in for core product functionality. | Services where data migration is structurally impossible or data portability is not guaranteed. |
+
+# **02  Tech stack — full selection with rationale**
+
+## **Client layer**
+
+| **Technology** | **Version** | **Role** | **Why selected** | **Why not alternatives** |
+| --- | --- | --- | --- | --- |
+| **React Native** | 0.73+ (via Expo SDK 52+) | Mobile app runtime | Single codebase for iOS + Android. Best AI coding agent support (TypeScript). Largest ecosystem for mobile. | Flutter: fewer AI coding resources, Dart is less familiar. Native: separate iOS/Android codebases = 2× engineering cost. |
+| **Expo SDK** | 52–56 (latest stable) | Build toolchain, native module management, OTA updates | Eliminates native build complexity. EAS handles cloud builds. Expo Go for instant device testing. No Xcode/Android Studio needed. | Bare React Native: requires local Xcode + Android Studio, complex native module management. Not viable for 2-person AI-assisted team. |
+| **TypeScript** | 5.x (strict mode) | Type safety throughout the codebase | Catches bugs at compile time. Critical for a product with complex data shapes (RE request/response, household profiles, genome tags). | JavaScript: no type safety. Unacceptable for a product where a type error in allergen data can cause real harm. |
+| **Expo Router** | v3 (file-based) | Navigation | File = route. Matches DOC-05 screen inventory exactly. Deep linking built in. Tab bar and stack navigation out of the box. | React Navigation: manual route definitions, no automatic deep link mapping. More boilerplate for same result. |
+| **React Native Reanimated** | v3 | 60fps gesture animations | Runs animations on the UI thread, not the JS thread. The only way to achieve 60fps swipe card animations reliably on Android. | Animated API (default RN): runs on JS thread. Cannot guarantee 60fps. Unacceptable for the meal card swipe interaction. |
+| **React Native Gesture Handler** | v2 | Gesture detection | Works with Reanimated v3. Handles swipe-reveal, carousel swipe, lock tap — all gestures the product relies on. | PanResponder (default RN): JS thread. Conflicts with scroll. Lower accuracy. |
+| **TanStack Query** | v5 | Server state management, caching, offline | Handles caching, background refresh, stale-while-revalidate, and offline mode in one library. MMKV persister for plan caching. | Redux + RTK Query: more boilerplate. Context API: no caching or background refresh. Zustand alone: not designed for server state. |
+| **Zustand** | v4 | Client/UI state | Lightweight, no boilerplate, no providers. Handles UI state (gesture state, tab selection, modal visibility) not managed by TanStack Query. | Redux: far too much boilerplate for a mobile app. MobX: less familiar to AI coding agents. |
+| **MMKV** | latest | Local storage, plan cache, event queue | 10× faster than AsyncStorage. Synchronous reads (critical for offline plan display). Supports encryption (required for DPDP compliance on sensitive data). | AsyncStorage: async reads cause flicker on offline load. Not encrypted. |
+| **expo-image** | latest | Dish photo display | Built-in blurhash placeholder support. Disk and memory caching. Avoids react-native-fast-image native module complexity. | react-native-fast-image: requires native build. expo-image achieves same result with Expo managed workflow. |
+
+## **Backend layer**
+
+| **Technology** | **Version** | **Role** | **Why selected** | **Why not alternatives** |
+| --- | --- | --- | --- | --- |
+| **Supabase** | Latest | PostgreSQL + Auth + Edge Functions + Storage + Realtime | Single platform for everything backend. Free tier: 500MB DB, 1GB storage, 50K MAU, 500K Edge Function invocations/month. PostgreSQL enables complex RE queries. | Firebase: NoSQL — cannot do the complex JOIN and aggregate queries the RE needs. Custom Node.js server: operational overhead, no free tier at this quality. |
+| **PostgreSQL** | 15 (via Supabase) | Primary database | Full SQL for RE scoring, class-to-cohort joins, feature store queries. GIN indexes for full-text dish search. Row Level Security. | MySQL: weaker RLS support. MongoDB: NoSQL, cannot do relational RE queries efficiently. |
+| **Supabase Edge Functions** | Deno runtime | RE module, event processing, onboarding, cron | Deploy alongside the database. Sub-100ms cold start. Access to DB via service role with RLS bypass for RE queries. TypeScript. | Separate Node.js/Python service: additional infrastructure, not on free tier. Vercel Edge Functions: no direct DB access. |
+| **Supabase Auth** | Latest | User authentication | JWT built in. RLS integrates with auth.uid(). Email+password MVP. Social auth (Google/Apple) ready for Phase 0.5. | Firebase Auth: would require separate auth provider from DB. Custom JWT: implementation overhead, security risk. |
+| **Supabase Storage** | Latest | Dish photo originals | Integrated with Supabase project. 1GB free. CDN-ready. RLS on buckets. | S3: separate AWS account, more expensive, no free tier equivalent. Cloudinary (storage): pricier at scale. |
+
+## **External services**
+
+| **Service** | **Free tier** | **Role** | **Replacement path** |
+| --- | --- | --- | --- |
+| **OneSignal** | Unlimited devices, basic segmentation | Push notification delivery (morning breakfast preview at 7 AM, prep reminders) | Firebase Cloud Messaging directly. 2 weeks to migrate. |
+| **PostHog** | 1M events/month | Product analytics — DAU, funnels, retention, acceptance rate, session depth | Mixpanel or Amplitude. Data exportable via API. 2 weeks to migrate. |
+| **Sentry** | 5K errors/month | Error monitoring, crash reports, performance monitoring | Datadog or self-hosted Glitchtip. 2 weeks to migrate. |
+| **OpenWeatherMap** | 1K calls/day (60K/month) | Live weather data for RE contextual scoring (city-level, daily) | WeatherAPI.com or Tomorrow.io. Same data structure. 2 weeks to migrate. |
+| **EAS (Expo)** | 30 builds/month free | Cloud builds for iOS and Android. App store submission. | Local builds with Xcode + Android Studio. 1 week to set up local pipeline. |
+| **GitHub Actions** | 2,000 minutes/month free | CI/CD: typecheck, lint, tests, safety gate queries, build triggers | GitLab CI or CircleCI. 1 week to migrate pipeline. |
+| **Cloudinary** | 25GB bandwidth/month | CDN delivery + on-the-fly image resizing (800×600 WebP for dish photos) | Supabase Storage + Image Transformation. 1 week to migrate CDN config. |
+
+# **03  System architecture overview**
+
+***The app is a dumb display client. All intelligence lives in the backend. The RE is a sovereign module.***
+
+| **Layer** | **Components** | **Communicates with** | **Data direction** |
+| --- | --- | --- | --- |
+| **Mobile client (React Native + Expo)** | 35 screens, Gesture Handler, Reanimated, TanStack Query cache, Zustand, MMKV offline store, OneSignal client | Supabase Auth (JWT), RE Edge Functions (HTTPS), Supabase REST (CRUD via anon key + RLS) | Sends: user events, onboarding data, plan interactions. Receives: meal slates, user profile, dish data. |
+| **RE module (Supabase Edge Functions)** | POST /v1/recommendations, POST /v1/events, POST /v1/onboarding, GET /v1/plan, GET /v1/health | Supabase PostgreSQL (via service role), OpenWeatherMap API | Reads: cohort matrix, dish genome, user events, feature store. Writes: suggestion logs, plan cache. Reads: weather context. |
+| **Database (PostgreSQL via Supabase)** | public schema (app data), re_engine schema (RE data) | Edge Functions (service role), Mobile client (anon key + RLS) | Stores all persistent state. RLS enforces row-level access control. |
+| **Auth (Supabase Auth)** | JWT issuer, session manager, email+password, social (Phase 0.5) | Mobile client, Edge Functions (JWT verification) | Issues JWTs to client. Validates JWTs on all requests. |
+| **Storage (Supabase Storage)** | dish-photos bucket (originals), CDN via Cloudinary | Mobile client (read via CDN URL) | Dish photos stored once. Served to client via Cloudinary CDN with on-the-fly resize. |
+| **External services** | OneSignal, PostHog, Sentry, OpenWeatherMap | Edge Functions (server-side calls), Mobile client (client-side SDKs) | One-way: app sends events to PostHog/Sentry. Edge Functions fetch from OpenWeatherMap. |
+
+## **Data flow — a morning plan request**
+
+| **Step** | **Actor** | **Action** | **Data in** | **Data out** |
+| --- | --- | --- | --- | --- |
+| **1** | Cron (11:30 PM UTC = 5 AM IST) | Morning cron triggers plan pre-generation for all active users | Active user list (last_active within 7 days) | Queues plan generation jobs |
+| **2** | Edge Function: recommendations | Validates user context. Calls RE pipeline. | user_id, date (IST), city | Runs full RE pipeline (see RE-DOC-01) |
+| **3** | RE pipeline | assign_persona → generate_class_plan → expand_dishes → score → mmr_rerank → safety_gate | cohort_matrix, dish_genome, user events | Ranked dish slate (8 per slot) + confidence score |
+| **4** | Edge Function: recommendations | Writes plan to plan_cache table. Queues OneSignal notification. | Ranked slate | plan_cache row, OneSignal scheduled push |
+| **5** | OneSignal | Delivers morning push at user's configured time (7 AM default) | Scheduled notification + breakfast dish name | Push notification to device |
+| **6** | Mobile client | User taps notification → app opens → reads plan from plan_cache via TanStack Query | GET plan/{user_id}/{date} | Renders 3 meal cards in < 3s |
+| **7** | Mobile client | User swipes, locks, accepts → interaction events fired | dish_id, event_type, meal_slot, context | POST /v1/events — logged to suggestion_logs |
+| **8** | Edge Function: events | Logs event to suggestion_logs. Updates user's class affinity weights. | Event payload | Updated feature store (async, does not block UI) |
+
+# **04  Client architecture — React Native app**
+
+## **Folder structure**
+
+| foofoo/                            # Repository root ├── app/                           # Expo Router screens (file = route) │   ├── _layout.tsx                # Root: GestureHandler + QueryClient + Stack │   ├── index.tsx                  # Entry: session check → auth or home │   ├── (auth)/                    # A-01 to A-05 │   │   ├── sign-in.tsx │   │   ├── sign-up.tsx │   │   └── forgot-password.tsx │   ├── (onboarding)/              # OB-00 to OB-08b │   │   ├── ob-00.tsx              # Conversational intro │   │   ├── ob-01.tsx              # Who is this for (cohort) │   │   ├── ob-02.tsx              # Household details (dynamic) │   │   ├── ob-03.tsx              # Home state + city + duration │   │   ├── ob-04.tsx              # Diet type │   │   ├── ob-05.tsx              # Allergens │   │   ├── ob-06.tsx              # Cook capability │   │   ├── ob-07.tsx              # Dish preference swipe │   │   ├── ob-08.tsx              # Profile setup │   │   └── ob-08b.tsx             # Plan preview │   └── (tabs)/                    # 5-tab bar │       ├── _layout.tsx            # Tab bar config │       ├── home/                  # H-01 to H-09 │       ├── week/                  # W-01 │       ├── search/                # S-01 to S-03 │       ├── mymeals/               # MM-01 to MM-02 │       └── profile/               # P-01 to P-08 ├── src/ │   ├── components/                # Reusable UI components (C-01 to C-11) │   │   ├── meal-card/             # C-01: primary meal card │   │   ├── swipe-carousel/        # C-02: 8-alternative carousel │   │   ├── swipe-reveal/          # C-03: Not Today/Never buttons │   │   ├── tab-bar/               # C-04 │   │   ├── onboarding-chip/       # C-05 │   │   ├── toast/                 # C-06 │   │   ├── skeleton/              # C-07 │   │   ├── bottom-sheet/          # C-08 │   │   ├── day-header/            # C-09 │   │   ├── addon-row/             # C-10 │   │   └── migration-slider/      # C-11 │   ├── services/                  # External clients │   │   ├── supabase.ts            # Supabase client (SecureStore adapter) │   │   ├── re-client.ts           # RE Edge Function caller │   │   ├── onesignal.ts           # Push notification client │   │   └── weather.ts             # OpenWeatherMap (not called from client — RE only) │   ├── hooks/                     # Custom React hooks │   │   ├── use-daily-plan.ts      # TanStack Query: today's plan │   │   ├── use-week-plan.ts       # TanStack Query: 7-day plan │   │   ├── use-dish-search.ts     # TanStack Query: search │   │   └── use-offline-sync.ts    # Event queue flush on reconnect │   ├── stores/                    # Zustand stores │   │   ├── plan-store.ts          # Local plan state (locks, selections) │   │   ├── ui-store.ts            # Modal visibility, active tab │   │   └── auth-store.ts          # Current user session │   ├── repositories/              # Data access layer │   │   ├── plan.repository.ts     # Plan CRUD via Supabase │   │   ├── dish.repository.ts     # Dish data access │   │   └── events.repository.ts   # Interaction event logging │   ├── config/ │   │   ├── constants.ts           # Colors, spacing, timing, RE config │   │   └── feature-flags.ts       # Phase-gated feature switches │   ├── types/                     # TypeScript type definitions │   │   └── index.ts               # Dish, DailyPlan, UserProfile, REInput, RESlate │   └── utils/                     # Helpers, formatters, validators ├── supabase/ │   ├── functions/                 # Edge Functions (Deno TypeScript) │   │   ├── recommendations/       # POST /v1/recommendations │   │   ├── events/                # POST /v1/events │   │   ├── onboarding/            # POST /v1/onboarding │   │   ├── plan/                  # GET /v1/plan/{user_id}/{week} │   │   └── health/                # GET /v1/health │   └── migrations/                # Numbered SQL migrations ├── .env.local                     # Local dev secrets (never committed) ├── .env.example                   # Template (committed, no values) ├── CLAUDE.md                      # AI coding agent context └── CHANGELOG.md                   # Sprint-by-sprint change log |
+| --- |
+
+## **Navigation model**
+
+| **Layer** | **Implementation** | **Screens** |
+| --- | --- | --- |
+| **Root Stack** | Expo Router Stack — no header | auth group, onboarding group, tabs group |
+| **Auth group** | Stack within (auth) — no header | sign-in, sign-up, forgot-password |
+| **Onboarding group** | Stack within (onboarding) — full screen, no tab bar, progress bar component | ob-00 through ob-08b (10 screens) |
+| **Tab bar** | Expo Router Tabs — 5 tabs, persistent, cream background on screen | home, week, search, mymeals, profile |
+| **Home stack** | Stack within (tabs)/home — slides right for detail screens | H-01 (Day View) → H-02 (Meal Detail) |
+| **Modals** | Bottom sheet via @gorhom/bottom-sheet — not stack navigation | H-06 Not Today, H-07 Never, H-08 Add to date, S-03 Filter panel |
+| **Deep links** | foofoo:// scheme. Expo Router handles automatic deep link routing from push notifications | foofoo://home, foofoo://meal/{id}, foofoo://mymeals, foofoo://profile/never |
+
+## **State management layers**
+
+| **Layer** | **Library** | **What it owns** | **Why this library** |
+| --- | --- | --- | --- |
+| **Server state** | TanStack Query v5 | API responses: daily plan, week plan, dish detail, search results, user profile. Auto-caching, background refresh, stale-while-revalidate. | Handles caching, deduplication, offline fallback, and background sync automatically. Best-in-class for async server data. |
+| **Offline persistence** | TanStack Query + MMKV persister | Today's plan persisted across app restarts. Dish data cached for 24 hours. User profile cached indefinitely. | MMKV is 10× faster than AsyncStorage. Synchronous reads mean the cached plan appears instantly on offline open with zero flicker. |
+| **Client UI state** | Zustand v4 | Locked slots map, swipe-reveal open state, active modal, gesture in progress, offline banner visibility. | Minimal boilerplate. Synchronous updates match gesture animation speed. No provider needed. |
+| **Auth session** | Supabase Auth + Zustand | JWT token, user ID, session expiry. Stored in SecureStore on device. | SecureStore is encrypted. Supabase handles refresh automatically. Zustand exposes session to components without Provider. |
+| **Event queue** | MMKV (raw key-value) | Interaction events queued when offline. Format: array of serialised REEvent objects. | Events must survive app restart if offline. MMKV persists synchronously. Queue flushed on NetInfo reconnect event. |
+
+## **Gesture system — implementation**
+
+| **Gesture** | **Implementation** | **Thread** | **Performance spec** |
+| --- | --- | --- | --- |
+| **Swipe carousel on meal card (left/right)** | PanGestureHandler wrapping card. On x-displacement > 40px: trigger carousel open via Zustand. Card translates with gesture using Animated.Value driven by Reanimated. | UI thread (Reanimated worklet) | < 100ms visual response. Tested on Pixel 3a (lowest target device). |
+| **Swipe-reveal action buttons (left swipe)** | PanGestureHandler. On x-displacement > 40px left: card translates left 80px, buttons enter from right. Distinct from carousel — different threshold and direction. | UI thread | < 100ms. Release snaps back if < 80px. Release past 80px reveals buttons. |
+| **Lock icon tap** | TouchableOpacity with haptic feedback (Haptics.impactAsync). Zustand updates locked_slots map synchronously. | JS thread (fast enough for tap) | < 16ms state update. Haptic fires on same frame. |
+| **Swap icon tap** | TouchableOpacity. Triggers TanStack Query fetch for alternative dishes (pre-fetched on plan load). Opens carousel. | JS thread | Alternatives pre-fetched — carousel opens with data immediately. |
+| **Pull-to-refresh on Day View** | RefreshControl on ScrollView. Calls TanStack Query refetch() for unlocked slots only. Locked slots excluded from refetch. | JS thread | System pull-to-refresh animation. RE call < 3s. |
+| **OB-07 dish preference swipe** | PanGestureHandler. RIGHT (+x) = YES, LEFT (–x) = NOPE. Stamp overlay fades in as card moves. Visible buttons (heart/X) trigger same logic without gesture. | UI thread | Spring animation. Card flies off over 260ms. |
+
+# **05  Backend architecture — Supabase**
+
+## **Project configuration**
+
+| **Setting** | **Value** | **Notes** |
+| --- | --- | --- |
+| **Region** | ap-south-1 (Mumbai) | Closest AWS region to Indian users. Reduces API latency by 40–80ms vs Singapore. |
+| **PostgreSQL version** | 15 | Supports Row Level Security, generated columns, GIN indexes for full-text search. |
+| **Auth providers (MVP)** | Email + password | Social login (Google, Apple) added in Phase 0.5 per F-51. |
+| **Auth providers (Phase 0.5+)** | Email + Google + Apple | Google: OAuth 2.0. Apple: Sign in with Apple (required for iOS if other social login exists). |
+| **Row Level Security** | Enabled on ALL tables | No exceptions. Every table has at least one policy. Service role bypasses RLS in Edge Functions only. |
+| **Database schemas** | public (app data), re_engine (RE data) | Schema separation enforces RE isolation. App never directly queries re_engine tables. |
+| **Storage buckets** | dish-photos (public read, no user write) | Dish photos uploaded by admin only. Public CDN URL. No user-uploaded content in MVP. |
+| **Realtime** | Disabled in MVP | Not required until social features (Phase 3). Saves Realtime connection quota. |
+| **Connection pooling** | PgBouncer (Supabase built-in) | Required when Edge Functions scale. Prevents connection exhaustion under concurrent requests. |
+| **Environment** | Production: foofoo-mvp project. Staging: foofoo-staging project. | Separate Supabase projects for prod and staging. Same schema. Secrets managed via EAS environment variables. |
+
+## **Edge Functions — the five endpoints**
+
+| **Endpoint** | **Method** | **Runtime** | **Responsibility** | **Auth** |
+| --- | --- | --- | --- | --- |
+| **POST /v1/recommendations** | POST | Deno (TypeScript) | Full RE pipeline: validate → assign_persona → generate_class_plan → generate_addons → expand_dishes → score_candidates → mmr_rerank → safety_gate → return slate. Writes to plan_cache. | JWT (service role internally; validates user JWT on entry) |
+| **POST /v1/events** | POST | Deno | Receives user interaction event (dish_accepted, dish_never, dish_not_today, dish_swiped_past, dish_cooked, dish_ordered, dish_rated, plan_opened, session_depth). Writes to suggestion_logs. Triggers async feature store update. | JWT — anon key allowed; RLS validates user_id matches auth.uid() |
+| **POST /v1/onboarding** | POST | Deno | Processes completed onboarding object. Calls assign_persona(). Returns initial persona_assignment + confidence_score. Writes to profiles table. | JWT |
+| **GET /v1/plan/{user_id}/{week}** | GET | Deno | Returns cached 7-day class plan for a user-week from plan_cache. Falls back to generating if cache miss. | JWT — user can only fetch own plan (RLS) |
+| **GET /v1/health** | GET | Deno | Returns RE health status: database connection, last successful plan generation timestamp, current re_version. Used by app to decide whether to show cached plan. | None — public endpoint |
+
+## **RE pipeline — step-by-step implementation**
+
+| **Stage** | **Function** | **Input** | **Output** | **Failure behaviour** |
+| --- | --- | --- | --- | --- |
+| **1. Validate** | validateRequest() | User JWT, meal_slot, date, context | Validated user_id, IST date, context object | Return 400. App falls back to cached plan. |
+| **2. Assign persona** | assignPersona() | user_id | persona_id, confidence_score from re_engine.cohort_matrix + profiles | If no persona match: use MC_GENERIC fallback with confidence 0.35 |
+| **3. Generate class plan** | generateClassPlan() | persona_id, day_of_week, day_type (weekday/weekend) | Array of class_codes for each meal slot: [{slot:'breakfast', class_code:'BF_LIGHT_GRAIN'}] | Use default class plan for cohort if DB read fails |
+| **4. Generate add-ons** | generateAddons() | member_segments[], class plan | addon_slots[]: [{member_name, slot, addon_class_code}] | Skip add-ons. Primary plan returned without add-ons. |
+| **5. Expand to dishes** | expandClassToDishes() | class_code, user hard constraints (diet, allergens, never_list) | candidate_dishes[]: dish_ids that pass ALL hard constraints | If < 3 candidates after constraint filter: widen class, log as coverage gap |
+| **6. Score candidates** | scoreCandidates() | candidate_dishes, user_id, context, confidence_score | scored_dishes[]: [{dish_id, score: float}] using weighted formula | If scoring fails: rank by cohort popularity (fallback signal) |
+| **7. MMR re-rank** | mmrRerank() | scored_dishes, already_selected dishes for this plan | reranked_dishes[]: diversity-balanced slate | If < 8 dishes after MMR: pad with highest-scoring remaining candidates |
+| **8. Safety gate** | safetyGateCheck() | final slate, user constraints | PASS or FAIL with violation details | FAIL: discard slate, regenerate (max 2 retries). After 2 failures: return 500 with cached plan fallback signal |
+| **9. Return** | buildResponse() | Validated final slate | JSON response per RE-DOC-01 contract | — |
+
+## **Database schema — overview (detail in DOC-11)**
+
+| **Schema** | **Table group** | **Tables** | **Accessed by** |
+| --- | --- | --- | --- |
+| **public** | User data | profiles, household_members, onboarding_sessions | App client (anon key + RLS), Edge Functions |
+| **public** | Content (read-only for users) | dishes, ingredients, dish_ingredients, meal_classes | App client (anon key), Edge Functions |
+| **public** | Plan state | week_plans, plan_slots, suggestion_logs, plan_cache | Edge Functions write. App client reads (own rows only). |
+| **public** | Events | interaction_events, push_notification_logs | Edge Functions write. Never readable by client. |
+| **re_engine** | RE data | cohort_matrix, re_class_taxonomy, re_dish_genome, re_persona_slot_plan, re_segment_addon_rule, re_state_class_affinity | Edge Functions only. App client has no access. |
+| **re_engine** | Feature store | user_taste_vectors, class_affinity_weights, never_list_cache | Edge Functions read/write only. |
+
+## **Cron jobs**
+
+| **Job** | **Schedule (UTC)** | **IST equivalent** | **Action** |
+| --- | --- | --- | --- |
+| **Morning plan pre-generation** | 23:30 UTC | 05:00 IST | Generates plans for all users active in last 7 days. Populates plan_cache. Queues OneSignal push notifications per user's configured time. |
+| **Cohort weight recalibration** | Sunday 18:00 UTC | Sunday 23:30 IST | Compares actual acceptance rates per cohort vs research weights. Updates cohort_matrix.weight where reality diverges. Runs on acceptance data from past 7 days. |
+| **Feature store cleanup** | Daily 00:00 UTC | 05:30 IST | Removes interaction events older than 2 years (DPDP Act retention policy). Purges deleted user data. |
+| **RE health check** | Every 5 minutes | Continuous | Calls GET /v1/health. Alerts if health check fails 3 consecutive times. |
+
+# **06  Security architecture**
+
+## **Authentication and authorisation**
+
+| **Component** | **Implementation** | **Why** |
+| --- | --- | --- |
+| **User authentication** | Supabase Auth. Email + password MVP. JWT issued on sign-in. Stored in SecureStore (encrypted, device keychain). | SecureStore uses device's secure enclave. Tokens never in AsyncStorage (unencrypted). |
+| **API authorisation** | Every Supabase API call includes Authorization: Bearer {jwt} header. Supabase validates JWT and passes auth.uid() to RLS policies. | Zero-trust: every request is validated. No session cookies. Stateless. |
+| **Row Level Security** | Every table has RLS enabled and at least one policy. Example: users can only read/write rows where user_id = auth.uid(). | A compromised anon key cannot read another user's data. RLS is enforced at the database layer — cannot be bypassed by client code. |
+| **Service role key** | Only used inside Supabase Edge Functions (server-side). Never in React Native app code. Never in git. | Service role bypasses RLS — it can read all rows. Must never be exposed to client. |
+| **RE schema access** | re_engine schema has no RLS policies readable by the anon key. App client has zero access to RE tables. | Prevents reverse-engineering of the RE algorithm. Users cannot read cohort weights or scoring formulas. |
+| **Secrets management** | All secrets in environment variables: .env.local (local dev, gitignored) and EAS Secrets (production builds). Zero hardcoded values in source code. | Automated secret scan in GitHub Actions CI blocks any commit containing key patterns. |
+
+## **DPDP Act 2023 compliance — technical implementation**
+
+| **Requirement** | **Technical implementation** | **Verified by** |
+| --- | --- | --- |
+| **Granular consent at signup** | Consent captured per data category in onboarding. Stored in profiles.consent_record (JSONB). Timestamp + version recorded. | Legal audit before launch |
+| **Data export within 72 hours** | Edge Function: GET /v1/user/export — returns all user data as JSON. Triggered by user from P-08 screen. Queued job completes within 72 hours. | Tested: request → delivery time |
+| **Account deletion within 72 hours** | Edge Function: DELETE /v1/user — soft-deletes all rows (sets deleted_at). Cron job permanently purges within 72 hours. | Tested: deletion request → zero rows verifiable by user |
+| **Interaction event retention** | All interaction_events older than 2 years purged by daily cron. Policy documented in Privacy Policy. | Monthly audit log |
+| **Age gate** | OB-03 or signup includes age verification. Users under 13 blocked per DPDP minor protection provisions. | QA test case: under-13 input blocked |
+| **Data minimisation** | Only fields that materially change the meal plan are collected in onboarding. Validated against DOC-04 NFR. | Schema audit: every column must have a documented RE impact reason |
+
+# **07  Performance architecture**
+
+| **NFR** | **Target** | **Implementation** | **Measured by** |
+| --- | --- | --- | --- |
+| **Plan generation speed** | < 3s end-to-end on budget Android | Plan pre-generated by morning cron at 5 AM IST. App reads from plan_cache on open — a single DB read, not a full RE pipeline call. | Sentry performance monitoring: trace from app open to plan render |
+| **On-demand plan generation** | < 3s when cache is cold (new user) | RE pipeline optimised: indexed cohort_matrix queries, pre-computed class-to-dish maps. Edge Function: < 800ms. Network round trip: < 200ms. Render: < 500ms. | Load test before launch on Pixel 3a (reference device) |
+| **Swipe carousel latency** | < 100ms visual response | Reanimated v3 runs animations on UI thread. Gesture handler detects displacement on UI thread. No JS thread involvement during swipe. | Frame profiler: every gesture interaction |
+| **Search result latency** | < 500ms | Full-text search using PostgreSQL GIN index on dishes.search_vector (tsvector of name + cuisine + class tags). Supabase RPC function: < 200ms query time. | PostHog: search_result_time event |
+| **App cold start** | < 2s | Hermes JS engine (faster startup). MMKV synchronous read of cached plan before first network request. Skeleton loaders shown immediately. | Sentry: app_start span |
+| **Image loading** | < 500ms per dish photo | Cloudinary CDN: 800×600 WebP. expo-image: disk cache first, memory cache second. Blurhash placeholder during load (zero blank space). | PostHog: image_load_time event |
+| **Offline plan display** | Instant (< 100ms) | MMKV persister on TanStack Query: today's plan read synchronously from disk. No network call needed for render. | Manual test: aeroplane mode, restart app |
+| **60fps gesture animations** | Sustained 60fps during swipe | Reanimated v3 worklets run on UI thread. No JS thread bridge calls during animation. Tested on Pixel 3a. | Frame profiler: 0 dropped frames on swipe |
+
+## **Reference test device**
+
+| **Minimum specification for performance testing: **Pixel 3a (2019) with 4GB RAM, Snapdragon 670, Android 12. Every performance target must be met on this device. Testing only on flagship devices is not acceptable — 60%+ of Foofoo's target users are on mid-range Android devices. |
+| --- |
+
+# **08  Offline architecture**
+
+Foofoo must be useful without internet. A user who has already loaded today's plan should be able to see it, lock meals, and record interactions even when their connection drops. The architecture ensures this with three components: plan cache, event queue, and network state monitor.
+
+| **Component** | **Implementation** | **Data persisted** | **Recovery behaviour** |
+| --- | --- | --- | --- |
+| **Plan cache (TanStack Query + MMKV persister)** | TanStack Query's queryClient is configured with a MMKV-backed persister. When plan data is fetched successfully, it is written synchronously to MMKV. On next app open (online or offline), MMKV returns the cached plan instantly. | Today's plan (7-day plan cache for week view). Dish detail for previously viewed dishes. User profile. | Stale-while-revalidate: shows cached plan immediately, refetches in background when online. Offline banner shown via NetInfo.isConnected. |
+| **Interaction event queue** | All interaction events (dish_accepted, dish_never, dish_not_today, lock, etc.) that fail to POST to /v1/events are serialised to MMKV event_queue key as a JSON array. | Array of pending REEvent objects: {event_type, dish_id, meal_slot, context, timestamp, retry_count} | On NetInfo connectionChange event (offline → online): flush queue. POST all queued events to /v1/events in order. Clear queue on success. Max 3 retries per event before logging to Sentry. |
+| **Network state monitor** | @react-native-community/netinfo. Listens for connection state changes. Exposed via useNetworkStatus hook. | Connection type + isConnected boolean. Stored in Zustand network-store. | On offline: show offline banner (H-01 info-blue stripe). Disable actions that require network. On reconnect: flush event queue, refetch plan in background. |
+| **Push notification handling** | OneSignal notification received offline: tap opens app, app reads from MMKV cache. Notification data (dish name, thumbnail) shown from notification payload itself (not from a network call). | Notification payload includes: dish_id, dish_name, dish_photo_url (CDN, not Supabase direct) | No network call needed to open notification and see breakfast suggestion. |
+
+# **09  Timezone handling — IST / UTC rules**
+
+| **Non-negotiable rule: **All timestamps stored in PostgreSQL as timestamptz (UTC). India is IST = UTC+5:30. The conversion must happen in the right place — mishandling this produces plans with the wrong date for users. |
+| --- |
+
+| **Rule** | **Implementation** | **Common mistake to avoid** |
+| --- | --- | --- |
+| **All DB timestamps in UTC** | Every created_at, updated_at, plan_date column is timestamptz. Never timezone-naive timestamp. | Storing IST time as a timezone-naive timestamp — causes off-by-5:30 errors in all date queries. |
+| **Plan date uses IST date** | When generating a plan for 'today', compute the IST date: new Date() + 5.5 hours = IST date. Use that date as plan_date. A plan generated at 11:30 PM UTC = 5:00 AM IST is for the NEXT day in IST. | Using UTC date as plan_date — users in India see yesterday's plan at 12:01 AM IST (6:30 PM UTC). |
+| **Cron jobs scheduled in UTC** | Morning cron: 23:30 UTC = 05:00 AM IST. Supabase cron (pg_cron) uses UTC. | Scheduling cron at 05:00 UTC = 10:30 AM IST. Plan generation 5.5 hours too late. |
+| **Notification time stored in IST** | user.notification_time stored as HH:MM in IST. When scheduling OneSignal, convert: UTC_time = IST_time - 5h30m. | Storing notification time in UTC — user sets 7:00 AM, receives at 12:30 PM IST. |
+| **Client displays in device timezone** | All timestamps displayed to user use the device's local timezone (IST for Indian users). Use date-fns or Intl.DateTimeFormat with timezone awareness. | Displaying UTC timestamp directly — shows '1:30 AM' when user meant '7:00 AM'. |
+| **'****Today****'**** calculation in Edge Functions** | const today = new Date(); today.setMinutes(today.getMinutes() + 330); // +5:30 hours for IST. Use today.toISOString().split('T')[0] for plan_date. | Using new Date().toISOString() without IST offset — off by a day for evening plan generation. |
+
+# **10  CI/CD and deployment architecture**
+
+## **Environment map (locked — do not modify without founder approval)**
+
+| **Environment** | **Branch** | **Supabase project** | **What deploys here** | **Deploy trigger** |
+| --- | --- | --- | --- | --- |
+| **Local development** | Any feature branch | foofoo-staging (local Supabase CLI) | Developer's own test builds via Expo Go | Manual: expo start |
+| **Staging** | apverse-labs-RE branch | foofoo-staging (kwypxyqxojauhiehuirz) | RE development, schema changes, integration tests | Push to apverse-labs-RE |
+| **Production** | main branch | foofoo-mvp (ufgfznpqixplcbhmsqqw) | Live app for real users | Explicit founder approval required — never auto-deploy |
+
+| **Critical rule: **Claude Code must NEVER commit or push to main or develop branches without explicit founder approval in the conversation. Production deploys are manual, deliberate decisions — never triggered automatically. |
+| --- |
+
+## **GitHub Actions CI pipeline**
+
+| **Step** | **Trigger** | **Action** | **Blocks deploy if fails?** |
+| --- | --- | --- | --- |
+| **TypeScript typecheck** | Every push to any branch | npx tsc --noEmit — zero type errors allowed | Yes |
+| **ESLint** | Every push | eslint src/ app/ — zero errors allowed | Yes |
+| **Unit tests** | Every push | jest — all tests must pass | Yes |
+| **RE safety gate queries** | Every push that touches supabase/ or src/services/re-client.ts | Run 3 SQL queries against foofoo-staging. Must return 0 rows each: (1) diet violations, (2) allergen violations, (3) Jain violations. | Yes — P0 release blocker |
+| **Secret scan** | Every push | gitleaks scan — detect hardcoded API keys, passwords, JWTs | Yes |
+| **Build check** | Push to apverse-labs-RE or main | EAS Build (development profile) — confirms build compiles for both platforms | Yes for staging. Manual for production. |
+
+## **EAS Build and submit**
+
+| **Profile** | **Command** | **Output** | **When used** |
+| --- | --- | --- | --- |
+| **development** | eas build --profile development | Development client APK + IPA for Expo Go | Feature development, daily testing |
+| **preview** | eas build --profile preview | Internal distribution build (no store) | QA testing, founder review |
+| **production** | eas build --profile production | App Store + Play Store ready build | Release only — explicit approval required |
+| **submit-android** | eas submit --platform android | Uploads to Google Play (Internal Testing → Closed Testing → Production) | After production build approval |
+| **submit-ios** | eas submit --platform ios | Uploads to App Store Connect (TestFlight → Review → Release) | After production build approval |
+
+## **Environment variables — complete list**
+
+| **Variable** | **Where used** | **Sensitive?** | **Set in** |
+| --- | --- | --- | --- |
+| **EXPO_PUBLIC_SUPABASE_URL** | React Native client (anon key safe) | No | EAS env + .env.local |
+| **EXPO_PUBLIC_SUPABASE_ANON_KEY** | React Native client | No (RLS protects data) | EAS env + .env.local |
+| **SUPABASE_SERVICE_ROLE_KEY** | Edge Functions only | YES — never in client | EAS secrets (server) + .env.local (gitignored) |
+| **SUPABASE_DB_URL** | Edge Functions (direct DB connection) | YES | EAS secrets |
+| **ONESIGNAL_APP_ID** | React Native client (public) | No | EAS env + .env.local |
+| **ONESIGNAL_REST_API_KEY** | Edge Functions only (push scheduling) | YES | EAS secrets |
+| **OPENWEATHERMAP_API_KEY** | Edge Functions only | YES | EAS secrets |
+| **POSTHOG_API_KEY** | React Native client (public) | No | EAS env + .env.local |
+| **SENTRY_DSN** | React Native client (public) | No | EAS env + .env.local |
+| **CLOUDINARY_CLOUD_NAME** | React Native client (for CDN URL construction) | No | EAS env + .env.local |
+
+# **11  Scalability path**
+
+| **Scale** | **Infrastructure** | **Cost/month** | **Key changes from previous tier** | **RE state** |
+| --- | --- | --- | --- | --- |
+| **100 DAU (MVP launch)** | Supabase Free tier. Cloudinary free. OneSignal free. PostHog free. GitHub Actions free. | ₹0 | Initial architecture as described in this document. | classfirst_v1. Pure rule-based. |
+| **500 DAU (MVP success)** | Supabase Free tier still sufficient. Monitor DB at 70% capacity. | ₹0 | No changes. Free tier handles comfortably. | classfirst_v2 (personal history learning active). |
+| **2,000 DAU (Phase 0.5–1)** | Supabase Pro ($25/month). Connection pooler important at this scale. Cloudinary free sufficient. | ~₹2,000/month | Upgrade Supabase to Pro for connection pooling + 8GB DB + enhanced Edge Function limits. | classfirst_v2/v3. |
+| **10,000 DAU (Phase 1.5–2)** | Supabase Pro + read replica for RE queries. Cloudinary Pro for CDN. EAS priority build queue. | ~₹8,000–15,000/month | Add read replica. Separate RE read queries to replica. Add Redis cache (Upstash free) for cohort_matrix (hot data). | cluster_v1 activated. |
+| **50,000 DAU (Phase 3)** | Supabase Business or self-hosted. Dedicated RE service consideration. Multi-region possible. | ~₹40,000–80,000/month | Evaluate migrating RE to dedicated service. Feature store may benefit from Redis upgrade. | ltr_v1 if data sufficient. |
+| **200,000+ DAU (Year 2+)** | Custom infrastructure. Kubernetes. Horizontal scaling of RE. Dedicated ML training pipeline. | Revenue-funded | Full architectural evolution per RE-DOC-05 Phase D recommendations. | ml_v1. |
+
+# **12  Development environment setup**
+
+| **Tool** | **Version / requirement** | **Purpose** | **How to install** |
+| --- | --- | --- | --- |
+| **Node.js** | 20 LTS (minimum) | JavaScript runtime | nvm install 20 && nvm use 20 |
+| **npm** | 10+ (comes with Node 20) | Package management | Included with Node.js |
+| **Expo CLI** | Latest | Run dev server, manage Expo projects | npm install -g expo-cli |
+| **EAS CLI** | Latest | Cloud builds and submissions | npm install -g eas-cli |
+| **Supabase CLI** | Latest | Local Supabase development, migrations, Edge Function testing | npm install -g supabase |
+| **Docker** | Latest stable | Required for supabase start (local PostgreSQL + Auth) | Docker Desktop from docker.com |
+| **Git** | Latest | Version control | Pre-installed on most systems |
+| **VS Code** | Latest | Primary editor | Extensions: ESLint, Prettier, Expo Tools, Supabase |
+| **Expo Go (Android)** | Latest from Play Store | Device testing without native builds | Install on physical device |
+| **Expo Go (iOS)** | Latest from App Store | Device testing | Install on physical device |
+| **GitHub Codespace** | Optional — browser-based VS Code | Alternative to local setup. All tools pre-installed in Codespace config. | Open repo in GitHub → Code → Codespaces |
+
+## **First-run setup (new developer)**
+
+| **Step** | **Command** | **What it does** |
+| --- | --- | --- |
+| **1. Clone repo** | git clone git@github.com:apverse-labs/foofoo.git && cd foofoo | Gets the codebase |
+| **2. Install dependencies** | npm install | Installs all React Native and TypeScript dependencies |
+| **3. Copy env template** | cp .env.example .env.local | Creates local env file. Fill in values from 1Password / founder. |
+| **4. Start local Supabase** | supabase start | Starts local PostgreSQL + Auth + Storage + Edge Functions via Docker |
+| **5. Run migrations** | supabase db reset | Applies all migrations to local DB. Seeds test data. |
+| **6. Start Expo dev server** | npx expo start | Opens Expo Dev Server. Scan QR code with Expo Go on device. |
+| **7. Verify RE health** | curl http://localhost:54321/functions/v1/health | Should return {status:'ok',re_version:'classfirst_v1'} |
+
+# **13  Architecture Decision Records (ADRs)**
+
+ADRs document significant technical decisions with their context and consequences. They are the institutional memory of why things are the way they are. Every engineer reads these before making changes to the architecture.
+
+| **ADR-001 · React Native + Expo over Flutter or native** ***Status: Accepted*** **Context:** Two non-technical founders building with AI assistance (Claude Code). The product is a mobile app targeting Android (primary) and iOS. Budget is ₹25,000 — no external developers. **Decision:** Use React Native with Expo. TypeScript throughout. Expo SDK for native module management. EAS for cloud builds. **Consequences:** PRO: Largest AI coding agent support (TypeScript, React). Expo eliminates native build complexity. Single codebase. RISK: Some native features require custom native modules (mitigated by Expo's managed workflow). CON: Flutter would have better performance on low-end devices — accepted because RE runs server-side, not client-side. |
+| --- |
+
+| **ADR-002 · Supabase over Firebase or custom backend** ***Status: Accepted*** **Context:** Backend needed for: auth, relational database, file storage, server-side functions, and real-time (future). Budget constraint: free tier must be viable until 500 DAU. **Decision:** Use Supabase. PostgreSQL for the database. Edge Functions for RE and event processing. Supabase Auth for authentication. Supabase Storage for dish photos. **Consequences:** PRO: PostgreSQL is mandatory for RE queries — NoSQL (Firebase Firestore) cannot handle complex RE scoring joins and aggregations. Supabase free tier is more generous than Firebase Blaze for our use case. Open-source (self-hostable as exit strategy). RISK: Supabase is smaller than Firebase — less community support. Mitigated by excellent documentation. |
+| --- |
+
+| **ADR-003 · RE as Supabase Edge Functions (not separate microservice) at MVP** ***Status: Accepted*** **Context:** RE is specified as a standalone module with a versioned API contract. At MVP scale (< 500 DAU), a dedicated microservice adds operational overhead without benefit. Supabase Edge Functions can run the RE pipeline. **Decision:** Implement RE as Supabase Edge Functions at MVP. RE has its own schema (re_engine) and endpoints (/v1/recommendations etc.) that fulfil the module contract. Migration to a dedicated service is planned for Phase 3 if scale demands it. **Consequences:** PRO: Zero additional infrastructure. Runs adjacent to the database (low latency for RE queries). Deno TypeScript matches client TypeScript. CON: Edge Function cold start (~100ms) — mitigated by morning plan pre-generation cron. RISK: Edge Function timeout (150 seconds max in Supabase) — RE pipeline target is < 3s, well within limit. |
+| --- |
+
+| **ADR-004 · TanStack Query over Redux or Zustand for server state** ***Status: Accepted*** **Context:** The app needs: server data fetching with caching, background refresh, stale-while-revalidate, offline persistence, and request deduplication. Zustand is used for UI state but not designed for async server data. **Decision:** Use TanStack Query v5 for all server state. Configure MMKV persister for offline plan caching. Use Zustand for synchronous UI state only (gesture states, modal visibility). **Consequences:** PRO: Purpose-built for server state. MMKV persister is straightforward to configure. Automatic background refetch, error retry, and deduplication. CON: Another library to learn. JUSTIFIED: the alternative (manual fetch + Redux reducers + persist middleware) is 3× more code for the same result. |
+| --- |
+
+| **ADR-005 · MMKV over AsyncStorage for local persistence** ***Status: Accepted*** **Context:** The app requires: (1) synchronous reads for cached plan display on app open, (2) encrypted storage for sensitive user data (DPDP compliance), (3) fast event queue writes during gesture interactions. **Decision:** Use react-native-mmkv for all local persistence. Configure as TanStack Query persister. Use for interaction event queue during offline. Encrypt sensitive keys. **Consequences:** PRO: 10× faster than AsyncStorage. Synchronous read API (no await needed). Native encryption. CON: Requires Expo config plugin (adds complexity to managed workflow). MITIGATED: Expo MMKV plugin is well-maintained. |
+| --- |
+
+| **ADR-006 · Expo Router over React Navigation** ***Status: Accepted*** **Context:** Navigation library choice for a 35-screen app. Both are mature options. Deep linking is a requirement for push notifications. **Decision:** Use Expo Router v3. File-based routing matches DOC-05 screen inventory exactly. Deep linking configured automatically from route structure. **Consequences:** PRO: File = route maps directly to screen ID (H-01, OB-03, etc.). Deep links work automatically. Tab bar and nested stacks work out of the box. CON: Less community content than React Navigation (Expo Router is newer). RISK: Breaking changes in Expo Router v3 are possible — pin version. |
+| --- |
+
+| **ADR-007 · FlashList over FlatList for meal card lists** ***Status: Accepted*** **Context:** The home screen renders 3 meal cards. The search results screen renders dish rows. FlatList is the default React Native list component but has known performance issues on low-end Android devices. **Decision:** Use FlashList (@shopify/flash-list) for all scrollable lists of meal cards or dish rows. FlatList only for very short lists (< 5 items) where FlashList's estimatedItemSize is impractical. **Consequences:** PRO: FlashList recycles cells more aggressively. 5× less blank flash on fast scroll. Significantly better on Pixel 3a reference device. CON: estimatedItemSize must be tuned per list type. JUSTIFIED: performance on reference device is an NFR. |
+| --- |
+
+| **ADR-008 · OneSignal over direct FCM/APNs for push notifications** ***Status: Accepted*** **Context:** Push notifications are required for the morning habit loop. Implementing FCM (Firebase Cloud Messaging) and APNs directly requires managing two separate notification APIs plus scheduling logic. **Decision:** Use OneSignal. Single SDK for both Android and iOS. Scheduling, segmentation, and analytics built in. Free tier: unlimited devices with basic segmentation. **Consequences:** PRO: Single integration covers both platforms. Push scheduling (for 7 AM IST delivery) built into OneSignal dashboard. CON: Dependency on a third-party service. REPLACEMENT PATH: migrate to direct FCM/APNs + custom scheduling in Edge Functions. 2 weeks. |
+| --- |
+
+| **ADR-009 · TypeScript strict mode throughout** ***Status: Accepted*** **Context:** The product handles safety-critical data: allergen exclusions, dietary constraints, household member health profiles. A type error in this data could surface an allergen-containing dish to a user with a severe allergy. **Decision:** TypeScript strict mode enabled in tsconfig.json. No @ts-ignore comments. No any types except where TypeScript's inference is provably insufficient and the risk is documented. **Consequences:** PRO: Type safety catches the category of bugs that allergen data is most vulnerable to. Dish genome type definitions catch missing fields at compile time. CON: Slower development velocity (Claude Code must generate correct types first). JUSTIFIED: safety-critical data makes this non-negotiable. |
+| --- |
+
+# **14  Document sign-off**
+
+| **Field** | **Value** |
+| --- | --- |
+| **Document** | DOC-10 · Technical Architecture |
+| **Version** | 1.0 |
+| **Date** | June 2026 |
+| **Status** | DRAFT — pending founder sign-off |
+| **Stack** | React Native + Expo SDK 52+ │ TypeScript strict │ Expo Router v3 │ Supabase (PostgreSQL + Auth + Edge Functions + Storage) │ TanStack Query v5 │ Zustand v4 │ MMKV │ OneSignal │ PostHog │ Sentry │ EAS Build │ Cloudinary │ OpenWeatherMap |
+| **RE implementation** | Supabase Edge Functions (Deno TypeScript) at MVP. Migration to dedicated microservice planned for Phase 3+ when scale demands it. |
+| **Database region** | ap-south-1 (Mumbai) — lowest latency for Indian users |
+| **Critical rule** | Production deploys require explicit founder approval. Claude Code never commits to main without approval. |
+| **Next document** | DOC-11 · Database Schema — every table, column, constraint, index, and RLS policy |
+| **ADRs documented** | 9 architecture decisions (ADR-001 through ADR-009) |
+
+Founder sign-off: ___________________________     Date: _______________

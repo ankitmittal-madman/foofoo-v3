@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foofoo RE — Evolution Map</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0f1117;color:#e8e8e8;padding:24px;min-height:100vh}
+h1{font-size:22px;color:#fff;margin-bottom:4px}
+.sub{font-size:13px;color:#888;margin-bottom:24px}
+
+/* 2x2 state grid */
+.state-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+@media(max-width:640px){.state-grid{grid-template-columns:1fr}}
+.state-card{border-radius:12px;padding:20px;cursor:pointer;transition:all 0.25s;border:2px solid transparent;position:relative}
+.state-card:hover{transform:translateY(-2px)}
+.state-card.active{border-color:rgba(255,255,255,0.3)}
+.state-card .state-id{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:0.7;margin-bottom:6px}
+.state-card .state-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.state-card .state-desc{font-size:12px;opacity:0.75;line-height:1.5}
+.state-card .state-badge{position:absolute;top:12px;right:12px;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700}
+
+/* State A */
+.sa{background:#1a1a2e;border-color:#4A3FA0}
+.sa.active{background:#20204a}
+/* State B */
+.sb{background:#091a12;border-color:#1A5C38}
+.sb.active{background:#0f2a1c}
+/* State C */
+.sc{background:#2a1a00;border-color:#854F0B}
+.sc.active{background:#3d2e0a}
+/* State D */
+.sd{background:#200d0d;border-color:#993C1D}
+.sd.active{background:#2e1212}
+
+/* Detail panel */
+.detail{background:#151820;border-radius:12px;padding:24px;border:1px solid #2a2d3a;margin-bottom:24px;display:none}
+.detail.show{display:block}
+.detail-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.detail-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.detail-title{font-size:18px;font-weight:700}
+.detail-sub{font-size:12px;color:#888;margin-top:2px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:640px){.detail-grid{grid-template-columns:1fr}}
+.detail-box{background:#1e2530;border-radius:8px;padding:12px}
+.detail-box-title{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#666;margin-bottom:6px}
+.detail-box-body{font-size:13px;color:#ccc;line-height:1.6}
+/* mini weight bar */
+.mwb{display:flex;height:20px;border-radius:4px;overflow:hidden;margin-top:8px;gap:2px}
+.mwb-seg{display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,0.85);transition:width 0.5s}
+/* metrics */
+.metrics{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.metric{background:#1e2530;border-radius:8px;padding:10px 14px;flex:1;min-width:120px}
+.metric-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.metric-val{font-size:18px;font-weight:700;color:#1D9E75}
+.metric-sub{font-size:10px;color:#555;margin-top:2px}
+
+/* Phase timeline */
+.timeline{display:flex;flex-direction:column;gap:0;margin-top:4px}
+.tl-item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #1e2530;cursor:pointer;transition:background 0.2s;border-radius:6px;padding:10px}
+.tl-item:hover{background:#1e2530}
+.tl-item:last-child{border-bottom:none}
+.tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.tl-phase{font-size:11px;font-weight:700;color:#888;min-width:80px}
+.tl-body{flex:1}
+.tl-title{font-size:13px;color:#fff;font-weight:600;margin-bottom:2px}
+.tl-desc{font-size:12px;color:#666;line-height:1.5}
+.tl-metric{font-size:11px;color:#1D9E75;margin-top:3px}
+
+/* ML path */
+.ml-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+@media(max-width:640px){.ml-cards{grid-template-columns:1fr}}
+.ml-card{background:#1e2530;border-radius:8px;padding:12px;border-top:3px solid}
+.ml-card-phase{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#888;margin-bottom:4px}
+.ml-card-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px}
+.ml-card-algo{font-size:11px;color:#ccc;margin-bottom:6px;line-height:1.5}
+.ml-card-trigger{font-size:10px;color:#666}
+</style>
+</head>
+<body>
+<h1>Foofoo RE — Evolution Map</h1>
+<p class="sub">Click a state to explore how the recommendation engine operates and evolves across four distinct modes.</p>
+
+<div class="state-grid">
+  <div class="state-card sa" onclick="showState('A',this)">
+    <div class="state-badge" style="background:#4A3FA0;color:#EEEDFE">< 1K DAU</div>
+    <div class="state-id" style="color:#7F77DD">State A</div>
+    <div class="state-title">Research mode</div>
+    <div class="state-desc">New user · low base<br>Secondary research + cohort priors only</div>
+  </div>
+  <div class="state-card sb" onclick="showState('B',this)">
+    <div class="state-badge" style="background:#1A5C38;color:#EAF3DE">< 1K DAU</div>
+    <div class="state-id" style="color:#1D9E75">State B</div>
+    <div class="state-title">Learning mode</div>
+    <div class="state-desc">Mature user · low base<br>Personal history leads; cohort as fallback</div>
+  </div>
+  <div class="state-card sc" onclick="showState('C',this)">
+    <div class="state-badge" style="background:#854F0B;color:#FAEEDA">5K+ DAU</div>
+    <div class="state-id" style="color:#EF9F27">State C</div>
+    <div class="state-title">Cluster mode</div>
+    <div class="state-desc">New user · large base<br>Cluster matching from onboarding profile</div>
+  </div>
+  <div class="state-card sd" onclick="showState('D',this)">
+    <div class="state-badge" style="background:#993C1D;color:#FAECE7">5K+ DAU</div>
+    <div class="state-id" style="color:#D85A30">State D</div>
+    <div class="state-title">Full intelligence</div>
+    <div class="state-desc">Mature user · large base<br>Personal + cluster trends + optional CF</div>
+  </div>
+</div>
+
+<div class="detail" id="detailPanel"></div>
+
+<!-- Phase timeline -->
+<div class="detail show" style="margin-bottom:24px">
+  <div class="detail-header">
+    <div class="detail-icon" style="background:#1e2530">📅</div>
+    <div><div class="detail-title">RE evolution by product phase</div><div class="detail-sub">Click any phase to see what changes in the RE</div></div>
+  </div>
+  <div class="timeline" id="phaseline"></div>
+</div>
+
+<!-- ML upgrade path -->
+<div class="detail show">
+  <div class="detail-header">
+    <div class="detail-icon" style="background:#1e2530">🤖</div>
+    <div><div class="detail-title">ML upgrade path — rule-based to full AI</div><div class="detail-sub">The app API never changes. Only the RE's internal scoring stage is swapped.</div></div>
+  </div>
+  <div class="ml-cards" id="mlCards"></div>
+</div>
+
+<script>
+var states={
+  A:{
+    title:"Research mode",desc:"New user with zero history on a small platform. The RE relies entirely on secondary research data about what households like this one typically eat, combined with onboarding signals and contextual intelligence.",
+    color:"#4A3FA0",bg:"#20204a",icon:"📚",
+    weights:{cohort:55,content:20,history:0,context:15,explore:10},
+    boxes:[
+      {t:"Primary data source",b:"Secondary research database: 36-state regional food patterns, cohort meal rhythms, staple dishes per home state. Built pre-launch from Indian food science literature."},
+      {t:"Cold start approach",b:"Onboarding cohort assigned (MC_FAMILY, MC_SOLO etc.) → class plan from cohort matrix → dish candidates within class → bandit exploration for variety."},
+      {t:"Confidence range",b:"0.40–0.65 depending on onboarding completeness. Drops 0.05 per skipped critical field (diet type skip = –0.15)."},
+      {t:"Exploration strategy",b:"Thompson Sampling bandit with Beta(α,β) priors set from cohort base rates. ~10% of slate is explorative."}
+    ],
+    metrics:[{l:"Day 0 target",v:">25%",s:"Acceptance rate"},{l:"Confidence",v:"0.40–0.65",s:"Based on onboarding"},{l:"Data source",v:"Research",s:"Secondary DB only"},{l:"CF layer",v:"None",s:"Not viable at this scale"}]
+  },
+  B:{
+    title:"Learning mode",desc:"A mature user on a small platform. The RE has built a detailed personal model from 30–90+ days of interactions. No clusters available yet, but the individual model is rich and accurate.",
+    color:"#1A5C38",bg:"#0f2a1c",icon:"🧠",
+    weights:{cohort:10,content:20,history:55,context:15,explore:0},
+    boxes:[
+      {t:"Primary data source",b:"User's full event log: swipes, locks, nevers, ratings, cooks, orders. Taste vector built from genome of accepted dishes. Exponential time decay weights recent events higher."},
+      {t:"Personal taste vector",b:"Average genome vector of all accepted dishes, weighted by recency and acceptance strength. Used for ContentMatch scoring against candidate dishes."},
+      {t:"Confidence range",b:"0.80–0.96 for users with 150+ interactions. The RE knows this user well and makes confident, accurate suggestions."},
+      {t:"Exploration strategy",b:"Minimal exploration (w_explore ≈ 0). RE exploits known preferences. MMR variety guard prevents filter bubble by ensuring cuisine and method diversity."}
+    ],
+    metrics:[{l:"Day 30 target",v:">45%",s:"Acceptance rate"},{l:"Confidence",v:"0.80–0.96",s:"150+ interactions"},{l:"History weight",v:"55–65%",s:"Dominant signal"},{l:"Never rate",v:"<10%",s:"Target"}]
+  },
+  C:{
+    title:"Cluster mode",desc:"A new user joining a platform with 5,000+ DAU. Instead of relying purely on research data, the RE finds the cluster of existing users whose historical behaviour best matches this new user's onboarding profile.",
+    color:"#854F0B",bg:"#3d2e0a",icon:"🎯",
+    weights:{cohort:25,content:25,history:25,context:15,explore:10},
+    boxes:[
+      {t:"Cluster definition",b:"K-means or hierarchical clustering on interaction patterns: which meal classes users accept, which dishes repeat, which they never. Clusters refresh weekly as user base evolves."},
+      {t:"New user matching",b:"Onboarding profile (cohort + home state + diet + cook capability) mapped to best-matching cluster via cosine similarity. Cluster's historical behaviour seeds new user's initial plan."},
+      {t:"Advantage over State A",b:"Cluster behaviour is real Indian user data, not research assumptions. A new State C user gets a richer, more accurate Day-0 plan than State A ever could — grounded in what real households like theirs actually ate."},
+      {t:"Confidence range",b:"0.55–0.75 for new users with cluster match quality > 0.70. Better than State A's maximum of 0.65 even with complete onboarding."}
+    ],
+    metrics:[{l:"Day 0 target",v:">35%",s:"vs >25% in State A"},{l:"Confidence",v:"0.55–0.75",s:"Cluster match quality"},{l:"Trigger",v:"5K DAU",s:"Cluster activation"},{l:"Cluster refresh",v:"Weekly",s:"As base evolves"}]
+  },
+  D:{
+    title:"Full intelligence",desc:"A mature user on a large platform. The most sophisticated RE state: personal history + cluster trends + optional collaborative filtering. The RE produces genuinely personalised plans that also surface culturally trending dishes from similar households.",
+    color:"#993C1D",bg:"#2e1212",icon:"⭐",
+    weights:{cohort:5,content:15,history:65,context:15,explore:0},
+    boxes:[
+      {t:"Personal + cluster blend",b:"User's personal model (65%) combined with cluster trend signal: what's trending in this user's cluster recently. New dishes popular among similar households get a moderate boost."},
+      {t:"Anti-filter-bubble mechanism",b:"If accepted dishes come from < 3 cuisine families for 30 consecutive days, exploration bonus activates (+0.10 for dishes from unexplored cuisines). Prevents 'only ever suggests paneer dishes' trap."},
+      {t:"Cluster evolution",b:"User's cluster membership updates weekly based on behaviour. A user who starts as 'South Indian veg family' but starts accepting North Indian dishes may migrate to a 'pan-Indian urban family' cluster."},
+      {t:"CF layer (when viable)",b:"Matrix Factorization (ALS) when interaction density > 1%. Provides 'users like you also liked...' signal. Only activates when statistically viable — RE checks density before enabling."}
+    ],
+    metrics:[{l:"Day 30 target",v:">55%",s:"Acceptance rate"},{l:"Confidence",v:"0.88–0.96",s:"Mature + cluster"},{l:"History weight",v:"65%+",s:"Dominant"},{l:"CF viability",v:">1%",s:"Interaction density needed"}]
+  }
+};
+
+function showState(key,el){
+  document.querySelectorAll('.state-card').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  var s=states[key];
+  var d=document.getElementById('detailPanel');
+  d.classList.add('show');
+  var wb=['cohort','content','history','context','explore'];
+  var wColors=['#854F0B','#1A5C38','#4A3FA0','#993C1D','#185FA5'];
+  var wSegs=wb.map(function(k,i){
+    var v=s.weights[k];
+    return '<div class="mwb-seg" style="background:'+wColors[i]+';width:'+v+'%">'+
+      (v>8?v+'%':'')+'</div>';
+  }).join('');
+  var boxes=s.boxes.map(function(b){
+    return '<div class="detail-box"><div class="detail-box-title">'+b.t+'</div><div class="detail-box-body">'+b.b+'</div></div>';
+  }).join('');
+  var metrics=s.metrics.map(function(m){
+    return '<div class="metric"><div class="metric-label">'+m.l+'</div><div class="metric-val">'+m.v+'</div><div class="metric-sub">'+m.s+'</div></div>';
+  }).join('');
+  d.innerHTML='<div class="detail-header"><div class="detail-icon" style="background:'+s.bg+'">'+s.icon+'</div><div><div class="detail-title">'+s.title+'</div><div class="detail-sub">'+s.desc+'</div></div></div>'+
+    '<div style="margin-bottom:10px"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#666;margin-bottom:4px">SCORING WEIGHTS</div><div class="mwb">'+wSegs+'</div><div style="display:flex;gap:10px;margin-top:5px;flex-wrap:wrap">'+
+    wb.map(function(k,i){return '<div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#888"><div style="width:8px;height:8px;border-radius:50%;background:'+wColors[i]+'"></div>'+k.replace('_',' ')+': '+s.weights[k]+'%</div>';}).join('')+
+    '</div></div><div class="detail-grid">'+boxes+'</div><div class="metrics">'+metrics+'</div>';
+}
+
+// Phase timeline
+var phases=[
+  {phase:"MVP Week 1–14",dot:"#4A3FA0",title:"classfirst_v1 — rule-based launch",desc:"Cohort-first class plan. Hard constraints. MMR variety guard. Bandit exploration. Safety gates.",metric:"Target: Day-0 acceptance > 25%"},
+  {phase:"Sprint 6",dot:"#1A5C38",title:"classfirst_v2 — personal learning activates",desc:"After 7 days of user data per user, personal history weights begin activating. Cohort weight reduces.",metric:"Target: Day-7 acceptance improves 8–12% vs Day-1"},
+  {phase:"Phase 1",dot:"#1D9E75",title:"classfirst_v3 — dish embeddings",desc:"Word2Vec trained on accepted dish sequences. Better cross-cuisine content match. Serendipity improves.",metric:"Target: Cross-cuisine discovery +15%"},
+  {phase:"Phase 2",dot:"#854F0B",title:"cluster_v1 — new user clustering",desc:"5K DAU milestone triggers cluster activation. New users matched to interaction clusters, not just research cohorts.",metric:"Target: New user Day-0 acceptance > 35%"},
+  {phase:"Phase 3",dot:"#E24B4A",title:"ltr_v1 — learning to rank (new API /v2)",desc:"Gradient Boosted Trees replaces hand-tuned weights. Trained on 10K+ labeled events. Breaking change = /v2 endpoint.",metric:"Target: Overall acceptance +10–15%"},
+  {phase:"Year 2",dot:"#D85A30",title:"ml_v1 — full ML stack",desc:"Two-tower retrieval + neural re-ranking + collaborative filtering (ALS when density > 1%). Full personalization.",metric:"Target: Retention + acceptance at scale"}
+];
+var pl=document.getElementById('phaseline');
+phases.forEach(function(ph){
+  var d=document.createElement('div');
+  d.className='tl-item';
+  d.innerHTML='<div class="tl-dot" style="background:'+ph.dot+'"></div>'+
+    '<div class="tl-phase">'+ph.phase+'</div>'+
+    '<div class="tl-body"><div class="tl-title">'+ph.title+'</div><div class="tl-desc">'+ph.desc+'</div><div class="tl-metric">'+ph.metric+'</div></div>';
+  pl.appendChild(d);
+});
+
+// ML cards
+var mlVersions=[
+  {phase:"MVP",name:"classfirst_v1",algo:"Rule-based scoring. Hand-tuned weights. MMR variety. Bandit exploration.",trigger:"Live at launch",color:"#4A3FA0"},
+  {phase:"Sprint 6",name:"classfirst_v2",algo:"+ Personal history learning. Weights auto-adjust per user interaction count.",trigger:"7 days of user data",color:"#1A5C38"},
+  {phase:"Phase 1",name:"classfirst_v3",algo:"+ Dish embeddings (Word2Vec on accepted sequences). Better content match.",trigger:"2,000+ events total",color:"#0F6E56"},
+  {phase:"Phase 2",name:"cluster_v1",algo:"+ Cluster-based cold start. K-means on interaction patterns.",trigger:"5,000 DAU milestone",color:"#854F0B"},
+  {phase:"Phase 3",name:"ltr_v1 /v2",algo:"Learning-to-Rank (GBDT). Replaces hand-tuned weights. New API version.",trigger:"10K+ labeled events",color:"#E24B4A"},
+  {phase:"Year 2",name:"ml_v1 /v2",algo:"Two-tower retrieval + neural ranking + CF (ALS). Full ML stack.",trigger:"1M+ events; CF density > 1%",color:"#D85A30"}
+];
+var mc=document.getElementById('mlCards');
+mc.style.gridTemplateColumns='repeat(3,1fr)';
+mlVersions.forEach(function(v){
+  var d=document.createElement('div');
+  d.className='ml-card';
+  d.style.borderTopColor=v.color;
+  d.innerHTML='<div class="ml-card-phase">'+v.phase+'</div>'+
+    '<div class="ml-card-name">'+v.name+'</div>'+
+    '<div class="ml-card-algo">'+v.algo+'</div>'+
+    '<div class="ml-card-trigger">Trigger: '+v.trigger+'</div>';
+  mc.appendChild(d);
+});
+</script>
+</body>
+</html>

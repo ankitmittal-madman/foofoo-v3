@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foofoo RE — Pipeline Explorer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0f1117;color:#e8e8e8;min-height:100vh;padding:24px}
+h1{font-size:22px;color:#fff;margin-bottom:4px}
+.sub{font-size:13px;color:#888;margin-bottom:28px}
+.pipeline{display:flex;flex-direction:column;gap:0}
+.layer{border-radius:12px;padding:20px 24px;margin-bottom:8px;cursor:pointer;transition:all 0.25s;border:1.5px solid transparent;position:relative}
+.layer:hover{transform:translateX(4px)}
+.layer.active{border-color:rgba(255,255,255,0.3);transform:translateX(0)}
+.layer-header{display:flex;align-items:center;gap:12px;margin-bottom:0}
+.layer-num{font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.7;text-transform:uppercase;min-width:60px}
+.layer-title{font-size:16px;font-weight:700;flex:1}
+.layer-tag{font-size:11px;padding:3px 8px;border-radius:20px;opacity:0.8}
+.layer-body{margin-top:14px;display:none;border-top:1px solid rgba(255,255,255,0.1);padding-top:14px}
+.layer.active .layer-body{display:block}
+.layer-desc{font-size:13px;line-height:1.7;color:#ccc;margin-bottom:12px}
+.signals{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.signal{background:rgba(255,255,255,0.05);border-radius:8px;padding:10px 12px}
+.signal-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.signal-val{font-size:13px;color:#fff}
+/* Layer colors */
+.l4{background:#2a2008;border-color:#854F0B}.l4.active{background:#3d2e0a}
+.l3{background:#200d0d;border-color:#993C1D}.l3.active{background:#2e1212}
+.l2{background:#0d0d20;border-color:#4A3FA0}.l2.active{background:#141428}
+.l1{background:#091a12;border-color:#1A5C38}.l1.active{background:#0f2a1c}
+.arrow{text-align:center;color:#555;font-size:18px;margin:-4px 0;z-index:1;position:relative}
+/* Example panel */
+.example-panel{background:#151820;border-radius:12px;padding:20px 24px;margin-top:20px;border:1px solid #2a2d3a}
+.ex-title{font-size:13px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.ex-steps{display:flex;flex-direction:column;gap:10px}
+.ex-step{display:flex;gap:12px;align-items:flex-start}
+.ex-step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ex-step-text{font-size:13px;line-height:1.6;color:#ccc}
+.ex-step-text strong{color:#fff}
+/* Output slate */
+.slate{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.dish-card{background:#1e2530;border-radius:8px;padding:10px 12px;border:1px solid #2a3040;min-width:110px}
+.dish-rank{font-size:10px;color:#666;margin-bottom:3px}
+.dish-name{font-size:13px;color:#fff;font-weight:600;margin-bottom:3px}
+.dish-score{font-size:11px;color:#1D9E75}
+.dish-badge{display:inline-block;font-size:10px;background:#1A5C38;color:#9FE1CB;padding:1px 6px;border-radius:10px;margin-top:3px}
+/* Controls */
+.controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.ctrl-btn{background:#1e2530;border:1px solid #2a3040;color:#ccc;padding:7px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all 0.2s}
+.ctrl-btn:hover,.ctrl-btn.active{background:#1A5C38;border-color:#1A5C38;color:#fff}
+.formula-box{background:#0a1a0f;border:1px solid #1A5C38;border-radius:8px;padding:14px;font-family:monospace;font-size:12px;color:#9FE1CB;line-height:1.9;margin-top:10px}
+.hard{color:#E24B4A;font-weight:700}
+.weight-bar{display:flex;gap:4px;margin-top:10px;height:28px;border-radius:6px;overflow:hidden}
+.wb-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;transition:width 0.5s;cursor:default}
+.wb-legend{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap}
+.wb-li{display:flex;align-items:center;gap:5px;font-size:11px;color:#888}
+.wb-dot{width:10px;height:10px;border-radius:50%}
+</style>
+</head>
+<body>
+<h1>Foofoo RE — Pipeline Explorer</h1>
+<p class="sub">Click each layer to understand what it does. Select a user state to see how weights shift.</p>
+
+<div class="controls" id="stateControls">
+  <button class="ctrl-btn active" onclick="setState(0,this)">Day 0 — New user</button>
+  <button class="ctrl-btn" onclick="setState(1,this)">Day 3 — First signals</button>
+  <button class="ctrl-btn" onclick="setState(2,this)">Day 14 — Pattern forming</button>
+  <button class="ctrl-btn" onclick="setState(3,this)">Day 60+ — Personalised</button>
+</div>
+
+<div class="pipeline">
+
+  <div class="layer l4" onclick="toggle(this)">
+    <div class="layer-header">
+      <span class="layer-num" style="color:#EF9F27">Layer 4</span>
+      <span class="layer-title">Contextual meal science</span>
+      <span class="layer-tag" style="background:#2a1a00;color:#EF9F27">outermost</span>
+    </div>
+    <div class="layer-body">
+      <p class="layer-desc">Sets the frame for every request. Weather, day of week, time of day, season — all read silently before any scoring begins. A rainy Tuesday morning generates different scoring multipliers than a sunny Sunday afternoon. The user never configures this.</p>
+      <div class="signals">
+        <div class="signal"><div class="signal-label">Weather signal</div><div class="signal-val">🌧 Rainy → comfort × 1.2, fried × 1.15, light × 0.8</div></div>
+        <div class="signal"><div class="signal-label">Day signal</div><div class="signal-val">Tuesday (weekday) → quick-cook class bias, &lt;30 min</div></div>
+        <div class="signal"><div class="signal-label">Season signal</div><div class="signal-val">June–Sept (monsoon) → seasonal_affinity:monsoon boosted</div></div>
+        <div class="signal"><div class="signal-label">Time signal</div><div class="signal-val">7 AM → breakfast slot, morning-appropriate only</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="layer l3" onclick="toggle(this)">
+    <div class="layer-header">
+      <span class="layer-num" style="color:#D85A30">Layer 3</span>
+      <span class="layer-title">Household food intelligence</span>
+      <span class="layer-tag" style="background:#1a0800;color:#D85A30">the differentiator</span>
+    </div>
+    <div class="layer-body">
+      <p class="layer-desc">Resolves who this plan is for. One plan for the whole household + member-specific add-ons. Home state and current city are always separate signals — a Madhya Pradesh family in Mumbai gets MP food identity as the base, Mumbai as an overlay.</p>
+      <div class="signals">
+        <div class="signal"><div class="signal-label">Cohort</div><div class="signal-val">MC_FAMILY → SC_COUPLE_WITH_SCHOOL_CHILD</div></div>
+        <div class="signal"><div class="signal-label">Regional</div><div class="signal-val">Home: Madhya Pradesh • City: Mumbai (5 yrs)</div></div>
+        <div class="signal"><div class="signal-label">Member add-ons</div><div class="signal-val">INFANT → addon_slot generated. SCHOOL_CHILD → spice capped at 2/5</div></div>
+        <div class="signal"><div class="signal-label">Class plan</div><div class="signal-val">BF_LIGHT_GRAIN → MP boost: poha, chila, upma ranked up</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="layer l2" onclick="toggle(this)">
+    <div class="layer-header">
+      <span class="layer-num" style="color:#7F77DD">Layer 2</span>
+      <span class="layer-title">Food graph</span>
+      <span class="layer-tag" style="background:#0d0a20;color:#7F77DD">safety & substitution</span>
+    </div>
+    <div class="layer-body">
+      <p class="layer-desc">Filters candidates before scoring. Propagates allergens through ingredient relationships — a peanut allergy automatically excludes every dish containing any peanut-derived ingredient, including dishes added to the database months later.</p>
+      <div class="signals">
+        <div class="signal"><div class="signal-label">Allergen filter</div><div class="signal-val" style="color:#E24B4A">Peanut allergy → removes groundnut oil, chikki, namkeen, satay</div></div>
+        <div class="signal"><div class="signal-label">Diet filter</div><div class="signal-val" style="color:#E24B4A">Vegetarian → removes all non-veg dishes before scoring</div></div>
+        <div class="signal"><div class="signal-label">Class filter</div><div class="signal-val" style="color:#E24B4A">BF_LIGHT_GRAIN → removes all non-breakfast-class dishes</div></div>
+        <div class="signal"><div class="signal-label">Never list</div><div class="signal-val" style="color:#E24B4A">User's Never list → permanent exclusion</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="layer l1" onclick="toggle(this)">
+    <div class="layer-header">
+      <span class="layer-num" style="color:#1D9E75">Layer 1</span>
+      <span class="layer-title">Meal genome scoring</span>
+      <span class="layer-tag" style="background:#091a12;color:#1D9E75">innermost · scores survivors</span>
+    </div>
+    <div class="layer-body">
+      <p class="layer-desc">Scores every dish that survived the filters. 20 genome dimensions × 5 signal weights = final score. Weights shift over time as user history grows.</p>
+      <div class="formula-box" id="formulaBox">
+FinalScore =
+  <span style="color:#EF9F27">w_cohort</span>  × CohortPrior(cohort, dish)
++ <span style="color:#1D9E75">w_content</span> × ContentMatch(taste_vector, genome)
++ <span style="color:#7F77DD">w_history</span> × PersonalHistory(events, dish)
++ <span style="color:#D85A30">w_context</span> × ContextFit(weather, day, season)
++ <span style="color:#185FA5">w_explore</span> × ExplorationBonus(dish)
+- PenaltyTerms(not_today_decay, variety_penalty)
+
+<span class="hard">SUBJECT TO: HardConstraintFilter == PASS  ← runs first, always</span>
+      </div>
+
+      <div class="weight-bar" id="weightBar">
+        <div class="wb-seg" style="background:#854F0B;width:55%" title="Cohort prior">55%</div>
+        <div class="wb-seg" style="background:#1A5C38;width:20%" title="Content match">20%</div>
+        <div class="wb-seg" style="background:#4A3FA0;width:0%" title="Personal history">0%</div>
+        <div class="wb-seg" style="background:#993C1D;width:15%" title="Context">15%</div>
+        <div class="wb-seg" style="background:#185FA5;width:10%" title="Exploration">10%</div>
+      </div>
+      <div class="wb-legend">
+        <div class="wb-li"><div class="wb-dot" style="background:#854F0B"></div>Cohort prior</div>
+        <div class="wb-li"><div class="wb-dot" style="background:#1A5C38"></div>Content match</div>
+        <div class="wb-li"><div class="wb-dot" style="background:#4A3FA0"></div>Personal history</div>
+        <div class="wb-li"><div class="wb-dot" style="background:#993C1D"></div>Context fit</div>
+        <div class="wb-li"><div class="wb-dot" style="background:#185FA5"></div>Exploration</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="example-panel">
+  <div class="ex-title">Worked example — rainy Tuesday, 7AM, Mumbai, MP family, vegetarian, peanut allergy, infant</div>
+  <div class="ex-steps">
+    <div class="ex-step">
+      <div class="ex-step-num" style="background:#854F0B">4</div>
+      <div class="ex-step-text"><strong>Context:</strong> Rainy (weather API), Tuesday (weekday), 7 AM (breakfast slot), monsoon season → boost warm/comfort dishes, quick-cook class bias</div>
+    </div>
+    <div class="ex-step">
+      <div class="ex-step-num" style="background:#993C1D">3</div>
+      <div class="ex-step-text"><strong>Household:</strong> MC_FAMILY + SC_COUPLE_WITH_SCHOOL_CHILD. Home: Madhya Pradesh. Class: BF_LIGHT_GRAIN. MP boost → poha, chila, upma. Generate infant add-on slot.</div>
+    </div>
+    <div class="ex-step">
+      <div class="ex-step-num" style="background:#4A3FA0">2</div>
+      <div class="ex-step-text"><strong>Food Graph:</strong> Remove all dishes with peanut-derived ingredients. Remove non-veg. Remove non-breakfast-class dishes. Remove Never list. → 47 dishes remain from original 180 in class.</div>
+    </div>
+    <div class="ex-step">
+      <div class="ex-step-num" style="background:#1A5C38">1</div>
+      <div class="ex-step-text"><strong>Genome scores 47 survivors.</strong> Top result: Poha with vegetables (regional: MP ✓, comfort: 3/5 ✓, cook time: 15 min ✓, spice: 1/5 ✓, weather: rainy ✓)</div>
+    </div>
+  </div>
+  <div class="slate" id="slate">
+    <div class="dish-card"><div class="dish-rank">Rank 1 · Score 0.91</div><div class="dish-name">Poha</div><div class="dish-score">MP origin · comfort · 15 min</div><div class="dish-badge">Class: BF_LIGHT_GRAIN</div></div>
+    <div class="dish-card"><div class="dish-rank">Rank 2 · Score 0.87</div><div class="dish-name">Chila</div><div class="dish-score">MP origin · protein · 20 min</div><div class="dish-badge">Class: BF_LIGHT_GRAIN</div></div>
+    <div class="dish-card"><div class="dish-rank">Rank 3 · Score 0.83</div><div class="dish-name">Upma</div><div class="dish-score">comfort · warm · 20 min</div><div class="dish-badge">Class: BF_LIGHT_GRAIN</div></div>
+    <div class="dish-card"><div class="dish-rank">Rank 4 · Score 0.79</div><div class="dish-name">Sabudana Khichdi</div><div class="dish-score">warm · comfort · 25 min</div><div class="dish-badge">Class: BF_LIGHT_GRAIN</div></div>
+    <div class="dish-card" style="border-color:#993C1D;background:#1a0d0d"><div class="dish-rank">Add-on · Infant</div><div class="dish-name">Dal Porridge</div><div class="dish-score">soft · no spice · no salt</div><div class="dish-badge" style="background:#993C1D;color:#F5C4B3">ADDON_INFANT</div></div>
+  </div>
+</div>
+
+<script>
+function toggle(el){
+  var wasActive=el.classList.contains('active');
+  document.querySelectorAll('.layer').forEach(function(l){l.classList.remove('active');});
+  if(!wasActive) el.classList.add('active');
+}
+
+var states=[
+  {label:"Day 0",cohort:55,content:20,history:0,context:15,explore:10},
+  {label:"Day 3",cohort:35,content:25,history:15,context:15,explore:10},
+  {label:"Day 14",cohort:20,content:25,history:35,context:15,explore:5},
+  {label:"Day 60+",cohort:5,content:15,history:65,context:15,explore:0}
+];
+
+function setState(idx,btn){
+  document.querySelectorAll('#stateControls .ctrl-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  var s=states[idx];
+  var bar=document.getElementById('weightBar');
+  var segs=bar.querySelectorAll('.wb-seg');
+  var vals=[s.cohort,s.content,s.history,s.context,s.explore];
+  segs.forEach(function(seg,i){
+    seg.style.width=vals[i]+'%';
+    seg.textContent=vals[i]>5?vals[i]+'%':'';
+  });
+}
+
+document.querySelector('.layer.l1').classList.add('active');
+</script>
+</body>
+</html>

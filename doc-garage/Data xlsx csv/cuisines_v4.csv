@@ -1,0 +1,66 @@
+name,display_name,cuisine_group,parent_cuisine,state_origin,description,tier,is_user_facing,is_active,is_updated,last_update_date,is_review
+punjabi,Punjabi,north_indian,,Punjab,"Butter-heavy tandoor-centric. Dal makhani, butter chicken, sarson ka saag, chole bhature.",tier_1,Y,Y,N,,Y
+kashmiri,Kashmiri,north_indian,,J&K,"Wazwan tradition. Rogan josh, dum aloo, yakhni. Fennel, dry ginger, saffron.",tier_2,Y,Y,N,,Y
+rajasthani,Rajasthani,north_indian,,Rajasthan,"Desert cuisine. Dal baati churma, gatte ki sabzi, laal maas. Heavy ghee.",tier_2,Y,Y,N,,Y
+himachali,Himachali,north_indian,,Himachal Pradesh,"Mountain cuisine. Dham thali, madra, siddu. Yogurt-based gravies.",tier_3,N,N,N,,Y
+uttarakhandi,Uttarakhandi,north_indian,,Uttarakhand,"Garhwali + Kumaoni. Kafuli, chainsoo, bhatt ki churkani. Lentil-heavy.",tier_3,N,N,N,,Y
+delhi,Delhi,north_indian,,Delhi,"Melting pot. Chole bhature, paranthas, chaat, kebabs. Punjabi + Mughlai + UP influences.",tier_1,Y,Y,N,,Y
+up,UP (General),north_indian,,Uttar Pradesh,"Broader UP home cooking. Tahiri, bedmi puri, baati chokha, kachori-sabzi.",tier_1,Y,Y,N,,Y
+bihari,Bihari,north_indian,,Bihar,"Litti chokha, sattu paratha, thekua, dal pitha. Sattu-centric, mustard oil.",tier_2,Y,Y,N,,Y
+bundelkhandi,Bundelkhandi,north_indian,,Bundelkhand (MP/UP),"Rustic. Bafla, maheri, lapsi.",tier_3,N,N,N,,Y
+sindhi,Sindhi,north_indian,,Sindh (diaspora),"Dal pakwan, sindhi kadhi, sai bhaji, koki. Gram flour heavy, tamarind-forward.",tier_2,Y,Y,N,,Y
+tamil,Tamil,south_indian,,Tamil Nadu,"Rice-centric, tamarind-forward. Sambar, rasam, poriyal, kootu.",tier_1,Y,Y,N,,Y
+chettinad,Chettinad,south_indian,tamil,TN (Karaikudi),"Fiery merchant cuisine. Chettinad chicken, kuzhambu. Unique spices.",tier_2,Y,Y,N,,Y
+kerala,Kerala,south_indian,,Kerala,"Coconut-everything. Appam-stew, fish molee, avial, puttu-kadala, sadya.",tier_1,Y,Y,N,,Y
+malabar,Malabar,south_indian,kerala,Kerala (North),"Muslim-influenced Kerala. Malabar biryani, pathiri.",tier_2,Y,Y,N,,Y
+andhra,Andhra,south_indian,,Andhra Pradesh,"Chilli-forward. Gongura, pesarattu, pulihora. India's spiciest mainstream cuisine.",tier_2,Y,Y,N,,Y
+telangana,Telangana,south_indian,,Telangana,"Sakinalu, jonna rotte, sarva pindi. More millet-based than coastal Andhra.",tier_2,Y,Y,N,,Y
+karnataka,Karnataka,south_indian,,Karnataka,"Bisi bele bath, ragi mudde, jolada rotti. Diverse by sub-region.",tier_1,Y,Y,N,,Y
+udupi,Udupi,south_indian,karnataka,Karnataka (Udupi),"Temple cuisine. Masala dosa, set dosa, sambar. Strictly vegetarian.",tier_2,Y,Y,N,,Y
+mangalorean,Mangalorean,south_indian,karnataka,Karnataka (Mangalore),"Coastal. Kori rotti, fish gassi, neer dosa. Seafood-heavy.",tier_2,Y,Y,N,,Y
+coorg,Coorg (Kodava),south_indian,karnataka,Karnataka (Coorg),"Kodava tribal. Pandi curry (pork), bamboo shoot curry.",tier_3,N,N,N,,Y
+bengali,Bengali,east_indian,,West Bengal,"Fish and rice culture. Machher jhol, shorshe ilish, aloo posto, sandesh.",tier_1,Y,Y,N,,Y
+odia,Odia,east_indian,,Odisha,"Temple-influenced. Dalma, pakhala bhaat, chhena poda. Light, less oily.",tier_2,Y,Y,N,,Y
+assamese,Assamese,east_indian,,Assam,"Khar, masor tenga, aloo pitika. Minimal oil, fermented ingredients, bhut jolokia.",tier_2,Y,Y,N,,Y
+jharkhandi,Jharkhandi,east_indian,,Jharkhand,"Tribal/Adivasi. Dhuska, rugra. Forest ingredients, rustic.",tier_3,N,N,N,,Y
+maharashtrian,Maharashtrian,west_indian,,Maharashtra,"Vada pav, misal pav, puran poli, thalipeeth. Peanut + coconut base.",tier_1,Y,Y,N,,Y
+malvani,Malvani,west_indian,maharashtrian,Maharashtra (Konkan),"Coastal. Malvani fish curry, sol kadhi. Coconut-heavy, fiery.",tier_2,Y,Y,N,,Y
+kolhapuri,Kolhapuri,west_indian,maharashtrian,Maharashtra (Kolhapur),Extreme heat. Tambda/pandhra rassa. Special Kolhapuri masala.,tier_2,Y,Y,N,,Y
+vidarbha,Vidarbha,west_indian,maharashtrian,Maharashtra (Vidarbha),Saoji cuisine — extremely spicy. More Central Indian influence.,tier_3,N,N,N,,Y
+gujarati,Gujarati,west_indian,,Gujarat,"Sweet-in-everything. Dhokla, thepla, undhiyu, khandvi. Sugar/jaggery in curries.",tier_1,Y,Y,N,,Y
+kutchi,Kutchi,west_indian,gujarati,Gujarat (Kutch),"Desert Gujarati. Dabeli, bajri rotla. Millet-heavy.",tier_3,N,N,N,,Y
+goan,Goan,west_indian,,Goa,"Portuguese-influenced. Vindaloo, xacuti, bebinca. Vinegar, kokum, coconut.",tier_1,Y,Y,N,,Y
+konkani,Konkani,west_indian,,Konkan Coast,"Broader coastal. Sol kadhi, amboli. Coconut + kokum + seafood.",tier_2,N,Y,N,,Y
+parsi,Parsi,west_indian,,Mumbai/Gujarat,"Zoroastrian community. Dhansak, patra ni machhi, salli boti. Sweet-sour-spicy.",tier_2,Y,Y,N,,Y
+madhya_pradesh,Madhya Pradesh,central_indian,,Madhya Pradesh,Bhopali + Indori + Malwa. Varies widely by city.,tier_2,Y,Y,N,,Y
+indori,Indori,central_indian,madhya_pradesh,MP (Indore),"Street food powerhouse. Poha-jalebi, bhutte ka kees. Snacking capital.",tier_2,Y,Y,N,,Y
+chhattisgarhi,Chhattisgarhi,central_indian,,Chhattisgarh,"Rice-and-lentil tribal. Fara, muthiya, bore baasi. Simple, minimal spice.",tier_3,N,N,N,,Y
+naga,Naga,northeast_indian,,Nagaland,"Fermented, smoked, fiery. Smoked pork, axone, raja mirchi chutney.",tier_3,N,N,N,,Y
+manipuri,Manipuri,northeast_indian,,Manipur,"Eromba, singju, kangshoi. Fermented fish, light, soup-heavy.",tier_3,N,N,N,,Y
+mizo,Mizo,northeast_indian,,Mizoram,"Bai, sawhchiar. Boiled/steamed, closest to Southeast Asian in India.",tier_3,N,N,N,,Y
+sikkimese,Sikkimese,northeast_indian,,Sikkim,"Tibetan-Nepali influenced. Momos, thukpa, gundruk, sel roti.",tier_2,Y,Y,N,,Y
+meghalayan,Meghalayan,northeast_indian,,Meghalaya,"Jadoh, tungrymbai. Khasi + Garo tribal. Black sesame.",tier_3,N,N,N,,Y
+arunachali,Arunachali,northeast_indian,,Arunachal Pradesh,"Thukpa, pika pila. Minimal spice, smoked meats.",tier_3,N,N,N,,Y
+tripuri,Tripuri,northeast_indian,,Tripura,"Mui borok, berma. Bengali-influenced with tribal preparations.",tier_3,N,N,N,,Y
+mughlai,Mughlai,mughlai_nawabi,,Delhi/UP,"Rich Mughal court cuisine. Biryanis, kormas, kebabs, nihari. Cream, nuts, saffron.",tier_1,Y,Y,N,,Y
+awadhi,Awadhi,mughlai_nawabi,mughlai,Lucknow/UP,"Refined Nawabi. Dum cooking, galouti kebab, Lucknowi biryani.",tier_1,Y,Y,N,,Y
+hyderabadi,Hyderabadi,mughlai_nawabi,,Hyderabad,"Nizam court cuisine. Hyderabadi biryani, haleem, mirchi ka salan.",tier_1,Y,Y,N,,Y
+street_food_generic,Street Food (Pan-Indian),street_food,,Pan-India,"Chaat, vada pav, pav bhaji, pani puri, bhel puri, kathi roll.",tier_1,Y,Y,N,,Y
+indian_bakery,Indian Bakery,street_food,,Pan-India,"Pav, khari biscuit, maska bun, nankhatai, plum cake.",tier_2,Y,Y,N,,Y
+indo_chinese,Indo-Chinese,chinese_asian,,Pan-India (Kolkata origin),"Hakka noodles, manchurian, chilli chicken/paneer, fried rice.",tier_1,Y,Y,N,,Y
+chinese_authentic,Chinese (Authentic),chinese_asian,,China,"Dim sum, mapo tofu, Sichuan. Growing in metros.",tier_2,Y,Y,N,,Y
+indian_tibetan,Indian-Tibetan,chinese_asian,,Hill stations/NE,"Momos (Indian style), thukpa, tingmo. Tibetan base + Indian spices.",tier_2,Y,Y,N,,Y
+continental,Continental,continental,,Europe (generic),"Indian catch-all for Western food. Grilled chicken, soups, salads, sandwiches.",tier_1,Y,Y,N,,Y
+italian,Italian,italian,,Italy,"Pasta, pizza, risotto. Widely eaten in urban India.",tier_1,Y,Y,N,,Y
+american,American,american,,USA,"Burgers, fries, mac and cheese, BBQ, pancakes.",tier_2,Y,N,N,,Y
+mediterranean,Mediterranean,mediterranean,,Mediterranean region,"Grain bowls, grilled meats, olive oil based. Health-food trend.",tier_3,Y,N,N,,Y
+anglo_indian,Anglo-Indian,anglo_indian,,Pan-India,"Mulligatawny soup, railway mutton curry, jhal frezi. British-Indian colonial fusion.",tier_3,N,N,N,,Y
+thai,Thai,thai,,Thailand,"Pad thai, green/red curry, tom yum. Coconut base familiar to South Indians.",tier_2,Y,N,N,,Y
+japanese,Japanese,japanese,,Japan,"Sushi, ramen, tempura, teriyaki. Niche but growing.",tier_3,Y,N,N,,Y
+korean,Korean,korean,,South Korea,"Kimchi, bibimbap, Korean fried chicken. K-wave driving adoption in Gen Z.",tier_2,Y,N,N,,Y
+middle_eastern_generic,Middle Eastern,middle_eastern,,Middle East,"Hummus, falafel, shawarma, kebab platters.",tier_2,Y,N,N,,Y
+lebanese,Lebanese,middle_eastern,middle_eastern_generic,Lebanon,"Tabbouleh, manoushe, kibbeh. Often listed separately on Indian menus.",tier_3,N,N,N,,Y
+bhutanese,Bhutanese,bhutanese,,Bhutan,"Ema datshi, phaksha paa. Chilli + cheese focused.",tier_3,Y,Y,Y,20-05-2026,Y
+burmese,Burmese,burmese,,Burma,"Mohinga, khow suey, tea leaf salad. SE Asian + Indian fusion.",tier_3,Y,Y,Y,20-05-2026,Y
+mexican,Mexican,mexican,,Mexico,"Tacos, burritos, quesadillas. Corn + beans + chilli.",tier_3,Y,Y,Y,20-05-2026,Y
+vietnamese,Vietnamese,vietnamese,,Vietnam,"Pho, banh mi, spring rolls. Fresh herbs + light broths.",tier_3,Y,Y,Y,20-05-2026,Y
