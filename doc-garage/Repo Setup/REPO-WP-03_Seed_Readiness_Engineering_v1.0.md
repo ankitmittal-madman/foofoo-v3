@@ -1,5 +1,14 @@
 # REPO-WP-03_Seed_Readiness_Engineering_v1.0
 
+> **⚠️ SUPERSEDED BY `REPO-WP-03_Seed_Readiness_Engineering_v1.1`** (revised after WP-3B post-execution review, 2026-07-08). Retained here for history only — do not execute or reference against this version. See v1.1 for the current scope, or the changelog below for exactly what changed.
+>
+> **Summary of changes, v1.0 → v1.1:**
+> 1. **Required Discovery method changed** — v1.0 derived each rollback from reading the forward migration file's text alone. v1.1 mandates a live `pg_depend`/`pg_views`/`pg_indexes`/`pg_constraint`/`pg_trigger`/`pg_proc` catalog scan per object (the same method WP-3B demonstrated), because a forward file's text doesn't reveal what later migrations came to depend on it.
+> 2. **Execution ordering** — v1.1 follows `DOC-P3-05`'s documented 15-group dependency order explicitly, rather than deriving order implicitly from file-read sequence, and calls out two files (`010`, `019`) as requiring manual reasoning (triggers-before-functions, policies-before-RLS-disable) instead of pure mechanical reversal.
+> 3. **Dependencies re-verified live** — v1.1 re-confirms 26/26 migrations applied with no drift since WP-3B (v1.0 assumed this from the prior session without a fresh check).
+> 4. **Acceptance Criteria strengthened** — v1.1 adds explicit confirmation that the two manual-review files (010, 019) correctly reverse in the right order, not just that an inventory diff is clean.
+> 5. **Exit Criteria clarified** — v1.1 adds "do not continue to WP-3C" as an explicit stop, where v1.0 only said "STOP for Founder approval."
+
 **Repository Engineering Work Package #3 — Seed Readiness Engineering**
 **Project:** FooFoo (apverse-labs/foofoo-v3) · **Supabase:** `slsqtlygeekdppuyiiff`
 **Placement:** `docs/project-history/` (continuing REPO-BOOT-01/02 → REPO-WP-02 lineage)
