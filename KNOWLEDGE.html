@@ -374,6 +374,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">⚙️</span> S2 · Governance docs
       <span class="nav-badge">Jul 13</span>
     </div>
+    <div class="nav-item" onclick="showPage('s5')">
+      <span class="nav-icon">🗄</span> S5 · Clean-room validation
+      <span class="nav-badge">Jul 13</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -508,6 +512,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s2')">.gitignore</span>
         </div>
         <div class="tl-note">Committed the Founder-supplied repository operating guide (CLAUDE.md) and documentation index (docs/README.md); untracked the 3 junk .DS_Store files behind a new .gitignore. The 3 templates and 4 runbooks are still blocked — their exact content has not been supplied yet.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 13, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#166534"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#f0fdf4;color:#166534">S5</span>
+        <div class="tl-title">Clean-room repository validation (WP-5F)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s5')">CleanRoom Validation Report</span>
+          <span class="tl-chip" onclick="showPage('s5')">WP-5F</span>
+          <span class="tl-chip" onclick="showPage('s5')">IDR-001</span>
+        </div>
+        <div class="tl-note">Independently re-read all 28 migrations, 28 rollbacks, 3 seeds and 6 validation scripts and proved (by simulation, no database touched) that the schema can rebuild and roll back cleanly — 28/28 paired, contiguous, no cycles. Readiness rated YELLOW: two new defects found (a seed that won't load against its own migrated schema, and a validation script expecting the wrong table count), plus three carried gaps. Recommended WP-5D/5E/5G. Nothing built, nothing executed.</div>
       </div>
     </div>
     <!-- TIMELINE_INJECT -->
@@ -683,6 +701,10 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">data/source/.DS_Store, database/migrations/.DS_Store, docs/architecture/.DS_Store</td><td><span class="tag tag-mod">Removed</span></td><td class="fr-session">S2</td><td class="fr-desc">Untracked from git (disk copies remain, now ignored)</td></tr>
         <tr><td class="fr-file">KNOWLEDGE.html</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S2</td><td class="fr-desc">Session 2 documented</td></tr>
         <tr><td class="fr-file">.claude/skills/session-resume/SKILL.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S2</td><td class="fr-desc">Session resumption protocol from dotfiles — /session-resume rebuilds project state from the repo (never from chat memory) and waits for Founder approval before new work</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_CleanRoom_Validation_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S5</td><td class="fr-desc">WP-5F findings: 8 matrices, clean-room simulation, YELLOW readiness, gaps</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5F_CleanRoom_Repository_Validation_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S5</td><td class="fr-desc">WP-5F work package (validation-only)</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-001_WP-5F_CleanRoom_Validation_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S5</td><td class="fr-desc">WP-5F execution certificate</td></tr>
+        <tr><td class="fr-file">docs/governance/[ACTIVE]_IDR-001_WP5_Sequence_Reconciliation_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S5</td><td class="fr-desc">Reconciles brief vs plan WP-5 numbering; Founder to ratify</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1298,7 +1320,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s3 -->
 
   <!-- ── Session 4 ── -->
-  <div id="page-s4" class="page-content" style="display:block">
+  <div id="page-s4" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S4 · Rollback layer recovery (WP-5C)</div>
       <div class="page-subtitle">Every database migration can now be undone: the 26 missing rollback scripts were reconstructed from the migrations themselves, giving the repository a complete, self-reconstructable down-path for the first time.</div>
@@ -1323,6 +1345,33 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s4 -->
+
+  <!-- ── Session 5 ── -->
+  <div id="page-s5" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S5 · Clean-room repository validation (WP-5F)</div>
+      <div class="page-subtitle">A full, independent health check of the recovered database blueprint — proving on paper that it can build itself up and tear itself back down cleanly, and finding exactly where it still falls short of a clean bill of health.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was checked this session</div>
+        <div class="session-card-meta">July 13, 2026<br>WP-5F</div>
+      </div>
+      <div class="session-card-desc">
+        Every one of the 28 build scripts (migrations), 28 undo scripts (rollbacks), 3 sample-data files (seeds) and 6 self-test files (validation) was read from top to bottom — not skimmed, and not taken on trust from earlier sessions' reports. On paper, the blueprint is solid: the build scripts are numbered 001–028 with no gaps, each one only relies on tables an earlier script already made, and every single one has exactly one matching undo script (28 out of 28). Run in reverse, the undo scripts return the database to empty. <b>Two real problems surfaced that earlier reports missed:</b> (1) one sample-data file tries to load a meal-slot value the way the old schema stored it, but a later build script changed how that column works — so it would fail to load; (2) one self-test file still expects 60 tables when the recovered blueprint now has 62. Neither is an architecture flaw — both are leftovers from before the last six build scripts were added. Nothing was built, changed, or run against any database; this was a read-and-report pass only. Overall verdict: <b>YELLOW</b> — the core is sound, but the sample-data and self-test layers, plus some missing production scripts and execution proof, must be fixed before a green light.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">62</div><div class="stat-l">SQL files read in full</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">28/28</div><div class="stat-l">Build↔undo paired</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB / code changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">YELLOW</div><div class="stat-l">Readiness verdict</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Recommended (Founder approval required, none executed yet): <b>WP-5D — Production Migration Recovery</b> (add the 3 build scripts that were applied to the live database but never saved to the repo, so a fresh build matches production); <b>WP-5E — Execution Evidence Recovery</b> (produce real run-output certificates for the earlier seed/validation work, and fix the two problems found this session — the sample-data slot value and the stale table count); <b>WP-5G — Repository Green Certification</b> (actually run the build+teardown on a throwaway database to prove it, then certify GREEN). A governance note (IDR-001) was also raised because this brief renumbered the work-package plan (old plan called green-cert "5F"; this brief calls green-cert "5G") — Founder to pick one numbering. Still open from before: 3 architecture decisions, the DPDP age-gate, the ~30k-row master seed file, and 9 naming exceptions.</div>
+      </div>
+    </div>
+  </div><!-- /page-s5 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
