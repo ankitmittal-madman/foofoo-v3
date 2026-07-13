@@ -1018,8 +1018,8 @@ function deepDiveFeature(featureLabel){
             desc: 'All 134 files in doc-garage were opened and matched against the folder responsibility table — status lines like "DESIGNED — awaiting approval" decided placement, never the filename.',
             codeFlow: [ {chip:'doc-garage/ (now removed)'}, {label:'classified into'}, {chip:'docs/'}, {label:'and'}, {chip:'database/'} ],
             files: [
-              {path:'docs/project-history/work-packages/REPO-WP-03D_Seed_Readiness_Certification_v1_0.md', desc:'Named "Certification" but content says DESIGNED — filed as a work package'},
-              {path:'docs/project-history/certificates/[DRAFT]_REPO-BOOT-03_Repository_Migration_Certification_v1.0.md', desc:'Genuine certificate — documents the executed repo migration with evidence'}
+              {path:'docs/project-history/work-packages/[ACTIVE]_REPO-WP-03D_Seed_Readiness_Certification_v1.0.md', desc:'Named "Certification" but content says DESIGNED — filed as a work package'},
+              {path:'docs/project-history/certificates/[ACTIVE]_REPO-BOOT-03_Repository_Migration_Certification_v1.0.md', desc:'Genuine certificate — documents the executed repo migration with evidence'}
             ],
             api: null,
             db: null
@@ -1282,16 +1282,17 @@ function deepDiveFeature(featureLabel){
         <b>WP-5A</b> produced the forensic Repository Completeness Audit and five recovery-planning documents — proving the repo could not rebuild its own database (migrations 021–026 were missing).
         <b>WP-5B</b> recovered those six migration files by reading the live Supabase schema read-only and cross-checking repository evidence; every recovered file is headed "RECONSTRUCTED FROM EVIDENCE" and the database was never modified. It also surfaced three further applied-but-missing migrations (pf1_security_hardening, 103_production_cuisines, 103_production_ingredients) as new findings.
         <b>WP-5AA</b> first STOPPED on a genuine conflict (the naming convention vs. DOC-P3-09 §06E), produced a conflict report, and — once the Founder explicitly ratified the standard and authorized renaming — normalized the whole repository: 75 files renamed via git mv onto the single <code>[STATUS]_Name_vX.Y</code> / bare-<code>NNN_description.sql</code> standard, references rewritten so nothing breaks, and 42 files (lifecycle-word statuses + binary .docx/.html) honestly left as documented exceptions. CLAUDE.md now enforces the naming standard for every future session.
+        <b>Same-day correction (WP-5AA Part 2):</b> the Founder issued four directives — treat latest-version DRAFT docs as final, collapse FROZEN into ACTIVE (no parallel-status conflict), keep both APDF documents ACTIVE (Base v1.0 is the complete view, vNext v2.0 the addendum), and finish the Product/Governance renames. A re-scan found 13 of the "binary" files were actually plain text with real DRAFT headers; 58 more files were renamed, cutting exceptions from 42 to 9 (2 genuine identity conflicts, 7 records with no status word at all).
       </div>
       <div class="stat-row">
         <div class="stat"><div class="stat-n" style="color:#1a56db">6</div><div class="stat-l">Migrations recovered</div></div>
-        <div class="stat"><div class="stat-n" style="color:#5145b8">75</div><div class="stat-l">Files renamed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">133</div><div class="stat-l">Files renamed (75+58)</div></div>
         <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Files deleted / DB changes</div></div>
-        <div class="stat"><div class="stat-n" style="color:#92500a">42</div><div class="stat-l">Documented exceptions</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">9</div><div class="stat-l">Documented exceptions</div></div>
       </div>
       <div class="next-box">
         <div class="next-label">Next session</div>
-        <div class="next-text">Founder to (1) answer whether ChatGPT holds original 021–026 / WP-4B/4DB artifacts, (2) ratify the DESIGNED→[DRAFT] / EXECUTED→[FROZEN] / RESOLVED→[ACTIVE] mapping to normalize the REPO-WP/AGR series and completion summaries, (3) approve a .docx→.md conversion WP. Still open: WP-5C rollback recovery (rollbacks 001–026), WP-4B/4DB execution certificates, and the newly-found pf1/103_* migrations.</div>
+        <div class="next-text">Founder to (1) answer whether ChatGPT holds original 021–026 / WP-4B/4DB artifacts, (2) resolve which of the two SESSION_HANDOFF files is canonical, (3) classify the 7 no-status completion/readiness records (DOC-P3-05 Part B/C/D, Regression Validation, P3-03 Context/Logic Inventory). Still open: WP-5C rollback recovery (rollbacks 001–026), WP-4B/4DB execution certificates, and the newly-found pf1/103_* migrations.</div>
       </div>
     </div>
   </div><!-- /page-s3 -->

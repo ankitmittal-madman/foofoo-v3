@@ -38,7 +38,7 @@ The filename token cannot simply be preserved, because the scan proves it is wro
 | `Copy of _ACTIVE__DOC-P3-07_..._v1_2.md` | ACTIVE | "ACTIVE — APPROVED — FROZEN" | [FROZEN] |
 | `Copy of _ACTIVE__DOC-P3-08_..._v1_1.md` | ACTIVE | "ACTIVE — APPROVED AND FROZEN" | [FROZEN] |
 | `REPO-WP-03_..._v1.0.md` | (none) | "⚠️ SUPERSEDED BY v1.1" | [SUPERSEDED] |
-| `[SUPERSEDED]_APDF_Framework_Base_v1.0.md` | ACTIVE | superseded by vNext Addendum | [SUPERSEDED]? |
+| `[ACTIVE]_APDF_Framework_Base_v1.0.md` | ACTIVE | superseded by vNext Addendum | [SUPERSEDED]? |
 | `Copy of _ACTIVE__APDF_..._vNext_Addendum_v2_0.md` | ACTIVE | "Draft — Ready for Founder Review" | [DRAFT] |
 | `_ACTIVE__Batch1_Discovery_..._FROZEN.md` | ACTIVE + FROZEN suffix | "APPROVED — ACTIVE — FROZEN" | [FROZEN] |
 | `_ACTIVE__Batch2_Mapping_..._v1_0.md` | ACTIVE | "Draft — Ready for Founder Review" | [DRAFT] |

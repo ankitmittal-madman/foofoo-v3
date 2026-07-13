@@ -2,7 +2,7 @@
 
 **Repository Engineering Work Package #4DA — Validation Script Corrections Only**
 **Project:** FooFoo (`apverse-labs/foofoo-v3`) · **Supabase:** `slsqtlygeekdppuyiiff`
-**Placement:** `docs/project-history/REPO-WP-04DA_Validation_Script_Corrections_v1_0.md`
+**Placement:** `docs/project-history/[ACTIVE]_REPO-WP-04DA_Validation_Script_Corrections_v1.0.md`
 **Date:** 2026-07-10 · **Status:** DESIGNED — awaiting Founder approval to execute
 **Supersedes:** the "Part B" corrections section of the original `WP-4D v1.0` draft (split out into its own gated package per Founder governance request)
 **Prerequisites:** WP-4A ✅, WP-4B ✅, WP-4C ✅, Migration 027 ✅, Migration 028 ✅ (all independently re-verified in prior sessions)
@@ -108,7 +108,7 @@ Post-edit re-read of both files (Section "Acceptance Criteria") is the only vali
 
 ## Versioning & Placement
 
-`REPO-WP-04DA_Validation_Script_Corrections_v1_0.md` → `docs/project-history/`, committed before execution begins, per established WP-3/WP-4 pattern.
+`[ACTIVE]_REPO-WP-04DA_Validation_Script_Corrections_v1.0.md` → `docs/project-history/`, committed before execution begins, per established WP-3/WP-4 pattern.
 
 ## Sign-off
 

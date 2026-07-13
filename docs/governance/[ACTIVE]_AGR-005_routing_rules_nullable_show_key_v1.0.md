@@ -3,7 +3,7 @@
 **Type:** Architecture Gap Register entry
 **Status:** RESOLVED via migration 027 (pending Founder sign-off below)
 **Discovered:** WP-4B execution, 2026-07-09, statement 3 of 10 (`re_routing_rules` seed load)
-**Placement:** `docs/project-history/AGR-005_routing_rules_nullable_show_key.md`
+**Placement:** `docs/project-history/[ACTIVE]_AGR-005_routing_rules_nullable_show_key_v1.0.md`
 
 ---
 

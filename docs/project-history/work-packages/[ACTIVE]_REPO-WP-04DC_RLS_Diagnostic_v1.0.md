@@ -2,7 +2,7 @@
 
 **Repository Engineering Work Package #4DC — Row-Level Security Diagnostic (Read-Only, Self-Rolling-Back)**
 **Project:** FooFoo (`apverse-labs/foofoo-v3`) · **Supabase:** `slsqtlygeekdppuyiiff`
-**Placement:** `docs/project-history/REPO-WP-04DC_RLS_Diagnostic_v1_0.md`
+**Placement:** `docs/project-history/[ACTIVE]_REPO-WP-04DC_RLS_Diagnostic_v1.0.md`
 **Date:** 2026-07-10 · **Status:** DESIGNED — awaiting Founder approval to execute
 **Prerequisites:** WP-4DB's Phase B halt at `901` Test 5 (this session's evidence gathering, see below)
 
@@ -124,7 +124,7 @@ The row-count measurement **is** the validation — a single, direct, unambiguou
 
 ## Versioning & Placement
 
-`REPO-WP-04DC_RLS_Diagnostic_v1_0.md` → `docs/project-history/`, committed before execution begins, per established WP-3/WP-4 pattern.
+`[ACTIVE]_REPO-WP-04DC_RLS_Diagnostic_v1.0.md` → `docs/project-history/`, committed before execution begins, per established WP-3/WP-4 pattern.
 
 ## Sign-off
 

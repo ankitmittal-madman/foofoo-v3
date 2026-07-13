@@ -2,64 +2,56 @@
 
 **Status:** ACTIVE — exception register
 **Version:** v1.0
-**Date:** 2026-07-13
+**Date:** 2026-07-13 (updated same day — see Revision Note)
 **Placement:** docs/governance/[ACTIVE]_Repository_Naming_Exception_Register_v1.0.md
-**Supersedes:** None
+**Supersedes:** In-place revision of this document's own v1.0 (not a new version — see note below; content, not identity, changed)
 **Dependencies:** [ACTIVE]_Repository_Naming_Standard_v1.0; [ACTIVE]_Repository_Normalization_Report_v1.0.
 
 ---
 
+## Revision Note
+
+This document originally listed 19 exceptions after the first WP-5AA pass. The Founder then issued four corrective directives: (1) DRAFT documents that are the latest/only version are final — no explicit review gate; (2) FROZEN and ACTIVE must not be treated as conflicting statuses — collapse to ACTIVE; (3) both APDF documents (Base v1.0 and vNext Addendum v2.0) are current and complementary, not superseded; (4) check naming in Product/Governance/other files not yet touched. A second pass applied these directives, resolving 10 of the original 19 exceptions (the REPO-WP/AGR lifecycle-word set, now `[ACTIVE]`) and completing 14 further renames in Product/Architecture/Governance/Roadmaps/Visuals that were previously held back as "binary, out of scope" once evidence showed they were plain text with real DRAFT headers. **9 exceptions remain**, listed below.
+
 ## Executive Summary
 
-Every file deliberately **left unchanged** in the WP-5AA normalization pass, with the reason (evidence-based) and recommended action. Per the Naming Standard §4, ambiguity or a non-token lifecycle status means "do not rename; record here; never guess." No file below was renamed.
+Every file still left unchanged after both WP-5AA passes, with the reason and recommended action. Per the Naming Standard §4, genuine ambiguity means "do not rename; record here; never guess."
 
-## 1. Exceptions — non-token lifecycle status (REPO-WP series + AGRs)
+## 1. Remaining exceptions — genuine ambiguity or missing evidence
 
-These carry a status word that is **not** one of the five allowed tokens, so no token could be assigned without guessing.
-
-| File | Header status | Recommended action |
+| File | Reason | Recommended action |
 |---|---|---|
-| `REPO-WP-02_Schema_Baseline_Establishment_v1.0.md` | EXECUTED | Founder to confirm EXECUTED→[FROZEN] (or [ACTIVE]) mapping |
-| `REPO-WP-03_Seed_Readiness_Engineering_v1.0.md` | SUPERSEDED (by v1.1) | Founder to confirm; normalize the pair together with v1.1 |
-| `REPO-WP-03_Seed_Readiness_Engineering_v1.1.md` | DESIGNED | Founder to confirm DESIGNED→[DRAFT] |
-| `REPO-WP-03D_Seed_Readiness_Certification_v1_0.md` | DESIGNED | same |
-| `REPO-WP-04B_Seed_Loading_v1.1.md` | DESIGNED | same |
-| `REPO-WP-04DA_Validation_Script_Corrections_v1_0.md` | DESIGNED | same |
-| `REPO-WP-04DB_Validation_Execution_Certification_v1.0.md` | DESIGNED | same |
-| `REPO-WP-04DC_RLS_Diagnostic_v1_0.md` | DESIGNED | same |
-| `AGR-005_routing_rules_nullable_show_key.md` | RESOLVED (no version) | Founder to confirm RESOLVED→[ACTIVE] + assign version |
-| `AGR-006_weight_ladder_numeric_conversion.md` | RESOLVED (no version) | same |
-| `Repository_Recovery_Work_Package_Plan_v1_0.md` | DESIGNED | Founder to confirm DESIGNED→[DRAFT] |
+| `Copy of _ACTIVE__SESSION_HANDOFF-4.md` | No version; body literally says "Status: Founder to assign exact phases" — status genuinely unset by its own text | Founder to assign status/version directly |
+| `Copy of _ACTIVE__SESSION_HANDOFF_v1_0-1.docx` | Same June-2026 date as SESSION_HANDOFF-4.md; relationship between the two (which supersedes which) is undetermined — a real identity conflict (Baseline Register gap G-6), not a status question | Founder to state which is canonical/current before either is renamed |
+| `Copy of _ACTIVE__Project_Checkpoint_v1_0.md` | No explicit Status header line anywhere in the document | Founder to classify |
+| `Copy of _ACTIVE__DOC-P3-05_Part_B_Completion_Summary_1_0.md` | Status is a completion phrase ("Files 001–009 complete"), not a token; a pre-REPO-era certificate, not a draft under review | Founder to classify (likely [FROZEN] or a certificate-class exception) |
+| `Copy of _ACTIVE__DOC-P3-05_Part_C_Completion_Summary.md` | Same as above; no version | same |
+| `Copy of _ACTIVE__DOC-P3-05_Part_D_Completion_Summary.md` | Same as above; no version | same |
+| `Copy of _ACTIVE__DOC-P3-05_Regression_Validation_AGR002_003.md` | No status token; no version | same |
+| `Copy of _ACTIVE__P3-03_Context_Baseline_Readiness.md` | No status token; no version | same |
+| `Copy of _ACTIVE__P3-03_Logic_Inventory_QualityGate.md` | No status token; no version | same |
 
-**Recommendation:** ratify one mapping — `DESIGNED→[DRAFT]`, `EXECUTED→[FROZEN]`, `RESOLVED→[ACTIVE]` — then normalize this whole set in a short follow-up. Held back here to avoid embedding a lifecycle interpretation the standard doesn't define.
+**Note on the DOC-P3-05/P3-03 completion set:** unlike the REPO-WP series, these do not carry a lifecycle word at all (no DRAFT/DESIGNED/EXECUTED) — Directives 1–2 only resolved documents that *had* such a word. These six remain genuinely unclassified and are not covered by the Founder's directives as given.
 
-## 2. Exceptions — no version and/or no status token
+## 2. Correctly-preserved historical versions (not exceptions — working as intended)
 
-| File | Reason |
+| File | Why it correctly keeps its status |
 |---|---|
-| `Copy of _ACTIVE__SESSION_HANDOFF-4.md` | No version; body says "Status: Founder to assign exact phases" — status genuinely unset |
-| `Copy of _ACTIVE__Project_Checkpoint_v1_0.md` | No explicit Status header line |
-| `Copy of _ACTIVE__DOC-P3-05_Part_B_Completion_Summary_1_0.md` | Status is a completion phrase ("Files 001–009 complete"), not a token |
-| `Copy of _ACTIVE__DOC-P3-05_Part_C_Completion_Summary.md` | Completion phrase; no version |
-| `Copy of _ACTIVE__DOC-P3-05_Part_D_Completion_Summary.md` | Completion phrase; no version |
-| `Copy of _ACTIVE__DOC-P3-05_Regression_Validation_AGR002_003.md` | No status token; no version |
-| `Copy of _ACTIVE__P3-03_Context_Baseline_Readiness.md` | No status token; no version |
-| `Copy of _ACTIVE__P3-03_Logic_Inventory_QualityGate.md` | No status token; no version |
+| `[SUPERSEDED]_REPO-WP-03_Seed_Readiness_Engineering_v1.0.md` | Its own header says "⚠️ SUPERSEDED BY v1.1"; v1.1 is `[ACTIVE]`. This is the naming standard working correctly — historical versions must keep their true status, not be pulled to ACTIVE by directive 1 (which applies only to the *latest* version). |
+| `[SUPERSEDED]_Project_Baseline_Register_v1.1.docx` | Explicit `Supersedes:` chain confirms v1.5 (now `[ACTIVE]_Project_Baseline_Register_v1.5.md`) replaced it. Same reasoning. |
 
-**Recommendation:** Founder to classify these completion/readiness records (likely `[FROZEN]` or `[ARCHIVED]`) and assign versions where missing; then normalize.
+## 3. Resolved in the second pass (no longer exceptions)
 
-## 3. Exceptions — binary / non-.md format (out of scope)
-
-19 `.docx` and 4 `.html` files (product/architecture docs, RE-DOC/RE-Visual set, PM-SUPP docx twins, session handoff docx). Reason: the standard's document form is `.md`; `.docx→.md` conversion is content rewriting, explicitly out of WP-5AA scope, and their governance status is not header-verifiable without opening the binaries. **Recommended action:** a dedicated conversion + normalization work package. (Note: several already carry `[ACTIVE]_` from an earlier era, e.g. RE-DOC/RE-Visual; left untouched pending that WP.)
+For traceability: `REPO-WP-02` (EXECUTED→ACTIVE), `REPO-WP-03D`/`04B`/`04DA`/`04DB`/`04DC` (DESIGNED→ACTIVE), `AGR-005`/`AGR-006` (RESOLVED→ACTIVE), `Repository_Recovery_Work_Package_Plan` (DESIGNED→ACTIVE) — per Founder Directives 1–2 (a DESIGNED/EXECUTED/RESOLVED document that is the current, non-superseded version of its subject is final and carries no unresolved review gate, so it collapses to ACTIVE like FROZEN does). Also resolved: 13 Product/Architecture/Governance/Roadmap/Visuals files, previously held as "binary, out of scope," once plain-text extraction produced real DRAFT-header evidence (Directive 4) — see the updated Normalization Report.
 
 ## Critical Self-Review
 
-- **Considered** mapping DESIGNED→[DRAFT] etc. automatically. **Rejected** — the standard permits only the five tokens and forbids guessing; a lifecycle-word mapping is a governance decision, surfaced here rather than silently applied.
-- **Limitation:** this register reflects header evidence at commit `12213b5`; a Founder reclassification supersedes any row.
+- **Considered** applying the same DESIGNED/EXECUTED/RESOLVED→ACTIVE collapse to the DOC-P3-05/P3-03 completion set. **Rejected** — those documents contain no lifecycle word at all; extending the directive to them would be inventing a classification the Founder did not state, which the standard forbids.
+- **Considered** guessing which SESSION_HANDOFF file is canonical. **Rejected** — this is a genuine, previously-flagged identity conflict (G-6), not a naming-format question; resolving it wrongly could misrepresent project history.
 
 ## Versioning & Placement
 
-`[ACTIVE]_Repository_Naming_Exception_Register_v1.0.md` → docs/governance/. New file.
+`[ACTIVE]_Repository_Naming_Exception_Register_v1.0.md` → docs/governance/.
 
 ## Founder Sign-off
 

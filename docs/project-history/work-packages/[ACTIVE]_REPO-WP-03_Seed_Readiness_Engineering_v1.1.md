@@ -1,14 +1,5 @@
 # REPO-WP-03_Seed_Readiness_Engineering_v1.0
 
-> **⚠️ SUPERSEDED BY `REPO-WP-03_Seed_Readiness_Engineering_v1.1`** (revised after WP-3B post-execution review, 2026-07-08). Retained here for history only — do not execute or reference against this version. See v1.1 for the current scope, or the changelog below for exactly what changed.
->
-> **Summary of changes, v1.0 → v1.1:**
-> 1. **Required Discovery method changed** — v1.0 derived each rollback from reading the forward migration file's text alone. v1.1 mandates a live `pg_depend`/`pg_views`/`pg_indexes`/`pg_constraint`/`pg_trigger`/`pg_proc` catalog scan per object (the same method WP-3B demonstrated), because a forward file's text doesn't reveal what later migrations came to depend on it.
-> 2. **Execution ordering** — v1.1 follows `DOC-P3-05`'s documented 15-group dependency order explicitly, rather than deriving order implicitly from file-read sequence, and calls out two files (`010`, `019`) as requiring manual reasoning (triggers-before-functions, policies-before-RLS-disable) instead of pure mechanical reversal.
-> 3. **Dependencies re-verified live** — v1.1 re-confirms 26/26 migrations applied with no drift since WP-3B (v1.0 assumed this from the prior session without a fresh check).
-> 4. **Acceptance Criteria strengthened** — v1.1 adds explicit confirmation that the two manual-review files (010, 019) correctly reverse in the right order, not just that an inventory diff is clean.
-> 5. **Exit Criteria clarified** — v1.1 adds "do not continue to WP-3C" as an explicit stop, where v1.0 only said "STOP for Founder approval."
-
 **Repository Engineering Work Package #3 — Seed Readiness Engineering**
 **Project:** FooFoo (apverse-labs/foofoo-v3) · **Supabase:** `slsqtlygeekdppuyiiff`
 **Placement:** `docs/project-history/` (continuing REPO-BOOT-01/02 → REPO-WP-02 lineage)
@@ -49,25 +40,27 @@
 
 ## WP-3A — Rollback Completion (001–019) — *executes second*
 
+**Revised after WP-3B post-execution review (fresh discovery, 2026-07-08) — one scope adjustment made, detailed in Critical Self-Review below.**
+
 | Field | Content |
 |---|---|
-| **Objective** | Author the 19 missing paired rollback files for migrations 001–019, completing the §5.3 convention repo-wide (020–026 already paired). |
-| **Context** | WP-2 discovered zero rollback files existed for the frozen baseline — specified in `DOC-P3-05` §5.3 ("written at the same time as the forward migration") but never delivered. Overdue specified debt. |
-| **Dependencies** | WP-3B complete (so the rollback set is authored once, against the final migration sequence). |
-| **Authority** | `DOC-P3-05 Part A v1.2` §5.3 — the reversal-ordering rules (drop policies before tables, triggers before functions, children before parents, dependents before referenced) are already specified; this sub-package delivers them, inventing nothing. |
-| **Required Documents** | All of `database/migrations/001–019` (each rollback is derived from its forward file); `DOC-P3-05` §5.3. |
-| **Required Discovery** | Read each forward file in full; derive its exact object inventory; author the reversal in strict opposite order. |
+| **Objective** | Author the 19 missing paired rollback files for migrations 001–019, completing the §5.3 convention repo-wide (020–026 already paired, confirmed live: 26/26 migrations applied, no drift since WP-3B). |
+| **Context** | WP-2 discovered zero rollback files existed for the frozen baseline — specified in `DOC-P3-05` §5.3 ("written at the same time as the forward migration") but never delivered. Overdue specified debt. Re-verified this session: `018_meal_classes_mirror_sync` remains the intentionally-empty placeholder (no new risk introduced by 026). |
+| **Dependencies** | WP-3B complete and confirmed frozen (fresh discovery: 26 migrations in `supabase_migrations.schema_migrations`, `meal_classes` carries exactly PK + the recreated CHECK, no surprise objects). |
+| **Authority** | `DOC-P3-05 Part A v1.2` §5.3 (reversal-ordering rules) + **WP-3B's own demonstrated discovery method** (combined `pg_depend`/`pg_views`/`pg_indexes`/`pg_constraint`/`pg_trigger`/`pg_proc` catalog scan per object, performed live, before authoring) — adopted here as the required discovery method, not merely reading forward-file text. |
+| **Required Documents** | All of `database/migrations/001–019` and their group context per `DOC-P3-05` Phase 5.1's 15-group taxonomy; `DOC-P3-05` §5.3. |
+| **Required Discovery** | For each of the 15 groups (in `DOC-P3-05`'s own dependency order — schema/extensions → reference tables → ... → triggers → ... → RLS → indexes): read the forward file(s) AND run a live catalog dependency scan for every object it creates, exactly as WP-3B did — because a forward file's own text doesn't necessarily reveal what has come to depend on it by migration 026's time. |
 | **Founder Decisions** | None. |
-| **Execution Strategy** | Author 19 files; do NOT execute them against the live database (the baseline must remain applied) — correctness is validated structurally, not by destructive execution. |
-| **Validation Strategy** | Per file: every object created in the forward file has a corresponding DROP in the rollback, in valid dependency order — verified by object-inventory diff, not by running it. One additional non-destructive spot-proof permitted: none required beyond WP-2's already-proven 020 mechanism test. |
-| **Rollback Strategy** | N/A — these files ARE the rollback layer; they are additive file authorship with zero live-database effect. |
-| **Deliverables** | 19 `_rollback.sql` files, committed. |
-| **Acceptance Criteria** | 26 of 26 migrations carry a paired rollback; object-inventory diff clean for all 19 new files. |
-| **Exit Criteria** | Acceptance met, Execution Report, **STOP for Founder approval**. |
-| **Risks** | A rollback authored wrong stays latent until used. Mitigated by inventory-diff validation; accepted residual (destructively testing all 19 against a live baseline would be worse than the risk). |
-| **Stop Conditions** | Any forward file whose object inventory is ambiguous (e.g., dynamic SQL) — report, don't guess. |
+| **Execution Strategy** | Author 19 rollback files, following the documented 15-group order (not a risk-reprioritized order — see Critical Self-Review). Two files require manual reasoning beyond mechanical reversal, per `DOC-P3-05` §5.3's own flag: `010_trigger_functions_and_triggers` (drop triggers before functions) and `019_rls_policies` (drop policies before disabling RLS). The other 17 are direct DROP-in-reverse-creation-order. Do NOT execute any of the 19 against the live, 26-migration database — the baseline must remain applied and undisturbed. |
+| **Validation Strategy** | Per group: object-inventory diff (every object the forward file(s) created has a corresponding DROP, in valid dependency order) — structural, non-destructive. No live rollback execution for 001–019 (unlike 020's proof-of-mechanism test) — rolling back e.g. `002_reference_tier0` would cascade-break 26 live, applied migrations built on top of it; the risk of that destructive test exceeds its evidentiary value. |
+| **Rollback Strategy** | N/A — these files ARE the rollback layer; authorship is additive, zero live-database effect. |
+| **Deliverables** | 19 `_rollback.sql` files, committed, organized by the same 15-group logical sequence. |
+| **Acceptance Criteria** | 26 of 26 migrations carry a paired rollback; object-inventory diff clean for all 19 new files; the 2 manual-review files (010, 019) explicitly confirmed to reverse triggers-before-functions and policies-before-RLS-disable respectively. |
+| **Exit Criteria** | Acceptance met, Execution Report, **STOP for Founder approval — do not continue to WP-3C.** |
+| **Risks** | A rollback authored wrong stays latent until used. Mitigated by per-group inventory-diff validation using WP-3B's live-discovery method, not text-only inference. |
+| **Stop Conditions** | Any forward file/group whose object inventory is ambiguous (e.g., dynamic SQL, an object with dependents not evident from the file text alone) — report, don't guess, exactly as WP-3B's discovery pass would have stopped had it found something non-trivial. |
 | **Why WP-3, not WP-4** | Last moment before the schema becomes load-bearing. If WP-4 surfaces a structural defect needing correction, correction safety presumes the rollback layer exists. |
-| **Critical Self-Review** | Challenged whether this is busywork — concluded no: it is delivering an already-specified convention, and its absence was flagged as a WP-2 finding, not invented here. |
+| **Critical Self-Review** | **Scope adjustment from the original v1.0 spec:** "Required Discovery" now mandates the live catalog-scan method WP-3B demonstrated, rather than deriving rollbacks from forward-file text alone — a forward file doesn't show what came to depend on its objects later in the 26-migration sequence. **Execution-order self-challenge:** considered authoring the two manual-review files (010, 019) first on a "hardest-first" theory — rejected, because authoring in `DOC-P3-05`'s own documented 15-group dependency order means each group's rollback can be checked against an already-internally-consistent partial rollback set, which a reprioritized order would forfeit. |
 
 ---
 
@@ -125,7 +118,7 @@ Test: can WP-4 execute with effectively zero avoidable structural errors after W
 
 ## Versioning & Placement
 
-`REPO-WP-03_Seed_Readiness_Engineering_v1.0.md` → `docs/project-history/`, committed **before** execution begins (lesson from WP-2's Step-0 finding — the Work Package file precedes its prompt this time).
+`[SUPERSEDED]_REPO-WP-03_Seed_Readiness_Engineering_v1.0.md` → `docs/project-history/`, committed **before** execution begins (lesson from WP-2's Step-0 finding — the Work Package file precedes its prompt this time).
 
 ## Sign-off
 

@@ -2,7 +2,7 @@
 
 **Repository Engineering Work Package #3D — Seed Readiness Certification**
 **Project:** FooFoo (`apverse-labs/foofoo-v3`) · **Supabase:** `slsqtlygeekdppuyiiff`
-**Placement:** `docs/project-history/REPO-WP-03D_Seed_Readiness_Certification_v1_0.md`
+**Placement:** `docs/project-history/[ACTIVE]_REPO-WP-03D_Seed_Readiness_Certification_v1.0.md`
 **Date:** 2026-07-09 · **Status:** DESIGNED — awaiting Founder approval to execute
 **Prerequisites:** WP-3B ✅ · WP-3A ✅ · WP-3C ✅ (all independently live-verified this session — see Verification Summary below)
 
@@ -159,7 +159,7 @@ Acceptance met, Execution Report produced, **STOP — WP-3 fully closed, Founder
 
 ## Versioning & Placement
 
-`REPO-WP-03D_Seed_Readiness_Certification_v1_0.md` → `docs/project-history/`, committed **before** execution begins (established pattern from WP-3).
+`[ACTIVE]_REPO-WP-03D_Seed_Readiness_Certification_v1.0.md` → `docs/project-history/`, committed **before** execution begins (established pattern from WP-3).
 
 ## Sign-off
 

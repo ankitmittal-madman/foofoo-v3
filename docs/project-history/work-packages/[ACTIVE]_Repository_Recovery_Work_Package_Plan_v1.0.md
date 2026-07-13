@@ -3,7 +3,7 @@
 **Status:** DESIGNED — awaiting Founder approval to execute (no WP executed)
 **Version:** v1.0
 **Date:** 2026-07-13
-**Placement:** docs/project-history/work-packages/Repository_Recovery_Work_Package_Plan_v1_0.md
+**Placement:** docs/project-history/work-packages/[ACTIVE]_Repository_Recovery_Work_Package_Plan_v1.0.md
 **Supersedes:** None — first Repository Recovery Work Package Plan
 **Dependencies:** Repository_Completeness_Audit_v1_0 (evidence), Repository_Recovery_Roadmap_v1_0 (sequence), Repository_Recovery_Backlog_v1_0 (items), Repository_Recovery_Risk_Register_v1_0 (risk), Repository_Recovery_Decision_Log_v1_0 (decisions). WP format derived from REPO-BOOT-02 Task 8.
 
@@ -97,7 +97,7 @@ Standing constraints for all WPs: no fabricated SQL, execution, or certificates;
 
 ## Versioning & Placement
 
-`Repository_Recovery_Work_Package_Plan_v1_0.md` → `docs/project-history/work-packages/`. New file; supersedes nothing. Individual WPs, when authored for execution, become their own `REPO-WP-5x` documents citing this plan.
+`[ACTIVE]_Repository_Recovery_Work_Package_Plan_v1.0.md` → `docs/project-history/work-packages/`. New file; supersedes nothing. Individual WPs, when authored for execution, become their own `REPO-WP-5x` documents citing this plan.
 
 ## Founder Sign-off
 

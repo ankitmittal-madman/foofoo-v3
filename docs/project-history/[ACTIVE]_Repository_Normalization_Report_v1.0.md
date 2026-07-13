@@ -32,13 +32,9 @@ Full old→new list: see the Rename Mapping Table. Token derivation and judgment
 - `Status:` prose inside documents was left as authored (already consistent with the derived token); only filenames and references changed.
 - CLAUDE.md updated with a naming-enforcement clause pointing at the Naming Standard (Step 10).
 
-## 3. Exceptions (unchanged) — summary
+## 3. Exceptions — superseded by the Correction Addendum
 
-- **11** files with a non-token lifecycle status (`DESIGNED`/`EXECUTED`/`RESOLVED`: the REPO-WP series, AGR-005/006, Recovery WP Plan).
-- **8** files with no version and/or no status token (completion summaries, readiness/quality-gate docs, SESSION_HANDOFF-4, Project_Checkpoint).
-- **23** binary `.docx`/`.html` (out-of-scope for `.md` conversion).
-
-Reasons + recommended actions: Exception Register. All are resolvable in short follow-ups once the Founder ratifies the `DESIGNED/EXECUTED/RESOLVED` → token mapping and the binary-conversion approach.
+**Update (same day):** the Founder issued four correcting directives after this report was first written (see `[ACTIVE]_Repository_Naming_Correction_Addendum_v1.0.md`), resolving all but 9 of the exceptions below in a second pass. The original exception counts (11 non-token lifecycle, 8 no-version/no-status, 23 binary) are preserved here as the historical record of what Part 1 left undone; **do not treat them as current** — see the Correction Addendum and the rewritten Exception Register for the post-correction state (9 remaining exceptions: 2 genuine identity conflicts, 7 no-status/no-version records with no lifecycle word for the directives to act on).
 
 ## 4. Repository Health Update (before → after)
 
@@ -49,7 +45,8 @@ Reasons + recommended actions: Exception Register. All are resolvable in short f
 | Governance ratification | 🟡 no ratified naming standard | 🟢 standard ratified + CLAUDE.md-enforced |
 | Broken references | 🟢 none | 🟢 none (rewritten) |
 | Git history | 🟢 intact | 🟢 intact (`git mv` only) |
-| Remaining naming debt | — | 🟡 19 docs + 23 binaries pending Founder mapping decision (tracked) |
+| Remaining naming debt (Part 1) | — | 🟡 19 docs + 23 binaries pending Founder mapping decision (tracked) |
+| Remaining naming debt (after Correction Addendum, same day) | — | 🟢 down to 9 genuine exceptions (2 identity conflicts, 7 no-status/no-version); 133 files normalized total |
 
 **Overall: YELLOW → YELLOW-improving.** Naming is no longer a governance conflict; residual items are bounded, tracked, and Founder-gated. (DB-layer items — rollbacks 001–026, WP-4B/4DB certificates, the out-of-scope `pf1`/`103_*` migrations — are unchanged by this WP.)
 

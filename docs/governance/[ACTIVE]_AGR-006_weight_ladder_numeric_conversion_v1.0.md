@@ -3,7 +3,7 @@
 **Type:** Architecture Gap Register entry
 **Status:** RESOLVED via migration 028 (pending Founder sign-off below)
 **Discovered:** WP-4C execution, 2026-07-09, statement 1 of 23 (`re_weight_ladder_config` seed load)
-**Placement:** `docs/project-history/AGR-006_weight_ladder_numeric_conversion.md`
+**Placement:** `docs/project-history/[ACTIVE]_AGR-006_weight_ladder_numeric_conversion_v1.0.md`
 
 ---
 

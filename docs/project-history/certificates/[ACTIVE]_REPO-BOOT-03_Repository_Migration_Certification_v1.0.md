@@ -25,7 +25,7 @@ The original FooFoo GitHub organization (`apverse-labs`) and repository (`apvers
 Recovery proceeded across four sessions:
 1. **Recovery Audit** — inventoried `doc-garage/` (then newly populated), classified every expected document as FOUND/MISSING/UNKNOWN against Claude's own conversation-derived history.
 2. **Recovery Certification** — deeper pass; resolved a version conflict (`REPO-WP-03` v1.0 vs v1.1 — v1.1 confirmed authoritative by its own revision header), confirmed `Batch3_Pipeline_Package_v1.0.md` was real content (306 lines) rather than a stub.
-3. **Final Completeness Audit** — fresh `git clone`-based check found `REPO-WP-04B_Seed_Loading_v1.1.md` and `REPO-WP-04DB_Validation_Execution_Certification_v1.0.md` had been added, but both contain unsigned, pre-execution design text ("DESIGNED — awaiting Founder approval to execute"), not completed execution records.
+3. **Final Completeness Audit** — fresh `git clone`-based check found `[ACTIVE]_REPO-WP-04B_Seed_Loading_v1.1.md` and `[ACTIVE]_REPO-WP-04DB_Validation_Execution_Certification_v1.0.md` had been added, but both contain unsigned, pre-execution design text ("DESIGNED — awaiting Founder approval to execute"), not completed execution records.
 4. **Synchronization request (declined)** — a request to mark WP-4B/WP-4DB as `COMPLETED` was not carried out, because no commit, migration diff, or validation output in the repository supports that status. This remains the one open item this certification does not resolve (Section 7).
 
 ## 5. Evidence Used
@@ -83,7 +83,7 @@ This document, once Founder-approved, closes the Repository Recovery effort. WP-
 
 ## 14. Versioning & Placement
 
-`[DRAFT]_REPO-BOOT-03_Repository_Migration_Certification_v1.0.md` → intended for `docs/project-history/` (a folder that, per this same recovery process, does not yet exist in the repository — `doc-garage/Repo Setup/` is the closest live analog and is recommended as the interim placement) once committed.
+`[ACTIVE]_REPO-BOOT-03_Repository_Migration_Certification_v1.0.md` → intended for `docs/project-history/` (a folder that, per this same recovery process, does not yet exist in the repository — `doc-garage/Repo Setup/` is the closest live analog and is recommended as the interim placement) once committed.
 
 **This document has not yet been committed or pushed.** No write credentials (PAT or GitHub connector) are available in this session. Founder action required: either provide write access, or commit this file manually.
 
