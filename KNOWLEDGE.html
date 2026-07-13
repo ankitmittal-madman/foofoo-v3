@@ -378,6 +378,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🗄</span> S5 · Clean-room validation
       <span class="nav-badge">Jul 13</span>
     </div>
+    <div class="nav-item" onclick="showPage('s6')">
+      <span class="nav-icon">🛠</span> S6 · Validation remediation
+      <span class="nav-badge">Jul 13</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -526,6 +530,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s5')">IDR-001</span>
         </div>
         <div class="tl-note">Independently re-read all 28 migrations, 28 rollbacks, 3 seeds and 6 validation scripts and proved (by simulation, no database touched) that the schema can rebuild and roll back cleanly — 28/28 paired, contiguous, no cycles. Readiness rated YELLOW: two new defects found (a seed that won't load against its own migrated schema, and a validation script expecting the wrong table count), plus three carried gaps. Recommended WP-5D/5E/5G. Nothing built, nothing executed.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 13, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#9a3412"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#fff7ed;color:#9a3412">S6</span>
+        <div class="tl-title">Validation remediation (WP-5E)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s6')">seed 101</span>
+          <span class="tl-chip" onclick="showPage('s6')">validation 900</span>
+          <span class="tl-chip" onclick="showPage('s6')">WP-5E</span>
+        </div>
+        <div class="tl-note">Fixed the two problems S5 found. The sample-data file (seed 101) now stores meal-slots the way the migrated schema expects (as lists, with the old "addon" value becoming "snack") — restoring a fix that was made last year but lost when the repo was rebuilt. The self-test (validation 900) now expects the correct 62 tables, derived from the build scripts themselves rather than a stale document. Only those two files changed; no migrations, schema, or database touched. Health nudged up within YELLOW — two blockers cleared, three remain (missing production scripts, run-proof, and a live rebuild test).</div>
       </div>
     </div>
     <!-- TIMELINE_INJECT -->
@@ -705,6 +723,13 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5F_CleanRoom_Repository_Validation_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S5</td><td class="fr-desc">WP-5F work package (validation-only)</td></tr>
         <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-001_WP-5F_CleanRoom_Validation_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S5</td><td class="fr-desc">WP-5F execution certificate</td></tr>
         <tr><td class="fr-file">docs/governance/[ACTIVE]_IDR-001_WP5_Sequence_Reconciliation_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S5</td><td class="fr-desc">Reconciles brief vs plan WP-5 numbering; Founder to ratify</td></tr>
+        <tr><td class="fr-file mono">database/seeds/101_seed_reference_data_framework.sql</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S6</td><td class="fr-desc">SEED-01 fix: re_meal_classes slot scalar→text[], 'addon'→['snack']</td></tr>
+        <tr><td class="fr-file mono">database/validation/900_structural_validation.sql</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S6</td><td class="fr-desc">VALIDATION-01 fix: Check 1 table count 60→62, repository-derived</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5E_Validation_Remediation_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S6</td><td class="fr-desc">WP-5E work package</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-002_WP-5E_Validation_Remediation_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S6</td><td class="fr-desc">WP-5E execution certificate</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5E_Engineering_Decision_Log_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S6</td><td class="fr-desc">WP-5E decisions (WED-01..09)</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5E_Evidence_Register_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S6</td><td class="fr-desc">WP-5E evidence (E-01..15)</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5E_Validation_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S6</td><td class="fr-desc">Post-correction re-validation + health before/after</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1347,7 +1372,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s4 -->
 
   <!-- ── Session 5 ── -->
-  <div id="page-s5" class="page-content" style="display:block">
+  <div id="page-s5" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S5 · Clean-room repository validation (WP-5F)</div>
       <div class="page-subtitle">A full, independent health check of the recovered database blueprint — proving on paper that it can build itself up and tear itself back down cleanly, and finding exactly where it still falls short of a clean bill of health.</div>
@@ -1372,6 +1397,33 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s5 -->
+
+  <!-- ── Session 6 ── -->
+  <div id="page-s6" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S6 · Validation remediation (WP-5E)</div>
+      <div class="page-subtitle">The two defects the last session found are now fixed — using only what the repository itself already proves — so the database blueprint's sample-data and self-test layers finally match the build scripts.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was corrected this session</div>
+        <div class="session-card-meta">July 13, 2026<br>WP-5E</div>
+      </div>
+      <div class="session-card-desc">
+        Session 5 (the health check) found two problems; this session fixed exactly those two, nothing more. <b>Fix 1 — sample data:</b> one build script (025) had changed how meal-slots are stored — from a single word to a list, and renaming the old value "addon" to "snack". The sample-data file still used the old single-word form, so it would have failed to load. An earlier fix for this existed last year but was lost when the repository was rebuilt; this session <b>restored</b> it (each of the 9 meal-class rows now uses a list, and the two "addon" rows became "snack"), grounded in the build script and the old work-package record — not invented. <b>Fix 2 — self-test:</b> one check expected 60 tables from an outdated document; the recovered blueprint actually has 62 (two tables were added by later build scripts). The check now expects 62, and — importantly — explains where that number comes from (counted from the build scripts), so it verifies reality instead of trusting a stale document. Nothing else was touched: no build scripts, no undo scripts, no schema, no database. A few other stale checks exist but belong to a different, separately-approved work package that needs a live database to fix, so they were deliberately left alone. Health: still <b>YELLOW</b>, but two of the five blockers are now cleared.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">2</div><div class="stat-l">Defects fixed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">2</div><div class="stat-l">SQL files changed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Schema / DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">5</div><div class="stat-l">History docs written</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Recommended (not started, Founder approval required): <b>WP-5F2</b> — re-run the clean-room health check to confirm the build→load→self-test cycle is now clean; then <b>WP-5D</b> — Production Migration Recovery (add the 3 build scripts applied to the live database but never saved, so a fresh build matches production); then <b>WP-5G</b> — Repository Green Certification (actually run build+teardown on a throwaway database, confirm it matches production, and certify GREEN). The separately-approved validation-script corrections (WP-04DA — trigger/RLS counts, one trigger test) should be folded into WP-5F2 or WP-5G since they need a live database.</div>
+      </div>
+    </div>
+  </div><!-- /page-s6 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->

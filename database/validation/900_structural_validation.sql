@@ -8,9 +8,22 @@
 
 \echo '=== STRUCTURAL VALIDATION — Part (d) ==='
 
--- Check 1: table count (DOC-P3-04 §02 states 60 tables total)
-\echo '--- Check 1: Total table count (expect 60) ---'
-SELECT count(*) AS table_count FROM information_schema.tables
+-- Check 1: base-table count.
+-- WP-5E CORRECTION (2026-07-13) — VALIDATION-01: the prior expected value of 60
+-- was DOC-P3-04 §02's figure, written before migrations 021 and 024 were added.
+-- The expected count is DERIVED FROM THE REPOSITORY (the migration files), not
+-- from stale documentation: 60 baseline (001–016 structural tables per §02)
+--   + 1 public.cuisines            (migration 021)
+--   + 1 re_engine.re_dish_regional_affinity (migration 024)
+--   = 62 base tables.
+-- Verifiable in-repo: `grep -cE '^\s*CREATE TABLE' database/migrations/*.sql`
+-- totals 62 (partition CHILDREN are created dynamically by 017's DO block and
+-- are correctly excluded below and from the count). If a future STRUCTURAL
+-- migration adds or drops a base table, update this derivation and the count
+-- together — the number must always trace to the migration set, never to a doc.
+\echo '--- Check 1: Total base-table count (expect 62 — see WP-5E derivation) ---'
+SELECT count(*) AS table_count, 62 AS expected, count(*) = 62 AS pass
+FROM information_schema.tables
 WHERE table_schema IN ('public','re_engine') AND table_type = 'BASE TABLE'
   AND table_name NOT LIKE 'interaction_events_2%'  -- exclude partition children
   AND table_name NOT LIKE 'suggestion_logs_2%';

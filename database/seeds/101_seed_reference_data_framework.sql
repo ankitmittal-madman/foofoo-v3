@@ -71,19 +71,37 @@ INSERT INTO re_engine.re_subcohorts (subcohort_code, main_cohort_code, descripti
 -- AWAITING SOURCE DATA: 36 remaining subcohort refinements.
 
 -- S-06: re_meal_classes — illustrative subset (target: 131)
+-- ---------------------------------------------------------------------------
+-- WP-5E CORRECTION (2026-07-13) — SEED-01: slot column is text[], not scalar text.
+-- Migration 025 converted re_engine.re_meal_classes.slot from scalar text
+-- (CHECK IN 'breakfast','lunch','dinner','addon') to text[] with
+-- CHECK (slot <@ ARRAY['breakfast','lunch','dinner','snack'] AND cardinality>=1),
+-- mapping the legacy scalar 'addon' to ARRAY['snack']. The scalar values below
+-- were the PRE-025 form; against the migrated schema they failed on BOTH type
+-- (scalar into text[]) and value ('addon' no longer permitted). This block
+-- RESTORES the array form that REPO-WP-04B v1.1 (§Pre-Design row "WP-4A fix
+-- genuinely on main": "All 9 re_meal_classes rows now ARRAY[...]; 'addon' →
+-- ARRAY['snack'] confirmed correct") records as previously loaded and correct,
+-- and that was lost in the apverse-labs repository reconstruction. This is
+-- recovery of a documented, applied fix — not new business logic.
+-- Per-row change: every prior scalar wrapped as a single-element array; the two
+-- 'addon'-slot rows become ARRAY['snack'] per the migration-025 / REPO-WP-02
+-- §7.6 rule (NOT re-mapped to planning_role — Batch1 MAP-DEC-003). planning_role,
+-- day_type, fits, cuisine_family, diet_type are UNCHANGED.
+-- ---------------------------------------------------------------------------
 INSERT INTO re_engine.re_meal_classes
   (class_code, slot, day_type, planning_role, weekday_fit_1_5, weekend_fit_1_5,
    variety_cooldown_days, max_per_week, cuisine_family, diet_type)
 VALUES
-  ('BF_LIGHT_GRAIN', 'breakfast', 'any', 'MAIN_PRIMARY', 5, 4, 2, 3, 'pan_indian', 'veg'),
-  ('BF_STUFFED_FLATBREAD', 'breakfast', 'weekend', 'MAIN_PRIMARY', 2, 5, 3, 2, 'north_indian', 'veg'),
-  ('BF_SOUTH_FERMENTED', 'breakfast', 'any', 'MAIN_PRIMARY', 4, 4, 2, 3, 'south_indian', 'veg'),
-  ('LUNCH_DAL_SABZI_ROTI', 'lunch', 'any', 'MAIN_PRIMARY', 5, 4, 2, 3, 'north_indian', 'veg'),
-  ('DIN_CURRY_ROTI', 'dinner', 'any', 'MAIN_PRIMARY', 5, 4, 2, 3, 'north_indian', 'veg'),
-  ('DIN_NON_VEG_MAIN', 'dinner', 'any', 'MAIN_PRIMARY', 2, 4, 3, 2, 'mughlai', 'non_veg'),
-  ('ADDON_INFANT', 'addon', 'any', 'ADDON_ONLY_NOT_PRIMARY', NULL, NULL, NULL, NULL, NULL, 'veg'),
-  ('ADDON_DIABETIC', 'addon', 'any', 'ADDON_ONLY_NOT_PRIMARY', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('COMBO_RICE_DAL_VEG', 'lunch', 'any', 'COMBO_TEMPLATE_NOT_PRIMARY', 4, 4, 3, 2, 'pan_indian', 'veg');
+  ('BF_LIGHT_GRAIN', ARRAY['breakfast'], 'any', 'MAIN_PRIMARY', 5, 4, 2, 3, 'pan_indian', 'veg'),
+  ('BF_STUFFED_FLATBREAD', ARRAY['breakfast'], 'weekend', 'MAIN_PRIMARY', 2, 5, 3, 2, 'north_indian', 'veg'),
+  ('BF_SOUTH_FERMENTED', ARRAY['breakfast'], 'any', 'MAIN_PRIMARY', 4, 4, 2, 3, 'south_indian', 'veg'),
+  ('LUNCH_DAL_SABZI_ROTI', ARRAY['lunch'], 'any', 'MAIN_PRIMARY', 5, 4, 2, 3, 'north_indian', 'veg'),
+  ('DIN_CURRY_ROTI', ARRAY['dinner'], 'any', 'MAIN_PRIMARY', 5, 4, 2, 3, 'north_indian', 'veg'),
+  ('DIN_NON_VEG_MAIN', ARRAY['dinner'], 'any', 'MAIN_PRIMARY', 2, 4, 3, 2, 'mughlai', 'non_veg'),
+  ('ADDON_INFANT', ARRAY['snack'], 'any', 'ADDON_ONLY_NOT_PRIMARY', NULL, NULL, NULL, NULL, NULL, 'veg'),
+  ('ADDON_DIABETIC', ARRAY['snack'], 'any', 'ADDON_ONLY_NOT_PRIMARY', NULL, NULL, NULL, NULL, NULL, NULL),
+  ('COMBO_RICE_DAL_VEG', ARRAY['lunch'], 'any', 'COMBO_TEMPLATE_NOT_PRIMARY', 4, 4, 3, 2, 'pan_indian', 'veg');
 -- AWAITING SOURCE DATA: 122 remaining class codes (full 131-row taxonomy incl. all 24 addon
 -- classes and remaining MAIN_PRIMARY/COMBO_TEMPLATE rows).
 
