@@ -386,6 +386,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🗄</span> S7 · Clean-room execution
       <span class="nav-badge">Jul 13</span>
     </div>
+    <div class="nav-item" onclick="showPage('s8')">
+      <span class="nav-icon">🔐</span> S8 · Production parity
+      <span class="nav-badge">Jul 13</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -563,6 +567,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s7')">WP-5F2</span>
         </div>
         <div class="tl-note">Actually ran the whole database blueprint on a throwaway local database (never production): all 28 build scripts applied cleanly (62 tables), all 3 sample-data files loaded (proving last session's fix works for real), the self-tests ran, and all 28 undo scripts reversed everything back to empty. A long-standing security question was finally answered by direct measurement: a stray permission does exist, but row-level security still blocks the write (0 rows changed) — so data is safe, and the proper fix is the missing production security script (WP-5D). Health: still YELLOW but the core is now proven-by-execution GREEN. Repository files unchanged — this was a test run, not an edit.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 13, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#e8f8f2;color:#0e7a5a">S8</span>
+        <div class="tl-title">Production parity recovery (WP-5D)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s8')">prod ledger diff</span>
+          <span class="tl-chip" onclick="showPage('s8')">pf1 recovered (evidence)</span>
+          <span class="tl-chip" onclick="showPage('s8')">WP-5D</span>
+        </div>
+        <div class="tl-note">Compared the repository's build scripts against the live production database (read-only, never modified). Production has 3 scripts the repo lacks: one real security fix (pf1 — the exact fix for the leftover-permission gap found earlier) and two production data loads (real cuisines & ingredients — intentionally kept out of the repo). The security fix's exact text was recovered as evidence, but it can't be added yet: it depends on a hidden auto-security helper that lives only in production and clashes with the repo's deliberate security design — a call only the Founder can make. Parity is 96.6%; one decision away from complete. Repository files unchanged this session.</div>
       </div>
     </div>
     <!-- TIMELINE_INJECT -->
@@ -755,6 +773,12 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5F2_Validation_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">Regression check + execution-based health</td></tr>
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5F2_Evidence_Register_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">Raw execution evidence + compat bootstrap</td></tr>
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5F2_Decision_Log_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S7</td><td class="fr-desc">WP-5F2 decisions (F2D-01..10)</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5D_Production_Parity_Recovery_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">WP-5D work package (parity, analysis-only)</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5D_Evidence_Register_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">Ledger diff, pf1 verbatim, rls_auto_enable def, RLS drift</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5D_Engineering_Decision_Log_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">Classifications + pf1 STOP decision (D-01..08)</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5D_Validation_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">Rebuildability preserved; regression cross-check</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-5D_Production_Parity_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">96.6% parity; exhaustive remaining differences</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-004_WP-5D_Production_Parity_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S8</td><td class="fr-desc">WP-5D execution certificate (read-only prod introspection)</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1451,7 +1475,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s6 -->
 
   <!-- ── Session 7 ── -->
-  <div id="page-s7" class="page-content" style="display:block">
+  <div id="page-s7" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S7 · Clean-room execution validation (WP-5F2)</div>
       <div class="page-subtitle">We stopped reasoning about the database blueprint and actually ran it — from empty, all the way up and all the way back down — on a disposable local database that never touched production.</div>
@@ -1476,6 +1500,33 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s7 -->
+
+  <!-- ── Session 8 ── -->
+  <div id="page-s8" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S8 · Production parity recovery (WP-5D)</div>
+      <div class="page-subtitle">We checked the repository's database blueprint against what's actually running in production — and found it's one deliberate decision away from being a complete, faithful source of truth.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was reconciled this session</div>
+        <div class="session-card-meta">July 13, 2026<br>WP-5D</div>
+      </div>
+      <div class="session-card-desc">
+        The goal was to make the repository match production's engineering exactly. We read production's migration history (read-only — <b>never touched or changed production</b>) and found <b>3 scripts</b> production has that the repo doesn't: (1) <b>pf1</b> — a real security fix that closes the leftover-permission gap Session 7 measured; (2 & 3) two <b>production data loads</b> (real cuisines and ingredients) which are deliberately <i>not</i> kept in the repo (the repo uses small sample data instead). The security fix's exact text was recovered from production as evidence. But it <b>can't be added to the repo yet</b>: one of its lines locks down a hidden "auto-enable-security" helper that exists only in production, was never part of any tracked script, and actually <i>conflicts</i> with the repo's deliberate design (it switches on row-security for internal bookkeeping tables the design intentionally leaves off — production currently has security on 33 tables where the repo design expects 20). Adding it would either break the repo's from-scratch rebuild or silently change the frozen design — a call only the Founder should make. So this session recovered the evidence, classified everything, measured the gap (96.6% parity), and stopped short of guessing. No repository files changed.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">96.6%</div><div class="stat-l">Migration parity</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">1</div><div class="stat-l">Canonical gap (pf1)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">2</div><div class="stat-l">Prod data loads (excluded)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Repo / prod changes</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Readiness: <b>NOT yet</b> the complete engineering source of truth. One Founder decision unblocks it — <b>how to treat the hidden auto-security helper (rls_auto_enable / ensure_rls):</b> (A) adopt it as a real repo object (needs architecture review — it changes the frozen security design), or (B) declare it a production-only operational overlay and add pf1 to the repo with that one line quarantined and documented. Once decided, pf1 can be committed, parity reaches ~100%, and then <b>WP-5G — Repository Green Certification</b> can run (a final live build+diff on a real disposable Supabase environment). Not started — awaiting Founder decision.</div>
+      </div>
+    </div>
+  </div><!-- /page-s8 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
