@@ -1,0 +1,19 @@
+name: Mirror to GitLab Foofoo - V3
+on: 
+  workflow_dispatch:
+
+jobs:
+  gitlab-mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Push to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git remote add gitlab https://oauth2:${GITLAB_TOKEN}@gitlab.com/anki.mittal/foofoo-v3.git
+          git push gitlab "refs/heads/*:refs/heads/*" "refs/tags/*:refs/tags/*" --force
