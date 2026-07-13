@@ -40,11 +40,11 @@ Internal-consistency validation only (no live apply). Result: migration+rollback
 
 ## 5. Git commit
 
-Commit: `docs: repository validation and clean-room certification` — hash recorded on push (see repository log; this certificate accompanies that commit).
+Commit `793bb38` — `docs: repository validation and clean-room certification` (parent `ab516c6`). Documentation only: 4 new `docs/` files + `KNOWLEDGE.html`; no `database/` or application file staged (verified via `git diff --cached`).
 
 ## 6. Push confirmation
 
-Pushed to `origin/main`. (Confirmed in the session final report.)
+Pushed to `origin/main`: `ab516c6..793bb38`. HEAD == origin/main == `793bb38`, clean working tree. (This certificate's own hash-recording amendment follows as the next commit.)
 
 ## 7. Deviations
 
