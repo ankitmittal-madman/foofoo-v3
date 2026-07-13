@@ -1297,6 +1297,33 @@ function deepDiveFeature(featureLabel){
     </div>
   </div><!-- /page-s3 -->
 
+  <!-- ── Session 4 ── -->
+  <div id="page-s4" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S4 · Rollback layer recovery (WP-5C)</div>
+      <div class="page-subtitle">Every database migration can now be undone: the 26 missing rollback scripts were reconstructed from the migrations themselves, giving the repository a complete, self-reconstructable down-path for the first time.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 13, 2026<br>WP-5C</div>
+      </div>
+      <div class="session-card-desc">
+        The repository had rollback scripts for only 2 of its 28 migrations (027, 028) — the other 26 were either never written (001–020) or lost when the old repository was deleted (021–026). WP-5C authored all 26. Each rollback was rebuilt from its own forward migration file (the authoritative record of what that migration created) and reverses exactly that — nothing more. They are designed to run in reverse order (028→001) and use plain <code>DROP</code> so a mistake fails loudly instead of silently cascading, matching the existing 027/028 style. Five reversals carry loud warnings because undoing them on real data would lose or reject rows (the two <code>slot</code> array conversions, the tag-uniqueness restore, the extension drop, and the runtime-named partitions) — all safe on today's unseeded database. No forward migration, architecture, or live database was touched; the database was only read, never changed.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">26</div><div class="stat-l">Rollbacks recovered</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">28/28</div><div class="stat-l">Rollback coverage</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Forward/DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">6</div><div class="stat-l">Governance docs</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Recommended: WP-5D (recover WP-4B/4DB execution evidence + the applied-but-missing pf1_security_hardening / 103_production_* migrations), then WP-5F (clean-room rebuild + teardown to prove the migration+rollback layers actually replay), then WP-5G (Repository Green Certification). Still open from before: the 3 PIR architecture decisions, DPDP age-gate, IDR-001 master seed data, and the 9 naming exceptions (2 SESSION_HANDOFF identity conflicts + 7 no-status records).</div>
+      </div>
+    </div>
+  </div><!-- /page-s4 -->
+
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
 
