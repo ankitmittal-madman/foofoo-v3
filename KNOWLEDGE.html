@@ -410,6 +410,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🌱</span> S13 · WP-6D-gen seeds generated (ICD-1)
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s14')">
+      <span class="nav-icon">🔎</span> S14 · WP-6RE knowledge audit
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -629,6 +633,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s10')">Repository Gate PASSED</span>
         </div>
         <div class="tl-note">An independent audit re-verified everything from scratch (structure, docs, database, production parity) and re-ran the whole build-and-teardown on a throwaway database: 29/29 build, 29/29 rollback to empty, seeds load, parity 100% canonical, every production difference explained. All ten GREEN criteria pass. The repository is CERTIFIED GREEN — the recovery program (WP-5A→5G) is complete and this repo is now the permanent engineering baseline. The Repository Gate is passed; coding can begin. Next: the Data Gate — load the real seed data (Seed Engineering). Nothing was modified except adding the certification documents.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#7c3aed"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#f5f3ff;color:#7c3aed">S14</span>
+        <div class="tl-title">WP-6RE — forensic audit: can the engine be fully seeded? (read-only)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s14')">RE-DOC read at last</span>
+          <span class="tl-chip" onclick="showPage('s14')">1 real blocker (GAP-002)</span>
+          <span class="tl-chip" onclick="showPage('s14')">prior report corrected</span>
+        </div>
+        <div class="tl-note">A read-only forensic audit re-derived, from evidence only, whether the recommendation engine can be fully seeded — explicitly not trusting earlier sessions. It read the five RE design documents (RE-DOC-01–05) for the first time (they were never opened before). Finding: the earlier "the whole engine layer is blocked because values are missing" conclusion was too pessimistic and is corrected. Most contested values are actually derivable or recoverable, with provenance: meal-class weekday/weekend type (from fit scores), persona diet (from the persona's nonveg mode + a frozen business rule), state 2-letter codes (already in the affinity file), region, and persona codes. Only ONE genuine blocker survives, and it's proven with arithmetic: the cohort table can hold at most 1,476 unique rows under its own uniqueness rule, but the target is 2,952 — because the source data splits every cohort into two city tiers the table has no column for (GAP-002). That's a real design decision for the Founder (add a city-tier column, or change the target), not missing data. Nothing truly absent; nothing fabricated; no database touched.</div>
       </div>
     </div>
     <div class="timeline-row">
@@ -1739,7 +1757,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s12 -->
 
   <!-- ── Session 13 ── -->
-  <div id="page-s13" class="page-content" style="display:block">
+  <div id="page-s13" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S13 · WP-6D-gen — the canonical content seeds are generated (ICD-1)</div>
       <div class="page-subtitle">A deterministic generator turned the source files into real, reversible seed SQL for FooFoo's food catalog — with everything traceable and nothing invented — and logged the future-expansion backlog.</div>
@@ -1768,6 +1786,37 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s13 -->
+
+  <!-- ── Session 14 ── -->
+  <div id="page-s14" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S14 · WP-6RE — forensic audit: can the recommendation engine be fully seeded? (read-only)</div>
+      <div class="page-subtitle">An independent, evidence-only re-check — not trusting earlier sessions — of whether the engine's knowledge can be fully loaded. It corrected a prior over-pessimistic finding and isolated the one real blocker.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was audited this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-6RE · Read-only</div>
+      </div>
+      <div class="session-card-desc">
+        The Founder asked for a forensic audit: prove, from repository evidence alone, whether the recommendation engine can be completely and deterministically seeded — and explicitly <b>do not trust previous reports</b>. This session finally read the <b>five recommendation-engine design documents (RE-DOC-01–05)</b>, which had never been opened in any prior session, and re-derived every contested value from scratch.
+        <br><br>
+        The big result: the earlier conclusion — "the whole engine layer is blocked because key values are missing from the master workbook" — was <b>too pessimistic and is now corrected</b>. Most of those "missing" values are in fact <b>derivable or recoverable</b>, each with a traceable source: a meal-class's weekday/weekend type (from its fit scores, all 131 present), a persona's diet (from its nonveg mode plus a frozen business rule), the 2-letter state codes (already sitting in the regional-affinity file), the region grouping, and persona codes. Nothing in the engine's knowledge is <b>truly</b> absent.
+        <br><br>
+        Exactly <b>one genuine blocker</b> survives, and it's provable with simple arithmetic rather than opinion: the cohort table's own uniqueness rule (one row per persona + state + diet-mode) allows at most <b>1,476</b> rows, but the target is <b>2,952</b> — because the source splits every cohort into <b>two city tiers</b> that the table has no column to hold (this is the long-standing "GAP-002"). That is a real design decision for the Founder — add a city-tier column, or change the target — not a data problem. It blocks only the cohort table and the two big plan tables that depend on it (the 20,664-row weekly plan and the 7,992-row add-on plan). Everything else can be seeded. No database was touched and nothing was invented.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#7c3aed">12 / 15</div><div class="stat-l">RE tables seedable</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b91c1c">1</div><div class="stat-l">Real blocker (GAP-002)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#166534">0</div><div class="stat-l">Truly-absent items</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">DB changes (read-only)</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — one Founder decision, then generation</div>
+        <div class="next-text">Recommended: a one-page Founder decision on GAP-002 (recommend adding a <code>city_tier</code> column to the cohort table via a governed schema-change request, which restores the 2,952 target), plus a quick sign-off on the four derivation rules (day-type, persona diet, state code, region). After that, the engine seeds can be generated (WP-6RE-gen) and loaded onto staging with the content seeds (WP-6E). Audit document: <code>[ACTIVE]_WP-6RE_Recommendation_Engine_Knowledge_Audit_v1.0.md</code>. STOP honoured — no seeds, no schema change, no load.</div>
+      </div>
+    </div>
+  </div><!-- /page-s14 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
