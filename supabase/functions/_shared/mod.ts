@@ -16,8 +16,8 @@ export { createLogger } from "./logging/logger.ts";
 export type { LogFields, Logger, LogLevel } from "./logging/logger.ts";
 
 // errors
-export { AppError, ERROR_CATALOGUE } from "./errors/index.ts";
-export type { ErrorCode, ErrorSpec } from "./errors/index.ts";
+export { API_ERRORS, AppError, ERROR_CATALOGUE } from "./errors/index.ts";
+export type { ApiErrorCode, ErrorCode, ErrorSpec } from "./errors/index.ts";
 
 // types
 export type { AuthClaims, RequestContext } from "./types/context.ts";
@@ -31,21 +31,33 @@ export type { SupabaseClient } from "./db/client.ts";
 // auth
 export { claimsFromPayload, extractBearer } from "./auth/jwt.ts";
 export { assertOwns, assertRole, requireAuth } from "./auth/authorize.ts";
+export { authenticate, requireOwnership, supabaseJwtVerifier } from "./auth/authenticate.ts";
+export type { JwtVerifier } from "./auth/authenticate.ts";
 
 // validation
 export { validate, z } from "./validation/validate.ts";
+export { CONSENT_TYPES, parseConsentRequest } from "./validation/consent-schema.ts";
+export type { ConsentInput, ConsentRequest, ConsentType } from "./validation/consent-schema.ts";
 
 // middleware
 export { buildContext, compose, errorBoundary, requestLogging } from "./middleware/index.ts";
 export type { Handler, Middleware } from "./middleware/index.ts";
 
 // api
-export { jsonOk, noContent } from "./api/response.ts";
+export { jsonContract, jsonOk, noContent } from "./api/response.ts";
 export { defineHandler } from "./api/handler.ts";
 
-// repositories / services (base classes only)
+// repositories / services (base classes + concrete WP-8C classes)
 export { BaseRepository } from "./repositories/base-repository.ts";
 export { BaseService } from "./services/base-service.ts";
+export { ConsentRepository } from "./repositories/consent-repository.ts";
+export type {
+  ConsentInsertRow,
+  IConsentRepository,
+  RecordedConsent,
+} from "./repositories/consent-repository.ts";
+export { ConsentService } from "./services/consent-service.ts";
+export type { ConsentResponse } from "./services/consent-service.ts";
 
 // telemetry
 export { loggerSink, withTiming } from "./telemetry/telemetry.ts";

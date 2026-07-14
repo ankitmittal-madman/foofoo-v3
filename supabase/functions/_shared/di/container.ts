@@ -8,12 +8,16 @@
  */
 import { createServiceRoleClient, type SupabaseClient } from "../db/client.ts";
 import { loggerSink, type TelemetrySink } from "../telemetry/telemetry.ts";
+import { ConsentRepository } from "../repositories/consent-repository.ts";
+import { ConsentService } from "../services/consent-service.ts";
 import type { RequestContext } from "../types/context.ts";
 
 export class Container {
   private readonly ctx: RequestContext;
   private _db: SupabaseClient | null = null;
   private _telemetry: TelemetrySink | null = null;
+  private _consentRepository: ConsentRepository | null = null;
+  private _consentService: ConsentService | null = null;
 
   constructor(ctx: RequestContext) {
     this.ctx = ctx;
@@ -30,8 +34,22 @@ export class Container {
     return this._telemetry;
   }
 
-  // Repository/service accessors are added per-WP as concrete classes land (WP-8C onward),
-  // each as a lazy getter that composes from `this.db` / `this.ctx`.
+  // ── WP-8C: consent (POST /v1/consent, LF-M01) ──────────────────────────────────────────────
+  get consentRepository(): ConsentRepository {
+    if (this._consentRepository === null) {
+      this._consentRepository = new ConsentRepository(this.db, this.ctx.logger);
+    }
+    return this._consentRepository;
+  }
+
+  get consentService(): ConsentService {
+    if (this._consentService === null) {
+      this._consentService = new ConsentService(this.ctx, this.consentRepository);
+    }
+    return this._consentService;
+  }
+
+  // Further repository/service accessors are added per-WP as concrete classes land.
 }
 
 /** Build a fresh container for a request. */

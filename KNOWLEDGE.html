@@ -771,6 +771,21 @@ function deepDiveFeature(featureLabel){
         <div class="tl-note">A full evidence-first read of the whole repository (governance, frozen schema via migrations, all 11 source files, the recommendation-engine dependency map, and all six research batches) produced the Data-Gate plan. Key verified finding: the reason seeding stalled — "the master workbook is missing" (IDR-001) — is no longer true; the workbook and every content file are present in data/source/. Better still, the four architecture decisions the research said were blocking (cuisine home, tag vector ordering, combo roles, the snack/compound meal-slot) were already approved in the Architecture Freeze and are live in migrations 021–028. So the schema is genuinely ready. What actually remains is small and decision-bound, not research: confirm the permanent allergen bitmask, formally defer a few genuinely-unsourced datasets (with documented engine fallbacks), and ratify some deterministic value-normalization rules. Delivered one planning document (WP-6 v1.0) breaking the work into WP-6A→6F. No SQL written, no data loaded, no schema touched — planning only, awaiting Founder go-ahead.</div>
       </div>
     </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#ecfdf5;color:#0e7a5a">S21</span>
+        <div class="tl-title">First real backend endpoint: auth check-in + consent (WP-8C, part 1)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('timeline-full')">/v1/consent</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">JWT verification</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">24 tests pass</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">REPO-CERT-011</span>
+        </div>
+        <div class="tl-note">The first actual working backend endpoint. The plan named WP-8C as "auth + onboarding + consent," but a careful read showed onboarding secretly depends on the recommendation engine (it hands back a first week plan), which isn't built yet and belongs to later work packages — and the spec that would settle that boundary (DOC-P4-02) doesn't exist. So the build was correctly narrowed to the two pieces that are fully specified and self-contained, and onboarding was deferred with the reason written down (not faked). Delivered: real login-token verification (the app's ID card is checked against Supabase, not just decoded), an ownership rule (you can only act on your own account — needed because these functions bypass row-level security), and the complete "record my privacy consent" endpoint (DPDP) — validation, the four allowed consent types, append-only storage, and the personalization-granted flag that later gates onboarding. Genuinely validated: formatter, linter, type-checker, and 24 tests all pass (8 old + 16 new). No database, schema, seed, or security change; nothing pushed to main — it's on a branch for review. Certified REPO-CERT-011.</div>
+      </div>
+    </div>
     <!-- TIMELINE_INJECT -->
   </div>
 
