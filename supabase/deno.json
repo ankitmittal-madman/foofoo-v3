@@ -1,0 +1,27 @@
+{
+  "tasks": {
+    "fmt": "deno fmt",
+    "fmt:check": "deno fmt --check",
+    "lint": "deno lint",
+    "check": "deno check functions/_shared/mod.ts",
+    "test": "deno test --allow-env functions/_tests/",
+    "verify": "deno fmt --check && deno lint && deno check functions/_shared/mod.ts && deno test --allow-env functions/_tests/"
+  },
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.45.4",
+    "zod": "npm:zod@3.23.8",
+    "@std/assert": "jsr:@std/assert@1.0.6"
+  },
+  "fmt": {
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false,
+    "include": ["functions/"]
+  },
+  "lint": {
+    "include": ["functions/"],
+    "rules": { "tags": ["recommended"] }
+  },
+  "exclude": [".git", "node_modules"]
+}

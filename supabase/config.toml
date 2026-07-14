@@ -1,0 +1,23 @@
+# FooFoo — Supabase local project config (WP-8B scaffold).
+# Minimal config for local development (`supabase start`). Region/production are governed by
+# DOC-P3-08 (locked env map: local / foofoo-staging / foofoo-mvp). This file configures the
+# LOCAL stack only; remote projects are selected via `supabase link` + secrets, never here.
+project_id = "foofoo"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "re_engine"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[functions]
+# Edge Functions verify JWT by default; individual functions opt out (e.g. /v1/health) in later WPs.
+verify_jwt = true
+
+[auth]
+enabled = true

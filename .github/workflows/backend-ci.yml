@@ -1,0 +1,30 @@
+name: backend-ci
+
+# WP-8B — backend scaffold CI. Runs formatter check, linter, type-check, and unit tests on the
+# Deno Edge Function foundation. DB safety-gate checks (diet/allergen/Jain = 0 rows against
+# foofoo-staging, DOC-P3-08 §CI) are added when endpoints touching those paths land (WP-8E).
+on:
+  push:
+    paths: ["supabase/**", ".github/workflows/backend-ci.yml"]
+  pull_request:
+    paths: ["supabase/**", ".github/workflows/backend-ci.yml"]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: supabase
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Format check
+        run: deno fmt --check
+      - name: Lint
+        run: deno lint
+      - name: Type check
+        run: deno check functions/_shared/mod.ts
+      - name: Unit tests
+        run: deno test --allow-env functions/_tests/
