@@ -30,14 +30,17 @@ SELECT 'GATE_1_DIET' AS gate, count(*) AS violations_found
 FROM (
   SELECT cdo.dish_id FROM re_engine.re_class_dish_options cdo
   JOIN public.dishes d ON d.id = cdo.dish_id
-  WHERE cdo.meal_class_code = 'DIN_NON_VEG_MAIN' AND d.diet_type = 'non_veg'
-  -- This proves Butter Chicken is correctly classified non_veg AND correctly placed only
-  -- under a non-veg class — i.e. it would NOT be a violation if served to a non-veg user,
-  -- and the underlying data (d.diet_type) needed for Gate 1 to ever work is itself correct.
+  WHERE cdo.meal_class_code = 'LD_CHICKEN_HOME_CURRY' AND d.diet_type = 'non_veg'
+  -- This proves the non-veg dishes under a non-veg class (e.g. Andhra Chicken Curry) are
+  -- correctly classified non_veg AND correctly placed only under a non-veg class — i.e. they
+  -- would NOT be a violation if served to a non-veg user, and the underlying data
+  -- (d.diet_type) needed for Gate 1 to ever work is itself correct.
+  -- (Modernized WP-6E3: canonical class 'LD_CHICKEN_HOME_CURRY' replaces illustrative 'DIN_NON_VEG_MAIN'.)
 ) sub;
--- EXPECTED: 1 row returned (Butter Chicken is correctly non_veg + correctly classed) — this
--- is a precondition check proving Gate 1's data dependencies are sound, since the live gate
--- itself only has meaning once suggestion_logs has real rows from a running RE pipeline.
+-- EXPECTED: violations_found > 0 (canonical non-veg dishes are correctly non_veg + correctly
+-- classed under a non-veg class) — this is a precondition check proving Gate 1's data
+-- dependencies are sound, since the live gate itself only has meaning once suggestion_logs
+-- has real rows from a running RE pipeline.
 
 -- TEST 2: Gate 3 (Jain) — prove is_jain is correctly false for an onion-containing dish
 \echo '--- Test 2: Gate 3 precondition — Poha (contains onion) must show is_jain=false ---'
@@ -49,10 +52,12 @@ FROM public.dishes WHERE name = 'Poha';
 -- through suggestion_logs, which requires a live pipeline to populate.
 
 -- TEST 3: Gate 4 (Planning role) — prove ADDON_INFANT cannot pass as MAIN_PRIMARY
-\echo '--- Test 3: Gate 4 — ADDON_INFANT must have planning_role != MAIN_PRIMARY ---'
+\echo '--- Test 3: Gate 4 — BF_INFANT_6M_SOFT must have planning_role != MAIN_PRIMARY ---'
 SELECT class_code, planning_role, (planning_role != 'MAIN_PRIMARY') AS gate_4_would_pass
-FROM re_engine.re_meal_classes WHERE class_code = 'ADDON_INFANT';
--- EXPECTED: gate_4_would_pass = true.
+FROM re_engine.re_meal_classes WHERE class_code = 'BF_INFANT_6M_SOFT';
+-- EXPECTED: gate_4_would_pass = true (canonical add-on class carries planning_role
+-- 'ADDON_ONLY_NOT_PRIMARY', so it can never be placed as a weekly MAIN_PRIMARY).
+-- (Modernized WP-6E3: canonical add-on class 'BF_INFANT_6M_SOFT' replaces illustrative 'ADDON_INFANT'.)
 
 -- TEST 4: Live Gate 4 simulation — directly insert a violating plan_slot and prove a Gate 4
 -- query catches it (this one CAN be tested live, since plan_slots needs no Edge Function)

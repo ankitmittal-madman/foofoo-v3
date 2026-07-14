@@ -434,6 +434,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🗄️</span> S19 · Canonical data loaded to new Supabase (WP-6E.2)
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s20')">
+      <span class="nav-icon">🔒</span> S20 · Security hardening + validation modernization (WP-6E.3)
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -2050,6 +2054,39 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s19 -->
+
+  <!-- ── Session 20 ── -->
+  <div id="page-s20" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">S20 · WP-6E.3 — closing the one security gap and modernizing the self-tests</div>
+      <div class="page-subtitle">The single finding from last session (client roles could still edit the dishes' derived safety columns) was root-caused, fixed the proper way, and the whole validation suite was brought current to the real data — now passing end to end.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was done this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-6E.3 · REPO-CERT-010</div>
+      </div>
+      <div class="session-card-desc">
+        <b>The finding, root-caused (Phase 1).</b> Last session flagged that on the new Supabase the app roles (anon/authenticated) could still write the dishes' derived, safety-critical columns (diet type, allergen flags, genome) — even though the certified security fix (migration 029) is recorded as applied. This session proved <i>why</i>, from evidence: the recorded migration genuinely <b>did</b> contain the REVOKEs, and the repo file was never edited. But Supabase's own <b>platform default</b> ("grant everything on new tables to the app roles") had put a full table-level grant on <code>dishes</code> at creation, and a table-level grant overrides column-level revokes — so on this freshly-provisioned project the certified lock-down simply wasn't in force. No later migration or data load re-granted anything. That is environment drift, not a repository defect. (Postgres doesn't journal grant changes, so the exact moment can't be timestamped — stated honestly, not guessed.)
+        <br><br>
+        <b>The fix, done to scope (Phase 2).</b> Only the <b>missing privilege statements from migration 029</b> were applied — the exact repo-certified REVOKE/GRANT lines, nothing else (the production-only quarantined line stayed quarantined). Before/after was captured. After: anon/authenticated <b>cannot write any dishes column</b> and cannot run the derivation trigger functions; but they keep read access (the app still reads the catalog), the backend's full-access role is untouched, and row-level security is unchanged. No data, no counts, no schema touched.
+        <br><br>
+        <b>The self-tests, modernized (Phase 3).</b> The validation scripts still referenced the old removed sample rows ("Aloo Poha with Peanuts", "ADDON_INFANT"), a stale table-count, the pre-Option-C targets, and a wrong weekday spelling. Each was updated to the real canonical data — swapping in genuine dishes/classes that exercise the <i>same</i> logic, mapping the seed-gate targets to the approved ICD-1 scope, turning a brittle fixed count into a stronger "no table without security" check, and fixing the weekday format. Intent preserved, accuracy improved, nothing weakened — two checks actually became stricter.
+        <br><br>
+        <b>Regression (Phase 4).</b> The full suite (900–905) was re-run on the live database and <b>passes end to end</b>: 62 tables, all 15 seed gates exact, all foreign keys clean (zero orphans), derivations correct, the propagate trigger proven on real data, the app roles now correctly blocked from writing derived columns, RLS intact, GAP-002 satisfied, and the end-to-end smoke test resolving a real weekly plan. The only two "skips" are tests that need seeded login fixtures (which don't exist until the auth flow is built) — exactly as in the original certification. The one test that temporarily edits an ingredient reverted cleanly; every count and derivation is unchanged.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#166534">CLOSED</div><div class="stat-l">Security finding F-1</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">900–905 ✓</div><div class="stat-l">Full suite passes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">4</div><div class="stat-l">Validation scripts modernized</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Data / count / schema changes</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — Backend Engineering (WP-8C)</div>
+        <div class="next-text">The new Supabase is now the canonical execution environment with the certified security posture in force and a self-test suite that matches reality. Backend work (WP-8C: auth &amp; onboarding endpoints against the seeded reference data) can proceed cleanly. Small remaining debt: the S-15 city-migration overlay (needs a source value) and adding login test fixtures so the two skipped auth-dependent checks can run once WP-8C lands. Certificate: <code>docs/project-history/certificates/[ACTIVE]_REPO-CERT-010_WP-6E3_Security_Hardening_and_Validation_Modernization_v1.0.md</code>.</div>
+      </div>
+    </div>
+  </div><!-- /page-s20 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->

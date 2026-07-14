@@ -116,6 +116,7 @@ All derived columns were produced by the repository triggers, not written by han
 - **Impact:** defense-in-depth only. Row-level protection is intact — RLS blocks `anon` writes to `public.dishes` (903 PASS) and clients never reach `re_engine` (900 Check 6 PASS). The gap is the column-privilege layer, which would let an authenticated client tamper with derived safety columns *if* an RLS write policy admitted them.
 - **Action taken:** none. WP-6E.2 Phase 2 authorized migration 030 "and nothing else"; an RBAC change is out of the authorized scope, so it is reported for a deliberate decision rather than applied.
 - **Recommended remediation (one line, repo-certified, idempotent):** re-apply the REVOKE block from `database/migrations/029_pf1_security_hardening.sql` (lines 44–71) against this project. Restores full parity and flips 900 Check 4 / 901 Test 5 to PASS.
+- **RESOLVED (2026-07-14, WP-6E.3 / REPO-CERT-010):** root-caused (Supabase platform default `GRANT ALL ON TABLES` superseded pf1/029's column REVOKEs on this newly-provisioned project) and reconciled by applying only migration 029's missing privilege statements. Post-fix: authenticated/anon cannot write any dishes column, trigger functions locked to service_role, SELECT/RLS/service_role unaffected; 900 Check 4 and 901 Test 5 now PASS. See REPO-CERT-010.
 
 ## 8. Engineering Decision Log
 

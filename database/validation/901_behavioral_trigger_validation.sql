@@ -9,21 +9,25 @@
 \echo '=== BEHAVIORAL VALIDATION: fn_derive_dish_attributes() ==='
 
 -- TEST 1: Rule 2 — a dish with NO non-veg ingredient and NOT all-vegan -> diet_type = 'veg'
-\echo '--- Test 1: Poha (onion, mustard, turmeric, rice) should derive diet_type=veg, is_jain=false (onion is jain-excluded) ---'
+\echo '--- Test 1: Poha (canonical: onion, mustard, turmeric, rice) should derive diet_type=vegan, is_jain=false (onion is jain-excluded) ---'
 SELECT name, diet_type, is_jain, allergen_flags
 FROM public.dishes WHERE name = 'Poha';
--- EXPECTED: diet_type='veg' (no non-veg ingredient), is_jain=false (Onion.is_jain_excluded=true
--- per file 102's seed data) — this directly proves LF-K01 Rule 3: is_jain requires ALL
--- ingredients jain-safe; Onion is not, so Poha must come out is_jain=false.
+-- EXPECTED (WP-6E.2 canonical seeds 103/106/107): diet_type='vegan' (all ingredients vegan;
+-- 'vegan' is the stricter case of Rule 2's "no non-veg ingredient"), is_jain=false because
+-- canonical ingredient 'onion'.is_jain_excluded=true (seed 103) — proving LF-K01 Rule 3:
+-- is_jain requires ALL ingredients jain-safe; onion is not, so Poha comes out is_jain=false.
+-- (Modernized WP-6E3: canonical Poha derives 'vegan' — was 'veg' against the removed file-102 row.)
 
 -- TEST 2: Rule 1 — allergen_flags is the UNION of ingredient allergens
-\echo '--- Test 2: Aloo Poha with Peanuts should derive allergen_flags including bit 0 (nuts, value 1) ---'
+\echo '--- Test 2: Bharli Vangi (canonical, contains peanut) should derive allergen_flags including bit 0 (nuts, value 1) ---'
 SELECT name, allergen_flags, (allergen_flags & 1) > 0 AS has_nut_allergen_bit
-FROM public.dishes WHERE name = 'Aloo Poha with Peanuts';
+FROM public.dishes WHERE name = 'Bharli Vangi';
 -- EXPECTED: has_nut_allergen_bit = true, proving the UNION logic in LF-K01 Rule 1 actually
--- executed via the trigger, not via any manual entry (none was made — file 102 left these
--- columns unset on INSERT, deliberately, to prove the trigger and not the seed script
--- produced this value).
+-- executed via the trigger. Canonical seed 106/107 insert dish + dish_ingredients with the
+-- derived columns left unset; fn_derive_dish_attributes populates allergen_flags from the
+-- union of ingredient allergens (peanut carries the nut bit).
+-- (Modernized WP-6E3: canonical dish 'Bharli Vangi' replaces the removed illustrative
+-- 'Aloo Poha with Peanuts'; both exercise the same nut-bit union path.)
 
 -- TEST 3: Rule 2 — ANY non-veg ingredient -> diet_type = 'non_veg'
 \echo '--- Test 3: Butter Chicken (chicken, ghee, onion) should derive diet_type=non_veg ---'
@@ -32,22 +36,24 @@ SELECT name, diet_type, is_jain FROM public.dishes WHERE name = 'Butter Chicken'
 -- Rule 3's precondition fails regardless of ingredient jain-safety).
 
 -- TEST 4 (live mutation test): Rule 5 — UPDATE-time re-derivation via fn_propagate_ingredient_change
-\echo '--- Test 4: changing Peanuts.allergen_flags should immediately re-derive Aloo Poha (AGR-003 behavioral proof) ---'
+\echo '--- Test 4: changing peanut.allergen_flags should immediately re-derive Bharli Vangi (AGR-003 behavioral proof) ---'
 DO $$
 DECLARE
   v_before integer;
   v_after integer;
 BEGIN
-  SELECT allergen_flags INTO v_before FROM public.dishes WHERE name = 'Aloo Poha with Peanuts';
-  -- Simulate a content-ops correction: Peanuts gains the soy bit too (value 32) for this test
-  UPDATE public.ingredients SET allergen_flags = allergen_flags | 32 WHERE name = 'Peanuts';
-  SELECT allergen_flags INTO v_after FROM public.dishes WHERE name = 'Aloo Poha with Peanuts';
+  SELECT allergen_flags INTO v_before FROM public.dishes WHERE name = 'Bharli Vangi';
+  -- Simulate a content-ops correction: peanut gains the soy bit too (value 32) for this test
+  UPDATE public.ingredients SET allergen_flags = allergen_flags | 32 WHERE name = 'peanut';
+  SELECT allergen_flags INTO v_after FROM public.dishes WHERE name = 'Bharli Vangi';
   ASSERT v_after = (v_before | 32),
     'FAIL: fn_propagate_ingredient_change did not re-derive the dish after ingredient change';
   RAISE NOTICE 'PASS: dish allergen_flags updated from % to % immediately after ingredient edit, with no manual re-derivation step', v_before, v_after;
   -- Revert for idempotent re-running of this test script
-  UPDATE public.ingredients SET allergen_flags = allergen_flags & ~32 WHERE name = 'Peanuts';
+  UPDATE public.ingredients SET allergen_flags = allergen_flags & ~32 WHERE name = 'peanut';
 END $$;
+-- (Modernized WP-6E3: canonical dish 'Bharli Vangi' + canonical ingredient slug 'peanut'
+--  replace the removed illustrative 'Aloo Poha with Peanuts' / 'Peanuts' — same propagate path.)
 -- This is the single most important behavioral test in this file: it proves the exact
 -- mechanism that closed AGR-003 actually works end-to-end, not just that the SQL applied
 -- without a Postgres error.

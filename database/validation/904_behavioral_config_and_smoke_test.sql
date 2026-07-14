@@ -62,15 +62,19 @@ BEGIN
   SELECT c.cohort_id INTO v_cohort_id FROM re_engine.re_cohorts c
   WHERE c.persona_id = v_persona_id LIMIT 1;
   IF v_cohort_id IS NOT NULL THEN
-    PERFORM 1 FROM re_engine.re_weekly_class_plans WHERE cohort_id = v_cohort_id AND day_of_week = 'monday';
+    -- Canonical seed 114 stores day_of_week as 3-letter title-case ('Mon'..'Sun'), not 'monday'.
+    PERFORM 1 FROM re_engine.re_weekly_class_plans WHERE cohort_id = v_cohort_id AND day_of_week = 'Mon';
     IF FOUND THEN
       RAISE NOTICE 'PASS: class plan lookup (LF-B02 pattern) resolved a real weekly plan row';
     ELSE
-      RAISE NOTICE 'PARTIAL: cohort found but no Monday plan row exists yet — expected, per IDR-001, since only 1 illustrative weekly_class_plans row was seeded';
+      RAISE EXCEPTION 'FAIL: cohort % has no Monday (Mon) weekly plan row — canonical seed 114 expects 7 days per cohort', v_cohort_id;
     END IF;
   ELSE
-    RAISE NOTICE 'PARTIAL: no re_cohorts row for this persona — expected under IDR-001 illustrative seed scope';
+    RAISE EXCEPTION 'FAIL: no re_cohorts row for this persona — canonical seed 113 expects a cohort per persona/state/tier';
   END IF;
 
-  RAISE NOTICE 'SMOKE TEST COMPLETE: data model supports the onboarding -> persona -> class plan path. Full-volume behavior (all cohorts, all days) cannot be exercised until IDR-001 is resolved with real source data.';
+  RAISE NOTICE 'SMOKE TEST COMPLETE: data model supports the onboarding -> persona -> class plan path on the full canonical dataset (WP-6E.2: 2,952 cohorts x 7 days = 20,664 weekly plan rows).';
+  -- (Modernized WP-6E3: day_of_week 'monday' -> 'Mon' to match canonical seed 114; the former
+  --  IDR-001 "illustrative / only 1 row seeded" PARTIAL branches are now hard FAILs, since the
+  --  full canonical RE layer is loaded — this strengthens the smoke test, it does not weaken it.)
 END $$;
