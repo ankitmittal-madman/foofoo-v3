@@ -398,6 +398,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🏁</span> S10 · GREEN certification
       <span class="nav-badge">Jul 13</span>
     </div>
+    <div class="nav-item" onclick="showPage('s11')">
+      <span class="nav-icon">📚</span> S11 · WP-6 knowledge plan (Data Gate)
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -617,6 +621,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s10')">Repository Gate PASSED</span>
         </div>
         <div class="tl-note">An independent audit re-verified everything from scratch (structure, docs, database, production parity) and re-ran the whole build-and-teardown on a throwaway database: 29/29 build, 29/29 rollback to empty, seeds load, parity 100% canonical, every production difference explained. All ten GREEN criteria pass. The repository is CERTIFIED GREEN — the recovery program (WP-5A→5G) is complete and this repo is now the permanent engineering baseline. The Repository Gate is passed; coding can begin. Next: the Data Gate — load the real seed data (Seed Engineering). Nothing was modified except adding the certification documents.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S11</span>
+        <div class="tl-title">WP-6 Canonical Knowledge Engineering — plan (Data Gate)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s11')">deep repo read</span>
+          <span class="tl-chip" onclick="showPage('s11')">IDR-001 unblocked</span>
+          <span class="tl-chip" onclick="showPage('s11')">WP-6 plan v1.0</span>
+        </div>
+        <div class="tl-note">A full evidence-first read of the whole repository (governance, frozen schema via migrations, all 11 source files, the recommendation-engine dependency map, and all six research batches) produced the Data-Gate plan. Key verified finding: the reason seeding stalled — "the master workbook is missing" (IDR-001) — is no longer true; the workbook and every content file are present in data/source/. Better still, the four architecture decisions the research said were blocking (cuisine home, tag vector ordering, combo roles, the snack/compound meal-slot) were already approved in the Architecture Freeze and are live in migrations 021–028. So the schema is genuinely ready. What actually remains is small and decision-bound, not research: confirm the permanent allergen bitmask, formally defer a few genuinely-unsourced datasets (with documented engine fallbacks), and ratify some deterministic value-normalization rules. Delivered one planning document (WP-6 v1.0) breaking the work into WP-6A→6F. No SQL written, no data loaded, no schema touched — planning only, awaiting Founder go-ahead.</div>
       </div>
     </div>
     <!-- TIMELINE_INJECT -->
@@ -1598,7 +1616,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s9 -->
 
   <!-- ── Session 10 ── -->
-  <div id="page-s10" class="page-content" style="display:block">
+  <div id="page-s10" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S10 · Repository GREEN certification (WP-5G)</div>
       <div class="page-subtitle">An independent audit certified the repository as production-grade — it can rebuild itself from nothing and undo itself back to nothing, its documentation holds together, and every difference from production is explained. The recovery program is complete.</div>
@@ -1623,6 +1641,37 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s10 -->
+
+  <!-- ── Session 11 ── -->
+  <div id="page-s11" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S11 · WP-6 Canonical Knowledge Engineering — the plan for the Data Gate</div>
+      <div class="page-subtitle">A deep, evidence-first read of the whole repository produced the plan to build FooFoo's permanent food-knowledge layer. The headline: the thing everyone thought was blocking us isn't blocking us anymore.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was produced this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-6 · Planning only</div>
+      </div>
+      <div class="session-card-desc">
+        With the repository now GREEN-certified, the next milestone is the <b>Data Gate</b>: loading the real, full-volume food knowledge (roughly 30,000 rows — dishes, ingredients, cuisines, tags, cohorts, meal plans, regional affinity) against the frozen schema and proving it passes every safety and structural check. This session did not load anything. It did the homework first, exactly as instructed: read the governance rules, the frozen database schema, all eleven Founder-supplied source files, the recommendation-engine's dependency on the data, and all six research batches — then wrote a single planning document, <b>WP-6 v1.0</b>.
+        <br><br>
+        The most important discovery came from trusting the live repository over old summaries. For months the project believed its biggest blocker was <b>IDR-001</b> — "the master data workbook is missing." <b>It is no longer missing</b> — the workbook and every content file are sitting in <code>data/source/</code> right now. And the four design questions the research said had to be answered before loading (where cuisine lives, how tags get their vector order, how combo roles work, and how to handle "snack" and "lunch/dinner" meal slots) were <b>already decided in the Architecture Freeze and already built into migrations 021–028</b>. In plain terms: the schema is genuinely ready, and the door that was stuck is open.
+        <br><br>
+        What actually remains before a full load is small and specific — decisions, not more research: confirm the permanent <b>allergen number-code</b> (which bit means which allergen, because safety checks depend on it), formally <b>set aside a few datasets that genuinely don't exist in any file yet</b> (using the engine's documented fallbacks rather than inventing values), and <b>rubber-stamp a few tidy-up rules</b> for normalizing values. The plan breaks the work into six clean sub-steps, <b>WP-6A → WP-6F</b>, ending in a validated database and a Data-Gate certificate. Nothing was fabricated; every genuine gap is left as a Founder decision.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">11</div><div class="stat-l">Source files read</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">~30k</div><div class="stat-l">Rows to load</div></div>
+        <div class="stat"><div class="stat-n" style="color:#166534">4/4</div><div class="stat-l">Old blockers resolved</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">SQL / schema changes</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session — awaiting Founder go-ahead</div>
+        <div class="next-text">STOP condition honoured: no implementation started. On approval, the first execution step is <b>WP-6A — Knowledge Blueprint & Source-to-Target Contract</b> (freeze the exact source→column map and load order; still no SQL), followed by <b>WP-6B</b> where the Founder makes the four pending decisions (chiefly the permanent allergen code). Only after those does any seed SQL get written (WP-6D) and loaded onto <b>staging</b> (WP-6E), validated and certified (WP-6F). Production stays untouched until a separate, explicit Founder-approved promotion. Plan document: <code>docs/project-history/work-packages/[ACTIVE]_WP-6_Canonical_Knowledge_Engineering_Plan_v1.0.md</code>.</div>
+      </div>
+    </div>
+  </div><!-- /page-s11 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
