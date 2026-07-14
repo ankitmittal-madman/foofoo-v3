@@ -394,6 +394,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔐</span> S9 · Parity complete (Option B)
       <span class="nav-badge">Jul 13</span>
     </div>
+    <div class="nav-item" onclick="showPage('s10')">
+      <span class="nav-icon">🏁</span> S10 · GREEN certification
+      <span class="nav-badge">Jul 13</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -601,6 +605,20 @@ function deepDiveFeature(featureLabel){
         <div class="tl-note">The Founder chose Option B, so the missing production security fix (pf1) was added to the repo as migration 029 — verbatim, with only the one line that touches the production-only auto-security helper commented out and fully documented. A clean-room run proved it: 001→029 builds, 029→001 tears back down to empty, and the fix actually closes the leftover-permission gap (write access to protected columns is now removed, read kept). The hidden auto-security helper stays an operational overlay, never repo architecture. Canonical migration parity is now 100%. Kept lean: one completion document + one required certificate.</div>
       </div>
     </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 13, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#166534"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#f0fdf4;color:#166534">S10</span>
+        <div class="tl-title">Repository GREEN certification (WP-5G)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s10')">independent audit</span>
+          <span class="tl-chip" onclick="showPage('s10')">REPO-CERT-006</span>
+          <span class="tl-chip" onclick="showPage('s10')">Repository Gate PASSED</span>
+        </div>
+        <div class="tl-note">An independent audit re-verified everything from scratch (structure, docs, database, production parity) and re-ran the whole build-and-teardown on a throwaway database: 29/29 build, 29/29 rollback to empty, seeds load, parity 100% canonical, every production difference explained. All ten GREEN criteria pass. The repository is CERTIFIED GREEN — the recovery program (WP-5A→5G) is complete and this repo is now the permanent engineering baseline. The Repository Gate is passed; coding can begin. Next: the Data Gate — load the real seed data (Seed Engineering). Nothing was modified except adding the certification documents.</div>
+      </div>
+    </div>
     <!-- TIMELINE_INJECT -->
   </div>
 
@@ -801,6 +819,8 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file mono">database/rollback/029_pf1_security_hardening_rollback.sql</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S9</td><td class="fr-desc">Paired rollback for 029 (preserves 29/29 invariant)</td></tr>
         <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5D_Production_Parity_Completion_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S9</td><td class="fr-desc">Consolidated WP-5D completion (decision, overlay, verification, parity)</td></tr>
         <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-005_WP-5D_Completion_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S9</td><td class="fr-desc">WP-5D completion execution certificate</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5G_Repository_Green_Certification_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S10</td><td class="fr-desc">Independent GREEN certification: audit, scorecard, evidence, decision</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-006_Repository_Green_Certification_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S10</td><td class="fr-desc">Repository Health Certificate — GREEN (@ 7ffe7b3)</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1551,7 +1571,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s8 -->
 
   <!-- ── Session 9 ── -->
-  <div id="page-s9" class="page-content" style="display:block">
+  <div id="page-s9" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S9 · Production parity completed — Option B (WP-5D)</div>
       <div class="page-subtitle">The last engineering gap between the repository and production is closed: the missing security fix is now in the repo, and the production-only automation is documented and deliberately kept out.</div>
@@ -1576,6 +1596,33 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s9 -->
+
+  <!-- ── Session 10 ── -->
+  <div id="page-s10" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S10 · Repository GREEN certification (WP-5G)</div>
+      <div class="page-subtitle">An independent audit certified the repository as production-grade — it can rebuild itself from nothing and undo itself back to nothing, its documentation holds together, and every difference from production is explained. The recovery program is complete.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was certified this session</div>
+        <div class="session-card-meta">July 13, 2026<br>WP-5G</div>
+      </div>
+      <div class="session-card-desc">
+        Acting as an <b>independent auditor</b> (not the engineer who built it), everything was re-checked from first principles and re-executed on a throwaway database — no trusting earlier sessions. Results: the repository builds cleanly from empty through all <b>29 migrations</b>, loads its sample data, passes structural validation, and <b>tears all the way back down to empty</b> with all 29 undo scripts. Compared against live production (read-only): the engineering is a <b>100% canonical match</b> — same 62 tables, same 24 access policies — and the only differences (a production-only auto-security helper and two real-data loads) are each documented and deliberately excluded. All <b>ten</b> conditions required for a GREEN rating are met. Verdict: <b>REPOSITORY CERTIFIED GREEN</b>. The recovery program (WP-5A→5G) is officially complete and this repository is now the permanent engineering baseline — future work continues only from here. A few small, documented housekeeping items (9 legacy filenames, some stale self-test expectations, a thin README) were noted as non-blocking maintenance, not hidden and not "quietly fixed."
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#166534">GREEN</div><div class="stat-l">Certification</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">10/10</div><div class="stat-l">Criteria passed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">100%</div><div class="stat-l">Recovery complete</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Repo edits (audit only)</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next phase — back to product</div>
+        <div class="next-text">The <b>Repository Gate is PASSED</b> — coding may begin. Next is the <b>Data Gate: Seed Engineering</b> — load the real full-volume master dataset (~30k rows, IDR-001) against the now-certified schema and pass the 900-series on real data. After that come the API Gate (backend / recommendation-engine runtime against the frozen DOC-P3-06 contract) and finally the Release Gate (launch + DPDP). Backend and frontend have designs but no code yet. <b>Recommended next work package: WP-6 — Seed Engineering (Data Gate).</b> Not started — awaiting Founder go-ahead.</div>
+      </div>
+    </div>
+  </div><!-- /page-s10 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
