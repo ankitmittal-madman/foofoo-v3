@@ -1,2 +1,7 @@
 # macOS Finder metadata — never belongs in the repository (removed from tracking 2026-07-13)
 .DS_Store
+
+# Local secrets — database connection strings / credentials. NEVER commit. (WP-6E.2)
+.env
+.env.*
+!.env.example

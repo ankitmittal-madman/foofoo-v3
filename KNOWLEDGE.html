@@ -430,6 +430,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🏗️</span> S18 · Backend scaffold built + validated (WP-8B)
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s19')">
+      <span class="nav-icon">🗄️</span> S19 · Canonical data loaded to new Supabase (WP-6E.2)
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -2013,6 +2017,39 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s18 -->
+
+  <!-- ── Session 19 ── -->
+  <div id="page-s19" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">S19 · WP-6E.2 — the canonical food knowledge is now actually loaded into the new Supabase</div>
+      <div class="page-subtitle">Every prior data session prepared and proved the seeds on throwaway databases. This session put them, for real, into the live hosted project — replacing the old placeholder data — and verified every count matches the certified baseline exactly.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was done this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-6E.2 · REPO-CERT-009</div>
+      </div>
+      <div class="session-card-desc">
+        Important context first: the earlier "Data Gate" certificate (REPO-CERT-007) proved the seeds on a <b>disposable throwaway database</b> and deliberately never touched a hosted project. So the new Supabase project had <b>never actually received the real food knowledge</b> — it still held old <b>illustrative placeholder data</b> (the sample dishes "Poha", "Butter Chicken", "Aloo Poha with Peanuts"; a handful of sample cohorts and meal classes) plus correct reference tables (65 cuisines, 191 ingredients) and <b>8 duplicate ingredient rows</b> left over from the samples. This session, with explicit Founder go-ahead, brought that live project into full parity with the certified repository.
+        <br><br>
+        <b>What happened, in order:</b> First, reconciliation confirmed every difference was explainable with zero real conflicts — the "extra" rows were provably the old sample data, and the 8 extra ingredients were just display-name duplicates of real ones (e.g. "Onion" vs <code>onion</code>), used only by the sample dishes. Those samples were <b>snapshotted first, then removed</b> (nothing deleted without a saved record). Migration 030 (the city-tier fix) was already present — nothing to do there. Then all the canonical seeds were loaded <b>verbatim</b> from the repository. The database's own triggers did the derived work automatically: diet type / Jain / allergen flags for all 802 dishes, all 802 genome vectors, all 111 tag positions.
+        <br><br>
+        <b>A real engineering hurdle, handled honestly:</b> the database tool available could not reliably transfer the 10.8 MB of seed SQL (large payloads truncated or stalled), and one automated helper even tried to <b>re-generate</b> cohort rows by formula — which the rules forbid. That was rejected. Instead, with the Founder's connection string (kept in a git-ignored file, never committed), the seeds were loaded straight from the files with the standard Postgres client, guaranteeing the data is exactly the repository's. The reconstructed cohorts were then <b>independently proven correct</b> by loading the 20,664 weekly-plan rows on top — every single one linked to a valid cohort with zero errors (2,952 × 7 = 20,664).
+        <br><br>
+        <b>Result:</b> all <b>18 knowledge tables match the certified targets exactly</b>, and the authoritative recommendation-engine validation (905) <b>fully passes</b> — every count, every foreign key (zero orphans), and the safety rule that only main-meal classes appear as weekly primaries. The other validation scripts pass or hit the already-documented "stale sample-fixture" caveats. <b>One genuine finding was reported, not silently changed:</b> on this live project the app roles can still edit the dishes' derived safety columns (diet type, allergens) — the certified lock-down (migration 029) isn't in effect here. Row-level security still blocks the real risk, so it's a defense-in-depth gap; fixing it is an RBAC change outside this task's authorized scope, so it's flagged for a deliberate Founder decision with the exact one-line fix noted.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">18/18</div><div class="stat-l">Tables at exact parity</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">~48k</div><div class="stat-l">Canonical rows loaded</div></div>
+        <div class="stat"><div class="stat-n" style="color:#166534">905 ✓</div><div class="stat-l">RE validation full pass</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b45309">1</div><div class="stat-l">Finding (privilege drift)</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — Backend Engineering (WP-8C), with one hardening step</div>
+        <div class="next-text">The new Supabase is now the <b>canonical execution environment</b> — the repository is the engineering source of truth and the data matches it exactly (ICD-1 scope). Backend work (WP-8C: auth &amp; onboarding endpoints against this seeded reference data) can proceed. <b>Recommended before any client-facing write path:</b> re-apply the REVOKE block from <code>migration 029</code> to lock down the dishes derived columns (closes the finding above; flips two validation checks to pass). Deferred as before: the S-15 city-migration overlay (needs a source value). Certificate: <code>docs/project-history/certificates/[ACTIVE]_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md</code>.</div>
+      </div>
+    </div>
+  </div><!-- /page-s19 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
