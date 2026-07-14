@@ -422,6 +422,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🏁</span> S16 · Data Gate executed + certified
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s17')">
+      <span class="nav-icon">🧱</span> S17 · Backend Foundation Architecture (WP-8A)
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -641,6 +645,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s10')">Repository Gate PASSED</span>
         </div>
         <div class="tl-note">An independent audit re-verified everything from scratch (structure, docs, database, production parity) and re-ran the whole build-and-teardown on a throwaway database: 29/29 build, 29/29 rollback to empty, seeds load, parity 100% canonical, every production difference explained. All ten GREEN criteria pass. The repository is CERTIFIED GREEN — the recovery program (WP-5A→5G) is complete and this repo is now the permanent engineering baseline. The Repository Gate is passed; coding can begin. Next: the Data Gate — load the real seed data (Seed Engineering). Nothing was modified except adding the certification documents.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S17</span>
+        <div class="tl-title">Backend Foundation Architecture designed (WP-8A)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s17')">design only</span>
+          <span class="tl-chip" onclick="showPage('s17')">DOC-P4-00</span>
+          <span class="tl-chip" onclick="showPage('s17')">Phase 8 roadmap</span>
+        </div>
+        <div class="tl-note">With the data foundation certified, backend engineering began — as architecture, not code. A single comprehensive document (DOC-P4-00) lays out how the backend will be built, grounded entirely in the frozen design: Supabase Edge Functions (Deno/TypeScript) over PostgreSQL, two API surfaces (the app talks directly to safe tables via row-level security; everything touching the recommendation engine goes through custom functions), the 10 frozen endpoints, a clean layered structure (handlers → services → repositories → database), the recommendation engine as an isolated, reusable module shared by the live endpoint and the nightly job, explicit in-function authorization (because the engine runs with elevated privileges that bypass row-level security), and a deploy pipeline that runs the safety gates as release blockers. It covers all 30 requested topics plus a readiness score, risks, an implementation order, and a Phase-8 work-package roadmap (8B scaffolding → 8H hardening → API Gate). No code, no endpoints, no schema or database changes — design for approval. Backend readiness scored 8.5/10.</div>
       </div>
     </div>
     <div class="timeline-row">
@@ -1886,7 +1904,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s15 -->
 
   <!-- ── Session 16 ── -->
-  <div id="page-s16" class="page-content" style="display:block">
+  <div id="page-s16" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S16 · The Data Gate was executed on staging and certified — the knowledge database really builds from zero</div>
       <div class="page-subtitle">Everything the repository describes was actually run on a disposable database: build, seed, derive, validate, tear down, and rebuild — deterministically. Data Gate PASSED (initial canonical dataset).</div>
@@ -1915,6 +1933,37 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s16 -->
+
+  <!-- ── Session 17 ── -->
+  <div id="page-s17" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S17 · Backend Foundation Architecture — how the backend will be built (design only, WP-8A)</div>
+      <div class="page-subtitle">With the data foundation certified, backend engineering begins — as a design blueprint, not code. One document lays out the whole backend approach, grounded in the frozen architecture.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was produced this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-8A · DOC-P4-00</div>
+      </div>
+      <div class="session-card-desc">
+        This was the first step of Phase 8 (Backend Engineering) — and deliberately <b>architecture, not implementation</b>. It produced a single comprehensive backend architecture document (DOC-P4-00), built strictly on top of the already-frozen design rather than inventing anything new. The backend is <b>Supabase Edge Functions (Deno/TypeScript) over PostgreSQL</b>, with two "surfaces": the mobile app reads safe tables directly (protected by row-level security), while everything touching the recommendation engine goes through <b>custom functions</b> exposing the 10 frozen API endpoints.
+        <br><br>
+        The document specifies a clean layered code structure (thin request handlers → business services → data repositories → database), the recommendation engine as an <b>isolated, reusable module</b> shared by both the live endpoint and the nightly plan-generation job, and one safety-critical rule made explicit: because these functions run with elevated privileges that <b>bypass</b> row-level security, every ownership check must be written into the code itself. It also covers authentication, validation, error handling, logging, configuration, transactions, caching, background jobs, testing, deployment (via the same numbered-migration discipline, with the safety gates as release blockers), versioning, rate limiting, observability, a future-AI path, and a scalability roadmap — all 30 requested topics.
+        <br><br>
+        It closes with a backend readiness score (<b>8.5/10</b>), risks (chiefly: don't miss an in-code authorization check, and the 800ms recommendation budget), a recommended build order, and a Phase-8 work-package roadmap (8B scaffolding → 8H hardening → the API Gate). <b>No code, no endpoints, no schema or database changes</b> — a blueprint for Founder approval before any implementation starts.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">30/30</div><div class="stat-l">Topics covered</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">8.5/10</div><div class="stat-l">Backend readiness</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">8B–8H</div><div class="stat-l">Impl work packages</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Code / DB changes</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — Founder approval, then implementation</div>
+        <div class="next-text">Await Founder approval of the architecture. On approval, implementation begins with <b>WP-8B</b> (backend scaffolding + shared foundation + CI pipeline + the health endpoint to prove the deploy path), then auth/onboarding (8C), the recommendation-engine runtime core (8D), the recommendations endpoint + nightly job (8E), and onward to the API Gate. Also still open, non-blocking here: the WP-6E.1 canonical seed sync decision, and the DPDP under-13 age gate (launch-blocking). Document: <code>docs/architecture/[ACTIVE]_DOC-P4-00_Backend_Foundation_Architecture_v1.0.md</code>.</div>
+      </div>
+    </div>
+  </div><!-- /page-s17 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
