@@ -771,6 +771,21 @@ function deepDiveFeature(featureLabel){
         <div class="tl-note">A full evidence-first read of the whole repository (governance, frozen schema via migrations, all 11 source files, the recommendation-engine dependency map, and all six research batches) produced the Data-Gate plan. Key verified finding: the reason seeding stalled — "the master workbook is missing" (IDR-001) — is no longer true; the workbook and every content file are present in data/source/. Better still, the four architecture decisions the research said were blocking (cuisine home, tag vector ordering, combo roles, the snack/compound meal-slot) were already approved in the Architecture Freeze and are live in migrations 021–028. So the schema is genuinely ready. What actually remains is small and decision-bound, not research: confirm the permanent allergen bitmask, formally defer a few genuinely-unsourced datasets (with documented engine fallbacks), and ratify some deterministic value-normalization rules. Delivered one planning document (WP-6 v1.0) breaking the work into WP-6A→6F. No SQL written, no data loaded, no schema touched — planning only, awaiting Founder go-ahead.</div>
       </div>
     </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#7c3aed"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#f5f3ff;color:#7c3aed">S22</span>
+        <div class="tl-title">Architectural reconciliation before onboarding — decision: author DOC-P4-02 first</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('timeline-full')">read-only investigation</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">Option B</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">DOC-P4-02 (draft)</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">REPO-CERT-012</span>
+        </div>
+        <div class="tl-note">Before writing any onboarding code, a complete evidence-only reconciliation traced the whole path (registration → auth → consent → onboarding → persona → cohort → recommendation → weekly plan → add-ons → API) against the actual repository. Two findings matter. First, the good news: every piece of DATA the recommendation engine needs already exists and is validated — personas, cohorts (2,952), weekly plans (20,664), add-on plans, meal classes, non-veg logic, dish links — all seeded and passing the self-tests. What's missing is the runtime CODE, which is expected. Second, the real blocker: the specs disagree on one precise point — the onboarding API is documented to hand back a "first week plan," but the same specs also say onboarding writes no plan tables and that plan generation is a separate nightly job. Nobody wrote down how/when the first plan actually gets made relative to onboarding — and the document that's supposed to settle exactly this (DOC-P4-02, the service/edge-function spec) was never written. So this was NOT a contradiction to "fix" and NOT enough to code against. Recommendation: Option B — author DOC-P4-02 first. Did so as a DRAFT that lays out everything the frozen docs already decide, and isolates the one open question as a Founder decision (AD-01: does onboarding return the plan, trigger it, or defer it?) with three evidence-backed options and a recommendation — deliberately NOT decided unilaterally. Delivered a reconciliation report, DOC-P4-02 draft, and REPO-CERT-012. No code, no database, no schema change; branch only, not pushed. STOP: onboarding is not built until the Founder ratifies AD-01.</div>
+      </div>
+    </div>
     <!-- TIMELINE_INJECT -->
   </div>
 
