@@ -414,6 +414,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔎</span> S14 · WP-6RE knowledge audit
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s15')">
+      <span class="nav-icon">⚙️</span> S15 · GAP-002 fixed + RE seeds generated
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -633,6 +637,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s10')">Repository Gate PASSED</span>
         </div>
         <div class="tl-note">An independent audit re-verified everything from scratch (structure, docs, database, production parity) and re-ran the whole build-and-teardown on a throwaway database: 29/29 build, 29/29 rollback to empty, seeds load, parity 100% canonical, every production difference explained. All ten GREEN criteria pass. The repository is CERTIFIED GREEN — the recovery program (WP-5A→5G) is complete and this repo is now the permanent engineering baseline. The Repository Gate is passed; coding can begin. Next: the Data Gate — load the real seed data (Seed Engineering). Nothing was modified except adding the certification documents.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#ecfdf5;color:#0e7a5a">S15</span>
+        <div class="tl-title">GAP-002 resolved (city_tier SER) + Recommendation Engine seeds generated</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s15')">SER-001 + migration 030</span>
+          <span class="tl-chip" onclick="showPage('s15')">2,952 / 20,664 / 7,992</span>
+          <span class="tl-chip" onclick="showPage('s15')">S-15 deferred</span>
+        </div>
+        <div class="tl-note">Founder approved Option A: distinguish cohorts by city tier. This session proved it (the 2,952 source cohorts are 1,476 household types × 2 city tiers, differing only by tier — zero exceptions), wrote a governed Schema Evolution Request (SER-001), and added migration 030 to give re_cohorts a city_tier column and a tier-aware uniqueness key. Then a deterministic generator produced the full recommendation-engine seed layer (migrations 110–117): states, personas, sub-cohorts, meal classes, and — now unblocked — cohorts (2,952), the 20,664-row weekly plan (exactly cohorts × 7), and the 7,992-row household add-on plan, all matching their targets exactly. Dish-linked tables were seeded for the dishes we actually have (Option C / ICD-1); the rest stay in the deferred backlog. A validation script (905) checks every count, foreign key, and the safety rule that only main-meal classes appear as weekly primaries (0 violations confirmed in source). One table stays deferred honestly: the city-migration overlay needs a "migration duration band" field that simply isn't in the source workbook — flagged, not invented. Repository remains contiguous and fully rollback-paired.</div>
       </div>
     </div>
     <div class="timeline-row">
@@ -1788,7 +1806,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s13 -->
 
   <!-- ── Session 14 ── -->
-  <div id="page-s14" class="page-content" style="display:block">
+  <div id="page-s14" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S14 · WP-6RE — forensic audit: can the recommendation engine be fully seeded? (read-only)</div>
       <div class="page-subtitle">An independent, evidence-only re-check — not trusting earlier sessions — of whether the engine's knowledge can be fully loaded. It corrected a prior over-pessimistic finding and isolated the one real blocker.</div>
@@ -1817,6 +1835,37 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s14 -->
+
+  <!-- ── Session 15 ── -->
+  <div id="page-s15" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S15 · GAP-002 resolved via governed schema change, and the recommendation-engine seeds are generated</div>
+      <div class="page-subtitle">The one real blocker is fixed the proper way (a schema evolution request + migration), and the full engine knowledge layer — cohorts, weekly plans, household plans — is now generated deterministically.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-6RE-DEC + WP-6RE-GEN · Option A</div>
+      </div>
+      <div class="session-card-desc">
+        The Founder approved <b>Option A</b>: the recommendation engine should distinguish cohorts by <b>city tier</b>. This session engineered it correctly and end-to-end. First, a final proof: the 2,952 source cohorts are exactly <b>1,476 household types × 2 city tiers</b>, and for every one of the 1,476 pairs the two tier rows are identical except for the tier — so city tier is the single, minimal, non-redundant thing that was missing. That proof was written up as a governed <b>Schema Evolution Request (SER-001)</b>, and a new database migration (<b>030</b>) adds a <code>city_tier</code> column to the cohort table and upgrades its uniqueness rule to include it. This is the first schema change since the architecture was frozen, done through proper governance — not an edit to old files.
+        <br><br>
+        With the blocker gone, a deterministic generator produced the entire engine seed layer as migrations <b>110–117</b> (with paired rollbacks): 36 states, 41 personas, 41 sub-cohorts, 131 meal classes, 24 add-on classes — and the three tables that were stuck: <b>2,952 cohorts</b>, the <b>20,664-row weekly plan</b> (exactly cohorts × 7), and the <b>7,992-row household add-on plan</b>. All three hit their targets exactly. Dish-linked tables (class→dish, add-on→dish, regional affinity) were seeded only for dishes we actually have (Option C), with the remainder already in the deferred backlog. A validation script (905) checks every row count, every foreign key, and the safety rule that only main-meal classes appear as weekly primaries — confirmed zero violations in the source.
+        <br><br>
+        Everything is deterministic (stable IDs derived from the source keys), idempotent, fully reversible, and traceable to source. <b>Nothing was loaded into a database and nothing was invented.</b> One table remains honestly deferred: the city-migration overlay needs a "migration duration band" value that isn't present in the source workbook — flagged for a small follow-up, not fabricated.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">2,952</div><div class="stat-l">Cohorts (S-11 ✓)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">20,664</div><div class="stat-l">Weekly plan rows (S-12 ✓)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">030 + 110–117</div><div class="stat-l">Migrations added</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b45309">1</div><div class="stat-l">Table deferred (S-15)</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — WP-6E (staging load), Founder-gated</div>
+        <div class="next-text">The content seeds (103–109) and the engine seeds (110–117) are ready to apply on <b>staging</b> after migration 030, then run the 900-series validation (including 905) and the four safety gates. That load is <b>WP-6E</b> and needs explicit Founder approval — production stays untouched. Two small follow-ups: source or decide the S-15 "migration duration band", and confirm the documented derivation rules (region grouping, persona diet, day-type default). Artifacts: <code>SER-001</code>, <code>migration 030</code>, <code>database/etl/generate_re_seeds.py</code>, seeds <code>110–117</code>, validation <code>905</code>.</div>
+      </div>
+    </div>
+  </div><!-- /page-s15 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->

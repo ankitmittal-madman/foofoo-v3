@@ -1,0 +1,152 @@
+-- Migration: 111_seed_re_reference_hierarchy.sql
+-- Title: re_main_cohorts(5), re_subcohorts, re_personas, re_routing_rules, re_persona_assignment_rules
+-- Layer: re_engine seed (WP-6RE-GEN v1.0); requires migration 030 (SER-001 city_tier)
+-- Generated: 2026-07-14T05:57:31Z by database/etl/generate_re_seeds.py (deterministic)
+-- Provenance:
+--   source: Main_Cohort_Hierarchy / Subcohort_Routing / Persona_Master_v3 / Routing_Rules_v3 (sha256:bf8e1bd86d831005)
+--   source: re_main_cohorts + re_routing_rules carried from seed 101 ([CONFIRMED] DOC-P3-03 §03)
+-- Business rules:
+--   - persona id = md5(persona_code)::uuid; persona_code = source persona_id (P01..P41)
+--   - main_cohort_code via MC1-5->MC_SOLO.. crosswalk (labels, seed 101)
+--   - persona primary_diet from nonveg_mode (CAN-RULE-006: default/health/budget->veg)
+-- Idempotent: ON CONFLICT DO NOTHING; surrogate UUIDs = md5(natural_key)::uuid. Paired rollback.
+-- Supersedes illustrative rows in seed 101/102 for these tables (never edited in place).
+
+BEGIN;
+INSERT INTO re_engine.re_main_cohorts (cohort_code,display_label,sort_order) VALUES ('MC_SOLO','Just me',1) ON CONFLICT (cohort_code) DO NOTHING;
+INSERT INTO re_engine.re_main_cohorts (cohort_code,display_label,sort_order) VALUES ('MC_COUPLE','Two of us',2) ON CONFLICT (cohort_code) DO NOTHING;
+INSERT INTO re_engine.re_main_cohorts (cohort_code,display_label,sort_order) VALUES ('MC_NUCLEAR_FAMILY','Family with children',3) ON CONFLICT (cohort_code) DO NOTHING;
+INSERT INTO re_engine.re_main_cohorts (cohort_code,display_label,sort_order) VALUES ('MC_JOINT_FAMILY','Joint family / multi-gen',4) ON CONFLICT (cohort_code) DO NOTHING;
+INSERT INTO re_engine.re_main_cohorts (cohort_code,display_label,sort_order) VALUES ('MC_PG_HOSTEL','PG / hostel / shared',5) ON CONFLICT (cohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC1A','MC_SOLO','student_hostel_budget') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC1B','MC_SOLO','solo_young_professional') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC1C','MC_SOLO','working_woman_alone') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC1D','MC_SOLO','flatmates_shared_kitchen') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC1E','MC_SOLO','migrant_adult_home_state') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC1F','MC_SOLO','desk_job_sedentary') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC2A','MC_COUPLE','dink_couple') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC2B','MC_COUPLE','newly_married_mixed_state') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC2C','MC_COUPLE','planning_pregnancy') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC2D','MC_COUPLE','pregnant_household') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC2E','MC_COUPLE','couple_with_infant_0_6m') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC2F','MC_COUPLE','couple_with_baby_6_18m') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC2G','MC_COUPLE','interstate_couple_mixed_cuisine') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC3A','MC_NUCLEAR_FAMILY','family_with_toddler') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC3B','MC_NUCLEAR_FAMILY','family_with_school_kids') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC3C','MC_NUCLEAR_FAMILY','family_with_teenagers') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC3D','MC_NUCLEAR_FAMILY','child_picky_eater') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC3E','MC_NUCLEAR_FAMILY','budget_family') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC3F','MC_NUCLEAR_FAMILY','homemaker_elaborate_family') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC4A','MC_JOINT_FAMILY','joint_multigeneration') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC4B','MC_JOINT_FAMILY','elderly_couple') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC4C','MC_JOINT_FAMILY','recovery_senior_light') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC4D','MC_JOINT_FAMILY','diabetic_low_gi_household') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC4E','MC_JOINT_FAMILY','bp_heart_conscious') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC4F','MC_JOINT_FAMILY','child_plus_diabetic_elder_overlap') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5A','MC_PG_HOSTEL','weight_loss_calorie_conscious') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5B','MC_PG_HOSTEL','gym_high_protein') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5C','MC_PG_HOSTEL','vegetarian_protein') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5D','MC_PG_HOSTEL','strict_jain') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5E','MC_PG_HOSTEL','fasting_ritual') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5F','MC_PG_HOSTEL','cook_assisted_skilled') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5G','MC_PG_HOSTEL','cook_needs_instruction') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5H','MC_PG_HOSTEL','working_woman_managing_cook') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5I','MC_PG_HOSTEL','maid_dependent_batch_cook') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5J','MC_PG_HOSTEL','premium_experimental_foodie') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5K','MC_PG_HOSTEL','regular_nonveg_household') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5L','MC_PG_HOSTEL','eggitarian_low_meat') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5M','MC_PG_HOSTEL','seafood_coastal_nonveg') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5N','MC_PG_HOSTEL','sunday_mutton_nonveg') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5O','MC_PG_HOSTEL','home_veg_outside_nonveg') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_subcohorts (subcohort_code,main_cohort_code,description) VALUES ('SC5P','MC_PG_HOSTEL','field_work_heavy_breakfast') ON CONFLICT (subcohort_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P01')::uuid,'P01','MC_SOLO','Solo student/hostel budget','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P02')::uuid,'P02','MC_SOLO','Solo young professional','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P03')::uuid,'P03','MC_SOLO','Working woman living alone','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P04')::uuid,'P04','MC_COUPLE','DINK couple no children','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P05')::uuid,'P05','MC_COUPLE','Newly married mixed-state couple','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P06')::uuid,'P06','MC_COUPLE','Couple planning pregnancy','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P07')::uuid,'P07','MC_COUPLE','Pregnant woman household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P08')::uuid,'P08','MC_COUPLE','Couple with infant 0-6 months','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P09')::uuid,'P09','MC_COUPLE','Couple with baby 6-18 months','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P10')::uuid,'P10','MC_NUCLEAR_FAMILY','Nuclear family with toddler','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P11')::uuid,'P11','MC_NUCLEAR_FAMILY','Nuclear family with school kids','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P12')::uuid,'P12','MC_NUCLEAR_FAMILY','Family with teenagers','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P13')::uuid,'P13','MC_JOINT_FAMILY','Joint/multi-generation family','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P14')::uuid,'P14','MC_JOINT_FAMILY','Elderly couple','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P15')::uuid,'P15','MC_JOINT_FAMILY','Diabetic / low-GI household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P16')::uuid,'P16','MC_JOINT_FAMILY','Hypertension / heart conscious','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P17')::uuid,'P17','MC_PG_HOSTEL','Weight loss / calorie conscious','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P18')::uuid,'P18','MC_PG_HOSTEL','Gym/high-protein nonveg or egg-friendly','non_veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P19')::uuid,'P19','MC_PG_HOSTEL','Vegetarian protein seeker','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P20')::uuid,'P20','MC_PG_HOSTEL','Strict Jain household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P21')::uuid,'P21','MC_PG_HOSTEL','Fasting/ritual observant household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P22')::uuid,'P22','MC_PG_HOSTEL','Cook-assisted household: skilled cook','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P23')::uuid,'P23','MC_PG_HOSTEL','Cook-assisted: needs constant instruction','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P24')::uuid,'P24','MC_PG_HOSTEL','Working woman managing cook + office','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P25')::uuid,'P25','MC_PG_HOSTEL','Maid-dependent minimal cooking / batch cook','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P26')::uuid,'P26','MC_NUCLEAR_FAMILY','Budget/value-conscious family','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P27')::uuid,'P27','MC_PG_HOSTEL','Premium experimental foodie','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P28')::uuid,'P28','MC_SOLO','Migrant in metro preserving home-state food','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P29')::uuid,'P29','MC_COUPLE','Inter-state couple / mixed cuisine household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P30')::uuid,'P30','MC_PG_HOSTEL','Regular non-veg household','non_veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P31')::uuid,'P31','MC_PG_HOSTEL','Eggitarian / low-meat household','egg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P32')::uuid,'P32','MC_PG_HOSTEL','Seafood/coastal non-veg household','non_veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P33')::uuid,'P33','MC_PG_HOSTEL','Mutton/Sunday special non-veg household','non_veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P34')::uuid,'P34','MC_PG_HOSTEL','Vegetarian home, occasional outside non-veg','non_veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P35')::uuid,'P35','MC_NUCLEAR_FAMILY','Child picky eater household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P36')::uuid,'P36','MC_JOINT_FAMILY','Recovery/senior digestive light household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P37')::uuid,'P37','MC_SOLO','Flatmates shared kitchen','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P38')::uuid,'P38','MC_PG_HOSTEL','Field-work heavy breakfast household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P39')::uuid,'P39','MC_SOLO','Desk-job sedentary household','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P40')::uuid,'P40','MC_NUCLEAR_FAMILY','Home-maker elaborate cooking family','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_personas (id,persona_code,main_cohort_code,display_name,primary_diet) VALUES (md5('P41')::uuid,'P41','MC_JOINT_FAMILY','Composite family: child + diabetic/elderly member','veg') ON CONFLICT (persona_code) DO NOTHING;
+INSERT INTO re_engine.re_routing_rules (trigger_answer,show_question_key,skip_if_answered,sort_order) VALUES ('MC_NUCLEAR_FAMILY','children_ages',NULL,1);
+INSERT INTO re_engine.re_routing_rules (trigger_answer,show_question_key,skip_if_answered,sort_order) VALUES ('MC_JOINT_FAMILY','elder_members_present',NULL,2);
+INSERT INTO re_engine.re_routing_rules (trigger_answer,show_question_key,skip_if_answered,sort_order) VALUES ('MC_JOINT_FAMILY','elder_health_conditions',NULL,3);
+INSERT INTO re_engine.re_routing_rules (trigger_answer,show_question_key,skip_if_answered,sort_order) VALUES ('MC_SOLO',NULL,ARRAY['children_ages', 'elder_members_present']::text[],4);
+INSERT INTO re_engine.re_routing_rules (trigger_answer,show_question_key,skip_if_answered,sort_order) VALUES ('MC_COUPLE',NULL,ARRAY['children_ages', 'elder_members_present']::text[],5);
+INSERT INTO re_engine.re_routing_rules (trigger_answer,show_question_key,skip_if_answered,sort_order) VALUES ('MC_PG_HOSTEL',NULL,ARRAY['children_ages', 'elder_members_present']::text[],6);
+INSERT INTO re_engine.re_routing_rules (trigger_answer,show_question_key,skip_if_answered,sort_order) VALUES ('diet_type=jain',NULL,ARRAY['nonveg_questions']::text[],7);
+INSERT INTO re_engine.re_routing_rules (trigger_answer,show_question_key,skip_if_answered,sort_order) VALUES ('infant_declared','infant_allergen_questions',NULL,8);
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_SOLO','SC1A',NULL,NULL,md5('P01')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_SOLO','SC1B',NULL,NULL,md5('P02')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_SOLO','SC1C',NULL,NULL,md5('P03')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_SOLO','SC1D',NULL,NULL,md5('P37')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_SOLO','SC1E',NULL,NULL,md5('P28')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_SOLO','SC1F',NULL,NULL,md5('P39')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_COUPLE','SC2A',NULL,NULL,md5('P04')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_COUPLE','SC2B',NULL,NULL,md5('P05')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_COUPLE','SC2C',NULL,NULL,md5('P06')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_COUPLE','SC2D',NULL,NULL,md5('P07')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_COUPLE','SC2E',NULL,NULL,md5('P08')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_COUPLE','SC2F',NULL,NULL,md5('P09')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_COUPLE','SC2G',NULL,NULL,md5('P29')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_NUCLEAR_FAMILY','SC3A',NULL,NULL,md5('P10')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_NUCLEAR_FAMILY','SC3B',NULL,NULL,md5('P11')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_NUCLEAR_FAMILY','SC3C',NULL,NULL,md5('P12')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_NUCLEAR_FAMILY','SC3D',NULL,NULL,md5('P35')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_NUCLEAR_FAMILY','SC3E',NULL,NULL,md5('P26')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_NUCLEAR_FAMILY','SC3F',NULL,NULL,md5('P40')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_JOINT_FAMILY','SC4A',NULL,NULL,md5('P13')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_JOINT_FAMILY','SC4B',NULL,NULL,md5('P14')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_JOINT_FAMILY','SC4C',NULL,NULL,md5('P36')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_JOINT_FAMILY','SC4D',NULL,NULL,md5('P15')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_JOINT_FAMILY','SC4E',NULL,NULL,md5('P16')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_JOINT_FAMILY','SC4F',NULL,NULL,md5('P41')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5A',NULL,NULL,md5('P17')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5B',NULL,NULL,md5('P18')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5C',NULL,NULL,md5('P19')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5D',NULL,NULL,md5('P20')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5E',NULL,NULL,md5('P21')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5F',NULL,NULL,md5('P22')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5G',NULL,NULL,md5('P23')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5H',NULL,NULL,md5('P24')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5I',NULL,NULL,md5('P25')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5J',NULL,NULL,md5('P27')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5K',NULL,NULL,md5('P30')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5L',NULL,NULL,md5('P31')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5M',NULL,NULL,md5('P32')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5N',NULL,NULL,md5('P33')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5O',NULL,NULL,md5('P34')::uuid) ON CONFLICT DO NOTHING;
+INSERT INTO re_engine.re_persona_assignment_rules (main_cohort_code,subcohort_code,state_code,diet_type,persona_id) VALUES ('MC_PG_HOSTEL','SC5P',NULL,NULL,md5('P38')::uuid) ON CONFLICT DO NOTHING;
+COMMIT;
