@@ -402,6 +402,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">📚</span> S11 · WP-6 knowledge plan (Data Gate)
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s12')">
+      <span class="nav-icon">🧭</span> S12 · WP-6A–D mapping + blocker
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -621,6 +625,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s10')">Repository Gate PASSED</span>
         </div>
         <div class="tl-note">An independent audit re-verified everything from scratch (structure, docs, database, production parity) and re-ran the whole build-and-teardown on a throwaway database: 29/29 build, 29/29 rollback to empty, seeds load, parity 100% canonical, every production difference explained. All ten GREEN criteria pass. The repository is CERTIFIED GREEN — the recovery program (WP-5A→5G) is complete and this repo is now the permanent engineering baseline. The Repository Gate is passed; coding can begin. Next: the Data Gate — load the real seed data (Seed Engineering). Nothing was modified except adding the certification documents.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#b45309"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#fffbeb;color:#b45309">S12</span>
+        <div class="tl-title">WP-6A–D executed — mapping done, one real blocker found</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s12')">9/10 decisions gone</span>
+          <span class="tl-chip" onclick="showPage('s12')">full mapping</span>
+          <span class="tl-chip" onclick="showPage('s12')">dish-catalog blocker</span>
+        </div>
+        <div class="tl-note">Progressive execution ran WP-6A→6D. The design work is complete: the source-to-target mapping for every domain (with provenance on every rule), the deterministic load-order and rollback plan, and a re-check of every historical Founder decision — nine of ten have already been built into the certified schema, so they simply disappeared. Then execution hit a genuine, evidence-based wall: the dish content file (810 dishes) covers only 17% of the dishes the recommendation engine's class-dish options reference, and 2% of the add-on options — roughly 750 referenced dishes aren't in the content set at all. That is missing data / a product decision, not something engineering can invent, so nothing was fabricated and no seed SQL was written. Delivered one document (WP-6A–D v1.0) and stopped at the blocker for a Founder call on the authoritative dish catalog. No database touched.</div>
       </div>
     </div>
     <div class="timeline-row">
@@ -1643,7 +1661,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s10 -->
 
   <!-- ── Session 11 ── -->
-  <div id="page-s11" class="page-content" style="display:block">
+  <div id="page-s11" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S11 · WP-6 Canonical Knowledge Engineering — the plan for the Data Gate</div>
       <div class="page-subtitle">A deep, evidence-first read of the whole repository produced the plan to build FooFoo's permanent food-knowledge layer. The headline: the thing everyone thought was blocking us isn't blocking us anymore.</div>
@@ -1672,6 +1690,35 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s11 -->
+
+  <!-- ── Session 12 ── -->
+  <div id="page-s12" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S12 · WP-6A–D — the mapping is done, and we found the one thing that genuinely blocks loading</div>
+      <div class="page-subtitle">Progressive execution took the plan into real engineering: how every source value becomes a database value, the exact load order, and a hard, evidence-based blocker that needs a Founder decision — not more code.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was produced this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-6A · 6B · 6C · 6D</div>
+      </div>
+      <div class="session-card-desc">
+        Following the "keep going until you hit a real decision" instruction, this session executed four sub-steps in one pass and wrote a single document (<b>WP-6A–D v1.0</b>). It produced the full <b>source-to-target map</b> — for every source column, exactly which database column it becomes, how it's transformed, and the precise document or migration that justifies it (provenance on every rule, as instructed). It confirmed the load order and rollback plan, and re-checked every old "Founder decision" against the live repository. The good news: <b>nine of the ten open decisions have already been built into the certified schema</b> (cuisine home, tag ordering, combo roles, the snack/lunch-dinner slots, the weekly-plan shape, regional-affinity table, dish attributes) — so they simply no longer need a decision. The allergen number-code turned out to be already fixed in the frozen business spec (7 allergens), leaving only a small safety-scope note about two allergens the model doesn't cover (fish, mustard).
+        <br><br>
+        Then execution hit a <b>genuine wall</b>, found by actually parsing the source files: the dish content file has <b>810 dishes</b>, but the recommendation engine's "which dishes belong to which meal-class" table references about <b>916 different dishes — and only 17% of them exist in the content file</b> (the add-on table is worse: 2%). Around <b>750 referenced dishes are simply not in the content set</b>. No amount of clever name-matching fixes that — the dishes aren't there. This is either a <b>missing data file</b> or a <b>product decision</b> about what the real dish catalog is. Per the rules, nothing was invented and <b>no seed SQL was written</b> — the work stopped here and surfaced the decision.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#166534">9/10</div><div class="stat-l">Old decisions gone</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b45309">17%</div><div class="stat-l">Class dishes in catalog</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b91c1c">~750</div><div class="stat-l">Dishes missing</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Rows fabricated</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — Founder decision required (genuine STOP)</div>
+        <div class="next-text">Everything except the class-dish and add-on-dish linkage is designed and ready to load onto staging. To unblock those two tables, the Founder needs to choose: <b>(A)</b> supply the full dish catalog (~900+ dishes) if the 810-file is only a subset; <b>(B)</b> treat the ~900 referenced names as the catalog to build (large content effort); or <b>(C)</b> scope the two tables down to only the dishes we have (revises two Seed-Gate targets). Also asked: confirm the fish/mustard allergen scope (recommend: leave as the frozen 7-allergen model). Document: <code>docs/project-history/work-packages/[ACTIVE]_WP-6A-6D_Knowledge_Mapping_and_Seed_Pipeline_v1.0.md</code>. <b>WP-6E (the actual load) does not begin until approved.</b></div>
+      </div>
+    </div>
+  </div><!-- /page-s12 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
