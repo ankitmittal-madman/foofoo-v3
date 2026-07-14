@@ -406,6 +406,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🧭</span> S12 · WP-6A–D mapping + blocker
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s13')">
+      <span class="nav-icon">🌱</span> S13 · WP-6D-gen seeds generated (ICD-1)
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -625,6 +629,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s10')">Repository Gate PASSED</span>
         </div>
         <div class="tl-note">An independent audit re-verified everything from scratch (structure, docs, database, production parity) and re-ran the whole build-and-teardown on a throwaway database: 29/29 build, 29/29 rollback to empty, seeds load, parity 100% canonical, every production difference explained. All ten GREEN criteria pass. The repository is CERTIFIED GREEN — the recovery program (WP-5A→5G) is complete and this repo is now the permanent engineering baseline. The Repository Gate is passed; coding can begin. Next: the Data Gate — load the real seed data (Seed Engineering). Nothing was modified except adding the certification documents.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#ecfdf5;color:#0e7a5a">S13</span>
+        <div class="tl-title">WP-6D-gen — canonical content seeds generated (ICD-1)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s13')">802 dishes</span>
+          <span class="tl-chip" onclick="showPage('s13')">deterministic ETL</span>
+          <span class="tl-chip" onclick="showPage('s13')">885 deferred</span>
+        </div>
+        <div class="tl-note">The Founder approved Option C (ICD-1): seed only the dishes we actually have, defer the rest, invent nothing. This session built a deterministic generator that reads the source files and writes the seed SQL itself — so every value is traceable to a source and re-running gives identical output. It produced seven paired seed+rollback migrations (103–109): 191 ingredients, 111 tags, 65 cuisines, 802 dishes (8 combo rows correctly moved to the combo tables), ~7,100 dish→ingredient links and ~10,500 dish→tag links, 35 combos — all idempotent, all reversible. It also produced the Deferred Knowledge Register: 885 dish references that point to dishes not in our catalog, logged as the official future-expansion backlog (not errors). Nothing was loaded into a database and nothing was fabricated. Honest finding: the recommendation-engine reference tables (personas, cohorts, weekly plans, meal-class→dish links) still can't be generated because several required values simply aren't in the master workbook — that's a separate normalization decision, flagged clearly.</div>
       </div>
     </div>
     <div class="timeline-row">
@@ -1692,7 +1710,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s11 -->
 
   <!-- ── Session 12 ── -->
-  <div id="page-s12" class="page-content" style="display:block">
+  <div id="page-s12" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S12 · WP-6A–D — the mapping is done, and we found the one thing that genuinely blocks loading</div>
       <div class="page-subtitle">Progressive execution took the plan into real engineering: how every source value becomes a database value, the exact load order, and a hard, evidence-based blocker that needs a Founder decision — not more code.</div>
@@ -1719,6 +1737,37 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s12 -->
+
+  <!-- ── Session 13 ── -->
+  <div id="page-s13" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S13 · WP-6D-gen — the canonical content seeds are generated (ICD-1)</div>
+      <div class="page-subtitle">A deterministic generator turned the source files into real, reversible seed SQL for FooFoo's food catalog — with everything traceable and nothing invented — and logged the future-expansion backlog.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was produced this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-6D-gen · Option C / ICD-1</div>
+      </div>
+      <div class="session-card-desc">
+        The Founder approved <b>Option C — the Initial Canonical Dataset (ICD-1)</b>: seed only the dishes that actually exist in our master file, defer any recommendation entry that points to a dish we don't have yet, and invent nothing. This session delivered exactly that. Instead of hand-typing thousands of rows (error-prone), it built a small <b>deterministic generator</b> that reads the checksummed source files and writes the seed SQL itself. This guarantees the Founder's rules: every value traces back to a specific source file and rule, and re-running produces the identical result.
+        <br><br>
+        The generator produced <b>seven paired seed + rollback migrations (103–109)</b>: <b>191 ingredients, 111 tags, 65 cuisines, 802 dishes</b> (the 8 rows that are really combos were correctly routed to the combo tables), about <b>7,100 dish→ingredient links</b> and <b>10,500 dish→tag links</b>, and <b>35 combos</b>. Everything is idempotent (safe to re-run) and fully reversible. It also produced the <b>Deferred Knowledge Register</b>: <b>885 dish references</b> that point to dishes not in our catalog — logged as the official backlog for future curated imports, admin additions, or user content, <b>not</b> treated as errors. The safety-relevant allergen codes were confirmed against the frozen 7-allergen spec; two allergens (fish, mustard) fall outside that spec and were flagged, not forced.
+        <br><br>
+        <b>Nothing was loaded into any database, and nothing was fabricated.</b> One honest finding: the recommendation-engine reference tables (personas, cohorts, the 20k-row weekly plans, and the meal-class→dish links) still can't be generated, because several required values — like each meal-class's weekday/weekend type, the cohort "diet mode," and persona diet — simply don't exist in the master workbook. That's a separate normalization decision, surfaced clearly rather than guessed.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">802</div><div class="stat-l">Dishes prepared</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">7 / 7</div><div class="stat-l">Seed+rollback pairs</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">~18.7k</div><div class="stat-l">Content rows prepared</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b45309">885</div><div class="stat-l">Dishes deferred (backlog)</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — awaiting Founder approval (STOP honoured)</div>
+        <div class="next-text">The content seeds are ready to load onto <b>staging</b> and validate (that is <b>WP-6E</b>, which does not start without approval). To unlock the recommendation-engine tables, a short <b>RE-Reference-Normalization</b> step is needed: read the RE design docs for the class-taxonomy values and decide the diet-mode / persona-diet / state-code+region crosswalks (and confirm the cohort structure, GAP-002). Artifacts: <code>database/etl/generate_icd1_seeds.py</code>, <code>database/seeds/103–109</code> (+ rollbacks), <code>[ACTIVE]_WP-6D-gen_Canonical_Seed_Engineering_v1.0.md</code>, and the Deferred Knowledge Register CSV.</div>
+      </div>
+    </div>
+  </div><!-- /page-s13 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
