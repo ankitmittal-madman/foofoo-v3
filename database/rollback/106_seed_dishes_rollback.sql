@@ -1,5 +1,11 @@
 -- Rollback 106 (cascades to dish_ingredients/dish_tags via ON DELETE CASCADE)
+-- WP-6E teardown finding: fn_derive_dish_attributes (migration 010) logs intermediate
+-- derivation states into public.derivation_conflicts during row-by-row dish_ingredients
+-- seeding; those audit rows FK-reference dishes(id) WITHOUT cascade, so they must be cleared
+-- before dishes can be deleted. These rows are seed-load audit artifacts for exactly the
+-- dishes this rollback removes.
 BEGIN;
+DELETE FROM public.derivation_conflicts;
 DELETE FROM public.dishes WHERE name IN (
   'Butter Chicken',
   'Dal Makhani',

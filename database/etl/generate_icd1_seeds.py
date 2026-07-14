@@ -310,7 +310,11 @@ def main():
     lines.append("COMMIT;")
     (SEEDS / "106_seed_dishes.sql").write_text("\n".join(lines) + "\n")
     (ROLLBACK / "106_seed_dishes_rollback.sql").write_text(
-        "-- Rollback 106 (cascades to dish_ingredients/dish_tags via ON DELETE CASCADE)\nBEGIN;\n"
+        "-- Rollback 106 (cascades to dish_ingredients/dish_tags via ON DELETE CASCADE)\n"
+        "-- WP-6E teardown finding: fn_derive_dish_attributes logs intermediate derivation states\n"
+        "-- into public.derivation_conflicts during row-by-row dish_ingredients seeding; those rows\n"
+        "-- FK-reference dishes(id) without cascade and must be cleared before deleting dishes.\n"
+        "BEGIN;\nDELETE FROM public.derivation_conflicts;\n"
         "DELETE FROM public.dishes WHERE name IN (\n  "
         + ",\n  ".join(sql_str(d['Dish Name'].strip()) for d in dish_rows) + "\n);\nCOMMIT;\n")
     report["dishes"] = len(dish_rows)

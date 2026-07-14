@@ -418,6 +418,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">⚙️</span> S15 · GAP-002 fixed + RE seeds generated
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s16')">
+      <span class="nav-icon">🏁</span> S16 · Data Gate executed + certified
+      <span class="nav-badge">Jul 14</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -637,6 +641,20 @@ function deepDiveFeature(featureLabel){
           <span class="tl-chip" onclick="showPage('s10')">Repository Gate PASSED</span>
         </div>
         <div class="tl-note">An independent audit re-verified everything from scratch (structure, docs, database, production parity) and re-ran the whole build-and-teardown on a throwaway database: 29/29 build, 29/29 rollback to empty, seeds load, parity 100% canonical, every production difference explained. All ten GREEN criteria pass. The repository is CERTIFIED GREEN — the recovery program (WP-5A→5G) is complete and this repo is now the permanent engineering baseline. The Repository Gate is passed; coding can begin. Next: the Data Gate — load the real seed data (Seed Engineering). Nothing was modified except adding the certification documents.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 14, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#166534"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#f0fdf4;color:#166534">S16</span>
+        <div class="tl-title">Data Gate executed on staging and CERTIFIED (ICD-1)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s16')">build+seed+rollback</span>
+          <span class="tl-chip" onclick="showPage('s16')">repeatable</span>
+          <span class="tl-chip" onclick="showPage('s16')">REPO-CERT-007</span>
+        </div>
+        <div class="tl-note">The whole knowledge layer was actually built and loaded on a throwaway PostgreSQL database (never production), exactly as the repository specifies. All 30 migrations applied; the config, content and recommendation-engine seeds loaded; database triggers correctly computed every derived value (diet type, jain, allergens, food-DNA vectors) with no manual edits; and the cohort/weekly-plan counts came out exactly right (2,952 / 20,664 / 7,992). Validation passed, safety gates showed zero diet/allergen/jain violations, and the database then tore all the way back down to empty and rebuilt identically on a second fresh database — proving it's deterministic and repeatable. Two small rollback gaps found during teardown were fixed with evidence (a missing config-seed undo, and clearing an audit table before deleting dishes). Verdict: DATA GATE PASSED for the initial canonical dataset (REPO-CERT-007). The project now exits Knowledge Engineering and is ready for Backend Engineering. Two honest follow-ups remain: one deferred table (city-migration overlay, missing a field in the source) and some stale self-test expectations — both non-blocking.</div>
       </div>
     </div>
     <div class="timeline-row">
@@ -1837,7 +1855,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s14 -->
 
   <!-- ── Session 15 ── -->
-  <div id="page-s15" class="page-content" style="display:block">
+  <div id="page-s15" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S15 · GAP-002 resolved via governed schema change, and the recommendation-engine seeds are generated</div>
       <div class="page-subtitle">The one real blocker is fixed the proper way (a schema evolution request + migration), and the full engine knowledge layer — cohorts, weekly plans, household plans — is now generated deterministically.</div>
@@ -1866,6 +1884,37 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s15 -->
+
+  <!-- ── Session 16 ── -->
+  <div id="page-s16" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S16 · The Data Gate was executed on staging and certified — the knowledge database really builds from zero</div>
+      <div class="page-subtitle">Everything the repository describes was actually run on a disposable database: build, seed, derive, validate, tear down, and rebuild — deterministically. Data Gate PASSED (initial canonical dataset).</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was executed and certified this session</div>
+        <div class="session-card-meta">July 14, 2026<br>WP-6E · Data Gate</div>
+      </div>
+      <div class="session-card-desc">
+        This was the proof-in-practice step. On a completely disposable local PostgreSQL database (never production — the production Supabase was deliberately not touched), the repository built the entire system from nothing: all <b>30 migrations</b> applied cleanly, then the <b>config, content and recommendation-engine seeds</b> loaded. Crucially, the database's own triggers computed every derived value — each dish's diet type, jain status, allergen codes and food-DNA vector, plus the tag ordering — with <b>no manual edits</b>, and the results were spot-checked correct (chicken dish → non-veg; poha → vegan). The engine tables came out at their exact targets: <b>2,952 cohorts, 20,664 weekly-plan rows (exactly cohorts × 7), 7,992 household add-on rows</b>.
+        <br><br>
+        Validation ran end to end: every foreign key resolved (zero orphans), the city-tier fix (GAP-002) held (2,952 unique cohorts, every one tagged with a tier), the safety checks found <b>zero diet/allergen/jain violations</b>, and the access rules correctly blocked anonymous writes and hid the engine's internal tables. Then the database was <b>rolled all the way back to empty</b>, and the whole thing was <b>rebuilt identically on a second fresh database</b> — proving it is deterministic and repeatable, not a one-off. During teardown, two small rollback gaps surfaced and were fixed with evidence (a missing undo for the config seed, and clearing an audit table before deleting dishes).
+        <br><br>
+        Verdict: <b>DATA GATE PASSED</b> for the Initial Canonical Dataset, certified as REPO-CERT-007. The project now officially <b>exits Knowledge Engineering</b> and is <b>ready for Backend Engineering</b>. Nothing was faked and nothing was hidden — two honest follow-ups remain (one table, the city-migration overlay, is deferred because a field is genuinely absent from the source; and a few self-tests are hardcoded to old illustrative data), both non-blocking.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#166534">PASSED</div><div class="stat-l">Data Gate (ICD-1)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">30 + 15</div><div class="stat-l">Migrations + seeds run</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">0 → full → 0</div><div class="stat-l">Build/teardown proven</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">YES</div><div class="stat-l">Deterministic repeatable</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next phase — Backend Engineering</div>
+        <div class="next-text">Knowledge Engineering is complete. Next is the <b>API Gate</b>: build the backend / recommendation-engine runtime against the frozen API contract (DOC-P3-06), reading the now-proven knowledge layer. Two tracked, non-blocking follow-ups: source or decide the S-15 city-migration "duration band", and tidy the stale validation-script expectations (WP-04DA). Artifacts: <code>REPO-CERT-007</code>, <code>WP-6E execution report</code>, validation <code>905</code>. Production remains untouched; any staging→production promotion is a separate Founder-approved step.</div>
+      </div>
+    </div>
+  </div><!-- /page-s16 -->
 
   <!-- ── Session pages injected here ── -->
   <!-- SESSIONS_INJECT -->
