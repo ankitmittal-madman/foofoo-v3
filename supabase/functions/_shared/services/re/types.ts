@@ -110,11 +110,21 @@ export interface ScoringWeights {
   readonly wExplore: number;
 }
 
+/** One ranked dish in a slate (surfaces the already-computed FinalScore for DOC-P3-06 §06.4). */
+export interface RankedDish {
+  readonly dishId: string;
+  readonly rank: number;
+  readonly score: number;
+  readonly reasonTags: string[];
+}
+
 /** A generated slate for one plan slot (DOC-P3-02 Entity 25; ≤8 dishes). */
 export interface Slate {
   readonly mealSlot: MealSlot;
   readonly slotDate: string;
   readonly classCode: string;
+  /** Ranked dishes (rank 1 = headline). Surfaces engine output; no logic added here. */
+  readonly ranked: RankedDish[];
   readonly dishIds: string[];
   readonly reasonTags: Record<string, string[]>;
   readonly confidence: number;

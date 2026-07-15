@@ -41,6 +41,27 @@ export const API_ERRORS = {
     retriable: false,
     message: "consent_type is not a recognized value.",
   },
+  /** 403 — personalization consent not granted before onboarding (DOC-P3-06 §06.1; DOC-09 §03). */
+  ERR_CONSENT_REQUIRED: {
+    code: "ERR_CONSENT_REQUIRED",
+    httpStatus: 403,
+    retriable: false,
+    message: "Personalization consent is required before onboarding.",
+  },
+  /** 404 — no week_plans row for the requested slot/week (DOC-P3-06 §06.5). */
+  ERR_PLAN_NOT_FOUND: {
+    code: "ERR_PLAN_NOT_FOUND",
+    httpStatus: 404,
+    retriable: false,
+    message: "Plan not found for the requested week.",
+  },
+  /** 409 — onboarding retried after onboarding_completed=true (DOC-P3-06 §06.2/§08). */
+  ERR_ONBOARDING_ALREADY_COMPLETE: {
+    code: "ERR_ONBOARDING_ALREADY_COMPLETE",
+    httpStatus: 409,
+    retriable: false,
+    message: "Onboarding is already complete for this profile.",
+  },
 } as const satisfies Record<string, ErrorSpec>;
 
 export type ApiErrorCode = keyof typeof API_ERRORS;

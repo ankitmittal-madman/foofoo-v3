@@ -132,14 +132,19 @@ export class RecommendationEngine {
       combinedAllergenFlags: combined,
     });
 
+    const ranked = safe.map((s, i) => ({
+      dishId: s.candidate.dishId,
+      rank: i + 1,
+      score: s.score,
+      reasonTags: reasonTags(s, req.context),
+    }));
     return {
       mealSlot: req.context.mealSlot,
       slotDate: req.context.slotDate,
       classCode: req.classCode,
-      dishIds: safe.map((s) => s.candidate.dishId),
-      reasonTags: Object.fromEntries(
-        safe.map((s) => [s.candidate.dishId, reasonTags(s, req.context)]),
-      ),
+      ranked,
+      dishIds: ranked.map((r) => r.dishId),
+      reasonTags: Object.fromEntries(ranked.map((r) => [r.dishId, r.reasonTags])),
       confidence: req.user.confidenceScore,
       coldStartMode: req.user.coldStartMode,
       reVersion,
