@@ -438,6 +438,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔒</span> S20 · Security hardening + validation modernization (WP-6E.3)
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s21')">
+      <span class="nav-icon">🔬</span> S21 · CandidateRepository audit (WP-8FA)
+      <span class="nav-badge">Jul 15</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -1648,7 +1652,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s2 -->
 
   <!-- ── Session 3 ── -->
-  <div id="page-s3" class="page-content" style="display:block">
+  <div id="page-s3" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S3 · Recovery sprint + repository naming normalization</div>
       <div class="page-subtitle">The missing database history was recovered from the live database, and the whole repository was renamed onto one governed naming standard — with git history preserved and the genuinely-ambiguous files honestly left alone.</div>
@@ -2082,7 +2086,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s17 -->
 
   <!-- ── Session 18 ── -->
-  <div id="page-s18" class="page-content" style="display:block">
+  <div id="page-s18" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S18 · Backend foundation scaffold — built and validated (WP-8B)</div>
       <div class="page-subtitle">The first real backend code: the engineering base every future feature sits on. Foundation only — no features, fully validated against a real toolchain.</div>
@@ -2179,6 +2183,37 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s20 -->
 
   <!-- ── Session pages injected here ── -->
+  <!-- ── Session 21 ── -->
+  <div id="page-s21" class="page-content" style="display:block">
+    <div class="page-header">
+      <div class="page-title">S21 · CandidateRepository evidence audit — resolving the WP-8F blockers (WP-8FA, read-only)</div>
+      <div class="page-subtitle">A forensic reconciliation of the five recommendation-engine "blockers" against repository evidence. Most turned out to be solvable — the key was reading a document the last session couldn't open.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was audited this session</div>
+        <div class="session-card-meta">July 15, 2026<br>WP-8FA · REPO-CERT-017</div>
+      </div>
+      <div class="session-card-desc">
+        WP-8F had halted backend implementation on four fields the recommendation engine needs but couldn't source from the database, plus a fifth cold-start question — flagging several as possibly needing schema changes. This session was a read-only audit to settle each one with hard evidence, and it materially <b>improved the picture</b>. The decisive move: the previous session could not read the recommendation-engine design doc "RE-DOC-02" (a binary Word file); this session extracted it and found its <b>20-dimension "genome" definitions</b>, which directly answer most of the blockers. A direct look at the actual ingredient data settled the rest.
+        <br><br>
+        Results, one verdict each: <b>Cuisine family</b> — already derivable (it's the cuisine "group" already in the database, matching the design doc's "regional origin" dimension); no schema change. <b>Beef/pork religious safety</b> — also derivable: "beef" and "pork" are real, distinct ingredients already loaded, so a dish can be checked by a simple ingredient join (the earlier "unprovable" verdict was wrong). <b>Halal</b> — genuinely unmodelled (it's about certification, not ingredients) → a documented limitation for now. <b>Seasonal affinity</b> — intentionally deferred (the source data never had it; the engine uses weather instead). <b>Cold-start cohort priors</b> — intentionally empty by design (the spec says use a neutral 0.5 until real usage data arrives after launch, and the code already does exactly that). <b>Main ingredient class</b> — the one real open item: it needs a Founder decision on how to pick a dish's "main" ingredient and where to store it.
+        <br><br>
+        Net effect: the blocker set shrank from "four unprovable + one" to <b>one Founder decision + three documented deferrals + one onboarding-safety note</b>. Two fields can now be built immediately. No code, schema, or database was changed.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">14/17</div><div class="stat-l">Fields fully proven</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">2</div><div class="stat-l">Blockers now derivable</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b45309">1</div><div class="stat-l">Genuine Founder decision</div></div>
+        <div class="stat"><div class="stat-n" style="color:#166534">017</div><div class="stat-l">Certificate</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — one Founder decision, then resume WP-8F</div>
+        <div class="next-text">Founder decision needed on <b>8F-02 (main ingredient class)</b>: ratify a "dominant ingredient" rule and where it lives (a new tag dimension, data-only; or a seeded ingredient category). Acknowledge three deferrals (halal, seasonal, cohort priors) and the onboarding note that halal isn't enforced at MVP. Then CandidateRepository can be built (cuisine family + beef/pork are ready). Docs: <code>WP-8FA audit</code>, <code>REPO-CERT-017</code>. No implementation until approved.</div>
+      </div>
+    </div>
+  </div><!-- /page-s21 -->
+
   <!-- SESSIONS_INJECT -->
 
 </main>
