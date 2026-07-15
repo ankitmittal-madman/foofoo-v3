@@ -846,6 +846,21 @@ function deepDiveFeature(featureLabel){
         <div class="tl-note">The engine from last session was connected to the three things that use it — all sharing the one engine, with no recommendation logic copied anywhere. Built and tested: (1) onboarding "orchestration" — it does its own job (process the answers, work out the confidence score, resolve which persona and cohort the household maps to, check the privacy consent was given), then hands off to the engine to build the first week's plan, saves that plan, and returns it; (2) the live "recommend this slot again" service (for when a user says "not today"), which asks the same engine and saves the fresh options; (3) the nightly job that rebuilds plans for active users using the same engine, skipping past any single user that errors. Plus the database-saving adapters for plans and onboarding data (real, column-checked against the schema). Genuinely validated: formatter, linter, type-checker, and 62 tests (10 new) all pass, using in-memory fakes. Honest limits (written up as remaining work): the adapter that assembles candidate dishes needs a piece of the dish "genome/tag" schema mapped first — I deliberately did NOT guess it — and the two web endpoints depend on that adapter, so both are the next step; nothing has been run against a real database yet; and a spec example (onboarding confidence) capped at the documented 0.65 day-0 maximum. No database, schema, or frozen-document change; branch only, not pushed.</div>
       </div>
     </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 15, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#b45309"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#fffbeb;color:#b45309">S26</span>
+        <div class="tl-title">WP-8F stopped at the gate: the dish "candidate" can't be built without guessing (blocker report)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('timeline-full')">schema proof failed</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">4 mappings unprovable</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">STOP, no guessing</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">REPO-CERT-016</span>
+        </div>
+        <div class="tl-note">WP-8F was meant to make the backend actually run against the real database — starting with the "candidate dish" builder that hands the engine each dish with all its attributes. The rule was strict: prove every field maps to a real column before writing code, and STOP (don't guess) if any can't. Proof done against the live schema — and four required dish attributes have NO real source: (1) "cuisine family" — there's no such column on dishes; the dish→cuisine link exists but the cuisines table has two candidate columns and neither is named "family"; (2) "main ingredient class" — no such field at all (the nearest is a dish "category", which is a different thing); (3) the meat markers for halal / no-beef / no-pork diets — the ingredients table only tracks veg/vegan/jain, so these safety-relevant religious filters have nothing to check against; (4) "seasonal affinity" on a dish — no such column anywhere. Plus a fifth: the cold-start "cohort average taste" has no table to read from. Guessing any of these would silently mis-filter food for real dietary/religious needs — exactly what we must never do. So: STOP. Wrote a precise blocker report listing each gap's exact schema location and the decision needed (several likely need a schema-change request, which is founder-gated and out of this work package's scope). No code written, nothing touched; the existing 62 tests still pass. The recommendation engine and everything before it remain intact — this is a "we need decisions before we can wire it to the database" checkpoint, not a failure.</div>
+      </div>
+    </div>
     <!-- TIMELINE_INJECT -->
   </div>
 
