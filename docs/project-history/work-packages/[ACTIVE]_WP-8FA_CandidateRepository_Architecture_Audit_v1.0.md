@@ -1,11 +1,11 @@
 # [ACTIVE]_WP-8FA_CandidateRepository_Architecture_Audit_v1.0
 
-**Status:** ACTIVE — CPTO-level architectural evidence audit (READ-ONLY). No runtime code, no schema/migration/seed/DB change. Companion certificate: REPO-CERT-017.
+**Status:** ACTIVE — CPTO-level architectural evidence audit (READ-ONLY). No runtime code, no schema/migration/seed/DB change. Companion certificate: REPO-CERT-019.
 **Version:** v1.0
 **Date:** 2026-07-15
 **Placement:** docs/project-history/work-packages/[ACTIVE]_WP-8FA_CandidateRepository_Architecture_Audit_v1.0.md
 **Purpose:** Resolve, from repository evidence alone, whether the four WP-8F `DishCandidate` blockers (+ the fifth cold-start prior blocker) are (A) already solved / (B) derivable / (C) intentional MVP deferral / (D) require a Founder-approved SER — eliminating uncertainty before runtime implementation resumes.
-**Evidence basis read this session (from source):** `services/re/types.ts` (`DishCandidate`), `re/constraints.ts`, `re/variety.ts`, `re/scoring.ts`, `adapters/supabase-stores.ts`; **RE-DOC-02 §02 (the 20 genome dimensions — extracted from the `.docx` that WP-8F could not read)**, RE-DOC-03/04/05; DOC-P3-03 §06/§07/§08; migrations 002/003/008/009/021/022/024; seeds 100/103/104; source `cuisines_v4.csv`, `ingredients_v5.csv`, `dishes.xlsx`; WP-8F report (REPO-CERT-016).
+**Evidence basis read this session (from source):** `services/re/types.ts` (`DishCandidate`), `re/constraints.ts`, `re/variety.ts`, `re/scoring.ts`, `adapters/supabase-stores.ts`; **RE-DOC-02 §02 (the 20 genome dimensions — extracted from the `.docx` that WP-8F could not read)**, RE-DOC-03/04/05; DOC-P3-03 §06/§07/§08; migrations 002/003/008/009/021/022/024; seeds 100/103/104; source `cuisines_v4.csv`, `ingredients_v5.csv`, `dishes.xlsx`; WP-8F report (REPO-CERT-018).
 
 > **Headline:** the single most important new fact is that **RE-DOC-02 §02 (the 20 genome dimensions) is now read** (the WP-8F author explicitly could not — "`.docx`/binary, not machine-readable"). It resolves 8F-01 directly and re-frames the others. Combined with a direct check of the ingredient/dish data (which WP-8F did not perform for beef/pork), **three of the four "unprovable" WP-8F blockers are actually derivable with no schema change.** Only main-ingredient-class and halal-certification are genuine gaps; seasonal and cohort-prior are intentional, spec-documented MVP deferrals.
 
@@ -117,7 +117,7 @@ Legend: ✅ Fully Proven · 🟡 Derived (no schema change) · 🟠 Ambiguous ·
 - **Is any "B" actually a hidden schema change?** No — 8F-01 and beef/pork are pure joins over already-seeded tables.
 
 ## Versioning & Placement
-v1.0, docs/project-history/work-packages/, naming per WP-5AA. Consolidates the four required report artifacts (Traceability, Architecture Audit, Evidence Matrix, Final Recommendation) into one document per the repo's lean-governance rule. Companion: REPO-CERT-017.
+v1.0, docs/project-history/work-packages/, naming per WP-5AA. Consolidates the four required report artifacts (Traceability, Architecture Audit, Evidence Matrix, Final Recommendation) into one document per the repo's lean-governance rule. Companion: REPO-CERT-019.
 
 ---
 

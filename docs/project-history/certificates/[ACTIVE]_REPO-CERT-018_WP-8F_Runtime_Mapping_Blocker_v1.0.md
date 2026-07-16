@@ -1,9 +1,9 @@
-# REPO-CERT-016 — WP-8F Runtime Mapping Blocker (STOP) v1.0
+# REPO-CERT-018 — WP-8F Runtime Mapping Blocker (STOP) v1.0
 
 **Status:** ACTIVE — Investigation Certificate (schema-mapping proof; **STOP** before implementation). No code, schema, migration, seed, validation-SQL, security, or frozen-document change; no live-DB write.
 **Version:** v1.0
 **Date:** 2026-07-15
-**Placement:** docs/project-history/certificates/[ACTIVE]_REPO-CERT-016_WP-8F_Runtime_Mapping_Blocker_v1.0.md
+**Placement:** docs/project-history/certificates/[ACTIVE]_REPO-CERT-018_WP-8F_Runtime_Mapping_Blocker_v1.0.md
 **Attests:** [ACTIVE]_WP-8F_Runtime_Adapters_Blocker_Report_v1.0.md
 **Dependencies:** REPO-CERT-015 (WP-8E), REPO-CERT-014 (WP-8D); DOC-P3-03 §06/§07/§08; migrations 002/003/008/009/011/012/021/022/024; seed 104.
 

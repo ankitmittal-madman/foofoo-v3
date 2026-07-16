@@ -438,8 +438,8 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔒</span> S20 · Security hardening + validation modernization (WP-6E.3)
       <span class="nav-badge">Jul 14</span>
     </div>
-    <div class="nav-item" onclick="showPage('s21')">
-      <span class="nav-icon">🔬</span> S21 · CandidateRepository audit (WP-8FA)
+    <div class="nav-item" onclick="showPage('s28')">
+      <span class="nav-icon">🔬</span> S28 · CandidateRepository audit (WP-8FA)
       <span class="nav-badge">Jul 15</span>
     </div>
     <!-- NAV_INJECT -->
@@ -854,13 +854,13 @@ function deepDiveFeature(featureLabel){
       <div class="tl-date">Jul 15, 2026</div>
       <div class="tl-spine"><div class="tl-dot" style="background:#b45309"></div></div>
       <div class="tl-content">
-        <span class="tl-badge" style="background:#fffbeb;color:#b45309">S26</span>
+        <span class="tl-badge" style="background:#fffbeb;color:#b45309">S27</span>
         <div class="tl-title">WP-8F stopped at the gate: the dish "candidate" can't be built without guessing (blocker report)</div>
         <div class="tl-chips">
           <span class="tl-chip" onclick="showPage('timeline-full')">schema proof failed</span>
           <span class="tl-chip" onclick="showPage('timeline-full')">4 mappings unprovable</span>
           <span class="tl-chip" onclick="showPage('timeline-full')">STOP, no guessing</span>
-          <span class="tl-chip" onclick="showPage('timeline-full')">REPO-CERT-016</span>
+          <span class="tl-chip" onclick="showPage('timeline-full')">REPO-CERT-018</span>
         </div>
         <div class="tl-note">WP-8F was meant to make the backend actually run against the real database — starting with the "candidate dish" builder that hands the engine each dish with all its attributes. The rule was strict: prove every field maps to a real column before writing code, and STOP (don't guess) if any can't. Proof done against the live schema — and four required dish attributes have NO real source: (1) "cuisine family" — there's no such column on dishes; the dish→cuisine link exists but the cuisines table has two candidate columns and neither is named "family"; (2) "main ingredient class" — no such field at all (the nearest is a dish "category", which is a different thing); (3) the meat markers for halal / no-beef / no-pork diets — the ingredients table only tracks veg/vegan/jain, so these safety-relevant religious filters have nothing to check against; (4) "seasonal affinity" on a dish — no such column anywhere. Plus a fifth: the cold-start "cohort average taste" has no table to read from. Guessing any of these would silently mis-filter food for real dietary/religious needs — exactly what we must never do. So: STOP. Wrote a precise blocker report listing each gap's exact schema location and the decision needed (several likely need a schema-change request, which is founder-gated and out of this work package's scope). No code written, nothing touched; the existing 62 tests still pass. The recommendation engine and everything before it remain intact — this is a "we need decisions before we can wire it to the database" checkpoint, not a failure.</div>
       </div>
@@ -2184,15 +2184,15 @@ function deepDiveFeature(featureLabel){
 
   <!-- ── Session pages injected here ── -->
   <!-- ── Session 21 ── -->
-  <div id="page-s21" class="page-content" style="display:block">
+  <div id="page-s28" class="page-content" style="display:block">
     <div class="page-header">
-      <div class="page-title">S21 · CandidateRepository evidence audit — resolving the WP-8F blockers (WP-8FA, read-only)</div>
+      <div class="page-title">S28 · CandidateRepository evidence audit — resolving the WP-8F blockers (WP-8FA, read-only)</div>
       <div class="page-subtitle">A forensic reconciliation of the five recommendation-engine "blockers" against repository evidence. Most turned out to be solvable — the key was reading a document the last session couldn't open.</div>
     </div>
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was audited this session</div>
-        <div class="session-card-meta">July 15, 2026<br>WP-8FA · REPO-CERT-017</div>
+        <div class="session-card-meta">July 15, 2026<br>WP-8FA · REPO-CERT-019</div>
       </div>
       <div class="session-card-desc">
         WP-8F had halted backend implementation on four fields the recommendation engine needs but couldn't source from the database, plus a fifth cold-start question — flagging several as possibly needing schema changes. This session was a read-only audit to settle each one with hard evidence, and it materially <b>improved the picture</b>. The decisive move: the previous session could not read the recommendation-engine design doc "RE-DOC-02" (a binary Word file); this session extracted it and found its <b>20-dimension "genome" definitions</b>, which directly answer most of the blockers. A direct look at the actual ingredient data settled the rest.
@@ -2205,14 +2205,14 @@ function deepDiveFeature(featureLabel){
         <div class="stat"><div class="stat-n" style="color:#0e7a5a">14/17</div><div class="stat-l">Fields fully proven</div></div>
         <div class="stat"><div class="stat-n" style="color:#1a56db">2</div><div class="stat-l">Blockers now derivable</div></div>
         <div class="stat"><div class="stat-n" style="color:#b45309">1</div><div class="stat-l">Genuine Founder decision</div></div>
-        <div class="stat"><div class="stat-n" style="color:#166534">017</div><div class="stat-l">Certificate</div></div>
+        <div class="stat"><div class="stat-n" style="color:#166534">019</div><div class="stat-l">Certificate</div></div>
       </div>
       <div class="next-box">
         <div class="next-label">Next — one Founder decision, then resume WP-8F</div>
-        <div class="next-text">Founder decision needed on <b>8F-02 (main ingredient class)</b>: ratify a "dominant ingredient" rule and where it lives (a new tag dimension, data-only; or a seeded ingredient category). Acknowledge three deferrals (halal, seasonal, cohort priors) and the onboarding note that halal isn't enforced at MVP. Then CandidateRepository can be built (cuisine family + beef/pork are ready). Docs: <code>WP-8FA audit</code>, <code>REPO-CERT-017</code>. No implementation until approved.</div>
+        <div class="next-text">Founder decision needed on <b>8F-02 (main ingredient class)</b>: ratify a "dominant ingredient" rule and where it lives (a new tag dimension, data-only; or a seeded ingredient category). Acknowledge three deferrals (halal, seasonal, cohort priors) and the onboarding note that halal isn't enforced at MVP. Then CandidateRepository can be built (cuisine family + beef/pork are ready). Docs: <code>WP-8FA audit</code>, <code>REPO-CERT-019</code>. No implementation until approved.</div>
       </div>
     </div>
-  </div><!-- /page-s21 -->
+  </div><!-- /page-s28 -->
 
   <!-- SESSIONS_INJECT -->
 

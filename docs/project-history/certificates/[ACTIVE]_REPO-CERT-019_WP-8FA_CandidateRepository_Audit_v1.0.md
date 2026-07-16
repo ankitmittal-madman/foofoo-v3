@@ -1,11 +1,11 @@
-# REPO-CERT-017 — WP-8FA CandidateRepository Architecture Audit Certification v1.0
+# REPO-CERT-019 — WP-8FA CandidateRepository Architecture Audit Certification v1.0
 
 **Status:** ACTIVE — Audit Certificate (evidence reconciliation; read-only).
 **Version:** v1.0
 **Date:** 2026-07-15
-**Placement:** docs/project-history/certificates/[ACTIVE]_REPO-CERT-017_WP-8FA_CandidateRepository_Audit_v1.0.md
+**Placement:** docs/project-history/certificates/[ACTIVE]_REPO-CERT-019_WP-8FA_CandidateRepository_Audit_v1.0.md
 **Attests:** [ACTIVE]_WP-8FA_CandidateRepository_Architecture_Audit_v1.0.md
-**Supersedes analysis of:** WP-8F blocker report (REPO-CERT-016) — corrected where new evidence warranted.
+**Supersedes analysis of:** WP-8F blocker report (REPO-CERT-018) — corrected where new evidence warranted.
 
 ---
 

@@ -1,6 +1,6 @@
 # [ACTIVE]_WP-8F_Runtime_Adapters_Blocker_Report_v1.0
 
-**Status:** ACTIVE — **BLOCKER REPORT (STOP).** WP-8F implementation is HALTED at the mandatory schema-mapping proof: the engine's `DishCandidate` cannot be materialized from the canonical schema without guessing four mappings. No runtime adapters, endpoints, or live-DB writes were implemented (prompt rule: "Do NOT continue past uncertainty"). Companion certificate: REPO-CERT-016.
+**Status:** ACTIVE — **BLOCKER REPORT (STOP).** WP-8F implementation is HALTED at the mandatory schema-mapping proof: the engine's `DishCandidate` cannot be materialized from the canonical schema without guessing four mappings. No runtime adapters, endpoints, or live-DB writes were implemented (prompt rule: "Do NOT continue past uncertainty"). Companion certificate: REPO-CERT-018.
 **Version:** v1.0
 **Date:** 2026-07-15
 **Placement:** docs/project-history/work-packages/[ACTIVE]_WP-8F_Runtime_Adapters_Blocker_Report_v1.0.md
@@ -126,7 +126,7 @@ Several of these (8F-02, 8F-04, possibly 8F-01b/8F-03) imply **schema evolution 
 
 ## Versioning & Placement
 
-v1.0, docs/project-history/work-packages/ per the Placement Rule; naming per WP-5AA. Companion: REPO-CERT-016.
+v1.0, docs/project-history/work-packages/ per the Placement Rule; naming per WP-5AA. Companion: REPO-CERT-018.
 
 ## Founder Sign-off (decisions 8F-01…8F-04 required to unblock)
 
