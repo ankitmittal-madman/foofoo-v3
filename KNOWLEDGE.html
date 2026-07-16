@@ -183,6 +183,49 @@
   .ff-deepdive-btn{padding:10px 18px;border-radius:8px;border:1px solid var(--blue-border);background:var(--blue-bg);color:var(--blue);font-size:13px;font-weight:600;cursor:pointer}
   .ff-deepdive-btn:hover{background:var(--blue-border)}
 
+  /* ── WP-K01 Operating System layer (S26) ── */
+  .os-note{font-size:12px;color:var(--text3);margin:-14px 0 18px;line-height:1.5}
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:18px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px}
+  .kpi-l{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+  .kpi-v{font-size:14px;font-weight:600;line-height:1.35}
+  .kpi-v.mono{font-family:'SF Mono','Fira Code',monospace;font-size:12px}
+  .kpi-s{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4}
+  .pbar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .pbar-name{width:190px;flex-shrink:0;font-size:12px;font-weight:500;text-align:right;color:var(--text2)}
+  .pbar{flex:1;height:14px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+  .pbar-fill{height:100%;border-radius:7px 0 0 7px;background:var(--blue);opacity:.75}
+  .pbar-pct{width:88px;flex-shrink:0;font-size:11px;color:var(--text2)}
+  .st{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap;display:inline-block}
+  .st-done{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+  .st-active{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+  .st-partial{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+  .st-pending{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+  .st-blocked{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+  .st-open{background:#fbeaf0;color:#72243e;border:1px solid #f0c2d2}
+  .os-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px}
+  .os-table th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
+  .os-table td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5;color:var(--text2)}
+  .os-table td:first-child{color:var(--text)}
+  .os-table .mono{font-family:'SF Mono','Fira Code',monospace;font-size:11px}
+  .os-wrap{overflow-x:auto}
+  .src{font-size:11px;color:var(--text3)}
+  .src a,.os-table a,.kpi a,.dd-text a{color:var(--blue);text-decoration:none}
+  .src a:hover,.os-table a:hover{text-decoration:underline}
+  .os-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+  .os-card-title{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .os-tree{font-family:'SF Mono','Fira Code',monospace;font-size:12px;line-height:1.9;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;overflow-x:auto;white-space:pre;color:var(--text2)}
+  .os-tree b{color:var(--text)}
+  .os-flow{display:flex;flex-direction:column;align-items:center;gap:2px;margin:12px 0}
+  .os-flow-node{min-width:280px;text-align:center;font-size:12px;padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface)}
+  .os-flow-node b{display:block;font-size:12px}
+  .os-flow-node span{font-size:11px;color:var(--text3)}
+  .os-flow-arrow{color:var(--text3);font-size:12px;line-height:1.2}
+  .gate-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);margin-bottom:6px}
+  .gate-ic{font-size:15px;flex-shrink:0}
+  .gate-name{font-size:13px;font-weight:600;width:170px;flex-shrink:0}
+  .gate-note{font-size:12px;color:var(--text2);line-height:1.5;flex:1}
+
   @media(max-width:640px){#sidebar{display:none}#main{padding:20px 16px}.stat-row{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -346,8 +389,57 @@ function deepDiveFeature(featureLabel){
 <nav id="sidebar">
   <div class="sidebar-logo">
     <div class="app-name">FooFoo</div>
-    <div class="app-sub">Build knowledge base</div>
+    <div class="app-sub">Engineering operating system</div>
   </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Operating System</div>
+    <div class="nav-item active" onclick="showPage('exec')">
+      <span class="nav-icon">🎛</span> Executive dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('roadmap')">
+      <span class="nav-icon">🧭</span> Project roadmap
+    </div>
+    <div class="nav-item" onclick="showPage('features')">
+      <span class="nav-icon">✨</span> Feature dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('repo')">
+      <span class="nav-icon">🌳</span> Repository architecture
+    </div>
+    <div class="nav-item" onclick="showPage('backend')">
+      <span class="nav-icon">🧱</span> Backend architecture
+    </div>
+    <div class="nav-item" onclick="showPage('re')">
+      <span class="nav-icon">🤖</span> Recommendation engine
+    </div>
+    <div class="nav-item" onclick="showPage('dbdash')">
+      <span class="nav-icon">🗄</span> Database dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('api')">
+      <span class="nav-icon">🔌</span> API catalogue
+      <span class="nav-badge">1/10</span>
+    </div>
+    <div class="nav-item" onclick="showPage('impl')">
+      <span class="nav-icon">📦</span> Implementation (WPs)
+    </div>
+    <div class="nav-item" onclick="showPage('adr')">
+      <span class="nav-icon">⚖️</span> Decision register
+    </div>
+    <div class="nav-item" onclick="showPage('debt')">
+      <span class="nav-icon">🧾</span> Technical debt
+    </div>
+    <div class="nav-item" onclick="showPage('validation')">
+      <span class="nav-icon">✅</span> Validation dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('deploy')">
+      <span class="nav-icon">🚀</span> Deployment dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('metrics')">
+      <span class="nav-icon">📊</span> Repository metrics
+    </div>
+  </div>
+
+  <hr class="sidebar-divider">
 
   <div class="sidebar-section">
     <div class="sidebar-section-label">Overview</div>
@@ -370,8 +462,16 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">📦</span> S1 · Repo restructure
       <span class="nav-badge">Jul 13</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s2')">
+    <div class="nav-item" onclick="showPage('s2')">
       <span class="nav-icon">⚙️</span> S2 · Governance docs
+      <span class="nav-badge">Jul 13</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s3')">
+      <span class="nav-icon">🧰</span> S3 · Recovery + naming
+      <span class="nav-badge">Jul 13</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s4')">
+      <span class="nav-icon">↩️</span> S4 · Rollback recovery
       <span class="nav-badge">Jul 13</span>
     </div>
     <div class="nav-item" onclick="showPage('s5')">
@@ -438,6 +538,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔒</span> S20 · Security hardening + validation modernization (WP-6E.3)
       <span class="nav-badge">Jul 14</span>
     </div>
+    <div class="nav-item" onclick="showPage('s26')">
+      <span class="nav-icon">🎛</span> S26 · Knowledge platform refactor (WP-K01)
+      <span class="nav-badge">Jul 15</span>
+    </div>
     <div class="nav-item" onclick="showPage('s28')">
       <span class="nav-icon">🔬</span> S28 · CandidateRepository audit (WP-8FA)
       <span class="nav-badge">Jul 15</span>
@@ -451,23 +555,502 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">5</span>
+      <span class="nav-badge">6</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">27</span>
+      <span class="nav-badge">32</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">11</span>
+      <span class="nav-badge">16</span>
     </div>
   </div>
 </nav>
 
 <main id="main">
+
+  <!-- ══════════ WP-K01 OPERATING SYSTEM LAYER (living pages — update in place, never append) ══════════ -->
+
+  <!-- ── 01 · Executive Dashboard ── -->
+  <div id="page-exec" class="page-content">
+    <div class="page-header">
+      <div class="page-title">Executive dashboard</div>
+      <div class="page-subtitle"><b>FooFoo</b> — an AI-powered meal-decision assistant for Indian households. A <b>class-first recommendation engine</b> (household → cohort → class plan → dish pool) built documentation-first on Supabase/PostgreSQL with Deno/TypeScript Edge Functions. Vision: <a href="docs/product/%5BACTIVE%5D_DOC-01_Product_Brief_v1.1.docx">DOC-01 Product Brief</a>.</div>
+    </div>
+    <div class="os-note">This page is a status snapshot, not a source of truth — every figure names the certificate or document that owns it. Facts current as of <b>S26 · 2026-07-15</b>, commit <span class="mono">e76bd9c</span>. When a later session changes reality, it updates this page in place.</div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-l">Current phase</div><div class="kpi-v">Phase 8 — Backend Engineering</div><div class="kpi-s">Data Gate passed; API Gate is next (<a href="docs/architecture/%5BACTIVE%5D_DOC-P4-00_Backend_Foundation_Architecture_v1.0.md">DOC-P4-00</a>)</div></div>
+      <div class="kpi"><div class="kpi-l">Latest work package</div><div class="kpi-v">WP-8E — RE integration layer</div><div class="kpi-s">One engine, three callers · <a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-015_WP-8E_RE_Integration_Layer_v1.0.md">REPO-CERT-015</a></div></div>
+      <div class="kpi"><div class="kpi-l">Next work package</div><div class="kpi-v">RE read-port adapters + endpoints</div><div class="kpi-s">CandidateRepository first, then /v1/onboarding + /v1/recommendations, then live-DB validation (WP-8E §7)</div></div>
+      <div class="kpi"><div class="kpi-l">Latest certificate</div><div class="kpi-v">REPO-CERT-015</div><div class="kpi-s">2026-07-15 · WP-8E execution</div></div>
+      <div class="kpi"><div class="kpi-l">Latest commit</div><div class="kpi-v mono">e76bd9c</div><div class="kpi-s">feat(re): WP-8E integration layer</div></div>
+      <div class="kpi"><div class="kpi-l">Current branch</div><div class="kpi-v mono">main</div><div class="kpi-s">clean; feature branches merged locally, per-WP push discipline</div></div>
+      <div class="kpi"><div class="kpi-l">Backend tests</div><div class="kpi-v">62 / 62 passing</div><div class="kpi-s">deno task verify, 2026-07-15 (REPO-CERT-015)</div></div>
+      <div class="kpi"><div class="kpi-l">Production readiness</div><div class="kpi-v"><span class="st st-blocked">NOT READY</span></div><div class="kpi-s">API Gate not passed; DPDP age gate open (AGR-P3-07-001)</div></div>
+    </div>
+
+    <div class="os-card">
+      <div class="os-card-title">Completion by track <span class="src">— engineering estimates derived from the gate ledger and WP certificates below; not measured telemetry. Basis: <a href="#" onclick="showPage('impl');return false">Implementation dashboard</a>.</span></div>
+      <div class="pbar-row"><div class="pbar-name">Discovery &amp; architecture</div><div class="pbar"><div class="pbar-fill" style="width:100%;background:var(--green)"></div></div><div class="pbar-pct">100% · frozen</div></div>
+      <div class="pbar-row"><div class="pbar-name">Database (schema + data)</div><div class="pbar"><div class="pbar-fill" style="width:95%;background:var(--green)"></div></div><div class="pbar-pct">95% · ICD-1</div></div>
+      <div class="pbar-row"><div class="pbar-name">Recommendation engine</div><div class="pbar"><div class="pbar-fill" style="width:65%"></div></div><div class="pbar-pct">~65%</div></div>
+      <div class="pbar-row"><div class="pbar-name">Backend (Surface B)</div><div class="pbar"><div class="pbar-fill" style="width:45%"></div></div><div class="pbar-pct">~45%</div></div>
+      <div class="pbar-row"><div class="pbar-name">Infrastructure / CI</div><div class="pbar"><div class="pbar-fill" style="width:70%"></div></div><div class="pbar-pct">~70%</div></div>
+      <div class="pbar-row"><div class="pbar-name">Deployment</div><div class="pbar"><div class="pbar-fill" style="width:20%"></div></div><div class="pbar-pct">~20%</div></div>
+      <div class="pbar-row"><div class="pbar-name">Frontend</div><div class="pbar"><div class="pbar-fill" style="width:0%"></div></div><div class="pbar-pct">0% · no DOC-P4-01</div></div>
+      <div class="pbar-row"><div class="pbar-name"><b>Overall</b></div><div class="pbar"><div class="pbar-fill" style="width:55%"></div></div><div class="pbar-pct"><b>~55%</b></div></div>
+      <div class="src">Database is 95% not 100% because S-15 (<span class="mono">re_city_migration_overlays</span>) is deferred and <span class="mono">re_cohort_class_priors</span> is unseeded — see <a href="#" onclick="showPage('debt');return false">Technical debt</a>. RE/backend basis: core + orchestration built and tested, but 1/10 endpoints implemented and nothing has run against a live DB.</div>
+    </div>
+
+    <div class="os-card">
+      <div class="os-card-title">Current risks <span class="src">— top items; full list in <a href="#" onclick="showPage('debt');return false">Technical debt</a> and DOC-P4-00 §Risks</span></div>
+      <table class="os-table"><tbody>
+        <tr><td><span class="st st-open">OPEN</span></td><td><b>DPDP under-13 age gate (AGR-P3-07-001)</b> — launch-blocking legal requirement with no implemented mechanism. Founder-owned. <span class="src"><a href="docs/governance/%5BACTIVE%5D_DOC-P3-05_Architecture_Gap_Register_v1.1.md">Gap Register</a></span></td></tr>
+        <tr><td><span class="st st-blocked">BLOCKED</span></td><td><b>CandidateRepository adapter</b> — dish variety dimensions live as genome tags (<span class="mono">dish_tags</span>→<span class="mono">tags</span>), not columns; mapping deliberately not guessed. Gates both remaining endpoints. <span class="src">WP-8E §6.1</span></td></tr>
+        <tr><td><span class="st st-partial">RISK</span></td><td><b>Service-role authorization omissions</b> — Edge Functions bypass RLS, so any missed in-function ownership check is a data exposure. Mitigated by <span class="mono">requireOwnership</span> middleware pattern. <span class="src">DOC-P4-00 §8</span></td></tr>
+        <tr><td><span class="st st-partial">RISK</span></td><td><b>Cold-start priors unseeded</b> — <span class="mono">re_cohort_class_priors</span> empty, so new-user ranking uses the neutral 0.50 fallback (LF-E02). Documented MVP limitation. <span class="src">WP-8D §3</span></td></tr>
+        <tr><td><span class="st st-pending">WATCH</span></td><td><b>Nothing exercised against a live database</b> — all 62 tests use in-memory fakes; live-DB behavioural validation is enumerated debt. <span class="src">WP-8E §6.4</span></td></tr>
+      </tbody></table>
+    </div>
+
+    <div class="os-card">
+      <div class="os-card-title">Decisions awaiting the Founder</div>
+      <table class="os-table"><tbody>
+        <tr><td class="mono">AD-01</td><td>Countersign <a href="docs/architecture/%5BDRAFT%5D_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md">DOC-P4-02</a> to promote it DRAFT→ACTIVE. The onboarding↔first-plan boundary was reconciled via the CDM (RE Engine is the plan actor; onboarding orchestrates — WP-8D §1); direction was given in-session, formal signature pending.</td></tr>
+        <tr><td class="mono">DCR-8D-01</td><td>Confirm the weight-ladder interpolation reading — the DOC-P3-03 §07 worked example is internally inconsistent; the continuous forward-transition reading was implemented and tested by invariant. <span class="src">WP-8D §4</span></td></tr>
+        <tr><td class="mono">Priors</td><td>Disposition <span class="mono">re_cohort_class_priors</span>: seed it (WP-6-class task) or formally accept the neutral-fallback MVP limitation. <span class="src">REPO-CERT-013/014</span></td></tr>
+        <tr><td class="mono">Countersignatures</td><td>All 15 execution certificates (REPO-CERT-001…015) carry blank Founder countersignature lines — work is executed and evidenced, formal acceptance pending.</td></tr>
+      </tbody></table>
+    </div>
+
+    <div class="os-card">
+      <div class="os-card-title">Founder 5-minute path</div>
+      <div class="dd-text" style="font-size:13px;line-height:1.8">
+        1 · This page (where we are, what's blocked, what you owe).&nbsp;
+        2 · <a href="#" onclick="showPage('roadmap');return false">Project roadmap</a> (gates passed vs pending).&nbsp;
+        3 · <a href="#" onclick="showPage('features');return false">Feature dashboard</a> (what a user can/can't do yet).&nbsp;
+        4 · <a href="#" onclick="showPage('debt');return false">Technical debt</a> (what we owe ourselves).&nbsp;
+        5 · <a href="#" onclick="showPage('timeline-full');return false">Session history</a> (how we got here, S1→S26).
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 02 · Project Roadmap ── -->
+  <div id="page-roadmap" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Project roadmap</div>
+      <div class="page-subtitle">The delivery journey and its five gates. This page shows live status; the narrative roadmap documents (<a href="docs/roadmaps/%5BACTIVE%5D_FooFoo_Project_Roadmap_v1.1.md">FooFoo_Project_Roadmap v1.1</a>, dated 2026-07-03, and <a href="docs/roadmaps/%5BACTIVE%5D_PM-SUPP-01_Roadmap_v1.0.md">PM-SUPP-01</a>) are historical — their percentages pre-date the Data Gate and backend work.</div>
+    </div>
+
+    <div class="os-card">
+      <div class="os-card-title">Stages</div>
+      <div class="pbar-row"><div class="pbar-name">Discovery &amp; research</div><div class="pbar"><div class="pbar-fill" style="width:100%;background:var(--green)"></div></div><div class="pbar-pct"><span class="st st-done">DONE</span></div></div>
+      <div class="pbar-row"><div class="pbar-name">Architecture (P3 series)</div><div class="pbar"><div class="pbar-fill" style="width:100%;background:var(--green)"></div></div><div class="pbar-pct"><span class="st st-done">FROZEN</span></div></div>
+      <div class="pbar-row"><div class="pbar-name">Database &amp; canonical data</div><div class="pbar"><div class="pbar-fill" style="width:95%;background:var(--green)"></div></div><div class="pbar-pct"><span class="st st-done">DONE</span></div></div>
+      <div class="pbar-row"><div class="pbar-name">Backend (Phase 8)</div><div class="pbar"><div class="pbar-fill" style="width:45%"></div></div><div class="pbar-pct"><span class="st st-active">ACTIVE</span></div></div>
+      <div class="pbar-row"><div class="pbar-name">Frontend</div><div class="pbar"><div class="pbar-fill" style="width:0%"></div></div><div class="pbar-pct"><span class="st st-pending">PENDING</span></div></div>
+      <div class="pbar-row"><div class="pbar-name">Testing (live behavioural)</div><div class="pbar"><div class="pbar-fill" style="width:15%"></div></div><div class="pbar-pct"><span class="st st-pending">PENDING</span></div></div>
+      <div class="pbar-row"><div class="pbar-name">Deployment</div><div class="pbar"><div class="pbar-fill" style="width:20%"></div></div><div class="pbar-pct"><span class="st st-pending">PENDING</span></div></div>
+      <div class="pbar-row"><div class="pbar-name">Production launch</div><div class="pbar"><div class="pbar-fill" style="width:0%"></div></div><div class="pbar-pct"><span class="st st-pending">PENDING</span></div></div>
+    </div>
+
+    <div class="os-card">
+      <div class="os-card-title">Gate ledger <span class="src">— gate model per <a href="docs/roadmaps/%5BACTIVE%5D_FooFoo_Project_Roadmap_v1.1.md">Roadmap v1.1</a>; status per certificates</span></div>
+      <div class="gate-row"><span class="gate-ic">🟢</span><span class="gate-name">Architecture Gate</span><span class="gate-note"><b>PASSED</b> 2026-07-03 — 8 P3 documents frozen, Founder-signed. <a href="docs/governance/%5BACTIVE%5D_Phase3_5_Architecture_Freeze_v1.0.md">Architecture Freeze</a></span></div>
+      <div class="gate-row"><span class="gate-ic">🟢</span><span class="gate-name">Repository Gate</span><span class="gate-note"><b>PASSED</b> 2026-07-13 — repository CERTIFIED GREEN after the WP-5A→5G recovery program; build 001→029 and teardown proven in a clean room. <a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-006_Repository_Green_Certification_v1.0.md">REPO-CERT-006</a></span></div>
+      <div class="gate-row"><span class="gate-ic">🟢</span><span class="gate-name">Data Gate (ICD-1)</span><span class="gate-note"><b>PASSED</b> 2026-07-14 — canonical knowledge layer proven on a clean room (<a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-007_WP-6E_Data_Gate_Execution_v1.0.md">REPO-CERT-007</a>), synced to the live project (<a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md">REPO-CERT-009</a>), security-hardened + validation modernized (<a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-010_WP-6E3_Security_Hardening_and_Validation_Modernization_v1.0.md">REPO-CERT-010</a>).</span></div>
+      <div class="gate-row"><span class="gate-ic">🟡</span><span class="gate-name">API Gate</span><span class="gate-note"><b>IN PROGRESS</b> — Edge Functions must pass behavioural validation against the frozen <a href="docs/architecture/%5BACTIVE%5D_DOC-P3-06_API_Contract_Specification_v1.2.md">DOC-P3-06</a> contract. Done: scaffold (8B), auth+consent (8C), RE core (8D), integration layer (8E). Remaining: adapters, /v1/onboarding + /v1/recommendations, the other 6 endpoints, live-DB validation, WP-8F/8G/8H.</span></div>
+      <div class="gate-row"><span class="gate-ic">⚪</span><span class="gate-name">Release Gate</span><span class="gate-note"><b>NOT REACHED</b> — requires API Gate, DOC-09/DOC-08 launch criteria, and resolution of AGR-P3-07-001 (DPDP age gate, currently OPEN and launch-blocking).</span></div>
+    </div>
+
+    <div class="os-card">
+      <div class="os-card-title">Phase 8 work-package sequence <span class="src">— per DOC-P4-00 §Phase-8 roadmap</span></div>
+      <div class="os-wrap"><table class="os-table">
+        <thead><tr><th>WP</th><th>Scope</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">WP-8A</td><td>Backend Foundation Architecture (DOC-P4-00)</td><td><span class="st st-done">DONE</span></td></tr>
+          <tr><td class="mono">WP-8B</td><td>Scaffold + _shared foundation + CI</td><td><span class="st st-done">DONE</span> · CERT-008</td></tr>
+          <tr><td class="mono">WP-8C</td><td>Auth framework + consent + onboarding</td><td><span class="st st-partial">PARTIAL</span> · auth+consent done (CERT-011); onboarding endpoint pending</td></tr>
+          <tr><td class="mono">WP-8D</td><td>Reusable RE core + unit tests</td><td><span class="st st-done">DONE</span> · CERT-014</td></tr>
+          <tr><td class="mono">WP-8E</td><td>RE integration: orchestrators + scheduler + persistence</td><td><span class="st st-done">DONE</span> (orchestration) · CERT-015 · adapters/endpoints = enumerated debt</td></tr>
+          <tr><td class="mono">WP-8F</td><td>/v1/events + /v1/plan + suppression + taste-vector evolution</td><td><span class="st st-pending">NOT STARTED</span></td></tr>
+          <tr><td class="mono">WP-8G</td><td>Observability, rate limiting, NFR/latency validation</td><td><span class="st st-pending">NOT STARTED</span></td></tr>
+          <tr><td class="mono">WP-8H</td><td>Admin/content-ops endpoints + security hardening + DPDP coordination</td><td><span class="st st-pending">NOT STARTED</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- ── 03 · Feature Dashboard ── -->
+  <div id="page-features" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Feature dashboard</div>
+      <div class="page-subtitle">Every product capability, its implementation status, owning work package, and where its code and specification live. "Surface A" = the app talks to Supabase directly under RLS (no custom backend needed); "Surface B" = custom Edge Functions (<a href="docs/architecture/%5BACTIVE%5D_DOC-P3-06_API_Contract_Specification_v1.2.md">DOC-P3-06 §01</a>).</div>
+    </div>
+    <div class="os-wrap"><table class="os-table">
+      <thead><tr><th>Feature</th><th>Status</th><th>Owner WP</th><th>Repository location</th><th>Specification</th><th>Done</th></tr></thead>
+      <tbody>
+        <tr><td><b>Registration / login</b></td><td><span class="st st-pending">PLATFORM</span></td><td>— (Supabase Auth)</td><td class="mono">n/a — GoTrue issues JWTs; no custom code by design</td><td>DOC-P3-06 §04 · DOC-P3-07</td><td>n/a</td></tr>
+        <tr><td><b>Authentication framework</b></td><td><span class="st st-done">BUILT</span></td><td>WP-8C · CERT-011</td><td class="mono">supabase/functions/_shared/auth/</td><td>DOC-P3-06 §04/§05 · DOC-P4-00 §7–8</td><td>100% (live GoTrue unexercised)</td></tr>
+        <tr><td><b>Consent (DPDP)</b></td><td><span class="st st-done">BUILT</span></td><td>WP-8C · CERT-011</td><td class="mono">supabase/functions/consent/ + _shared/services/consent-service.ts</td><td>DOC-P3-06 §06.1 · DOC-P3-03 §15 (LF-M01)</td><td>100% (not deployed)</td></tr>
+        <tr><td><b>Onboarding</b></td><td><span class="st st-partial">PARTIAL</span></td><td>WP-8E · CERT-015</td><td class="mono">_shared/services/onboarding/orchestrator.ts</td><td>DOC-P3-06 §06.2 · DOC-P3-03 §03 (LF-A01–A09) · DOC-P4-02 (DRAFT)</td><td>~60% — orchestrator tested; endpoint + adapters pending</td></tr>
+        <tr><td><b>Recommendation engine</b></td><td><span class="st st-partial">PARTIAL</span></td><td>WP-8D · CERT-014</td><td class="mono">_shared/services/re/ (9 files)</td><td>DOC-P3-03 §06–11 · RE-DOC-01–05</td><td>~65% — core done; read adapters + endpoints pending</td></tr>
+        <tr><td><b>Weekly planning</b></td><td><span class="st st-partial">PARTIAL</span></td><td>WP-8E · CERT-015</td><td class="mono">_shared/services/planning/persistence.ts · services/scheduler/nightly-plan.ts</td><td>DOC-P3-03 §14 (LF-L01) · DOC-P3-06 §06.5/06.6</td><td>~50% — persistence + scheduler tested; CRON deploy + /v1/plan pending</td></tr>
+        <tr><td><b>Meal tracking / events</b></td><td><span class="st st-pending">NOT STARTED</span></td><td>WP-8F (planned)</td><td class="mono">— (/v1/events not built)</td><td>DOC-P3-06 §06.3 (LF-J01, G01/G02)</td><td>0%</td></tr>
+        <tr><td><b>Profile &amp; DPDP rights</b></td><td><span class="st st-pending">NOT STARTED</span></td><td>WP-8F/8H (planned)</td><td class="mono">— (Surface A reads; /v1/user/export + /v1/user/delete not built)</td><td>DOC-P3-06 §06.7/06.8 (LF-M02/M03)</td><td>0%</td></tr>
+        <tr><td><b>Gamification</b></td><td><span class="st st-pending">NOT SCHEDULED</span></td><td>— no frozen WP</td><td class="mono">—</td><td>product scope: <a href="docs/architecture/%5BACTIVE%5D_DOC-04_PRD_v1.1.docx">DOC-04 PRD</a></td><td>0%</td></tr>
+        <tr><td><b>Notifications</b></td><td><span class="st st-pending">DESIGNED</span></td><td>WP-8F+ (planned)</td><td class="mono">— (OneSignal server leg; push_notification_logs table exists)</td><td>DOC-P3-08 §09 · DOC-10</td><td>0%</td></tr>
+        <tr><td><b>Admin / content-ops</b></td><td><span class="st st-pending">NOT STARTED</span></td><td>WP-8H (planned)</td><td class="mono">— (manual gate per LF-K04)</td><td>DOC-P3-06 §03 · DOC-P4-00 §8</td><td>0%</td></tr>
+        <tr><td><b>Analytics</b></td><td><span class="st st-pending">DESIGNED</span></td><td>WP-8G (planned)</td><td class="mono">— (PostHog + Sentry seams in _shared/telemetry/)</td><td>DOC-P3-08 §09 · DOC-P3-06 §22</td><td>0%</td></tr>
+      </tbody>
+    </table></div>
+    <div class="src" style="margin-top:8px">Status legend: BUILT = code + tests pass (with fakes; nothing is deployed yet). PARTIAL = some layers built and tested, runtime path incomplete. DESIGNED = frozen architecture exists, no code. PLATFORM = provided by Supabase, intentionally no custom code.</div>
+  </div>
+
+  <!-- ── 04 · Repository Architecture ── -->
+  <div id="page-repo" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Repository architecture</div>
+      <div class="page-subtitle">What every folder is for and how far along it is. The folder structure is <b>frozen</b> — new top-level folders need a Founder-approved RACR (<a href="CLAUDE.md">CLAUDE.md</a> Placement Rule).</div>
+    </div>
+    <div class="os-tree"><b>foofoo-v3/</b>
+├── <b>CLAUDE.md</b>              repo operating rules — session protocol, placement rule, naming standard (WP-5AA)
+├── <b>KNOWLEDGE.html</b>         this file — the engineering operating system + session history
+├── <b>docs/</b>
+│   ├── <b>product/</b>           what FooFoo is, for whom — DOC-01/02/03/07/08/09 (6 docs, frozen)
+│   ├── <b>architecture/</b>      how it is built — DOC-P3-02..08 (frozen), DOC-P4-00 (ACTIVE), DOC-P4-02 (DRAFT), RE-DOC-01..04, PRD/IA/UX
+│   ├── <b>governance/</b>        standing rules — APDF, naming standard, AGR/SER registers, Baseline Register, Architecture Freeze (25 files)
+│   ├── <b>project-history/</b>   what actually happened — reports + decision logs per WP
+│   │   ├── <b>work-packages/</b>  proposed work; DESIGNED until certified (28 files)
+│   │   └── <b>certificates/</b>   proof of real execution — REPO-CERT-001..015 + REPO-BOOT-03 (23 files)
+│   ├── <b>research/</b>          Batch 1–6 discovery/canonicalization records (21 docs, frozen history)
+│   ├── <b>roadmaps/</b>          forward plans (narrative; live status lives on the Roadmap page here)
+│   └── <b>visuals/</b>           interactive HTML explainers (design system + 3 RE explorers)
+├── <b>database/</b>              ★ source of truth for all SQL
+│   ├── <b>migrations/</b>        001–030 structural schema (numbered, ordered, frozen via DOC-P3-04/05)
+│   ├── <b>rollback/</b>          46 paired down-scripts — 30 structural + 16 seed rollbacks (29/29 teardown execution-proven)
+│   ├── <b>seeds/</b>             100–117: config, reference, canonical content + RE knowledge (ICD-1)
+│   ├── <b>validation/</b>        900–905 structural/behavioural/safety-gate/RE checks (modernized WP-6E.3)
+│   └── <b>etl/</b>               deterministic seed generators (generate_icd1_seeds.py, generate_re_seeds.py)
+├── <b>data/source/</b>           original CSV/XLSX spreadsheets — the evidence trail for every seed value
+├── <b>supabase/</b>              ★ backend code tree (Deno/TypeScript Edge Functions — WP-8B..8E)
+│   ├── <b>functions/_shared/</b>  the engineering foundation + all services (see Backend architecture)
+│   │   ├── api/ auth/ middleware/ validation/ errors/ logging/ telemetry/ config/ db/ di/ types/ utils/
+│   │   ├── <b>services/re/</b>     ★ the ONLY home of recommendation logic (WP-8D)
+│   │   ├── services/{onboarding,recommendations,scheduler,planning,adapters}/  callers + persistence (WP-8E)
+│   │   └── repositories/       base + consent repository (all SQL lives here)
+│   ├── <b>functions/consent/</b>  the one deployed-shape endpoint so far: POST /v1/consent
+│   ├── <b>functions/_tests/</b>   62 tests across 4 suites (foundation/consent/re_core/re_integration)
+│   ├── config.toml · deno.json · scripts/ (verify.sh, gen-types.sh)
+│   └── README.md
+├── <b>engineering/templates/</b>  reserved — EMPTY until the Founder supplies template texts (never fabricated)
+└── <b>.github/workflows/</b>     backend-ci.yml (fmt/lint/check/test on every push) · mirror.yml · drive-backup.yml</div>
+    <div class="src" style="margin-top:10px">Status: <span class="mono">docs/</span> complete for the frozen baseline · <span class="mono">database/</span> execution-proven (GREEN + Data Gate) · <span class="mono">supabase/</span> foundation + RE core + orchestration built, endpoints 1/10 · <span class="mono">engineering/templates/</span> empty by honest design. Index of documents: <a href="docs/README.md">docs/README.md</a>.</div>
+  </div>
+
+  <!-- ── 05 · Backend Architecture ── -->
+  <div id="page-backend" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Backend architecture</div>
+      <div class="page-subtitle">Layered Deno/TypeScript Edge Functions over PostgreSQL, exactly per <a href="docs/architecture/%5BACTIVE%5D_DOC-P4-00_Backend_Foundation_Architecture_v1.0.md">DOC-P4-00</a>. Handlers are thin; services orchestrate business logic (each cites its LF-*); repositories own all SQL; Edge Functions run as <b>service_role</b> (RLS bypassed), so <b>every ownership check is explicit in code</b>.</div>
+    </div>
+    <div class="os-card">
+      <div class="os-card-title">Request flow (Surface B)</div>
+      <div class="os-flow">
+        <div class="os-flow-node"><b>User / mobile app</b><span>Authorization: Bearer &lt;JWT&gt; (Supabase Auth)</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>API — thin handler</b><span>functions/&lt;endpoint&gt;/handler.ts · parse → delegate → envelope</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>Middleware — compose()</b><span>trace-id → authenticate (JWT verify) → requireOwnership → error boundary → structured log</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>Validation — Zod schemas</b><span>_shared/validation/ · mirrors DB CHECK constraints · 400 vs 422 split (DCR-8C-02)</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>Service layer</b><span>_shared/services/ · one LF-cited orchestration per method · stateless, per-request DI container</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>Repository layer</b><span>_shared/repositories/ + services/adapters/ · the only place SQL lives · keyset pagination</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>PostgreSQL (ap-south-1)</b><span>public schema (RLS) + re_engine schema (service_role-only) · triggers own derived columns</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>Response envelope</b><span>contract-shaped body + additive trace_id (jsonContract, DCR-8C-01) · errors = DOC-P3-06 §21 catalogue</span></div>
+      </div>
+    </div>
+    <div class="os-card">
+      <div class="os-card-title">Implemented components <span class="src">— all under <span class="mono">supabase/functions/</span>; 53 TS files, 62 tests</span></div>
+      <div class="os-wrap"><table class="os-table">
+        <thead><tr><th>Component</th><th>Files</th><th>Built by</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Foundation (config · db · errors · logging · telemetry · middleware · api · di · validation wrapper · base repo/service)</td><td class="mono">_shared/*</td><td>WP-8B · CERT-008</td><td>fail-fast config; structured JSON logger (single sanctioned sink); AppError never leaks internals</td></tr>
+          <tr><td>Auth framework</td><td class="mono">auth/authenticate.ts · auth/authorize.ts · auth/jwt.ts</td><td>WP-8C · CERT-011</td><td>real JWT signature verification (injectable verifier); requireOwnership guard</td></tr>
+          <tr><td>ConsentService + repository + endpoint</td><td class="mono">services/consent-service.ts · repositories/consent-repository.ts · consent/</td><td>WP-8C · CERT-011</td><td>LF-M01; append-only consent_records; the only runnable endpoint</td></tr>
+          <tr><td>RE core (engine · scoring · constraints · variety · safety · resolvers · ports · types)</td><td class="mono">services/re/ (9 files)</td><td>WP-8D · CERT-014</td><td>pure logic behind ports; see RE page</td></tr>
+          <tr><td>OnboardingOrchestrator</td><td class="mono">services/onboarding/orchestrator.ts</td><td>WP-8E · CERT-015</td><td>LF-A01–A09 + consent gate + engine invocation + §06.2 handle</td></tr>
+          <tr><td>RecommendationService</td><td class="mono">services/recommendations/service.ts</td><td>WP-8E · CERT-015</td><td>§06.4 single-slot re-recommendation, persists fresh slate</td></tr>
+          <tr><td>NightlyPlanScheduler</td><td class="mono">services/scheduler/nightly-plan.ts</td><td>WP-8E · CERT-015</td><td>LF-L01; per-user failure isolation; CRON deploy pending</td></tr>
+          <tr><td>WeekPlanStore + persistence mapping</td><td class="mono">services/planning/persistence.ts</td><td>WP-8E · CERT-015</td><td>GeneratedWeekPlan → week_plans/plan_slots; atomicity RPC = debt</td></tr>
+          <tr><td>Supabase store adapters</td><td class="mono">services/adapters/supabase-stores.ts</td><td>WP-8E · CERT-015</td><td>verified columns; type-checked only — no live DB run yet</td></tr>
+        </tbody>
+      </table></div>
+      <div class="src">Not built: /v1/health, /v1/onboarding, /v1/recommendations, /v1/events, /v1/plan*, /v1/user/* endpoints; RE read-port concrete adapters (CandidateRepository blocked on genome-tag mapping); rate limiting; Sentry/PostHog/OneSignal/OpenWeather wiring (seams only). See <a href="#" onclick="showPage('api');return false">API catalogue</a> and <a href="#" onclick="showPage('debt');return false">Technical debt</a>.</div>
+    </div>
+  </div>
+
+  <!-- ── 06 · Recommendation Engine ── -->
+  <div id="page-re" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Recommendation engine</div>
+      <div class="page-subtitle">The class-first RE: a household resolves to a <b>cohort</b>, the cohort to a <b>weekly class plan</b>, each class to a <b>dish pool</b>, and the engine picks the slate. One reusable engine owns every recommendation decision; recommendation logic exists <b>only</b> in <span class="mono">supabase/functions/_shared/services/re/</span>. Authority: <a href="docs/architecture/%5BACTIVE%5D_DOC-P3-03_Business_Logic_Specification_v1.0.md">DOC-P3-03 §06–11</a>, RE-DOC-01–05, <a href="docs/project-history/work-packages/%5BACTIVE%5D_WP-8D_Recommendation_Engine_Core_v1.0.md">WP-8D</a>/<a href="docs/project-history/work-packages/%5BACTIVE%5D_WP-8E_RE_Integration_Layer_v1.0.md">WP-8E</a>.</div>
+    </div>
+    <div class="os-card">
+      <div class="os-card-title">Pipeline (per slot)</div>
+      <div class="os-flow">
+        <div class="os-flow-node"><b>Resolve</b><span>persona (LF-A09, Option-B fallback) → cohort (persona × state × diet_mode × city_tier) → weekly class plan (LF-B02) → non-veg overlay (LF-B03) · resolvers.ts</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>Candidates</b><span>class → dish pool via re_class_dish_options (LF-D01) · LF-D07 popular fallback when &lt;3 candidates</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>6 hard constraints</b><span>diet · ingredient-level allergen union · Jain · Never list · planning-role · availability (LF-D02–D06) · constraints.ts</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>5-signal scoring</b><span>FinalScore = weight-ladder(CohortPrior · ContentMatch cosine · PersonalHistory λ-decay · ContextFit · Thompson ExplorationBonus) − NotToday penalty (LF-E01–E08) · scoring.ts</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>Variety</b><span>MMR re-rank (λ=0.70) + variety windows: fried cap, monsoon override, same-dish/same-ingredient (LF-F01–F03) · variety.ts</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>4 safety gates</b><span>diet / allergen / Jain / planning-role — zero-tolerance, last line before serve (LF-H01–H04) · safety.ts</span></div><div class="os-flow-arrow">▼</div>
+        <div class="os-flow-node"><b>Slate</b><span>ranked dishes + reason tags (immutable, CDM Inv. 14) · engine.ts generateSlate / generateWeekPlan</span></div>
+      </div>
+    </div>
+    <div class="os-card">
+      <div class="os-card-title">Cold start → warm start</div>
+      <div class="dd-text">Day-0 confidence is computed from onboarding answers (LF-A08), clamped to the documented <b>0.40–0.65</b> Day-0 range (DCR-8E-01 cap at 0.65); <span class="mono">cold_start_mode</span> holds while interaction_count is low. Cold-start ranking leans on CohortPrior (w≈0.55 at tier 1) + exploration (Thompson sampling, Beta(1,1)=uniform at start, bounded bonus). As interactions accumulate, the <b>weight ladder</b> (5 tiers, continuous forward-transition interpolation — DCR-8D-01) shifts weight from cohort priors toward PersonalHistory/ContentMatch. <b>Current limitation:</b> <span class="mono">re_cohort_class_priors</span> is unseeded, so cold-start CohortPrior = neutral 0.50 fallback (LF-E02) until seeded.</div>
+    </div>
+    <div class="os-card">
+      <div class="os-card-title">One engine, three callers <span class="src">(DCR-P3-06-007; proven in the WP-8E integration test)</span></div>
+      <table class="os-table"><tbody>
+        <tr><td><b>Onboarding</b></td><td>OnboardingOrchestrator runs LF-A01–A09 (its own logic), then invokes <span class="mono">engine.generateWeekPlan</span>, persists via WeekPlanStore, returns the §06.2 handle. Per the CDM Domain Events, the RE Engine is the first-plan actor (AD-01 reconciliation, WP-8D §1).</td></tr>
+        <tr><td><b>Recommendations</b></td><td>RecommendationService (POST /v1/recommendations, §06.4) invokes <span class="mono">engine.generateSlate</span> for one slot, persists the fresh slate + FinalScores.</td></tr>
+        <tr><td><b>Nightly scheduler</b></td><td>NightlyPlanScheduler (LF-L01, 23:30 UTC / 05:00 IST when deployed) iterates eligible users through the same engine; single-user failures isolated.</td></tr>
+      </tbody></table>
+    </div>
+    <div class="os-card">
+      <div class="os-card-title">History, context &amp; evolution</div>
+      <div class="dd-text"><b>History:</b> the engine reads the append-only event stream (never writes user tables — RE-DOC-01 isolation); PersonalHistory decays with λ=0.05; Not-Today suppression decays with threshold + context override; Never list is a hard constraint. <b>Context:</b> ContextFit multiplies weather/season/day against genome tags (<span class="mono">re_context_multipliers</span>, seeded); weather via 12h <span class="mono">weather_cache</span>. <b>Evolution roadmap</b> (RE-DOC-05, behind the stable /v1 contract via <span class="mono">re_engine_versions</span>): <span class="mono">classfirst_v1</span> (active) → <span class="mono">classfirst_v2</span> → <span class="mono">ltr_v1</span> → <span class="mono">ml_v1</span>; /v2/recommendations reserved, unimplemented. No pgvector/LLM infra exists today by design (DOC-P4-00 §28).</div>
+    </div>
+    <div class="os-card">
+      <div class="os-card-title">Current vs future implementation</div>
+      <table class="os-table"><tbody>
+        <tr><td><span class="st st-done">BUILT</span></td><td>Engine core (28 tests) + orchestration layer (10 tests): constraints, scoring, variety, safety, resolvers, engine, DTOs, ports; onboarding/recommendations/scheduler callers; plan persistence; verified-column store adapters.</td></tr>
+        <tr><td><span class="st st-blocked">BLOCKED</span></td><td>CandidateRepository concrete adapter — needs the dish_tags/tags variety-dimension + genome_vector ordering + allergen join verified before a DishCandidate can be materialized (WP-8E §6.1 — deliberately not guessed).</td></tr>
+        <tr><td><span class="st st-pending">PENDING</span></td><td>Remaining read-port adapters (cohort/priors/taste/history/bandit/context/never/suppression + ReStateStore), the two HTTP endpoints, nightly CRON deployment, live-DB behavioural validation (extend 902/905), priors seeding, addon-slot generation (schema mismatch: re_segment_addon_rule named in docs does not exist — real path is re_household_addon_plans + re_addon_classes + re_addon_dish_options).</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <!-- ── 07 · Database Dashboard ── -->
+  <div id="page-dbdash" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Database dashboard</div>
+      <div class="page-subtitle">62 base tables across two schemas: <span class="mono">public</span> (RLS-guarded, Surface A) and <span class="mono">re_engine</span> (service_role-only). Schema authority: <a href="docs/architecture/%5BACTIVE%5D_DOC-P3-04_Data_Architecture_ERD_v1.3.md">DOC-P3-04 v1.3</a>. Live canonical state: project <span class="mono">cmkswalqpmmqojwdmqbv</span>, certified by <a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md">REPO-CERT-009</a> (18/18 tables exact, DIFFS: 0) and hardened by <a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-010_WP-6E3_Security_Hardening_and_Validation_Modernization_v1.0.md">REPO-CERT-010</a>.</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-l">Migrations</div><div class="kpi-v">30 / 30 rollback-paired</div><div class="kpi-s">001–030 · build+teardown execution-proven</div></div>
+      <div class="kpi"><div class="kpi-l">Seeds</div><div class="kpi-v">18 files (100–117)</div><div class="kpi-s">config + reference + canonical ICD-1</div></div>
+      <div class="kpi"><div class="kpi-l">Validation</div><div class="kpi-v">900–905 all pass</div><div class="kpi-s">last live run 2026-07-14 (CERT-010)</div></div>
+      <div class="kpi"><div class="kpi-l">Security</div><div class="kpi-v">Hardened</div><div class="kpi-s">AGR-001/Inv-6 posture in force; re_engine invisible to clients</div></div>
+    </div>
+    <div class="os-card">
+      <div class="os-card-title">Tables by domain, with live canonical counts <span class="src">(counts: REPO-CERT-009 §5; domain map: DOC-P3-04 §02)</span></div>
+      <div class="os-wrap"><table class="os-table">
+        <thead><tr><th>Domain</th><th>Tables</th><th>Live state</th></tr></thead>
+        <tbody>
+          <tr><td><b>Reference / content</b> (public)</td><td class="mono">dishes · ingredients · dish_ingredients · tags · dish_tags · dish_combos · dish_combo_items · cuisines · meal_classes (mirror)</td><td>802 dishes · 191 ingredients · 7,108 links · 111 tags · 10,456 dish_tags · 35 combos · 65 cuisines · 131 classes — derived columns 100% trigger-owned</td></tr>
+          <tr><td><b>Users / household</b> (public)</td><td class="mono">profiles · household_members · onboarding_sessions · consent_records</td><td>empty — no end users yet (backend pre-launch)</td></tr>
+          <tr><td><b>Planning</b> (public)</td><td class="mono">week_plans · plan_slots · addon_slots</td><td>empty — written by the RE at runtime</td></tr>
+          <tr><td><b>Interaction / context</b> (public, partitioned)</td><td class="mono">interaction_events · suggestion_logs · context_log · weather_cache</td><td>empty — append-only event stream</td></tr>
+          <tr><td><b>Recommendation knowledge</b> (re_engine)</td><td class="mono">re_states · re_personas · re_subcohorts · re_main_cohorts · re_meal_classes · re_addon_classes · re_cohorts · re_weekly_class_plans · re_household_addon_plans · re_nonveg_logic · re_class_dish_options · re_addon_dish_options · re_dish_regional_affinity · re_persona_assignment_rules · re_routing_rules · overlap rules</td><td>36 states · 41 personas · 41 subcohorts · 5 main cohorts · 131 classes · 24 addon classes · <b>2,952 cohorts</b> (city_tier, SER-001) · <b>20,664 weekly plans</b> (= cohorts × 7) · 7,992 addon plans · 36 nonveg rows · 165 + 6 dish options (ICD-1) · 130 affinity</td></tr>
+          <tr><td><b>RE identity / history</b> (re_engine)</td><td class="mono">user_re_state · user_taste_vectors · never_list · not_today_suppression · variety_window_state</td><td>empty — per-user runtime state</td></tr>
+          <tr><td><b>Configuration</b> (re_engine)</td><td class="mono">re_weight_ladder_config · re_scoring_config · re_event_weights · re_confidence_config · re_city_overlay_config · re_variety_rules · re_class_affinity_config · re_context_multipliers · re_festival_calendar · re_engine_versions</td><td>seeded + verified (weight ladder sums = 1.0; classfirst_v1 active)</td></tr>
+          <tr><td><b>Audit / security / ops</b> (public)</td><td class="mono">audit_log · derivation_conflicts · safety_gate_log · coverage_gap_log · push_notification_logs · etl_job_runs · feature_flags · dish_features</td><td>derivation_conflicts = 0 after canonical load; RLS on 33/33 public tables</td></tr>
+        </tbody>
+      </table></div>
+      <div class="src">Known gaps (deliberate, tracked): <span class="mono">re_city_migration_overlays</span> = 0 rows (S-15 deferred — source lacks migration_duration_band) · <span class="mono">re_cohort_class_priors</span> unseeded (neutral fallback in force). See <a href="#" onclick="showPage('debt');return false">Technical debt</a>.</div>
+    </div>
+  </div>
+
+  <!-- ── 08 · API Catalogue ── -->
+  <div id="page-api" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">API catalogue</div>
+      <div class="page-subtitle">The complete frozen Surface-B inventory — 9 <span class="mono">/v1</span> endpoints + 1 reserved <span class="mono">/v2</span>. Contract authority: <a href="docs/architecture/%5BACTIVE%5D_DOC-P3-06_API_Contract_Specification_v1.2.md">DOC-P3-06 v1.2 §03/§06</a>. No endpoint is deployed yet; "IMPLEMENTED" means built + tested locally. Surface A (direct PostgREST + RLS table access) is intentionally not re-implemented as endpoints.</div>
+    </div>
+    <div class="os-wrap"><table class="os-table">
+      <thead><tr><th>Endpoint</th><th>Status</th><th>WP</th><th>Source files</th><th>Tests</th><th>Contract</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">POST /v1/consent</td><td><span class="st st-done">IMPLEMENTED</span></td><td>WP-8C</td><td class="mono">functions/consent/ · services/consent-service.ts · repositories/consent-repository.ts · validation/consent-schema.ts</td><td>16 (consent.test.ts)</td><td>§06.1 · LF-M01</td></tr>
+        <tr><td class="mono">POST /v1/onboarding</td><td><span class="st st-partial">ORCHESTRATOR BUILT</span></td><td>WP-8E → next WP</td><td class="mono">services/onboarding/orchestrator.ts (handler pending)</td><td>in re_integration.test.ts</td><td>§06.2 · LF-A01–A09 · AD-01/DOC-P4-02</td></tr>
+        <tr><td class="mono">POST /v1/recommendations</td><td><span class="st st-partial">SERVICE BUILT</span></td><td>WP-8E → next WP</td><td class="mono">services/recommendations/service.ts + services/re/ (handler pending; blocked on CandidateRepository)</td><td>in re_integration.test.ts + re_core.test.ts</td><td>§06.4 · LF-B..I pipeline · ≤800ms budget</td></tr>
+        <tr><td class="mono">POST /v2/recommendations</td><td><span class="st st-pending">RESERVED</span></td><td>— future LTR/ML</td><td class="mono">—</td><td>—</td><td>§03 · RE-DOC-01 §04</td></tr>
+        <tr><td class="mono">POST /v1/events</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F (planned)</td><td class="mono">—</td><td>—</td><td>§06.3 · LF-J01 + G01/G02 sub-path</td></tr>
+        <tr><td class="mono">GET /v1/plan/{user_id}/{week}</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F (planned)</td><td class="mono">— (plan-slot read adapters exist in services/adapters/)</td><td>—</td><td>§06.5 · reads LF-L01 output</td></tr>
+        <tr><td class="mono">POST /v1/plan/refresh</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F (planned)</td><td class="mono">—</td><td>—</td><td>§06.6 · LF-L02 · DCR-P3-06-004</td></tr>
+        <tr><td class="mono">GET /v1/user/export</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F/8H (planned)</td><td class="mono">—</td><td>—</td><td>§06.7 · LF-M02 · DPDP, async ≤72h</td></tr>
+        <tr><td class="mono">POST /v1/user/delete</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F/8H (planned)</td><td class="mono">—</td><td>—</td><td>§06.8 · LF-M03 · DPDP, async ≤72h</td></tr>
+        <tr><td class="mono">GET /v1/health</td><td><span class="st st-pending">PENDING</span></td><td>next endpoint WP</td><td class="mono">— (recommended first deploy-pipeline proof, DOC-P4-00 §Impl-order)</td><td>—</td><td>§06.9 · public, &lt;50ms</td></tr>
+      </tbody>
+    </table></div>
+    <div class="src" style="margin-top:8px">Deprecated endpoints: none (v1 contract is additive-only, §16.4/§17). Scheduled (non-HTTP) runtimes: <span class="mono">_cron/nightly-plan</span> (LF-L01 — service built, CRON not deployed) and daily dish-feature snapshot (LF-J09 — not built).</div>
+  </div>
+
+  <!-- ── 09 · Implementation Dashboard ── -->
+  <div id="page-impl" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Implementation dashboard</div>
+      <div class="page-subtitle">Every work package, its objective, and its proof. Rule (<a href="CLAUDE.md">CLAUDE.md</a>): a WP may only read COMPLETED if a companion certificate with real execution output exists in <span class="mono">docs/project-history/certificates/</span>.</div>
+    </div>
+    <div class="os-wrap"><table class="os-table">
+      <thead><tr><th>WP</th><th>Objective</th><th>Status</th><th>Certificate</th><th>Commit</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">REPO-BOOT-01..03</td><td>Repository bootstrap + migration to this repo after the apverse-labs account loss (history begins 2026-07-13)</td><td><span class="st st-done">DONE</span></td><td>REPO-BOOT-03</td><td class="mono">(baseline)</td></tr>
+        <tr><td class="mono">REPO-WP-02/03/04*</td><td>Schema baseline + seed readiness/loading/validation (pre-recovery era)</td><td><span class="st st-done">SUPERSEDED</span></td><td>via WP-5F2/5G (docs/README note)</td><td class="mono">—</td></tr>
+        <tr><td class="mono">WP-5A/5B</td><td>Completeness audit + recover migrations 021–026 from the live DB</td><td><span class="st st-done">DONE</span></td><td>audit + recovery reports</td><td class="mono">12213b5</td></tr>
+        <tr><td class="mono">WP-5AA</td><td>Repository naming normalization (133 renames; 9 honest exceptions)</td><td><span class="st st-done">DONE</span></td><td>Naming Validation Report</td><td class="mono">f212be6</td></tr>
+        <tr><td class="mono">WP-5C</td><td>Author all 26 missing rollbacks (28/28 coverage)</td><td><span class="st st-done">DONE</span></td><td>Rollback Validation Report</td><td class="mono">3e4bb8a</td></tr>
+        <tr><td class="mono">WP-5F / 5E / 5F2</td><td>Clean-room validation → remediation → real build/teardown execution</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-001/002/003</td><td class="mono">793bb38 · 8e0440c · 92a717c</td></tr>
+        <tr><td class="mono">WP-5D</td><td>Production parity: recover pf1 as migration 029 (Founder Option B)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-004/005</td><td class="mono">630694d · 7ffe7b3</td></tr>
+        <tr><td class="mono">WP-5G</td><td>Independent GREEN certification — Repository Gate PASSED</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-006</td><td class="mono">21e01d7</td></tr>
+        <tr><td class="mono">WP-6 / 6A–6D</td><td>Canonical knowledge plan + source→target mapping (found the dish-catalog blocker)</td><td><span class="st st-done">DONE</span></td><td>WP-6A-6D report</td><td class="mono">0d2258d · 2899c89</td></tr>
+        <tr><td class="mono">WP-6D-gen</td><td>Deterministic ETL → content seeds 103–109 (802 dishes; 885 deferred)</td><td><span class="st st-done">DONE</span></td><td>WP-6D-gen + Deferred Register</td><td class="mono">21f7d59</td></tr>
+        <tr><td class="mono">WP-6RE + DEC/GEN</td><td>RE knowledge audit → SER-001 city_tier (migration 030) → RE seeds 110–117</td><td><span class="st st-done">DONE</span></td><td>WP-6RE + SER-001</td><td class="mono">b74c7a7 · 8904d7b</td></tr>
+        <tr><td class="mono">WP-6E</td><td>Data Gate executed on disposable clean room — PASSED (ICD-1)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-007</td><td class="mono">cc4c828</td></tr>
+        <tr><td class="mono">WP-6E.2</td><td>Canonical sync to live Supabase (18/18 exact, DIFFS: 0)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-009</td><td class="mono">bee2ddc</td></tr>
+        <tr><td class="mono">WP-6E.3</td><td>Privilege-drift root cause + hardening + validation modernization</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-010</td><td class="mono">f155e65</td></tr>
+        <tr><td class="mono">WP-8A</td><td>Backend Foundation Architecture (DOC-P4-00, 30 topics, readiness 8.5/10)</td><td><span class="st st-done">DONE</span></td><td>DOC-P4-00 ACTIVE</td><td class="mono">b89ca7e</td></tr>
+        <tr><td class="mono">WP-8B</td><td>Backend scaffold: _shared foundation + CI + 8 tests</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-008</td><td class="mono">2a2cf4b</td></tr>
+        <tr><td class="mono">WP-8C</td><td>Auth framework + POST /v1/consent (onboarding deferred with evidence)</td><td><span class="st st-partial">PARTIAL</span></td><td>REPO-CERT-011</td><td class="mono">6906dd5</td></tr>
+        <tr><td class="mono">WP-8C-recon</td><td>Read-only reconciliation → Option B → DOC-P4-02 DRAFT authored (AD-01 surfaced)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-012</td><td class="mono">d195973</td></tr>
+        <tr><td class="mono">WP-8D-recon</td><td>Pre-implementation RE reconciliation → STOP (AD-01 + priors gap)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-013</td><td class="mono">c170006</td></tr>
+        <tr><td class="mono">WP-8D</td><td>Reusable RE core — pure logic behind ports, 28 tests, AD-01 reconciled via CDM</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-014</td><td class="mono">e113ffa</td></tr>
+        <tr><td class="mono">WP-8E</td><td>Integration layer — one engine, three callers + persistence adapters, 10 tests</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-015</td><td class="mono">e76bd9c</td></tr>
+        <tr><td class="mono">WP-K01</td><td>KNOWLEDGE.html → engineering operating system (this refactoring)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-016</td><td class="mono">S26</td></tr>
+      </tbody>
+    </table></div>
+    <div class="src" style="margin-top:8px">Full ledger with per-WP evidence registers and decision logs: <a href="docs/project-history/">docs/project-history/</a> (28 work packages · 23 certificate-folder records).</div>
+  </div>
+
+  <!-- ── 10 · Decision Register ── -->
+  <div id="page-adr" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Decision register</div>
+      <div class="page-subtitle">Every governed architecture decision, its reason, and where its full record lives. This register indexes; the originating document owns the detail. (The legacy per-session "Key decisions" page is preserved under Reference.)</div>
+    </div>
+    <div class="os-wrap"><table class="os-table">
+      <thead><tr><th>ID</th><th>Decision</th><th>Why</th><th>Status</th><th>Authority / evidence</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">AGR-001..004</td><td>Schema-vs-governance defect fixes during migration authoring (undefined role in REVOKE; meal_classes/derivation_conflicts file allocation; index-count imprecision)</td><td>root-cause fixes at the planning layer, not implementation patches</td><td><span class="st st-done">RESOLVED</span></td><td><a href="docs/governance/%5BACTIVE%5D_DOC-P3-05_Architecture_Gap_Register_v1.1.md">Gap Register</a></td></tr>
+        <tr><td class="mono">AGR-P3-07-001</td><td>DPDP under-13 age verification has no implemented mechanism</td><td>legal (DPDP Act 2023) — needs Founder-directed correction or policy mitigation</td><td><span class="st st-open">OPEN · launch-blocking</span></td><td>Gap Register · DOC-P3-07 §06/§19/§38</td></tr>
+        <tr><td class="mono">AGR-005 / AGR-006</td><td>routing_rules.show_question_key made nullable · weight-ladder weights numeric</td><td>schema corrections ratified through governance (migrations 027/028)</td><td><span class="st st-done">RESOLVED</span></td><td><a href="docs/governance/">docs/governance/ AGR docs</a></td></tr>
+        <tr><td class="mono">SER-001</td><td>Add city_tier to re_cohorts + tier-aware uniqueness (migration 030)</td><td>GAP-002: source cohorts are 1,476 households × 2 city tiers = 2,952; table could only hold 1,476</td><td><span class="st st-done">RESOLVED</span></td><td><a href="docs/governance/%5BACTIVE%5D_SER-001_re_cohorts_city_tier_v1.0.md">SER-001</a></td></tr>
+        <tr><td class="mono">Option B (pf1)</td><td>Recover production's pf1 security hardening as repo migration 029, quarantining the prod-only rls_auto_enable line</td><td>production parity without importing an unapproved auto-security overlay</td><td><span class="st st-done">ADOPTED</span></td><td>WP-5D Completion · REPO-CERT-005</td></tr>
+        <tr><td class="mono">Option C (ICD-1)</td><td>Seed only dishes that exist in the catalog; defer 885 referenced-but-absent dishes to a register</td><td>never invent content; deferred ≠ error</td><td><span class="st st-done">ADOPTED</span></td><td>WP-6D-gen · <a href="docs/project-history/work-packages/%5BACTIVE%5D_WP-6_Deferred_Knowledge_Register_v1.0.csv">Deferred Register (885 rows)</a></td></tr>
+        <tr><td class="mono">DCR-P3-06-001/004/005/007</td><td>Formalized /v1/consent, /v1/plan/refresh, /v1/user/delete as endpoints; scheduled jobs call the shared service, never the public HTTP endpoint</td><td>close contract gaps found while freezing DOC-P3-06</td><td><span class="st st-done">FROZEN</span></td><td>DOC-P3-06 v1.2</td></tr>
+        <tr><td class="mono">AD-01</td><td>First-week-plan boundary: the RE Engine (separate actor) generates the plan during onboarding; onboarding orchestrates — no DCR needed</td><td>DOC-P3-02 CDM Domain Events name the RE Engine as the PlanPreviewGenerated actor; prior §12/§13 reading was too literal</td><td><span class="st st-partial">RESOLVED — countersignature pending</span></td><td>WP-8D §1 · <a href="docs/architecture/%5BDRAFT%5D_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md">DOC-P4-02 (DRAFT)</a></td></tr>
+        <tr><td class="mono">AD-02 / DCR-8C-01</td><td>Response envelope = contract-shaped body + additive trace_id (jsonContract)</td><td>frozen contract outranks scaffold convenience</td><td><span class="st st-done">ADOPTED</span></td><td>WP-8C §4 · REPO-CERT-011</td></tr>
+        <tr><td class="mono">AD-03 / DCR-8C-02</td><td>400 ERR_VALIDATION_FAILED (structure) vs 422 ERR_CONSENT_TYPE_INVALID (enum) split</td><td>per DOC-P3-06 §07/§21 semantics</td><td><span class="st st-done">ADOPTED</span></td><td>WP-8C §4</td></tr>
+        <tr><td class="mono">AD-04 / DCR-8C-03</td><td>consent ip_address_hash deferred (nullable) until an IP-salt secret exists</td><td>no placeholder secrets</td><td><span class="st st-partial">DEFERRED</span></td><td>WP-8C §4</td></tr>
+        <tr><td class="mono">AD-05</td><td>Onboarding→RE hand-off is the persisted user_re_state row — no new payload</td><td>frozen-consistent; no invented contract</td><td><span class="st st-done">ADOPTED (WP-8E)</span></td><td>DOC-P4-02 §8 · WP-8E</td></tr>
+        <tr><td class="mono">DCR-8D-01</td><td>Weight-ladder: continuous forward-transition interpolation (worked example in §07 is self-inconsistent)</td><td>preserves partition-of-unity + continuity; tested by invariant</td><td><span class="st st-partial">FLAGGED — Founder confirm</span></td><td>WP-8D §4 · REPO-CERT-014</td></tr>
+        <tr><td class="mono">DCR-8E-01</td><td>Onboarding confidence clamped to the documented Day-0 max 0.65; persistWeekPlan is sequential upserts (atomic RPC = debt)</td><td>faithful to LF-A08's stated range; Supabase JS client cannot wrap multi-statement transactions</td><td><span class="st st-done">ADOPTED</span></td><td>WP-8E §4</td></tr>
+        <tr><td class="mono">IDR-001</td><td>WP-5 numbering reconciliation (green-cert = 5G)</td><td>two briefs used conflicting WP numbers</td><td><span class="st st-done">RESOLVED</span></td><td><a href="docs/governance/%5BACTIVE%5D_IDR-001_WP5_Sequence_Reconciliation_v1.0.md">IDR-001</a></td></tr>
+        <tr><td class="mono">WP-K01 D-01..D-08</td><td>This knowledge-platform refactoring's own decisions (why each OS section exists, preservation rules, default page)</td><td>see the dedicated log</td><td><span class="st st-done">RECORDED</span></td><td><a href="docs/project-history/%5BACTIVE%5D_WP-K01_Decision_Log_v1.0.md">WP-K01 Decision Log</a></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <!-- ── 11 · Technical Debt Register ── -->
+  <div id="page-debt" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Technical debt register</div>
+      <div class="page-subtitle">Everything we knowingly owe, with priority, risk, and the work package expected to pay it. Nothing here is hidden in a report — each item cites its origin.</div>
+    </div>
+    <div class="os-wrap"><table class="os-table">
+      <thead><tr><th>Priority</th><th>Item</th><th>Risk if unpaid</th><th>Mitigation today</th><th>Owner / target</th><th>Origin</th></tr></thead>
+      <tbody>
+        <tr><td><span class="st st-open">P0</span></td><td>DPDP under-13 age gate has no mechanism (AGR-P3-07-001)</td><td>cannot legally launch in India</td><td>launch-gated; tracked in Gap Register</td><td>Founder → WP-8H coordination</td><td>DOC-P3-07 §06</td></tr>
+        <tr><td><span class="st st-blocked">P1</span></td><td>CandidateRepository adapter blocked on dish_tags/tags variety-dimension + genome_vector ordering + allergen join</td><td>RE cannot run against the real DB; both remaining endpoints gated</td><td>deferred, not guessed</td><td>next WP (schema-verification task)</td><td>WP-8E §6.1</td></tr>
+        <tr><td><span class="st st-partial">P1</span></td><td>No live-DB behavioural validation of the backend (all tests use fakes)</td><td>runtime surprises vs real schema/RLS/GoTrue</td><td>clean-room pattern exists (WP-6E) to extend via 902/905</td><td>next WP</td><td>WP-8E §6.4</td></tr>
+        <tr><td><span class="st st-partial">P1</span></td><td>/v1/onboarding + /v1/recommendations + /v1/health handlers not built; nightly CRON not deployed</td><td>no runnable product path</td><td>orchestrators/services done and tested</td><td>next WP</td><td>WP-8E §6.3</td></tr>
+        <tr><td><span class="st st-partial">P2</span></td><td>re_cohort_class_priors unseeded — cold-start CohortPrior = neutral 0.50</td><td>weaker day-0 ranking quality</td><td>documented LF-E02 fallback; other signals carry ranking</td><td>Founder disposition → WP-6-class seed task</td><td>WP-8D §3</td></tr>
+        <tr><td><span class="st st-partial">P2</span></td><td>persistWeekPlan is sequential upserts, not atomic</td><td>half-written plan on mid-write failure</td><td>move into a Postgres RPC (DOC-P4-00 §16)</td><td>endpoint WP</td><td>WP-8E §4</td></tr>
+        <tr><td><span class="st st-partial">P2</span></td><td>Addon-slot generation: docs name re_segment_addon_rule, which does not exist — real path is re_household_addon_plans + re_addon_classes + re_addon_dish_options</td><td>doc/schema mismatch could mislead implementation</td><td>reconcile before addon slots are generated</td><td>WP-8F-era</td><td>WP-8E §6.6</td></tr>
+        <tr><td><span class="st st-partial">P2</span></td><td>Auth-fixture gap: 902 Test 4 / 903 cross-user checks self-SKIP without seeded test profiles</td><td>RLS isolation not continuously re-proven live</td><td>add fixtures now that the auth framework exists</td><td>live-validation WP</td><td>REPO-CERT-010 §7</td></tr>
+        <tr><td><span class="st st-pending">P3</span></td><td>S-15 re_city_migration_overlays deferred (0 rows) — source lacks migration_duration_band</td><td>city-migration overlay signal inactive</td><td>engine fallback documented</td><td>Founder/data sourcing</td><td>REPO-CERT-007</td></tr>
+        <tr><td><span class="st st-pending">P3</span></td><td>885 deferred dish references (ICD-1 scope) + dish_combo_items subset (64)</td><td>RE candidate coverage bounded until content expands</td><td>Deferred Knowledge Register is the backlog</td><td>content/product</td><td><a href="docs/project-history/work-packages/%5BACTIVE%5D_WP-6_Deferred_Knowledge_Register_v1.0.csv">Deferred Register</a></td></tr>
+        <tr><td><span class="st st-pending">P3</span></td><td>Stale orientation docs: root README + docs/README say "no application code exists"; Roadmap v1.1 says "Repository Bootstrap 40%"; supabase/README says "no endpoints yet"</td><td>a new reader gets a pre-Phase-8 picture</td><td>this KNOWLEDGE OS page is current; doc refresh needs its own governed pass (found during WP-K01, reported not silently fixed)</td><td>small docs WP</td><td>WP-K01 review</td></tr>
+        <tr><td><span class="st st-pending">P3</span></td><td>Governance housekeeping: 3 templates + 4 runbooks never supplied (folders empty); 9 "Copy of _ACTIVE__" filenames pending authorized rename; duplicate WP-3D_Check2_Fix_Reference.sql in two folders; DOC-P4-01 (frontend spec) unauthored</td><td>onboarding friction; naming-standard exceptions persist</td><td>tracked in Exception Register + docs/README</td><td>Founder-authorized cleanup</td><td><a href="docs/governance/%5BACTIVE%5D_Repository_Naming_Exception_Register_v1.0.md">Exception Register</a></td></tr>
+        <tr><td><span class="st st-pending">P3</span></td><td>15 execution certificates awaiting Founder countersignature; DOC-P4-02 awaiting DRAFT→ACTIVE promotion; DCR-8D-01 awaiting confirmation</td><td>governance record incomplete</td><td>work itself is executed + evidenced</td><td>Founder</td><td>certificates</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <!-- ── 12 · Validation Dashboard ── -->
+  <div id="page-validation" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Validation dashboard</div>
+      <div class="page-subtitle">Two validation layers: the SQL suite (900–905) proving the database, and <span class="mono">deno task verify</span> proving the backend code. Scripts live in <a href="database/validation/">database/validation/</a>; the suite was modernized to the canonical ICD-1 baseline in WP-6E.3.</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-l">SQL suite — last live run</div><div class="kpi-v">2026-07-14 · ALL PASS</div><div class="kpi-s">against project cmkswalqpmmqojwdmqbv (<a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-010_WP-6E3_Security_Hardening_and_Validation_Modernization_v1.0.md">REPO-CERT-010 §4</a>)</div></div>
+      <div class="kpi"><div class="kpi-l">Backend — last verify</div><div class="kpi-v">2026-07-15 · 62/62</div><div class="kpi-s">fmt + lint + check + test (REPO-CERT-015)</div></div>
+      <div class="kpi"><div class="kpi-l">Known exceptions</div><div class="kpi-v">2 SKIPs</div><div class="kpi-s">auth-fixture environment limits, not failures</div></div>
+      <div class="kpi"><div class="kpi-l">CI</div><div class="kpi-v">backend-ci on GitHub Actions</div><div class="kpi-s">runs verify on every supabase/** push; DB safety gates join at WP-8E-endpoint time</div></div>
+    </div>
+    <div class="os-wrap"><table class="os-table">
+      <thead><tr><th>Script</th><th>Proves</th><th>Latest result</th><th>Known exceptions</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">900_structural_validation</td><td>62 tables · 7 safety-critical FKs · 5 fn_* + 4 app triggers · derived-column privileges · RLS on every public table · re_engine lockdown · 15 seed gates (ICD-1 targets)</td><td><span class="st st-done">PASS</span> (7/7 checks)</td><td>—</td></tr>
+        <tr><td class="mono">901_behavioral_trigger_validation</td><td>derivation triggers: Poha→vegan, allergen union (Bharli Vangi), Butter Chicken→non_veg, ingredient-change propagation (1→33), derived-write block</td><td><span class="st st-done">PASS</span> (5/5)</td><td>—</td></tr>
+        <tr><td class="mono">902_behavioral_safety_gates</td><td>the 4 zero-tolerance gates on live data (diet / allergen / Jain / planning-role)</td><td><span class="st st-done">PASS</span></td><td>Test 4 SKIPs — needs a seeded profile fixture</td></tr>
+        <tr><td class="mono">903_behavioral_rls_validation</td><td>anon write-block · re_engine invisibility · cross-user isolation</td><td><span class="st st-done">PASS</span></td><td>cross-user check SKIPs — no auth fixtures yet</td></tr>
+        <tr><td class="mono">904_behavioral_config_and_smoke_test</td><td>weight-ladder sums = 1.0 · invalid weight rejected · event weights · end-to-end "Monday plan" smoke resolve</td><td><span class="st st-done">PASS</span> (full)</td><td>—</td></tr>
+        <tr><td class="mono">905_re_knowledge_seed_validation</td><td><b>authoritative RE check:</b> 12 seed gates exact · GAP-002 (2,952 / ×7 = 20,664) · 9/9 FK anti-joins = 0 orphans · planning-role safety = 0</td><td><span class="st st-done">FULL PASS</span></td><td>—</td></tr>
+        <tr><td class="mono">deno task verify</td><td>backend: format · lint · type-check (52 files) · 62 tests (8 foundation + 16 consent + 28 RE core + 10 integration)</td><td><span class="st st-done">PASS 62/62</span></td><td>tests use injected fakes — live-DB behaviour is enumerated debt</td></tr>
+      </tbody>
+    </table></div>
+    <div class="src" style="margin-top:8px">Release rule (DOC-P3-08 §CI / DOC-P3-07 §34): the diet/allergen/Jain safety-gate SQL returning any non-zero row is a P0 release blocker once endpoints deploy.</div>
+  </div>
+
+  <!-- ── 13 · Deployment Dashboard ── -->
+  <div id="page-deploy" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Deployment dashboard</div>
+      <div class="page-subtitle">Environment map is <b>locked</b> (DOC-P3-08 §Env / DOC-P3-07 §31): local dev → <span class="mono">foofoo-staging</span> → production <span class="mono">foofoo-mvp</span>; production promotion is always a separate, Founder-approved step. Canonical execution project (Founder, WP-6E.1): <span class="mono">cmkswalqpmmqojwdmqbv</span>, region ap-south-1.</div>
+    </div>
+    <div class="os-wrap"><table class="os-table">
+      <thead><tr><th>Surface</th><th>Status</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td><b>Database (Supabase)</b></td><td><span class="st st-done">LIVE · CANONICAL</span></td><td>Migrations 001–030 applied; canonical ICD-1 data loaded 18/18 exact (CERT-009); privileges hardened to the certified 029 posture (CERT-010). This is the staging/canonical target — not public production.</td></tr>
+        <tr><td><b>Edge Functions</b></td><td><span class="st st-blocked">NOT DEPLOYED</span></td><td>consent endpoint + services are built and tested locally only. No <span class="mono">supabase functions deploy</span> has been certified. First deploy should be /v1/health to prove the pipeline (DOC-P4-00 §Impl-order).</td></tr>
+        <tr><td><b>Nightly CRON (pg_cron / scheduled function)</b></td><td><span class="st st-pending">NOT SCHEDULED</span></td><td>NightlyPlanScheduler service exists; 23:30 UTC / 05:00 IST schedule (LF-L01) not installed.</td></tr>
+        <tr><td><b>Frontend / Vercel</b></td><td><span class="st st-pending">NONE</span></td><td>No frontend exists; DOC-P4-01 (frontend spec) unauthored. Nothing on Vercel.</td></tr>
+        <tr><td><b>CI/CD</b></td><td><span class="st st-done">ACTIVE</span></td><td><span class="mono">.github/workflows/backend-ci.yml</span> — fmt/lint/check/test on every supabase/** push or PR. Safety-gate SQL against staging joins as a release blocker when endpoints land. Manual <span class="mono">mirror.yml</span> (GitLab) + <span class="mono">drive-backup.yml</span> (Google Drive) exist for repo redundancy.</td></tr>
+        <tr><td><b>External services</b></td><td><span class="st st-pending">SEAMS ONLY</span></td><td>OpenWeatherMap · OneSignal · Cloudinary · PostHog · Sentry — designed (DOC-P3-08), config slots exist, none wired.</td></tr>
+        <tr><td><b>Production readiness</b></td><td><span class="st st-blocked">NOT READY</span></td><td>Blocking: API Gate (endpoints + live behavioural validation), AGR-P3-07-001 (DPDP age gate), Release-Gate criteria (DOC-09/DOC-08). Deploy discipline: numbered migrations + paired rollbacks + CI gates + Founder-approved promotion only.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <!-- ── 14 · Repository Metrics ── -->
+  <div id="page-metrics" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Repository metrics</div>
+      <div class="page-subtitle">Counted from the working tree at S26 (2026-07-15, commit <span class="mono">e76bd9c</span>). These are inventory facts, not quality claims.</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-l">API endpoints</div><div class="kpi-v">1 implemented / 10 frozen</div><div class="kpi-s">+2 with service layer built, handler pending</div></div>
+      <div class="kpi"><div class="kpi-l">Backend services</div><div class="kpi-v">5 + RE core</div><div class="kpi-s">consent · onboarding · recommendations · scheduler · planning + services/re</div></div>
+      <div class="kpi"><div class="kpi-l">Repositories / adapters</div><div class="kpi-v">2 + 4 stores</div><div class="kpi-s">base + consent · SupabaseWeekPlan/Onboarding/PlanSlot/EligibleUsers stores</div></div>
+      <div class="kpi"><div class="kpi-l">Backend TypeScript files</div><div class="kpi-v">53</div><div class="kpi-s">under supabase/functions/</div></div>
+      <div class="kpi"><div class="kpi-l">Tests</div><div class="kpi-v">62 (4 suites)</div><div class="kpi-s">62/62 passing · coverage not yet measured (no coverage tooling configured)</div></div>
+      <div class="kpi"><div class="kpi-l">Database tables</div><div class="kpi-v">62 base</div><div class="kpi-s">public + re_engine (900 Check 1)</div></div>
+      <div class="kpi"><div class="kpi-l">Migrations</div><div class="kpi-v">30</div><div class="kpi-s">+ 46 rollback files (30 structural, 16 seed)</div></div>
+      <div class="kpi"><div class="kpi-l">Seed / validation SQL</div><div class="kpi-v">18 / 7</div><div class="kpi-s">seeds 100–117 · validation 900–905 + 1 reference</div></div>
+      <div class="kpi"><div class="kpi-l">Documents</div><div class="kpi-v">162 files under docs/</div><div class="kpi-s">product 6 · architecture 19 · governance 25 · research 21 · roadmaps 5 · visuals 4 · history the rest</div></div>
+      <div class="kpi"><div class="kpi-l">Work packages</div><div class="kpi-v">28 records</div><div class="kpi-s">docs/project-history/work-packages/</div></div>
+      <div class="kpi"><div class="kpi-l">Certificates</div><div class="kpi-v">16 REPO-CERT + 7 legacy/boot</div><div class="kpi-s">REPO-CERT-001..016 · REPO-BOOT-03 · readiness records</div></div>
+      <div class="kpi"><div class="kpi-l">Sessions documented</div><div class="kpi-v">26</div><div class="kpi-s">S1 (2026-07-13) → S26 (2026-07-15)</div></div>
+    </div>
+    <div class="src">Live data-layer counts (dishes 802, cohorts 2,952, weekly plans 20,664, …) live on the <a href="#" onclick="showPage('dbdash');return false">Database dashboard</a> — not repeated here.</div>
+  </div>
 
   <!-- ── Architecture page ── -->
   <div id="page-arch-full" class="page-content" style="display:none">
@@ -852,6 +1435,21 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="timeline-row">
       <div class="tl-date">Jul 15, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S26</span>
+        <div class="tl-title">Knowledge book rebuilt into an engineering operating system (WP-K01)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('exec')">executive dashboard</span>
+          <span class="tl-chip" onclick="showPage('api')">API catalogue</span>
+          <span class="tl-chip" onclick="showPage('debt')">debt register</span>
+          <span class="tl-chip" onclick="showPage('s26')">S26 details</span>
+        </div>
+        <div class="tl-note">After a full repository re-review, this file gained 14 living dashboard pages (executive status, roadmap gates, features, repository tree, backend flow, recommendation engine, database, APIs, work packages, decisions, technical debt, validation, deployment, metrics) that update in place — while every historical session stayed exactly as written. Each dashboard links to the document or certificate that owns its facts, so there is one source of truth. Companion work-package report, certificate (REPO-CERT-016), decision log and impact report were added under docs/. Documentation only — no code, database or migration change.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 15, 2026</div>
       <div class="tl-spine"><div class="tl-dot" style="background:#b45309"></div></div>
       <div class="tl-content">
         <span class="tl-badge" style="background:#fffbeb;color:#b45309">S27</span>
@@ -1000,6 +1598,25 @@ function deepDiveFeature(featureLabel){
         <div class="dd-text">S2 · Jul 13</div>
       </div>
     </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-mod-backend-tree" onclick="toggleDetail('mod-backend-tree')">
+        <div class="detail-left">
+          <span class="tag tag-new">New</span>
+          <span class="detail-name">supabase/functions/</span>
+        </div>
+        <span class="detail-chevron" id="chev-mod-backend-tree">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-mod-backend-tree">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">The entire backend code tree (Deno/TypeScript Edge Functions), built across WP-8B → WP-8E: a shared engineering foundation, the authentication framework, the consent endpoint, the reusable Recommendation Engine core, and the three orchestration callers that share it.</div>
+        <div class="dd-label">Files / tables in this module</div>
+        <div class="dd-text"><code>_shared/</code> — config, db clients, auth guards, middleware, validation, errors, logging, DI, base classes<br><code>_shared/services/re/</code> — the ONLY home of recommendation logic (engine, scoring, constraints, variety, safety, resolvers)<br><code>_shared/services/{onboarding,recommendations,scheduler,planning,adapters}/</code> — callers + persistence<br><code>consent/</code> — POST /v1/consent endpoint · <code>_tests/</code> — 62 tests in 4 suites</div>
+        <div class="dd-label">How it helps the app</div>
+        <div class="dd-text">This is the code that will actually answer "what should we cook?" — everything above the database. The live, always-current breakdown is on the Backend architecture and Recommendation engine dashboards (this entry stays deliberately thin to avoid duplicating them).</div>
+        <div class="dd-label">Last touched</div>
+        <div class="dd-text">S25 · Jul 15 (registered S26)</div>
+      </div>
+    </div>
     <!-- MODULES_INJECT -->
   </div>
 
@@ -1067,6 +1684,11 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-005_WP-5D_Completion_Execution_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S9</td><td class="fr-desc">WP-5D completion execution certificate</td></tr>
         <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-5G_Repository_Green_Certification_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S10</td><td class="fr-desc">Independent GREEN certification: audit, scorecard, evidence, decision</td></tr>
         <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-006_Repository_Green_Certification_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S10</td><td class="fr-desc">Repository Health Certificate — GREEN (@ 7ffe7b3)</td></tr>
+        <tr><td class="fr-file">KNOWLEDGE.html</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S26</td><td class="fr-desc">Rebuilt as the engineering operating system (WP-K01): 14 living dashboards added, all history preserved</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-K01_Knowledge_Platform_Refactoring_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S26</td><td class="fr-desc">WP-K01 refactoring report — objective, review evidence, information architecture, validation</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-016_WP-K01_Knowledge_Platform_Refactoring_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S26</td><td class="fr-desc">Execution certificate for the knowledge-platform migration</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-K01_Decision_Log_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S26</td><td class="fr-desc">Why each Operating System section exists; preservation and default-page decisions</td></tr>
+        <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-K01_Repository_Impact_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S26</td><td class="fr-desc">Exactly which files changed and which were untouched (code/DB: zero)</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1141,6 +1763,31 @@ function deepDiveFeature(featureLabel){
       <div class="decision-q">Why do the .DS_Store files still exist on disk after "removal"?</div>
       <div class="decision-a">The instructed method was git rm --cached + .gitignore, which removes them from version control but not from disk. They're now invisible to git and can't return; the disk copies are harmless leftovers on this one machine.</div>
       <div class="decision-meta">S2 · Jul 13</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why add an "Operating System" layer instead of patching the session log (WP-K01)?</div>
+      <div class="decision-a">The book had become append-only history: sessions S21–S25 existed only as timeline rows, the files register stopped at S10, and the decisions log at S2. History answers "what happened", but nobody could answer "where are we now" without reading 25 sessions. The new layer holds living pages that update in place; the session log stays append-only underneath. Full reasoning per section: docs/project-history/[ACTIVE]_WP-K01_Decision_Log_v1.0.md.</div>
+      <div class="decision-meta">S26 · Jul 15</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why were the old sessions, timeline, modules, files and decisions pages kept verbatim?</div>
+      <div class="decision-a">WP-K01 mandated preserved traceability, and this project treats rewritten history as its worst failure mode. The refactoring was performed as programmatic insertion around the existing blocks — the only edits inside preserved content were two defect fixes (S3 and S18 both claimed to be the default page) and two missing sidebar links (S3/S4 pages existed but were unreachable).</div>
+      <div class="decision-meta">S26 · Jul 15</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why does the Executive dashboard open by default instead of the latest session?</div>
+      <div class="decision-a">The book's primary readers (Founder, new engineer, resuming Claude session) need current state first — the "understand the project in 5 minutes" requirement. The latest session is one click away in the sidebar and linked from the timeline.</div>
+      <div class="decision-meta">S26 · Jul 15</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why are completion percentages labelled "engineering estimates"?</div>
+      <div class="decision-a">No document defines a completion metric, and inventing precise-looking numbers would violate the no-fabrication rule. The bars are explicitly derived from the gate ledger and WP certificates, each with its basis stated, so a reader can audit the judgement.</div>
+      <div class="decision-meta">S26 · Jul 15</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why record the stale READMEs/roadmap in the debt register instead of fixing them now?</div>
+      <div class="decision-a">WP-K01's scope is the knowledge platform; those files are governed documents whose refresh deserves its own reviewed change, not a drive-by edit inside an unrelated work package. Found, reported, tracked — not silently rewritten.</div>
+      <div class="decision-meta">S26 · Jul 15</div>
     </div>
     <!-- DECISIONS_INJECT -->
   </div>
@@ -1442,7 +2089,7 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s1 -->
 
   <!-- ── Session 2 ── -->
-  <div id="page-s2" class="page-content">
+  <div id="page-s2" class="page-content" style="display:none">
 
     <div class="page-header">
       <div class="page-title">S2 · Repository governance documents</div>
@@ -2183,8 +2830,34 @@ function deepDiveFeature(featureLabel){
   </div><!-- /page-s20 -->
 
   <!-- ── Session pages injected here ── -->
-  <!-- ── Session 21 ── -->
-  <div id="page-s28" class="page-content" style="display:block">
+  <!-- ── Session 26 ── -->
+  <div id="page-s26" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">S26 · Knowledge platform refactoring (WP-K01)</div>
+      <div class="page-subtitle">This knowledge book was rebuilt from an append-only session diary into an engineering operating system — 14 living dashboards in front, with every historical session preserved untouched behind them.</div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 15, 2026<br>WP-K01</div>
+      </div>
+      <div class="session-card-desc">
+        A complete repository re-review (documents, work packages, certificates, backend code, database state, CI) was performed first — no prior-session memory trusted. Then KNOWLEDGE.html gained a new "Operating System" layer: an executive dashboard (phase, completion, risks, open Founder decisions), a live roadmap with the five-gate ledger, a feature dashboard, the repository tree explained, the backend request flow, a dedicated Recommendation Engine page (pipeline, cold start, one-engine-three-callers, evolution), a database dashboard with live canonical counts, the full 10-endpoint API catalogue, a work-package ledger, a decision register, a technical-debt register, validation and deployment dashboards, and repository metrics. Every dashboard cites the document or certificate that owns its facts instead of duplicating them. All 25 prior sessions, the timeline, modules, files register and decisions log were preserved verbatim — this refactoring added navigation and living pages, it did not rewrite history. Two pre-existing defects were fixed: both S3 and S18 were marked as the default page (invalid HTML behaviour), and S3/S4 had pages but no sidebar links. Documentation drift found during the review (stale READMEs and roadmap percentages) was recorded in the debt register — reported, not silently edited. Four companion documents were produced: the WP-K01 report, execution certificate REPO-CERT-016, a decision log, and a repository impact report. No production code, database, migration, backend or frontend file was touched.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">14</div><div class="stat-l">Living dashboards</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">26</div><div class="stat-l">Sessions preserved</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">4</div><div class="stat-l">Companion docs</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Code/DB changes</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Engineering: the RE read-port adapters (CandidateRepository first — a schema-verification task), then the /v1/onboarding and /v1/recommendations handlers, then live-DB behavioural validation (WP-8E §7). Founder: AD-01 countersignature (DOC-P4-02 DRAFT→ACTIVE), DCR-8D-01 confirmation, and the re_cohort_class_priors disposition. Knowledge book: future sessions keep appending session blocks here AND update the Operating System pages in place so they never go stale.</div>
+      </div>
+    </div>
+  </div><!-- /page-s26 -->
+  <!-- ── Session 27/28 (WP-8F blocker + WP-8FA audit) ── -->
+  <div id="page-s28" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S28 · CandidateRepository evidence audit — resolving the WP-8F blockers (WP-8FA, read-only)</div>
       <div class="page-subtitle">A forensic reconciliation of the five recommendation-engine "blockers" against repository evidence. Most turned out to be solvable — the key was reading a document the last session couldn't open.</div>
