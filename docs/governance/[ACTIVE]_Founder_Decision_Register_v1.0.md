@@ -322,6 +322,8 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Future Review Trigger:** None.
 - **Source Evidence:** `docs/project-history/certificates/[ACTIVE]_REPO-CERT-019_WP-8FA_CandidateRepository_Audit_v1.0.md`.
 
+**[FD-11 update, 2026-07-17]** `main_ingredient_class` tags (14 values, added to `public.tags` as a Tier-2 dimension — see `[ACTIVE]_DOC-P3-13_Main_Ingredient_Derivation_Heuristic_v1.0.md`) are confirmed **`is_user_facing = false`, ratified by the Founder.** Rationale: this is an internal scoring/variety dimension (per its stated purpose in DOC-P3-02, "improves ContentMatch quality"), not a user-visible filter or badge. **Revisit only if a future feature specifically needs user-facing filtering by ingredient class** — no such feature exists today. This does not itself close FD-11 in full: the broader dominant-ingredient derivation rule and the `is_main_ingredient` data load are tracked separately (WP-10, `[ACTIVE]_DOC-P3-13_...`); this note settles the narrower `is_user_facing` question only.
+
 ### FD-12 — `dish_combos` cuisine-destination column
 - **Status:** Pending (half-closed) · **Origin:** `docs/research/[ACTIVE]_Phase3_5_Project_Integration_Review_v1.0.md` §9/§14 (`B4-GAP-001`, `B5-GAP-003`), `docs/research/[ACTIVE]_Batch5_Pipeline_Package_v1.1.md` (`B5-RES-003`)
 - **Context:** The original finding said neither `dishes` nor `dish_combos` had a cuisine-destination column. Live verification this audit chain confirms `dishes.cuisine_id` now exists (migration `021_cuisines_reference.sql`) — resolved on that side — but `dish_combos` still has **no** cuisine column at all, confirmed via direct `information_schema.columns` query.
