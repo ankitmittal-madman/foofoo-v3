@@ -81,6 +81,7 @@ Applied to every item in this Register, per the task's own taxonomy:
 | FD-11 | `mainIngredientClass` dominant-ingredient rule | Pending | §7 |
 | FD-12 | `dish_combos` cuisine-destination column | Pending | §7 |
 | FD-13 | `POST /v1/events` idempotency handling | Pending | §7 |
+| FD-14 | `re_class_dish_options` content-seeding coverage gap | Ratified | §7 |
 | PD-01 | Class-first architecture | Ratified | §8 |
 | PD-02 | RE module isolation ("the RE is the product") | Ratified | §8 |
 | PD-03 | Freemium monetization, 90-day habit window | Ratified | §8 |
@@ -361,6 +362,27 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Acceptance Criteria:** A one-line Founder sign-off on Option (a) (or a ruling for Option (b) plus its schema change).
 - **Future Review Trigger:** None.
 - **Source Evidence:** `docs/architecture/[ACTIVE]_DOC-P3-06_API_Contract_Specification_v1.2.md` §08, the `[DCR]` line quoted above.
+
+### FD-14 — `re_class_dish_options` content-seeding coverage gap (interim fallback-heavy state, ratified)
+- **Status:** Ratified (2026-07-17, claude.ai session) · **Origin:** `[ACTIVE]_WP-11_CandidateRepository_Adapter_v1.0.md` §6 / `REPO-CERT-022`, direct live-schema verification during `CandidateRepository` adapter implementation.
+- **Context:** Verified directly against the live database: `re_engine.re_class_dish_options` has 165 total rows across 802 dishes and 131 `re_meal_classes`. **50 of 131 classes (38%) have zero rows at all**; the 81 populated classes average **2.0** dishes each, **7 at most**. `ScoringConfig.minCandidates = 3` (LF-D07 threshold).
+- **Problem Statement:** For the majority of meal classes, `CandidateRepository.getClassCandidates` cannot on its own return enough survivors to clear the LF-D07 fallback threshold — meaning `getPopularFallback` (the "8 most popular dishes filtered by diet_type only" static fallback) will be the dominant runtime path for those classes, not a rare edge case. Should Wave 3 engineering (add-ons, cold-start plumbing) proceed against this data reality, or does it need to be treated as a blocker requiring content backfill first?
+- **Alternatives Considered:** (a) Treat as a blocker — halt engineering until `re_class_dish_options` is backfilled for all 131 classes; (b) Treat as an accepted interim state — proceed with engineering against the current data, with the fallback-heavy behavior being real-but-acceptable at MVP scale, and backfill the missing class→dish assignments as ongoing content work in parallel; (c) silently proceed without logging the gap.
+- **Final Decision:** **Ratified — Option (b).** `re_class_dish_options` is confirmed 38% empty across meal classes (average 2.0 dishes where seeded). Launch with fallback-heavy behavior for under-seeded classes as an accepted interim state, consistent with the FD-07 cohort-prior precedent (a different table, same class of decision: a genuine content/research gap is not manufactured into a schema or engineering problem). Backfilling real dish-to-class assignments for the 50 empty/thin classes is ongoing content work, tracked separately, and is explicitly **not** a blocker to Wave 3 engineering continuing (add-ons/FD-06, then cold-start plumbing).
+- **Business Rationale:** A user who requests a plan for an under-seeded class still sees a populated, safe, diet-correct slate (the static popular fallback) rather than a blank screen or a blocked feature — consistent with DOC-P3-06 §07's stated fallback philosophy ("graceful degradation over hard failure"). Waiting for full content coverage before continuing engineering would stall Wave 3 for a content problem, not an engineering one.
+- **Technical Rationale:** The `CandidateRepository` adapter (WP-11) is correct and already implements the LF-D07 fallback path faithfully; the gap is in seeded reference data (`re_class_dish_options` rows), not in code. No schema change is implied by this decision.
+- **Engineering Impact:** None blocking — Wave 3 (add-ons per FD-06, then cold-start plumbing) proceeds as planned. Recommendation quality for under-seeded classes will be generic (popularity-ranked, diet-filtered only) until content backfill lands.
+- **AI Impact:** None directly. **Recommendation Engine Impact:** LF-D01/D07 — `getClassCandidates` sparse-result behavior is now an explicitly accepted state, not a silent gap.
+- **Database Impact:** None from this decision itself; the eventual backfill will be `INSERT`s into `re_engine.re_class_dish_options` (seed-data work, not a migration).
+- **API Impact:** None. **Batch Impact:** None. **ETL Impact:** The eventual backfill is an ETL/content task, not scoped here. **Architecture Impact:** None — `CandidateRepository`'s interface and the LF-D07 fallback already accommodate this state by design.
+- **Affected Documents:** `[ACTIVE]_WP-11_CandidateRepository_Adapter_v1.0.md`, `REPO-CERT-022`.
+- **Affected Work Packages:** WP-11 (surfaced it); the eventual content-backfill work is not yet a numbered WP.
+- **Affected Tests:** None new — `_tests/re_core.test.ts` already covers the LF-D07 fallback path (`engine.generateSlate — falls back to popular dishes when <3 candidates survive`).
+- **Affected Epics:** Epic 1 (`CandidateRepository`), indirectly Epic 2/Wave 3 (add-ons, cold-start) which will run against this data reality.
+- **Implementation Notes:** Do not backfill `re_class_dish_options` speculatively without real dish→class curation — the same "no invention" discipline (AI-01) that governs every other seed applies here too.
+- **Acceptance Criteria:** This decision is satisfied by its own ratification — no further sign-off gate blocks Wave 3 engineering. Content backfill is tracked as ongoing work, re-evaluated whenever `re_class_dish_options` coverage is next revisited.
+- **Future Review Trigger:** Re-evaluate if live usage data (post-launch) shows the fallback path degrading actual user acceptance rates (DOC-01 §07's Day-0/Day-90 metric) meaningfully below what class-specific candidates would have produced.
+- **Source Evidence:** Direct `SELECT count(*)` / `GROUP BY meal_class_code` queries against `re_engine.re_class_dish_options` and `re_engine.re_meal_classes`, this claude.ai session, 2026-07-17; `[ACTIVE]_WP-11_CandidateRepository_Adapter_v1.0.md` §6.
 
 ---
 

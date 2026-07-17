@@ -1,0 +1,25 @@
+# [ACTIVE]_DOC-P3-12_Governance_Improvement_Backlog_v1.3
+
+**Version:** 1.3 (supersedes v1.2)
+**Date:** 2026-07-17
+
+## Revision Summary (v1.2 → v1.3)
+
+Five new entries (GB-004–GB-008) logged from `[ACTIVE]_WP-11_CandidateRepository_Adapter_v1.0.md` (REPO-CERT-022) — debt surfaced while building the `CandidateRepository` adapter, none of it blocking that Work Package's own completion. **Nothing removed** — this document remains the permanent parking lot through Batch 6.
+
+## Current Entries
+
+| GB-ID | Title | Priority | Deferred Until | Checkpoint Classification | Reasoning |
+|---|---|---|---|---|---|
+| GB-001 | Visual Impact Chain renderer | Low | Post-Batch-6 review | **Keep** | Still valid, still low priority, still purely cosmetic — no new evidence changes its status |
+| GB-002 | Resolution Order Kanban view | Low | Post-Batch-6 review | **Keep** | Same reasoning |
+| GB-003 | Individual dishes may need true multi-cuisine tagging (one-to-many), similar to how `regional_origin` already works as a multi-valued genome dimension — currently `dishes.cuisine_id` is single-valued. | Low | No current feature requires it | **Keep** | Surfaced during FD-12 (`dish_combos` cuisine tie-break) investigation: several dish-combo mixed-cuisine cases trace back to individual dishes plausibly belonging to more than one cuisine, which a single-valued `cuisine_id` FK cannot express. Deferred — no current feature (scoring, variety, combo tie-break) requires multi-valued dish cuisine; noted here so it isn't rediscovered from scratch later. |
+| GB-004 | `cookingMethod`/`texture` multi-value tie-break (lowest `tags.vector_position`) has no documented spec basis, unlike `mainIngredientClass` (which has DOC-P3-13's protein/pulse > grain priority). Currently arbitrary-but-deterministic in `SupabaseCandidateRepository.pickTag`. | Medium | Before the variety-guard (LF-F01/F02) result is trusted for production ranking decisions | **New (2026-07-17)** | Surfaced in WP-11 (`CandidateRepository` adapter, REPO-CERT-022): 164 dishes have 2–3 `cooking_method` tag rows, 283 have 2–3 `texture` rows, and the type requires a single string for each. Needs a written derivation rule (analogous to DOC-P3-13) rather than the adapter's own ad-hoc tie-break, since it silently shapes MMR diversity scoring. |
+| GB-005 | Pre-existing bug: `variety.ts:89` checks `s.cookingMethod === "fried"`, but the real `cooking_method` tag vocabulary has no bare `"fried"` value (only `deep_fried`/`shallow_fried`) — the fried-count variety-window rule silently never fires. | Medium | Next touch of `variety.ts` or `re_variety_rules` | **New (2026-07-17)** | Surfaced in WP-11 while re-reading `variety.ts` to confirm `CandidateRepository`'s output shape — unrelated to the adapter itself, not fixed there to keep that Work Package's change scoped to its own stated mission. |
+| GB-006 | No FK constraints exist on `dish_ingredients` (`dish_id`, `ingredient_id`), `dish_tags` (`dish_id`, `tag_id`), or `re_class_dish_options` (`dish_id`) → their reference tables. Only `re_class_dish_options.meal_class_code → re_meal_classes` has a real FK. | Medium | Next schema-evolution batch (SER) | **New (2026-07-17)** | Verified directly via `pg_constraint` in WP-11 — this is why `SupabaseCandidateRepository` cannot use PostgREST relational embedding (`.select("ingredients(name)")`) and must do flat queries + in-memory joins instead. A data-integrity gap independent of this adapter; future migration should add the missing FKs. |
+| GB-007 | `beef`/`pork` ingredient linkage via `dish_ingredients` is sparse: only 1 dish links `beef`, 13 link `pork` (verified count). Likely under-links real beef/pork dishes present in the seeded dish set (WP-8FA cited "pork ×36, beef ×6" from the source `dishes.xlsx` text, not the linked join count). | Medium | Next content-data review pass | **New (2026-07-17)** | Surfaced in WP-11 while verifying `hasBeef`/`hasPork` derivation — the join itself is correct (WP-8FA 8F-03, verdict B), but the underlying `dish_ingredients` seed coverage for these two ingredients appears incomplete. Needs a content review, not an adapter or schema change. |
+| GB-008 | `hasNonHalalMeat` relies on a fail-closed proxy (`hasPork OR mainIngredientClass='meat'`) pending real halal-certification data, which is unmodelled anywhere in the schema or source (WP-8FA 8F-03, verdict C). | Low | If halal-observant households become a significant user segment | **New (2026-07-17)** | Carried forward from WP-8FA, re-confirmed and implemented (conservatively) in WP-11. Acceptable for MVP — the conservative default never mis-serves a halal user a non-halal dish, it only over-rejects. Revisit with a real halal-certification data source if this segment grows large enough that the over-rejection meaningfully hurts those households' experience. |
+
+**0 Resolved, 0 Merged, 0 Future Cleanup, 0 Rejected this checkpoint** — GB-001/002/003 are exactly as valid as when logged; GB-004–008 are new entries from WP-11, not reclassifications.
+
+Founder sign-off: _______________________ Date: ___________
