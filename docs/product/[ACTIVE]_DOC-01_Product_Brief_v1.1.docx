@@ -104,7 +104,7 @@ The MVP ships exactly enough to answer one question: do users come back daily be
 | **Never / Not Today / Lock / Plus gestures** | – | Core — cannot defer |
 | **500+ Indian dishes with simple ingredient lists** | – | Core — cannot defer |
 | **Passive feedback loop (interactions train the AI silently)** | – | Core — cannot defer |
-| **Grocery list auto-generated from plan** | – | Core — cannot defer |
+| **Grocery list auto-generated from plan** | – | Out of MVP scope — corrected 2026-07-16 (FD-08) to match DOC-04 v1.1's existing Change Notice, which already moved this feature out of MVP. This row previously read "Core — cannot defer," which conflicted with DOC-04; DOC-04 is confirmed correct. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-08. |
 | **Morning push notification with plan preview** | – | Core — cannot defer |
 | **Android + iOS launch (React Native single codebase)** | – | Both from Day 1 |
 | **Full step-by-step recipes** | Phase 0.5 | Core value is the decision, not the instruction |

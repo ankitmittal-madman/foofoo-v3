@@ -56,7 +56,9 @@ All errors use DOC-P3-06 §21.1 codes: onboarding consent gate → `ERR_CONSENT_
 
 ## 5. Governance compliance
 
-No `CREATE`/`ALTER`/`DROP`; no migration, seed, canonical data, validation SQL, RLS/privilege, or frozen-document change (verified: change set touched only `supabase/functions/` + docs). Recommendation logic exists only in `services/re/`. DOC-P4-02 stays **DRAFT** (AD-01 not re-ratified here; the orchestration model was reconciled in WP-8D and Founder-directed, formal countersignature still pending). Branch `feat/wp-8d-re-core-reconciliation`; **not pushed**.
+No `CREATE`/`ALTER`/`DROP`; no migration, seed, canonical data, validation SQL, RLS/privilege, or frozen-document change (verified: change set touched only `supabase/functions/` + docs). Recommendation logic exists only in `services/re/`. DOC-P4-02 stayed **DRAFT** at time of this Work Package's execution (AD-01 not re-ratified here; the orchestration model was reconciled in WP-8D and Founder-directed, formal countersignature still pending then). Branch `feat/wp-8d-re-core-reconciliation`; not pushed as of this Work Package's own execution.
+
+**[FD-01 update, 2026-07-16]** This branch's later push to `main` is retroactively ratified as authorized — see `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-01 and `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`. **[FD-04 update, 2026-07-16]** DOC-P4-02's AD-01 is now ratified as Option 2 (synchronous first-plan generation) and DOC-P4-02 has been promoted DRAFT → ACTIVE — see FD-04. This Work Package's own text above is left unchanged as the historical record at time of execution, per `CLAUDE.md`'s never-delete-history rule.
 
 ## 6. Remaining Technical Debt (precise, for WP-8E completion / next WP)
 

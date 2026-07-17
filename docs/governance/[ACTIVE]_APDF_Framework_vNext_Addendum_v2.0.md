@@ -2,7 +2,7 @@
 
 **Reconstruction of the AI-First Product Development Framework, derived from the complete FooFoo project lifecycle**
 **Supersedes:** `APDF_Framework_v1.md` (retained, unmodified, as historical reference — the original 6-phase/33-document model)
-**Date:** 2026-07-03 · **Status:** Draft — Ready for Founder Review
+**Date:** 2026-07-03 · **Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **This is a reconstruction of the framework itself, not a new architecture, not a new governance layer, not a redesign of anything already frozen.**
 
 ---

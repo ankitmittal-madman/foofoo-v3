@@ -2,7 +2,7 @@
 
 **Version:** 1.0  
 **Date:** June 2026  
-**Status:** DRAFT — pending founder sign-off  
+**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.  
 **Prepared by:** Claude (Solution Architect role)  
 **Prerequisite:** DOC-P3-02 Conceptual Domain Model v1.1 (must be read before this document)  
 **Next document:** DOC-P3-04 · Data Architecture and Entity Relationship Model
@@ -250,6 +250,8 @@ Maximum at Day 0 completion: 0.65
 Range Day 0: 0.40 – 0.65
 
 Range Day 1–3 (with interactions): 0.55 – 0.72
+
+**[FD-03, ratified 2026-07-16]** The additive contributions above can sum beyond 0.65 (schema ceiling is 1.0); `computeOnboardingConfidence` clamps the result to **[0.35, 0.65] at Day 0**. The 1.0 schema ceiling governs only later warm-state evolution (Day 1+), not Day 0. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-03.
 
 **Output:** confidence\_score float stored on User RE State  
 **CDM entities:** Confidence Score (13)
@@ -536,7 +538,7 @@ progress \= (interaction\_count \- tier\_lower\_bound) / (tier\_upper\_bound \- 
 
 w\_x \= w\_x\_lower \+ progress × (w\_x\_upper \- w\_x\_lower)
 
-Example: interaction\_count \= 30 (Emerging tier, between 11 and 50): progress \= (30-11)/(50-11) \= 0.487 w\_cohort \= 0.20 \+ 0.487 × (0.20-0.20) \= 0.20 w\_history \= 0.15 \+ 0.487 × (0.35-0.15) \= 0.247
+**Example (continuous forward-transition reading — ratified FD-02, ratifies the interpretation already implemented in `interpolateWeightLadder`):** interaction\_count \= 30 (Emerging tier, 11–50, next tier Established, 51–150): progress \= (30-11)/(50-11) \= 0.487. Each weight interpolates from the *current* tier's value toward the *next* tier's value: w\_cohort \= 0.20 \+ 0.487 × (0.10-0.20) \= 0.151 w\_content \= 0.25 \+ 0.487 × (0.20-0.25) \= 0.226 w\_history \= 0.35 \+ 0.487 × (0.50-0.35) \= 0.423 w\_context \= 0.15 \+ 0.487 × (0.15-0.15) \= 0.150 w\_explore \= 0.05 \+ 0.487 × (0.05-0.05) \= 0.050 — sum \= 1.000 (partition-of-unity holds at every tier boundary, tested in `_tests/re_core.test.ts`).
 
 **Implementation note:** Weights computed at request time from current interaction\_count. NOT stored as static values on the user profile. `[Source: RE-DOC-03 §02]`  
 **CDM entities:** Weight Ladder (41)
@@ -1575,7 +1577,7 @@ Success metrics from RE-DOC-05 §04, formally defined:
 | :---- | :---- |
 | Document | DOC-P3-03 · Business Logic and Algorithm Specification |
 | Version | 1.0 |
-| Status | DRAFT — pending founder sign-off |
+| Status | ACTIVE — [FD-05, 2026-07-16] no Founder signature required for `[ACTIVE]` status; see naming standard amendment |
 | Logical functions specified | 61 across 13 groups |
 | Documented facts | All specifications with \[DOCUMENTED\] tag |
 | Confirmed decisions | Event weights, MC\_GENERIC fallback, class affinity magnitudes (all \[CONFIRMED\]) |

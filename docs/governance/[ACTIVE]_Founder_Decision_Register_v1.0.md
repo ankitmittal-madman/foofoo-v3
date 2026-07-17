@@ -68,16 +68,16 @@ Applied to every item in this Register, per the task's own taxonomy:
 
 | ID | Title | Category | Section |
 |---|---|---|---|
-| FD-01 | Ratify/reject WP-8D/8E push to main | Pending | §7 |
-| FD-02 | DCR-8D-01 weight-ladder ambiguity | Pending | §7 |
-| FD-03 | DCR-8E-01 Day-0 confidence cap | Pending | §7 |
-| FD-04 | DOC-P4-02 DRAFT→ACTIVE (AD-01) | Pending | §7 |
-| FD-05 | ACTIVE/DRAFT contradiction across frozen set | Pending | §7 |
+| FD-01 | Ratify/reject WP-8D/8E push to main | Ratified | §7 |
+| FD-02 | DCR-8D-01 weight-ladder ambiguity | Ratified | §7 |
+| FD-03 | DCR-8E-01 Day-0 confidence cap | Ratified | §7 |
+| FD-04 | DOC-P4-02 DRAFT→ACTIVE (AD-01) | Ratified | §7 |
+| FD-05 | ACTIVE/DRAFT contradiction across frozen set | Ratified | §7 |
 | FD-06 | Member add-ons build-order priority | Pending | §7 |
 | FD-07 | Cold-start priors + OB-07 signal priority | Pending | §7 |
-| FD-08 | DOC-01 vs DOC-04 MVP scope conflict | Pending | §7 |
-| FD-09 | DOC-10 §10 stale environment map | Pending | §7 |
-| FD-10 | LF-D07 fallback behavior approval | Pending | §7 |
+| FD-08 | DOC-01 vs DOC-04 MVP scope conflict | Ratified | §7 |
+| FD-09 | DOC-10 §10 stale environment map | Ratified | §7 |
+| FD-10 | LF-D07 fallback behavior approval | Ratified | §7 |
 | FD-11 | `mainIngredientClass` dominant-ingredient rule | Pending | §7 |
 | FD-12 | `dish_combos` cuisine-destination column | Pending | §7 |
 | FD-13 | `POST /v1/events` idempotency handling | Pending | §7 |
@@ -105,12 +105,12 @@ Applied to every item in this Register, per the task's own taxonomy:
 Full 24-field format applied. Where a field has no recorded content in any primary source, this Register states that explicitly rather than inventing one.
 
 ### FD-01 — Ratify or reject the `main`-branch push of WP-8D/8E
-- **Status:** Pending · **Date raised:** 2026-07-16 (this audit chain) · **Origin:** `[ACTIVE]_WP-9_Validation_Audit_v1.0.md` §H-03
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Date raised:** 2026-07-16 (this audit chain) · **Origin:** `[ACTIVE]_WP-9_Validation_Audit_v1.0.md` §H-03
 - **Context:** WP-8D/8E's own work-package text implies the code was not yet pushed; the actual repository shows both merged to `main` and `origin/main`.
 - **Problem Statement:** Governance record and repository state disagree on whether this was an authorized push.
 - **Alternatives Considered:** Not recorded in any source — this is a factual discrepancy, not a design choice with options.
-- **Final Decision:** Not yet made — awaiting Founder ratification or a governance exception entry.
-- **Business Rationale / Technical Rationale:** N/A — pending.
+- **Final Decision:** The WP-8D/8E push to `main` is retroactively ratified as authorized; no governance exception is logged. WP-8D/8E work-package notes corrected accordingly (2026-07-17).
+- **Business Rationale / Technical Rationale:** N/A — factual ratification, not a design tradeoff.
 - **Engineering Impact:** Blocks clean closure of `REPO-CERT-014`/`015`.
 - **AI Impact:** None directly.
 - **Recommendation Engine Impact:** None directly — the code itself is unaffected either way.
@@ -125,11 +125,11 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `git log origin/main --oneline` (confirms `e113ffa`/`e76bd9c` present, re-verified this session at `b27ca58`).
 
 ### FD-02 — Rule on DCR-8D-01 (weight-ladder worked-example inconsistency)
-- **Status:** Pending · **Origin:** `docs/project-history/[ACTIVE]_WP-8D_Pre_Implementation_Architecture_Reconciliation_v1.0.md`
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/project-history/[ACTIVE]_WP-8D_Pre_Implementation_Architecture_Reconciliation_v1.0.md`
 - **Context:** `DOC-P3-03` §07's own worked example uses inconsistent interpolation references between weight-ladder tiers.
 - **Problem Statement:** Two readings of the interpolation rule are both textually defensible.
 - **Alternatives Considered:** The two competing readings are described in the primary source; this Register does not restate them, per instruction to cite rather than copy.
-- **Final Decision:** Not yet ratified — engineering has implemented "the continuous forward-transition reading" as its working assumption.
+- **Final Decision:** The "continuous forward-transition reading" is confirmed as the ratified standard (already implemented in `interpolateWeightLadder`). `DOC-P3-03` §07's worked example corrected to match (2026-07-17).
 - **Business Rationale:** Consistent Day-0→Mature scoring behavior is required for the cold-start metric (DOC-01 §07) to mean anything.
 - **Technical Rationale:** The continuous reading is the only one that keeps `interpolateWeightLadder`'s partition-of-unity invariant true at every tier boundary (tested).
 - **Engineering Impact:** None further — already implemented; only the *documentation* needs to catch up to what shipped.
@@ -146,11 +146,11 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `supabase/functions/_shared/services/re/scoring.ts` (`interpolateWeightLadder`); `_tests/re_core.test.ts`.
 
 ### FD-03 — Rule on DCR-8E-01 (Day-0 confidence 0.65 cap vs 1.0 schema ceiling)
-- **Status:** Pending · **Origin:** `docs/project-history/work-packages/[ACTIVE]_WP-8E_RE_Integration_Layer_v1.0.md`, line ~53
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/project-history/work-packages/[ACTIVE]_WP-8E_RE_Integration_Layer_v1.0.md`, line ~53
 - **Context:** LF-A08 states additive onboarding-confidence contributions sum to 1.00 for a fully-answered onboarding, but also states "Maximum at Day 0 completion: 0.65."
 - **Problem Statement:** The schema's confidence range allows up to 1.0; the Day-0 text caps it at 0.65 — which governs?
 - **Alternatives Considered:** Not separately enumerated in the source beyond the two conflicting statements themselves.
-- **Final Decision:** Implemented as: clamp to [0.35, 0.65] at Day 0; the 1.0 ceiling applies to later warm-state evolution.
+- **Final Decision:** Confirmed: clamp to [0.35, 0.65] at Day 0; the 1.0 ceiling applies only to later warm-state evolution. `DOC-P3-03` LF-A08 section now notes the clamp explicitly (2026-07-17).
 - **Business Rationale:** Prevents overconfident Day-0 recommendations before any real signal exists.
 - **Technical Rationale:** Faithful to the explicit "Maximum at Day 0: 0.65" sentence.
 - **Engineering Impact:** Already implemented; ratification is documentation catch-up only.
@@ -166,13 +166,13 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `supabase/functions/_shared/services/onboarding/orchestrator.ts` (clamp logic).
 
 ### FD-04 — Promote DOC-P4-02 from DRAFT to ACTIVE (AD-01 countersignature)
-- **Status:** Pending · **Origin:** `docs/architecture/[DRAFT]_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md` §3
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/architecture/[DRAFT]_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md` §3
 - **Context:** DOC-P4-02 itself states: *"Status: DRAFT — pending Founder sign-off. Contains one open architectural decision (AD-01) that GATES onboarding implementation."*
 - **Problem Statement:** What happens to a user's first weekly plan at the end of onboarding — three options are laid out in DOC-P4-02 §3 itself (capture-only/deferred generation; synchronous first-plan generation; cohort-only deferral), with a non-binding recommendation for Option 1.
 - **Alternatives Considered:** The three options are fully specified in DOC-P4-02 §3 — cited, not copied, per this Register's own rule.
-- **Final Decision:** Not yet ratified.
+- **Final Decision:** Ratified as **Option 2** — the first weekly plan is generated live/synchronously at the end of onboarding, consistent with the existing OB-08b "aha moment" product decision (overriding this Register's own non-binding Option 1 recommendation). `DOC-P4-02` re-issued as `[ACTIVE]_DOC-P4-02_..._v1.1.md` (2026-07-17); `[DRAFT]_..._v1.0.md` retained, stamped SUPERSEDED.
 - **Business Rationale:** Directly determines the onboarding→first-plan user experience.
-- **Technical Rationale:** Option 1 requires no new endpoint beyond what's already planned; Options 2/3 have different latency/architecture implications, per DOC-P4-02 §3.
+- **Technical Rationale:** Option 2 requires the RE core (WP-8D) to exist before onboarding ships — accepted as the mandatory build order, per DOC-P4-02 §3.
 - **Engineering Impact:** WP-8D and WP-8E were already built on an implicit direction without this ratification.
 - **AI Impact:** None directly. **Recommendation Engine Impact:** Determines whether `generateWeekPlan` runs synchronously during onboarding or is deferred.
 - **Database Impact:** None. **API Impact:** Determines `/v1/onboarding`'s exact response contract. **Batch Impact:** None. **ETL Impact:** None.
@@ -187,11 +187,11 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `docs/architecture/[DRAFT]_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md` §3.
 
 ### FD-05 — Resolve the systemic ACTIVE-vs-DRAFT status contradiction across the frozen document set
-- **Status:** Pending · **Origin:** `docs/governance/[ACTIVE]_Repository_Naming_Conflict_Report_v1.0.md` (2026-07-13)
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/governance/[ACTIVE]_Repository_Naming_Conflict_Report_v1.0.md` (2026-07-13)
 - **Context:** `DOC-P3-02`, `DOC-P3-03`, `DOC-P3-03A`, `DOC-P3-04`, `DOC-P3-05-Part-A`, and the vNext Addendum all carry the `[ACTIVE]` filename token while their own internal headers read "DRAFT — pending Founder sign-off," with blank signature lines.
 - **Problem Statement:** Is a document "frozen" because its filename says ACTIVE, or only once actually signed? The naming standard and the documents' own headers disagree.
 - **Alternatives Considered:** (a) sign the batch of documents; (b) amend the naming standard to state sign-off is not required for ACTIVE status. Both stated in `Final_Evidence_Closure_v1.0.md` §8 FD-05, sourced from the Conflict Report's own framing.
-- **Final Decision:** Not yet ratified — WP-5AA's STOP clause blocks any renaming pending this ruling.
+- **Final Decision:** Ratified as **Option (b)** — the naming standard is amended (`[ACTIVE]_Repository_Naming_Standard_v1.1.md`, new §4A) so that `[ACTIVE]` status does not require a Founder signature line. The six affected documents keep their `[ACTIVE]` filenames; their "DRAFT — pending Founder sign-off" headers are corrected, not the filenames (2026-07-17).
 - **Business Rationale:** Determines whether any "frozen" claim in the repository is currently defensible.
 - **Technical Rationale:** Runtime code (WP-8D/8E) has already been built against these documents' content regardless of their signature status.
 - **Engineering Impact:** None to code either way — governance validity only.
@@ -247,11 +247,11 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** live Supabase, `re_cohort_class_priors` = 0 rows (this audit chain's Step 1).
 
 ### FD-08 — Reconcile DOC-01 vs DOC-04 MVP scope (grocery list)
-- **Status:** Pending · **Origin:** `docs/product/[ACTIVE]_DOC-01_Product_Brief_v1.1.docx` line 107, vs. `docs/architecture/[ACTIVE]_DOC-04_PRD_v1.1.docx` Change Notice
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/product/[ACTIVE]_DOC-01_Product_Brief_v1.1.docx` line 107, vs. `docs/architecture/[ACTIVE]_DOC-04_PRD_v1.1.docx` Change Notice
 - **Context:** DOC-01 line 107 reads, verbatim (confirmed by direct grep this session): *"Grocery list auto-generated from plan | – | Core — cannot defer."* DOC-04 v1.1's Change Notice moves this feature out of MVP scope.
 - **Problem Statement:** Two frozen documents disagree on whether this is in-scope for MVP.
 - **Alternatives Considered:** Not separately enumerated — this is a direct factual conflict between two documents, not a menu of options.
-- **Final Decision:** Not yet ratified.
+- **Final Decision:** Ratified — grocery list is **out of MVP scope**. DOC-04's existing Change Notice is correct; DOC-01 §06 (which wrongly said "Core — cannot defer") corrected to match DOC-04, not the reverse (2026-07-17).
 - **Business Rationale:** A reader starting from the founding brief (DOC-01) gets a different MVP than a reader starting from the PRD (DOC-04).
 - **Technical Rationale:** N/A.
 - **Engineering Impact:** None directly today — no Epic currently builds grocery-list generation.
@@ -265,13 +265,13 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `grep -a -n -i "grocery" "docs/product/[ACTIVE]_DOC-01_Product_Brief_v1.1.docx"` (this session, line 107).
 
 ### FD-09 — Refresh the stale "locked" environment map in DOC-10 §10
-- **Status:** Pending · **Origin:** `docs/architecture/[ACTIVE]_DOC-10_Technical_Architecture_v1.0.docx` §10
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/architecture/[ACTIVE]_DOC-10_Technical_Architecture_v1.0.docx` §10
 - **Context:** DOC-10 §10 references a superseded Supabase project ref and GitHub org, contradicted by the repository's own recovery record.
 - **Problem Statement:** An engineer following DOC-10 literally would connect to the wrong infrastructure.
 - **Alternatives Considered:** Not applicable — this is a factual refresh, not a design choice.
-- **Final Decision:** Not yet ratified.
+- **Final Decision:** Ratified — DOC-10 §10 corrected to repo `ankitmittal-madman/foofoo-v3`, Supabase production project `cmkswalqpmmqojwdmqbv` (2026-07-17). **Note:** this supersedes the project ref `slsqtlygeekdppuyiiff` previously stated as "confirmed live" below in this same entry — the Founder supplied `cmkswalqpmmqojwdmqbv` as the correct value in the 2026-07-16 session; the earlier ref is understood to have been superseded or misidentified and should not be used going forward.
 - **Business Rationale:** None directly — pure documentation accuracy.
-- **Technical Rationale:** Current true values are `ankitmittal-madman/foofoo-v3` / Supabase project `slsqtlygeekdppuyiiff`, confirmed live this audit chain.
+- **Technical Rationale:** Current true values are `ankitmittal-madman/foofoo-v3` / Supabase project `cmkswalqpmmqojwdmqbv`, per Founder confirmation 2026-07-16 (supersedes the `slsqtlygeekdppuyiiff` ref this Register previously cited as live-confirmed).
 - **Engineering Impact:** Misleads any engineer following DOC-10 literally.
 - **AI Impact:** None. **Recommendation Engine Impact:** None. **Database Impact:** None. **API Impact:** None. **Batch Impact:** None. **ETL Impact:** None. **Architecture Impact:** None.
 - **Affected Documents:** `DOC-10` §10.
@@ -282,11 +282,11 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `docs/project-history/certificates/[ACTIVE]_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md`; live Supabase project ref confirmed this audit chain.
 
 ### FD-10 — Approve the improved LF-D07 fallback behavior as the documented standard
-- **Status:** Pending · **Origin:** `docs/architecture/[ACTIVE]_RE-DOC-01_Architecture.docx` §05 vs. `supabase/functions/_shared/services/re/constraints.ts`
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/architecture/[ACTIVE]_RE-DOC-01_Architecture.docx` §05 vs. `supabase/functions/_shared/services/re/constraints.ts`
 - **Context:** The shipped `handleConstraintConflict` implementation also enforces allergen and never-list constraints beyond what RE-DOC-01 §05's spec strictly requires.
 - **Problem Statement:** Code is safer than spec — should the spec be updated to match the safer behavior, or should code be pulled back to match spec exactly?
 - **Alternatives Considered:** Not separately enumerated — the code's extra safety margin is the only behavior that exists; the only real choice is whether to ratify it or revert it.
-- **Final Decision:** Not yet ratified — recommended: approve the code's behavior as the standard and update the spec, not the reverse.
+- **Final Decision:** Ratified — the shipped code's behavior is approved as the official standard; the code is not pulled back. `RE-DOC-01` §05 updated to match (2026-07-17).
 - **Business Rationale:** The extra enforcement (allergen+never beyond spec) reduces safety risk, not increases it.
 - **Technical Rationale:** Already implemented and tested; reverting would remove a safety margin for no documented benefit.
 - **Engineering Impact:** None further if approved as-is.
@@ -531,7 +531,8 @@ Requirement → Architecture → RE Document → Implementation → Database →
 | AGR-005 | ✅ (per source document) | see source |
 | AGR-006 | ✅ (per source document) | see source |
 | PD-01–05, RE-01–06, AI-01–03, GOV-01–02 | ✅ (ratified via document freeze — no separate signature line exists for these; freeze status is the ratification mechanism) | see each source document's own freeze date |
-| FD-01 through FD-13 | ☐ Not yet signed | — |
+| FD-01, FD-02, FD-03, FD-04, FD-05, FD-08, FD-09, FD-10 | ✅ (ratified in a claude.ai Founder decision-closing session; formalized in `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) | 2026-07-16 |
+| FD-06, FD-07, FD-11, FD-12, FD-13 | ☐ Not yet signed — out of scope for this wave, tracked separately | — |
 
 ## 17. Version History
 
@@ -539,6 +540,8 @@ Requirement → Architecture → RE Document → Implementation → Database →
 |---|---|
 | 2026-07-16 (earlier same day) | `Founder_Decision_Book_v1.0.md` created — first canonical index, FD-01–13 only. |
 | 2026-07-16 (this consolidation) | Book superseded by this Register. Scope expanded to product/RE/AI/governance philosophy decisions (PD-01–05, RE-01–06, AI-01–03, GOV-01–02), each cited to a directly-verified primary source (several `.docx` concept documents decoded and quoted directly for the first time this session). Structure expanded from 10 to 17 sections per the Final Governance Consolidation mandate. No FD-01–13 content altered — carried forward exactly. |
+| 2026-07-16 (Wave 0 — Founder Ratification Certificate) | 8 of the 13 Pending FDs (FD-01, FD-02, FD-03, FD-04, FD-05, FD-08, FD-09, FD-10) ratified by the Founder in a claude.ai decision-closing session, formalized in `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`. FD-06, FD-07, FD-11, FD-12, FD-13 remain Pending, explicitly out of scope for this wave. |
+| 2026-07-17 (Wave 1 — document corrections) | §6 and §16 updated to reflect the 8 Wave-0 ratifications (Pending → Ratified). Corresponding document corrections applied: WP-8D/8E notes (FD-01), `DOC-P3-03` §07 worked example + LF-A08 clamp note (FD-02/FD-03), `DOC-P4-02` promoted DRAFT→ACTIVE as v1.1 with AD-01 resolved as Option 2 (FD-04), naming standard amended to v1.1 + six document headers corrected (FD-05), `DOC-01` §06 grocery-list scope corrected (FD-08), `DOC-10` §10 environment map corrected — **note:** the corrected Supabase project ref (`cmkswalqpmmqojwdmqbv`, per Founder confirmation) differs from the ref this Register previously described as "confirmed live" (`slsqtlygeekdppuyiiff`) — flagged, not silently reconciled (FD-09), `RE-DOC-01` §05 updated with the ratified LF-D07 behavior (FD-10). No schema, code, or migration changes made — documentation corrections only. |
 
 ---
 

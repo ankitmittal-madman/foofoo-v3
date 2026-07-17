@@ -258,11 +258,13 @@ Foofoo must be useful without internet. A user who has already loaded today's pl
 
 ## **Environment map (locked — do not modify without founder approval)**
 
+**[FD-09, ratified 2026-07-16]** The table below was stale (superseded Supabase project ref and GitHub org, per `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-09). Corrected to the current live values: repo `ankitmittal-madman/foofoo-v3`, production Supabase project `cmkswalqpmmqojwdmqbv`. Staging project ref and branch-per-environment mapping were not part of FD-09 and are left as previously recorded pending separate verification.
+
 | **Environment** | **Branch** | **Supabase project** | **What deploys here** | **Deploy trigger** |
 | --- | --- | --- | --- | --- |
 | **Local development** | Any feature branch | foofoo-staging (local Supabase CLI) | Developer's own test builds via Expo Go | Manual: expo start |
 | **Staging** | apverse-labs-RE branch | foofoo-staging (kwypxyqxojauhiehuirz) | RE development, schema changes, integration tests | Push to apverse-labs-RE |
-| **Production** | main branch | foofoo-mvp (ufgfznpqixplcbhmsqqw) | Live app for real users | Explicit founder approval required — never auto-deploy |
+| **Production** | main branch | foofoo-mvp (cmkswalqpmmqojwdmqbv) | Live app for real users | Explicit founder approval required — never auto-deploy |
 
 | **Critical rule: **Claude Code must NEVER commit or push to main or develop branches without explicit founder approval in the conversation. Production deploys are manual, deliberate decisions — never triggered automatically. |
 | --- |
@@ -334,7 +336,7 @@ Foofoo must be useful without internet. A user who has already loaded today's pl
 
 | **Step** | **Command** | **What it does** |
 | --- | --- | --- |
-| **1. Clone repo** | git clone git@github.com:apverse-labs/foofoo.git && cd foofoo | Gets the codebase |
+| **1. Clone repo** | git clone git@github.com:ankitmittal-madman/foofoo-v3.git && cd foofoo-v3 | Gets the codebase |
 | **2. Install dependencies** | npm install | Installs all React Native and TypeScript dependencies |
 | **3. Copy env template** | cp .env.example .env.local | Creates local env file. Fill in values from 1Password / founder. |
 | **4. Start local Supabase** | supabase start | Starts local PostgreSQL + Auth + Storage + Edge Functions via Docker |

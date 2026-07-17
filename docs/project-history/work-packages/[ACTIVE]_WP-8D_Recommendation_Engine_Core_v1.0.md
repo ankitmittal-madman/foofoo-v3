@@ -71,7 +71,9 @@ Per CPTO direction: WP-8D is **not** blocked by the unseeded `re_cohort_class_pr
 
 ## 6. Verification & Governance
 
-`cd supabase && deno task verify` → fmt:check PASS · lint PASS · `deno check functions/_shared/services/re/index.ts` PASS · `deno test` **52 passed / 0 failed**. Branch `feat/wp-8d-re-core-reconciliation`; **not pushed** (committed locally after tests passed, per instruction). No frozen artifact touched; DOC-P4-02 remains DRAFT.
+`cd supabase && deno task verify` → fmt:check PASS · lint PASS · `deno check functions/_shared/services/re/index.ts` PASS · `deno test` **52 passed / 0 failed**. Branch `feat/wp-8d-re-core-reconciliation`; not pushed as of this Work Package's own execution (committed locally after tests passed, per instruction). No frozen artifact touched at that time; DOC-P4-02 remained DRAFT.
+
+**[FD-01 update, 2026-07-16]** This branch's later push to `main` (`e113ffa`/`e76bd9c`) is retroactively ratified as authorized — see `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-01 and `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`. This Work Package's own text above is left unchanged as the historical record at time of execution, per `CLAUDE.md`'s never-delete-history rule.
 
 ## Critical Self-Review
 

@@ -1,6 +1,6 @@
 # [ACTIVE]_Repository_Naming_Standard_v1.0
 
-**Status:** ACTIVE — ratified standard (Founder-approved via WP-5AA FINAL)
+**Status:** SUPERSEDED BY `[ACTIVE]_Repository_Naming_Standard_v1.1.md` (2026-07-16, FD-05 amendment — `[ACTIVE]` status no longer requires a Founder signature line). Retained unchanged as the historical v1.0 record per `CLAUDE.md`'s never-delete-superseded-document rule. Originally: ACTIVE — ratified standard (Founder-approved via WP-5AA FINAL)
 **Version:** v1.0
 **Date:** 2026-07-13
 **Placement:** docs/governance/[ACTIVE]_Repository_Naming_Standard_v1.0.md

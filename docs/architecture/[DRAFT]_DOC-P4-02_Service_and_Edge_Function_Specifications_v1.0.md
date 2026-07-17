@@ -1,6 +1,6 @@
 # [DRAFT]_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0
 
-**Status:** **DRAFT — pending Founder sign-off.** Contains one open architectural decision (AD-01) that GATES onboarding implementation. Not authoritative until ratified. No code, no schema/DB/migration/seed/security change is made by this document.
+**Status:** **SUPERSEDED BY `[ACTIVE]_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.1.md`** (2026-07-16, FD-04 ratification of AD-01 as Option 2). Retained unchanged as the historical DRAFT record per `CLAUDE.md`'s never-delete-superseded-document rule; not authoritative. Originally: **DRAFT — pending Founder sign-off.** Contains one open architectural decision (AD-01) that GATES onboarding implementation. Not authoritative until ratified. No code, no schema/DB/migration/seed/security change is made by this document.
 **Version:** v1.0
 **Date:** 2026-07-14
 **Placement:** docs/architecture/[DRAFT]_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md

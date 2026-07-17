@@ -2,7 +2,7 @@
 
 **Version:** 1.1
 **Date:** June 2026
-**Status:** DRAFT v1.1 — pending founder sign-off
+**Status:** ACTIVE v1.1 — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **Author:** Claude (Solution Architect role)
 **Sources read:** DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, DOC-06, DOC-09, DOC-10, RE-DOC-01 through RE-DOC-05, all HTML visual documents
 **Next document:** DOC-P3-03 · Business Logic and Algorithm Specification
@@ -1304,7 +1304,7 @@ User triggers swipe-left → Never button revealed → User taps Never → Confi
 | --- | --- |
 | Document | DOC-P3-02 · Conceptual Domain Model |
 | Version | 1.0 |
-| Status | DRAFT — pending founder sign-off |
+| Status | ACTIVE — [FD-05, 2026-07-16] no Founder signature required for `[ACTIVE]` status; see naming standard amendment |
 | Entities defined | 51 domain entities across 10 domain areas |
 | Business invariants | 14 |
 | Entity lifecycles | 4 key lifecycles |

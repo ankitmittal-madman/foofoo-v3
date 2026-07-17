@@ -1,7 +1,7 @@
 # DOC-P3-04 · Data Architecture and Entity Relationship Model
 **Version:** 1.3
 **Date:** June 2026
-**Status:** DRAFT — pending founder sign-off
+**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **Prerequisites:** DOC-P3-02 CDM v1.1, DOC-P3-03 v1.0, DOC-P3-03A v1.0 (all must be read first)
 **Next document:** DOC-P3-05 · Database Schema (migration files, derived directly from this document)
 
@@ -1457,7 +1457,7 @@ WHERE sl.profile_id = :user_id AND sl.dish_id = :dish_id AND sl.slot_date = :dat
 |---|---|
 | Document | DOC-P3-04 · Data Architecture and Entity Relationship Model |
 | Version | 1.0 |
-| Status | DRAFT — pending founder sign-off |
+| Status | ACTIVE — [FD-05, 2026-07-16] no Founder signature required for `[ACTIVE]` status; see naming standard amendment |
 | Tables specified | 59 across 2 schemas (38 `public`, 21 domain + 10 config in `re_engine`, fully enumerated in Section 03) |
 | Every table traced to | One or more LF-numbers from DOC-P3-03 and/or CDM entities/invariants from DOC-P3-02 |
 | Gap register | 8 items, all resolved before schema design began (Gap & Resolution Register, top of document) |
@@ -2069,7 +2069,7 @@ erDiagram
 | Schema changes | **None** — v1.0's tables, columns, and relationships are unchanged |
 | Genuine gaps surfaced | 4 (Q-01 through Q-04, Section 15.6), all additive constraint/trigger refinements for P3-05, none requiring redesign |
 | Scope boundary respected | No disaster recovery, backup, capacity planning, monitoring/alerting, SLOs, or incident response included — reserved for DOC-P4-05 and DOC-P5-05 per founder instruction |
-| Status | DRAFT v1.1 — pending founder sign-off |
+| Status | ACTIVE v1.1 — [FD-05, 2026-07-16] no Founder signature required for `[ACTIVE]` status; see naming standard amendment |
 
 Founder sign-off (v1.1 enhancement): ___________________________ Date: _______________
 
@@ -2087,7 +2087,7 @@ Founder sign-off (v1.1 enhancement): ___________________________ Date: _________
 | Q-02 status | **Resolved directly in DOC-P3-04**, not deferred to P3-05 — Section 15.6 updated accordingly; all six cross-references to the old "deferred" framing updated for consistency (Sections 13.3, 15.2, 15.6, 16.2) |
 | Schema changes | **None** — no table, column, or relationship was altered. Two trigger functions and their `CREATE TRIGGER` statements were added, which is exactly the kind of additive completion the founder requested, not a redesign |
 | Q-01, Q-03, Q-04 | Remain open, low-severity, still appropriately deferred to DOC-P3-05 |
-| Status | DRAFT v1.2 — pending founder sign-off |
+| Status | ACTIVE v1.2 — [FD-05, 2026-07-16] no Founder signature required for `[ACTIVE]` status; see naming standard amendment |
 
 Founder sign-off (v1.2 completion): ___________________________ Date: _______________
 

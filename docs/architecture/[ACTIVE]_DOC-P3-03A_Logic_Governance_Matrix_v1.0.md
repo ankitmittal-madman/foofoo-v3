@@ -2,7 +2,7 @@
 
 **Version:** 1.0
 **Date:** June 2026
-**Status:** DRAFT — pending founder sign-off
+**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **Companion to:** DOC-P3-03 · Business Logic and Algorithm Specification v1.0
 **Purpose:** Governance, traceability, execution classification, auditability, and validation of all 61 logical functions defined in P3-03. Does not redefine business logic.
 **Next document:** DOC-P3-04 · Data Architecture and Entity Relationship Model
@@ -1165,7 +1165,7 @@ For every logical function group: expected behaviour, failure behaviour, boundar
 | --- | --- |
 | Document | DOC-P3-03A · Logic Governance and Execution Matrix |
 | Version | 1.0 |
-| Status | DRAFT — pending founder sign-off |
+| Status | ACTIVE — [FD-05, 2026-07-16] no Founder signature required for `[ACTIVE]` status; see naming standard amendment |
 | Sections | 9 sections across 61 logical functions |
 | Read/Write Matrix | All 61 functions mapped to data read, written, derived, and consumed |
 | Configuration parameters | 47 parameters classified across 6 config tables |
