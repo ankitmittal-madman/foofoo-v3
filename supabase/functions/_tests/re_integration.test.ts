@@ -187,7 +187,7 @@ function answers(over: Partial<OnboardingAnswers> = {}): OnboardingAnswers {
   return {
     mainCohortCode: "MC_NUCLEAR_FAMILY",
     subCohortTag: "SC_WITH_SCHOOL_CHILD",
-    members: [{ segment: "SCHOOL_CHILD", allergenFlags: 0 }],
+    members: [{ conditions: ["school_child"], allergenFlags: 0 }],
     homeState: "MH",
     currentCity: "Mumbai",
     migrationBand: "3_7yr",

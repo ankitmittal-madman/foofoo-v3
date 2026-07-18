@@ -28,7 +28,8 @@ import { API_ERRORS } from "../../errors/api-catalogue.ts";
 export interface OnboardingAnswers {
   readonly mainCohortCode: string;
   readonly subCohortTag: string;
-  readonly members: Array<{ segment: string; memberName?: string; allergenFlags: number }>;
+  /** FD-15 Phase 2 (SER-004): each member carries zero or more independent condition tags. */
+  readonly members: Array<{ conditions: string[]; memberName?: string; allergenFlags: number }>;
   readonly homeState: string | null;
   readonly currentCity: string | null;
   readonly migrationBand: MigrationBand | null;
@@ -85,7 +86,8 @@ export interface ProfileRow {
 }
 export interface HouseholdMemberRow {
   readonly member_name: string | null;
-  readonly segment: string;
+  /** FD-15 Phase 2 (SER-004): household_members.conditions (text[]), not the old scalar segment. */
+  readonly conditions: string[];
   readonly allergen_flags: number;
 }
 export interface OnboardingSessionRow {
@@ -146,6 +148,35 @@ export function computeOnboardingConfidence(a: OnboardingAnswers): number {
   return Math.max(0.35, Math.min(0.65, c));
 }
 
+/**
+ * Mutually-exclusive age-band life-stage tags (SER-004 §11 implementation risk: the
+ * household_members.conditions CHECK validates vocabulary membership only, not business-rule
+ * exclusivity — enforced here at the application layer instead, per this repository's existing
+ * pattern of keeping business-rule validation in code, not DB triggers). Scoped narrowly to
+ * values that represent sequential, non-overlapping age bands for the same growing child — NOT
+ * every condition that happens to correlate with age (e.g. `picky_child`, `elderly_member`, and
+ * `recovery_member` are deliberately excluded: the research evidence (Canonical Planning Model
+ * §7 stress test — "Elderly couple + Recovery") shows those legitimately co-occur with an age
+ * band or with each other on the same member).
+ */
+const EXCLUSIVE_LIFE_STAGE_TAGS: ReadonlySet<string> = new Set([
+  "baby_6_18m",
+  "toddler",
+  "school_child",
+  "teen_high_appetite",
+]);
+
+/** LF-A05 area, application-layer only (SER-004 §11) — a member may carry at most one age-band tag. */
+export function assertNoConflictingLifeStageTags(conditions: readonly string[]): void {
+  const present = conditions.filter((c) => EXCLUSIVE_LIFE_STAGE_TAGS.has(c));
+  if (present.length > 1) {
+    throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
+      detail: `household member carries mutually-exclusive life-stage tags: ${present.join(", ")}`,
+      context: { conflictingConditions: present },
+    });
+  }
+}
+
 export class OnboardingOrchestrator {
   constructor(
     private readonly store: OnboardingStore,
@@ -189,6 +220,12 @@ export class OnboardingOrchestrator {
     const interactionCount = Math.min(answers.classSwipeCount, 10); // LF-A07 cap
     const cookCapability = answers.cookCapability ?? "beginner"; // LF-A06 skip default
 
+    // SER-004 §11: application-layer business rule, not a DB constraint — reject conflicting
+    // age-band tags on any single member before persisting anything.
+    for (const m of answers.members) {
+      assertNoConflictingLifeStageTags(m.conditions);
+    }
+
     // LF-A09 — resolve persona then cohort (Option-B fallback inside the resolver).
     const dietMode = dietType === "non_veg" || dietType === "egg" ? "non_veg" : "veg";
     const persona = await resolvePersonaAndCohort(this.cohortRepo, {
@@ -218,7 +255,7 @@ export class OnboardingOrchestrator {
       userId,
       answers.members.map((m) => ({
         member_name: m.memberName ?? null,
-        segment: m.segment,
+        conditions: m.conditions,
         allergen_flags: m.allergenFlags,
       })),
     );
@@ -263,7 +300,7 @@ export class OnboardingOrchestrator {
       homeState: answers.homeState ?? "",
     };
     const members: HouseholdMember[] = answers.members.map((m) => ({
-      segment: m.segment,
+      conditions: m.conditions,
       allergenFlags: m.allergenFlags,
       isActive: true,
     }));

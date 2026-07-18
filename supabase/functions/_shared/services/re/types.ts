@@ -30,7 +30,8 @@ export interface HouseholdConstraints {
 
 /** Active household member (DOC-P3-02 Entity 3; LF-A05 allergen union). */
 export interface HouseholdMember {
-  readonly segment: string;
+  /** FD-15 Phase 2 (SER-004): zero or more independent condition tags (household_members.conditions). */
+  readonly conditions: string[];
   readonly allergenFlags: number;
   readonly isActive: boolean;
 }

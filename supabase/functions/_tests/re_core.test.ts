@@ -141,8 +141,8 @@ Deno.test("passesAllergen — ingredient-level bitwise overlap excludes", () => 
 
 Deno.test("combinedAllergenFlags — OR of user + active members only", () => {
   const flags = combinedAllergenFlags(1, [
-    { segment: "TODDLER", allergenFlags: 2, isActive: true },
-    { segment: "X", allergenFlags: 4, isActive: false },
+    { conditions: ["toddler"], allergenFlags: 2, isActive: true },
+    { conditions: ["x"], allergenFlags: 4, isActive: false },
   ]);
   assertEquals(flags, 3); // 1 | 2 ; inactive member's 4 ignored
 });

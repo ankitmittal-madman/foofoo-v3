@@ -154,7 +154,8 @@ export class SupabaseOnboardingStore implements OnboardingStore {
       members.map((m) => ({
         profile_id: profileId,
         member_name: m.member_name,
-        segment: m.segment,
+        // FD-15 Phase 2 (SER-004): household_members.conditions is text[], not the old scalar segment.
+        conditions: m.conditions,
         allergen_flags: m.allergen_flags,
       })),
     );
