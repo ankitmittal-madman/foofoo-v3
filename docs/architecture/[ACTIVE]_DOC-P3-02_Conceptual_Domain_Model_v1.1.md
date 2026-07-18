@@ -142,6 +142,8 @@ The **Recommendation Engine Domain** defines how the output is produced — the 
 
 - ADULT_STANDARD: No special needs. No add-on generated. Influences household size only.
 
+**See also:** this 8-value Segment vocabulary and the persona/cohort sections in Part 3 are superseded on the topic of condition modeling by `[ACTIVE]_Phase1_Persona_Decomposition_Catalog_v1.0.md` and the Planning Semantics Architecture (FD-15, ratified 2026-07-17) — pending this document's own future revision, not rewritten here.
+
 **Relationships:**
 
 - Belongs to exactly 1 Household
