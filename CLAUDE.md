@@ -91,3 +91,25 @@ GitHub MCP is available via .mcp.json using ${GH_TOKEN}.
 Never fabricate execution, versions, commit history, or content that wasn't
 actually provided. If required input (a template, a section, a file) is
 missing, stop and report the gap rather than inventing placeholder content.
+
+## "Read" Means Complete Read (non-negotiable, never relaxed)
+When the Founder asks Claude (in any session — claude.ai or Claude Code)
+to "read" a file or document, this means reading it completely, start to
+finish, before responding. Not a sample. Not a representative excerpt.
+Not "the parts that seemed relevant." Not skipped because a similar file
+was read before or its content assumed from memory. Every line, every
+section.
+
+This is distinct from "check," "search," "skim," or "look up," which may
+legitimately use partial reads, grep, or targeted queries — those verbs
+are fine to interpret narrowly. "Read" is not one of them.
+
+If a file is too large to read in full within the current context or
+tooling constraints, STOP and say so explicitly, rather than silently
+reading a portion and reporting as if the whole file was read. A partial
+read disclosed honestly is acceptable; a partial read presented as
+complete is not.
+
+This rule applies retroactively to every future session's self-review:
+if a session claims something was "read" and it was not read in full,
+that claim is inaccurate and must be corrected, not defended.
