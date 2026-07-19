@@ -542,9 +542,29 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🎛</span> S26 · Knowledge platform refactor (WP-K01)
       <span class="nav-badge">Jul 15</span>
     </div>
+    <div class="nav-item" onclick="showPage('s27')">
+      <span class="nav-icon">🔎</span> S27 · Independent due-diligence audit (WP-9)
+      <span class="nav-badge">Jul 16</span>
+    </div>
     <div class="nav-item" onclick="showPage('s28')">
       <span class="nav-icon">🔬</span> S28 · CandidateRepository audit (WP-8FA)
       <span class="nav-badge">Jul 15</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s29')">
+      <span class="nav-icon">🗄</span> S29 · Schema evolution batch + FD-11 data load (WP-10)
+      <span class="nav-badge">Jul 17</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s30')">
+      <span class="nav-icon">🔌</span> S30 · CandidateRepository adapter built (WP-11)
+      <span class="nav-badge">Jul 17</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s31')">
+      <span class="nav-icon">🧩</span> S31 · Planning Semantics Architecture (WP-12)
+      <span class="nav-badge">Jul 17</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s32')">
+      <span class="nav-icon">🗄</span> S32 · Household conditions vocabulary (WP-13)
+      <span class="nav-badge">Jul 18</span>
     </div>
     <!-- NAV_INJECT -->
   </div>
@@ -559,14 +579,14 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">32</span>
+      <span class="nav-badge">88</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">16</span>
+      <span class="nav-badge">26</span>
     </div>
   </div>
 </nav>
@@ -1449,18 +1469,78 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
     <div class="timeline-row">
-      <div class="tl-date">Jul 15, 2026</div>
+      <div class="tl-date">Jul 16, 2026</div>
       <div class="tl-spine"><div class="tl-dot" style="background:#b45309"></div></div>
       <div class="tl-content">
         <span class="tl-badge" style="background:#fffbeb;color:#b45309">S27</span>
-        <div class="tl-title">WP-8F stopped at the gate: the dish "candidate" can't be built without guessing (blocker report)</div>
+        <div class="tl-title">An outside-style audit reads the whole repository end to end — then a second team checks the checker (WP-9)</div>
         <div class="tl-chips">
-          <span class="tl-chip" onclick="showPage('timeline-full')">schema proof failed</span>
-          <span class="tl-chip" onclick="showPage('timeline-full')">4 mappings unprovable</span>
-          <span class="tl-chip" onclick="showPage('timeline-full')">STOP, no guessing</span>
-          <span class="tl-chip" onclick="showPage('timeline-full')">REPO-CERT-018</span>
+          <span class="tl-chip" onclick="showPage('s27')">Grade B</span>
+          <span class="tl-chip" onclick="showPage('s27')">20/21 findings confirmed</span>
+          <span class="tl-chip" onclick="showPage('s27')">1 open Founder decision</span>
+          <span class="tl-chip" onclick="showPage('s27')">REPO-CERT-020</span>
         </div>
-        <div class="tl-note">WP-8F was meant to make the backend actually run against the real database — starting with the "candidate dish" builder that hands the engine each dish with all its attributes. The rule was strict: prove every field maps to a real column before writing code, and STOP (don't guess) if any can't. Proof done against the live schema — and four required dish attributes have NO real source: (1) "cuisine family" — there's no such column on dishes; the dish→cuisine link exists but the cuisines table has two candidate columns and neither is named "family"; (2) "main ingredient class" — no such field at all (the nearest is a dish "category", which is a different thing); (3) the meat markers for halal / no-beef / no-pork diets — the ingredients table only tracks veg/vegan/jain, so these safety-relevant religious filters have nothing to check against; (4) "seasonal affinity" on a dish — no such column anywhere. Plus a fifth: the cold-start "cohort average taste" has no table to read from. Guessing any of these would silently mis-filter food for real dietary/religious needs — exactly what we must never do. So: STOP. Wrote a precise blocker report listing each gap's exact schema location and the decision needed (several likely need a schema-change request, which is founder-gated and out of this work package's scope). No code written, nothing touched; the existing 62 tests still pass. The recommendation engine and everything before it remain intact — this is a "we need decisions before we can wire it to the database" checkpoint, not a failure.</div>
+        <div class="tl-note">Before more engineering continued, an independent, evidence-only due-diligence audit traced the entire chain — vision through APDF, product docs, database, seeds, migrations, validation, application code, and the Recommendation Engine — and scored the repository "B — Mostly Implemented with Minor Gaps": a real, tested RE core, but three structural weaknesses (unratified critical-path documents, a stale README, an identifier collision on one document ID) and one still-open engineering blocker (the `main_ingredient_class` derivation rule). A second, fully independent audit then re-derived every one of WP-9's 21 findings from zero — re-reading every document, re-running the test suite (62/62), and re-executing both seed generators to prove the data pipeline is deterministic — and confirmed 20 of 21 findings, softened one characterization, withdrew one overstated clause, and surfaced 8 additional findings WP-9's faster first pass had missed (most importantly, that a user's very first swipes during onboarding are recorded but their direction is discarded, wasting the single richest cold-start signal). Read-only both times: no code, schema, or documentation content was changed by either audit.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 17, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#5145b8"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#f0effe;color:#5145b8">S29</span>
+        <div class="tl-title">Two Founder-approved schema changes go live, plus the main-ingredient data load (WP-10)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s29')">migrations 031/032</span>
+          <span class="tl-chip" onclick="showPage('s29')">842 pairs flagged</span>
+          <span class="tl-chip" onclick="showPage('s29')">FD-12 cuisine fix</span>
+          <span class="tl-chip" onclick="showPage('s29')">REPO-CERT-021</span>
+        </div>
+        <div class="tl-note">Two Founder-approved Schema Evolution Requests were implemented and run live against Supabase: a boolean flag so a dish can have one or more "main" ingredients (SER-002), and a dedup key so a retried event never gets double-counted (SER-003) — plus a small data fix giving 7 mixed-cuisine combo dishes a real "Multi-Regional" cuisine instead of none. Every check was re-verified live afterward: 7,108 existing ingredient rows unaffected, the new unique index confirmed present on all 3 event partitions, all validation and trigger checks still green. The same day, the Founder's own main-ingredient dataset (810 dishes, reasoning included) was loaded: 802 dishes matched exactly (842 dish-ingredient pairs flagged, 40 dishes correctly getting two), the 8 non-matches were combos and correctly skipped, and the general derivation rule behind the Founder's own reasoning was written up as a heuristic for future dishes. A Cold Start design note was also added, deciding that onboarding swipes need no new blending formula — they just need to count as history, and the existing weight ladder does the rest. No code was written against any of this yet.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 17, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#e8f8f2;color:#0e7a5a">S30</span>
+        <div class="tl-title">The engine's first real data adapter is built — CandidateRepository, test-verified against the real scoring code (WP-11)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s30')">71 tests, 0 failures</span>
+          <span class="tl-chip" onclick="showPage('s30')">17 fields hydrated</span>
+          <span class="tl-chip" onclick="showPage('s30')">FD-14 ratified</span>
+          <span class="tl-chip" onclick="showPage('s30')">REPO-CERT-022</span>
+        </div>
+        <div class="tl-note">The one component the engine has needed since WP-8E — the adapter that actually reads real dishes out of the database and hands them to the engine — is built and proven, not just claimed compatible. All 17 fields the engine needs are filled from real columns (joined, tie-broken by a documented priority order, or explicitly marked as a deferred/proxy value where WP-8FA already said so), and a new test imports the engine's own filtering and scoring functions directly against this adapter's output — the exact claim last session's audit said was unverified. 9 new tests, 71 total, all passing. The adapter also surfaced a real content gap: 50 of 131 meal classes have no eligible dishes seeded yet, so the "popular fallback" path will run far more often than the ideal path until that's filled in — logged as an accepted interim decision (FD-14), not hidden.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 17, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S31</span>
+        <div class="tl-title">A new architecture for how a household's many needs get handled at once, ratified (WP-12)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s31')">FD-15 ratified</span>
+          <span class="tl-chip" onclick="showPage('s31')">4 new architecture docs</span>
+          <span class="tl-chip" onclick="showPage('s31')">docs only</span>
+          <span class="tl-chip" onclick="showPage('s31')">REPO-CERT-023</span>
+        </div>
+        <div class="tl-note">Four Founder-approved design documents were committed, replacing the old idea of hand-listing every possible combination of household conditions (41 personas × 8 segments) with a two-layer model: a small, stable catalogue of "who is planning" (≈5 archetypes) plus a rules-based layer that reads each member's actual conditions (diabetic, pregnant, elderly, and so on) and routes each one of three ways — absorbed into the main meal, swapped for a variant, or added as an extra dish. Before committing, the four documents were cross-checked against each other as one architecture and one real contradiction was found and fixed (two documents disagreed on whether a design question was still open). This is a documentation-only batch — it settles the design and hands off a concretely scoped next engineering step (fixing the household_members schema to actually store multiple conditions), but builds nothing itself.</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 18, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#92500a"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#fef8ec;color:#92500a">S32</span>
+        <div class="tl-title">Household members can finally carry more than one condition at once — migration written, not yet switched on (WP-13)</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s32')">migration 033 authored</span>
+          <span class="tl-chip" onclick="showPage('s32')">15-value vocabulary</span>
+          <span class="tl-chip" onclick="showPage('s32')">not yet applied</span>
+          <span class="tl-chip" onclick="showPage('s32')">REPO-CERT-024</span>
+        </div>
+        <div class="tl-note">Building on last session's architecture decision, the schema change it calls for was written: `household_members.segment` (one single-choice label per member) becomes `conditions` (a list, so one person can be elderly, diabetic, and recovering all at once). The new 15-word vocabulary was derived directly from a live database query, not retyped from memory, and every dependent line of code and both test files were updated to match — 71 tests still pass, zero failures. A real bug in the undo-script was caught and fixed before it could ever be run. The one thing this session deliberately did NOT do: actually run the migration against the live database — that step needs a separate, explicit go-ahead, and this session stopped and asked rather than just doing it.</div>
       </div>
     </div>
     <!-- TIMELINE_INJECT -->
@@ -1689,6 +1769,34 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-016_WP-K01_Knowledge_Platform_Refactoring_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S26</td><td class="fr-desc">Execution certificate for the knowledge-platform migration</td></tr>
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-K01_Decision_Log_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S26</td><td class="fr-desc">Why each Operating System section exists; preservation and default-page decisions</td></tr>
         <tr><td class="fr-file">docs/project-history/[ACTIVE]_WP-K01_Repository_Impact_Report_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S26</td><td class="fr-desc">Exactly which files changed and which were untouched (code/DB: zero)</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S27</td><td class="fr-desc">35-section evidence-only repository audit; Grade B, one open engineering blocker named</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-9_Validation_Audit_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S27</td><td class="fr-desc">Independent re-derivation of WP-9 from zero; 20/21 findings confirmed, 8 new found</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-020_WP-9_Due_Diligence_Audit_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S27</td><td class="fr-desc">Certifies the WP-9 audit method and findings — read-only, no code/doc changes</td></tr>
+        <tr><td class="fr-file mono">database/migrations/031_dish_ingredients_main_ingredient_flag.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S29</td><td class="fr-desc">is_main_ingredient boolean on dish_ingredients (SER-002), applied live</td></tr>
+        <tr><td class="fr-file mono">database/migrations/032_interaction_events_dedup_key.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S29</td><td class="fr-desc">dedup_key uuid + partitioned unique index on interaction_events (SER-003), applied live</td></tr>
+        <tr><td class="fr-file mono">database/rollback/031_dish_ingredients_main_ingredient_flag_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S29</td><td class="fr-desc">Paired rollback for migration 031</td></tr>
+        <tr><td class="fr-file mono">database/rollback/032_interaction_events_dedup_key_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S29</td><td class="fr-desc">Paired rollback for migration 032</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-10_FD12_FD11_FD13_Schema_Evolution_Batch_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S29</td><td class="fr-desc">WP-10 schema evolution batch — SER-002/003 + FD-12 data fix</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-021_WP-10_Schema_Evolution_Batch_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S29</td><td class="fr-desc">Execution certificate — both migrations + data fix verified live</td></tr>
+        <tr><td class="fr-file">docs/architecture/[ACTIVE]_DOC-P3-13_Main_Ingredient_Derivation_Heuristic_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S29</td><td class="fr-desc">General rule extracted from the Founder's 810-dish main-ingredient dataset</td></tr>
+        <tr><td class="fr-file">docs/architecture/[DRAFT]_Cold_Start_Design_Specification_Swipe_Blend_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S29</td><td class="fr-desc">How onboarding swipes feed the existing weight ladder — no new mechanism</td></tr>
+        <tr><td class="fr-file mono">supabase/functions/_tests/candidate_repository.test.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S30</td><td class="fr-desc">9 tests — field hydration, tie-break, and real engine-function compatibility</td></tr>
+        <tr><td class="fr-file mono">supabase/functions/_shared/services/adapters/supabase-stores.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S30</td><td class="fr-desc">Adds SupabaseCandidateRepository — the engine's first concrete data adapter</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-11_CandidateRepository_Adapter_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S30</td><td class="fr-desc">WP-11 — CandidateRepository adapter build, closes the WP-8F/8FA blocker chain</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-022_WP-11_CandidateRepository_Adapter_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S30</td><td class="fr-desc">Execution certificate — 71/71 tests, downstream compatibility proven</td></tr>
+        <tr><td class="fr-file">docs/architecture/[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S31</td><td class="fr-desc">Two-layer persona/condition redesign: composition catalogue + routing rules</td></tr>
+        <tr><td class="fr-file">docs/architecture/[ACTIVE]_Phase1_Persona_Decomposition_Catalog_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S31</td><td class="fr-desc">All 41 Persona_Master_v3 rows classified into the new model</td></tr>
+        <tr><td class="fr-file">docs/architecture/[ACTIVE]_Phase1B_Attribute_to_Class_Rule_Extraction_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S31</td><td class="fr-desc">92 hand-attached class lists collapsed into 8 shared rules + ~12 specializations</td></tr>
+        <tr><td class="fr-file">docs/architecture/[ACTIVE]_Canonical_Planning_Model_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S31</td><td class="fr-desc">The reasoning model — safety-first ordering, three-channel routing, stress tests</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-12_Planning_Semantics_Architecture_Batch_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S31</td><td class="fr-desc">WP-12 — docs-only commit batch, Final Architecture Baseline Review passed</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-023_WP-12_Planning_Semantics_Architecture_Batch_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S31</td><td class="fr-desc">Execution certificate — placement and FD-15 ratification verified</td></tr>
+        <tr><td class="fr-file mono">database/migrations/033_household_members_conditions_vocabulary.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S32</td><td class="fr-desc">segment (scalar) → conditions (15-value array) on household_members — authored, not yet applied</td></tr>
+        <tr><td class="fr-file mono">database/rollback/033_household_members_conditions_vocabulary_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S32</td><td class="fr-desc">Paired rollback for migration 033 — ordering bug caught and fixed before use</td></tr>
+        <tr><td class="fr-file">docs/governance/[ACTIVE]_SER-004_household_members_conditions_vocabulary_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S32</td><td class="fr-desc">Finalized Schema Evolution Request this migration implements exactly</td></tr>
+        <tr><td class="fr-file">docs/project-history/work-packages/[ACTIVE]_WP-13_Household_Members_Conditions_Vocabulary_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S32</td><td class="fr-desc">WP-13 — migration + code + tests authored and locally verified, not yet live</td></tr>
+        <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-024_WP-13_Household_Members_Conditions_Vocabulary_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S32</td><td class="fr-desc">Execution certificate — PARTIAL scope, live-DB application explicitly not certified</td></tr>
+        <tr><td class="fr-file mono">supabase/functions/_shared/services/onboarding/orchestrator.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S32</td><td class="fr-desc">conditions: string[] replaces segment: string; new life-stage conflict guard</td></tr>
+        <tr><td class="fr-file mono">supabase/functions/_shared/services/re/types.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S32</td><td class="fr-desc">HouseholdMember.conditions: string[] replaces segment: string</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1788,6 +1896,56 @@ function deepDiveFeature(featureLabel){
       <div class="decision-q">Why record the stale READMEs/roadmap in the debt register instead of fixing them now?</div>
       <div class="decision-a">WP-K01's scope is the knowledge platform; those files are governed documents whose refresh deserves its own reviewed change, not a drive-by edit inside an unrelated work package. Found, reported, tracked — not silently rewritten.</div>
       <div class="decision-meta">S26 · Jul 15</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why commission a second, independent audit of WP-9 instead of just acting on its findings?</div>
+      <div class="decision-a">WP-9 disclosed its own accelerated reading in several areas; a from-zero re-audit is the strongest way to test whether a fast first pass can be trusted before committing engineering time to its recommendations. It came back 20/21 confirmed with 8 new findings — validating the re-audit rather than making it redundant.</div>
+      <div class="decision-meta">S27 · Jul 16</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why does dish_ingredients.is_main_ingredient allow more than one TRUE row per dish?</div>
+      <div class="decision-a">Some dishes (biryanis, fermented-batter dishes, dishes with dual defining pulses) genuinely have more than one ingredient that defines their identity — restricting to one TRUE row per dish would be a fabricated constraint the actual data doesn't support.</div>
+      <div class="decision-meta">S29 · Jul 17</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why does the interaction_events dedup key only guarantee uniqueness within one month's partition?</div>
+      <div class="decision-a">Postgres requires the partition key inside any unique index on a partitioned table, so a bare cross-partition guarantee isn't possible at the DB layer. The Founder approved a two-layer design: this index for the common case, plus an app-level 24-hour lookback check (not yet built) for the rare boundary case — a documented trade-off, not a compromise glossed over.</div>
+      <div class="decision-meta">S29 · Jul 17</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why write a "main ingredient" derivation heuristic instead of just loading the Founder's dataset and stopping there?</div>
+      <div class="decision-a">The Founder's 810-dish dataset only covers dishes that already exist. Every future new dish still needs a rule — extracting the pattern behind the Founder's own reasoning now means a future dish can be classified consistently instead of guessed at from scratch, while still routing genuinely ambiguous cases back to human review.</div>
+      <div class="decision-meta">S29 · Jul 17</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why does CandidateRepository use flat queries and in-memory joins instead of Supabase's relational-embedding shortcut?</div>
+      <div class="decision-a">Verified via pg_constraint that no foreign key exists on dish_ingredients.ingredient_id, dish_tags.tag_id, or re_class_dish_options.dish_id — embedding syntax would silently fail to resolve rather than error loudly. Flat queries plus in-memory joins were used instead, once this was confirmed, not assumed.</div>
+      <div class="decision-meta">S30 · Jul 17</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why ratify the 38%-empty re_class_dish_options coverage (FD-14) instead of blocking WP-11 on it?</div>
+      <div class="decision-a">Content-seeding is an ongoing content task, not an engineering defect in the adapter that surfaced it — the same distinction already established by FD-07's accepted neutral cohort-prior fallback. Blocking engineering work on an unrelated content backlog would stall progress without fixing the actual gap any faster.</div>
+      <div class="decision-meta">S30 · Jul 17</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why replace the flat 41-persona/8-segment vocabulary with a two-layer composition + conditions model (FD-15)?</div>
+      <div class="decision-a">The flat approach required a hand-written combination row for every possible mix of conditions a household member could have — the exact anti-pattern that doesn't scale once members can be elderly AND diabetic AND recovering simultaneously. A small stable catalogue plus a rules layer that reads real conditions and routes them (absorb/swap/add) replaces N² combinations with a fixed, auditable rule set.</div>
+      <div class="decision-meta">S31 · Jul 17</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why is Absorb/Swap/Add routing derived at runtime instead of stored as a fixed property of each condition?</div>
+      <div class="decision-a">The ratified architecture states the same condition can route differently in different households (Architecture §9b) — persisting a fixed per-condition channel would directly contradict that design. No schema surface for routing exists anywhere in SER-004 as a result.</div>
+      <div class="decision-meta">S32 · Jul 18</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why does the household_members.conditions CHECK constraint allow zero conditions, unlike the meal-class array precedent?</div>
+      <div class="decision-a">A meal class must always occupy at least one slot, but zero conditions is the common, valid case for most household members — cardinality(conditions) >= 0 makes "no condition" the default rather than forcing a placeholder value the way the old ADULT_STANDARD enum did.</div>
+      <div class="decision-meta">S32 · Jul 18</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Why was migration 033 authored and verified but not applied to the live database in the same session?</div>
+      <div class="decision-a">The session's own tooling classified direct execution against the connected production Supabase project as a hard-to-reverse, shared-system action requiring separate explicit confirmation, consistent with this repository's standing rule to pause before such actions rather than bundle them into a "write and run" task by default.</div>
+      <div class="decision-meta">S32 · Jul 18</div>
     </div>
     <!-- DECISIONS_INJECT -->
   </div>
@@ -2856,7 +3014,181 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s26 -->
-  <!-- ── Session 27/28 (WP-8F blocker + WP-8FA audit) ── -->
+
+  <!-- ── Session 27 (WP-9 independent due-diligence audit + validation audit) ── -->
+  <div id="page-s27" class="page-content" style="display:none">
+
+    <div class="page-header">
+      <div class="page-title">S27 · Independent Engineering Due Diligence Audit — and a second audit that checks the checker (WP-9)</div>
+      <div class="page-subtitle">An outside-style audit read the whole repository end to end and graded it. Then a second, fully independent audit re-derived every one of its findings from zero to see if the first audit could be trusted.</div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was audited this session</div>
+        <div class="session-card-meta">July 16, 2026<br>WP-9 · REPO-CERT-020</div>
+      </div>
+      <div class="session-card-desc">Two read-only audits, no code or documentation changed by either. The first (WP-9) traced the full chain — vision → APDF documents → product docs → technical docs → database → seed/batch pipeline → migrations → validation → application code → Recommendation Engine — using only repository evidence on the branch the Founder designated as authoritative. The second (the Validation Audit) deliberately re-read everything from zero, on a clean backup, and only compared its own conclusions against WP-9's afterward — the strongest way to check whether an audit's findings can be trusted.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">B</div><div class="stat-l">Overall grade</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">20/21</div><div class="stat-l">Findings confirmed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">8</div><div class="stat-l">New findings surfaced</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">1</div><div class="stat-l">Open Founder decision</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s27','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s27','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s27','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s27-swim" class="view-pane active">
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">repo-wide audit</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s27','wp9-audit')">
+            <div class="step-num num-purple">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Full-repository due-diligence audit (WP-9)</span><span class="tag tag-cfg">Verified</span></div>
+              <div class="step-desc">Four parallel read-only research passes plus direct lead-auditor verification traced the product from its founding documents down to the live database and the Recommendation Engine code, graded "B — Mostly Implemented with Minor Gaps."</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s27','wp9-validation')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Independent Validation Audit — re-derived from zero</span><span class="tag tag-cfg">Verified</span></div>
+              <div class="step-desc">A second team re-read every document and re-ran the full test suite and both seed generators without looking at WP-9 first, then compared conclusions — confirming 20 of 21 findings and finding 8 more WP-9's faster pass had missed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Resolve the one still-open engineering blocker (`main_ingredient_class` derivation rule) so the CandidateRepository adapter can finally be built; refresh the stale docs/README.md migration count; rule on whether the three critical unratified documents (Business Logic Spec, its governance matrix, the ERD) need formal Founder sign-off.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s27-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s27-wp9-audit" onclick="toggleDetail('s27-wp9-audit')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Verified</span>
+            <span class="detail-name">WP-9 — Independent Engineering Due Diligence Audit</span>
+          </div>
+          <span class="detail-chevron" id="chev-s27-wp9-audit">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s27-wp9-audit">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A 35-section evidence-only review of the entire repository — every product/architecture document's status, the database schema, the seed/ETL pipeline, validation scripts, and every line of Recommendation Engine code — scored against what actually exists on disk, not what any prior report claimed.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">4 parallel research passes</span><span class="dd-arrow">→</span>
+            <span class="dd-node">lead auditor re-verifies one claim directly</span><span class="dd-arrow">→</span>
+            <span class="dd-node">35-section report + REPO-CERT-020</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">Verdict: B — Mostly Implemented with Minor Gaps</span>  ← the headline finding was actually reassuring: the team's own "stop rather than guess" discipline (WP-8D→8E→8F→8FA) was found to be working exactly as designed</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does the audit trust a "B" grade rather than treat every gap as a failure?</div>
+            <div class="dd-why-a">Because almost every gap it found (unratified documents, the stale README, the one open CandidateRepository decision) was something the repository's own paper trail had already disclosed before the audit began — a team whose own records catch its own gaps doesn't need an auditor to discover them for the first time, it needs the discipline to close them.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why audit a branch that had diverged from origin/main?</div>
+            <div class="dd-why-a">The Founder explicitly selected that branch (`feat/wp-8f-runtime-blocker`) as the authoritative base for this audit, since it carried the WP-8F/8FA work origin/main didn't yet have — the divergence is disclosed in the report's own §0 rather than silently audited around.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s27-wp9-validation" onclick="toggleDetail('s27-wp9-validation')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Verified</span>
+            <span class="detail-name">Independent Validation Audit of WP-9</span>
+          </div>
+          <span class="detail-chevron" id="chev-s27-wp9-validation">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s27-wp9-validation">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A second, independent team re-read everything WP-9 sampled — in full this time, not sampled — and only looked at WP-9's own conclusions after finishing its own independent pass, to check whether the first audit's findings hold up rather than just repeating them.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">re-read every doc from zero</span><span class="dd-arrow">→</span>
+            <span class="dd-node">re-run 62 tests + regenerate both seed pipelines</span><span class="dd-arrow">→</span>
+            <span class="dd-node">compare against WP-9's 21 findings</span><span class="dd-arrow">→</span>
+            <span class="dd-node">8 new findings + verdict re-affirmed</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">both ETL generators re-executed end-to-end: all committed seed migrations regenerate byte-identical excluding timestamps</span>  ← direct proof the seed data pipeline is deterministic and untampered, not merely assumed from the scripts' existence</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why did the Founder commission a second audit of the first audit?</div>
+            <div class="dd-why-a">To test whether an accelerated first pass could be trusted before acting on its recommendations — the vindication was that 20 of 21 findings held up, but 8 real findings were missed precisely where WP-9's reading was thinnest (full product docs, full visuals, onboarding-signal semantics), justifying the re-audit rather than treating it as redundant.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">What was the single most important new finding?</div>
+            <div class="dd-why-a">MF-02: onboarding swipes are written to the database, but the orchestrator only counts *how many* swipes happened, discarding *which* dishes were liked or rejected — silently throwing away the single highest-value cold-start signal the onboarding flow collects.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Resolve the `main_ingredient_class` derivation rule (the one remaining WP-8F blocker) so CandidateRepository can be built; address the cold-start integrity package the Validation Audit flagged as top priority (seed `re_cohort_class_priors`, persist swipe direction, apply the LF-A09 fallback rule).</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s27-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S27 = [
+      {
+        id: 'repo-audit',
+        label: 'Repository due-diligence audit',
+        steps: [
+          {
+            layer: 'App logic',
+            tag: 'POLICY',
+            title: 'Trace vision → docs → database → code, evidence only',
+            desc: 'Every APDF-mapped document, every migration/seed/validation script, and every Recommendation Engine source file was read and checked against what it actually claims — not summarized from memory or prior reports.',
+            codeFlow: [ {chip:'docs/ (33 APDF documents)'}, {label:'cross-checked against'}, {chip:'database/migrations/'}, {label:'and'}, {chip:'supabase/functions/_shared/services/re/'} ],
+            files: [
+              {path:'docs/project-history/work-packages/[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md', desc:'The 35-section audit report itself — this document is the deliverable'},
+              {path:'docs/project-history/certificates/[ACTIVE]_REPO-CERT-020_WP-9_Due_Diligence_Audit_v1.0.md', desc:'Certifies the audit method and findings, no code/schema/doc changes made'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'App logic',
+            tag: 'POLICY',
+            title: 'Independent re-derivation, compared only afterward',
+            desc: 'A second team re-read the same evidence base from a clean backup without consulting WP-9 first, re-ran the full test suite and regenerated both seed pipelines, then built its own 21-row verification matrix against WP-9\'s findings.',
+            codeFlow: [ {chip:'foofoo-v3-backup-2026-07-15.zip'}, {label:'re-audited independently'}, {chip:'62/62 tests re-run'}, {label:'compared against'}, {chip:'WP-9 findings'} ],
+            files: [
+              {path:'docs/project-history/work-packages/[ACTIVE]_WP-9_Validation_Audit_v1.0.md', desc:'The independent verification matrix, missed findings, and re-affirmed verdict'}
+            ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s27-flows', window.FEATURE_FLOWS_S27);
+    </script>
+
+  </div><!-- /page-s27 -->
+
+  <!-- ── Session 28 (WP-8FA audit) ── -->
   <div id="page-s28" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S28 · CandidateRepository evidence audit — resolving the WP-8F blockers (WP-8FA, read-only)</div>
@@ -2886,6 +3218,882 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s28 -->
+
+  <!-- ── Session 29 (WP-10 schema evolution batch + FD-11 main-ingredient data load) ── -->
+  <div id="page-s29" class="page-content" style="display:none">
+
+    <div class="page-header">
+      <div class="page-title">S29 · Schema evolution batch — main-ingredient flag, event dedup key, and the FD-11 data load (WP-10)</div>
+      <div class="page-subtitle">Two Founder-approved schema changes went live against the real database, a cuisine data fix was applied, and the Founder's own main-ingredient dataset for 810 dishes was loaded and turned into a reusable rule.</div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 17, 2026<br>WP-10 · REPO-CERT-021</div>
+      </div>
+      <div class="session-card-desc">Migration 031 adds a boolean "is this the main ingredient" flag to each dish-ingredient pairing; migration 032 adds a dedup key so a retried event never gets double-counted. Both were applied live via Supabase and re-verified afterward with direct queries, not assumed from the migration text. A data-only fix gave 7 mixed-cuisine combo dishes a real "Multi-Regional" cuisine. The same day, the Founder's own 810-dish main-ingredient dataset (with reasoning for every choice) was loaded into the now-existing column, and the general pattern behind that reasoning was written up as a heuristic document for dishes added in future without Founder-supplied data. A Cold Start design note was also added, deciding that onboarding swipes need no new blending formula — they just need to correctly count as history, and the existing weight ladder already does the rest.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">2</div><div class="stat-l">Migrations (031/032)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">842</div><div class="stat-l">Ingredient pairs flagged</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">802/810</div><div class="stat-l">Dishes matched exactly</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">7</div><div class="stat-l">Combos re-cuisined</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s29','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s29','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s29','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s29-swim" class="view-pane active">
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s29','migrations')">
+            <div class="step-num num-teal">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Migrations 031 + 032 applied live</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">A boolean "main ingredient" column and an event dedup key + partitioned unique index were added to the live database and re-verified with direct queries.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s29','fd12-fix')">
+            <div class="step-num num-teal">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">FD-12 cuisine data fix</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">One new "Multi-Regional" cuisine row was inserted and pointed at from exactly 7 named combo dishes — a plain data change, no migration file.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ same day, once the column existed</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">data + docs</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s29','fd11-load')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">FD-11 main-ingredient data loaded + heuristic written</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">802 of 810 Founder-supplied dishes matched exactly; 842 (dish, ingredient) pairs flagged true; the general derivation pattern behind the Founder's own reasoning was documented for future dishes.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s29','cold-start-addendum')">
+            <div class="step-num num-purple">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Cold Start Design Spec addendum (swipe blend)</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Decided onboarding swipes need no new blend formula — they just need to count as history, and the existing weight ladder handles the rest. Filed DRAFT, pending Founder sign-off.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Build the CandidateRepository adapter — the `main_ingredient_class` schema blocker is now cleared, so the last WP-8F gap can finally be closed in code.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s29-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s29-migrations" onclick="toggleDetail('s29-migrations')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">database/migrations/031_dish_ingredients_main_ingredient_flag.sql, 032_interaction_events_dedup_key.sql</span>
+          </div>
+          <span class="detail-chevron" id="chev-s29-migrations">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s29-migrations">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">031 adds a plain boolean column so any dish-ingredient row can be flagged as a "main" ingredient (a dish can have more than one). 032 adds a client-supplied dedup key plus a partitioned unique index so a retried event submission is recognized instead of counted twice.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">SER-002/SER-003 approved</span><span class="dd-arrow">→</span>
+            <span class="dd-node">mcp__supabase__apply_migration</span><span class="dd-arrow">→</span>
+            <span class="dd-node">live column/index confirmed via information_schema/pg_inherits</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">ALTER TABLE public.dish_ingredients ADD COLUMN is_main_ingredient boolean NOT NULL DEFAULT false;</span>  ← every one of the 7,108 existing rows became false automatically — nothing was guessed or backfilled by this migration alone</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why a plain boolean instead of a rank or weight column?</div>
+            <div class="dd-why-a">The rule for deciding which ingredient "dominates" a dish (by weight, by listing order, or a curated list) was still unratified at migration time — a rank/weight column would have presupposed one specific rule. A boolean is the minimum structure that works under any of them, including multiple true rows per dish.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why can't the dedup key fully guarantee no double-counted event?</div>
+            <div class="dd-why-a">The events table is partitioned by month, and Postgres requires the partition key inside any unique index on a partitioned table — so the DB-level guarantee only holds within one partition. The Founder approved a two-layer design: this index for the common case, plus a 24-hour app-level lookback check (not yet built) for the rare cross-partition case.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s29-fd12-fix" onclick="toggleDetail('s29-fd12-fix')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">FD-12 data fix — Multi-Regional cuisine</span>
+          </div>
+          <span class="detail-chevron" id="chev-s29-fd12-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s29-fd12-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Gives 7 combo dishes that genuinely span more than one regional cuisine (Kerala Rice Meals, Biryani Raita, Chole Bhature, Dosa Sambar, Masala Dosa Set, Poha Jalebi, Puri Aloo) a real cuisine value instead of none.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">insert 'multi_regional' into cuisines</span><span class="dd-arrow">→</span>
+            <span class="dd-node">update cuisine_id on 7 named combos</span><span class="dd-arrow">→</span>
+            <span class="dd-node">verified: 35 combos total, unchanged; cuisines 65→66</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">cuisines count 65→66 (exactly one new row)</span>  ← live-verified, not assumed — nothing else was added or removed</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not fix the 7 orphaned combos or the Kerala Rice Meals mistagging in the same pass?</div>
+            <div class="dd-why-a">Both were explicitly out of scope — the orphaned combos need a Founder deliverable (which dishes they should link to), and the Kerala Rice Meals mistagging needs human content review, not an automatic correction. Fixing them silently would have been exactly the kind of unauthorized scope creep this repository's governance forbids.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s29-fd11-load" onclick="toggleDetail('s29-fd11-load')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">DOC-P3-13 Main Ingredient Derivation Heuristic + main_ingredient_class tag data</span>
+          </div>
+          <span class="detail-chevron" id="chev-s29-fd11-load">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s29-fd11-load">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Loads the Founder's own main-ingredient classification for 810 dishes into the database (as `is_main_ingredient=true` rows and a new 14-value tag dimension), and writes down the general rule behind the Founder's reasoning so a future new dish can be classified without guessing.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">Founder dataset (810 dishes, reasoning included)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">802 matched exactly, 8 combos correctly excluded</span><span class="dd-arrow">→</span>
+            <span class="dd-node">842 pairs flagged true</span><span class="dd-arrow">→</span>
+            <span class="dd-node">pattern extracted into DOC-P3-13</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">The main ingredient is the one that defines the dish's culinary identity — not the one that dominates by weight, quantity, or ingredient-list position.</span>  ← the general rule extracted verbatim from the pattern in the Founder's own worked reasoning, not invented independently</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Is this heuristic allowed to override a Founder judgment call on an ambiguous future dish?</div>
+            <div class="dd-why-a">No — the document explicitly routes any case where the choice "felt arbitrary" (e.g. picking one vegetable among several) back to human review, the same way the Founder's own Medium-confidence rows are meant to be spot-checked rather than silently trusted.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s29-cold-start-addendum" onclick="toggleDetail('s29-cold-start-addendum')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">Cold Start Design Specification — Day-1 Swipe Blend (DRAFT)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s29-cold-start-addendum">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s29-cold-start-addendum">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Defines exactly how the ~10 dish swipes a user makes during onboarding affect their very first weekly plan, before this gets built — deliberately without inventing a new blending mechanism.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">onboarding swipes recorded as interaction_events</span><span class="dd-arrow">→</span>
+            <span class="dd-node">interaction_count crosses into the 1–10 tier</span><span class="dd-arrow">→</span>
+            <span class="dd-node">existing weight ladder shifts weight toward personal history automatically</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">swipes don't need a bespoke blend rule — they need to correctly count as history</span>  ← the core design decision: reuse the existing mechanism rather than invent a new one</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not design a dedicated swipe-weighting formula?</div>
+            <div class="dd-why-a">The existing weight ladder already handles low-confidence-at-low-interaction-count by giving history only 15% weight at this tier — a bespoke formula would duplicate a safeguard that already exists, and this repository's own governance treats inventing new mechanisms without evidence as the kind of assumption to avoid.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">With `main_ingredient_class` now populated, build the CandidateRepository adapter (the last WP-8F/8FA blocker) and prove it against the engine's real scoring/filtering code.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s29-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S29 = [
+      {
+        id: 'schema-evolution-batch',
+        label: 'Schema evolution batch (SER-002/003 + FD-12)',
+        steps: [
+          {
+            layer: 'Database',
+            tag: 'DB',
+            title: 'Apply migrations 031/032 live',
+            desc: 'Both Founder-approved SERs were applied directly against the live Supabase project, each re-verified afterward with a real query rather than trusted from the migration text.',
+            codeFlow: [ {chip:'database/migrations/031_dish_ingredients_main_ingredient_flag.sql'}, {label:'applied via'}, {chip:'mcp__supabase__apply_migration'}, {label:'verified via'}, {chip:'information_schema.columns'} ],
+            files: [
+              {path:'database/migrations/031_dish_ingredients_main_ingredient_flag.sql', desc:'Adds is_main_ingredient boolean to dish_ingredients'},
+              {path:'database/migrations/032_interaction_events_dedup_key.sql', desc:'Adds dedup_key uuid + partitioned unique index to interaction_events'},
+              {path:'database/rollback/031_dish_ingredients_main_ingredient_flag_rollback.sql', desc:'Undo script for migration 031'},
+              {path:'database/rollback/032_interaction_events_dedup_key_rollback.sql', desc:'Undo script for migration 032'}
+            ],
+            api: null,
+            db: {table:'dish_ingredients / interaction_events', op:'ALTER TABLE', note:'Both applied live, both re-verified with direct queries, 0 existing rows lost or altered in meaning'}
+          },
+          {
+            layer: 'Database',
+            tag: 'DB',
+            title: 'Load the Founder\'s main-ingredient dataset',
+            desc: 'Once the column existed, the Founder-supplied classification for 810 dishes was written into it as real data, not left as an empty structural placeholder.',
+            codeFlow: [ {chip:'Founder 810-dish dataset'}, {label:'matched against'}, {chip:'dishes (802/810 exact)'}, {label:'flagged in'}, {chip:'dish_ingredients.is_main_ingredient'} ],
+            files: [
+              {path:'docs/architecture/[ACTIVE]_DOC-P3-13_Main_Ingredient_Derivation_Heuristic_v1.0.md', desc:'The extracted general rule, for classifying future dishes without Founder input'}
+            ],
+            api: null,
+            db: {table:'dish_ingredients', op:'UPDATE', note:'842 (dish, ingredient) pairs set true — verified by direct count, not assumed from the batch job'}
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s29-flows', window.FEATURE_FLOWS_S29);
+    </script>
+
+  </div><!-- /page-s29 -->
+
+  <!-- ── Session 30 (WP-11 CandidateRepository adapter) ── -->
+  <div id="page-s30" class="page-content" style="display:none">
+
+    <div class="page-header">
+      <div class="page-title">S30 · CandidateRepository — the engine's first real data adapter, built and test-verified (WP-11)</div>
+      <div class="page-subtitle">The one piece the Recommendation Engine has needed since WP-8E — something that actually fetches real dishes out of the database — now exists, and a new test proves it works with the engine's real filtering and scoring code, not just a claim that it should.</div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 17, 2026<br>WP-11 · REPO-CERT-022</div>
+      </div>
+      <div class="session-card-desc"><code>SupabaseCandidateRepository</code> hydrates all 17 fields the engine needs for every candidate dish — straight from real columns where possible, joined and tie-broken where a dish has more than one tag value, and explicitly marked as a documented deferral or proxy where WP-8FA already said no better source exists. A new test file imports the engine's actual constraint-checking and scoring functions and runs them directly against this adapter's output — the specific claim last session's audit flagged as unverified. 71 tests total, 9 new, all passing. The adapter also surfaced a real content gap: 50 of 131 meal classes have no eligible dishes seeded yet, logged as an accepted interim decision (FD-14) rather than hidden.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">17</div><div class="stat-l">Fields hydrated</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">71/71</div><div class="stat-l">Tests passing</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">9</div><div class="stat-l">New tests this session</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">50/131</div><div class="stat-l">Classes with 0 seeded dishes</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s30','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s30','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s30','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s30-swim" class="view-pane active">
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">RE adapter</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s30','adapter')">
+            <div class="step-num num-purple">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">SupabaseCandidateRepository built</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Hydrates all 17 DishCandidate fields the engine needs, joined from real tables with one documented tie-break rule for multi-valued tags.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s30','tests')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Downstream compatibility proven by test</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">9 new tests import the engine's real constraint and scoring functions and run them directly against this adapter's output — no shim, no assumption.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ reads existing tables, no new migration</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">read-only</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s30','content-gap')">
+            <div class="step-num num-teal">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Content-seeding gap surfaced (FD-14)</span><span class="tag tag-cfg">Verified</span></div>
+              <div class="step-desc">50 of 131 meal classes have zero eligible dishes seeded — the "popular fallback" path, not the ideal path, will run most of the time until this is filled in.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">The other 8 read-port adapters (cohort resolution, priors, taste vector, personal history, bandit state, context multipliers, never-list, suppression), the two HTTP endpoints, and live-DB behavioral validation are all still open — none touched by this Work Package.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s30-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s30-adapter" onclick="toggleDetail('s30-adapter')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">supabase/functions/_shared/services/adapters/supabase-stores.ts — SupabaseCandidateRepository</span>
+          </div>
+          <span class="detail-chevron" id="chev-s30-adapter">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s30-adapter">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Implements both methods of the CandidateRepository port (getClassCandidates, getPopularFallback), fetching real dish rows and joining ingredients/tags/cuisine to fill every field the engine's scoring code expects — with flat queries and in-memory joins, since no foreign keys exist to support Supabase's relational-embedding shortcut.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">loadDishes / loadAllergenMarks / loadTags / loadCuisineGroups</span><span class="dd-arrow">→</span>
+            <span class="dd-node">assemble() joins them in memory</span><span class="dd-arrow">→</span>
+            <span class="dd-node">17-field DishCandidate returned</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">const MAIN_INGREDIENT_CLASS_PRIORITY = [...]</span>  ← applies DOC-P3-13's documented priority order verbatim when a dish has more than one main-ingredient tag, rather than picking one arbitrarily</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not use Supabase's relational-embedding query syntax (e.g. .select("ingredients(name)"))?</div>
+            <div class="dd-why-a">Verified via pg_constraint that no foreign key exists on dish_ingredients.ingredient_id, dish_tags.tag_id, or re_class_dish_options.dish_id — embedding syntax would silently fail to resolve. Flat queries plus in-memory joins were used instead, and this reasoning is recorded directly in the adapter's own code comment.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">What happens to fields with no real source at all?</div>
+            <div class="dd-why-a">seasonalAffinity always returns empty (WP-8FA already found no source exists anywhere) and hasNonHalalMeat uses a documented fail-closed proxy (hasPork OR mainIngredientClass='meat') — both explicitly labeled as deferrals/proxies in the code and this certificate, never silently presented as real data.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s30-tests" onclick="toggleDetail('s30-tests')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">supabase/functions/_tests/candidate_repository.test.ts (9 tests)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s30-tests">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s30-tests">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Tests the adapter against a fake Supabase query-builder chain (no live database) — and, crucially, also imports the engine's real applyHardConstraints and scoring functions and runs them directly against the adapter's fake-backed output.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">fake 3-dish fixture</span><span class="dd-arrow">→</span>
+            <span class="dd-node">SupabaseCandidateRepository.getClassCandidates()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">real applyHardConstraints() + contentMatch()/contextFit()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">9/9 pass</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">hexagonal architecture holds — applyHardConstraints runs on adapter output unmodified</span>  ← the actual test name; this is the literal claim WP-8E left unverified, now a passing test instead of an assertion in a report</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does this matter more than "the adapter type-checks"?</div>
+            <div class="dd-why-a">Type-checking only proves the shapes match; it doesn't prove the engine's actual filtering/scoring logic runs correctly against real adapter output. Importing and running the real functions closes that gap with a real, repeatable test rather than an inference.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s30-content-gap" onclick="toggleDetail('s30-content-gap')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Verified</span>
+            <span class="detail-name">re_class_dish_options coverage gap (FD-14)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s30-content-gap">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s30-content-gap">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Verified directly against the live schema that 50 of 131 meal classes have zero eligible dishes seeded, and the 81 populated classes average only 2.0 dishes each (7 at most) — while the engine's minimum candidate threshold is 3.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">live query: re_class_dish_options per class</span><span class="dd-arrow">→</span>
+            <span class="dd-node">50/131 classes = 0 rows</span><span class="dd-arrow">→</span>
+            <span class="dd-node">getPopularFallback becomes the dominant runtime path</span><span class="dd-arrow">→</span>
+            <span class="dd-node">logged as FD-14, not hidden</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">this is a content-seeding gap the adapter faithfully surfaces; it is not an adapter defect</span>  ← distinguishes "the code is right, the data behind it is incomplete" rather than blurring the two</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why ratify this as an accepted gap instead of blocking on it?</div>
+            <div class="dd-why-a">The precedent was already set by FD-07 (accepting the neutral cohort-prior fallback for now) — content-seeding is a separate, ongoing content task, not an engineering blocker to this Work Package's own completion, and pretending otherwise would stall unrelated engineering work waiting on a content backlog.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Remaining WP-8E debt, untouched here: the other 8 read-port adapters, the /v1/onboarding and /v1/recommendations HTTP endpoints, live-DB behavioral validation, plan-persistence atomicity, and add-on generation (LF-C/FD-06).</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s30-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S30 = [
+      {
+        id: 'candidate-repository-adapter',
+        label: 'CandidateRepository adapter',
+        steps: [
+          {
+            layer: 'App logic',
+            tag: 'HOOK',
+            title: 'Hydrate 17 DishCandidate fields from real tables',
+            desc: 'Flat queries against dishes, dish_ingredients, dish_tags, and cuisines are joined in memory (no foreign keys exist to support relational embedding) into the exact shape the engine expects.',
+            codeFlow: [ {chip:'adapters/supabase-stores.ts: SupabaseCandidateRepository'}, {label:'joins'}, {chip:'dishes + dish_ingredients + dish_tags + cuisines'}, {label:'returns'}, {chip:'DishCandidate[]'} ],
+            files: [
+              {path:'supabase/functions/_shared/services/adapters/supabase-stores.ts', desc:'SupabaseCandidateRepository class + private join/hydration helpers'}
+            ],
+            api: null,
+            db: {table:'dishes / dish_ingredients / dish_tags / cuisines', op:'SELECT', note:'Read-only, no schema or data change — reads columns populated in S29'}
+          },
+          {
+            layer: 'App logic',
+            tag: 'HOOK',
+            title: 'Prove compatibility with the real engine functions',
+            desc: 'The new test imports applyHardConstraints and scoring.ts\'s contentMatch/contextFit directly and runs them against the adapter\'s fake-backed output with zero shimming.',
+            codeFlow: [ {chip:'candidate_repository.test.ts'}, {label:'imports'}, {chip:'services/re/constraints.ts'}, {label:'and'}, {chip:'services/re/scoring.ts'} ],
+            files: [
+              {path:'supabase/functions/_tests/candidate_repository.test.ts', desc:'9 tests: field hydration, tie-break, hard-constraint and scoring compatibility'}
+            ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s30-flows', window.FEATURE_FLOWS_S30);
+    </script>
+
+  </div><!-- /page-s30 -->
+
+  <!-- ── Session 31 (WP-12 Planning Semantics Architecture batch) ── -->
+  <div id="page-s31" class="page-content" style="display:none">
+
+    <div class="page-header">
+      <div class="page-title">S31 · Planning Semantics Architecture — a new design for handling a household's many needs at once (WP-12)</div>
+      <div class="page-subtitle">Four Founder-approved documents replace the idea of hand-listing every possible combination of household conditions with a small, stable catalogue plus a rules layer that reads each member's real conditions and decides what to do about each one.</div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was committed this session</div>
+        <div class="session-card-meta">July 17, 2026<br>WP-12 · REPO-CERT-023 · FD-15</div>
+      </div>
+      <div class="session-card-desc">Four documents from the claude.ai Planning Semantics design track were committed: the two-layer architecture itself (a small composition catalogue plus a conditions-to-routing rules layer), a full classification of all 41 existing personas into that new model, the 8 shared rules that replace 92 hand-attached class lists, and the underlying reasoning model — how FooFoo decides whether a household member's condition gets absorbed into the main meal, swapped for a variant, or added as an extra dish. Before committing, all four were cross-checked together as one architecture; one real contradiction was found (two documents disagreed on whether a design question was still open) and fixed. This is documentation only — no code, schema, or data changed — but it hands off a concretely scoped next engineering step.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">4</div><div class="stat-l">New architecture docs</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">41</div><div class="stat-l">Personas reclassified</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">92→8</div><div class="stat-l">Class lists → shared rules</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Code/schema/data changes</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s31','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s31','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s31','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s31-swim" class="view-pane active">
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">architecture docs</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s31','architecture-docs')">
+            <div class="step-num num-purple">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Four Planning Semantics documents committed</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Architecture, persona decomposition catalogue, shared attribute-to-class rules, and the reasoning model — placed under docs/architecture/ with encoding corrections applied.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s31','baseline-review')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Final Architecture Baseline Review</span><span class="tag tag-cfg">Verified</span></div>
+              <div class="step-desc">All four documents reviewed together as one architecture; one real cross-document contradiction found and fixed before commit.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s31','fd15-governance')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">FD-15 ratified + CDM cross-reference</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Founder Decision Register gets a new ratified entry; the Conceptual Domain Model gets a one-line pointer to the new catalogue, not a rewrite.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Phase 2 — fix household_members.segment to actually store multiple conditions, built directly against these four documents. FD-06 (LF-C build-order sequencing) remains a separate, still-open question.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s31-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s31-architecture-docs" onclick="toggleDetail('s31-architecture-docs')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">4 new docs/architecture/ files — Planning Semantics Architecture, Persona Decomposition Catalog, Attribute-to-Class Rules, Planning Model</span>
+          </div>
+          <span class="detail-chevron" id="chev-s31-architecture-docs">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s31-architecture-docs">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Replaces the flat 41-persona/8-segment approach with two layers: a small composition catalogue (~5 archetypes, who is actually planning) plus a conditions layer that reads each member's real tags and routes each one of three ways — absorbed into the main meal, swapped for a variant, or added as an extra dish.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">Persona_Master_v3 (41 rows)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">classified into ~8 composition + ~22 condition + ~7 diet + 2 region rows</span><span class="dd-arrow">→</span>
+            <span class="dd-node">92 class lists collapsed to 8 shared rules + ~12 specializations</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">the same condition can route differently in different households</span>  ← the core design principle (Architecture §9b) that rules out persisting a fixed per-condition channel anywhere in the schema</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not keep the existing 41-persona/8-segment vocabulary and just add more rows?</div>
+            <div class="dd-why-a">FD-15 found that approach was the exact anti-pattern it was designed to eliminate — every new compound case (elderly AND diabetic AND recovering) would need its own hand-written combination row, which doesn't scale and duplicates the same underlying rule dozens of times.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s31-baseline-review" onclick="toggleDetail('s31-baseline-review')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Verified</span>
+            <span class="detail-name">Final Architecture Baseline Review</span>
+          </div>
+          <span class="detail-chevron" id="chev-s31-baseline-review">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s31-baseline-review">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A coherence pass across all four documents together, asking one question: could a new engineer implement Phase 2 from these documents alone, without going back to the original research spreadsheet?</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">read all 4 docs as one architecture</span><span class="dd-arrow">→</span>
+            <span class="dd-node">found: Architecture doc says 2 questions "remain open," Catalog already answers both</span><span class="dd-arrow">→</span>
+            <span class="dd-node">Architecture §8 updated to cross-reference the Catalog's answers</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">Verdict: READY WITH MINOR DOCUMENTATION NOTES</span>  ← the review's own conclusion after fixing the one real contradiction it found</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why run a cross-document review at all, if each document was already Founder-approved individually?</div>
+            <div class="dd-why-a">Four documents drafted in the same session can still individually be correct yet contradict each other on a shared question — exactly what happened here. A same-session sign-off pass catches that class of defect before a future engineer hits it mid-implementation.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s31-fd15-governance" onclick="toggleDetail('s31-fd15-governance')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Founder_Decision_Register (FD-15) + DOC-P3-02 cross-reference</span>
+          </div>
+          <span class="detail-chevron" id="chev-s31-fd15-governance">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s31-fd15-governance">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Records the Founder's ratification of the new architecture as FD-15 (citing all four documents), marks the household_members.segment vocabulary blocker from WP-8E as resolved-by-direction, and adds a one-line pointer in the Conceptual Domain Model rather than rewriting it.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">FD-15 added to §7</span><span class="dd-arrow">→</span>
+            <span class="dd-node">Decision Index / Sign-off Register / Version History updated</span><span class="dd-arrow">→</span>
+            <span class="dd-node">DOC-P3-02 Entity 3 gets one "See also" line</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">the CDM's persona/segment sections are superseded on this topic pending the CDM's own future revision</span>  ← an honest pointer, not a silent rewrite of a still-ACTIVE document's substance</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just rewrite DOC-P3-02's persona/segment section directly?</div>
+            <div class="dd-why-a">This repository's own convention forbids rewriting a still-ACTIVE document's substance without that document's own versioned revision — a cross-reference pointer respects that boundary while still making the new source of truth findable.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Phase 2 (household_members.segment → conditions schema fix) is the specified next engineering Work Package, built directly against these four ratified documents.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s31-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S31 = [
+      {
+        id: 'planning-semantics-architecture',
+        label: 'Planning Semantics Architecture batch',
+        steps: [
+          {
+            layer: 'App logic',
+            tag: 'POLICY',
+            title: 'Commit four ratified design documents',
+            desc: 'The composition catalogue, the persona decomposition, the shared attribute-to-class rules, and the reasoning model are placed at their naming-standard-compliant paths, with mojibake encoding corrected during commit (no wording changed).',
+            codeFlow: [ {chip:'claude.ai Planning Semantics session output'}, {label:'encoding-corrected, committed to'}, {chip:'docs/architecture/'} ],
+            files: [
+              {path:'docs/architecture/[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md', desc:'The two-layer redesign: composition catalog + conditions/routing rules layer'},
+              {path:'docs/architecture/[ACTIVE]_Phase1_Persona_Decomposition_Catalog_v1.0.md', desc:'All 41 personas classified into the new model'},
+              {path:'docs/architecture/[ACTIVE]_Phase1B_Attribute_to_Class_Rule_Extraction_v1.0.md', desc:'92 class lists collapsed into 8 shared rules'},
+              {path:'docs/architecture/[ACTIVE]_Canonical_Planning_Model_v1.0.md', desc:'The reasoning model: safety-first ordering, three-channel routing, stress-test households'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'App logic',
+            tag: 'POLICY',
+            title: 'Ratify FD-15 and cross-reference the CDM',
+            desc: 'The Founder Decision Register and the Conceptual Domain Model are updated additively to point at the new architecture as the baseline for future engineering.',
+            codeFlow: [ {chip:'docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md'}, {label:'+FD-15'}, {chip:'docs/architecture/[ACTIVE]_DOC-P3-02_Conceptual_Domain_Model_v1.1.md'}, {label:'+see-also line'} ],
+            files: [
+              {path:'docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md', desc:'FD-15 entry added — resolves the household_members.segment blocker by direction'}
+            ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s31-flows', window.FEATURE_FLOWS_S31);
+    </script>
+
+  </div><!-- /page-s31 -->
+
+  <!-- ── Session 32 (WP-13 household_members conditions vocabulary) ── -->
+  <div id="page-s32" class="page-content" style="display:none">
+
+    <div class="page-header">
+      <div class="page-title">S32 · Household members can carry more than one condition at once — migration authored, not yet switched on (WP-13)</div>
+      <div class="page-subtitle">Building on last session's architecture decision, the schema change it calls for was written and locally verified — but deliberately not run against the live database without a separate, explicit go-ahead.</div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was authored this session</div>
+        <div class="session-card-meta">July 18, 2026<br>WP-13 · REPO-CERT-024 · SER-004</div>
+      </div>
+      <div class="session-card-desc"><code>household_members.segment</code> (one single-choice label per member, 8 possible values) becomes <code>conditions</code> (a list of 0 or more, from a 15-value vocabulary) — so one person can be tagged elderly, diabetic, and recovering all at the same time, matching what last session's architecture said was required. The 15-value vocabulary was derived directly from a live database query, not retyped from memory. Migration 033 and its rollback were written, three TypeScript files and two test files updated to match, and the full local test suite re-run clean (71/71). A real bug in the rollback script's statement order was caught and fixed before it could ever cause harm. The one thing this session deliberately did not do: actually apply migration 033 to the live database — that step needs your explicit, separate confirmation.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">15</div><div class="stat-l">Condition vocabulary values</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">71/71</div><div class="stat-l">Tests passing</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">5</div><div class="stat-l">Files updated</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Migrations applied live</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s32','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s32','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s32','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s32-swim" class="view-pane active">
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">code + tests</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s32','orchestrator')">
+            <div class="step-num num-purple">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Onboarding orchestrator + RE types updated</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">segment: string becomes conditions: string[] everywhere it's used, plus a new guard against contradictory age-band tags on the same member.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s32','tests')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Tests updated, full suite re-run clean</span><span class="tag tag-cfg">Verified</span></div>
+              <div class="step-desc">re_core.test.ts and re_integration.test.ts fixtures switched to the new array shape; 71/71 tests pass, no regressions.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ authored and locally verified, not yet applied</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">not yet live</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s32','migration033')">
+            <div class="step-num num-teal">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Migration 033 + rollback written, not applied</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">Converts segment (scalar) to conditions (array) with a 15-value CHECK constraint. Written and locally verified against live schema introspection, but execution against the real database is explicitly withheld pending Founder confirmation.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Get explicit Founder go-ahead to run migration 033 against the live database, then re-run 900_structural_validation.sql (impossible until the migration is actually applied). Future SERs already flagged: cook-capability/economic re-homing, the LF-C/Planning Engine routing design, and a documentation realignment pass on DOC-P3-04/06/03.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s32-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s32-orchestrator" onclick="toggleDetail('s32-orchestrator')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">supabase/functions/_shared/services/onboarding/orchestrator.ts, adapters/supabase-stores.ts, re/types.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s32-orchestrator">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s32-orchestrator">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Every place that read or wrote a member's single segment value now reads/writes a list of conditions instead, and a new function rejects a request where one member is tagged with more than one mutually-exclusive age band at once.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">OnboardingAnswers.members[].conditions: string[]</span><span class="dd-arrow">→</span>
+            <span class="dd-node">assertNoConflictingLifeStageTags() validates</span><span class="dd-arrow">→</span>
+            <span class="dd-node">persistHouseholdMembers() writes the array</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">export function assertNoConflictingLifeStageTags(conditions: readonly string[]): void</span>  ← a structural input-validation guard, not a scoring or routing decision — it just rejects a malformed request before it's ever saved</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does this guard exclude picky_child, elderly_member, and pregnant_member from its exclusivity check?</div>
+            <div class="dd-why-a">The Canonical Planning Model's own stress test ("Elderly couple + Recovery") shows those conditions legitimately co-occurring with an age band or with each other on the same member — the guard only blocks combinations that are genuinely contradictory (like toddler and teen_high_appetite on one person), not ones the ratified architecture already expects to coexist.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s32-tests" onclick="toggleDetail('s32-tests')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Verified</span>
+            <span class="detail-name">re_core.test.ts, re_integration.test.ts — updated fixtures</span>
+          </div>
+          <span class="detail-chevron" id="chev-s32-tests">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s32-tests">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Every test fixture using the old segment: "TODDLER" shape was rewritten to conditions: ["toddler"] (array, lowercase, matching the new vocabulary) and the full local suite re-run to confirm nothing broke.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">grep -rn "segment" supabase/functions/</span><span class="dd-arrow">→</span>
+            <span class="dd-node">zero remaining functional references</span><span class="dd-arrow">→</span>
+            <span class="dd-node">deno task verify: fmt/lint/check/test all pass, 71/71</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">71 passed / 0 failed</span>  ← counted directly from the repository's own test files (9 test files × Deno.test occurrences), matching the certificate's claim exactly</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why sweep the whole codebase for "segment" instead of just fixing the files known to use it?</div>
+            <div class="dd-why-a">A rename this central can leave a stray reference anywhere; a full-codebase grep is the only way to be sure zero functional references remain, rather than trusting the list of "files I remember touching."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s32-migration033" onclick="toggleDetail('s32-migration033')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">database/migrations/033_household_members_conditions_vocabulary.sql (+ rollback)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s32-migration033">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s32-migration033">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Converts household_members.segment from a single scalar value to conditions, a list of zero or more values from a 15-word canonical vocabulary — written and locally verified, but not yet run against the live database.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">live introspection: 0 rows, constraint name confirmed</span><span class="dd-arrow">→</span>
+            <span class="dd-node">ALTER COLUMN ... TYPE text[] USING ARRAY[segment]</span><span class="dd-arrow">→</span>
+            <span class="dd-node">RENAME to conditions</span><span class="dd-arrow">→</span>
+            <span class="dd-node">new 15-value CHECK constraint</span><span class="dd-arrow">→</span>
+            <span class="dd-node">awaiting Founder go-ahead to apply</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">CHECK (conditions <@ ARRAY[15 values]::text[] AND cardinality(conditions) >= 0)</span>  ← allows zero conditions as the normal case, unlike the meal-class array precedent (025/026) which required at least one value</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why was migration 033 not simply run this session, since it was already written and verified?</div>
+            <div class="dd-why-a">The session's own tooling classified direct execution against the connected production Supabase project as a hard-to-reverse, shared-system action requiring explicit confirmation beyond the general task framing — the same standing rule this repository applies to any risky action. Writing, verifying, and stopping to ask is treated as the complete, correct outcome for this step, not an unfinished one.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">What real bug was caught before it could cause harm?</div>
+            <div class="dd-why-a">An early draft of the rollback script added the old scalar CHECK constraint before converting the column back from array to scalar type — which doesn't type-check against an array column. Caught during self-review and corrected to the right statement order, with the residual data-loss caveats documented inline rather than silently fixed and forgotten.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Apply migration 033 once explicitly authorized, then re-run 900_structural_validation.sql against the new shape. Three future SERs are already flagged and waiting: cook-capability/economic-behavioral re-homing, the LF-C/Planning Engine routing design (which must treat six of the fifteen conditions' natural expiry as a first-class input), and the DOC-P3-04/06/03 documentation realignment pass.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s32-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S32 = [
+      {
+        id: 'household-conditions-vocabulary',
+        label: 'Household members conditions vocabulary (SER-004)',
+        steps: [
+          {
+            layer: 'Database',
+            tag: 'DB',
+            title: 'Author migration 033 against a live-verified schema',
+            desc: 'Every assumption (constraint name, row count, dependent views/functions, the target vocabulary) was re-confirmed by direct read-only introspection before a single line of DDL was written.',
+            codeFlow: [ {chip:'psql introspection (read-only)'}, {label:'confirms'}, {chip:'household_members_segment_check, 0 rows'}, {label:'informs'}, {chip:'database/migrations/033_household_members_conditions_vocabulary.sql'} ],
+            files: [
+              {path:'database/migrations/033_household_members_conditions_vocabulary.sql', desc:'Forward migration: segment (scalar) to conditions (array, 15-value CHECK)'},
+              {path:'database/rollback/033_household_members_conditions_vocabulary_rollback.sql', desc:'Companion rollback, with an ordering bug caught and fixed before use'},
+              {path:'docs/governance/[ACTIVE]_SER-004_household_members_conditions_vocabulary_v1.0.md', desc:'The finalized Schema Evolution Request this migration implements exactly'}
+            ],
+            api: null,
+            db: {table:'household_members', op:'ALTER TABLE (authored, not yet applied)', note:'Awaiting explicit Founder confirmation before execution against the live database'}
+          },
+          {
+            layer: 'App logic',
+            tag: 'HOOK',
+            title: 'Update every dependent line of code and test',
+            desc: 'Three TypeScript files and two test files were updated to the new array shape, then the full local suite was re-run to confirm no regression.',
+            codeFlow: [ {chip:'onboarding/orchestrator.ts'}, {label:'+'}, {chip:'adapters/supabase-stores.ts'}, {label:'+'}, {chip:'re/types.ts'}, {label:'verified by'}, {chip:'deno task verify'} ],
+            files: [
+              {path:'supabase/functions/_shared/services/onboarding/orchestrator.ts', desc:'conditions: string[] replaces segment: string; new life-stage conflict guard'},
+              {path:'supabase/functions/_shared/services/re/types.ts', desc:'HouseholdMember.conditions: string[] replaces segment: string'}
+            ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s32-flows', window.FEATURE_FLOWS_S32);
+    </script>
+
+  </div><!-- /page-s32 -->
 
   <!-- SESSIONS_INJECT -->
 
