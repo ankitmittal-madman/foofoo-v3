@@ -45,6 +45,14 @@
 --   SER-004 §8/Architecture §9b, routing is derived dynamically by the future Planning Engine,
 --   not a static property of a condition. No schema surface for it exists here or is implied.
 
+-- Must run BEFORE the type change below: Postgres re-validates every existing constraint that
+-- references a column during ALTER COLUMN ... TYPE. Leaving this CHECK (built for a scalar
+-- text column: segment = ANY (ARRAY[...])) in place while converting to text[] produces
+-- "ERROR: operator does not exist: text[] = text" — caught by live execution, not static review,
+-- in a prior deployment attempt. Fixed here by dropping it first.
+ALTER TABLE public.household_members
+  DROP CONSTRAINT household_members_segment_check;
+
 ALTER TABLE public.household_members
   ALTER COLUMN segment TYPE text[] USING ARRAY[segment];
 
@@ -53,9 +61,6 @@ ALTER TABLE public.household_members
 
 ALTER TABLE public.household_members
   ALTER COLUMN conditions SET DEFAULT '{}';
-
-ALTER TABLE public.household_members
-  DROP CONSTRAINT household_members_segment_check;
 
 ALTER TABLE public.household_members
   ADD CONSTRAINT household_members_conditions_check

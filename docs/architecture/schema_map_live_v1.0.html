@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FooFoo — Live Database Schema Map v1.0</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1b2436; --border:#2a3550; --text:#e8ecf5;
+    --dim:#8b96b3; --pk:#f5c451; --fk:#61a0ff; --check:#7ee0a8; --re:#c792ea; --pub:#6ec6ff;
+    --warn:#ff6b6b; --warnbg:#3a1f24;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45;}
+  header{padding:24px 32px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#141a29,#0f1420);}
+  header h1{margin:0 0 6px;font-size:22px;}
+  header p{margin:2px 0;color:var(--dim);font-size:13px;}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin-right:6px;}
+  .badge.re{background:rgba(199,146,234,.18);color:var(--re);border:1px solid rgba(199,146,234,.4);}
+  .badge.pub{background:rgba(110,198,255,.15);color:var(--pub);border:1px solid rgba(110,198,255,.4);}
+  .warnbox{margin:16px 32px;padding:14px 18px;background:var(--warnbg);border:1px solid var(--warn);border-radius:8px;color:#ffd7d7;font-size:13px;}
+  .warnbox b{color:var(--warn);}
+  nav{padding:10px 32px;background:#12182a;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;font-size:13px;}
+  nav a{color:var(--dim);text-decoration:none;margin-right:16px;}
+  nav a:hover{color:var(--text);}
+  main{padding:24px 32px 80px;}
+  section{margin-bottom:44px;}
+  h2{font-size:17px;border-left:4px solid var(--fk);padding-left:10px;margin:0 0 14px;}
+  h3{font-size:14px;color:var(--dim);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.04em;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .card.re{border-color:rgba(199,146,234,.35);}
+  .card.pub{border-color:rgba(110,198,255,.3);}
+  .card .hd{padding:10px 14px;background:var(--panel2);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .card .hd .name{font-weight:600;font-size:13px;font-family:ui-monospace,Consolas,monospace;}
+  .card .hd .rows{font-size:11px;color:var(--dim);white-space:nowrap;}
+  .card .cols{padding:8px 14px 12px;font-size:12px;font-family:ui-monospace,Consolas,monospace;}
+  .col{display:flex;gap:6px;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,.04);}
+  .col:last-child{border-bottom:none;}
+  .col .cn{color:var(--text);min-width:150px;}
+  .col .ct{color:var(--dim);flex:1;}
+  .tag{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;letter-spacing:.03em;}
+  .tag.pk{background:rgba(245,196,81,.15);color:var(--pk);border:1px solid rgba(245,196,81,.4);}
+  .tag.fk{background:rgba(97,160,255,.15);color:var(--fk);border:1px solid rgba(97,160,255,.4);}
+  .fks{padding:8px 14px 12px;border-top:1px solid var(--border);font-size:11.5px;}
+  .fks .fk-row{color:var(--dim);padding:2px 0;}
+  .fks .fk-row b{color:var(--fk);font-family:ui-monospace,Consolas,monospace;font-weight:600;}
+  .flow{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px 22px;font-size:13px;}
+  .flow .step{display:flex;align-items:center;gap:10px;margin:6px 0;flex-wrap:wrap;}
+  .step .box{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:ui-monospace,Consolas,monospace;font-size:12px;}
+  .step .arrow{color:var(--dim);}
+  .gapline{color:var(--warn);font-weight:600;}
+  .okline{color:var(--check);font-weight:600;}
+  table.simple{border-collapse:collapse;width:100%;font-size:12.5px;margin-top:8px;}
+  table.simple th,table.simple td{border:1px solid var(--border);padding:6px 10px;text-align:left;}
+  table.simple th{background:var(--panel2);color:var(--dim);font-weight:600;}
+  code{background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:12px;}
+  footer{padding:20px 32px;color:var(--dim);font-size:11px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>FooFoo — Live Database Schema Map <span style="color:var(--dim);font-weight:400;">v1.0</span></h1>
+  <p><span class="badge re">re_engine schema</span><span class="badge pub">public schema</span> Generated from a live <code>mcp__supabase__list_tables(verbose=true)</code> + <code>pg_constraint</code> read on 2026-07-17. This reflects the DATABASE AS IT ACTUALLY EXISTS right now — not the Conceptual Domain Model, not intended design. No fixes or mappings proposed.</p>
+  <p>Companion document: see the Wave-1.5-style findings report delivered alongside this file for the full persona/cohort/add-on/overlay investigation this map supports.</p>
+</header>
+
+<div class="warnbox">
+  <b>Unrelated security advisory surfaced during this read-only pass (not part of the requested investigation, reported per tool policy):</b>
+  35 of 35 tables in the <code>re_engine</code> schema have Row Level Security <b>disabled</b> and are fully exposed to the anon/authenticated Supabase roles. This was surfaced by the live <code>list_tables</code> call itself, not solicited. No remediation was applied — this is a report-only surfacing, exactly as CLAUDE.md's audit-rls skill would flag it, for Founder awareness.
+</div>
+
+<nav>
+  <a href="#flow">Persona→Cohort→Plan flow</a>
+  <a href="#addon-flow">Add-on flow &amp; the gap</a>
+  <a href="#re-engine">re_engine tables</a>
+  <a href="#public">public tables</a>
+</nav>
+
+<main>
+
+<section id="flow">
+  <h2>1. Persona → Cohort → Weekly Class Plan (the real, live join path)</h2>
+  <div class="flow">
+    <div class="step">
+      <span class="box">re_main_cohorts (5 rows)</span><span class="arrow">←FK cohort_code←</span>
+      <span class="box">re_subcohorts (41 rows)</span>
+    </div>
+    <div class="step">
+      <span class="box">re_persona_assignment_rules (41 rows)</span>
+      <span class="arrow">— FKs to →</span>
+      <span class="box">main_cohort_code</span>
+      <span class="box">subcohort_code (nullable)</span>
+      <span class="box">state_code (nullable, always NULL in live data)</span>
+      <span class="box">diet_type (plain text, no FK, always NULL in live data)</span>
+      <span class="arrow">→</span>
+      <span class="box">persona_id → re_personas.id</span>
+    </div>
+    <div class="step">
+      <span class="okline">Verified live:</span> every one of the 41 rows keys off <code>subcohort_code</code> alone —
+      <code>state_code</code> and <code>diet_type</code> are NULL on all 41 rows. The mapping is effectively
+      1 subcohort → 1 persona, not the "age band + lifecycle health + overlay" multi-factor derivation
+      DOC-P3-02 describes in prose.
+    </div>
+    <div class="step">
+      <span class="box">re_personas (41 rows)</span><span class="arrow">→</span>
+      <span class="box">re_cohorts (2,952 rows, persona_id + state_code + diet_mode + city_tier)</span>
+      <span class="arrow">→</span>
+      <span class="box">re_weekly_class_plans (20,664 rows: 2,952 cohorts × 7 days)</span>
+    </div>
+    <div class="step">
+      <span class="box">re_weekly_class_plans.{breakfast,lunch,dinner}_class_code</span><span class="arrow">→</span>
+      <span class="box">re_meal_classes.class_code (131 rows)</span>
+    </div>
+    <div class="step">
+      Runtime overlay found in code (<code>resolvers.ts:resolveWeeklyClassPlan</code>): the ONLY overlay
+      confirmed to change a <b>primary</b> class assignment is the non-veg cadence overlay
+      (<code>re_nonveg_logic</code>) — it swaps up to N weekly slots to a non-veg main class for
+      non_veg/egg households. No fitness/health/city overlay was found touching primary class selection
+      anywhere in <code>supabase/functions/</code>.
+    </div>
+  </div>
+</section>
+
+<section id="addon-flow">
+  <h2>2. Add-on structure &amp; the segment-vocabulary gap</h2>
+  <div class="flow">
+    <div class="step">
+      <span class="box">household_members.segment</span>
+      <span class="arrow">CHECK-constrained to 8 UPPER_SNAKE values:</span>
+      <code>INFANT, TODDLER, SCHOOL_CHILD, DIABETIC_ELDER, POSTPARTUM, FITNESS_OVERLAY, FASTING_MEMBER, ADULT_STANDARD</code>
+    </div>
+    <div class="step">
+      <span class="box">re_addon_classes.segment</span> / <span class="box">re_household_addon_plans.segment</span>
+      <span class="arrow">plain text, NO CHECK constraint, NO FK — 19 distinct live lower_snake_case values:</span>
+      <code>allergy_member, baby_6_18m, child_or_picky_child, cook_needs_instruction, diabetic_member, elderly_member,
+      fasting_member, gym_high_protein_member, hypertension_heart_member, jain_member,
+      lactating_or_postpartum_mother, picky_child, postpartum_mother, pregnant_member, recovery_member,
+      school_child, teen_high_appetite, toddler, weight_loss_member, working_kitchen_manager</code>
+    </div>
+    <div class="step gapline">
+      GAP — verified live: no FK, CHECK, or shared value exists between these two vocabularies
+      (case mismatch alone breaks equality: <code>TODDLER</code> vs <code>toddler</code>). No mapping/translation
+      table exists anywhere in <code>public</code> or <code>re_engine</code>.
+    </div>
+    <div class="step gapline">
+      GAP — verified in code: <code>supabase/functions/_shared/services/re/types.ts</code>'s
+      <code>HouseholdMember</code> interface carries only <code>segment / allergenFlags / isActive</code> — no
+      <code>dietType</code> field. <code>supabase-stores.ts:persistHouseholdMembers</code> writes only
+      <code>profile_id, member_name, segment, allergen_flags</code> — it never writes
+      <code>household_members.diet_type</code>. A grep for <code>"addon"</code> across all of
+      <code>supabase/functions/</code> returns exactly 2 hits, both comments stating add-ons are
+      "separate structures" not yet built — not one line of runtime addon-generation logic exists.
+    </div>
+    <div class="step">
+      <span class="box">public.addon_slots</span> — 0 live rows.
+      <span class="box">re_household_addon_plans</span> — 7,992 rows (cohort-level static config, not
+      per-household instance data: <code>cohort_id + segment → addon_class_code</code>).
+    </div>
+  </div>
+</section>
+
+<section id="re-engine">
+  <h2>3. re_engine schema — persona / cohort / add-on / class tables</h2>
+  <div class="grid">
+
+    <div class="card re"><div class="hd"><span class="name">re_main_cohorts</span><span class="rows">5 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">cohort_code</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">display_label</span><span class="ct">text</span></div>
+        <div class="col"><span class="cn">sort_order</span><span class="ct">int2</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">Referenced by: <b>re_subcohorts</b>, <b>re_personas</b>, <b>re_persona_assignment_rules</b> (all via cohort_code)</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_subcohorts</span><span class="rows">41 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">subcohort_code</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">main_cohort_code</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">description</span><span class="ct">text, nullable</span></div>
+      </div>
+      <div class="fks"><div class="fk-row"><b>main_cohort_code</b> → re_main_cohorts.cohort_code</div>
+      <div class="fk-row">Referenced by: <b>re_persona_assignment_rules.subcohort_code</b></div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_personas</span><span class="rows">41 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">persona_code</span><span class="ct">text, unique</span></div>
+        <div class="col"><span class="cn">main_cohort_code</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">display_name</span><span class="ct">text</span></div>
+        <div class="col"><span class="cn">primary_diet</span><span class="ct">text</span></div>
+        <div class="col"><span class="cn">is_active</span><span class="ct">bool</span></div>
+      </div>
+      <div class="fks"><div class="fk-row"><b>main_cohort_code</b> → re_main_cohorts.cohort_code</div>
+      <div class="fk-row">Referenced by: <b>re_cohorts.persona_id</b>, <b>re_persona_assignment_rules.persona_id</b>, <b>user_re_state.persona_id</b></div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_persona_assignment_rules</span><span class="rows">41 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">main_cohort_code</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">subcohort_code</span><span class="tag fk">FK, nullable</span></div>
+        <div class="col"><span class="cn">state_code</span><span class="tag fk">FK, nullable — always NULL live</span></div>
+        <div class="col"><span class="cn">diet_type</span><span class="ct">text, no FK — always NULL live</span></div>
+        <div class="col"><span class="cn">persona_id</span><span class="tag fk">FK</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">UNIQUE(main_cohort_code, subcohort_code, state_code, diet_type)</div>
+      <div class="fk-row"><b>persona_id</b> → re_personas.id</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_cohorts</span><span class="rows">2,952 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">cohort_id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">persona_id</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">state_code</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">diet_mode</span><span class="ct">text</span></div>
+        <div class="col"><span class="cn">prior_weight</span><span class="ct">float4</span></div>
+        <div class="col"><span class="cn">city_tier</span><span class="ct">'T1'|'T2', nullable</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">Referenced by: <b>re_cohort_class_priors</b>, <b>re_weekly_class_plans</b>, <b>re_household_addon_plans</b> (all via cohort_id)</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_weekly_class_plans</span><span class="rows">20,664 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">cohort_id</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">day_of_week</span><span class="ct">text</span></div>
+        <div class="col"><span class="cn">breakfast_class_code</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">lunch_class_code</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">dinner_class_code</span><span class="tag fk">FK</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">3 FKs → re_meal_classes.class_code; <b>cohort_id</b> → re_cohorts.cohort_id</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_meal_classes</span><span class="rows">131 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">class_code</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">slot</span><span class="ct">text[] (breakfast/lunch/dinner/snack)</span></div>
+        <div class="col"><span class="cn">day_type</span><span class="ct">weekday|weekend|any</span></div>
+        <div class="col"><span class="cn">planning_role</span><span class="ct">MAIN_PRIMARY | ADDON_ONLY_NOT_PRIMARY | COMBO_TEMPLATE_NOT_PRIMARY</span></div>
+        <div class="col"><span class="cn">weekday_fit_1_5 / weekend_fit_1_5</span><span class="ct">int2</span></div>
+        <div class="col"><span class="cn">variety_cooldown_days / max_per_week</span><span class="ct">int2, nullable</span></div>
+        <div class="col"><span class="cn">cuisine_family</span><span class="ct">text, nullable</span></div>
+        <div class="col"><span class="cn">diet_type</span><span class="ct">text, nullable</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">Referenced by: re_class_dish_options, re_cohort_class_priors, re_meal_class_overlap_rules, re_weekly_class_plans (×3)</div>
+      <div class="fk-row" style="color:var(--warn)">Note: 12 rows carry <code>planning_role='ADDON_ONLY_NOT_PRIMARY'</code> — a SECOND, structurally separate addon mechanism from re_addon_classes below.</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_class_dish_options</span><span class="rows">165 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">meal_class_code</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">dish_id</span><span class="ct">uuid, NOT FK-enforced in schema list</span></div>
+        <div class="col"><span class="cn">base_score</span><span class="ct">float4</span></div>
+        <div class="col"><span class="cn">is_primary_candidate</span><span class="ct">bool</span></div>
+      </div>
+      <div class="fks"><div class="fk-row"><b>meal_class_code</b> → re_meal_classes.class_code</div></div>
+    </div>
+
+    <div class="card re" style="border-color:var(--warn)"><div class="hd"><span class="name">re_addon_classes</span><span class="rows">24 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">addon_class_code</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">segment</span><span class="ct">text, NOT NULL, no FK, no CHECK — 19 distinct lower_snake_case values</span></div>
+        <div class="col"><span class="cn">slot</span><span class="ct">text, NOT NULL</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">Referenced by: re_addon_dish_options.addon_class_code, re_household_addon_plans.addon_class_code</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_addon_dish_options</span><span class="rows">6 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">addon_class_code</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">dish_id</span><span class="ct">uuid</span></div>
+        <div class="col"><span class="cn">suitability_rank</span><span class="ct">int2</span></div>
+      </div>
+      <div class="fks"><div class="fk-row" style="color:var(--warn)">Only 6 rows cover 24 addon classes — most addon classes have zero dish options.</div></div>
+    </div>
+
+    <div class="card re" style="border-color:var(--warn)"><div class="hd"><span class="name">re_household_addon_plans</span><span class="rows">7,992 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">segment</span><span class="ct">text, NOT NULL, no FK to re_addon_classes.segment</span></div>
+        <div class="col"><span class="cn">cohort_id</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">addon_class_code</span><span class="tag fk">FK</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">Cohort-level static config (cohort_id+segment→addon_class_code), NOT a per-household-instance assignment table.</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_city_migration_overlays</span><span class="rows">0 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">home_state</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">current_city</span><span class="ct">text</span></div>
+        <div class="col"><span class="cn">migration_duration_band</span><span class="ct">text</span></div>
+        <div class="col"><span class="cn">city_overlay_weight</span><span class="ct">float4</span></div>
+      </div>
+      <div class="fks"><div class="fk-row" style="color:var(--warn)">Table is empty (0 rows) — the "overlay" that IS a real table has no seeded data.</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_city_overlay_config</span><span class="rows">6 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">migration_band</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">city_overlay_weight</span><span class="ct">float4</span></div>
+      </div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_nonveg_logic</span><span class="rows">36 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">state_code</span><span class="tag pk">PK / FK</span></div>
+        <div class="col"><span class="cn">weekly_nonveg_slots</span><span class="ct">int2</span></div>
+        <div class="col"><span class="cn">preferred_slots</span><span class="ct">text[]</span></div>
+      </div>
+      <div class="fks"><div class="fk-row" style="color:var(--check)">Confirmed live consumer: resolvers.ts resolveWeeklyClassPlan() — the one overlay that changes PRIMARY class selection.</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">user_re_state</span><span class="rows">0 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">profile_id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">persona_id</span><span class="tag fk">FK, nullable</span></div>
+        <div class="col"><span class="cn">overlay_persona_ids</span><span class="ct">uuid[], default '{}'</span></div>
+        <div class="col"><span class="cn">confidence_score</span><span class="ct">float4, 0.35–1.0</span></div>
+        <div class="col"><span class="cn">cold_start_mode</span><span class="ct">bool</span></div>
+        <div class="col"><span class="cn">weight_tier / city_overlay_weight</span><span class="ct">text / float4, nullable</span></div>
+      </div>
+      <div class="fks"><div class="fk-row" style="color:var(--warn)">overlay_persona_ids and city_overlay_weight are persisted/read (supabase-stores.ts) but no grep hit in scoring.ts — no confirmed scoring consumer found in current code.</div></div>
+    </div>
+
+    <div class="card re"><div class="hd"><span class="name">re_cohort_class_priors</span><span class="rows">0 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">cohort_id</span><span class="tag pk">PK/FK</span></div>
+        <div class="col"><span class="cn">class_code</span><span class="tag pk">PK/FK</span></div>
+        <div class="col"><span class="cn">acceptance_rate_prior</span><span class="ct">float4, default 0.5</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="public">
+  <h2>4. public schema — content, household &amp; onboarding tables</h2>
+  <div class="grid">
+
+    <div class="card pub"><div class="hd"><span class="name">profiles</span><span class="rows">0 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK / FK→auth.users</span></div>
+        <div class="col"><span class="cn">home_state</span><span class="tag fk">FK→re_engine.re_states</span></div>
+        <div class="col"><span class="cn">migration_duration_band</span><span class="ct">6-value CHECK</span></div>
+        <div class="col"><span class="cn">city_overlay_weight</span><span class="ct">float4 0–1</span></div>
+        <div class="col"><span class="cn">diet_type</span><span class="ct">veg|non_veg|egg|vegan|jain</span></div>
+        <div class="col"><span class="cn">religious_pref</span><span class="ct">all|hindu_veg|jain|halal|no_beef|no_pork</span></div>
+        <div class="col"><span class="cn">allergen_flags</span><span class="ct">int4 bitfield</span></div>
+        <div class="col"><span class="cn">cook_capability</span><span class="ct">beginner|intermediate|advanced</span></div>
+      </div>
+      <div class="fks"><div class="fk-row" style="color:var(--check)">CHECK <code>jain_diet_consistency</code>: religious_pref='jain' ⇒ diet_type must be veg/jain. One-directional (religion constrains diet), NOT "diet_type overrides religion".</div></div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">household_members</span><span class="rows">0 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">profile_id</span><span class="tag fk">FK→profiles</span></div>
+        <div class="col"><span class="cn">segment</span><span class="ct">8-value CHECK, UPPER_SNAKE</span></div>
+        <div class="col"><span class="cn">diet_type</span><span class="ct">veg|non_veg|egg|vegan|jain, nullable — written by NO code path found</span></div>
+        <div class="col"><span class="cn">allergen_flags</span><span class="ct">int4</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">One row = one member with exactly one segment; a household (profile_id) CAN have multiple members with different segments — schema allows it. Whether downstream addon logic can act on more than one simultaneously is unverified/unbuilt (see report §4).</div></div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">dishes</span><span class="rows">802 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">diet_type</span><span class="ct">veg|non_veg|egg|vegan</span></div>
+        <div class="col"><span class="cn">is_jain</span><span class="ct">bool, nullable</span></div>
+        <div class="col"><span class="cn">parent_dish_id</span><span class="tag fk">FK→dishes.id — 0 of 802 rows populated</span></div>
+        <div class="col"><span class="cn">cuisine_id</span><span class="tag fk">FK→cuisines</span></div>
+        <div class="col"><span class="cn">food_dna_tier_1</span><span class="ct">'tier_1' (483) | 'tier_2' (319) — not a variant/combo/standard marker</span></div>
+        <div class="col"><span class="cn">genome_vector</span><span class="ct">float4[]</span></div>
+      </div>
+      <div class="fks"><div class="fk-row" style="color:var(--warn)">No column marks a dish as Variant/Combo/Standard. parent_dish_id exists structurally but is 100% unpopulated live.</div></div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">dish_combos</span><span class="rows">35 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">combo_type</span><span class="ct">inseparable | base_with_sides | thali</span></div>
+        <div class="col"><span class="cn">cuisine_id</span><span class="tag fk">FK, nullable</span></div>
+      </div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">dish_combo_items</span><span class="rows">64 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">combo_id, dish_id</span><span class="tag pk">composite PK/FK</span></div>
+        <div class="col"><span class="cn">role</span><span class="ct">primary|side|accompaniment</span></div>
+        <div class="col"><span class="cn">component_type</span><span class="ct">8-value CHECK</span></div>
+      </div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">dish_tags</span><span class="rows">11,297 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">dish_id, tag_id</span><span class="tag pk">composite PK/FK</span></div>
+        <div class="col"><span class="cn">confidence</span><span class="ct">float4 0–1, default 1.0</span></div>
+      </div>
+      <div class="fks"><div class="fk-row" style="color:var(--warn)">Live distribution: ALL 11,297 rows carry confidence = 1.0 exactly. No spread exists to distinguish AI-tagged from human-verified rows in current data.</div></div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">dish_ingredients</span><span class="rows">7,108 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">dish_id, ingredient_id</span><span class="tag pk">composite PK/FK</span></div>
+        <div class="col"><span class="cn">is_main_ingredient</span><span class="ct">bool — true: 842, false: 6,266</span></div>
+      </div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">addon_slots</span><span class="rows">0 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">plan_slot_id</span><span class="tag fk">FK→plan_slots</span></div>
+        <div class="col"><span class="cn">household_member_id</span><span class="tag fk">FK→household_members</span></div>
+        <div class="col"><span class="cn">addon_class_code</span><span class="ct">text, NOT FK-enforced here</span></div>
+        <div class="col"><span class="cn">dish_id</span><span class="tag fk">FK→dishes, nullable</span></div>
+      </div>
+      <div class="fks"><div class="fk-row" style="color:var(--warn)">This is the ONE table that could tie a specific household member to a specific addon dish. It is empty, and no code path writing to it was found.</div></div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">plan_slots</span><span class="rows">0 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">id</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">week_plan_id</span><span class="tag fk">FK</span></div>
+        <div class="col"><span class="cn">meal_slot</span><span class="ct">breakfast|lunch|dinner (no 'snack')</span></div>
+        <div class="col"><span class="cn">class_code</span><span class="tag fk">FK→meal_classes</span></div>
+        <div class="col"><span class="cn">selected_dish_id</span><span class="tag fk">FK, nullable</span></div>
+      </div>
+    </div>
+
+    <div class="card pub"><div class="hd"><span class="name">meal_classes</span><span class="rows">131 rows</span></div>
+      <div class="cols">
+        <div class="col"><span class="cn">class_code</span><span class="tag pk">PK</span></div>
+        <div class="col"><span class="cn">is_addon</span><span class="ct">bool, default false</span></div>
+      </div>
+      <div class="fks"><div class="fk-row">Public mirror of re_engine.re_meal_classes (per migration 018 "mirror_sync") — simpler, only a boolean is_addon flag rather than the 3-value planning_role.</div></div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h3>How to read the color coding</h3>
+  <table class="simple">
+    <tr><th>Marker</th><th>Meaning</th></tr>
+    <tr><td><span class="tag pk">PK</span></td><td>Primary key column</td></tr>
+    <tr><td><span class="tag fk">FK</span></td><td>Foreign key column, target named in the card or the FK panel below it</td></tr>
+    <tr><td><span class="gapline">Red text</span></td><td>A structural gap or disconnect verified live (empty table, orphaned column, mismatched vocabulary, no code consumer found)</td></tr>
+    <tr><td><span class="okline">Green text</span></td><td>A confirmed working, wired-up mechanism found in live code</td></tr>
+  </table>
+</section>
+
+</main>
+<footer>
+  Generated 2026-07-17 from live Supabase queries (list_tables verbose, pg_constraint, execute_sql) and a read-only grep of supabase/functions/. Row counts and code citations are as of that read; re-verify before relying on this for anything beyond the accompanying findings report. No fixes applied.
+</footer>
+</body>
+</html>
