@@ -394,7 +394,7 @@ function deepDiveFeature(featureLabel){
 
   <div class="sidebar-section">
     <div class="sidebar-section-label">Operating System</div>
-    <div class="nav-item active" onclick="showPage('exec')">
+    <div class="nav-item" onclick="showPage('exec')">
       <span class="nav-icon">🎛</span> Executive dashboard
     </div>
     <div class="nav-item" onclick="showPage('roadmap')">
@@ -566,6 +566,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🗄</span> S32 · Household conditions vocabulary (WP-13)
       <span class="nav-badge">Jul 18</span>
     </div>
+    <div class="nav-item active" onclick="showPage('s33')">
+      <span class="nav-icon">🗄</span> S33 · Migration 033 goes live + WP-9 gaps closed (FD-16/17)
+      <span class="nav-badge">Jul 19</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -596,7 +600,7 @@ function deepDiveFeature(featureLabel){
   <!-- ══════════ WP-K01 OPERATING SYSTEM LAYER (living pages — update in place, never append) ══════════ -->
 
   <!-- ── 01 · Executive Dashboard ── -->
-  <div id="page-exec" class="page-content">
+  <div id="page-exec" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">Executive dashboard</div>
       <div class="page-subtitle"><b>FooFoo</b> — an AI-powered meal-decision assistant for Indian households. A <b>class-first recommendation engine</b> (household → cohort → class plan → dish pool) built documentation-first on Supabase/PostgreSQL with Deno/TypeScript Edge Functions. Vision: <a href="docs/product/%5BACTIVE%5D_DOC-01_Product_Brief_v1.1.docx">DOC-01 Product Brief</a>.</div>
@@ -1543,6 +1547,20 @@ function deepDiveFeature(featureLabel){
         <div class="tl-note">Building on last session's architecture decision, the schema change it calls for was written: `household_members.segment` (one single-choice label per member) becomes `conditions` (a list, so one person can be elderly, diabetic, and recovering all at once). The new 15-word vocabulary was derived directly from a live database query, not retyped from memory, and every dependent line of code and both test files were updated to match — 71 tests still pass, zero failures. A real bug in the undo-script was caught and fixed before it could ever be run. The one thing this session deliberately did NOT do: actually run the migration against the live database — that step needs a separate, explicit go-ahead, and this session stopped and asked rather than just doing it.</div>
       </div>
     </div>
+    <div class="timeline-row">
+      <div class="tl-date">Jul 19, 2026</div>
+      <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+      <div class="tl-content">
+        <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S33</span>
+        <div class="tl-title">Migration 033 (household conditions) confirmed live in production; two long-open WP-9 documentation gaps permanently closed by Founder ruling</div>
+        <div class="tl-chips">
+          <span class="tl-chip" onclick="showPage('s33')">household_members.conditions live</span>
+          <span class="tl-chip" onclick="showPage('s33')">FD-16 ratified</span>
+          <span class="tl-chip" onclick="showPage('s33')">FD-17 ratified</span>
+        </div>
+        <div class="tl-note">S32 authored migration 033 and stopped short of running it, pending explicit Founder go-ahead. That go-ahead was given in a session that hit its usage limit before it could update this book — this session independently re-verified the live database (not just trusted the claim) and confirmed `household_members.conditions` and its 15-value CHECK constraint are exactly as SER-004 specified. Also closed: the seeds 101/102 rollback gap and the REPO-CERT-017 numbering skip, both flagged by WP-9 and now permanently accepted (FD-16/FD-17 in the Founder Decision Register) rather than left open indefinitely.</div>
+      </div>
+    </div>
     <!-- TIMELINE_INJECT -->
   </div>
 
@@ -1797,6 +1815,8 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file">docs/project-history/certificates/[ACTIVE]_REPO-CERT-024_WP-13_Household_Members_Conditions_Vocabulary_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S32</td><td class="fr-desc">Execution certificate — PARTIAL scope, live-DB application explicitly not certified</td></tr>
         <tr><td class="fr-file mono">supabase/functions/_shared/services/onboarding/orchestrator.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S32</td><td class="fr-desc">conditions: string[] replaces segment: string; new life-stage conflict guard</td></tr>
         <tr><td class="fr-file mono">supabase/functions/_shared/services/re/types.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S32</td><td class="fr-desc">HouseholdMember.conditions: string[] replaces segment: string</td></tr>
+        <tr><td class="fr-file">docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S33</td><td class="fr-desc">FD-16 (seeds 101/102 rollback gap, permanent acceptance) and FD-17 (REPO-CERT-017 numbering skip, permanent) added</td></tr>
+        <tr><td class="fr-file mono">KNOWLEDGE.html</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S33</td><td class="fr-desc">This session's own entry, correcting the record forward now that migration 033 is confirmed live (S32 itself is left untouched, per this book's own append-only rule)</td></tr>
         <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -1946,6 +1966,21 @@ function deepDiveFeature(featureLabel){
       <div class="decision-q">Why was migration 033 authored and verified but not applied to the live database in the same session?</div>
       <div class="decision-a">The session's own tooling classified direct execution against the connected production Supabase project as a hard-to-reverse, shared-system action requiring separate explicit confirmation, consistent with this repository's standing rule to pause before such actions rather than bundle them into a "write and run" task by default.</div>
       <div class="decision-meta">S32 · Jul 18</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">The task instructions this session claimed migration 033 was already deployed with a full transaction/commit/smoke-test trail — but S32 (this book's own last entry) said it was still awaiting go-ahead. Which one governs?</div>
+      <div class="decision-a">Neither claim was trusted blind. The live database was queried directly: `household_members.conditions` exists as a `text[]` column with exactly the 15-value CHECK constraint SER-004 specifies, and `033_household_members_conditions_vocabulary` appears in the live migration ledger dated 2026-07-19. The deployment is real — S32 was simply written moments before it happened and a later session (that hit its usage limit) applied it without updating this book. This session corrects the record forward rather than either blindly trusting the new claim or blindly trusting the stale one.</div>
+      <div class="decision-meta">S33 · Jul 19</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Should the seeds 101/102 rollback gap (WP-9 Medium Finding 1) finally get a rollback script authored, closing it the "normal" way?</div>
+      <div class="decision-a">No — Founder ruling (FD-16): the data those seeds loaded was illustrative and was already superseded/removed during REPO-CERT-009. Writing a rollback now would mean authoring teardown logic for rows that no longer exist in any live or intended state — that's fabricated remediation, not real recovery capability. The gap is accepted permanently instead.</div>
+      <div class="decision-meta">S33 · Jul 19</div>
+    </div>
+    <div class="decision-item">
+      <div class="decision-q">Should a REPO-CERT-017 be created retroactively just to fill the numbering gap WP-9 found?</div>
+      <div class="decision-a">No — Founder ruling (FD-17): 017 is a permanent, disclosed skip (a leftover from branch-numbering reservation, per WP-9 §0). Manufacturing a certificate with no real deliverable behind it would itself be a fabrication; renumbering the certificates that already exist (016, 018, 019) would break every cross-reference to them. The gap stays open by design, not by oversight.</div>
+      <div class="decision-meta">S33 · Jul 19</div>
     </div>
     <!-- DECISIONS_INJECT -->
   </div>
@@ -4094,6 +4129,224 @@ function deepDiveFeature(featureLabel){
     </script>
 
   </div><!-- /page-s32 -->
+
+  <div id="page-s33" class="page-content">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S33 · Migration 033 confirmed live + WP-9 gaps closed (FD-16/FD-17)</div>
+      <div class="page-subtitle">The household-conditions database change from last session is now confirmed running in production, and two long-open documentation gaps got a final, permanent ruling from the Founder.</div>
+    </div>
+
+    <!-- ── Summary card ── -->
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Jul 19, 2026<br>3 things touched</div>
+      </div>
+      <div class="session-card-desc">This session started by treating a claim of "already deployed" as something to verify, not trust — the last session's own knowledge-book entry (S32) said the opposite. A direct, read-only query against the live Supabase database settled it: migration 033 really is live, `household_members.conditions` carries exactly the 15-value constraint SER-004 specifies. Separately, two gaps WP-9's audit had flagged as open for months — the seeds 101/102 rollback gap and the REPO-CERT-017 numbering skip — were given a permanent Founder ruling (FD-16, FD-17) in the Founder Decision Register, so neither sits as an unresolved question indefinitely.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">0</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">1</div><div class="stat-l">DB change confirmed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+
+    <!-- ── View tabs ── -->
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s33','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s33','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s33','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s33-swim" class="view-pane active">
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s33','live-verify')">
+            <div class="step-num num-purple">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Verify the deployment claim against live evidence, not trust it</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Instead of assuming migration 033 was deployed just because this session's instructions said so, the live database was queried directly to check.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ live query result confirms the deployment really happened</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s33','live-verify')">
+            <div class="step-num num-teal">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">household_members.conditions confirmed live</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">The column is a text array with exactly the 15-value list SER-004 specified, and migration 033 shows up in the live migration ledger dated today.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ two separate documentation gaps get closed the same way — a real ruling, not a guess</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s33','fd16')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">FD-16: seeds 101/102 rollback gap accepted permanently</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The illustrative data those seeds loaded was already superseded and removed earlier in the project, so there's nothing left to write a rollback against.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s33','fd17')">
+            <div class="step-num num-purple">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">FD-17: REPO-CERT-017 numbering skip accepted permanently</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Certificate number 017 was never used; rather than invent a certificate for it or renumber the ones that exist, the gap is now formally accepted as permanent.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Next session box — always present -->
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Re-run `900_structural_validation.sql` and the behavioral smoke tests against the new `conditions` column shape for full closure evidence (not yet independently re-executed this session — only the schema/constraint were verified live). Then pick up wherever LF-C (member add-ons) or the remaining Pending FDs (FD-06, FD-07, FD-11, FD-12, FD-13) get prioritized next.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s33-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s33-live-verify" onclick="toggleDetail('s33-live-verify')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">Live verification: household_members.conditions</span>
+          </div>
+          <span class="detail-chevron" id="chev-s33-live-verify">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s33-live-verify">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Confirms, by querying the real production database directly, that migration 033 (authored last session but left unapplied, pending Founder go-ahead) actually ran — rather than taking either this session's instructions or last session's knowledge-book entry at their word.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">information_schema.columns query</span><span class="dd-arrow">→</span>
+            <span class="dd-node">conditions column is text[] (not segment/text)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">pg_constraint query</span><span class="dd-arrow">→</span>
+            <span class="dd-node">15-value CHECK matches SER-004 exactly</span><span class="dd-arrow">→</span>
+            <span class="dd-node">list_migrations shows 033 dated 2026-07-19</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">CHECK (conditions <@ ARRAY['baby_6_18m', ..., 'weight_loss_member'] AND cardinality(conditions) >= 0)</span>  ← the exact 15-word vocabulary, confirmed live, not assumed from the migration file alone</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why re-verify something the task instructions already stated as fact?</div>
+            <div class="dd-why-a">This book's own last entry (S32) stated the opposite — that the migration was written but explicitly not yet applied. Two contradictory claims about the same fact can't both be documented as true; a live, read-only query settles which one is actually correct instead of picking a side by trusting whichever source spoke more recently or more confidently.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s33-fd16" onclick="toggleDetail('s33-fd16')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">FD-16 — Founder_Decision_Register_v1.0.md</span>
+          </div>
+          <span class="detail-chevron" id="chev-s33-fd16">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s33-fd16">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Formally, permanently closes WP-9's Medium Finding 1 (seed files 101/102 have no rollback) with a dated Founder ruling, instead of leaving it as an open audit finding indefinitely.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">WP-9 flags the gap (2026-07-16)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">reason traced to REPO-CERT-009 (illustrative data removed)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">FD-16 added, Ratified, 2026-07-18</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">Final Decision: Ratified — Option (b). The seeds 101/102 rollback gap is accepted permanently.</span>  ← no rollback file will ever be authored for these two seeds</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just write the missing rollback and close the gap the normal way?</div>
+            <div class="dd-why-a">The data those seeds loaded was illustrative and was already superseded/removed during REPO-CERT-009. A rollback script would be teardown logic for rows that don't exist in any live or intended state — that's fabricated remediation, not real recovery capability, and this repository's own rules forbid inventing execution or history that didn't happen.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s33-fd17" onclick="toggleDetail('s33-fd17')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">FD-17 — Founder_Decision_Register_v1.0.md</span>
+          </div>
+          <span class="detail-chevron" id="chev-s33-fd17">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s33-fd17">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Formally, permanently closes the REPO-CERT-017 numbering question WP-9 raised (§0) — certificate number 017 was never filed, only referenced in a couple of stale commit messages.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">WP-9 finds 016/017 referenced in commit messages but not on disk</span><span class="dd-arrow">→</span>
+            <span class="dd-node">real certificates are 018/019, not 016/017</span><span class="dd-arrow">→</span>
+            <span class="dd-node">FD-17 added, Ratified, 2026-07-18</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">No certificate will be created to fill it, and no existing certificate (016, 018, 019, ...) will be renumbered.</span>  ← the skip stays permanent and disclosed, not silently patched over</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just create a REPO-CERT-017 to make the sequence look complete?</div>
+            <div class="dd-why-a">There's no real deliverable behind that number — manufacturing a certificate purely to fill a numeric gap would itself be a fabrication. Renumbering the certificates that do exist (016/018/019) would break every place that already cites them by number. A disclosed, permanent skip is more honest than either.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Re-run the structural/behavioral validation suite against the live `conditions` column for full closure evidence. Pick up LF-C (member add-ons) or one of the remaining Pending FDs next.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s33-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S33 = [
+      {
+        id: 'live-deployment-verification',
+        label: 'Verify migration 033 deployment (SER-004)',
+        steps: [
+          {
+            layer: 'Database',
+            tag: 'DB',
+            title: 'Query live schema and constraints directly',
+            desc: 'Rather than trust either the session instructions or the prior knowledge-book entry, the actual production database was queried read-only to see what is really there.',
+            codeFlow: [ {chip:'information_schema.columns (live query)'}, {label:'+'}, {chip:'pg_constraint (live query)'}, {label:'+'}, {chip:'list_migrations (live query)'} ],
+            files: [
+              {path:'database/migrations/033_household_members_conditions_vocabulary.sql', desc:'The forward migration this live check confirms actually ran'}
+            ],
+            api: null,
+            db: {table:'household_members', op:'SELECT (read-only introspection)', note:'Confirms conditions column type + 15-value CHECK constraint match SER-004 exactly'}
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s33-flows', window.FEATURE_FLOWS_S33);
+    </script>
+
+  </div><!-- /page-s33 -->
 
   <!-- SESSIONS_INJECT -->
 

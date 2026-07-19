@@ -83,6 +83,8 @@ Applied to every item in this Register, per the task's own taxonomy:
 | FD-13 | `POST /v1/events` idempotency handling | Pending | §7 |
 | FD-14 | `re_class_dish_options` content-seeding coverage gap | Ratified | §7 |
 | FD-15 | Planning Semantics Architecture direction (persona/segment layer redesign) | Ratified | §7 |
+| FD-16 | Seeds 101/102 rollback gap — permanent acceptance | Ratified | §7 |
+| FD-17 | REPO-CERT-017 permanent numbering skip | Ratified | §7 |
 | PD-01 | Class-first architecture | Ratified | §8 |
 | PD-02 | RE module isolation ("the RE is the product") | Ratified | §8 |
 | PD-03 | Freemium monetization, 90-day habit window | Ratified | §8 |
@@ -404,6 +406,46 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Future Review Trigger:** Re-evaluate composition-archetype count and cooking-capability attachment findings if Phase 2 implementation surfaces evidence contradicting the Phase1 Catalog's classification.
 - **Source Evidence:** `[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md`, `[ACTIVE]_Phase1_Persona_Decomposition_Catalog_v1.0.md`, `[ACTIVE]_Phase1B_Attribute_to_Class_Rule_Extraction_v1.0.md`, `[ACTIVE]_Canonical_Planning_Model_v1.0.md`; `[ACTIVE]_WP-8E_RE_Integration_Layer_v1.0.md` (item 6, `re_segment_addon_rule` schema mismatch); `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-06 (LF-C build-order, remains separately Pending).
 
+### FD-16 — Seeds 101/102 rollback gap: permanent acceptance
+- **Status:** Ratified (2026-07-18, Founder decision) · **Origin:** `[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md` §7/§24 (Medium Finding 1)
+- **Context:** Seed files `100_seed_config_tables.sql` through `117_...rollback.sql` are all paired with rollbacks, except `101` and `102`, which have no rollback counterpart — flagged by WP-9 as "a real, unaddressed gap — likely explained by 'illustrative seeds' later removed per REPO-CERT-007/009/010, but the gap itself is undocumented" at the time of that audit.
+- **Problem Statement:** Should rollback scripts be authored for `101`/`102` to close the gap, or is the absence permanently accepted as correct?
+- **Alternatives Considered:** (a) author `101_rollback`/`102_rollback` now, reconstructing teardown logic for data that no longer exists live; (b) accept the gap permanently — the data these seeds populated was illustrative, deliberately superseded and removed during `REPO-CERT-009` (WP-6E2 Canonical Production Sync), so there is nothing live left for a rollback to reverse.
+- **Final Decision:** Ratified — **Option (b).** The seeds 101/102 rollback gap is accepted permanently. No rollback will be authored for either file.
+- **Business Rationale:** N/A — data-lifecycle housekeeping, not a product-facing tradeoff.
+- **Technical Rationale:** The illustrative data these seeds loaded was already superseded and removed during `REPO-CERT-009`; authoring a rollback now would be reconstructing a teardown path for rows that no longer exist in any live or intended state — fabricated remediation for a gap that is already closed in substance, not real recovery capability.
+- **Engineering Impact:** Closes WP-9's Medium Finding 1 permanently; no future audit should re-flag this as an open gap.
+- **AI Impact:** None. **Recommendation Engine Impact:** None.
+- **Database Impact:** None — no DDL, no seed, no rollback file created. **API Impact:** None. **Batch Impact:** None. **ETL Impact:** None. **Architecture Impact:** None.
+- **Affected Documents:** `[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md` (finding closed by reference), this Register.
+- **Affected Work Packages:** WP-9.
+- **Affected Tests:** None.
+- **Affected Epics:** None.
+- **Implementation Notes:** None — no code, SQL, or rollback file is to be created as a result of this decision.
+- **Acceptance Criteria:** Satisfied by this ratification itself; no further action required.
+- **Future Review Trigger:** None — permanent acceptance, not revisited absent a live-data reason to reconsider.
+- **Source Evidence:** `[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md` §7 Findings, §24 Medium Finding 1; `[ACTIVE]_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md`.
+
+### FD-17 — REPO-CERT-017: permanent numbering skip
+- **Status:** Ratified (2026-07-18, Founder decision) · **Origin:** `[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md` §0
+- **Context:** Commit messages on the (now-merged) `feat/wp-8f-runtime-blocker` branch reference "(REPO-CERT-016)" and "(REPO-CERT-017)" in prose, but the certificates actually filed for that work are `[ACTIVE]_REPO-CERT-018_WP-8F_Runtime_Mapping_Blocker_v1.0.md` and `[ACTIVE]_REPO-CERT-019_WP-8FA_CandidateRepository_Audit_v1.0.md`. WP-9 confirmed, by direct filesystem read, that numbers 016–017 are simply unused/skipped on that branch — most likely a deliberate reservation to avoid colliding with `main`'s own `REPO-CERT-016` (WP-K01) — and classified it as "a minor commit-message hygiene defect... not a repository integrity fault."
+- **Problem Statement:** Should a `REPO-CERT-017` be manufactured retroactively to fill the numbering gap, or should the certificate sequence simply skip `017` permanently?
+- **Alternatives Considered:** (a) create a backfilled `REPO-CERT-017` document purely to close the numeric gap, with no independent deliverable behind it; (b) accept the skip permanently as a disclosed, harmless numbering artifact — never renumbering any already-filed certificate.
+- **Final Decision:** Ratified — **Option (b).** `REPO-CERT-017` is a permanent, disclosed numbering skip. No certificate will be created to fill it, and no existing certificate (`016`, `018`, `019`, ...) will be renumbered.
+- **Business Rationale:** N/A — repository hygiene, not a product tradeoff.
+- **Technical Rationale:** Renumbering already-filed, already-cited certificates would break every existing cross-reference to them (WP-8F, WP-8FA, this Register, `KNOWLEDGE.html`); manufacturing a placeholder certificate with no real deliverable behind it would itself be a fabrication, forbidden under `CLAUDE.md`'s "Rules for AI Behaviour."
+- **Engineering Impact:** Closes the numbering question raised in WP-9 §0 permanently; no future WP should attempt to backfill or renumber around it.
+- **AI Impact:** None. **Recommendation Engine Impact:** None.
+- **Database Impact:** None. **API Impact:** None. **Batch Impact:** None. **ETL Impact:** None. **Architecture Impact:** None.
+- **Affected Documents:** `[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md`, this Register.
+- **Affected Work Packages:** WP-8F, WP-8FA (numbering context only — their own certificates, 018/019, are unaffected and unchanged).
+- **Affected Tests:** None.
+- **Affected Epics:** None.
+- **Implementation Notes:** None — no file is to be created or renamed as a result of this decision.
+- **Acceptance Criteria:** Satisfied by this ratification itself; no further action required.
+- **Future Review Trigger:** None — permanent acceptance.
+- **Source Evidence:** `[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md` §0.
+
 ---
 
 ## 8. Product Philosophy Decisions
@@ -582,6 +624,7 @@ Requirement → Architecture → RE Document → Implementation → Database →
 | FD-01, FD-02, FD-03, FD-04, FD-05, FD-08, FD-09, FD-10 | ✅ (ratified in a claude.ai Founder decision-closing session; formalized in `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) | 2026-07-16 |
 | FD-06, FD-07, FD-11, FD-12, FD-13 | ☐ Not yet signed — out of scope for this wave, tracked separately | — |
 | FD-15 | ✅ (Founder-approved 2026-07-17, claude.ai Planning Semantics session — approval lines present in `[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md` §Founder sign-off) | 2026-07-17 |
+| FD-16, FD-17 | ✅ (Founder decision, this session) | 2026-07-18 |
 
 ## 17. Version History
 
@@ -592,6 +635,7 @@ Requirement → Architecture → RE Document → Implementation → Database →
 | 2026-07-16 (Wave 0 — Founder Ratification Certificate) | 8 of the 13 Pending FDs (FD-01, FD-02, FD-03, FD-04, FD-05, FD-08, FD-09, FD-10) ratified by the Founder in a claude.ai decision-closing session, formalized in `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`. FD-06, FD-07, FD-11, FD-12, FD-13 remain Pending, explicitly out of scope for this wave. |
 | 2026-07-17 (Wave 1 — document corrections) | §6 and §16 updated to reflect the 8 Wave-0 ratifications (Pending → Ratified). Corresponding document corrections applied: WP-8D/8E notes (FD-01), `DOC-P3-03` §07 worked example + LF-A08 clamp note (FD-02/FD-03), `DOC-P4-02` promoted DRAFT→ACTIVE as v1.1 with AD-01 resolved as Option 2 (FD-04), naming standard amended to v1.1 + six document headers corrected (FD-05), `DOC-01` §06 grocery-list scope corrected (FD-08), `DOC-10` §10 environment map corrected — **note:** the corrected Supabase project ref (`cmkswalqpmmqojwdmqbv`, per Founder confirmation) differs from the ref this Register previously described as "confirmed live" (`slsqtlygeekdppuyiiff`) — flagged, not silently reconciled (FD-09), `RE-DOC-01` §05 updated with the ratified LF-D07 behavior (FD-10). No schema, code, or migration changes made — documentation corrections only. |
 | 2026-07-17 (FD-15 — Planning Semantics Architecture ratification) | FD-15 added: Founder ratified the two-layer Planning Semantics Architecture (composition catalog + rules-based condition/attribute inference layer, three-channel absorb/swap/add routing) across four new `docs/architecture/` documents — `Canonical_Planning_Semantics_Architecture_v1.0`, `Phase1_Persona_Decomposition_Catalog_v1.0`, `Phase1B_Attribute_to_Class_Rule_Extraction_v1.0`, `Canonical_Planning_Model_v1.0`. Supersedes the flat 41-persona/8-segment vocabulary approach for the add-on layer; marks the `household_members.segment` vocabulary blocker (WP-8E item 6) resolved-by-direction, with Phase 2 (vocabulary fix) now the specified next step. FD-06's separate LF-C sequencing question remains Pending. Companion cross-reference added to `DOC-P3-02` Entity 3. Docs-only commit — no schema, code, or data changes. |
+| 2026-07-18 (FD-16/FD-17 — WP-9 gap closures) | FD-16 added: seeds 101/102 rollback gap (WP-9 Medium Finding 1) permanently accepted — the illustrative data those seeds loaded was already superseded and removed during `REPO-CERT-009`, so no rollback will be authored. FD-17 added: `REPO-CERT-017` permanent numbering skip (WP-9 §0) — no certificate will be backfilled to fill the gap, and no existing certificate (016, 018, 019) is renumbered. Docs-only — no schema, code, migration, or data changes. Migration 033 (`household_members_conditions_vocabulary`), authored and reviewed in the prior session, applied to the live database this session — see `KNOWLEDGE.html` S32/S33 for full execution evidence. |
 
 ---
 
