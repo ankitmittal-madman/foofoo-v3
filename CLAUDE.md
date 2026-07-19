@@ -3,9 +3,32 @@
 ## Session Start Protocol (mandatory, every session)
 1. git fetch && git pull origin main
 2. Verify HEAD == origin/main, clean tree — stop and report if not
-3. Invoke every relevant skill in .claude/skills/ — report invoked/skipped/why
+3. Apply the Skill Activation Policy below — report invoked/skipped/why
 4. Read this file, then docs/README.md to find only what's relevant to the task
 5. Do NOT reread the entire repository unless structure changed or Founder requests full reconstruction
+
+## Skill Activation Policy (source of truth — this repo, not dotfiles)
+This table is the authoritative activation policy for THIS repository.
+dotfiles/.claude/CLAUDE.md is only the install source for skill files; its
+own activation table is never re-read once a skill is vendored in here —
+so this table, not that one, is what a session actually follows.
+
+Automatically activated, every session, no exception:
+- session-knowledge-doc — update KNOWLEDGE.html whenever code/DB/config/docs
+  were touched this session (see Session End below)
+- coding-standards-enforcer — shapes new code as it's written (inline docs,
+  structured logging), does not retrofit old code
+- debug-root-cause — activates on natural language ("this is broken", a
+  pasted error), not just an explicit command
+
+All other skills (audit-*, hygiene-*, install-*, incident-*) stay registered
+but inactive until the Founder or an explicit slash command invokes them.
+
+## Session End (mandatory whenever code, DB, config, or docs were touched)
+Update KNOWLEDGE.html per .claude/skills/session-knowledge-doc/SKILL.md
+before ending the turn — inject at the existing points, do not rewrite the
+file. If this step is skipped, say so explicitly and why, rather than
+silently ending the session.
 
 ## Repository Philosophy
 Documentation-first. Class-first Recommendation Engine (household → cohort →
