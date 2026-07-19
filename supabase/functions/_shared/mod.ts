@@ -70,3 +70,6 @@ export { Container, createContainer } from "./di/container.ts";
 export { PUBLIC_SCHEMA, RE_ENGINE_SCHEMA, ROLES } from "./constants/schemas.ts";
 export { newTraceId } from "./utils/id.ts";
 export { invariant } from "./utils/assert.ts";
+
+// stop-hook test marker
+// stop-hook test marker 2

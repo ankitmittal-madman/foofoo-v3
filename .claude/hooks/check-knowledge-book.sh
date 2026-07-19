@@ -35,13 +35,22 @@ SUBSTANTIVE_CHANGED="$(echo "$CHANGED_FILES" | grep -E '\.(ts|tsx|js|jsx|sql|md|
 KNOWLEDGE_CHANGED="$(echo "$CHANGED_FILES" | grep -c 'KNOWLEDGE.html' || true)"
 
 if [ -n "$SUBSTANTIVE_CHANGED" ] && [ "$KNOWLEDGE_CHANGED" -eq 0 ]; then
-  echo ""
-  echo "⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)"
-  echo "   This session changed files below but did NOT update KNOWLEDGE.html:"
-  echo "$SUBSTANTIVE_CHANGED" | sed 's/^/     - /'
-  echo "   Per CLAUDE.md Session End: update KNOWLEDGE.html now, or state"
-  echo "   explicitly why this session's changes don't warrant a new entry."
-  echo ""
+  WARNING="$(cat <<EOF
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed files below but did NOT update KNOWLEDGE.html:
+$(echo "$SUBSTANTIVE_CHANGED" | sed 's/^/     - /')
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now, or state
+   explicitly why this session's changes don't warrant a new entry.
+EOF
+)"
+  # Print to stdout (in case a real terminal session sees it) AND persist
+  # to a file. Confirmed by direct testing (2026-07-19): hook stdout from
+  # Claude Code does not reliably surface in the chat transcript in this
+  # environment — the canary test only became visible because it wrote to
+  # a file that could be read back in a later message. This mirrors that.
+  echo "$WARNING"
+  echo "$WARNING" >> .claude/hooks/knowledge-book-warnings.log
 fi
 
 exit 0

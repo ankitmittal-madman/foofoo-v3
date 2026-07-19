@@ -75,3 +75,4 @@ JOIN re_engine.re_meal_classes m
 WHERE m.planning_role <> 'MAIN_PRIMARY';
 
 \echo '=== END WP-6RE SEED VALIDATION ==='
+-- stop-hook test marker (harmless, no-op)
