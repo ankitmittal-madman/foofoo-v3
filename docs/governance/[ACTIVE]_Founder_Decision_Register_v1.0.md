@@ -85,6 +85,7 @@ Applied to every item in this Register, per the task's own taxonomy:
 | FD-15 | Planning Semantics Architecture direction (persona/segment layer redesign) | Ratified | §7 |
 | FD-16 | Seeds 101/102 rollback gap — permanent acceptance | Ratified | §7 |
 | FD-17 | REPO-CERT-017 permanent numbering skip | Ratified | §7 |
+| FD-18 | LF-C design-phase inputs: weekly-plan derivation, bandit re-grain target, config-table unification timing | Ratified | §7 |
 | PD-01 | Class-first architecture | Ratified | §8 |
 | PD-02 | RE module isolation ("the RE is the product") | Ratified | §8 |
 | PD-03 | Freemium monetization, 90-day habit window | Ratified | §8 |
@@ -445,6 +446,32 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Acceptance Criteria:** Satisfied by this ratification itself; no further action required.
 - **Future Review Trigger:** None — permanent acceptance.
 - **Source Evidence:** `[ACTIVE]_WP-9_Independent_Engineering_Due_Diligence_Audit_v1.0.md` §0.
+
+### FD-18 — LF-C design-phase inputs: weekly-plan derivation, bandit re-grain target, config-table unification timing
+- **Status:** Ratified (2026-07-18, Founder decision) · **Origin:** `[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md` §§8, 9, 12, 13, 14
+- **Context:** The Final Canonical RE Architecture Review evaluated all 35 RE-schema tables from first principles and flagged three items as needing a Founder call before or during LF-C: (a) whether weekly meal-plan derivation folds into LF-C's own design phase or becomes a separate SER; (b) what grain the Thompson Sampling bandit should learn at, since the current per-(user, dish) grain learns slower than the documented cold-start design (RE-DOC-05 State A) intends; (c) when the three duplicate KV config tables should be unified. This entry ratifies all three as one bundled decision, since all three are inputs to the same upcoming design phase rather than independent engineering tasks.
+- **Problem Statement:** (a) Does `re_weekly_class_plans` retirement (precomputed → live derivation from `re_meal_classes`' own fit-score/cuisine/cooldown columns) get folded into LF-C's design phase, or does it need its own SER first? (b) What is the target grain for bandit state — keep per-(user, dish), or re-grain coarser? (c) When do `re_class_affinity_config`/`re_confidence_config`/`re_scoring_config` get unified into one `re_config` table — before or after LF-C ships?
+- **Alternatives Considered:**
+  (a) Fold into LF-C design (recommended — LF-C already touches the same class/addon derivation surface) vs. scope as an independent SER immediately after.
+  (b) Per-(user, meal-class) as the primary bandit unit with per-dish tracking added only once a class has accumulated sufficient signal (recommended — matches RE-DOC-05 State A's documented class-level cold-start exploration intent) vs. keep the current per-(user, dish) grain vs. some other grain.
+  (c) Unify the three config tables after LF-C ships (recommended — zero current consumers depend on the existing shape, no urgency) vs. unify before LF-C begins.
+- **Final Decision:** Ratified — all three recommended options.
+  (a) Weekly meal-plan derivation is folded into LF-C's design phase, not scoped as a standalone SER. `re_weekly_class_plans` retires from the runtime path; class assignment derives live from `re_meal_classes`' own `weekday_fit_1_5`/`weekend_fit_1_5`/`cuisine_family`/`variety_cooldown_days` columns.
+  (b) The bandit re-grain target is confirmed as per-(user, meal-class) as the primary learning unit, with per-dish tracking introduced only once a class has accumulated sufficient signal to be informative. This is a near-term follow-up tracked alongside LF-C, not a blocker to it.
+  (c) The three duplicate KV config tables unify into one `re_config` table after LF-C ships, not before. Zero current urgency — no consumer depends on the existing three-table shape.
+- **Business Rationale:** None of the three changes user-facing behavior; all three reduce future engineering surface (fewer derivation paths to keep in sync, faster bandit convergence at scale, one config table instead of three) without introducing new product risk.
+- **Technical Rationale:** (a) No RE-DOC (01–05) ever describes `re_weekly_class_plans` as a deliberate cache — its 2,952 × 7 = 20,664 row count is an exact cross-product consistent with a spreadsheet import (`Weekly_Class_Plan_v3`), and the underlying inputs are already static per-class columns cheap enough to compute at request time; LF-C touches this exact derivation surface already, so folding the fix in avoids a second pass. (b) RE-DOC-05 §01 specifies the bandit serves *cold-start exploration*, and RE-DOC-05 State A explicitly describes that exploration as class-level cohort-adjusted priors — the per-dish grain implemented today is finer than the documented design intent, and at ~800 dishes with typical early users seeing 20–30 unique dishes, most (user, dish) cells stay uninformative (Beta(1,1)) for a long time; a per-(user, meal-class) grain generalizes faster and matches the storage ceiling concern (combinatorial growth in the billions at 10M-user scale). (c) The three config tables have no design document justifying their separation; merging is a pure hygiene win with zero migration urgency since nothing currently depends on the three-table shape.
+- **Engineering Impact:** Scopes LF-C's design phase to include weekly-plan live derivation from day one; schedules the bandit re-grain and config-table merge as tracked near-term follow-ups, explicitly non-blocking to LF-C.
+- **AI Impact:** The bandit re-grain (b) directly affects Recommendation Engine learning speed during cold start — expected to improve, not regress, convergence given the documented design intent. **Recommendation Engine Impact:** All three items are RE-internal; no change to RE's external API contract.
+- **Database Impact:** (a) `re_weekly_class_plans` retires from the runtime read path as part of LF-C (schema removal itself is a separate, later engineering action, not created by this decision). (b) `re_dish_bandit_state` grain changes from a future SER, not this entry. (c) `re_config` unification is a future SER, not this entry. **API Impact:** None from this decision itself — these are design-phase inputs, not implementations. **Batch Impact:** None yet. **ETL Impact:** None yet. **Architecture Impact:** Confirms the "persist facts and accumulating state, derive plans and assignments" principle from the Final Review §4 as the governing rule for all three items.
+- **Affected Documents:** `[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md` (decisions ratified by reference), this Register. SER-005 (addon-side derivation, already scoped) is extended in substance by (a) but not amended by this entry.
+- **Affected Work Packages:** LF-C (design phase, once opened).
+- **Affected Tests:** None yet — these are design-phase inputs; test impact belongs to the SERs/work packages that implement each item.
+- **Affected Epics:** None yet.
+- **Implementation Notes:** No code, schema, or data change results from this entry itself — it ratifies direction for LF-C's design phase and two near-term follow-ups. Implementation is scoped when LF-C's design phase actually opens (a) and when the bandit re-grain (b) and config merge (c) SERs are written.
+- **Acceptance Criteria:** Satisfied by this ratification itself for the purpose of unblocking LF-C's design phase; each of (a)/(b)/(c) gets its own acceptance criteria when actually implemented.
+- **Future Review Trigger:** None for (a) — folded into LF-C permanently. (b) and (c) are tracked as near-term, non-blocking follow-ups — revisit if LF-C's design phase surfaces new information that changes either recommendation.
+- **Source Evidence:** `[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md` §8 (Table Classification), §9 (Requires Founder Decision), §12 (Recommended Future Architecture), §13 (Migration Roadmap), §14 (Founder Decisions Required, items 2–4).
 
 ---
 

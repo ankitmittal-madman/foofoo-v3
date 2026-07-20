@@ -41,6 +41,29 @@ No new metric. This uses the same Day-0/Day-90 acceptance rate already named in 
 
 ## 6. Future considerations — event weighting (explicitly deferred, not decided)
 
+> **CORRECTION (2026-07-18):** This section's conclusion — "MVP treats all events
+> equally, differentiated weighting deferred" — is **superseded**. It re-decided
+> something already settled: DOC-P3-03 §16/LF-E04 already specifies a
+> differentiated, `[CONFIRMED]`, founder-approved event-weight model, ratified in
+> the original June 2026 business logic specification, matching the live
+> `re_event_weights` table exactly:
+>
+> | event_type | weight |
+> |---|---|
+> | dish_cooked | +0.80 |
+> | dish_locked | +0.60 |
+> | dish_rated_5star | +0.60 |
+> | dish_accepted | +0.40 |
+> | dish_rated_3star | +0.00 |
+> | dish_rated_1star | −0.30 |
+> | dish_swiped_past | −0.10 |
+> | dish_not_today | −0.10 |
+>
+> Differentiated event weighting is not a future consideration — it already
+> exists and should be trusted as-is. Source: `[ACTIVE]_Canonical_RE_Architecture_
+> Final_Review_v1.0.md` §5. Per GOV-02, this section is left below unedited as
+> the historical record — it is superseded, not deleted.
+
 MVP treats every interaction event type — swipe like, swipe dislike, cooked, skipped, repeated, saved, shared, favourite, removed, never-again — as contributing equally to `interaction_count` and to the taste vector. A "cooked" signal and a single onboarding swipe currently count the same.
 
 This is a known simplification, not an oversight. Differentiating event types by weight (e.g. "cooked" should probably count for more than "swiped left once") is a reasonable future direction, but assigning specific weights now — with zero real usage data to justify any particular number — would be inventing a value rather than deriving one, which this project's own governance explicitly avoids (AI-01: no assumptions, config not hardcoded without basis).
