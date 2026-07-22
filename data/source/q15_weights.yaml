@@ -1,0 +1,18 @@
+config_version: 1.0
+generated_from: Core Spine v1.0 (S3)
+generated_on: 2026-07-01
+# NOTE: implementation artifact derived from FROZEN specs. If a spec changes, update this file (RFC), never hard-code.
+
+# Ghar RE — Q15 cooking-objective gain  [SOURCE: Core Spine FROZEN §S3]
+# GAIN = 1 + sum_g gamma[obj][g] * gs_g(x) ;  gamma_effective = gamma_stated * kappa(confidence)
+gamma:            # [G_indulgence, G_light, G_protein]
+  awesome_taste:      {indulgence:  0.30, light: 0.00, protein: 0.00}   # default on skip
+  healthy_living:     {indulgence: -0.20, light: 0.30, protein: 0.00}
+  into_fitness:       {indulgence: -0.15, light: 0.20, protein: 0.30}
+  protein_calculator: {indulgence: -0.05, light: 0.05, protein: 0.50}
+kappa:
+  v1_value: 1.0          # stated objective at full strength (no behaviour yet)
+  floor:    0.3          # v2: decays toward this as feedback confidence rises [SP-F2]
+gain_bounds: [0.75, 1.30]
+default_objective: awesome_taste
+protein_source: proxy    # diet+category proxy in v1; dish_macro in v2 [SP-F11]

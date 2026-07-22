@@ -1,0 +1,20 @@
+state,zone,diet_lean,default_non_veg_cadence
+Rajasthan,West,strongly_veg,rare
+Gujarat,West,strongly_veg,rare
+Haryana,North,strongly_veg,weekend
+Punjab,North,veg_leaning,weekend
+Madhya Pradesh,Central,strongly_veg,weekend
+Uttar Pradesh,North,mixed,weekend
+Maharashtra,West,mixed,weekend
+Karnataka,South,mixed,frequent
+Delhi,North,mixed,weekend
+West Bengal,East,strongly_non_veg,frequent
+Kerala,South,strongly_non_veg,daily
+Telangana,South,strongly_non_veg,frequent
+Andhra Pradesh,South,strongly_non_veg,frequent
+Tamil Nadu,South,strongly_non_veg,frequent
+Odisha,East,strongly_non_veg,frequent
+Bihar,East,strongly_non_veg,frequent
+Jharkhand,East,strongly_non_veg,frequent
+Goa,West,strongly_non_veg,frequent
+Assam,Northeast,strongly_non_veg,daily

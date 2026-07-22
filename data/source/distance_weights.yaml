@@ -1,0 +1,45 @@
+config_version: 1.0
+generated_from: Core Spine v1.0 (S1 3.6)
+generated_on: 2026-07-01
+# NOTE: implementation artifact derived from FROZEN specs. If a spec changes, update this file (RFC), never hard-code.
+
+# Ghar RE — meal-class distance block weights beta  [SOURCE: Core Spine FROZEN §S1 3.6]
+# d(a,b) = sum_g beta_g * delta_g(a,b) ;  sum(beta) = 1.00
+beta:
+  sensory:
+    taste_intensity: 0.10
+    texture_TX:      0.08
+    richness_RI:     0.08
+    taste_TA:        0.07
+    mouthfeel_MF:    0.06
+    aroma_AR:        0.04
+    thermal_TH:      0.03      # sensory subtotal = 0.46
+  identity:
+    cuisine:         0.13
+    weather_WE:      0.03      # identity subtotal = 0.16
+  ingredient:
+    ING:             0.11      # IDF-weighted cosine
+  nutrition:
+    heaviness:       0.05
+    calories:        0.05      # nutrition subtotal = 0.10
+  preparation:
+    method_CM:       0.07
+    effort:          0.02
+    ferment_FM:      0.01      # preparation subtotal = 0.10
+  structure:
+    role_course_diet: 0.04
+    category_DC:      0.03     # structure subtotal = 0.07
+kernel:
+  tau: 0.30                    # sim(a,b) = exp(-d/tau)
+idf:
+  N: 810                       # IDF(i) = ln((N+1)/(df_i+1)) + 1 ; recompute on catalogue change
+cuisine_hierarchy_distance:    # hierarchical cuisine delta
+  same_cuisine:      0.00
+  same_parent:       0.25
+  same_group:        0.50
+  same_broad_region: 0.75
+  else:              1.00
+diet_distance:                 # graded diet delta  [from][to]
+  veg:    {veg: 0.0, egg: 0.3, non_veg: 1.0}
+  egg:    {veg: 0.3, egg: 0.0, non_veg: 0.7}
+  non_veg: {veg: 1.0, egg: 0.7, non_veg: 0.0}

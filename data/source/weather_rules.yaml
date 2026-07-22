@@ -1,0 +1,14 @@
+config_version: 1.0
+generated_from: Core Spine v1.0 (S2 m_weather) + KB v0.2 (Z2)
+generated_on: 2026-07-01
+# NOTE: implementation artifact derived from FROZEN specs. If a spec changes, update this file (RFC), never hard-code.
+
+# Ghar RE — weather transient rules  [SOURCE: Core Spine FROZEN §S2 m_weather + KB §Z2]
+# transient signed boost; never a hard filter. Target = KB comfort_hero(zone, weather).
+thermal_thresholds:
+  HOT_temp_c_gte:  34     # 34 degrees C     # -> cooling boost, demote fried/heavy/high-spice
+  COLD_temp_c_lte: 15     # 15 degrees C     # -> warming boost, relax health-damp
+  WET_on_rain_flag: true  # -> comfort/fried boost, demote raw/salad (+ coastal seafood peak-monsoon)
+magnitude: 0.40           # = W_WEATHER, signed
+humidity_modifier: optional   # apply only if API exposes humidity, else skip
+resolves_to: KB.comfort_hero  # cultural hero, NOT derivable from temperature alone

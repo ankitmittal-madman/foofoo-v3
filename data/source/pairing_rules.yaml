@@ -1,0 +1,19 @@
+config_version: 1.0
+generated_from: Core Spine v1.0 (S4)
+generated_on: 2026-07-01
+# NOTE: implementation artifact derived from FROZEN specs. If a spec changes, update this file (RFC), never hard-code.
+
+# Ghar RE — pairing guardrails + plate score  [SOURCE: Core Spine FROZEN §S4]
+# plate_score = (score_d + score_l) * (1 + lambda_pair * compat(d,l))   [multiplicative]
+plate:
+  lambda_pair: 0.5
+hard_gates:            # pair NOT formed if any violated
+  not_both_rich: true
+  not_same_base: true          # base-ingredient cosine gate
+  cuisine_coherence: true
+  theta_region: 0.5            # cuisine_dist(d,l) <= 0.5 (same group or closer)
+soft_terms:           # compat(d,l) in [-1,+1]
+  b_balance:   0.5             # one rich/medium + one light
+  b_protein:   0.3             # pulse/protein liquid + veg dry
+  p_sametaste: 0.2             # penalty: same dominant taste
+standalone: bypass_pairing     # standalone/complete dishes skip pairing
