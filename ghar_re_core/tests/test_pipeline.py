@@ -4,13 +4,13 @@ the behaviours the Core Spine / D1-D7 / Final_RE / KB require (Task 4).
 """
 import pytest
 
-from ghar_re import fixtures as F
-from ghar_re import knowledge as K
-from ghar_re import scoring as S
-from ghar_re import pairing as P
-from ghar_re.catalogue import Catalogue
-from ghar_re.derivation import derive_theta
-from ghar_re.pipeline import recommend, make_context
+from ghar_re_core import fixtures as F
+from ghar_re_core import knowledge as K
+from ghar_re_core import scoring as S
+from ghar_re_core import pairing as P
+from ghar_re_core.catalogue import Catalogue
+from ghar_re_core.derivation import derive_theta
+from ghar_re_core.pipeline import recommend, make_context
 
 CAT = Catalogue()
 HH = {h["id_key"]: h for h in F.HOUSEHOLDS}
@@ -223,7 +223,7 @@ def test_weather_is_zone_specific_not_generic():
 #     and ZERO sample rows are 'real'. (KB reference rows are a separate dataset and may be real.)
 # ---------------------------------------------------------------------------
 def test_sample_dataset_data_source_integrity():
-    from ghar_re.seedgen import gen_golden
+    from ghar_re_core.seedgen import gen_golden
     import re
     sql = gen_golden()
     tags = re.findall(r"'(real|ai_generated|stub)'", sql)

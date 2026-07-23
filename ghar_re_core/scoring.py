@@ -4,9 +4,9 @@ ghar_re.scoring — Hard Filters (Core Spine §S2 PART A) + BASE score (§S2 PAR
 All weights/thresholds come from data/source/*.yaml (via ghar_re.config) and the KB (via
 ghar_re.knowledge). Nothing scoring-related is hardcoded. Section refs are cited inline.
 """
-from ghar_re.config import CONFIG
-from ghar_re import knowledge as K
-from ghar_re import catalogue as C
+from ghar_re_core.config import CONFIG
+from ghar_re_core import knowledge as K
+from ghar_re_core import catalogue as C
 
 
 # =====================================================================================

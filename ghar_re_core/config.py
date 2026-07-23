@@ -36,6 +36,7 @@ class Config:
         self.derivation = _load("derivation_params.yaml")
         self.versions = dict(spine="Spine v1.0", kb="KB v0.2",
                              config="Config v%s" % self.base["config_version"])
+        self._community_priors = None
 
     # --- BASE weights (base_weights.yaml <- Core Spine §S2 §B9) ---
     def W(self, key):
@@ -101,6 +102,51 @@ class Config:
     def D(self, node):
         return self.derivation[node]
 
+    # --- community priors (community_priors.csv <- KB §C1) ---
+    # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a
+    # file themselves (RE-DOC-11 §1/§2). Keyed by state -> {state, zone, diet_lean, cadence}.
+    @property
+    def community_priors(self):
+        if self._community_priors is None:
+            import csv
+            self._community_priors = {}
+            with open(os.path.join(SRC, "community_priors.csv")) as f:
+                for r in csv.DictReader(f):
+                    self._community_priors[r["state"]] = r
+        return self._community_priors
 
-# Single frozen instance.
-CONFIG = Config()
+
+# ---------------------------------------------------------------------------
+# Active-config injection seam (RE-DOC-11 §2).
+#
+# Core math modules do `from ghar_re_core.config import CONFIG` and use `CONFIG.*`. To let the
+# service inject a Config produced by a ConfigProvider WITHOUT changing any of those call sites,
+# CONFIG is a thin proxy that delegates to the current active Config. The default active config is
+# the YAML-from-data/source load (used by the reference pipeline + tests); the service replaces it
+# at startup via `set_active_config(provider.load())`. A future RemoteConfigProvider is then a new
+# adapter with zero changes to scoring/derivation/pairing.
+# ---------------------------------------------------------------------------
+_active = None
+
+
+def active_config():
+    global _active
+    if _active is None:
+        _active = Config()
+    return _active
+
+
+def set_active_config(cfg):
+    """Inject the Config the engine should use (called by the service's ConfigProvider)."""
+    global _active
+    _active = cfg
+
+
+class _ConfigProxy:
+    """Delegates every attribute/method access to the current active Config."""
+    def __getattr__(self, name):
+        return getattr(active_config(), name)
+
+
+# What every core module imports; resolves to the active Config on each access.
+CONFIG = _ConfigProxy()

@@ -10,8 +10,8 @@ v1 pins: confidence = 1.0 everywhere; D7 latent = {} (not implemented); kappa ha
 import math
 from datetime import datetime, timezone
 
-from ghar_re.config import CONFIG
-from ghar_re import knowledge as K
+from ghar_re_core.config import CONFIG
+from ghar_re_core import knowledge as K
 
 VERSION = "D-layer v1.0"
 
@@ -54,7 +54,7 @@ def derive_theta(hh):
     dependents = sum(1 for a in ages if a["age"] < 18 or a["age"] >= 65)
     zone_home = K.STATE_ZONE.get(hh["q3_home_state"])
     # city tier from fixtures (CITY_TIER) -> tier1/2/3
-    from ghar_re import fixtures as F
+    from ghar_re_core import fixtures as F
     city_tier = F.CITY_TIER.get(hh["q4_current_city"], "tier2")
 
     # ---------------- D1 — income proxy (D1-D7 §4 D1) ----------------
@@ -195,24 +195,11 @@ def derive_theta(hh):
     return theta
 
 
-# --- community prior lookup (community_priors.csv via the seeded table shape) ---
-_COMMUNITY = None
-
-
-def _load_community():
-    global _COMMUNITY
-    if _COMMUNITY is None:
-        import csv, os
-        _COMMUNITY = {}
-        path = os.path.join(os.path.dirname(__file__), "..", "data", "source", "community_priors.csv")
-        with open(path) as f:
-            for r in csv.DictReader(f):
-                _COMMUNITY[r["state"]] = r
-    return _COMMUNITY
-
-
+# --- community prior lookup (KB §C1) ---
+# Reads from the loaded EngineConfig (CONFIG.community_priors), NOT from a file directly, so this
+# derivation module has zero file-path knowledge (RE-DOC-11 §1/§2). The config LOADER owns the I/O.
 def _community_prior(state):
-    return _load_community().get(state)
+    return CONFIG.community_priors.get(state)
 
 
 # --- city -> home state (for D4 local-zone resolution) ---

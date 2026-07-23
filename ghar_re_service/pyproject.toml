@@ -1,0 +1,23 @@
+# Ghar RE production service — the THIN hosting shell (RE-DOC-11 §3). It depends on and hosts the
+# ghar-re-core domain package; it contains no recommendation math of its own.
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghar-re-service"
+version = "1.0.0"
+description = "Ghar RE v1 HTTP service — FastAPI hosting shell over ghar-re-core."
+requires-python = ">=3.11"
+dependencies = [
+  "ghar-re-core",        # the domain package (path-installed from the repo root in dev)
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+  "jsonschema>=4.20",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "httpx>=0.27"]
+
+[tool.setuptools]
+packages = ["ghar_re_service"]

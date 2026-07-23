@@ -7,10 +7,10 @@ ghar_re.pipeline — end-to-end orchestration of the Ghar RE v1.0 rebuild.
 Weather is a MOCKED injected input (no live API in v1): ctx carries weather_condition / temp_c /
 is_raining, per Task 3 point 3.
 """
-from ghar_re.config import CONFIG
-from ghar_re.catalogue import Catalogue
-from ghar_re.derivation import derive_theta
-from ghar_re import pairing
+from ghar_re_core.config import CONFIG
+from ghar_re_core.catalogue import Catalogue
+from ghar_re_core.derivation import derive_theta
+from ghar_re_core import pairing
 
 
 def recommend(household, ctx, catalogue=None):
@@ -48,7 +48,7 @@ def format_result(res):
 
 
 if __name__ == "__main__":
-    from ghar_re import fixtures as F
+    from ghar_re_core import fixtures as F
     cat = Catalogue()
     for hh in F.HOUSEHOLDS:
         ctx = make_context(slot="dinner", season="transitional")

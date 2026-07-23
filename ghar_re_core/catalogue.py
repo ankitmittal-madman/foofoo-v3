@@ -5,8 +5,8 @@ Mirrors what ghar_re.dishes + joins hold in Postgres, so the pipeline/tests run 
 while staying faithful to the seeded schema. Zone is resolved cuisine -> cuisine_group -> zone_map
 (KB §R1), exactly as the DB would via ghar_re.zone_map.
 """
-from ghar_re import fixtures as F
-from ghar_re import knowledge as K
+from ghar_re_core import fixtures as F
+from ghar_re_core import knowledge as K
 
 # cuisine -> cuisine_group (from fixtures.CUISINES)
 _CUISINE_GROUP = {c[0]: c[2] for c in F.CUISINES}
@@ -36,15 +36,35 @@ class Dish:
 
 
 class Catalogue:
+    """In-memory CatalogueSnapshot. Downstream code depends on THIS object's read methods, never on
+    how the data was loaded (RE-DOC-11 §1) — a future PostgresCatalogueProvider returns the same shape."""
+
     def __init__(self, dish_dicts=None):
         self.dishes = [Dish(d) for d in (dish_dicts or F.DISHES)]
         self.by_name = {d.name: d for d in self.dishes}
+        # in-memory indices (built once; RE-DOC-10 §7 "build in-memory indices")
+        self.by_id = {d.id: d for d in self.dishes}
+        self._by_zone = {}
+        self._by_hero_role = {}
+        for d in self.dishes:
+            self._by_zone.setdefault(d.zone, []).append(d)
+            self._by_hero_role.setdefault(d.hero_role, []).append(d)
 
     def __iter__(self):
         return iter(self.dishes)
 
     def get(self, name):
         return self.by_name.get(name)
+
+    # --- CatalogueSnapshot read interface (RE-DOC-11 §1) ---
+    def get_dish(self, dish_id):
+        return self.by_id.get(dish_id)
+
+    def by_zone(self, zone):
+        return list(self._by_zone.get(zone, []))
+
+    def by_hero_role(self, role):
+        return list(self._by_hero_role.get(role, []))
 
 
 # ingredient master attributes (real, from ingredients_v5.csv) for jain/allergen derivation

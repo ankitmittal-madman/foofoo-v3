@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foofoo.app/contracts/ghar-re-v1.schema.json",
+  "title": "Ghar RE v1 HTTP contract",
+  "description": "Single source of truth for the Ghar RE v1 request/response contract (RE-DOC-10 §5/§6, RE-DOC-11 §5/§6). Both the Python RE and the Edge Function validate against this file. Validate a request against $defs/RecommendationRequest and a response against $defs/RecommendationResponse.",
+  "x-contract-version": "v1",
+  "x-compatibility-rules": {
+    "note": "COMPATIBILITY CONTRACT (RE-DOC-11 §5) — enforced, not just documented. The additive/open-field tolerance below is asserted by ghar_re_service/tests/test_contract.py; do not tighten `additionalProperties` to false without a /v2.",
+    "rules": [
+      "1. Additive/open mode: unknown fields MUST be ignored by consumers, never rejected. Every object here sets additionalProperties:true for exactly this reason.",
+      "2. New fields are ALWAYS optional and carry a sensible default assumed by older clients; never add a required field within v1.",
+      "3. NEVER repurpose or change the meaning/type of an existing field — add a new field and deprecate the old one over a documented window.",
+      "4. Only a genuinely breaking change (removing a field, changing a type, changing meaning) bumps the URL to /v2/; both versions run concurrently during migration."
+    ]
+  },
+  "$defs": {
+    "MetaField": {
+      "description": "A derived θ field with provenance (D1-D7 §1.1). Shown for reference/explainability; the request carries RAW Q1-Q15, not this.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "value": {},
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "source": { "type": "string" }
+      }
+    },
+
+    "MemberAge": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "role": { "type": "string", "description": "self/adult/child/teen/senior/toddler/weaning" },
+        "age": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["age"]
+    },
+
+    "HouseholdRaw": {
+      "description": "Raw Q1-Q15 onboarding answers. The RE runs D1-D7 itself (frozen decision: recommendation mathematics live exclusively inside the RE), so the caller sends raw inputs, NOT pre-derived θ.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "label": { "type": "string" },
+        "q1_household_type": {
+          "type": "string",
+          "enum": ["single", "couple", "couple_kids", "couple_kids_parents", "joint", "flatmates"]
+        },
+        "q2_working_professionals": { "type": "integer", "minimum": 0 },
+        "q3_home_state": { "type": "string" },
+        "q4_current_city": { "type": "string" },
+        "q5_diet": { "type": "string", "enum": ["veg", "eggetarian", "non_veg"] },
+        "q6_nonveg_types": { "type": "array", "items": { "type": "string" } },
+        "q7_veg_days": { "type": "array", "items": { "type": "string" } },
+        "q8_is_jain": { "type": "boolean" },
+        "q9_allergies": { "type": "array", "items": { "type": "string" } },
+        "q10_allergy_other": { "type": ["string", "null"] },
+        "q11_conditions": { "type": "array", "items": { "type": "string" } },
+        "q12_member_ages": { "type": "array", "items": { "$ref": "#/$defs/MemberAge" } },
+        "q13_who_cooks": { "type": "string", "enum": ["self", "family", "hired_cook", "order_tiffin"] },
+        "q14_eat_out_per_week": { "type": "integer", "minimum": 0 },
+        "q15_objective": {
+          "type": "string",
+          "enum": ["awesome_taste", "healthy_living", "into_fitness", "protein_calculator"]
+        }
+      },
+      "required": [
+        "q1_household_type", "q2_working_professionals", "q3_home_state", "q4_current_city",
+        "q5_diet", "q8_is_jain", "q12_member_ages", "q13_who_cooks", "q15_objective"
+      ]
+    },
+
+    "Weather": {
+      "description": "Mocked/injected weather (no live API in v1). is_raining / temp_c drive the transient m_weather term.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "is_raining": { "type": "boolean" },
+        "temp_c": { "type": ["number", "null"] },
+        "weather_condition": { "type": ["string", "null"], "description": "rain/heatwave/cold_snap/clear" },
+        "humidity": { "type": ["number", "null"] }
+      }
+    },
+
+    "HouseholdContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "slot": { "type": "string", "enum": ["breakfast", "lunch", "dinner", "snacks"] },
+        "date": { "type": "string", "description": "ISO date; season derivable from it if season omitted" },
+        "weekday": { "type": "string" },
+        "season": { "type": "string", "enum": ["summer", "monsoon", "winter", "transitional", "post_monsoon"] },
+        "weather": { "$ref": "#/$defs/Weather" },
+        "active_modes": { "type": "array", "items": { "type": "string", "enum": ["fasting", "festival", "veg_egg"] } },
+        "calorie_target": { "type": ["integer", "null"] }
+      },
+      "required": ["slot"]
+    },
+
+    "RecommendationRequest": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "request_id": { "type": "string", "description": "UUID; if omitted the service generates one and echoes it back." },
+        "household": { "$ref": "#/$defs/HouseholdRaw" },
+        "context": { "$ref": "#/$defs/HouseholdContext" }
+      },
+      "required": ["household", "context"]
+    },
+
+    "Contribution": {
+      "description": "One scoring module's contribution to a plate's BASE (RE-DOC-11 §6/§7). The list is OPEN: a new scoring module appends one entry; nothing upstream changes. Do NOT convert this back into fixed named fields.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "module": { "type": "string", "description": "e.g. m_palette, m_weather, sig, prior_boost, s_pref" },
+        "value": { "type": "number", "description": "the module's raw m_k(x) output" },
+        "weight": { "type": "number", "description": "W_k · conf_k applied to value" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "required": ["module", "value", "weight", "confidence"]
+    },
+
+    "Plate": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "plate_id": { "type": "string" },
+        "form": { "type": "string", "enum": ["pair", "single", "standalone"] },
+        "hero_dish_ids": { "type": "array", "items": { "type": "string" }, "description": "1 (single/standalone) or 2 (pair) hero dish ids" },
+        "hero_dish_names": { "type": "array", "items": { "type": "string" } },
+        "support": { "type": ["string", "null"], "description": "editable default carb from {Roti,Paratha,Poori,Rice}; null for standalone" },
+        "is_standalone": { "type": "boolean" },
+        "plate_score": { "type": "number" },
+        "base_total": { "type": "number", "description": "FIXED aggregate: Σ of contributions (before Q15 gain)" },
+        "gain_multiplier": { "type": "number", "description": "FIXED aggregate: GAIN_Q15 multiplier" },
+        "final_score": { "type": "number", "description": "FIXED aggregate: the plate's final rank score" },
+        "contributions": { "type": "array", "items": { "$ref": "#/$defs/Contribution" } }
+      },
+      "required": ["plate_id", "form", "hero_dish_ids", "plate_score", "base_total", "gain_multiplier", "final_score", "contributions"]
+    },
+
+    "RecommendationResponse": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "request_id": { "type": "string" },
+        "api_version": { "type": "string", "const": "v1" },
+        "engine_version": { "type": "string" },
+        "config_version": { "type": "string" },
+        "plates": { "type": "array", "items": { "$ref": "#/$defs/Plate" } },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Non-fatal notes (e.g. 'only 5 of 7 plates could be formed'). Partial results are a valid 200, not an error (RE-DOC-10 §11)."
+        }
+      },
+      "required": ["request_id", "api_version", "engine_version", "config_version", "plates", "warnings"]
+    },
+
+    "MetaResponse": {
+      "description": "GET /v1/meta — versions only, no request-specific data.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "api_version": { "type": "string", "const": "v1" },
+        "engine_version": { "type": "string" },
+        "config_version": { "type": "string" }
+      },
+      "required": ["api_version", "engine_version", "config_version"]
+    }
+  }
+}

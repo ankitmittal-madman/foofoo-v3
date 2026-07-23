@@ -1,0 +1,28 @@
+# Ghar RE — core domain package (the single, tested implementation of the recommendation
+# mathematics). Per RE-DOC-11 §3: this package is the ONE place the math lives; the production
+# service (ghar_re_service/) imports and hosts it, it never re-implements it.
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghar-re-core"
+version = "1.0.0"
+description = "Ghar RE v1.0 — recommendation-engine domain package (frozen Core Spine + D1–D7 layer)."
+requires-python = ">=3.11"
+dependencies = [
+  "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.setuptools]
+# The importable package is `ghar_re_core` (renamed from `ghar_re`); it stays exactly one level
+# below the repo root so its relative reads of ../data/source and ../database keep resolving.
+packages = ["ghar_re_core"]
+
+[tool.setuptools.package-data]
+# No data baked into the package itself in v1 — catalogue/config are read from data/source via the
+# service's providers (RE-DOC-11 §1/§2). This keeps the math package free of embedded snapshots.
+"ghar_re_core" = []

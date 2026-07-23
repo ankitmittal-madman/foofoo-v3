@@ -9,7 +9,12 @@
 # Hook-generated log — noise, not source (session-knowledge-doc skill)
 .claude/hooks/knowledge-book-warnings.log
 
-# Python bytecode (ghar_re reference engine)
+# Python bytecode (ghar_re_core + ghar_re_service)
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Python packaging build artifacts (editable installs)
+*.egg-info/
+build/
+dist/

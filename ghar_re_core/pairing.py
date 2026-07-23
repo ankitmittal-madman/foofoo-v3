@@ -6,9 +6,9 @@ negative_priors (the in_spine=yes rows ARE what pairing_rules.yaml encodes — s
 source). Standalone bypass, plate_score formula, greedy assemble-7 (no-duplicate guard +
 discovery-dial cap), default carb attach (§S4.4 + KB §R2a).
 """
-from ghar_re.config import CONFIG
-from ghar_re import knowledge as K
-from ghar_re import scoring as S
+from ghar_re_core.config import CONFIG
+from ghar_re_core import knowledge as K
+from ghar_re_core import scoring as S
 
 
 RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich"}
