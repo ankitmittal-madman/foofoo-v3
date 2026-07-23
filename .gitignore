@@ -8,3 +8,8 @@
 
 # Hook-generated log — noise, not source (session-knowledge-doc skill)
 .claude/hooks/knowledge-book-warnings.log
+
+# Python bytecode (ghar_re reference engine)
+__pycache__/
+*.pyc
+.pytest_cache/
