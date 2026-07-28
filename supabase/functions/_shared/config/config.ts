@@ -17,7 +17,15 @@ export interface AppConfig {
   readonly supabaseServiceRoleKey: string;
   readonly supabaseDbUrl: string | null;
   readonly isProduction: boolean;
+  /** Ghar RE service base URL (Phase C). Defaults to localhost for dev; no deployment yet (Phase F). */
+  readonly gharReServiceUrl: string;
+  /** Shared HMAC secret for the service-to-service call (RE-DOC-10 §9). */
+  readonly gharReServiceSecret: string;
 }
+
+/** Dev-only defaults for the Ghar RE service. NEVER used in staging/production (guarded below). */
+const GHAR_RE_DEV_URL = "http://localhost:8000";
+const GHAR_RE_DEV_SECRET = "dev-insecure-ghar-re-secret";
 
 /** Read a single env var by spec, enforcing the "required" contract. */
 function read(spec: { key: string; required: boolean }): string | null {
@@ -53,6 +61,19 @@ export function loadConfig(): AppConfig {
   const logLevel =
     (["debug", "info", "warn", "error"].includes(level) ? level : "info") as AppConfig["logLevel"];
 
+  const isProduction = environment === "production";
+
+  // Ghar RE service wiring. In PRODUCTION the URL + secret MUST be provided (fail fast — never ship
+  // the insecure dev default to prod, DOC-P3-07 §14). local/staging may fall back to dev defaults;
+  // staging enforcement can tighten once secrets are wired in Phase F (deployment). [TODO Phase F]
+  const gharReServiceUrl = read(ENV_VARS.GHAR_RE_SERVICE_URL);
+  const gharReServiceSecret = read(ENV_VARS.GHAR_RE_SERVICE_SECRET);
+  if (isProduction && (!gharReServiceUrl || !gharReServiceSecret)) {
+    throw new Error(
+      "[config] GHAR_RE_SERVICE_URL and GHAR_RE_SERVICE_SECRET are required in production.",
+    );
+  }
+
   return Object.freeze({
     environment,
     logLevel,
@@ -60,7 +81,9 @@ export function loadConfig(): AppConfig {
     supabaseAnonKey: read(ENV_VARS.SUPABASE_ANON_KEY) as string,
     supabaseServiceRoleKey: read(ENV_VARS.SUPABASE_SERVICE_ROLE_KEY) as string,
     supabaseDbUrl: read(ENV_VARS.SUPABASE_DB_URL),
-    isProduction: environment === "production",
+    isProduction,
+    gharReServiceUrl: gharReServiceUrl ?? GHAR_RE_DEV_URL,
+    gharReServiceSecret: gharReServiceSecret ?? GHAR_RE_DEV_SECRET,
   });
 }
 

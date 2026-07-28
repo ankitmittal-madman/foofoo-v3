@@ -22,6 +22,11 @@ export const ENV_VARS = {
   OPENWEATHERMAP_API_KEY: { key: "OPENWEATHERMAP_API_KEY", required: false, secret: true },
   ONESIGNAL_REST_API_KEY: { key: "ONESIGNAL_REST_API_KEY", required: false, secret: true },
   CLOUDINARY_CLOUD_NAME: { key: "CLOUDINARY_CLOUD_NAME", required: false, secret: false },
+  // Ghar RE service (Phase C). URL of the stateless Python RE; SECRET is the shared HMAC key for
+  // service-to-service auth (RE-DOC-10 §9). Not required locally (sensible dev defaults apply);
+  // MUST be set in staging/production (enforced in config.ts).
+  GHAR_RE_SERVICE_URL: { key: "GHAR_RE_SERVICE_URL", required: false, secret: false },
+  GHAR_RE_SERVICE_SECRET: { key: "GHAR_RE_SERVICE_SECRET", required: false, secret: true },
 } as const satisfies Record<string, EnvVarSpec>;
 
 export type EnvVarName = keyof typeof ENV_VARS;
