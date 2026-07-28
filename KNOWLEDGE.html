@@ -105,6 +105,31 @@
   .dd-why-q{font-size:11px;font-weight:600;color:var(--teal);margin-bottom:3px}
   .dd-why-a{font-size:12px;color:var(--text2);line-height:1.5}
 
+  /* ── Before / After impact bar ── */
+  .impact-bar{display:flex;align-items:stretch;gap:0;margin-bottom:16px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .impact-col{flex:1;padding:14px 16px}
+  .impact-before{background:#fff5f5;border-right:1px solid var(--border)}
+  .impact-after{background:var(--green-bg)}
+  .impact-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text3);margin-bottom:6px}
+  .impact-text{font-size:13px;color:var(--text);line-height:1.6}
+  .impact-arrow{display:flex;align-items:center;padding:0 12px;font-size:18px;color:var(--text3);background:var(--surface2);border-left:1px solid var(--border);border-right:1px solid var(--border)}
+
+  /* ── Files changed strip ── */
+  .files-changed{margin-bottom:16px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+  .files-changed-label{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:8px}
+  .files-changed-list{display:flex;flex-wrap:wrap;gap:6px}
+  .fc-file{display:flex;align-items:center;gap:5px;padding:3px 8px 3px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm)}
+  .fc-path{font-size:11px;font-family:'SF Mono','Fira Code',monospace;color:var(--text2)}
+
+  /* ── Input → Output inside detail drawer ── */
+  .dd-io{display:flex;align-items:stretch;gap:0;margin-top:6px;margin-bottom:4px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
+  .dd-io-col{flex:1;padding:10px 12px}
+  .dd-io-in{background:#f0f4ff}
+  .dd-io-out{background:var(--green-bg)}
+  .dd-io-arrow{display:flex;align-items:center;padding:0 8px;font-size:16px;color:var(--text3);background:var(--surface2);border-left:1px solid var(--border);border-right:1px solid var(--border)}
+  .dd-io-label{font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--text3);margin-bottom:4px}
+  .dd-io-text{font-size:12px;color:var(--text2);line-height:1.5}
+
   .arch-section{margin-bottom:20px}
   .arch-section-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px solid var(--border)}
   .arch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:7px}
@@ -282,6 +307,16 @@ function toggleDetail(id){
   ch.classList.toggle('open',!isOpen);
 }
 
+document.addEventListener('DOMContentLoaded',function(){
+  const visible=[...document.querySelectorAll('.page-content')].find(p=>p.style.display!=='none');
+  if(!visible)return;
+  const id=visible.id.replace(/^page-/,'');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    const oc=n.getAttribute('onclick')||'';
+    if(oc.includes("'"+id+"'"))n.classList.add('active');
+  });
+});
+
 // ── Feature flows tab (per-session) ──
 // Renders a flows[] array (see references/session-block-template.md) into rootId.
 // Called once per session from that session's own inline <script>, e.g.:
@@ -391,55 +426,6 @@ function deepDiveFeature(featureLabel){
     <div class="app-name">FooFoo</div>
     <div class="app-sub">Engineering operating system</div>
   </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">Operating System</div>
-    <div class="nav-item" onclick="showPage('exec')">
-      <span class="nav-icon">🎛</span> Executive dashboard
-    </div>
-    <div class="nav-item" onclick="showPage('roadmap')">
-      <span class="nav-icon">🧭</span> Project roadmap
-    </div>
-    <div class="nav-item" onclick="showPage('features')">
-      <span class="nav-icon">✨</span> Feature dashboard
-    </div>
-    <div class="nav-item" onclick="showPage('repo')">
-      <span class="nav-icon">🌳</span> Repository architecture
-    </div>
-    <div class="nav-item" onclick="showPage('backend')">
-      <span class="nav-icon">🧱</span> Backend architecture
-    </div>
-    <div class="nav-item" onclick="showPage('re')">
-      <span class="nav-icon">🤖</span> Recommendation engine
-    </div>
-    <div class="nav-item" onclick="showPage('dbdash')">
-      <span class="nav-icon">🗄</span> Database dashboard
-    </div>
-    <div class="nav-item" onclick="showPage('api')">
-      <span class="nav-icon">🔌</span> API catalogue
-      <span class="nav-badge">1/10</span>
-    </div>
-    <div class="nav-item" onclick="showPage('impl')">
-      <span class="nav-icon">📦</span> Implementation (WPs)
-    </div>
-    <div class="nav-item" onclick="showPage('adr')">
-      <span class="nav-icon">⚖️</span> Decision register
-    </div>
-    <div class="nav-item" onclick="showPage('debt')">
-      <span class="nav-icon">🧾</span> Technical debt
-    </div>
-    <div class="nav-item" onclick="showPage('validation')">
-      <span class="nav-icon">✅</span> Validation dashboard
-    </div>
-    <div class="nav-item" onclick="showPage('deploy')">
-      <span class="nav-icon">🚀</span> Deployment dashboard
-    </div>
-    <div class="nav-item" onclick="showPage('metrics')">
-      <span class="nav-icon">📊</span> Repository metrics
-    </div>
-  </div>
-
-  <hr class="sidebar-divider">
 
   <div class="sidebar-section">
     <div class="sidebar-section-label">Overview</div>
@@ -600,485 +586,6 @@ function deepDiveFeature(featureLabel){
 </nav>
 
 <main id="main">
-
-  <!-- ══════════ WP-K01 OPERATING SYSTEM LAYER (living pages — update in place, never append) ══════════ -->
-
-  <!-- ── 01 · Executive Dashboard ── -->
-  <div id="page-exec" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Executive dashboard</div>
-      <div class="page-subtitle"><b>FooFoo</b> — an AI-powered meal-decision assistant for Indian households. A <b>class-first recommendation engine</b> (household → cohort → class plan → dish pool) built documentation-first on Supabase/PostgreSQL with Deno/TypeScript Edge Functions. Vision: <a href="docs/product/%5BACTIVE%5D_DOC-01_Product_Brief_v1.1.docx">DOC-01 Product Brief</a>.</div>
-    </div>
-    <div class="os-note">This page is a status snapshot, not a source of truth — every figure names the certificate or document that owns it. Facts current as of <b>S26 · 2026-07-15</b>, commit <span class="mono">e76bd9c</span>. When a later session changes reality, it updates this page in place.</div>
-
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-l">Current phase</div><div class="kpi-v">Phase 8 — Backend Engineering</div><div class="kpi-s">Data Gate passed; API Gate is next (<a href="docs/architecture/%5BACTIVE%5D_DOC-P4-00_Backend_Foundation_Architecture_v1.0.md">DOC-P4-00</a>)</div></div>
-      <div class="kpi"><div class="kpi-l">Latest work package</div><div class="kpi-v">WP-8E — RE integration layer</div><div class="kpi-s">One engine, three callers · <a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-015_WP-8E_RE_Integration_Layer_v1.0.md">REPO-CERT-015</a></div></div>
-      <div class="kpi"><div class="kpi-l">Next work package</div><div class="kpi-v">RE read-port adapters + endpoints</div><div class="kpi-s">CandidateRepository first, then /v1/onboarding + /v1/recommendations, then live-DB validation (WP-8E §7)</div></div>
-      <div class="kpi"><div class="kpi-l">Latest certificate</div><div class="kpi-v">REPO-CERT-015</div><div class="kpi-s">2026-07-15 · WP-8E execution</div></div>
-      <div class="kpi"><div class="kpi-l">Latest commit</div><div class="kpi-v mono">e76bd9c</div><div class="kpi-s">feat(re): WP-8E integration layer</div></div>
-      <div class="kpi"><div class="kpi-l">Current branch</div><div class="kpi-v mono">main</div><div class="kpi-s">clean; feature branches merged locally, per-WP push discipline</div></div>
-      <div class="kpi"><div class="kpi-l">Backend tests</div><div class="kpi-v">62 / 62 passing</div><div class="kpi-s">deno task verify, 2026-07-15 (REPO-CERT-015)</div></div>
-      <div class="kpi"><div class="kpi-l">Production readiness</div><div class="kpi-v"><span class="st st-blocked">NOT READY</span></div><div class="kpi-s">API Gate not passed; DPDP age gate open (AGR-P3-07-001)</div></div>
-    </div>
-
-    <div class="os-card">
-      <div class="os-card-title">Completion by track <span class="src">— engineering estimates derived from the gate ledger and WP certificates below; not measured telemetry. Basis: <a href="#" onclick="showPage('impl');return false">Implementation dashboard</a>.</span></div>
-      <div class="pbar-row"><div class="pbar-name">Discovery &amp; architecture</div><div class="pbar"><div class="pbar-fill" style="width:100%;background:var(--green)"></div></div><div class="pbar-pct">100% · frozen</div></div>
-      <div class="pbar-row"><div class="pbar-name">Database (schema + data)</div><div class="pbar"><div class="pbar-fill" style="width:95%;background:var(--green)"></div></div><div class="pbar-pct">95% · ICD-1</div></div>
-      <div class="pbar-row"><div class="pbar-name">Recommendation engine</div><div class="pbar"><div class="pbar-fill" style="width:65%"></div></div><div class="pbar-pct">~65%</div></div>
-      <div class="pbar-row"><div class="pbar-name">Backend (Surface B)</div><div class="pbar"><div class="pbar-fill" style="width:45%"></div></div><div class="pbar-pct">~45%</div></div>
-      <div class="pbar-row"><div class="pbar-name">Infrastructure / CI</div><div class="pbar"><div class="pbar-fill" style="width:70%"></div></div><div class="pbar-pct">~70%</div></div>
-      <div class="pbar-row"><div class="pbar-name">Deployment</div><div class="pbar"><div class="pbar-fill" style="width:20%"></div></div><div class="pbar-pct">~20%</div></div>
-      <div class="pbar-row"><div class="pbar-name">Frontend</div><div class="pbar"><div class="pbar-fill" style="width:0%"></div></div><div class="pbar-pct">0% · no DOC-P4-01</div></div>
-      <div class="pbar-row"><div class="pbar-name"><b>Overall</b></div><div class="pbar"><div class="pbar-fill" style="width:55%"></div></div><div class="pbar-pct"><b>~55%</b></div></div>
-      <div class="src">Database is 95% not 100% because S-15 (<span class="mono">re_city_migration_overlays</span>) is deferred and <span class="mono">re_cohort_class_priors</span> is unseeded — see <a href="#" onclick="showPage('debt');return false">Technical debt</a>. RE/backend basis: core + orchestration built and tested, but 1/10 endpoints implemented and nothing has run against a live DB.</div>
-    </div>
-
-    <div class="os-card">
-      <div class="os-card-title">Current risks <span class="src">— top items; full list in <a href="#" onclick="showPage('debt');return false">Technical debt</a> and DOC-P4-00 §Risks</span></div>
-      <table class="os-table"><tbody>
-        <tr><td><span class="st st-open">OPEN</span></td><td><b>DPDP under-13 age gate (AGR-P3-07-001)</b> — launch-blocking legal requirement with no implemented mechanism. Founder-owned. <span class="src"><a href="docs/governance/%5BACTIVE%5D_DOC-P3-05_Architecture_Gap_Register_v1.1.md">Gap Register</a></span></td></tr>
-        <tr><td><span class="st st-blocked">BLOCKED</span></td><td><b>CandidateRepository adapter</b> — dish variety dimensions live as genome tags (<span class="mono">dish_tags</span>→<span class="mono">tags</span>), not columns; mapping deliberately not guessed. Gates both remaining endpoints. <span class="src">WP-8E §6.1</span></td></tr>
-        <tr><td><span class="st st-partial">RISK</span></td><td><b>Service-role authorization omissions</b> — Edge Functions bypass RLS, so any missed in-function ownership check is a data exposure. Mitigated by <span class="mono">requireOwnership</span> middleware pattern. <span class="src">DOC-P4-00 §8</span></td></tr>
-        <tr><td><span class="st st-partial">RISK</span></td><td><b>Cold-start priors unseeded</b> — <span class="mono">re_cohort_class_priors</span> empty, so new-user ranking uses the neutral 0.50 fallback (LF-E02). Documented MVP limitation. <span class="src">WP-8D §3</span></td></tr>
-        <tr><td><span class="st st-pending">WATCH</span></td><td><b>Nothing exercised against a live database</b> — all 62 tests use in-memory fakes; live-DB behavioural validation is enumerated debt. <span class="src">WP-8E §6.4</span></td></tr>
-      </tbody></table>
-    </div>
-
-    <div class="os-card">
-      <div class="os-card-title">Decisions awaiting the Founder</div>
-      <table class="os-table"><tbody>
-        <tr><td class="mono">AD-01</td><td>Countersign <a href="docs/architecture/%5BDRAFT%5D_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md">DOC-P4-02</a> to promote it DRAFT→ACTIVE. The onboarding↔first-plan boundary was reconciled via the CDM (RE Engine is the plan actor; onboarding orchestrates — WP-8D §1); direction was given in-session, formal signature pending.</td></tr>
-        <tr><td class="mono">DCR-8D-01</td><td>Confirm the weight-ladder interpolation reading — the DOC-P3-03 §07 worked example is internally inconsistent; the continuous forward-transition reading was implemented and tested by invariant. <span class="src">WP-8D §4</span></td></tr>
-        <tr><td class="mono">Priors</td><td>Disposition <span class="mono">re_cohort_class_priors</span>: seed it (WP-6-class task) or formally accept the neutral-fallback MVP limitation. <span class="src">REPO-CERT-013/014</span></td></tr>
-        <tr><td class="mono">Countersignatures</td><td>All 15 execution certificates (REPO-CERT-001…015) carry blank Founder countersignature lines — work is executed and evidenced, formal acceptance pending.</td></tr>
-      </tbody></table>
-    </div>
-
-    <div class="os-card">
-      <div class="os-card-title">Founder 5-minute path</div>
-      <div class="dd-text" style="font-size:13px;line-height:1.8">
-        1 · This page (where we are, what's blocked, what you owe).&nbsp;
-        2 · <a href="#" onclick="showPage('roadmap');return false">Project roadmap</a> (gates passed vs pending).&nbsp;
-        3 · <a href="#" onclick="showPage('features');return false">Feature dashboard</a> (what a user can/can't do yet).&nbsp;
-        4 · <a href="#" onclick="showPage('debt');return false">Technical debt</a> (what we owe ourselves).&nbsp;
-        5 · <a href="#" onclick="showPage('timeline-full');return false">Session history</a> (how we got here, S1→S26).
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 02 · Project Roadmap ── -->
-  <div id="page-roadmap" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Project roadmap</div>
-      <div class="page-subtitle">The delivery journey and its five gates. This page shows live status; the narrative roadmap documents (<a href="docs/roadmaps/%5BACTIVE%5D_FooFoo_Project_Roadmap_v1.1.md">FooFoo_Project_Roadmap v1.1</a>, dated 2026-07-03, and <a href="docs/roadmaps/%5BACTIVE%5D_PM-SUPP-01_Roadmap_v1.0.md">PM-SUPP-01</a>) are historical — their percentages pre-date the Data Gate and backend work.</div>
-    </div>
-
-    <div class="os-card">
-      <div class="os-card-title">Stages</div>
-      <div class="pbar-row"><div class="pbar-name">Discovery &amp; research</div><div class="pbar"><div class="pbar-fill" style="width:100%;background:var(--green)"></div></div><div class="pbar-pct"><span class="st st-done">DONE</span></div></div>
-      <div class="pbar-row"><div class="pbar-name">Architecture (P3 series)</div><div class="pbar"><div class="pbar-fill" style="width:100%;background:var(--green)"></div></div><div class="pbar-pct"><span class="st st-done">FROZEN</span></div></div>
-      <div class="pbar-row"><div class="pbar-name">Database &amp; canonical data</div><div class="pbar"><div class="pbar-fill" style="width:95%;background:var(--green)"></div></div><div class="pbar-pct"><span class="st st-done">DONE</span></div></div>
-      <div class="pbar-row"><div class="pbar-name">Backend (Phase 8)</div><div class="pbar"><div class="pbar-fill" style="width:45%"></div></div><div class="pbar-pct"><span class="st st-active">ACTIVE</span></div></div>
-      <div class="pbar-row"><div class="pbar-name">Frontend</div><div class="pbar"><div class="pbar-fill" style="width:0%"></div></div><div class="pbar-pct"><span class="st st-pending">PENDING</span></div></div>
-      <div class="pbar-row"><div class="pbar-name">Testing (live behavioural)</div><div class="pbar"><div class="pbar-fill" style="width:15%"></div></div><div class="pbar-pct"><span class="st st-pending">PENDING</span></div></div>
-      <div class="pbar-row"><div class="pbar-name">Deployment</div><div class="pbar"><div class="pbar-fill" style="width:20%"></div></div><div class="pbar-pct"><span class="st st-pending">PENDING</span></div></div>
-      <div class="pbar-row"><div class="pbar-name">Production launch</div><div class="pbar"><div class="pbar-fill" style="width:0%"></div></div><div class="pbar-pct"><span class="st st-pending">PENDING</span></div></div>
-    </div>
-
-    <div class="os-card">
-      <div class="os-card-title">Gate ledger <span class="src">— gate model per <a href="docs/roadmaps/%5BACTIVE%5D_FooFoo_Project_Roadmap_v1.1.md">Roadmap v1.1</a>; status per certificates</span></div>
-      <div class="gate-row"><span class="gate-ic">🟢</span><span class="gate-name">Architecture Gate</span><span class="gate-note"><b>PASSED</b> 2026-07-03 — 8 P3 documents frozen, Founder-signed. <a href="docs/governance/%5BACTIVE%5D_Phase3_5_Architecture_Freeze_v1.0.md">Architecture Freeze</a></span></div>
-      <div class="gate-row"><span class="gate-ic">🟢</span><span class="gate-name">Repository Gate</span><span class="gate-note"><b>PASSED</b> 2026-07-13 — repository CERTIFIED GREEN after the WP-5A→5G recovery program; build 001→029 and teardown proven in a clean room. <a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-006_Repository_Green_Certification_v1.0.md">REPO-CERT-006</a></span></div>
-      <div class="gate-row"><span class="gate-ic">🟢</span><span class="gate-name">Data Gate (ICD-1)</span><span class="gate-note"><b>PASSED</b> 2026-07-14 — canonical knowledge layer proven on a clean room (<a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-007_WP-6E_Data_Gate_Execution_v1.0.md">REPO-CERT-007</a>), synced to the live project (<a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md">REPO-CERT-009</a>), security-hardened + validation modernized (<a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-010_WP-6E3_Security_Hardening_and_Validation_Modernization_v1.0.md">REPO-CERT-010</a>).</span></div>
-      <div class="gate-row"><span class="gate-ic">🟡</span><span class="gate-name">API Gate</span><span class="gate-note"><b>IN PROGRESS</b> — Edge Functions must pass behavioural validation against the frozen <a href="docs/architecture/%5BACTIVE%5D_DOC-P3-06_API_Contract_Specification_v1.2.md">DOC-P3-06</a> contract. Done: scaffold (8B), auth+consent (8C), RE core (8D), integration layer (8E). Remaining: adapters, /v1/onboarding + /v1/recommendations, the other 6 endpoints, live-DB validation, WP-8F/8G/8H.</span></div>
-      <div class="gate-row"><span class="gate-ic">⚪</span><span class="gate-name">Release Gate</span><span class="gate-note"><b>NOT REACHED</b> — requires API Gate, DOC-09/DOC-08 launch criteria, and resolution of AGR-P3-07-001 (DPDP age gate, currently OPEN and launch-blocking).</span></div>
-    </div>
-
-    <div class="os-card">
-      <div class="os-card-title">Phase 8 work-package sequence <span class="src">— per DOC-P4-00 §Phase-8 roadmap</span></div>
-      <div class="os-wrap"><table class="os-table">
-        <thead><tr><th>WP</th><th>Scope</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td class="mono">WP-8A</td><td>Backend Foundation Architecture (DOC-P4-00)</td><td><span class="st st-done">DONE</span></td></tr>
-          <tr><td class="mono">WP-8B</td><td>Scaffold + _shared foundation + CI</td><td><span class="st st-done">DONE</span> · CERT-008</td></tr>
-          <tr><td class="mono">WP-8C</td><td>Auth framework + consent + onboarding</td><td><span class="st st-partial">PARTIAL</span> · auth+consent done (CERT-011); onboarding endpoint pending</td></tr>
-          <tr><td class="mono">WP-8D</td><td>Reusable RE core + unit tests</td><td><span class="st st-done">DONE</span> · CERT-014</td></tr>
-          <tr><td class="mono">WP-8E</td><td>RE integration: orchestrators + scheduler + persistence</td><td><span class="st st-done">DONE</span> (orchestration) · CERT-015 · adapters/endpoints = enumerated debt</td></tr>
-          <tr><td class="mono">WP-8F</td><td>/v1/events + /v1/plan + suppression + taste-vector evolution</td><td><span class="st st-pending">NOT STARTED</span></td></tr>
-          <tr><td class="mono">WP-8G</td><td>Observability, rate limiting, NFR/latency validation</td><td><span class="st st-pending">NOT STARTED</span></td></tr>
-          <tr><td class="mono">WP-8H</td><td>Admin/content-ops endpoints + security hardening + DPDP coordination</td><td><span class="st st-pending">NOT STARTED</span></td></tr>
-        </tbody>
-      </table></div>
-    </div>
-  </div>
-
-  <!-- ── 03 · Feature Dashboard ── -->
-  <div id="page-features" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Feature dashboard</div>
-      <div class="page-subtitle">Every product capability, its implementation status, owning work package, and where its code and specification live. "Surface A" = the app talks to Supabase directly under RLS (no custom backend needed); "Surface B" = custom Edge Functions (<a href="docs/architecture/%5BACTIVE%5D_DOC-P3-06_API_Contract_Specification_v1.2.md">DOC-P3-06 §01</a>).</div>
-    </div>
-    <div class="os-wrap"><table class="os-table">
-      <thead><tr><th>Feature</th><th>Status</th><th>Owner WP</th><th>Repository location</th><th>Specification</th><th>Done</th></tr></thead>
-      <tbody>
-        <tr><td><b>Registration / login</b></td><td><span class="st st-pending">PLATFORM</span></td><td>— (Supabase Auth)</td><td class="mono">n/a — GoTrue issues JWTs; no custom code by design</td><td>DOC-P3-06 §04 · DOC-P3-07</td><td>n/a</td></tr>
-        <tr><td><b>Authentication framework</b></td><td><span class="st st-done">BUILT</span></td><td>WP-8C · CERT-011</td><td class="mono">supabase/functions/_shared/auth/</td><td>DOC-P3-06 §04/§05 · DOC-P4-00 §7–8</td><td>100% (live GoTrue unexercised)</td></tr>
-        <tr><td><b>Consent (DPDP)</b></td><td><span class="st st-done">BUILT</span></td><td>WP-8C · CERT-011</td><td class="mono">supabase/functions/consent/ + _shared/services/consent-service.ts</td><td>DOC-P3-06 §06.1 · DOC-P3-03 §15 (LF-M01)</td><td>100% (not deployed)</td></tr>
-        <tr><td><b>Onboarding</b></td><td><span class="st st-partial">PARTIAL</span></td><td>WP-8E · CERT-015</td><td class="mono">_shared/services/onboarding/orchestrator.ts</td><td>DOC-P3-06 §06.2 · DOC-P3-03 §03 (LF-A01–A09) · DOC-P4-02 (DRAFT)</td><td>~60% — orchestrator tested; endpoint + adapters pending</td></tr>
-        <tr><td><b>Recommendation engine</b></td><td><span class="st st-partial">PARTIAL</span></td><td>WP-8D · CERT-014</td><td class="mono">_shared/services/re/ (9 files)</td><td>DOC-P3-03 §06–11 · RE-DOC-01–05</td><td>~65% — core done; read adapters + endpoints pending</td></tr>
-        <tr><td><b>Weekly planning</b></td><td><span class="st st-partial">PARTIAL</span></td><td>WP-8E · CERT-015</td><td class="mono">_shared/services/planning/persistence.ts · services/scheduler/nightly-plan.ts</td><td>DOC-P3-03 §14 (LF-L01) · DOC-P3-06 §06.5/06.6</td><td>~50% — persistence + scheduler tested; CRON deploy + /v1/plan pending</td></tr>
-        <tr><td><b>Meal tracking / events</b></td><td><span class="st st-pending">NOT STARTED</span></td><td>WP-8F (planned)</td><td class="mono">— (/v1/events not built)</td><td>DOC-P3-06 §06.3 (LF-J01, G01/G02)</td><td>0%</td></tr>
-        <tr><td><b>Profile &amp; DPDP rights</b></td><td><span class="st st-pending">NOT STARTED</span></td><td>WP-8F/8H (planned)</td><td class="mono">— (Surface A reads; /v1/user/export + /v1/user/delete not built)</td><td>DOC-P3-06 §06.7/06.8 (LF-M02/M03)</td><td>0%</td></tr>
-        <tr><td><b>Gamification</b></td><td><span class="st st-pending">NOT SCHEDULED</span></td><td>— no frozen WP</td><td class="mono">—</td><td>product scope: <a href="docs/architecture/%5BACTIVE%5D_DOC-04_PRD_v1.1.docx">DOC-04 PRD</a></td><td>0%</td></tr>
-        <tr><td><b>Notifications</b></td><td><span class="st st-pending">DESIGNED</span></td><td>WP-8F+ (planned)</td><td class="mono">— (OneSignal server leg; push_notification_logs table exists)</td><td>DOC-P3-08 §09 · DOC-10</td><td>0%</td></tr>
-        <tr><td><b>Admin / content-ops</b></td><td><span class="st st-pending">NOT STARTED</span></td><td>WP-8H (planned)</td><td class="mono">— (manual gate per LF-K04)</td><td>DOC-P3-06 §03 · DOC-P4-00 §8</td><td>0%</td></tr>
-        <tr><td><b>Analytics</b></td><td><span class="st st-pending">DESIGNED</span></td><td>WP-8G (planned)</td><td class="mono">— (PostHog + Sentry seams in _shared/telemetry/)</td><td>DOC-P3-08 §09 · DOC-P3-06 §22</td><td>0%</td></tr>
-      </tbody>
-    </table></div>
-    <div class="src" style="margin-top:8px">Status legend: BUILT = code + tests pass (with fakes; nothing is deployed yet). PARTIAL = some layers built and tested, runtime path incomplete. DESIGNED = frozen architecture exists, no code. PLATFORM = provided by Supabase, intentionally no custom code.</div>
-  </div>
-
-  <!-- ── 04 · Repository Architecture ── -->
-  <div id="page-repo" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Repository architecture</div>
-      <div class="page-subtitle">What every folder is for and how far along it is. The folder structure is <b>frozen</b> — new top-level folders need a Founder-approved RACR (<a href="CLAUDE.md">CLAUDE.md</a> Placement Rule).</div>
-    </div>
-    <div class="os-tree"><b>foofoo-v3/</b>
-├── <b>CLAUDE.md</b>              repo operating rules — session protocol, placement rule, naming standard (WP-5AA)
-├── <b>KNOWLEDGE.html</b>         this file — the engineering operating system + session history
-├── <b>docs/</b>
-│   ├── <b>product/</b>           what FooFoo is, for whom — DOC-01/02/03/07/08/09 (6 docs, frozen)
-│   ├── <b>architecture/</b>      how it is built — DOC-P3-02..08 (frozen), DOC-P4-00 (ACTIVE), DOC-P4-02 (DRAFT), RE-DOC-01..04, PRD/IA/UX
-│   ├── <b>governance/</b>        standing rules — APDF, naming standard, AGR/SER registers, Baseline Register, Architecture Freeze (25 files)
-│   ├── <b>project-history/</b>   what actually happened — reports + decision logs per WP
-│   │   ├── <b>work-packages/</b>  proposed work; DESIGNED until certified (28 files)
-│   │   └── <b>certificates/</b>   proof of real execution — REPO-CERT-001..015 + REPO-BOOT-03 (23 files)
-│   ├── <b>research/</b>          Batch 1–6 discovery/canonicalization records (21 docs, frozen history)
-│   ├── <b>roadmaps/</b>          forward plans (narrative; live status lives on the Roadmap page here)
-│   └── <b>visuals/</b>           interactive HTML explainers (design system + 3 RE explorers)
-├── <b>database/</b>              ★ source of truth for all SQL
-│   ├── <b>migrations/</b>        001–030 structural schema (numbered, ordered, frozen via DOC-P3-04/05)
-│   ├── <b>rollback/</b>          46 paired down-scripts — 30 structural + 16 seed rollbacks (29/29 teardown execution-proven)
-│   ├── <b>seeds/</b>             100–117: config, reference, canonical content + RE knowledge (ICD-1)
-│   ├── <b>validation/</b>        900–905 structural/behavioural/safety-gate/RE checks (modernized WP-6E.3)
-│   └── <b>etl/</b>               deterministic seed generators (generate_icd1_seeds.py, generate_re_seeds.py)
-├── <b>data/source/</b>           original CSV/XLSX spreadsheets — the evidence trail for every seed value
-├── <b>supabase/</b>              ★ backend code tree (Deno/TypeScript Edge Functions — WP-8B..8E)
-│   ├── <b>functions/_shared/</b>  the engineering foundation + all services (see Backend architecture)
-│   │   ├── api/ auth/ middleware/ validation/ errors/ logging/ telemetry/ config/ db/ di/ types/ utils/
-│   │   ├── <b>services/re/</b>     ★ the ONLY home of recommendation logic (WP-8D)
-│   │   ├── services/{onboarding,recommendations,scheduler,planning,adapters}/  callers + persistence (WP-8E)
-│   │   └── repositories/       base + consent repository (all SQL lives here)
-│   ├── <b>functions/consent/</b>  the one deployed-shape endpoint so far: POST /v1/consent
-│   ├── <b>functions/_tests/</b>   62 tests across 4 suites (foundation/consent/re_core/re_integration)
-│   ├── config.toml · deno.json · scripts/ (verify.sh, gen-types.sh)
-│   └── README.md
-├── <b>engineering/templates/</b>  reserved — EMPTY until the Founder supplies template texts (never fabricated)
-└── <b>.github/workflows/</b>     backend-ci.yml (fmt/lint/check/test on every push) · mirror.yml · drive-backup.yml</div>
-    <div class="src" style="margin-top:10px">Status: <span class="mono">docs/</span> complete for the frozen baseline · <span class="mono">database/</span> execution-proven (GREEN + Data Gate) · <span class="mono">supabase/</span> foundation + RE core + orchestration built, endpoints 1/10 · <span class="mono">engineering/templates/</span> empty by honest design. Index of documents: <a href="docs/README.md">docs/README.md</a>.</div>
-  </div>
-
-  <!-- ── 05 · Backend Architecture ── -->
-  <div id="page-backend" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Backend architecture</div>
-      <div class="page-subtitle">Layered Deno/TypeScript Edge Functions over PostgreSQL, exactly per <a href="docs/architecture/%5BACTIVE%5D_DOC-P4-00_Backend_Foundation_Architecture_v1.0.md">DOC-P4-00</a>. Handlers are thin; services orchestrate business logic (each cites its LF-*); repositories own all SQL; Edge Functions run as <b>service_role</b> (RLS bypassed), so <b>every ownership check is explicit in code</b>.</div>
-    </div>
-    <div class="os-card">
-      <div class="os-card-title">Request flow (Surface B)</div>
-      <div class="os-flow">
-        <div class="os-flow-node"><b>User / mobile app</b><span>Authorization: Bearer &lt;JWT&gt; (Supabase Auth)</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>API — thin handler</b><span>functions/&lt;endpoint&gt;/handler.ts · parse → delegate → envelope</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>Middleware — compose()</b><span>trace-id → authenticate (JWT verify) → requireOwnership → error boundary → structured log</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>Validation — Zod schemas</b><span>_shared/validation/ · mirrors DB CHECK constraints · 400 vs 422 split (DCR-8C-02)</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>Service layer</b><span>_shared/services/ · one LF-cited orchestration per method · stateless, per-request DI container</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>Repository layer</b><span>_shared/repositories/ + services/adapters/ · the only place SQL lives · keyset pagination</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>PostgreSQL (ap-south-1)</b><span>public schema (RLS) + re_engine schema (service_role-only) · triggers own derived columns</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>Response envelope</b><span>contract-shaped body + additive trace_id (jsonContract, DCR-8C-01) · errors = DOC-P3-06 §21 catalogue</span></div>
-      </div>
-    </div>
-    <div class="os-card">
-      <div class="os-card-title">Implemented components <span class="src">— all under <span class="mono">supabase/functions/</span>; 53 TS files, 62 tests</span></div>
-      <div class="os-wrap"><table class="os-table">
-        <thead><tr><th>Component</th><th>Files</th><th>Built by</th><th>Notes</th></tr></thead>
-        <tbody>
-          <tr><td>Foundation (config · db · errors · logging · telemetry · middleware · api · di · validation wrapper · base repo/service)</td><td class="mono">_shared/*</td><td>WP-8B · CERT-008</td><td>fail-fast config; structured JSON logger (single sanctioned sink); AppError never leaks internals</td></tr>
-          <tr><td>Auth framework</td><td class="mono">auth/authenticate.ts · auth/authorize.ts · auth/jwt.ts</td><td>WP-8C · CERT-011</td><td>real JWT signature verification (injectable verifier); requireOwnership guard</td></tr>
-          <tr><td>ConsentService + repository + endpoint</td><td class="mono">services/consent-service.ts · repositories/consent-repository.ts · consent/</td><td>WP-8C · CERT-011</td><td>LF-M01; append-only consent_records; the only runnable endpoint</td></tr>
-          <tr><td>RE core (engine · scoring · constraints · variety · safety · resolvers · ports · types)</td><td class="mono">services/re/ (9 files)</td><td>WP-8D · CERT-014</td><td>pure logic behind ports; see RE page</td></tr>
-          <tr><td>OnboardingOrchestrator</td><td class="mono">services/onboarding/orchestrator.ts</td><td>WP-8E · CERT-015</td><td>LF-A01–A09 + consent gate + engine invocation + §06.2 handle</td></tr>
-          <tr><td>RecommendationService</td><td class="mono">services/recommendations/service.ts</td><td>WP-8E · CERT-015</td><td>§06.4 single-slot re-recommendation, persists fresh slate</td></tr>
-          <tr><td>NightlyPlanScheduler</td><td class="mono">services/scheduler/nightly-plan.ts</td><td>WP-8E · CERT-015</td><td>LF-L01; per-user failure isolation; CRON deploy pending</td></tr>
-          <tr><td>WeekPlanStore + persistence mapping</td><td class="mono">services/planning/persistence.ts</td><td>WP-8E · CERT-015</td><td>GeneratedWeekPlan → week_plans/plan_slots; atomicity RPC = debt</td></tr>
-          <tr><td>Supabase store adapters</td><td class="mono">services/adapters/supabase-stores.ts</td><td>WP-8E · CERT-015</td><td>verified columns; type-checked only — no live DB run yet</td></tr>
-        </tbody>
-      </table></div>
-      <div class="src">Not built: /v1/health, /v1/onboarding, /v1/recommendations, /v1/events, /v1/plan*, /v1/user/* endpoints; RE read-port concrete adapters (CandidateRepository blocked on genome-tag mapping); rate limiting; Sentry/PostHog/OneSignal/OpenWeather wiring (seams only). See <a href="#" onclick="showPage('api');return false">API catalogue</a> and <a href="#" onclick="showPage('debt');return false">Technical debt</a>.</div>
-    </div>
-  </div>
-
-  <!-- ── 06 · Recommendation Engine ── -->
-  <div id="page-re" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Recommendation engine</div>
-      <div class="page-subtitle">The class-first RE: a household resolves to a <b>cohort</b>, the cohort to a <b>weekly class plan</b>, each class to a <b>dish pool</b>, and the engine picks the slate. One reusable engine owns every recommendation decision; recommendation logic exists <b>only</b> in <span class="mono">supabase/functions/_shared/services/re/</span>. Authority: <a href="docs/architecture/%5BACTIVE%5D_DOC-P3-03_Business_Logic_Specification_v1.0.md">DOC-P3-03 §06–11</a>, RE-DOC-01–05, <a href="docs/project-history/work-packages/%5BACTIVE%5D_WP-8D_Recommendation_Engine_Core_v1.0.md">WP-8D</a>/<a href="docs/project-history/work-packages/%5BACTIVE%5D_WP-8E_RE_Integration_Layer_v1.0.md">WP-8E</a>.</div>
-    </div>
-    <div class="os-card">
-      <div class="os-card-title">Pipeline (per slot)</div>
-      <div class="os-flow">
-        <div class="os-flow-node"><b>Resolve</b><span>persona (LF-A09, Option-B fallback) → cohort (persona × state × diet_mode × city_tier) → weekly class plan (LF-B02) → non-veg overlay (LF-B03) · resolvers.ts</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>Candidates</b><span>class → dish pool via re_class_dish_options (LF-D01) · LF-D07 popular fallback when &lt;3 candidates</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>6 hard constraints</b><span>diet · ingredient-level allergen union · Jain · Never list · planning-role · availability (LF-D02–D06) · constraints.ts</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>5-signal scoring</b><span>FinalScore = weight-ladder(CohortPrior · ContentMatch cosine · PersonalHistory λ-decay · ContextFit · Thompson ExplorationBonus) − NotToday penalty (LF-E01–E08) · scoring.ts</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>Variety</b><span>MMR re-rank (λ=0.70) + variety windows: fried cap, monsoon override, same-dish/same-ingredient (LF-F01–F03) · variety.ts</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>4 safety gates</b><span>diet / allergen / Jain / planning-role — zero-tolerance, last line before serve (LF-H01–H04) · safety.ts</span></div><div class="os-flow-arrow">▼</div>
-        <div class="os-flow-node"><b>Slate</b><span>ranked dishes + reason tags (immutable, CDM Inv. 14) · engine.ts generateSlate / generateWeekPlan</span></div>
-      </div>
-    </div>
-    <div class="os-card">
-      <div class="os-card-title">Cold start → warm start</div>
-      <div class="dd-text">Day-0 confidence is computed from onboarding answers (LF-A08), clamped to the documented <b>0.40–0.65</b> Day-0 range (DCR-8E-01 cap at 0.65); <span class="mono">cold_start_mode</span> holds while interaction_count is low. Cold-start ranking leans on CohortPrior (w≈0.55 at tier 1) + exploration (Thompson sampling, Beta(1,1)=uniform at start, bounded bonus). As interactions accumulate, the <b>weight ladder</b> (5 tiers, continuous forward-transition interpolation — DCR-8D-01) shifts weight from cohort priors toward PersonalHistory/ContentMatch. <b>Current limitation:</b> <span class="mono">re_cohort_class_priors</span> is unseeded, so cold-start CohortPrior = neutral 0.50 fallback (LF-E02) until seeded.</div>
-    </div>
-    <div class="os-card">
-      <div class="os-card-title">One engine, three callers <span class="src">(DCR-P3-06-007; proven in the WP-8E integration test)</span></div>
-      <table class="os-table"><tbody>
-        <tr><td><b>Onboarding</b></td><td>OnboardingOrchestrator runs LF-A01–A09 (its own logic), then invokes <span class="mono">engine.generateWeekPlan</span>, persists via WeekPlanStore, returns the §06.2 handle. Per the CDM Domain Events, the RE Engine is the first-plan actor (AD-01 reconciliation, WP-8D §1).</td></tr>
-        <tr><td><b>Recommendations</b></td><td>RecommendationService (POST /v1/recommendations, §06.4) invokes <span class="mono">engine.generateSlate</span> for one slot, persists the fresh slate + FinalScores.</td></tr>
-        <tr><td><b>Nightly scheduler</b></td><td>NightlyPlanScheduler (LF-L01, 23:30 UTC / 05:00 IST when deployed) iterates eligible users through the same engine; single-user failures isolated.</td></tr>
-      </tbody></table>
-    </div>
-    <div class="os-card">
-      <div class="os-card-title">History, context &amp; evolution</div>
-      <div class="dd-text"><b>History:</b> the engine reads the append-only event stream (never writes user tables — RE-DOC-01 isolation); PersonalHistory decays with λ=0.05; Not-Today suppression decays with threshold + context override; Never list is a hard constraint. <b>Context:</b> ContextFit multiplies weather/season/day against genome tags (<span class="mono">re_context_multipliers</span>, seeded); weather via 12h <span class="mono">weather_cache</span>. <b>Evolution roadmap</b> (RE-DOC-05, behind the stable /v1 contract via <span class="mono">re_engine_versions</span>): <span class="mono">classfirst_v1</span> (active) → <span class="mono">classfirst_v2</span> → <span class="mono">ltr_v1</span> → <span class="mono">ml_v1</span>; /v2/recommendations reserved, unimplemented. No pgvector/LLM infra exists today by design (DOC-P4-00 §28).</div>
-    </div>
-    <div class="os-card">
-      <div class="os-card-title">Current vs future implementation</div>
-      <table class="os-table"><tbody>
-        <tr><td><span class="st st-done">BUILT</span></td><td>Engine core (28 tests) + orchestration layer (10 tests): constraints, scoring, variety, safety, resolvers, engine, DTOs, ports; onboarding/recommendations/scheduler callers; plan persistence; verified-column store adapters.</td></tr>
-        <tr><td><span class="st st-blocked">BLOCKED</span></td><td>CandidateRepository concrete adapter — needs the dish_tags/tags variety-dimension + genome_vector ordering + allergen join verified before a DishCandidate can be materialized (WP-8E §6.1 — deliberately not guessed).</td></tr>
-        <tr><td><span class="st st-pending">PENDING</span></td><td>Remaining read-port adapters (cohort/priors/taste/history/bandit/context/never/suppression + ReStateStore), the two HTTP endpoints, nightly CRON deployment, live-DB behavioural validation (extend 902/905), priors seeding, addon-slot generation (schema mismatch: re_segment_addon_rule named in docs does not exist — real path is re_household_addon_plans + re_addon_classes + re_addon_dish_options).</td></tr>
-      </tbody></table>
-    </div>
-  </div>
-
-  <!-- ── 07 · Database Dashboard ── -->
-  <div id="page-dbdash" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Database dashboard</div>
-      <div class="page-subtitle">62 base tables across two schemas: <span class="mono">public</span> (RLS-guarded, Surface A) and <span class="mono">re_engine</span> (service_role-only). Schema authority: <a href="docs/architecture/%5BACTIVE%5D_DOC-P3-04_Data_Architecture_ERD_v1.3.md">DOC-P3-04 v1.3</a>. Live canonical state: project <span class="mono">cmkswalqpmmqojwdmqbv</span>, certified by <a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md">REPO-CERT-009</a> (18/18 tables exact, DIFFS: 0) and hardened by <a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-010_WP-6E3_Security_Hardening_and_Validation_Modernization_v1.0.md">REPO-CERT-010</a>.</div>
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-l">Migrations</div><div class="kpi-v">30 / 30 rollback-paired</div><div class="kpi-s">001–030 · build+teardown execution-proven</div></div>
-      <div class="kpi"><div class="kpi-l">Seeds</div><div class="kpi-v">18 files (100–117)</div><div class="kpi-s">config + reference + canonical ICD-1</div></div>
-      <div class="kpi"><div class="kpi-l">Validation</div><div class="kpi-v">900–905 all pass</div><div class="kpi-s">last live run 2026-07-14 (CERT-010)</div></div>
-      <div class="kpi"><div class="kpi-l">Security</div><div class="kpi-v">Hardened</div><div class="kpi-s">AGR-001/Inv-6 posture in force; re_engine invisible to clients</div></div>
-    </div>
-    <div class="os-card">
-      <div class="os-card-title">Tables by domain, with live canonical counts <span class="src">(counts: REPO-CERT-009 §5; domain map: DOC-P3-04 §02)</span></div>
-      <div class="os-wrap"><table class="os-table">
-        <thead><tr><th>Domain</th><th>Tables</th><th>Live state</th></tr></thead>
-        <tbody>
-          <tr><td><b>Reference / content</b> (public)</td><td class="mono">dishes · ingredients · dish_ingredients · tags · dish_tags · dish_combos · dish_combo_items · cuisines · meal_classes (mirror)</td><td>802 dishes · 191 ingredients · 7,108 links · 111 tags · 10,456 dish_tags · 35 combos · 65 cuisines · 131 classes — derived columns 100% trigger-owned</td></tr>
-          <tr><td><b>Users / household</b> (public)</td><td class="mono">profiles · household_members · onboarding_sessions · consent_records</td><td>empty — no end users yet (backend pre-launch)</td></tr>
-          <tr><td><b>Planning</b> (public)</td><td class="mono">week_plans · plan_slots · addon_slots</td><td>empty — written by the RE at runtime</td></tr>
-          <tr><td><b>Interaction / context</b> (public, partitioned)</td><td class="mono">interaction_events · suggestion_logs · context_log · weather_cache</td><td>empty — append-only event stream</td></tr>
-          <tr><td><b>Recommendation knowledge</b> (re_engine)</td><td class="mono">re_states · re_personas · re_subcohorts · re_main_cohorts · re_meal_classes · re_addon_classes · re_cohorts · re_weekly_class_plans · re_household_addon_plans · re_nonveg_logic · re_class_dish_options · re_addon_dish_options · re_dish_regional_affinity · re_persona_assignment_rules · re_routing_rules · overlap rules</td><td>36 states · 41 personas · 41 subcohorts · 5 main cohorts · 131 classes · 24 addon classes · <b>2,952 cohorts</b> (city_tier, SER-001) · <b>20,664 weekly plans</b> (= cohorts × 7) · 7,992 addon plans · 36 nonveg rows · 165 + 6 dish options (ICD-1) · 130 affinity</td></tr>
-          <tr><td><b>RE identity / history</b> (re_engine)</td><td class="mono">user_re_state · user_taste_vectors · never_list · not_today_suppression · variety_window_state</td><td>empty — per-user runtime state</td></tr>
-          <tr><td><b>Configuration</b> (re_engine)</td><td class="mono">re_weight_ladder_config · re_scoring_config · re_event_weights · re_confidence_config · re_city_overlay_config · re_variety_rules · re_class_affinity_config · re_context_multipliers · re_festival_calendar · re_engine_versions</td><td>seeded + verified (weight ladder sums = 1.0; classfirst_v1 active)</td></tr>
-          <tr><td><b>Audit / security / ops</b> (public)</td><td class="mono">audit_log · derivation_conflicts · safety_gate_log · coverage_gap_log · push_notification_logs · etl_job_runs · feature_flags · dish_features</td><td>derivation_conflicts = 0 after canonical load; RLS on 33/33 public tables</td></tr>
-        </tbody>
-      </table></div>
-      <div class="src">Known gaps (deliberate, tracked): <span class="mono">re_city_migration_overlays</span> = 0 rows (S-15 deferred — source lacks migration_duration_band) · <span class="mono">re_cohort_class_priors</span> unseeded (neutral fallback in force). See <a href="#" onclick="showPage('debt');return false">Technical debt</a>.</div>
-    </div>
-  </div>
-
-  <!-- ── 08 · API Catalogue ── -->
-  <div id="page-api" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">API catalogue</div>
-      <div class="page-subtitle">The complete frozen Surface-B inventory — 9 <span class="mono">/v1</span> endpoints + 1 reserved <span class="mono">/v2</span>. Contract authority: <a href="docs/architecture/%5BACTIVE%5D_DOC-P3-06_API_Contract_Specification_v1.2.md">DOC-P3-06 v1.2 §03/§06</a>. No endpoint is deployed yet; "IMPLEMENTED" means built + tested locally. Surface A (direct PostgREST + RLS table access) is intentionally not re-implemented as endpoints.</div>
-    </div>
-    <div class="os-wrap"><table class="os-table">
-      <thead><tr><th>Endpoint</th><th>Status</th><th>WP</th><th>Source files</th><th>Tests</th><th>Contract</th></tr></thead>
-      <tbody>
-        <tr><td class="mono">POST /v1/consent</td><td><span class="st st-done">IMPLEMENTED</span></td><td>WP-8C</td><td class="mono">functions/consent/ · services/consent-service.ts · repositories/consent-repository.ts · validation/consent-schema.ts</td><td>16 (consent.test.ts)</td><td>§06.1 · LF-M01</td></tr>
-        <tr><td class="mono">POST /v1/onboarding</td><td><span class="st st-partial">ORCHESTRATOR BUILT</span></td><td>WP-8E → next WP</td><td class="mono">services/onboarding/orchestrator.ts (handler pending)</td><td>in re_integration.test.ts</td><td>§06.2 · LF-A01–A09 · AD-01/DOC-P4-02</td></tr>
-        <tr><td class="mono">POST /v1/recommendations</td><td><span class="st st-partial">SERVICE BUILT</span></td><td>WP-8E → next WP</td><td class="mono">services/recommendations/service.ts + services/re/ (handler pending; blocked on CandidateRepository)</td><td>in re_integration.test.ts + re_core.test.ts</td><td>§06.4 · LF-B..I pipeline · ≤800ms budget</td></tr>
-        <tr><td class="mono">POST /v2/recommendations</td><td><span class="st st-pending">RESERVED</span></td><td>— future LTR/ML</td><td class="mono">—</td><td>—</td><td>§03 · RE-DOC-01 §04</td></tr>
-        <tr><td class="mono">POST /v1/events</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F (planned)</td><td class="mono">—</td><td>—</td><td>§06.3 · LF-J01 + G01/G02 sub-path</td></tr>
-        <tr><td class="mono">GET /v1/plan/{user_id}/{week}</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F (planned)</td><td class="mono">— (plan-slot read adapters exist in services/adapters/)</td><td>—</td><td>§06.5 · reads LF-L01 output</td></tr>
-        <tr><td class="mono">POST /v1/plan/refresh</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F (planned)</td><td class="mono">—</td><td>—</td><td>§06.6 · LF-L02 · DCR-P3-06-004</td></tr>
-        <tr><td class="mono">GET /v1/user/export</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F/8H (planned)</td><td class="mono">—</td><td>—</td><td>§06.7 · LF-M02 · DPDP, async ≤72h</td></tr>
-        <tr><td class="mono">POST /v1/user/delete</td><td><span class="st st-pending">PENDING</span></td><td>WP-8F/8H (planned)</td><td class="mono">—</td><td>—</td><td>§06.8 · LF-M03 · DPDP, async ≤72h</td></tr>
-        <tr><td class="mono">GET /v1/health</td><td><span class="st st-pending">PENDING</span></td><td>next endpoint WP</td><td class="mono">— (recommended first deploy-pipeline proof, DOC-P4-00 §Impl-order)</td><td>—</td><td>§06.9 · public, &lt;50ms</td></tr>
-      </tbody>
-    </table></div>
-    <div class="src" style="margin-top:8px">Deprecated endpoints: none (v1 contract is additive-only, §16.4/§17). Scheduled (non-HTTP) runtimes: <span class="mono">_cron/nightly-plan</span> (LF-L01 — service built, CRON not deployed) and daily dish-feature snapshot (LF-J09 — not built).</div>
-  </div>
-
-  <!-- ── 09 · Implementation Dashboard ── -->
-  <div id="page-impl" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Implementation dashboard</div>
-      <div class="page-subtitle">Every work package, its objective, and its proof. Rule (<a href="CLAUDE.md">CLAUDE.md</a>): a WP may only read COMPLETED if a companion certificate with real execution output exists in <span class="mono">docs/project-history/certificates/</span>.</div>
-    </div>
-    <div class="os-wrap"><table class="os-table">
-      <thead><tr><th>WP</th><th>Objective</th><th>Status</th><th>Certificate</th><th>Commit</th></tr></thead>
-      <tbody>
-        <tr><td class="mono">REPO-BOOT-01..03</td><td>Repository bootstrap + migration to this repo after the apverse-labs account loss (history begins 2026-07-13)</td><td><span class="st st-done">DONE</span></td><td>REPO-BOOT-03</td><td class="mono">(baseline)</td></tr>
-        <tr><td class="mono">REPO-WP-02/03/04*</td><td>Schema baseline + seed readiness/loading/validation (pre-recovery era)</td><td><span class="st st-done">SUPERSEDED</span></td><td>via WP-5F2/5G (docs/README note)</td><td class="mono">—</td></tr>
-        <tr><td class="mono">WP-5A/5B</td><td>Completeness audit + recover migrations 021–026 from the live DB</td><td><span class="st st-done">DONE</span></td><td>audit + recovery reports</td><td class="mono">12213b5</td></tr>
-        <tr><td class="mono">WP-5AA</td><td>Repository naming normalization (133 renames; 9 honest exceptions)</td><td><span class="st st-done">DONE</span></td><td>Naming Validation Report</td><td class="mono">f212be6</td></tr>
-        <tr><td class="mono">WP-5C</td><td>Author all 26 missing rollbacks (28/28 coverage)</td><td><span class="st st-done">DONE</span></td><td>Rollback Validation Report</td><td class="mono">3e4bb8a</td></tr>
-        <tr><td class="mono">WP-5F / 5E / 5F2</td><td>Clean-room validation → remediation → real build/teardown execution</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-001/002/003</td><td class="mono">793bb38 · 8e0440c · 92a717c</td></tr>
-        <tr><td class="mono">WP-5D</td><td>Production parity: recover pf1 as migration 029 (Founder Option B)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-004/005</td><td class="mono">630694d · 7ffe7b3</td></tr>
-        <tr><td class="mono">WP-5G</td><td>Independent GREEN certification — Repository Gate PASSED</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-006</td><td class="mono">21e01d7</td></tr>
-        <tr><td class="mono">WP-6 / 6A–6D</td><td>Canonical knowledge plan + source→target mapping (found the dish-catalog blocker)</td><td><span class="st st-done">DONE</span></td><td>WP-6A-6D report</td><td class="mono">0d2258d · 2899c89</td></tr>
-        <tr><td class="mono">WP-6D-gen</td><td>Deterministic ETL → content seeds 103–109 (802 dishes; 885 deferred)</td><td><span class="st st-done">DONE</span></td><td>WP-6D-gen + Deferred Register</td><td class="mono">21f7d59</td></tr>
-        <tr><td class="mono">WP-6RE + DEC/GEN</td><td>RE knowledge audit → SER-001 city_tier (migration 030) → RE seeds 110–117</td><td><span class="st st-done">DONE</span></td><td>WP-6RE + SER-001</td><td class="mono">b74c7a7 · 8904d7b</td></tr>
-        <tr><td class="mono">WP-6E</td><td>Data Gate executed on disposable clean room — PASSED (ICD-1)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-007</td><td class="mono">cc4c828</td></tr>
-        <tr><td class="mono">WP-6E.2</td><td>Canonical sync to live Supabase (18/18 exact, DIFFS: 0)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-009</td><td class="mono">bee2ddc</td></tr>
-        <tr><td class="mono">WP-6E.3</td><td>Privilege-drift root cause + hardening + validation modernization</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-010</td><td class="mono">f155e65</td></tr>
-        <tr><td class="mono">WP-8A</td><td>Backend Foundation Architecture (DOC-P4-00, 30 topics, readiness 8.5/10)</td><td><span class="st st-done">DONE</span></td><td>DOC-P4-00 ACTIVE</td><td class="mono">b89ca7e</td></tr>
-        <tr><td class="mono">WP-8B</td><td>Backend scaffold: _shared foundation + CI + 8 tests</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-008</td><td class="mono">2a2cf4b</td></tr>
-        <tr><td class="mono">WP-8C</td><td>Auth framework + POST /v1/consent (onboarding deferred with evidence)</td><td><span class="st st-partial">PARTIAL</span></td><td>REPO-CERT-011</td><td class="mono">6906dd5</td></tr>
-        <tr><td class="mono">WP-8C-recon</td><td>Read-only reconciliation → Option B → DOC-P4-02 DRAFT authored (AD-01 surfaced)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-012</td><td class="mono">d195973</td></tr>
-        <tr><td class="mono">WP-8D-recon</td><td>Pre-implementation RE reconciliation → STOP (AD-01 + priors gap)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-013</td><td class="mono">c170006</td></tr>
-        <tr><td class="mono">WP-8D</td><td>Reusable RE core — pure logic behind ports, 28 tests, AD-01 reconciled via CDM</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-014</td><td class="mono">e113ffa</td></tr>
-        <tr><td class="mono">WP-8E</td><td>Integration layer — one engine, three callers + persistence adapters, 10 tests</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-015</td><td class="mono">e76bd9c</td></tr>
-        <tr><td class="mono">WP-K01</td><td>KNOWLEDGE.html → engineering operating system (this refactoring)</td><td><span class="st st-done">DONE</span></td><td>REPO-CERT-016</td><td class="mono">S26</td></tr>
-      </tbody>
-    </table></div>
-    <div class="src" style="margin-top:8px">Full ledger with per-WP evidence registers and decision logs: <a href="docs/project-history/">docs/project-history/</a> (28 work packages · 23 certificate-folder records).</div>
-  </div>
-
-  <!-- ── 10 · Decision Register ── -->
-  <div id="page-adr" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Decision register</div>
-      <div class="page-subtitle">Every governed architecture decision, its reason, and where its full record lives. This register indexes; the originating document owns the detail. (The legacy per-session "Key decisions" page is preserved under Reference.)</div>
-    </div>
-    <div class="os-wrap"><table class="os-table">
-      <thead><tr><th>ID</th><th>Decision</th><th>Why</th><th>Status</th><th>Authority / evidence</th></tr></thead>
-      <tbody>
-        <tr><td class="mono">AGR-001..004</td><td>Schema-vs-governance defect fixes during migration authoring (undefined role in REVOKE; meal_classes/derivation_conflicts file allocation; index-count imprecision)</td><td>root-cause fixes at the planning layer, not implementation patches</td><td><span class="st st-done">RESOLVED</span></td><td><a href="docs/governance/%5BACTIVE%5D_DOC-P3-05_Architecture_Gap_Register_v1.1.md">Gap Register</a></td></tr>
-        <tr><td class="mono">AGR-P3-07-001</td><td>DPDP under-13 age verification has no implemented mechanism</td><td>legal (DPDP Act 2023) — needs Founder-directed correction or policy mitigation</td><td><span class="st st-open">OPEN · launch-blocking</span></td><td>Gap Register · DOC-P3-07 §06/§19/§38</td></tr>
-        <tr><td class="mono">AGR-005 / AGR-006</td><td>routing_rules.show_question_key made nullable · weight-ladder weights numeric</td><td>schema corrections ratified through governance (migrations 027/028)</td><td><span class="st st-done">RESOLVED</span></td><td><a href="docs/governance/">docs/governance/ AGR docs</a></td></tr>
-        <tr><td class="mono">SER-001</td><td>Add city_tier to re_cohorts + tier-aware uniqueness (migration 030)</td><td>GAP-002: source cohorts are 1,476 households × 2 city tiers = 2,952; table could only hold 1,476</td><td><span class="st st-done">RESOLVED</span></td><td><a href="docs/governance/%5BACTIVE%5D_SER-001_re_cohorts_city_tier_v1.0.md">SER-001</a></td></tr>
-        <tr><td class="mono">Option B (pf1)</td><td>Recover production's pf1 security hardening as repo migration 029, quarantining the prod-only rls_auto_enable line</td><td>production parity without importing an unapproved auto-security overlay</td><td><span class="st st-done">ADOPTED</span></td><td>WP-5D Completion · REPO-CERT-005</td></tr>
-        <tr><td class="mono">Option C (ICD-1)</td><td>Seed only dishes that exist in the catalog; defer 885 referenced-but-absent dishes to a register</td><td>never invent content; deferred ≠ error</td><td><span class="st st-done">ADOPTED</span></td><td>WP-6D-gen · <a href="docs/project-history/work-packages/%5BACTIVE%5D_WP-6_Deferred_Knowledge_Register_v1.0.csv">Deferred Register (885 rows)</a></td></tr>
-        <tr><td class="mono">DCR-P3-06-001/004/005/007</td><td>Formalized /v1/consent, /v1/plan/refresh, /v1/user/delete as endpoints; scheduled jobs call the shared service, never the public HTTP endpoint</td><td>close contract gaps found while freezing DOC-P3-06</td><td><span class="st st-done">FROZEN</span></td><td>DOC-P3-06 v1.2</td></tr>
-        <tr><td class="mono">AD-01</td><td>First-week-plan boundary: the RE Engine (separate actor) generates the plan during onboarding; onboarding orchestrates — no DCR needed</td><td>DOC-P3-02 CDM Domain Events name the RE Engine as the PlanPreviewGenerated actor; prior §12/§13 reading was too literal</td><td><span class="st st-partial">RESOLVED — countersignature pending</span></td><td>WP-8D §1 · <a href="docs/architecture/%5BDRAFT%5D_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md">DOC-P4-02 (DRAFT)</a></td></tr>
-        <tr><td class="mono">AD-02 / DCR-8C-01</td><td>Response envelope = contract-shaped body + additive trace_id (jsonContract)</td><td>frozen contract outranks scaffold convenience</td><td><span class="st st-done">ADOPTED</span></td><td>WP-8C §4 · REPO-CERT-011</td></tr>
-        <tr><td class="mono">AD-03 / DCR-8C-02</td><td>400 ERR_VALIDATION_FAILED (structure) vs 422 ERR_CONSENT_TYPE_INVALID (enum) split</td><td>per DOC-P3-06 §07/§21 semantics</td><td><span class="st st-done">ADOPTED</span></td><td>WP-8C §4</td></tr>
-        <tr><td class="mono">AD-04 / DCR-8C-03</td><td>consent ip_address_hash deferred (nullable) until an IP-salt secret exists</td><td>no placeholder secrets</td><td><span class="st st-partial">DEFERRED</span></td><td>WP-8C §4</td></tr>
-        <tr><td class="mono">AD-05</td><td>Onboarding→RE hand-off is the persisted user_re_state row — no new payload</td><td>frozen-consistent; no invented contract</td><td><span class="st st-done">ADOPTED (WP-8E)</span></td><td>DOC-P4-02 §8 · WP-8E</td></tr>
-        <tr><td class="mono">DCR-8D-01</td><td>Weight-ladder: continuous forward-transition interpolation (worked example in §07 is self-inconsistent)</td><td>preserves partition-of-unity + continuity; tested by invariant</td><td><span class="st st-partial">FLAGGED — Founder confirm</span></td><td>WP-8D §4 · REPO-CERT-014</td></tr>
-        <tr><td class="mono">DCR-8E-01</td><td>Onboarding confidence clamped to the documented Day-0 max 0.65; persistWeekPlan is sequential upserts (atomic RPC = debt)</td><td>faithful to LF-A08's stated range; Supabase JS client cannot wrap multi-statement transactions</td><td><span class="st st-done">ADOPTED</span></td><td>WP-8E §4</td></tr>
-        <tr><td class="mono">IDR-001</td><td>WP-5 numbering reconciliation (green-cert = 5G)</td><td>two briefs used conflicting WP numbers</td><td><span class="st st-done">RESOLVED</span></td><td><a href="docs/governance/%5BACTIVE%5D_IDR-001_WP5_Sequence_Reconciliation_v1.0.md">IDR-001</a></td></tr>
-        <tr><td class="mono">WP-K01 D-01..D-08</td><td>This knowledge-platform refactoring's own decisions (why each OS section exists, preservation rules, default page)</td><td>see the dedicated log</td><td><span class="st st-done">RECORDED</span></td><td><a href="docs/project-history/%5BACTIVE%5D_WP-K01_Decision_Log_v1.0.md">WP-K01 Decision Log</a></td></tr>
-      </tbody>
-    </table></div>
-  </div>
-
-  <!-- ── 11 · Technical Debt Register ── -->
-  <div id="page-debt" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Technical debt register</div>
-      <div class="page-subtitle">Everything we knowingly owe, with priority, risk, and the work package expected to pay it. Nothing here is hidden in a report — each item cites its origin.</div>
-    </div>
-    <div class="os-wrap"><table class="os-table">
-      <thead><tr><th>Priority</th><th>Item</th><th>Risk if unpaid</th><th>Mitigation today</th><th>Owner / target</th><th>Origin</th></tr></thead>
-      <tbody>
-        <tr><td><span class="st st-open">P0</span></td><td>DPDP under-13 age gate has no mechanism (AGR-P3-07-001)</td><td>cannot legally launch in India</td><td>launch-gated; tracked in Gap Register</td><td>Founder → WP-8H coordination</td><td>DOC-P3-07 §06</td></tr>
-        <tr><td><span class="st st-blocked">P1</span></td><td>CandidateRepository adapter blocked on dish_tags/tags variety-dimension + genome_vector ordering + allergen join</td><td>RE cannot run against the real DB; both remaining endpoints gated</td><td>deferred, not guessed</td><td>next WP (schema-verification task)</td><td>WP-8E §6.1</td></tr>
-        <tr><td><span class="st st-partial">P1</span></td><td>No live-DB behavioural validation of the backend (all tests use fakes)</td><td>runtime surprises vs real schema/RLS/GoTrue</td><td>clean-room pattern exists (WP-6E) to extend via 902/905</td><td>next WP</td><td>WP-8E §6.4</td></tr>
-        <tr><td><span class="st st-partial">P1</span></td><td>/v1/onboarding + /v1/recommendations + /v1/health handlers not built; nightly CRON not deployed</td><td>no runnable product path</td><td>orchestrators/services done and tested</td><td>next WP</td><td>WP-8E §6.3</td></tr>
-        <tr><td><span class="st st-partial">P2</span></td><td>re_cohort_class_priors unseeded — cold-start CohortPrior = neutral 0.50</td><td>weaker day-0 ranking quality</td><td>documented LF-E02 fallback; other signals carry ranking</td><td>Founder disposition → WP-6-class seed task</td><td>WP-8D §3</td></tr>
-        <tr><td><span class="st st-partial">P2</span></td><td>persistWeekPlan is sequential upserts, not atomic</td><td>half-written plan on mid-write failure</td><td>move into a Postgres RPC (DOC-P4-00 §16)</td><td>endpoint WP</td><td>WP-8E §4</td></tr>
-        <tr><td><span class="st st-partial">P2</span></td><td>Addon-slot generation: docs name re_segment_addon_rule, which does not exist — real path is re_household_addon_plans + re_addon_classes + re_addon_dish_options</td><td>doc/schema mismatch could mislead implementation</td><td>reconcile before addon slots are generated</td><td>WP-8F-era</td><td>WP-8E §6.6</td></tr>
-        <tr><td><span class="st st-partial">P2</span></td><td>Auth-fixture gap: 902 Test 4 / 903 cross-user checks self-SKIP without seeded test profiles</td><td>RLS isolation not continuously re-proven live</td><td>add fixtures now that the auth framework exists</td><td>live-validation WP</td><td>REPO-CERT-010 §7</td></tr>
-        <tr><td><span class="st st-pending">P3</span></td><td>S-15 re_city_migration_overlays deferred (0 rows) — source lacks migration_duration_band</td><td>city-migration overlay signal inactive</td><td>engine fallback documented</td><td>Founder/data sourcing</td><td>REPO-CERT-007</td></tr>
-        <tr><td><span class="st st-pending">P3</span></td><td>885 deferred dish references (ICD-1 scope) + dish_combo_items subset (64)</td><td>RE candidate coverage bounded until content expands</td><td>Deferred Knowledge Register is the backlog</td><td>content/product</td><td><a href="docs/project-history/work-packages/%5BACTIVE%5D_WP-6_Deferred_Knowledge_Register_v1.0.csv">Deferred Register</a></td></tr>
-        <tr><td><span class="st st-pending">P3</span></td><td>Stale orientation docs: root README + docs/README say "no application code exists"; Roadmap v1.1 says "Repository Bootstrap 40%"; supabase/README says "no endpoints yet"</td><td>a new reader gets a pre-Phase-8 picture</td><td>this KNOWLEDGE OS page is current; doc refresh needs its own governed pass (found during WP-K01, reported not silently fixed)</td><td>small docs WP</td><td>WP-K01 review</td></tr>
-        <tr><td><span class="st st-pending">P3</span></td><td>Governance housekeeping: 3 templates + 4 runbooks never supplied (folders empty); 9 "Copy of _ACTIVE__" filenames pending authorized rename; duplicate WP-3D_Check2_Fix_Reference.sql in two folders; DOC-P4-01 (frontend spec) unauthored</td><td>onboarding friction; naming-standard exceptions persist</td><td>tracked in Exception Register + docs/README</td><td>Founder-authorized cleanup</td><td><a href="docs/governance/%5BACTIVE%5D_Repository_Naming_Exception_Register_v1.0.md">Exception Register</a></td></tr>
-        <tr><td><span class="st st-pending">P3</span></td><td>15 execution certificates awaiting Founder countersignature; DOC-P4-02 awaiting DRAFT→ACTIVE promotion; DCR-8D-01 awaiting confirmation</td><td>governance record incomplete</td><td>work itself is executed + evidenced</td><td>Founder</td><td>certificates</td></tr>
-      </tbody>
-    </table></div>
-  </div>
-
-  <!-- ── 12 · Validation Dashboard ── -->
-  <div id="page-validation" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Validation dashboard</div>
-      <div class="page-subtitle">Two validation layers: the SQL suite (900–905) proving the database, and <span class="mono">deno task verify</span> proving the backend code. Scripts live in <a href="database/validation/">database/validation/</a>; the suite was modernized to the canonical ICD-1 baseline in WP-6E.3.</div>
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-l">SQL suite — last live run</div><div class="kpi-v">2026-07-14 · ALL PASS</div><div class="kpi-s">against project cmkswalqpmmqojwdmqbv (<a href="docs/project-history/certificates/%5BACTIVE%5D_REPO-CERT-010_WP-6E3_Security_Hardening_and_Validation_Modernization_v1.0.md">REPO-CERT-010 §4</a>)</div></div>
-      <div class="kpi"><div class="kpi-l">Backend — last verify</div><div class="kpi-v">2026-07-15 · 62/62</div><div class="kpi-s">fmt + lint + check + test (REPO-CERT-015)</div></div>
-      <div class="kpi"><div class="kpi-l">Known exceptions</div><div class="kpi-v">2 SKIPs</div><div class="kpi-s">auth-fixture environment limits, not failures</div></div>
-      <div class="kpi"><div class="kpi-l">CI</div><div class="kpi-v">backend-ci on GitHub Actions</div><div class="kpi-s">runs verify on every supabase/** push; DB safety gates join at WP-8E-endpoint time</div></div>
-    </div>
-    <div class="os-wrap"><table class="os-table">
-      <thead><tr><th>Script</th><th>Proves</th><th>Latest result</th><th>Known exceptions</th></tr></thead>
-      <tbody>
-        <tr><td class="mono">900_structural_validation</td><td>62 tables · 7 safety-critical FKs · 5 fn_* + 4 app triggers · derived-column privileges · RLS on every public table · re_engine lockdown · 15 seed gates (ICD-1 targets)</td><td><span class="st st-done">PASS</span> (7/7 checks)</td><td>—</td></tr>
-        <tr><td class="mono">901_behavioral_trigger_validation</td><td>derivation triggers: Poha→vegan, allergen union (Bharli Vangi), Butter Chicken→non_veg, ingredient-change propagation (1→33), derived-write block</td><td><span class="st st-done">PASS</span> (5/5)</td><td>—</td></tr>
-        <tr><td class="mono">902_behavioral_safety_gates</td><td>the 4 zero-tolerance gates on live data (diet / allergen / Jain / planning-role)</td><td><span class="st st-done">PASS</span></td><td>Test 4 SKIPs — needs a seeded profile fixture</td></tr>
-        <tr><td class="mono">903_behavioral_rls_validation</td><td>anon write-block · re_engine invisibility · cross-user isolation</td><td><span class="st st-done">PASS</span></td><td>cross-user check SKIPs — no auth fixtures yet</td></tr>
-        <tr><td class="mono">904_behavioral_config_and_smoke_test</td><td>weight-ladder sums = 1.0 · invalid weight rejected · event weights · end-to-end "Monday plan" smoke resolve</td><td><span class="st st-done">PASS</span> (full)</td><td>—</td></tr>
-        <tr><td class="mono">905_re_knowledge_seed_validation</td><td><b>authoritative RE check:</b> 12 seed gates exact · GAP-002 (2,952 / ×7 = 20,664) · 9/9 FK anti-joins = 0 orphans · planning-role safety = 0</td><td><span class="st st-done">FULL PASS</span></td><td>—</td></tr>
-        <tr><td class="mono">deno task verify</td><td>backend: format · lint · type-check (52 files) · 62 tests (8 foundation + 16 consent + 28 RE core + 10 integration)</td><td><span class="st st-done">PASS 62/62</span></td><td>tests use injected fakes — live-DB behaviour is enumerated debt</td></tr>
-      </tbody>
-    </table></div>
-    <div class="src" style="margin-top:8px">Release rule (DOC-P3-08 §CI / DOC-P3-07 §34): the diet/allergen/Jain safety-gate SQL returning any non-zero row is a P0 release blocker once endpoints deploy.</div>
-  </div>
-
-  <!-- ── 13 · Deployment Dashboard ── -->
-  <div id="page-deploy" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Deployment dashboard</div>
-      <div class="page-subtitle">Environment map is <b>locked</b> (DOC-P3-08 §Env / DOC-P3-07 §31): local dev → <span class="mono">foofoo-staging</span> → production <span class="mono">foofoo-mvp</span>; production promotion is always a separate, Founder-approved step. Canonical execution project (Founder, WP-6E.1): <span class="mono">cmkswalqpmmqojwdmqbv</span>, region ap-south-1.</div>
-    </div>
-    <div class="os-wrap"><table class="os-table">
-      <thead><tr><th>Surface</th><th>Status</th><th>Detail</th></tr></thead>
-      <tbody>
-        <tr><td><b>Database (Supabase)</b></td><td><span class="st st-done">LIVE · CANONICAL</span></td><td>Migrations 001–030 applied; canonical ICD-1 data loaded 18/18 exact (CERT-009); privileges hardened to the certified 029 posture (CERT-010). This is the staging/canonical target — not public production.</td></tr>
-        <tr><td><b>Edge Functions</b></td><td><span class="st st-blocked">NOT DEPLOYED</span></td><td>consent endpoint + services are built and tested locally only. No <span class="mono">supabase functions deploy</span> has been certified. First deploy should be /v1/health to prove the pipeline (DOC-P4-00 §Impl-order).</td></tr>
-        <tr><td><b>Nightly CRON (pg_cron / scheduled function)</b></td><td><span class="st st-pending">NOT SCHEDULED</span></td><td>NightlyPlanScheduler service exists; 23:30 UTC / 05:00 IST schedule (LF-L01) not installed.</td></tr>
-        <tr><td><b>Frontend / Vercel</b></td><td><span class="st st-pending">NONE</span></td><td>No frontend exists; DOC-P4-01 (frontend spec) unauthored. Nothing on Vercel.</td></tr>
-        <tr><td><b>CI/CD</b></td><td><span class="st st-done">ACTIVE</span></td><td><span class="mono">.github/workflows/backend-ci.yml</span> — fmt/lint/check/test on every supabase/** push or PR. Safety-gate SQL against staging joins as a release blocker when endpoints land. Manual <span class="mono">mirror.yml</span> (GitLab) + <span class="mono">drive-backup.yml</span> (Google Drive) exist for repo redundancy.</td></tr>
-        <tr><td><b>External services</b></td><td><span class="st st-pending">SEAMS ONLY</span></td><td>OpenWeatherMap · OneSignal · Cloudinary · PostHog · Sentry — designed (DOC-P3-08), config slots exist, none wired.</td></tr>
-        <tr><td><b>Production readiness</b></td><td><span class="st st-blocked">NOT READY</span></td><td>Blocking: API Gate (endpoints + live behavioural validation), AGR-P3-07-001 (DPDP age gate), Release-Gate criteria (DOC-09/DOC-08). Deploy discipline: numbered migrations + paired rollbacks + CI gates + Founder-approved promotion only.</td></tr>
-      </tbody>
-    </table></div>
-  </div>
-
-  <!-- ── 14 · Repository Metrics ── -->
-  <div id="page-metrics" class="page-content" style="display:none">
-    <div class="page-header">
-      <div class="page-title">Repository metrics</div>
-      <div class="page-subtitle">Counted from the working tree at S26 (2026-07-15, commit <span class="mono">e76bd9c</span>). These are inventory facts, not quality claims.</div>
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-l">API endpoints</div><div class="kpi-v">1 implemented / 10 frozen</div><div class="kpi-s">+2 with service layer built, handler pending</div></div>
-      <div class="kpi"><div class="kpi-l">Backend services</div><div class="kpi-v">5 + RE core</div><div class="kpi-s">consent · onboarding · recommendations · scheduler · planning + services/re</div></div>
-      <div class="kpi"><div class="kpi-l">Repositories / adapters</div><div class="kpi-v">2 + 4 stores</div><div class="kpi-s">base + consent · SupabaseWeekPlan/Onboarding/PlanSlot/EligibleUsers stores</div></div>
-      <div class="kpi"><div class="kpi-l">Backend TypeScript files</div><div class="kpi-v">53</div><div class="kpi-s">under supabase/functions/</div></div>
-      <div class="kpi"><div class="kpi-l">Tests</div><div class="kpi-v">62 (4 suites)</div><div class="kpi-s">62/62 passing · coverage not yet measured (no coverage tooling configured)</div></div>
-      <div class="kpi"><div class="kpi-l">Database tables</div><div class="kpi-v">62 base</div><div class="kpi-s">public + re_engine (900 Check 1)</div></div>
-      <div class="kpi"><div class="kpi-l">Migrations</div><div class="kpi-v">30</div><div class="kpi-s">+ 46 rollback files (30 structural, 16 seed)</div></div>
-      <div class="kpi"><div class="kpi-l">Seed / validation SQL</div><div class="kpi-v">18 / 7</div><div class="kpi-s">seeds 100–117 · validation 900–905 + 1 reference</div></div>
-      <div class="kpi"><div class="kpi-l">Documents</div><div class="kpi-v">162 files under docs/</div><div class="kpi-s">product 6 · architecture 19 · governance 25 · research 21 · roadmaps 5 · visuals 4 · history the rest</div></div>
-      <div class="kpi"><div class="kpi-l">Work packages</div><div class="kpi-v">28 records</div><div class="kpi-s">docs/project-history/work-packages/</div></div>
-      <div class="kpi"><div class="kpi-l">Certificates</div><div class="kpi-v">16 REPO-CERT + 7 legacy/boot</div><div class="kpi-s">REPO-CERT-001..016 · REPO-BOOT-03 · readiness records</div></div>
-      <div class="kpi"><div class="kpi-l">Sessions documented</div><div class="kpi-v">26</div><div class="kpi-s">S1 (2026-07-13) → S26 (2026-07-15)</div></div>
-    </div>
-    <div class="src">Live data-layer counts (dishes 802, cohorts 2,952, weekly plans 20,664, …) live on the <a href="#" onclick="showPage('dbdash');return false">Database dashboard</a> — not repeated here.</div>
-  </div>
 
   <!-- ── Architecture page ── -->
   <div id="page-arch-full" class="page-content" style="display:none">
@@ -2149,6 +1656,29 @@ function deepDiveFeature(featureLabel){
       <div class="page-subtitle">Every recovered project document was read, classified by what it actually is, and moved into a purpose-built folder tree — so anyone can now tell approved rules, design docs, proposals, and proof-of-work apart at a glance.</div>
     </div>
 
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">All 134 recovered files sat in one flat dump, with no way to tell an approved rule, a proposal, and proof of finished work apart without opening each one.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Every document lives in a purpose-built folder by what it actually is, the three standing AI working rules are installed, and this knowledge book exists to track every future session.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">.claude/skills/</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/</span><span class="tag tag-mod">Moved</span></span>
+        <span class="fc-file"><span class="fc-path">database/</span><span class="tag tag-mod">Moved</span></span>
+        <span class="fc-file"><span class="fc-path">data/source/</span><span class="tag tag-mod">Moved</span></span>
+        <span class="fc-file"><span class="fc-path">KNOWLEDGE.html</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was built this session</div>
@@ -2248,6 +1778,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s1-skills">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Installs the organisation's three always-on working rules into this repo so every future AI session follows them without being asked: keep this knowledge book updated, document code as it's written, and debug from real evidence.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The dotfiles repo's three skill files, referenced by the global CLAUDE.md working rules.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Three skill files committed into .claude/skills/, applied automatically from this session onward.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">session starts</span><span class="dd-arrow">→</span>
@@ -2275,6 +1811,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s1-docs-tree">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Separates documents by what they are for: why the product exists (product), how it's built (architecture), rules that bind future work (governance), the data-research trail (research), plans (roadmaps), interactive explainers (visuals), and history — with proposals (work-packages) kept strictly apart from proof of execution (certificates).</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">97 documents sitting in the flat doc-garage/ dump, each with its own header and status line.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Each document re-homed under docs/ by its true purpose, with git history preserved on every move.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">open file</span><span class="dd-arrow">→</span>
@@ -2306,6 +1848,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s1-database-tree">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Splits the SQL by what it does to the database: build it (migrations 001–020, 027, 028), undo it (rollback), fill it with starter data (seeds 100–102), or check its health (validation 900–904).</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">33 SQL files in the flat dump, distinguished only by filename and header comment.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Files sorted into database/migrations, rollback, seeds, validation — with the 19 missing rollbacks left honestly absent, not faked.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">read SQL header comment</span><span class="dd-arrow">→</span>
@@ -2332,6 +1880,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s1-data-source">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Preserves the original spreadsheets (810 dishes, ingredients, cuisines, personas, regional food data) that the Batch 1–6 research pipeline analysed and the seed SQL was generated from.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">11 original spreadsheet files (dishes, ingredients, personas, regional food data), sitting loose in the dump.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Preserved unchanged under data/source/ as the read-only evidence trail behind every seed value.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">spreadsheet</span><span class="dd-arrow">→</span>
@@ -2359,6 +1913,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s1-validation">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Proves the restructure lost nothing: exact file-count and filename match before vs. after, no two files landed on the same path, no document links broke, and three randomly re-read documents matched their folder's stated purpose.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Before/after file lists and git's own diff output for every moved file.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Confirmation that 134=134 with zero collisions or broken links, then commit a99c5e0 pushed.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">count + name match</span><span class="dd-arrow">→</span>
@@ -2443,6 +2003,27 @@ function deepDiveFeature(featureLabel){
     <div class="page-header">
       <div class="page-title">S2 · Repository governance documents</div>
       <div class="page-subtitle">The repository now carries its own rulebook — the Founder-supplied operating guide and documentation index were committed, and macOS junk files were removed from version control.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The repository had no committed rulebook — future sessions had no written rules to follow, and three macOS junk files were tracked by accident.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Every AI session now reads the same operating guide and documentation index first, and macOS junk files are permanently blocked from being tracked again.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">CLAUDE.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/README.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">.gitignore</span><span class="tag tag-new">New</span></span>
+      </div>
     </div>
 
     <div class="session-card">
@@ -2653,6 +2234,33 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S3 · Recovery sprint + repository naming normalization</div>
       <div class="page-subtitle">The missing database history was recovered from the live database, and the whole repository was renamed onto one governed naming standard — with git history preserved and the genuinely-ambiguous files honestly left alone.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Six of the database's own build-history files were missing entirely, and file names across the repository followed no single consistent standard.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The missing schema history is reconstructed from the live database and clearly labeled as such, and 133 files across the repository now follow one governed naming standard, enforced going forward by CLAUDE.md.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/021_cuisines_reference.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/022_dish_display_attributes.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/023_tags_uniqueness_and_vector_positions.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/024_re_dish_regional_affinity.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/025_combo_component_type_and_slot_array.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/026_meal_classes_mirror_slot_array.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/029_pf1_security_hardening.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">CLAUDE.md</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was built across this session's work packages</div>
@@ -2683,6 +2291,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S4 · Rollback layer recovery (WP-5C)</div>
       <div class="page-subtitle">Every database migration can now be undone: the 26 missing rollback scripts were reconstructed from the migrations themselves, giving the repository a complete, self-reconstructable down-path for the first time.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Only 2 of 28 database build scripts could be undone — a mistake in the other 26 had no safe way back.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Every one of the 28 build scripts now has a matching undo script, each rebuilt straight from what its own migration actually created.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/rollback/ (26 new rollback scripts, 001–026)</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was built this session</div>
@@ -2710,6 +2338,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S5 · Clean-room repository validation (WP-5F)</div>
       <div class="page-subtitle">A full, independent health check of the recovered database blueprint — proving on paper that it can build itself up and tear itself back down cleanly, and finding exactly where it still falls short of a clean bill of health.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Nobody had independently re-checked the recovered database blueprint from scratch — earlier reports were trusted, not re-verified.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The blueprint is proven sound on paper, and two real leftover problems (a stale sample-data value and an outdated self-test count) are found and named before they can cause harm.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/ (WP-5F report)</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was checked this session</div>
@@ -2737,6 +2385,27 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S6 · Validation remediation (WP-5E)</div>
       <div class="page-subtitle">The two defects the last session found are now fixed — using only what the repository itself already proves — so the database blueprint's sample-data and self-test layers finally match the build scripts.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">One sample-data file used a meal-slot format the schema no longer accepts, and one self-test still expected an outdated table count.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Both defects are fixed and grounded in the repository's own evidence — the sample data loads correctly and the self-test checks the real, current table count.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/seeds/ (meal-slot value fix)</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/validation/ (table-count check fix)</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was corrected this session</div>
@@ -2764,6 +2433,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S7 · Clean-room execution validation (WP-5F2)</div>
       <div class="page-subtitle">We stopped reasoning about the database blueprint and actually ran it — from empty, all the way up and all the way back down — on a disposable local database that never touched production.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The database blueprint had only ever been checked on paper — nobody had actually run it end to end.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The blueprint is proven by real execution on a throwaway database — it builds from empty, loads sample data, and tears back down to empty, exactly as designed.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">(execution/test run only — no repository files changed)</span><span class="tag tag-cfg">Verified</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was proven this session</div>
@@ -2791,6 +2480,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S8 · Production parity recovery (WP-5D)</div>
       <div class="page-subtitle">We checked the repository's database blueprint against what's actually running in production — and found it's one deliberate decision away from being a complete, faithful source of truth.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Nobody knew exactly how closely the repository's blueprint matched what was really running in production.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The gap is measured precisely (96.6% parity) and the one real missing security fix is identified and evidenced — with the Founder decision that unblocks it clearly stated, not guessed.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">(read-only production comparison — no repository files changed)</span><span class="tag tag-cfg">Verified</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was reconciled this session</div>
@@ -2818,6 +2527,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S9 · Production parity completed — Option B (WP-5D)</div>
       <div class="page-subtitle">The last engineering gap between the repository and production is closed: the missing security fix is now in the repo, and the production-only automation is documented and deliberately kept out.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The repository was missing one real security fix that production already had, leaving a leftover permission gap.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The repository matches production 100% on engineering — the missing security fix is added and proven, and the production-only automation is explicitly and permanently excluded by design.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/029_pf1_security_hardening.sql</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was completed this session</div>
@@ -2845,6 +2574,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S10 · Repository GREEN certification (WP-5G)</div>
       <div class="page-subtitle">An independent audit certified the repository as production-grade — it can rebuild itself from nothing and undo itself back to nothing, its documentation holds together, and every difference from production is explained. The recovery program is complete.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The repository had never been re-checked by an independent, first-principles audit — every earlier "it works" claim rested on the people who wrote it.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The repository is independently CERTIFIED GREEN — proven to build and tear itself down cleanly and match production exactly — and coding can now begin on the product itself.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/ (WP-5G Green Certification)</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was certified this session</div>
@@ -2872,6 +2621,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S11 · WP-6 Canonical Knowledge Engineering — the plan for the Data Gate</div>
       <div class="page-subtitle">A deep, evidence-first read of the whole repository produced the plan to build FooFoo's permanent food-knowledge layer. The headline: the thing everyone thought was blocking us isn't blocking us anymore.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The project believed its real food data was still missing (IDR-001) and that four design questions had to be answered before any loading could start.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The data was found to already be present and the design questions already decided — leaving a small, specific plan (WP-6A–6F) instead of a blocked project.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[ACTIVE]_WP-6_Canonical_Knowledge_Engineering_Plan_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was produced this session</div>
@@ -2903,6 +2672,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S12 · WP-6A–D — the mapping is done, and we found the one thing that genuinely blocks loading</div>
       <div class="page-subtitle">Progressive execution took the plan into real engineering: how every source value becomes a database value, the exact load order, and a hard, evidence-based blocker that needs a Founder decision — not more code.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">There was no full source-to-database mapping and 9 of 10 old "open decisions" were unnecessarily still treated as blockers.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Every source column now has a documented mapping, 9 of 10 old blockers turned out to already be resolved, and the one genuine problem — most referenced dishes don't exist in the content file — is surfaced with hard numbers instead of guessed around.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[ACTIVE]_WP-6A-6D_Knowledge_Mapping_and_Seed_Pipeline_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was produced this session</div>
@@ -2932,6 +2721,28 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S13 · WP-6D-gen — the canonical content seeds are generated (ICD-1)</div>
       <div class="page-subtitle">A deterministic generator turned the source files into real, reversible seed SQL for FooFoo's food catalog — with everything traceable and nothing invented — and logged the future-expansion backlog.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The database had no real food-content seed data — only a plan for how it should be generated.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">802 real dishes, their ingredients, tags and combos are prepared as reversible seed SQL — generated deterministically from source files, not typed by hand — ready to load onto staging.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/etl/generate_icd1_seeds.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/seeds/103–109 (+ rollbacks)</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[ACTIVE]_WP-6D-gen_Canonical_Seed_Engineering_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was produced this session</div>
@@ -2963,6 +2774,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S14 · WP-6RE — forensic audit: can the recommendation engine be fully seeded? (read-only)</div>
       <div class="page-subtitle">An independent, evidence-only re-check — not trusting earlier sessions — of whether the engine's knowledge can be fully loaded. It corrected a prior over-pessimistic finding and isolated the one real blocker.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The project believed the entire recommendation-engine knowledge layer was blocked because key values seemed missing from the source data.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Almost everything turns out derivable from real evidence — only one genuine blocker survives (a cohort table that can't hold both city tiers), pinned down with simple arithmetic instead of opinion.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[ACTIVE]_WP-6RE_Recommendation_Engine_Knowledge_Audit_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was audited this session</div>
@@ -2994,6 +2825,29 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S15 · GAP-002 resolved via governed schema change, and the recommendation-engine seeds are generated</div>
       <div class="page-subtitle">The one real blocker is fixed the proper way (a schema evolution request + migration), and the full engine knowledge layer — cohorts, weekly plans, household plans — is now generated deterministically.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The cohort table had no way to represent city tier, so it could only ever hold half the real cohorts (1,476 of 2,952).</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A governed schema change adds city tier, and the entire recommendation-engine knowledge layer — 2,952 cohorts, 20,664 weekly-plan rows, 7,992 add-on rows — is generated and hits its targets exactly.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/030_city_tier.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/generate_re_seeds.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/seeds/110–117 (+ rollbacks)</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/validation/905_re_validation.sql</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was built this session</div>
@@ -3025,6 +2879,27 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S16 · The Data Gate was executed on staging and certified — the knowledge database really builds from zero</div>
       <div class="page-subtitle">Everything the repository describes was actually run on a disposable database: build, seed, derive, validate, tear down, and rebuild — deterministically. Data Gate PASSED (initial canonical dataset).</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The full knowledge layer had been engineered and reasoned about, but never actually executed end to end on a real database run.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">DATA GATE PASSED — the whole system is proven to build from empty, load correctly, validate clean, and tear back down to empty, twice over on two fresh databases. Backend engineering can now begin.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-007_...v1.0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/rollback/ (2 rollback gap fixes)</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was executed and certified this session</div>
@@ -3056,6 +2931,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S17 · Backend Foundation Architecture — how the backend will be built (design only, WP-8A)</div>
       <div class="page-subtitle">With the data foundation certified, backend engineering begins — as a design blueprint, not code. One document lays out the whole backend approach, grounded in the frozen architecture.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">There was a certified database, but no agreed design for how the backend that reads it should actually be built.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A complete backend architecture blueprint exists — covering layers, auth, the recommendation-engine module, deployment and 26 other topics — ready for Founder approval before any code is written.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/architecture/[ACTIVE]_DOC-P4-00_Backend_Foundation_Architecture_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was produced this session</div>
@@ -3087,6 +2982,27 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S18 · Backend foundation scaffold — built and validated (WP-8B)</div>
       <div class="page-subtitle">The first real backend code: the engineering base every future feature sits on. Foundation only — no features, fully validated against a real toolchain.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The backend architecture existed only as a document — there was no actual Supabase Edge Functions project, and zero backend code.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A real, validated backend foundation exists — config, auth guards, middleware, logging, error handling — with 8/8 tests passing and CI running on every change.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/ (config, auth, middleware, logging, errors)</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-008_...v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was built this session</div>
@@ -3118,6 +3034,27 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S19 · WP-6E.2 — the canonical food knowledge is now actually loaded into the new Supabase</div>
       <div class="page-subtitle">Every prior data session prepared and proved the seeds on throwaway databases. This session put them, for real, into the live hosted project — replacing the old placeholder data — and verified every count matches the certified baseline exactly.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The live hosted Supabase project still only held old illustrative sample data (a handful of sample dishes and cohorts) — the certified real food knowledge had never actually reached it.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The live project now carries the real, certified food knowledge — all 18 knowledge tables at exact parity with the repository, with one honest security-drift finding reported rather than hidden.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">live Supabase database (data load, not repository files)</span><span class="tag tag-db">DB</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was done this session</div>
@@ -3151,6 +3088,28 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S20 · WP-6E.3 — closing the one security gap and modernizing the self-tests</div>
       <div class="page-subtitle">The single finding from last session (client roles could still edit the dishes' derived safety columns) was root-caused, fixed the proper way, and the whole validation suite was brought current to the real data — now passing end to end.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">On the live database, app-facing roles could still write the dishes' safety-critical derived columns — a real security gap left by a Supabase platform default, not a repository defect.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The gap is closed exactly to the certified scope, and the validation suite (900–905) is modernized to real data and passes end to end on the live database.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">live Supabase database (REVOKE/GRANT fix, not repository files)</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/validation/ (4 scripts modernized)</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-010_...v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was done this session</div>
@@ -3185,6 +3144,28 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S26 · Knowledge platform refactoring (WP-K01)</div>
       <div class="page-subtitle">This knowledge book was rebuilt from an append-only session diary into an engineering operating system — 14 living dashboards in front, with every historical session preserved untouched behind them.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The knowledge book was a diary — session pages only, no living overview of current project state.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A living operating-system layer (executive view, roadmap, feature status, backend/RE architecture, database, API catalogue, debt, deployment) sits in front of the diary — every historical session preserved untouched behind it.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">KNOWLEDGE.html</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[ACTIVE]_WP-K01_Knowledge_Platform_Refactoring_v1.0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-016_...v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was built this session</div>
@@ -3212,6 +3193,25 @@ function deepDiveFeature(featureLabel){
     <div class="page-header">
       <div class="page-title">S27 · Independent Engineering Due Diligence Audit — and a second audit that checks the checker (WP-9)</div>
       <div class="page-subtitle">An outside-style audit read the whole repository end to end and graded it. Then a second, fully independent audit re-derived every one of its findings from zero to see if the first audit could be trusted.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Nobody had checked, end to end, whether the whole repository's paper trail — documents, database, code — actually holds together, or whether earlier "it's done" claims could be trusted.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The repository is graded B (Mostly Implemented with Minor Gaps) by two independent audits that agree on 20 of 21 findings, with the remaining real gaps named instead of hidden.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-020_...v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
     </div>
 
     <div class="session-card">
@@ -3281,6 +3281,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s27-wp9-audit">
           <div class="dd-label">What this does</div>
           <div class="dd-text">A 35-section evidence-only review of the entire repository — every product/architecture document's status, the database schema, the seed/ETL pipeline, validation scripts, and every line of Recommendation Engine code — scored against what actually exists on disk, not what any prior report claimed.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The full repository state on the Founder-designated branch — documents, schema, seeds, validation scripts, and RE code.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A 35-section evidence-only report graded B, plus certificate REPO-CERT-020.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">4 parallel research passes</span><span class="dd-arrow">→</span>
@@ -3311,6 +3317,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s27-wp9-validation">
           <div class="dd-label">What this does</div>
           <div class="dd-text">A second, independent team re-read everything WP-9 sampled — in full this time, not sampled — and only looked at WP-9's own conclusions after finishing its own independent pass, to check whether the first audit's findings hold up rather than just repeating them.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The same repository, re-read from zero, plus WP-9's own 21 findings (consulted only after the independent pass finished).</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">20 of 21 findings confirmed, 8 new ones surfaced, and one open Founder decision named.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">re-read every doc from zero</span><span class="dd-arrow">→</span>
@@ -3385,6 +3397,26 @@ function deepDiveFeature(featureLabel){
       <div class="page-title">S28 · CandidateRepository evidence audit — resolving the WP-8F blockers (WP-8FA, read-only)</div>
       <div class="page-subtitle">A forensic reconciliation of the five recommendation-engine "blockers" against repository evidence. Most turned out to be solvable — the key was reading a document the last session couldn't open.</div>
     </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Backend implementation was halted on 5 recommendation-engine fields, some flagged as possibly needing a schema change nobody could confirm.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">4 of the 5 blockers are resolved with hard evidence (2 buildable now, 3 documented deferrals) — leaving exactly one genuine Founder decision instead of five unprovable ones.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-019_...v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
     <div class="session-card">
       <div class="session-card-header">
         <div class="session-card-title">What was audited this session</div>
@@ -3416,6 +3448,27 @@ function deepDiveFeature(featureLabel){
     <div class="page-header">
       <div class="page-title">S29 · Schema evolution batch — main-ingredient flag, event dedup key, and the FD-11 data load (WP-10)</div>
       <div class="page-subtitle">Two Founder-approved schema changes went live against the real database, a cuisine data fix was applied, and the Founder's own main-ingredient dataset for 810 dishes was loaded and turned into a reusable rule.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The database had no way to mark a dish's main ingredient, no dedup protection against double-counted events, and 7 combo dishes carried the wrong cuisine.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Both schema changes are live and re-verified, the cuisine data is corrected, and the Founder's own main-ingredient judgment for 810 dishes is loaded plus turned into a reusable rule for future dishes.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/031_dish_ingredients_main_ingredient_flag.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/032_interaction_events_dedup_key.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-021_...v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
     </div>
 
     <div class="session-card">
@@ -3510,6 +3563,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s29-migrations">
           <div class="dd-label">What this does</div>
           <div class="dd-text">031 adds a plain boolean column so any dish-ingredient row can be flagged as a "main" ingredient (a dish can have more than one). 032 adds a client-supplied dedup key plus a partitioned unique index so a retried event submission is recognized instead of counted twice.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Founder-approved SER-002/SER-003 change requests.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Two live schema changes, each re-verified against the real database afterward.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">SER-002/SER-003 approved</span><span class="dd-arrow">→</span>
@@ -3540,6 +3599,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s29-fd12-fix">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Gives 7 combo dishes that genuinely span more than one regional cuisine (Kerala Rice Meals, Biryani Raita, Chole Bhature, Dosa Sambar, Masala Dosa Set, Poha Jalebi, Puri Aloo) a real cuisine value instead of none.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">7 combo dishes with no cuisine value, genuinely spanning more than one region.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A new "Multi-Regional" cuisine row, applied to exactly those 7 dishes and nothing else.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">insert 'multi_regional' into cuisines</span><span class="dd-arrow">→</span>
@@ -3566,6 +3631,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s29-fd11-load">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Loads the Founder's own main-ingredient classification for 810 dishes into the database (as `is_main_ingredient=true` rows and a new 14-value tag dimension), and writes down the general rule behind the Founder's reasoning so a future new dish can be classified without guessing.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The Founder's own 810-dish main-ingredient dataset, with reasoning for every choice.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">842 dish-ingredient pairs flagged true, plus a written heuristic (DOC-P3-13) for classifying future dishes.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">Founder dataset (810 dishes, reasoning included)</span><span class="dd-arrow">→</span>
@@ -3593,6 +3664,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s29-cold-start-addendum">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Defines exactly how the ~10 dish swipes a user makes during onboarding affect their very first weekly plan, before this gets built — deliberately without inventing a new blending mechanism.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The open question of how onboarding swipes should shape a user's first weekly plan.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A DRAFT design decision: swipes count as interaction history, reusing the existing weight ladder rather than a new formula.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">onboarding swipes recorded as interaction_events</span><span class="dd-arrow">→</span>
@@ -3664,6 +3741,27 @@ function deepDiveFeature(featureLabel){
     <div class="page-header">
       <div class="page-title">S30 · CandidateRepository — the engine's first real data adapter, built and test-verified (WP-11)</div>
       <div class="page-subtitle">The one piece the Recommendation Engine has needed since WP-8E — something that actually fetches real dishes out of the database — now exists, and a new test proves it works with the engine's real filtering and scoring code, not just a claim that it should.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The recommendation engine had no real way to fetch actual dishes from the database — it could score and filter, but had nothing real to feed it.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A real adapter hydrates every field the engine needs from live tables, and a new test proves the engine's actual filtering and scoring code runs correctly on that adapter's output — not just claims it should.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/services/adapters/supabase-stores.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_tests/candidate_repository.test.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/certificates/[ACTIVE]_REPO-CERT-022_...v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
     </div>
 
     <div class="session-card">
@@ -3751,6 +3849,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s30-adapter">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Implements both methods of the CandidateRepository port (getClassCandidates, getPopularFallback), fetching real dish rows and joining ingredients/tags/cuisine to fill every field the engine's scoring code expects — with flat queries and in-memory joins, since no foreign keys exist to support Supabase's relational-embedding shortcut.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A meal-class ID, plus the dishes/dish_ingredients/dish_tags/cuisines tables.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A list of DishCandidate objects, each with all 17 fields the engine's scoring code needs.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">loadDishes / loadAllergenMarks / loadTags / loadCuisineGroups</span><span class="dd-arrow">→</span>
@@ -3781,6 +3885,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s30-tests">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Tests the adapter against a fake Supabase query-builder chain (no live database) — and, crucially, also imports the engine's real applyHardConstraints and scoring functions and runs them directly against the adapter's fake-backed output.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A fake 3-dish fixture standing in for a Supabase query-builder chain.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">9/9 tests passing, proving the engine's real constraint and scoring code runs correctly on the adapter's output.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">fake 3-dish fixture</span><span class="dd-arrow">→</span>
@@ -3808,6 +3918,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s30-content-gap">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Verified directly against the live schema that 50 of 131 meal classes have zero eligible dishes seeded, and the 81 populated classes average only 2.0 dishes each (7 at most) — while the engine's minimum candidate threshold is 3.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A live query counting re_class_dish_options rows per meal class.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A confirmed, logged content gap (50/131 classes empty) — accepted as FD-14, not hidden or worked around.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">live query: re_class_dish_options per class</span><span class="dd-arrow">→</span>
@@ -3877,6 +3993,29 @@ function deepDiveFeature(featureLabel){
     <div class="page-header">
       <div class="page-title">S31 · Planning Semantics Architecture — a new design for handling a household's many needs at once (WP-12)</div>
       <div class="page-subtitle">Four Founder-approved documents replace the idea of hand-listing every possible combination of household conditions with a small, stable catalogue plus a rules layer that reads each member's real conditions and decides what to do about each one.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Handling a household member with more than one condition at once (elderly AND diabetic AND recovering) would have needed its own hand-written combination rule — an approach that doesn't scale.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A small, stable catalogue plus 8 shared rules replace 92 hand-attached class lists, so any combination of real conditions can be routed correctly without a new rule for every case.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/architecture/[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/architecture/[ACTIVE]_Phase1_Persona_Decomposition_Catalog_v1.0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/architecture/[ACTIVE]_Phase1B_Attribute_to_Class_Rule_Extraction_v1.0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/architecture/[ACTIVE]_Canonical_Planning_Model_v1.0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md</span><span class="tag tag-mod">Modified</span></span>
+      </div>
     </div>
 
     <div class="session-card">
@@ -3953,6 +4092,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s31-architecture-docs">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Replaces the flat 41-persona/8-segment approach with two layers: a small composition catalogue (~5 archetypes, who is actually planning) plus a conditions layer that reads each member's real tags and routes each one of three ways — absorbed into the main meal, swapped for a variant, or added as an extra dish.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The existing Persona_Master_v3 (41 rows) and the 92 hand-attached class lists behind it.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A two-layer model — a small composition catalogue plus 8 shared routing rules — that covers the same ground without a rule per combination.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">Persona_Master_v3 (41 rows)</span><span class="dd-arrow">→</span>
@@ -3979,6 +4124,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s31-baseline-review">
           <div class="dd-label">What this does</div>
           <div class="dd-text">A coherence pass across all four documents together, asking one question: could a new engineer implement Phase 2 from these documents alone, without going back to the original research spreadsheet?</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">All four new documents, read together as one architecture rather than four separate sign-offs.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">One real contradiction found and fixed, ending in a "READY WITH MINOR DOCUMENTATION NOTES" verdict.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">read all 4 docs as one architecture</span><span class="dd-arrow">→</span>
@@ -4005,6 +4156,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s31-fd15-governance">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Records the Founder's ratification of the new architecture as FD-15 (citing all four documents), marks the household_members.segment vocabulary blocker from WP-8E as resolved-by-direction, and adds a one-line pointer in the Conceptual Domain Model rather than rewriting it.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The four ratified documents and the still-open household_members.segment blocker from WP-8E.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A new FD-15 entry closing that blocker, plus a one-line cross-reference added to the Conceptual Domain Model.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">FD-15 added to §7</span><span class="dd-arrow">→</span>
@@ -4076,6 +4233,28 @@ function deepDiveFeature(featureLabel){
     <div class="page-header">
       <div class="page-title">S32 · Household members can carry more than one condition at once — migration authored, not yet switched on (WP-13)</div>
       <div class="page-subtitle">Building on last session's architecture decision, the schema change it calls for was written and locally verified — but deliberately not run against the live database without a separate, explicit go-ahead.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Each household member could only be tagged with one condition (elderly, diabetic, recovering) at a time, even though real households often need more than one to apply at once.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A migration and matching code changes now let one member carry any combination of 15 real conditions at once — written, tested (71/71), and ready, but deliberately not yet switched on in the live database.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/033_household_members_conditions_vocabulary.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/rollback/033_household_members_conditions_vocabulary_rollback.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/services/onboarding/orchestrator.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/services/re/types.ts</span><span class="tag tag-mod">Modified</span></span>
+      </div>
     </div>
 
     <div class="session-card">
@@ -4163,6 +4342,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s32-orchestrator">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Every place that read or wrote a member's single segment value now reads/writes a list of conditions instead, and a new function rejects a request where one member is tagged with more than one mutually-exclusive age band at once.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">An onboarding request with a household member's conditions: string[] array.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A validated conditions array persisted per member, or a rejected request if two age bands conflict.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">OnboardingAnswers.members[].conditions: string[]</span><span class="dd-arrow">→</span>
@@ -4189,6 +4374,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s32-tests">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Every test fixture using the old segment: "TODDLER" shape was rewritten to conditions: ["toddler"] (array, lowercase, matching the new vocabulary) and the full local suite re-run to confirm nothing broke.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Old test fixtures still using the single-value segment shape.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Fixtures rewritten to the array shape, with the full suite re-run clean at 71/71.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">grep -rn "segment" supabase/functions/</span><span class="dd-arrow">→</span>
@@ -4215,6 +4406,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s32-migration033">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Converts household_members.segment from a single scalar value to conditions, a list of zero or more values from a 15-word canonical vocabulary — written and locally verified, but not yet run against the live database.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Live schema introspection of household_members.segment (0 rows, constraint name confirmed).</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A written, locally-verified migration + rollback pair, awaiting explicit Founder go-ahead before running live.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">live introspection: 0 rows, constraint name confirmed</span><span class="dd-arrow">→</span>
@@ -4292,6 +4489,25 @@ function deepDiveFeature(featureLabel){
     <div class="page-header">
       <div class="page-title">S33 · Migration 033 confirmed live + WP-9 gaps closed (FD-16/FD-17)</div>
       <div class="page-subtitle">The household-conditions database change from last session is now confirmed running in production, and two long-open documentation gaps got a final, permanent ruling from the Founder.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Whether migration 033 had actually been applied live was contradicted by two sources (this session's instructions vs. last session's own knowledge-book entry), and two audit findings had sat unresolved for months.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A live database query settles the contradiction — migration 033 really is running in production — and both long-open audit gaps get a permanent, documented Founder ruling.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md</span><span class="tag tag-mod">Modified</span></span>
+      </div>
     </div>
 
     <!-- ── Summary card ── -->
@@ -4400,6 +4616,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s33-live-verify">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Confirms, by querying the real production database directly, that migration 033 (authored last session but left unapplied, pending Founder go-ahead) actually ran — rather than taking either this session's instructions or last session's knowledge-book entry at their word.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Two contradictory claims about whether migration 033 was live.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A live query confirming the column, constraint, and migration date all match SER-004 exactly.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">information_schema.columns query</span><span class="dd-arrow">→</span>
@@ -4428,6 +4650,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s33-fd16">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Formally, permanently closes WP-9's Medium Finding 1 (seed files 101/102 have no rollback) with a dated Founder ruling, instead of leaving it as an open audit finding indefinitely.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">WP-9's flagged gap: seeds 101/102 have no rollback file.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">FD-16 — the gap is ratified as permanently accepted, since the data it loaded no longer exists to roll back.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">WP-9 flags the gap (2026-07-16)</span><span class="dd-arrow">→</span>
@@ -4454,6 +4682,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s33-fd17">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Formally, permanently closes the REPO-CERT-017 numbering question WP-9 raised (§0) — certificate number 017 was never filed, only referenced in a couple of stale commit messages.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">WP-9's flagged gap: certificate 017 referenced in commit messages but never filed.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">FD-17 — the numbering skip is ratified as permanent; no certificate created, no renumbering.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow">
             <span class="dd-node">WP-9 finds 016/017 referenced in commit messages but not on disk</span><span class="dd-arrow">→</span>
@@ -4509,6 +4743,32 @@ function deepDiveFeature(featureLabel){
     <div class="page-header">
       <div class="page-title">S34 · Ghar RE v1.0 — engine, service &amp; edge function</div>
       <div class="page-subtitle">Rebuilt the meal-recommendation brain from scratch: a tested engine that turns a household's answers into 7 meal ideas, wrapped in its own web service, and connected to the app through a new secure endpoint.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The old persona/cohort recommendation logic was retired with nothing built yet to replace it — the app had no working way to turn a household's answers into meal ideas.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A tested engine, its own web service, and a secure edge function together turn a household's answers into 7 ranked meal plates — with a safe fallback plate if anything goes wrong.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_core/pipeline.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/scoring.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/main.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">contracts/ghar-re-v1.schema.json</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/handler.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/re-client.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/fallback.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/034–037 (ghar_re schema)</span><span class="tag tag-new">New</span></span>
+      </div>
     </div>
 
     <div class="session-card">
@@ -4613,6 +4873,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s34-schema">
           <div class="dd-label">What this does</div>
           <div class="dd-text">Creates a brand-new, isolated database schema for the rebuilt engine: dishes and their ingredients/tags, households and their derived profile, safety tables, and the editable knowledge base the engine reads. It does not touch the old retired engine's tables.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The frozen Ghar RE v1.0 design — no live tables to migrate, a clean-slate build.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A new, isolated ghar_re schema (28 tables) the engine can read from, fully separate from the old retired tables.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow"><span class="dd-node">034 catalogue</span><span class="dd-arrow">→</span><span class="dd-node">035 household</span><span class="dd-arrow">→</span><span class="dd-node">036 safety</span><span class="dd-arrow">→</span><span class="dd-node">037 knowledge base</span></div>
           <div class="dd-label">Key line of code</div>
@@ -4628,6 +4894,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s34-core">
           <div class="dd-label">What this does</div>
           <div class="dd-text">The single tested implementation of the recommendation maths: it turns a household's raw Q1–Q15 answers into a profile, removes dishes the household can't eat, scores the rest against taste/region/weather, pairs them, and returns exactly 7 ranked meal plates. 16 tests cover it.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A household's raw Q1–Q15 answers plus the dish catalogue and context (weather, day).</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Exactly 7 ranked meal plates, each with a score and its contributing factors.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow"><span class="dd-node">answers</span><span class="dd-arrow">→</span><span class="dd-node">profile (D1–D7)</span><span class="dd-arrow">→</span><span class="dd-node">filter</span><span class="dd-arrow">→</span><span class="dd-node">score</span><span class="dd-arrow">→</span><span class="dd-node">pair</span><span class="dd-arrow">→</span><span class="dd-node">7 plates</span></div>
           <div class="dd-label">Key line of code</div>
@@ -4643,6 +4915,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s34-service">
           <div class="dd-label">What this does</div>
           <div class="dd-text">A thin FastAPI service that hosts the engine over HTTP. At startup it loads the dish catalogue and config through swappable "providers", then serves POST /v1/recommendations plus health/readiness checks. A JSON-Schema contract pins the exact request/response shape, with an open "contributions" list so new score factors don't break callers.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A contract-validated JSON request from the edge function (household answers + context).</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A contract-validated JSON response carrying the engine's 7 ranked plates.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow"><span class="dd-node">startup: load config + catalogue</span><span class="dd-arrow">→</span><span class="dd-node">validate request</span><span class="dd-arrow">→</span><span class="dd-node">call engine</span><span class="dd-arrow">→</span><span class="dd-node">validate + return response</span></div>
           <div class="dd-label">Key line of code</div>
@@ -4658,6 +4936,12 @@ function deepDiveFeature(featureLabel){
         <div class="detail-drawer" id="draw-s34-edge">
           <div class="dd-label">What this does</div>
           <div class="dd-text">The Supabase edge function that sits between the app and the engine. It authenticates the caller, builds the household's answers into a request, validates it, calls the engine with a signed security header, and passes the 7 plates back to the app. If the engine times out or fails, it returns a safe fallback meal as a normal success instead of an error.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">An authenticated app request for today's meal ideas.</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">7 ranked meal plates on success, or one safe fallback plate (never an error) if the engine is unreachable.</div></div>
+          </div>
           <div class="dd-label">Flow through it</div>
           <div class="dd-flow"><span class="dd-node">authenticate</span><span class="dd-arrow">→</span><span class="dd-node">compose + validate</span><span class="dd-arrow">→</span><span class="dd-node">signed call (2.5s, retry once)</span><span class="dd-arrow">→</span><span class="dd-node">pass through / fallback</span></div>
           <div class="dd-label">Key line of code</div>
