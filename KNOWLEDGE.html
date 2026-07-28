@@ -566,9 +566,13 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🗄</span> S32 · Household conditions vocabulary (WP-13)
       <span class="nav-badge">Jul 18</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s33')">
+    <div class="nav-item" onclick="showPage('s33')">
       <span class="nav-icon">🗄</span> S33 · Migration 033 goes live + WP-9 gaps closed (FD-16/17)
       <span class="nav-badge">Jul 19</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s34')">
+      <span class="nav-icon">🧩</span> S34 · Ghar RE v1.0 — engine, service &amp; edge function
+      <span class="nav-badge">Jul 28</span>
     </div>
     <!-- NAV_INJECT -->
   </div>
@@ -579,18 +583,18 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">6</span>
+      <span class="nav-badge">10</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">88</span>
+      <span class="nav-badge">99</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">26</span>
+      <span class="nav-badge">31</span>
     </div>
   </div>
 </nav>
@@ -1108,7 +1112,15 @@ function deepDiveFeature(featureLabel){
           <div class="arch-node-name">docs/</div>
           <div class="arch-node-desc">All project documentation, by purpose · S1</div>
         </div>
-        <!-- ARCH_APPLOGIC_INJECT -->
+      <div class="arch-node is-new" onclick="jumpModule('ghar-re-core')">
+  <div class="arch-node-name">ghar_re_core</div>
+  <div class="arch-node-desc">Recommendation engine (the maths) · S34</div>
+</div>
+<div class="arch-node is-new" onclick="jumpModule('ghar-re-service')">
+  <div class="arch-node-name">ghar_re_service</div>
+  <div class="arch-node-desc">FastAPI host + contract · S34</div>
+</div>
+  <!-- ARCH_APPLOGIC_INJECT -->
       </div>
     </div>
     <div class="arch-section">
@@ -1122,13 +1134,21 @@ function deepDiveFeature(featureLabel){
           <div class="arch-node-name">data/source/</div>
           <div class="arch-node-desc">Raw seed spreadsheets (CSV/XLSX) · S1</div>
         </div>
-        <!-- ARCH_DB_INJECT -->
+      <div class="arch-node is-new" onclick="jumpModule('ghar-re-schema')">
+  <div class="arch-node-name">ghar_re schema</div>
+  <div class="arch-node-desc">28 tables — catalogue + household + KB · S34</div>
+</div>
+  <!-- ARCH_DB_INJECT -->
       </div>
     </div>
     <div class="arch-section">
       <div class="arch-section-title">☁️ Server — functions</div>
       <div class="arch-grid" id="arch-server">
-        <!-- ARCH_SERVER_INJECT -->
+      <div class="arch-node is-new" onclick="jumpModule('recommendations-edge')">
+  <div class="arch-node-name">recommendations</div>
+  <div class="arch-node-desc">Edge fn: app → engine orchestration · S34</div>
+</div>
+  <!-- ARCH_SERVER_INJECT -->
       </div>
     </div>
     <div class="arch-section">
@@ -1561,7 +1581,23 @@ function deepDiveFeature(featureLabel){
         <div class="tl-note">S32 authored migration 033 and stopped short of running it, pending explicit Founder go-ahead. That go-ahead was given in a session that hit its usage limit before it could update this book — this session independently re-verified the live database (not just trusted the claim) and confirmed `household_members.conditions` and its 15-value CHECK constraint are exactly as SER-004 specified. Also closed: the seeds 101/102 rollback gap and the REPO-CERT-017 numbering skip, both flagged by WP-9 and now permanently accepted (FD-16/FD-17 in the Founder Decision Register) rather than left open indefinitely.</div>
       </div>
     </div>
-    <!-- TIMELINE_INJECT -->
+    <div class="timeline-row">
+    <div class="tl-date">Jul 28</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#5145b8"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f0effe;color:#5145b8">S34</span>
+      <div class="tl-title">Ghar RE v1.0 — engine, service &amp; edge function</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s34')">ghar_re schema (28 tables)</span>
+        <span class="tl-chip" onclick="showPage('s34')">ghar_re_core engine</span>
+        <span class="tl-chip" onclick="showPage('s34')">ghar_re_service (FastAPI)</span>
+        <span class="tl-chip" onclick="showPage('s34')">recommendations edge fn</span>
+        <span class="tl-chip" onclick="showPage('s34')">knowledge-book hook fix</span>
+      </div>
+      <div class="tl-note">Rebuilt the recommendation engine end-to-end (schema → tested engine → HTTP service + contract → edge function) and fixed the Stop hook so the knowledge-book check actually fires on committed work. Next: live table locations, then deploy.</div>
+    </div>
+  </div>
+  <!-- TIMELINE_INJECT -->
   </div>
 
   <!-- ── Modules ── -->
@@ -1715,7 +1751,91 @@ function deepDiveFeature(featureLabel){
         <div class="dd-text">S25 · Jul 15 (registered S26)</div>
       </div>
     </div>
-    <!-- MODULES_INJECT -->
+  <div class="detail-item">
+  <div class="detail-row" id="row-mod-ghar-re-core" onclick="toggleDetail('mod-ghar-re-core')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">ghar_re_core (recommendation engine)</span></div>
+    <span class="detail-chevron" id="chev-mod-ghar-re-core">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-ghar-re-core">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">The one place the recommendation maths live. It turns a household's raw Q1–Q15 answers into a profile, removes dishes they can't eat, scores the rest, pairs them and assembles exactly 7 ranked plates. All parameters come from config/knowledge files, never hard-coded.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>derivation.py</code> — turns onboarding answers into the household profile θ (D1–D7)<br>
+      <code>scoring.py</code> — hard filters + BASE score + the Q15 objective gain<br>
+      <code>pairing.py</code> — pairing guardrails + assembles the final 7 plates<br>
+      <code>pipeline.py</code> — runs the whole thing end-to-end for one household<br>
+      <code>config.py / knowledge.py / catalogue.py / fixtures.py</code> — config, knowledge-base data, and the in-memory dish catalogue<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">It's the brain that decides what a household should eat today. Keeping it as one tested package means there's never a second, slightly-different copy of the maths to drift out of sync.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S34 · Jul 28</div>
+  </div>
+</div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-ghar-re-service" onclick="toggleDetail('mod-ghar-re-service')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">ghar_re_service (HTTP host)</span></div>
+    <span class="detail-chevron" id="chev-mod-ghar-re-service">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-ghar-re-service">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">A thin FastAPI web service that hosts the engine. It loads the catalogue and config at startup through swappable providers, exposes POST /v1/recommendations plus /healthz and /readyz, and validates every request/response against the shared contract. It contains no maths of its own.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>main.py</code> — the FastAPI routes (translation only)<br>
+      <code>providers.py</code> — Catalogue/Config provider interfaces + one adapter each<br>
+      <code>modules.py</code> — wraps each score factor so the response can explain itself<br>
+      <code>engine.py / schemas.py / lifecycle.py</code> — request→response composition, schema validation, startup<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">It lets the app talk to the engine over a normal web call with a stable contract, and lets the data sources (catalogue, config) be swapped later without touching the maths.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S34 · Jul 28</div>
+  </div>
+</div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-recommendations-edge" onclick="toggleDetail('mod-recommendations-edge')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">recommendations edge function</span></div>
+    <span class="detail-chevron" id="chev-mod-recommendations-edge">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-recommendations-edge">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">The Supabase edge function that connects the app to the engine. It authenticates the caller, builds and validates the request, calls the engine with a signed security header (2.5s timeout, one retry on network errors only), and passes the 7 plates back — or a safe fallback meal if the engine is unavailable.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>handler.ts</code> — the orchestration flow<br>
+      <code>re-client.ts</code> — HMAC-signed call + timeout/retry<br>
+      <code>contract.ts</code> — validates payloads against the shared JSON-Schema<br>
+      <code>compose.ts / fallback.ts / events.ts</code> — build the request (stubbed household), fallback plate, outcome logging<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">It's the secure front door to the engine: the app makes one authenticated call and always gets a usable answer, even when the engine is slow or down.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S34 · Jul 28</div>
+  </div>
+</div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-ghar-re-schema" onclick="toggleDetail('mod-ghar-re-schema')">
+    <div class="detail-left"><span class="tag tag-db">DB</span><span class="detail-name">ghar_re database schema</span></div>
+    <span class="detail-chevron" id="chev-mod-ghar-re-schema">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-ghar-re-schema">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">A new, isolated database schema (28 tables) for the rebuilt engine: the dish catalogue, household answers + derived profile, safety/support tables, and the editable knowledge base. Every table carries a data_source column marking each row as real, AI-generated, or a stub.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>migrations 034–037</code> — create the catalogue, household, safety, and knowledge-base table groups<br>
+      <code>seeds 120–121</code> — knowledge-base reference data + a golden sample of ~39 dishes and 7 households<br>
+      <code>validation 906</code> — checks that every table has a NOT NULL data_source and the golden sample has zero 'real' rows<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">It's the engine's memory — the dishes it can suggest and the knowledge it reasons with — kept separate from the old retired engine so nothing collides.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S34 · Jul 28</div>
+  </div>
+</div>
+  <!-- MODULES_INJECT -->
   </div>
 
   <!-- ── Files register ── -->
@@ -1817,7 +1937,18 @@ function deepDiveFeature(featureLabel){
         <tr><td class="fr-file mono">supabase/functions/_shared/services/re/types.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S32</td><td class="fr-desc">HouseholdMember.conditions: string[] replaces segment: string</td></tr>
         <tr><td class="fr-file">docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S33</td><td class="fr-desc">FD-16 (seeds 101/102 rollback gap, permanent acceptance) and FD-17 (REPO-CERT-017 numbering skip, permanent) added</td></tr>
         <tr><td class="fr-file mono">KNOWLEDGE.html</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S33</td><td class="fr-desc">This session's own entry, correcting the record forward now that migration 033 is confirmed live (S32 itself is left untouched, per this book's own append-only rule)</td></tr>
-        <!-- FILES_INJECT -->
+      <tr><td class="fr-file mono">database/migrations/034_ghar_re_schema_and_catalogue.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S34</td><td class="fr-desc">Catalogue/knowledge tables (dishes, cuisines, ingredients, tags…) with a NOT NULL data_source enum</td></tr>
+<tr><td class="fr-file mono">database/migrations/035_ghar_re_household_runtime.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S34</td><td class="fr-desc">Household raw answers, derived profile θ, context/modes, feedback &amp; recommendation event tables</td></tr>
+<tr><td class="fr-file mono">database/migrations/036_ghar_re_safety_support.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S34</td><td class="fr-desc">Safety/support tables: allergen derivatives, dish variants, macros, sig scores, zone×slot priors</td></tr>
+<tr><td class="fr-file mono">database/migrations/037_ghar_re_knowledge_base.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S34</td><td class="fr-desc">Editable knowledge-base tables the engine reads (zone map, comfort heroes, negative priors, bands)</td></tr>
+<tr><td class="fr-file mono">ghar_re_core/</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S34</td><td class="fr-desc">The recommendation engine — the single tested implementation of the maths (D1–D7, scoring, pairing)</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S34</td><td class="fr-desc">FastAPI service that hosts the engine over HTTP with provider adapters + startup lifecycle</td></tr>
+<tr><td class="fr-file mono">contracts/ghar-re-v1.schema.json</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S34</td><td class="fr-desc">The locked request/response contract both the engine and the app validate against</td></tr>
+<tr><td class="fr-file mono">supabase/functions/recommendations/</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S34</td><td class="fr-desc">Edge function: authenticate → compose → signed call to the engine → pass-through / fallback</td></tr>
+<tr><td class="fr-file mono">supabase/functions/_shared/config/config.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S34</td><td class="fr-desc">Added GHAR_RE_SERVICE_URL/SECRET config (production-required, dev-defaulted)</td></tr>
+<tr><td class="fr-file mono">.claude/hooks/check-knowledge-book.sh</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S34</td><td class="fr-desc">Fixed the Stop hook to detect committed branch work, not just uncommitted changes</td></tr>
+<tr><td class="fr-file mono">docs/architecture/ghar-re/</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S34</td><td class="fr-desc">Moved the 6 canonical Ghar RE specs out of docs/temp into a grouped folder</td></tr>
+  <!-- FILES_INJECT -->
       </tbody>
     </table>
   </div>
@@ -1982,7 +2113,32 @@ function deepDiveFeature(featureLabel){
       <div class="decision-a">No — Founder ruling (FD-17): 017 is a permanent, disclosed skip (a leftover from branch-numbering reservation, per WP-9 §0). Manufacturing a certificate with no real deliverable behind it would itself be a fabrication; renumbering the certificates that already exist (016, 018, 019) would break every cross-reference to them. The gap stays open by design, not by oversight.</div>
       <div class="decision-meta">S33 · Jul 19</div>
     </div>
-    <!-- DECISIONS_INJECT -->
+  <div class="decision-item">
+  <div class="decision-q">Where should the recommendation maths live — in the service, or a separate package?</div>
+  <div class="decision-a">A separate installable package (ghar_re_core). The service and any future tool import it; nobody re-implements a formula. This is what prevents two slightly-different engines drifting apart (RE-DOC-11 §3).</div>
+  <div class="decision-meta">S34 · Jul 28</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">How do the app and the engine agree on the request/response shape across two languages?</div>
+  <div class="decision-a">One JSON-Schema contract file (contracts/ghar-re-v1.schema.json) that both sides validate against. The score breakdown is an open "contributions" list, so adding a new score factor never breaks callers.</div>
+  <div class="decision-meta">S34 · Jul 28</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">What happens when the engine is slow or unreachable?</div>
+  <div class="decision-a">The edge function returns a safe fallback meal as a normal success (not an error): 2.5s timeout, one retry on network errors only (never on timeout). A hungry user still sees familiar food.</div>
+  <div class="decision-meta">S34 · Jul 28</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why is the household/context fetch and event logging stubbed instead of built?</div>
+  <div class="decision-a">The live app database has no households / recommendation_event tables yet — they only exist in the golden-sample schema. Rather than invent a live schema silently, those steps are clearly stubbed with TODOs pending a founder decision on where the tables live.</div>
+  <div class="decision-meta">S34 · Jul 28</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why did the knowledge-book Stop hook never fire?</div>
+  <div class="decision-a">It only inspected uncommitted changes; the workflow commits everything before the turn ends, so the tree was always clean at Stop time. Fixed to also inspect committed branch work (branch vs origin/main), so session-knowledge-doc now actually fires.</div>
+  <div class="decision-meta">S34 · Jul 28</div>
+</div>
+  <!-- DECISIONS_INJECT -->
   </div>
 
   <!-- ── Session 1 ── -->
@@ -4130,7 +4286,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s32 -->
 
-  <div id="page-s33" class="page-content">
+  <div id="page-s33" class="page-content" style="display:none">
 
     <!-- ── Session header ── -->
     <div class="page-header">
@@ -4348,6 +4504,211 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s33 -->
 
+  <div id="page-s34" class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">S34 · Ghar RE v1.0 — engine, service &amp; edge function</div>
+      <div class="page-subtitle">Rebuilt the meal-recommendation brain from scratch: a tested engine that turns a household's answers into 7 meal ideas, wrapped in its own web service, and connected to the app through a new secure endpoint.</div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Jul 28, 2026<br>4 areas touched</div>
+      </div>
+      <div class="session-card-desc">The old persona/cohort recommendation logic was retired and replaced by the frozen "Ghar RE v1.0" design. This spanned four pieces: a new database schema for dishes/households/knowledge, a tested Python engine (the only place the recommendation maths live), a small web service that hosts that engine over HTTP with a locked request/response contract, and a Supabase edge function that composes a request, calls the engine, and passes the 7 meal plates back to the app. Weather is mocked and several data sources are clearly stubbed pending a founder decision on where the live tables live.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">20+</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">28</div><div class="stat-l">DB tables</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">1</div><div class="stat-l">Server fn</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s34','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s34','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s34','flows')">Feature flows</div>
+    </div>
+
+    <div id="s34-swim" class="view-pane active">
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div><div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">App asks for today's meal ideas</span></div>
+              <div class="step-desc">The app calls one secure endpoint to get a ranked list of 7 meal plates for the household. (Front-end wiring is future work.)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swim-arrow">↕ the app's request reaches the server</div>
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div><div class="swim-label-sub">edge function</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s34','edge')">
+            <div class="step-num num-amber">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Edge function composes &amp; signs the request</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Checks who's asking, builds the household's answers into a request, validates it against the locked contract, and calls the engine with a signed header. If the engine is slow or down, it returns a safe fallback meal instead of an error.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swim-arrow">↕ HTTP call to the recommendation engine service</div>
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div><div class="swim-label-sub">engine + service</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s34','service')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Service hosts the engine over HTTP</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">A thin FastAPI service loads the dish catalogue + config at startup and exposes the engine at /v1/recommendations, /healthz, /readyz. It contains no maths — it just hosts the engine.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s34','core')">
+            <div class="step-num num-purple">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Engine turns answers into 7 plates</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Derives a household profile (D1–D7), filters unsafe dishes, scores the rest, pairs them, and assembles exactly 7 ranked plates — the single tested implementation of the recommendation maths.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swim-arrow">↕ the engine reads its catalogue &amp; knowledge tables</div>
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div><div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s34','schema')">
+            <div class="step-num num-teal">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">New ghar_re schema (28 tables)</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">Catalogue, household, safety and knowledge-base tables — every row tagged with where it came from (real / ai_generated / stub). Isolated from the old retired engine.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Decide where the live households / recommendation_event tables live, add engine-side signature verification, then Phase D (observability) and Phase F (deploy the engine service).</div>
+      </div>
+    </div>
+
+    <div id="s34-detail" class="view-pane">
+      <div class="detail-item">
+        <div class="detail-row" id="row-s34-schema" onclick="toggleDetail('s34-schema')">
+          <div class="detail-left"><span class="tag tag-db">DB</span><span class="detail-name">ghar_re schema — migrations 034–037</span></div>
+          <span class="detail-chevron" id="chev-s34-schema">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s34-schema">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Creates a brand-new, isolated database schema for the rebuilt engine: dishes and their ingredients/tags, households and their derived profile, safety tables, and the editable knowledge base the engine reads. It does not touch the old retired engine's tables.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">034 catalogue</span><span class="dd-arrow">→</span><span class="dd-node">035 household</span><span class="dd-arrow">→</span><span class="dd-node">036 safety</span><span class="dd-arrow">→</span><span class="dd-node">037 knowledge base</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">data_source ghar_re.data_source_kind NOT NULL</span>  ← every table must say whether each row is real, AI-generated, or a stub — no silent defaults</div>
+          <div class="dd-why"><div class="dd-why-q">Why a separate schema instead of reusing the existing tables?</div><div class="dd-why-a">The old persona/cohort engine is fully retired; a clean isolated schema means the rebuild can't accidentally depend on or corrupt the old data, and can be reviewed like new code.</div></div>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-row" id="row-s34-core" onclick="toggleDetail('s34-core')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">ghar_re_core — the engine (Python)</span></div>
+          <span class="detail-chevron" id="chev-s34-core">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s34-core">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The single tested implementation of the recommendation maths: it turns a household's raw Q1–Q15 answers into a profile, removes dishes the household can't eat, scores the rest against taste/region/weather, pairs them, and returns exactly 7 ranked meal plates. 16 tests cover it.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">answers</span><span class="dd-arrow">→</span><span class="dd-node">profile (D1–D7)</span><span class="dd-arrow">→</span><span class="dd-node">filter</span><span class="dd-arrow">→</span><span class="dd-node">score</span><span class="dd-arrow">→</span><span class="dd-node">pair</span><span class="dd-arrow">→</span><span class="dd-node">7 plates</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">plates = pairing.assemble_7(cat, theta, ctx, objective, n=7)</span>  ← builds the 7 ranked plates for one household</div>
+          <div class="dd-why"><div class="dd-why-q">Why is this a separate installable package?</div><div class="dd-why-a">So the maths live in exactly one place. The web service and any future tool import this package rather than re-implementing formulas, which is what prevents two slightly different engines drifting apart.</div></div>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-row" id="row-s34-service" onclick="toggleDetail('s34-service')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">ghar_re_service — HTTP host + contract</span></div>
+          <span class="detail-chevron" id="chev-s34-service">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s34-service">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A thin FastAPI service that hosts the engine over HTTP. At startup it loads the dish catalogue and config through swappable "providers", then serves POST /v1/recommendations plus health/readiness checks. A JSON-Schema contract pins the exact request/response shape, with an open "contributions" list so new score factors don't break callers.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">startup: load config + catalogue</span><span class="dd-arrow">→</span><span class="dd-node">validate request</span><span class="dd-arrow">→</span><span class="dd-node">call engine</span><span class="dd-arrow">→</span><span class="dd-node">validate + return response</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">POST /v1/recommendations → engine.run(payload, catalogue, config, registry)</span>  ← the route just translates; the engine does the work</div>
+          <div class="dd-why"><div class="dd-why-q">Why a locked contract file both sides validate against?</div><div class="dd-why-a">The app and the engine are written in different languages; a shared schema they each check against is what stops them quietly disagreeing on the request/response shape over time.</div></div>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-row" id="row-s34-edge" onclick="toggleDetail('s34-edge')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">recommendations edge function (orchestration)</span></div>
+          <span class="detail-chevron" id="chev-s34-edge">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s34-edge">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The Supabase edge function that sits between the app and the engine. It authenticates the caller, builds the household's answers into a request, validates it, calls the engine with a signed security header, and passes the 7 plates back to the app. If the engine times out or fails, it returns a safe fallback meal as a normal success instead of an error.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">authenticate</span><span class="dd-arrow">→</span><span class="dd-node">compose + validate</span><span class="dd-arrow">→</span><span class="dd-node">signed call (2.5s, retry once)</span><span class="dd-arrow">→</span><span class="dd-node">pass through / fallback</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">x-ghar-signature: t=&lt;time&gt;,v1=&lt;hmac-sha256(secret, "&lt;time&gt;.&lt;body&gt;")&gt;</span>  ← the signature that proves the request really came from the app's server</div>
+          <div class="dd-why"><div class="dd-why-q">Why return a fallback plate instead of an error when the engine is down?</div><div class="dd-why-a">A hungry user should still see familiar food, not a broken screen. The failure is logged, but the user experience degrades gracefully.</div></div>
+        </div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Live household/event tables location decision, engine-side signature verification, then observability (Phase D) and deployment (Phase F).</div>
+      </div>
+    </div>
+
+    <div id="s34-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S34 = [
+      {
+        id: 'daily-recommendations',
+        label: 'Get 7 meal plates',
+        steps: [
+          {
+            layer: 'Server', tag: 'API',
+            title: 'Edge function receives the request',
+            desc: 'Authenticates the caller, then builds the household answers + context into a contract request and validates it before sending anything.',
+            codeFlow: [ {chip:'supabase/functions/recommendations/handler.ts'}, {label:'validates'}, {chip:'supabase/functions/recommendations/contract.ts'} ],
+            files: [ {path:'supabase/functions/recommendations/handler.ts', desc:'Thin orchestration: auth → compose → call → pass-through/fallback'}, {path:'supabase/functions/recommendations/contract.ts', desc:'Validates payloads against the shared JSON-Schema'} ],
+            api: {endpoint:'POST /v1/recommendations', note:'the app-facing endpoint'}, db: null
+          },
+          {
+            layer: 'Server', tag: 'API',
+            title: 'Signed call to the engine service',
+            desc: 'Calls the engine with an HMAC-signed header, a 2.5s timeout, and one retry on network errors only (never on timeout). Falls back to a safe plate on failure.',
+            codeFlow: [ {chip:'supabase/functions/recommendations/re-client.ts'}, {label:'HTTP POST'}, {chip:'ghar_re_service/ghar_re_service/main.py'} ],
+            files: [ {path:'supabase/functions/recommendations/re-client.ts', desc:'HMAC signing + timeout/retry client'} ],
+            api: {endpoint:'POST /v1/recommendations (engine)', note:'service-to-service call'}, db: null
+          },
+          {
+            layer: 'App logic', tag: 'HOOK',
+            title: 'Engine derives profile and scores dishes',
+            desc: 'The service hands the request to the engine, which derives the household profile, filters, scores, pairs and assembles 7 plates.',
+            codeFlow: [ {chip:'ghar_re_service/ghar_re_service/main.py'}, {label:'calls'}, {chip:'ghar_re_core/pipeline.py'}, {label:'scores via'}, {chip:'ghar_re_core/scoring.py'} ],
+            files: [ {path:'ghar_re_core/pipeline.py', desc:'End-to-end orchestration → 7 plates'}, {path:'ghar_re_core/scoring.py', desc:'Filters + BASE score + Q15 gain'} ],
+            api: null, db: {table:'ghar_re.dishes', op:'SELECT', note:'reads the dish catalogue (loaded at startup)'}
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s34-flows', window.FEATURE_FLOWS_S34);
+    </script>
+
+  </div><!-- /page-s34 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
