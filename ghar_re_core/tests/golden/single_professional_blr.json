@@ -1,0 +1,96 @@
+{
+  "household": "Single professional, Bengaluru",
+  "plates": [
+    {
+      "dry": "Medu Vada",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Medu Vada",
+        "Rasam"
+      ],
+      "liquid": "Rasam",
+      "plate_calories": 390,
+      "score": 5.077433,
+      "support": "Rice"
+    },
+    {
+      "dry": "Undhiyu",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Gujarati Toor Dal",
+        "Undhiyu"
+      ],
+      "liquid": "Gujarati Toor Dal",
+      "plate_calories": 560,
+      "score": 4.537284,
+      "support": "Rice"
+    },
+    {
+      "dry": "Onion Pakora",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Chole",
+        "Onion Pakora"
+      ],
+      "liquid": "Chole",
+      "plate_calories": 660,
+      "score": 4.148683,
+      "support": "Poori"
+    },
+    {
+      "dry": "Kanda Bhaji",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Gujarati Kadhi",
+        "Kanda Bhaji"
+      ],
+      "liquid": "Gujarati Kadhi",
+      "plate_calories": 490,
+      "score": 3.973145,
+      "support": "Rice"
+    },
+    {
+      "dry": "Idli",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Idli",
+        "Sambar"
+      ],
+      "liquid": "Sambar",
+      "plate_calories": 340,
+      "score": 3.946992,
+      "support": "Rice"
+    },
+    {
+      "dry": "Egg Bhurji",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Egg Bhurji",
+        "Sarson Ka Saag"
+      ],
+      "liquid": "Sarson Ka Saag",
+      "plate_calories": 520,
+      "score": 3.719572,
+      "support": "Rice"
+    },
+    {
+      "dry": "Aloo Gobi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Aloo Gobi",
+        "Punjabi Kadhi Pakora"
+      ],
+      "liquid": "Punjabi Kadhi Pakora",
+      "plate_calories": 540,
+      "score": 3.601432,
+      "support": "Rice"
+    }
+  ]
+}

@@ -621,8 +621,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🧩</span> S34 · Ghar RE v1.0 — engine, service &amp; edge function
       <span class="nav-badge">Jul 28</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s35')">
+    <div class="nav-item" onclick="showPage('s35')">
       <span class="nav-icon">📊</span> S35 · Ghar RE v1.0 Phase D — observability
+      <span class="nav-badge">Jul 28</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s36')">
+      <span class="nav-icon">🔒</span> S36 · Ghar RE v1.0 Phase E — golden-master test + CI gate
       <span class="nav-badge">Jul 28</span>
     </div>
     <!-- NAV_INJECT -->
@@ -5539,7 +5543,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s34 -->
 
-  <div id="page-s35" class="page-content">
+  <div id="page-s35" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S35 · Ghar RE v1.0 Phase D — observability (request tracing, structured logs, lightweight metrics)</div>
       <div class="page-subtitle">Made every recommendation request traceable end to end across both services, put a latency/outcome number on every log line, and added simple counters — no new infrastructure, nothing deployed.</div>
@@ -5597,6 +5601,65 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s35 -->
+  <div id="page-s36" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S36 · Ghar RE v1.0 Phase E — golden-master regression test + CI/contract gate</div>
+      <div class="page-subtitle">Locked today's recommendation output as a committed reference file so any accidental change to the scoring math now fails CI automatically, and wired up automated CI checks for the recommendation engine's Python side to match what the edge function side already had.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The edge function (Deno/TypeScript) side had automated CI — format/lint/type-check/tests on every push. The recommendation engine (Python) side had none: 31 tests existed and passed locally, but nothing forced them to run before a change could merge, and nothing would catch a change that silently altered what meal plates a household actually gets — a scoring bug could ship unnoticed as long as it didn't throw an error.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The Python side now has its own CI workflow that installs both packages fresh and runs the full 32-test suite on every push/PR that touches it. A new "golden-master" test locks the exact recommendation output for 4 representative households (non-veg default, Jain filter, toddler + rainy weather, migrant) — if the scoring math changes in any way, even a tiny one, this test fails and the PR shows exactly what changed, so nothing can drift silently. Both the Deno and Python workflows now also share a lightweight "contract-check" gate that fails fast if the one shared schema file (<code>contracts/ghar-re-v1.schema.json</code>) becomes malformed or if either side quietly starts reading a different copy.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">.github/workflows/re-ci.yml</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">.github/workflows/backend-ci.yml</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/test_golden_master.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/golden/single_professional_blr.json</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/golden/jain_couple_ahmedabad.json</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/golden/couple_toddler_pune.json</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/golden/migrant_bihar_mumbai.json</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 28, 2026<br>Phase E · contract tests + CI gate only</div>
+      </div>
+      <div class="session-card-desc">
+        This is Phase E from the frozen RE-DOC-10 phase table — contract tests and a CI/CD gate only, explicitly not deployment (that's Phase F, later). Four things:
+        <br><br>
+        <b>1. Verified the jsr.io assumption first, before building anything.</b> The Deno test suite depends on a package (<code>@std/assert</code>) fetched from <code>jsr.io</code>, and this session's sandbox cannot reach that registry (403 Forbidden) — the same restriction seen in earlier sessions. Rather than assume real GitHub Actions CI has the same restriction, this was checked directly against the repo's actual CI history: <code>backend-ci.yml</code> has run successfully 11+ times on GitHub's real runners, including once on the exact commit that merged Phase D to main, with its "Unit tests" step (the one that needs jsr.io) completing in ~4 seconds and passing. <b>Confirmed: jsr.io works in real CI.</b> The sandbox restriction is a sandbox-only limitation and has never actually affected what ships.
+        <br><br>
+        <b>2. Golden-master regression test.</b> Added <code>ghar_re_core/tests/test_golden_master.py</code>, which locks the pipeline's exact scored output — which 7 meal plates, in what order, with what score — for 4 fixed household+context combinations, as committed JSON files under <code>ghar_re_core/tests/golden/</code>. The test recomputes the same inputs and fails if the output differs at all from the locked file. This does NOT block an intentional scoring change — it just means the engineer updates the golden file in the same PR (one command: <code>python -m ghar_re_core.tests.test_golden_master --update</code>), so the reviewer sees exactly what changed instead of the change being invisible. Verified this actually catches drift by deliberately corrupting one golden file's score and confirming the test failed with a clear diff, then restored it. Also verified the golden files themselves are stable across repeated runs with Python's hash-randomization explicitly varied (<code>PYTHONHASHSEED=random</code>), since a naive lock of Python set/object output would have been flaky between runs — the test only locks the plain values that actually matter (form, score, heroes, support, calories, dish names), not raw object reprs.
+        <br><br>
+        <b>3. New Python CI workflow (<code>re-ci.yml</code>), matching the Deno side's convention.</b> Same structure as the existing <code>backend-ci.yml</code> (path-scoped triggers, a <code>verify</code> job), triggering on changes to <code>ghar_re_core/**</code>, <code>ghar_re_service/**</code>, or <code>contracts/**</code>. It installs both Python packages fresh and runs all 32 tests (16 original core + 15 service + this session's new golden-master test), verified locally in a clean virtual environment to match exactly what CI will do. One honest gap: neither <code>pyproject.toml</code> declares a linter or type-checker today, so — per the instruction not to introduce a new tool choice unilaterally — the workflow has a placeholder step that says so explicitly instead of silently skipping or silently picking one (e.g. ruff/mypy). That's a decision for the Founder, not this session.
+        <br><br>
+        <b>4. Shared contract gate + confirmed no schema duplication.</b> Both CI workflows now run a fast, dependency-free <code>contract-check</code> job first (schema is well-formed JSON, exactly one copy of it exists in the repo, both sides' actual source files still reference that one shared path) — the real test/lint jobs won't run until it passes. Audited whether Phase B or C had accidentally introduced a second copy of the schema: they had not — <code>ghar_re_service/schemas.py</code> and <code>supabase/functions/recommendations/contract.ts</code> both already read the exact same <code>contracts/ghar-re-v1.schema.json</code> file directly, so no fix was needed there, only the automated check that keeps it that way. <code>backend-ci.yml</code>'s trigger paths were widened to include <code>contracts/**</code>, since a schema-only edit needs to re-run the Deno side too (it imports the schema directly and its type-check/tests exercise that import).
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">7</div><div class="stat-l">Files touched</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">32/32</div><div class="stat-l">Python tests passing (fresh venv)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">2</div><div class="stat-l">CI workflows, both contract-gated</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Deploys / containers / deploy targets</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — Founder review + one manual setting, then Phase F</div>
+        <div class="next-text">This session deliberately stopped at contract tests + CI config, per RE-DOC-10's phase table — no deployment, no containerization, no deploy target. One thing outside this session's access: making these checks actually BLOCK a merge (branch protection "required status checks") is a GitHub repo-settings change, not a file in the repo — it cannot be verified or set from here. If the Founder wants that enforced, the exact check names to add under Settings → Branches → main → required status checks are: <code>verify</code> (from backend-ci.yml) and <code>verify</code> (from re-ci.yml) — GitHub distinguishes them by workflow, shown as "backend-ci / verify" and "re-ci / verify" in the branch-protection UI, plus optionally <code>contract-check</code> from each workflow if failing fast on a bad schema specifically (before the full suite runs) is wanted as its own required check. Waiting for review before Phase F (an actual deployment, with a real target and real monitoring).</div>
+      </div>
+    </div>
+  </div><!-- /page-s36 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

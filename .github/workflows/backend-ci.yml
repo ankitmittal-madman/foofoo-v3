@@ -3,14 +3,46 @@ name: backend-ci
 # WP-8B — backend scaffold CI. Runs formatter check, linter, type-check, and unit tests on the
 # Deno Edge Function foundation. DB safety-gate checks (diet/allergen/Jain = 0 rows against
 # foofoo-staging, DOC-P3-08 §CI) are added when endpoints touching those paths land (WP-8E).
+#
+# Also triggers on contracts/** (Phase E, RE-DOC-10 §14): recommendations/contract.ts imports
+# contracts/ghar-re-v1.schema.json directly, and the type-check + unit-test steps below exercise
+# that import transitively via recommendations.test.ts — a schema-only change must still run this
+# gate, not just re-ci.yml's.
 on:
   push:
-    paths: ["supabase/**", ".github/workflows/backend-ci.yml"]
+    paths: ["supabase/**", "contracts/**", ".github/workflows/backend-ci.yml"]
   pull_request:
-    paths: ["supabase/**", ".github/workflows/backend-ci.yml"]
+    paths: ["supabase/**", "contracts/**", ".github/workflows/backend-ci.yml"]
 
 jobs:
+  # RE-DOC-10 §14: neither side's suite is allowed to merge unless the contract itself is sound —
+  # well-formed, and still the SINGLE file both sides read (no silently-forked local copy).
+  # Duplicated from re-ci.yml (GitHub Actions has no cheap way to share a job across separate
+  # workflow files without a reusable-workflow indirection Phase E doesn't need yet) — keep the two
+  # copies in sync if the check itself changes.
+  contract-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Schema is well-formed JSON
+        run: python3 -c "import json; json.load(open('contracts/ghar-re-v1.schema.json')); print('contracts/ghar-re-v1.schema.json OK')"
+      - name: Exactly one schema file in the repo (single source of truth)
+        run: |
+          count=$(find . -name "ghar-re-v1.schema.json" -not -path "./.git/*" | wc -l)
+          if [ "$count" -ne 1 ]; then
+            echo "expected exactly 1 copy of ghar-re-v1.schema.json, found $count:"
+            find . -name "ghar-re-v1.schema.json" -not -path "./.git/*"
+            exit 1
+          fi
+      - name: Both sides reference the shared file, not a stale local copy
+        run: |
+          grep -q "contracts/ghar-re-v1.schema.json" ghar_re_service/ghar_re_service/schemas.py \
+            || { echo "ghar_re_service/schemas.py no longer references the shared schema path"; exit 1; }
+          grep -q "contracts/ghar-re-v1.schema.json" supabase/functions/recommendations/contract.ts \
+            || { echo "supabase/functions/recommendations/contract.ts no longer references the shared schema path"; exit 1; }
+
   verify:
+    needs: contract-check
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -1,0 +1,93 @@
+{
+  "household": "Couple with toddler, Pune",
+  "plates": [
+    {
+      "dry": "Cabbage Sabzi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Cabbage Sabzi",
+        "Gujarati Toor Dal"
+      ],
+      "liquid": "Gujarati Toor Dal",
+      "plate_calories": 320,
+      "score": 5.060986,
+      "support": "Roti"
+    },
+    {
+      "dry": "Pumpkin Sabzi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Moong Dal",
+        "Pumpkin Sabzi"
+      ],
+      "liquid": "Moong Dal",
+      "plate_calories": 320,
+      "score": 3.912927,
+      "support": "Roti"
+    },
+    {
+      "dry": "Dhokla",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Dhokla",
+        "Gujarati Kadhi"
+      ],
+      "liquid": "Gujarati Kadhi",
+      "plate_calories": 340,
+      "score": 3.473947,
+      "support": "Rice"
+    },
+    {
+      "dry": "Aloo Posto",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Aloo Posto",
+        "Cholar Dal"
+      ],
+      "liquid": "Cholar Dal",
+      "plate_calories": 470,
+      "score": 3.314314,
+      "support": "Roti"
+    },
+    {
+      "dry": null,
+      "form": "standalone",
+      "hero_dish": "Sabudana Khichdi",
+      "heroes": [
+        "Sabudana Khichdi"
+      ],
+      "liquid": null,
+      "plate_calories": 300,
+      "score": 3.074756,
+      "support": null
+    },
+    {
+      "dry": null,
+      "form": "standalone",
+      "hero_dish": "Bhuna Khichuri",
+      "heroes": [
+        "Bhuna Khichuri"
+      ],
+      "liquid": null,
+      "plate_calories": 380,
+      "score": 2.160966,
+      "support": null
+    },
+    {
+      "dry": null,
+      "form": "standalone",
+      "hero_dish": "Moong Dal Khichdi",
+      "heroes": [
+        "Moong Dal Khichdi"
+      ],
+      "liquid": null,
+      "plate_calories": 280,
+      "score": 2.086537,
+      "support": null
+    }
+  ]
+}

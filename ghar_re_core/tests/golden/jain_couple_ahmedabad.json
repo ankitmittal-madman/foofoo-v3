@@ -1,0 +1,92 @@
+{
+  "household": "Jain couple, Ahmedabad",
+  "plates": [
+    {
+      "dry": "Pumpkin Sabzi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Moong Dal",
+        "Pumpkin Sabzi"
+      ],
+      "liquid": "Moong Dal",
+      "plate_calories": 320,
+      "score": 6.178428,
+      "support": "Roti"
+    },
+    {
+      "dry": "Cabbage Sabzi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Cabbage Sabzi",
+        "Gujarati Toor Dal"
+      ],
+      "liquid": "Gujarati Toor Dal",
+      "plate_calories": 320,
+      "score": 5.914,
+      "support": "Roti"
+    },
+    {
+      "dry": "Dhokla",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Dhokla",
+        "Gujarati Kadhi"
+      ],
+      "liquid": "Gujarati Kadhi",
+      "plate_calories": 340,
+      "score": 5.384593,
+      "support": "Rice"
+    },
+    {
+      "dry": null,
+      "form": "standalone",
+      "hero_dish": "Lauki Khichdi",
+      "heroes": [
+        "Lauki Khichdi"
+      ],
+      "liquid": null,
+      "plate_calories": 260,
+      "score": 1.884255,
+      "support": null
+    },
+    {
+      "dry": null,
+      "form": "standalone",
+      "hero_dish": "Moong Dal Khichdi",
+      "heroes": [
+        "Moong Dal Khichdi"
+      ],
+      "liquid": null,
+      "plate_calories": 280,
+      "score": 1.879157,
+      "support": null
+    },
+    {
+      "dry": null,
+      "form": "single",
+      "hero_dish": "Curd Rice",
+      "heroes": [
+        "Curd Rice"
+      ],
+      "liquid": null,
+      "plate_calories": 260,
+      "score": 1.716232,
+      "support": "Roti"
+    },
+    {
+      "dry": null,
+      "form": "single",
+      "hero_dish": "Ven Pongal",
+      "heroes": [
+        "Ven Pongal"
+      ],
+      "liquid": null,
+      "plate_calories": 320,
+      "score": 1.523554,
+      "support": "Roti"
+    }
+  ]
+}

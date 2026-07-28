@@ -1,0 +1,96 @@
+{
+  "household": "Migrant single, Bihar->Mumbai",
+  "plates": [
+    {
+      "dry": "Undhiyu",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Gujarati Toor Dal",
+        "Undhiyu"
+      ],
+      "liquid": "Gujarati Toor Dal",
+      "plate_calories": 560,
+      "score": 5.410657,
+      "support": "Rice"
+    },
+    {
+      "dry": "Aloo Posto",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Aloo Posto",
+        "Macher Jhol"
+      ],
+      "liquid": "Macher Jhol",
+      "plate_calories": 490,
+      "score": 4.999325,
+      "support": "Rice"
+    },
+    {
+      "dry": "Cabbage Sabzi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Cabbage Sabzi",
+        "Moong Dal"
+      ],
+      "liquid": "Moong Dal",
+      "plate_calories": 300,
+      "score": 4.510199,
+      "support": "Rice"
+    },
+    {
+      "dry": "Lauki Sabzi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Dal Tadka",
+        "Lauki Sabzi"
+      ],
+      "liquid": "Dal Tadka",
+      "plate_calories": 330,
+      "score": 3.940152,
+      "support": "Rice"
+    },
+    {
+      "dry": "Dhokla",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Dhokla",
+        "Pithla"
+      ],
+      "liquid": "Pithla",
+      "plate_calories": 360,
+      "score": 3.751008,
+      "support": "Rice"
+    },
+    {
+      "dry": "Egg Bhurji",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Egg Bhurji",
+        "Sarson Ka Saag"
+      ],
+      "liquid": "Sarson Ka Saag",
+      "plate_calories": 520,
+      "score": 3.737751,
+      "support": "Rice"
+    },
+    {
+      "dry": "Aloo Gobi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Aloo Gobi",
+        "Chole"
+      ],
+      "liquid": "Chole",
+      "plate_calories": 550,
+      "score": 3.694651,
+      "support": "Poori"
+    }
+  ]
+}
