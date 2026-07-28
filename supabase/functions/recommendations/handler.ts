@@ -89,10 +89,10 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     log.info("recommendation.auth_ok", { user_id: claims.userId });
 
     // Fetch household + context (STUB until the live table exists — see compose.ts).
-    const { household, householdId: hid } = await loadHousehold(ctx, householdId);
+    const { household, householdId: hid, stubbed } = await loadHousehold(ctx, householdId);
     // TODO(founder-decision): once the live households table exists, enforce ownership here:
     //   requireOwnership(claims, household.profile_id)  — Edge Functions are the auth boundary.
-    log.info("recommendation.composed", { household_id: hid });
+    log.info("recommendation.composed", { household_id: hid, stubbed });
 
     const contextOverride = (body.context && typeof body.context === "object")
       ? body.context as Record<string, unknown>
@@ -134,6 +134,14 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
           plateCount: plateCount(result.body),
           reServed: true,
           latencyMs,
+          stubbed,
+          plates: result.body.plates,
+          engineVersion: typeof result.body.engine_version === "string"
+            ? result.body.engine_version
+            : undefined,
+          configVersion: typeof result.body.config_version === "string"
+            ? result.body.config_version
+            : undefined,
         });
         recordRequest(outcome);
         maybeLogSummary(log);
@@ -151,6 +159,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
         reServed: false,
         detail: respCheck.errors.join("; "),
         latencyMs,
+        stubbed,
       });
       recordRequest("fallback");
       maybeLogSummary(log);
@@ -172,6 +181,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
       reServed: false,
       detail: result.detail,
       latencyMs,
+      stubbed,
     });
     recordRequest(result.kind === "timeout" ? "timeout_fallback" : "fallback");
     maybeLogSummary(log);

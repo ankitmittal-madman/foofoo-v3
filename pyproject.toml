@@ -16,6 +16,77 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
+# Lint/type-check toolchain (Phase C.5 Task 3), resolving the placeholder left in re-ci.yml by
+# Phase E. Kept in its own extra so `pip install -e ".[test]"` stays the fast path for running
+# tests, and CI installs `.[lint]` explicitly when it needs the checkers.
+lint = ["ruff>=0.6", "mypy>=1.11"]
+
+# ---------------------------------------------------------------------------
+# ruff — lint + format. Config lives here (repo root) and covers BOTH packages
+# (ghar_re_core and ghar_re_service), so the two sides of the RE can never drift into different
+# style rules.
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100          # matches the Deno side's fmt lineWidth, so both languages wrap alike
+target-version = "py311"   # the version both pyproject.toml files already require
+exclude = ["ghar_re_core.egg-info", ".pytest_cache"]
+
+[tool.ruff.lint]
+# A deliberately modest starting set — the point of this pass is to catch real defects
+# (undefined names, unused imports, mutable default args, shadowed builtins), not to reformat
+# working code to satisfy a maximalist rule list on its first run.
+#   E/W = pycodestyle, F = pyflakes, I = import sorting, B = bugbear (real bug patterns),
+#   UP  = pyupgrade, C4 = comprehension clarity, SIM = simplification
+select = ["E", "W", "F", "I", "B", "UP", "C4", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests legitimately do things linters dislike: long descriptive assertions and, in the auth
+# tests, deliberately "wrong" values that exist precisely to be rejected.
+"*/tests/*" = ["E501"]
+
+# ghar_re_core is the FROZEN reference implementation of the recommendation mathematics, locked by
+# the golden-master test (ghar_re_core/tests/test_golden_master.py). The rules disabled below are
+# purely cosmetic — line length, dict() vs {}, import order, syntax modernisation, `l` as the
+# domain name for "liquid" in a dry/liquid plate pair. Applying them would mean ~150 edits to
+# working, output-locked math whose only possible outcome is risk: a lint pass is not the place to
+# touch code whose behaviour is deliberately pinned.
+#
+# The rules that catch REAL defects (F = pyflakes: undefined names, unused variables/imports;
+# B = bugbear: mutable defaults, unused loop control vars) stay ON for this package — see the
+# session summary for the two genuine findings they surfaced and why each was flagged for Founder
+# review rather than silently "fixed" (fixing them changes recommendation output, which is exactly
+# what the golden master exists to force into review).
+"ghar_re_core/*" = ["E501", "C408", "I001", "E741", "E401", "E402", "UP", "SIM"]
+
+# ---------------------------------------------------------------------------
+# mypy — type-check. Started in NON-strict mode on purpose: ghar_re_core is largely untyped
+# (dict-shaped θ objects and dish records by design), and turning on strict mode would produce
+# hundreds of findings that say nothing about correctness. The settings below catch the errors
+# that actually indicate bugs, and the service layer — which is typed — is checked more tightly.
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+exclude = ["ghar_re_core\\.egg-info", "build"]
+
+[[tool.mypy.overrides]]
+# ghar_re_core is the frozen reference implementation ported from the research pipeline: its
+# public surface is intentionally dict-based (θ fields carry value/confidence/source metadata as
+# plain dicts), so requiring annotations on every function would mean rewriting working,
+# golden-master-locked math to satisfy a checker.
+#
+# Note what is NOT switched off here: real type ERRORS are still reported for this package. The
+# first pass surfaced exactly one (an unannotated module-level cache), which was fixed rather than
+# ignored — so no blanket `ignore_errors` is needed or wanted.
+module = "ghar_re_core.*"
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+# Third-party packages that ship no type stubs.
+module = ["yaml.*", "jsonschema.*"]
+ignore_missing_imports = true
 
 [tool.setuptools]
 # The importable package is `ghar_re_core` (renamed from `ghar_re`); it stays exactly one level

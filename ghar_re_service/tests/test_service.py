@@ -1,17 +1,29 @@
 """
 Service-level e2e tests (FastAPI TestClient): health/readiness endpoints, /v1/meta, and a full
 /v1/recommendations round-trip against the golden-sample households.
+
+/v1/recommendations requires a valid service-to-service signature (RE-DOC-10 §9), so these tests
+post SIGNED raw bytes via _post() rather than TestClient's `json=` helper — the HMAC covers the
+exact body bytes, so the body must be serialized once and both signed and sent. The signature
+scheme itself is tested in test_auth.py; here it is just the price of admission.
 """
+
+import hashlib
+import hmac
+import json
+import time
+
 import pytest
 from fastapi.testclient import TestClient
+from ghar_re_service.providers import DEV_INSECURE_SECRET
 
-from ghar_re_service import main
 from ghar_re_core import fixtures as F
+from ghar_re_service import auth, main
 
 
 @pytest.fixture(scope="module")
 def client():
-    # entering the context runs the startup lifecycle (config → catalogue → indices → registry → ready)
+    # entering the context runs the startup lifecycle (auth → config → catalogue → indices → ready)
     with TestClient(main.app) as c:
         yield c
 
@@ -21,6 +33,23 @@ def _req(hh_key="couple_mumbai_mh", **ctx):
     context = {"slot": "dinner", "season": "monsoon", "weather": {"is_raining": True, "temp_c": 27}}
     context.update(ctx)
     return {"household": {k: v for k, v in hh.items() if k != "id_key"}, "context": context}
+
+
+def _post(client, payload):
+    """POST /v1/recommendations with a valid signature over the exact bytes sent."""
+    raw = json.dumps(payload).encode()
+    ts = int(time.time())
+    sig = hmac.new(
+        DEV_INSECURE_SECRET.encode(), f"{ts}.".encode() + raw, hashlib.sha256
+    ).hexdigest()
+    return client.post(
+        "/v1/recommendations",
+        content=raw,
+        headers={
+            "content-type": "application/json",
+            auth.SIGNATURE_HEADER: f"t={ts},v1={sig}",
+        },
+    )
 
 
 def test_healthz_always_200(client):
@@ -38,11 +67,11 @@ def test_readyz_and_recommend_503_before_ready(client):
     main.state.ready = False
     try:
         assert client.get("/readyz").status_code == 503
-        r = client.post("/v1/recommendations", json=_req())
+        r = _post(client, _req())
         assert r.status_code == 503
         assert r.json()["error"] == "service_not_ready"
     finally:
-        main.state.ready = True   # restore for the rest of the module
+        main.state.ready = True  # restore for the rest of the module
 
 
 def test_meta_returns_versions(client):
@@ -53,7 +82,7 @@ def test_meta_returns_versions(client):
 
 
 def test_recommendations_end_to_end(client):
-    r = client.post("/v1/recommendations", json=_req("couple_mumbai_mh"))
+    r = _post(client, _req("couple_mumbai_mh"))
     assert r.status_code == 200
     body = r.json()
     # contract-shaped response
@@ -73,20 +102,20 @@ def test_recommendations_tolerates_unknown_fields(client):
     req = _req()
     req["household"]["q99_future"] = "ignored"
     req["telemetry"] = {"client": "test"}
-    r = client.post("/v1/recommendations", json=req)
-    assert r.status_code == 200   # additive/open contract holds at the HTTP boundary
+    r = _post(client, req)
+    assert r.status_code == 200  # additive/open contract holds at the HTTP boundary
 
 
 def test_request_id_is_echoed(client):
     req = _req()
     req["request_id"] = "fixed-req-id-123"
-    body = client.post("/v1/recommendations", json=req).json()
+    body = _post(client, req).json()
     assert body["request_id"] == "fixed-req-id-123"
 
 
 def test_invalid_request_returns_422(client):
     bad = _req()
-    del bad["household"]["q1_household_type"]   # drop a required field
-    r = client.post("/v1/recommendations", json=bad)
+    del bad["household"]["q1_household_type"]  # drop a required field
+    r = _post(client, bad)
     assert r.status_code == 422
     assert r.json()["error"] == "invalid_request"

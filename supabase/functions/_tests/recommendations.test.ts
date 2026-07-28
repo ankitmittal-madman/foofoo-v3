@@ -19,7 +19,13 @@ import {
 import type { AuthClaims, Logger } from "../_shared/mod.ts";
 import { makeRecommendationsHandler, type RecommendationDeps } from "../recommendations/handler.ts";
 import { callRecommendationEngine, type FetchLike } from "../recommendations/re-client.ts";
-import type { HouseholdRaw } from "../recommendations/compose.ts";
+import {
+  allergenTokens,
+  composeHouseholdRaw,
+  type HouseholdRaw,
+  memberRole,
+  toMemberAge,
+} from "../recommendations/compose.ts";
 
 const REQUIRED_ENV = {
   SUPABASE_URL: "http://localhost:54321",
@@ -47,6 +53,36 @@ function withEnv(vars: Record<string, string>, fn: () => void | Promise<void>) {
 
 const USER_ID = "11111111-1111-1111-1111-111111111111";
 const CFG = { gharReServiceUrl: "http://re.local", gharReServiceSecret: "s3cr3t" };
+
+/**
+ * A fixed, contract-valid household injected in place of the live Postgres read.
+ *
+ * These are ORCHESTRATION tests (does the handler call the RE, pass plates through, fall back on
+ * timeout) — not data-access tests. Since Phase C.5 wired loadHouseholdRaw to real `public` tables,
+ * leaving it un-injected would make every test below depend on a live database, which is exactly
+ * the coupling the injectable-deps design exists to avoid.
+ */
+const TEST_HOUSEHOLD: HouseholdRaw = {
+  q1_household_type: "couple",
+  q2_working_professionals: 2,
+  q3_home_state: "Delhi",
+  q4_current_city: "Delhi",
+  q5_diet: "veg",
+  q6_nonveg_types: [],
+  q7_veg_days: [],
+  q8_is_jain: false,
+  q9_allergies: [],
+  q10_allergy_other: null,
+  q11_conditions: [],
+  q12_member_ages: [{ role: "adult", age: 32 }, { role: "adult", age: 30 }],
+  q13_who_cooks: "self",
+  q14_eat_out_per_week: 2,
+  q15_objective: "awesome_taste",
+};
+
+/** Inject the fixed household above, so no test below touches a database. */
+const loadTestHousehold = () =>
+  Promise.resolve({ household: TEST_HOUSEHOLD, householdId: USER_ID, stubbed: false });
 
 /** A no-op Logger for the re-client tests. */
 function fakeLogger(): Logger {
@@ -114,6 +150,8 @@ Deno.test("POST /v1/recommendations success passes RE plates[]/contributions[] t
     resetConfigCacheForTests();
     let called = 0;
     const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
       callRe: (_payload, requestId) => {
         called++;
         return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
@@ -137,6 +175,8 @@ Deno.test("POST /v1/recommendations timeout returns a fallback plate (valid 200,
     resetConfigCacheForTests();
     let called = 0;
     const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
       callRe: () => {
         called++;
         return Promise.resolve({
@@ -223,6 +263,7 @@ Deno.test("malformed composed payload is rejected before the RE is called (400, 
     const deps: RecommendationDeps = {
       loadHousehold: () =>
         Promise.resolve({ household: invalidHousehold, householdId: "stub", stubbed: true }),
+      recordEvent: () => Promise.resolve(),
       callRe: () => {
         called++;
         return Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse("x") });
@@ -234,4 +275,98 @@ Deno.test("malformed composed payload is rejected before the RE is called (400, 
     assertEquals(json.error.code, API_ERRORS.ERR_VALIDATION_FAILED.code);
     assertEquals(called, 0); // the RE was NEVER called — validation happened first
   });
+});
+
+// ── 5. Phase C.5 composition — live-table row shapes → contract-valid Q1–Q15 ─────────────────────
+// These exercise the PURE mapping functions only (no Supabase client, no database): the row shapes
+// they take are exactly what compose.ts selects from public.profiles / household_answers /
+// household_members, so a drift between the migration and the mapping shows up here.
+Deno.test("allergenTokens decodes the frozen 7-bit allergen model", () => {
+  assertEquals(allergenTokens(0), []);
+  assertEquals(allergenTokens(1), ["nuts"]);
+  assertEquals(allergenTokens(2 | 4), ["dairy", "gluten"]);
+  assertEquals(allergenTokens(64), ["sesame"]);
+  // every bit set → all seven, in bit order
+  assertEquals(allergenTokens(127), [
+    "nuts",
+    "dairy",
+    "gluten",
+    "shellfish",
+    "egg",
+    "soy",
+    "sesame",
+  ]);
+});
+
+Deno.test("memberRole maps the live conditions[] vocabulary to RE roles, strictest first", () => {
+  assertEquals(memberRole([]), "adult");
+  assertEquals(memberRole(["baby_6_18m"]), "weaning");
+  assertEquals(memberRole(["toddler"]), "toddler");
+  assertEquals(memberRole(["elderly_member"]), "senior");
+  assertEquals(memberRole(["school_child"]), "child");
+  assertEquals(memberRole(["teen_high_appetite"]), "teen");
+  // a member carrying several tags resolves to the most food-safety-constraining one
+  assertEquals(memberRole(["picky_child", "baby_6_18m"]), "weaning");
+});
+
+Deno.test("toMemberAge uses the real age when present and a role default when NULL", () => {
+  assertEquals(toMemberAge({ age: 71, conditions: ["elderly_member"] }), {
+    role: "senior",
+    age: 71,
+  });
+  // age is nullable in the live schema (migration 038 does not fabricate one) — the role-derived
+  // default keeps the payload contract-valid without inventing a specific user's age.
+  assertEquals(toMemberAge({ age: null, conditions: ["baby_6_18m"] }), { role: "weaning", age: 1 });
+  assertEquals(toMemberAge({ age: null, conditions: [] }), { role: "adult", age: 32 });
+});
+
+Deno.test("composeHouseholdRaw joins the three live sources into one contract payload", () => {
+  const hh = composeHouseholdRaw(
+    {
+      id: USER_ID,
+      home_state: "Gujarat",
+      current_city: "Ahmedabad",
+      diet_type: "veg",
+      religious_pref: "jain",
+      allergen_flags: 2, // dairy
+    },
+    {
+      q1_household_type: "couple",
+      q2_working_professionals: 2,
+      q6_nonveg_types: [],
+      q7_veg_days: [],
+      q10_allergy_other: null,
+      q11_conditions: [],
+      q13_who_cooks: "self",
+      q14_eat_out_per_week: 2,
+      q15_objective: "healthy_living",
+    },
+    [{ age: 34, conditions: [] }, { age: 32, conditions: [] }],
+  );
+  assertEquals(hh.q3_home_state, "Gujarat"); // from profiles
+  assertEquals(hh.q8_is_jain, true); // derived from religious_pref
+  assertEquals(hh.q9_allergies, ["dairy"]); // derived from the bitfield
+  assertEquals(hh.q15_objective, "healthy_living"); // from household_answers
+  assertEquals(hh.q12_member_ages.length, 2); // from household_members
+});
+
+Deno.test("composeHouseholdRaw serves neutral defaults when onboarding is incomplete", () => {
+  // A profile exists but household_answers does not yet — a half-onboarded user must still get a
+  // usable payload rather than an error.
+  const hh = composeHouseholdRaw(
+    {
+      id: USER_ID,
+      home_state: "Delhi",
+      current_city: "Delhi",
+      diet_type: "non_veg",
+      religious_pref: "all",
+      allergen_flags: 0,
+    },
+    null,
+    [],
+  );
+  assertEquals(hh.q5_diet, "non_veg"); // the real answer still wins where one exists
+  assertEquals(hh.q15_objective, "awesome_taste"); // neutral default
+  assertEquals(hh.q8_is_jain, false);
+  assertEquals(hh.q12_member_ages, [{ role: "adult", age: 32 }]); // never an empty member list
 });

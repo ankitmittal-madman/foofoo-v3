@@ -39,7 +39,6 @@ def arr(vals):
     """Postgres text[] literal."""
     if vals is None:
         return "NULL"
-    inner = ",".join('"' + str(v).replace('"', '\\"') + '"' for v in vals)
     return "ARRAY[" + ",".join(q(v) for v in vals) + "]::text[]" if vals else "ARRAY[]::text[]"
 
 
@@ -299,8 +298,6 @@ def gen_golden():
 
     # link comfort_hero_map.dish_id to golden dishes by exact name (reference rows keep their data_source)
     L.append("-- link comfort_hero_map.dish_id to golden dishes named after KB §R3 heroes")
-    hero_links = ["Onion Pakora", "Sarson Ka Saag", "Kanda Bhaji", "Curd Rice", "Rasam",
-                  "Medu Vada", "Bhuna Khichuri", "Undhiyu", "Pithla"]
     # Match KB names -> golden dish names (KB uses 'Pakora','Khichuri','Rasam'/'Rasam-Rice' etc.)
     name_map = {
         "Pakora": "Onion Pakora", "Sarson Ka Saag": "Sarson Ka Saag", "Kanda Bhaji": "Kanda Bhaji",

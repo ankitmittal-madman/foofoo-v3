@@ -7,10 +7,11 @@ the Phase A response, populating the open `contributions[]` via the ScoringModul
 
 If a formula appears to be needed here, it belongs in ghar_re_core, not this file.
 """
+
 from __future__ import annotations
 
 import uuid
-from typing import Any, Dict, List
+from typing import Any
 
 from ghar_re_core import pipeline as core_pipeline
 from ghar_re_core import scoring as S
@@ -23,7 +24,7 @@ TARGET_PLATES = 7
 _ARRAY_DEFAULTS = ("q6_nonveg_types", "q7_veg_days", "q9_allergies", "q11_conditions")
 
 
-def build_household_dict(hh: Dict[str, Any]) -> Dict[str, Any]:
+def build_household_dict(hh: dict[str, Any]) -> dict[str, Any]:
     """Map the contract's raw household (Q1-Q15) to the dict ghar_re_core.derivation expects."""
     out = dict(hh)
     out.setdefault("label", hh.get("label", "request-household"))
@@ -34,8 +35,11 @@ def build_household_dict(hh: Dict[str, Any]) -> Dict[str, Any]:
     return out
 
 
-def build_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
-    """Map the contract context to a core context dict (weather is mocked/injected — no live API)."""
+def build_context(ctx: dict[str, Any]) -> dict[str, Any]:
+    """Map the contract context to a core context dict.
+
+    Weather is mocked/injected in v1 — there is no live weather API.
+    """
     weather = ctx.get("weather") or {}
     return core_pipeline.make_context(
         slot=ctx.get("slot", "dinner"),
@@ -50,47 +54,56 @@ def build_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _principal_hero(plate):
-    """The hero whose BASE breakdown represents the plate's contributions. For a pair, the
-    higher-scoring of the two heroes; otherwise the sole hero. (Documented explainability choice.)"""
+    """The hero whose BASE breakdown represents the plate's contributions.
+
+    For a pair, the higher-scoring of the two heroes; otherwise the sole hero.
+    (Documented explainability choice.)
+    """
     if plate["form"] == "pair":
-        d, l = plate["dry"], plate["liquid"]
-        return d, [d, l]
+        dry, liquid = plate["dry"], plate["liquid"]
+        return dry, [dry, liquid]
     h = plate["hero"]
     return h, [h]
 
 
-def run(request: Dict[str, Any], catalogue, config, registry) -> Dict[str, Any]:
-    """Full request → response. `catalogue`/`config`/`registry` come from the providers at startup."""
+def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
+    """Full request → response.
+
+    `catalogue`/`config`/`registry` come from the providers at startup.
+    """
     request_id = request.get("request_id") or str(uuid.uuid4())
     hh = build_household_dict(request["household"])
     ctx = build_context(request["context"])
     objective = hh.get("q15_objective") or config.default_objective
 
-    result = core_pipeline.recommend(hh, ctx, catalogue)   # the ONE implementation of the math
-    plates_out: List[dict] = []
-    warnings: List[str] = []
+    result = core_pipeline.recommend(hh, ctx, catalogue)  # the ONE implementation of the math
+    plates_out: list[dict] = []
+    warnings: list[str] = []
 
     for i, p in enumerate(result["plates"]):
         principal, heroes = _principal_hero(p)
         base_total, contributions = compose_base(principal, result["theta"], ctx, config, registry)
         gain = S.gain_q15(principal, objective)
-        plates_out.append({
-            "plate_id": str(uuid.uuid5(uuid.NAMESPACE_OID, f"{request_id}:{i}")),
-            "form": p["form"],
-            "hero_dish_ids": [h.id for h in heroes],
-            "hero_dish_names": [h.name for h in heroes],
-            "support": p.get("support"),
-            "is_standalone": p["form"] == "standalone",
-            "plate_score": round(p["score"], 6),
-            "base_total": round(base_total, 6),          # fixed aggregate
-            "gain_multiplier": round(gain, 6),           # fixed aggregate
-            "final_score": round(p["score"], 6),         # fixed aggregate
-            "contributions": contributions,              # OPEN list (RE-DOC-11 §6)
-        })
+        plates_out.append(
+            {
+                "plate_id": str(uuid.uuid5(uuid.NAMESPACE_OID, f"{request_id}:{i}")),
+                "form": p["form"],
+                "hero_dish_ids": [h.id for h in heroes],
+                "hero_dish_names": [h.name for h in heroes],
+                "support": p.get("support"),
+                "is_standalone": p["form"] == "standalone",
+                "plate_score": round(p["score"], 6),
+                "base_total": round(base_total, 6),  # fixed aggregate
+                "gain_multiplier": round(gain, 6),  # fixed aggregate
+                "final_score": round(p["score"], 6),  # fixed aggregate
+                "contributions": contributions,  # OPEN list (RE-DOC-11 §6)
+            }
+        )
 
     if len(plates_out) < TARGET_PLATES:
         warnings.append(
-            f"only {len(plates_out)} of {TARGET_PLATES} plates could be formed for this household/context"
+            f"only {len(plates_out)} of {TARGET_PLATES} plates could be formed "
+            "for this household/context"
         )
 
     return {

@@ -2,7 +2,6 @@
 End-to-end tests: run the golden households through the full Ghar RE v1.0 pipeline and assert
 the behaviours the Core Spine / D1-D7 / Final_RE / KB require (Task 4).
 """
-import pytest
 
 from ghar_re_core import fixtures as F
 from ghar_re_core import knowledge as K
@@ -234,7 +233,7 @@ def test_sample_dataset_data_source_integrity():
 
 def test_kb_reference_verified_flag_maps_to_data_source():
     # ✓ (verified) -> real, ⚑ -> stub, for every comfort_hero_map row.
-    for zone, weather, name, verified, ds in K.COMFORT_HERO_MAP:
+    for _zone, _weather, name, verified, ds in K.COMFORT_HERO_MAP:
         assert ds == ("real" if verified else "stub"), f"{name}: verified={verified} ds={ds}"
     # sig bands + zone map are transcribed authored/catalogue values -> real
     assert all(b[3] == "real" for b in K.SIG_SCORE_BANDS)

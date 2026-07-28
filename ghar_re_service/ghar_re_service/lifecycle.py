@@ -2,6 +2,7 @@
 Startup lifecycle (RE-DOC-10 §7): load config → load catalogue → build indices → mark ready.
 Each step is logged (structured). /readyz flips to 200 only after this completes successfully.
 """
+
 from __future__ import annotations
 
 import json
@@ -9,14 +10,17 @@ import logging
 import sys
 import time
 from dataclasses import dataclass, field
-from typing import Optional, List
 
-from ghar_re_service.providers import (
-    CatalogueProvider, ConfigProvider,
-    LocalSnapshotCatalogueProvider, YamlFileConfigProvider,
-)
 from ghar_re_service.modules import build_registry
-
+from ghar_re_service.providers import (
+    AuthConfig,
+    AuthConfigProvider,
+    CatalogueProvider,
+    ConfigProvider,
+    EnvAuthConfigProvider,
+    LocalSnapshotCatalogueProvider,
+    YamlFileConfigProvider,
+)
 
 SERVICE_NAME = "ghar_re_service"
 
@@ -44,10 +48,11 @@ def log_event(event: str, **fields):
 class Counters:
     """Lightweight in-process counters (Phase D Task 3) — cheap, removable, no metrics backend.
     Reset on process restart; exposed read-only via GET /v1/meta."""
+
     requests_total: int = 0
     success_total: int = 0
-    partial_total: int = 0   # warnings[] non-empty but request otherwise succeeded (Task 4)
-    errors_total: int = 0    # invalid request or unhandled exception
+    partial_total: int = 0  # warnings[] non-empty but request otherwise succeeded (Task 4)
+    errors_total: int = 0  # invalid request or unhandled exception
 
     def record(self, outcome: str) -> None:
         self.requests_total += 1
@@ -70,11 +75,14 @@ class Counters:
 @dataclass
 class AppState:
     """Process-wide state built at startup and read by the routes."""
+
     config_provider: ConfigProvider = field(default_factory=YamlFileConfigProvider)
     catalogue_provider: CatalogueProvider = field(default_factory=LocalSnapshotCatalogueProvider)
-    config: Optional[object] = None
-    catalogue: Optional[object] = None
-    registry: Optional[List] = None
+    auth_provider: AuthConfigProvider = field(default_factory=EnvAuthConfigProvider)
+    config: object | None = None
+    catalogue: object | None = None
+    registry: list | None = None
+    auth: AuthConfig | None = None
     ready: bool = False
     counters: Counters = field(default_factory=Counters)
 
@@ -83,6 +91,12 @@ def startup(state: AppState) -> AppState:
     """Runs the load sequence. Sets state.ready=True only if every step succeeds."""
     t0 = time.time()
     log_event("startup.begin")
+
+    # 0. auth (RE-DOC-10 §9). Loaded FIRST and deliberately: in production a missing shared secret
+    # raises here, so the process dies before loading a catalogue it would then serve unauthed.
+    # Only the skew is logged — the secret's value is never logged, not even truncated.
+    state.auth = state.auth_provider.load()
+    log_event("startup.auth_loaded", max_skew_seconds=state.auth.max_skew_seconds)
 
     # 1. config
     state.config = state.config_provider.load()

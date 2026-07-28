@@ -7,7 +7,6 @@ source). Standalone bypass, plate_score formula, greedy assemble-7 (no-duplicate
 discovery-dial cap), default carb attach (§S4.4 + KB §R2a).
 """
 from ghar_re_core.config import CONFIG
-from ghar_re_core import knowledge as K
 from ghar_re_core import scoring as S
 
 
@@ -80,7 +79,16 @@ def compat(d, l):
     if d_rich != l_rich:
         val += b_balance
     # G6 protein-veg balance: pulse/protein liquid + veg dry (or vice versa)
-    protein_cat = {"dal_lentil", "kebab", "egg_dish", "curry"}
+    # ⚠️ KNOWN GAP (surfaced by ruff F841, Phase C.5 — flagged, deliberately NOT fixed here):
+    # protein_cat below names FOUR protein categories, but the l_protein check on the next line
+    # only tests {"dal_lentil"} (plus the non_veg/egg diet fallback). A liquid whose category is
+    # kebab / egg_dish / curry therefore does not earn the b_protein bonus unless its diet also
+    # happens to be non_veg/egg. Widening the check to `set(l.dish_category) & protein_cat` is a
+    # one-line change, but it CHANGES SCORING OUTPUT for affected plates — which is a reviewed
+    # recommendation-quality decision for the Founder, not a lint cleanup. The golden-master test
+    # will fail loudly the moment someone makes it, which is exactly the intended behaviour.
+    # The constant is kept (not deleted) so the intended rule stays visible in the code.
+    protein_cat = {"dal_lentil", "kebab", "egg_dish", "curry"}  # noqa: F841 — see note above
     l_protein = bool(set(l.dish_category) & {"dal_lentil"}) or l.diet in ("non_veg", "egg")
     d_veg = "dry_sabzi" in d.dish_category
     if l_protein and d_veg:
@@ -119,7 +127,6 @@ def default_carb(plate, theta):
         return "Poori"                          # festive/specific pairing (chole-poori)
     # by region fallback (§S4.4 region table)
     region = theta["region"]["value"]
-    home_state = theta["home_state"]["value"]
     rice_regions = {"South", "East"}
     if region in rice_regions:
         return "Rice"

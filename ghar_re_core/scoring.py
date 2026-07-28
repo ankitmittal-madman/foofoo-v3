@@ -212,7 +212,7 @@ def prior_boost(dish, theta, ctx):
     zone = theta["region"]["value"]
     slot = ctx["slot"]
     total = 0.0
-    for (z, s, mk, mv, boost, tags, ds) in K.PRIOR_ZONE_SLOT:
+    for (z, s, mk, mv, boost, _tags, _ds) in K.PRIOR_ZONE_SLOT:
         if z != zone or s != slot:
             continue
         if _prior_matches(dish, mk, mv):
@@ -328,7 +328,7 @@ def _comfort_heroes_for(theta, weather_tag):
     region = theta["region"]["value"]
     keys = [k for k in (subzone, region) if k]
     heroes = set()
-    for (zone, weather, name, verified, ds) in K.COMFORT_HERO_MAP:
+    for (zone, weather, name, _verified, _ds) in K.COMFORT_HERO_MAP:
         if weather == kb_weather and zone in keys:
             # resolve the KB hero NAME to the concrete golden dish name (exact match)
             heroes.add(K.COMFORT_HERO_TO_DISH.get(name, name))

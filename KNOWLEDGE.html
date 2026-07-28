@@ -625,8 +625,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">📊</span> S35 · Ghar RE v1.0 Phase D — observability
       <span class="nav-badge">Jul 28</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s36')">
+    <div class="nav-item" onclick="showPage('s36')">
       <span class="nav-icon">🔒</span> S36 · Ghar RE v1.0 Phase E — golden-master test + CI gate
+      <span class="nav-badge">Jul 28</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s37')">
+      <span class="nav-icon">🔐</span> S37 · Ghar RE Phase C.5 — RE auth, real app tables, ruff/mypy
       <span class="nav-badge">Jul 28</span>
     </div>
     <!-- NAV_INJECT -->
@@ -5601,7 +5605,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s35 -->
-  <div id="page-s36" class="page-content">
+  <div id="page-s36" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S36 · Ghar RE v1.0 Phase E — golden-master regression test + CI/contract gate</div>
       <div class="page-subtitle">Locked today's recommendation output as a committed reference file so any accidental change to the scoring math now fails CI automatically, and wired up automated CI checks for the recommendation engine's Python side to match what the edge function side already had.</div>
@@ -5660,6 +5664,69 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s36 -->
+  <div id="page-s37" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S37 · Ghar RE Phase C.5 — engine now checks who's calling, real household data, Python code checks</div>
+      <div class="page-subtitle">Closed the two security/data gaps the deployment audit found before they could ship, replaced the hardcoded fake household with real database reads, and turned on automatic Python code checking.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The recommendation engine accepted <b>any</b> request that reached it — the app was signing every call with a secret, but the engine never actually checked the signature, so the security was one-sided and effectively decorative. Separately, every recommendation was built from ONE hardcoded fake household (a Delhi veg couple) regardless of who was asking, and no record of what was recommended was ever saved to the database. The Python code also had no automatic quality checking at all.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The engine now verifies the signature on every recommendation request and rejects anything unsigned, tampered with, or replayed from more than 5 minutes ago — refusing it before doing any work at all. Recommendations are now built from the user's real profile, real household members, and real onboarding answers, with brand-new users getting sensible defaults instead of an error. Every recommendation served is now saved to a real database table. And Python code is now automatically checked for bugs and style on every push, the same way the app's TypeScript already was.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/auth.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/tests/test_auth.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/038_household_answers_context_and_events.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/rollback/038_..._rollback.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/compose.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/events.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/providers.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/main.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">pyproject.toml</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">.github/workflows/re-ci.yml</span><span class="tag tag-cfg">Config</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 28, 2026<br>Phase C.5 · prerequisite for Phase F</div>
+      </div>
+      <div class="session-card-desc">
+        This session ran the work originally scoped as "Phase C.5", which had been skipped when Phases D and E ran ahead of it. The deployment-topology audit confirmed both of its gaps were still open, and both had to close <b>before</b> any deployment work — not after.
+        <br><br>
+        <b>1. The engine now checks who is calling it.</b> The app was already signing every request to the recommendation engine with a shared secret (like a tamper-proof wax seal). The engine, however, never opened the seal — it just trusted whatever arrived. That made the whole security model one-sided: the plan assumed the engine would only ever be reachable from the app, but nothing enforced either half. The engine now verifies the seal on every recommendation request and rejects four distinct cases: no signature at all, a malformed one, a valid signature over <i>different</i> content (i.e. someone modified the request in transit), and a correctly-signed request that is more than 5 minutes old (someone replaying a captured request). Crucially, the rejection happens <i>before</i> the request is even read or any calculation is done. Health-check endpoints stay open on purpose — the hosting platform needs to ping those before any secret exists, and requiring a signature there is how a deployment locks itself out. Proven working across both languages: a signature generated by the real app code was fed to the engine and accepted, and the same signature with one extra byte added to the content was correctly rejected.
+        <br><br>
+        <b>2. Real household data, not a hardcoded sample.</b> Every recommendation was previously built from the same fake household. The honest finding here was that the live database already had <i>most</i> of what was needed under different names — so rather than create six new tables as originally sketched, this session verified what already existed and added only the four that genuinely didn't. The user's profile already <i>is</i> the household (it holds home state, city, diet, religious preference and allergies), and the household-members table already existed. Creating a second "households" table would have split household identity in two. What was actually missing: the remaining onboarding answers, the per-request context, a table to record what was recommended, and a table to record user feedback. A brand-new user with no profile yet is treated as a valid case, not an error — they get neutral defaults and a real recommendation instead of an error screen. One honest note carried into the code: member ages aren't collected by the current onboarding flow, so the engine gets a role-based stand-in age; this is safe because the safety-critical rules (baby food, elderly spice limits) key off the member's <i>role</i>, which <i>is</i> real data.
+        <br><br>
+        <b>3. Automatic Python code checking.</b> Phase E had left an explicit placeholder noting no Python linter had been chosen. This session added two standard tools (ruff for bugs/style, mypy for type errors) and wired them into the automated checks. The first real run flagged 223 issues. Rather than blanket-silencing them, each was triaged: everything in the service layer was properly fixed, and for the frozen recommendation math — whose exact output is deliberately locked by the golden-master test — only the rules that catch <i>real</i> bugs were kept on, with cosmetic ones switched off and the reason documented in the config. Two genuine dead-code findings in the math were fixed safely; the golden-master test then confirmed the recommendations were byte-for-byte unchanged, which is exactly the proof that matters.
+        <br><br>
+        <b>One real latent bug found and deliberately NOT fixed.</b> The linter surfaced a genuine gap in the plate-pairing rules: the "protein balance" bonus declares four qualifying food categories (dal, kebab, egg dish, curry) but the code only ever checks one of them (dal). So a curry- or kebab-based plate silently misses a bonus it was designed to get. Fixing it is a one-line change — but it would <b>change what food gets recommended</b>, which is a food-quality decision for the Founder, not something to slip into a code-cleanup task. It has been left in place with a clear explanatory note in the code, and the golden-master test will fail loudly the moment anyone changes it, forcing the change into review. That is the golden master doing precisely the job it was built for.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">49/49</div><div class="stat-l">Python tests passing</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">17</div><div class="stat-l">New signature-security tests</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">4</div><div class="stat-l">New database tables</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Deploys / containers</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — Founder review, then Phase F</div>
+        <div class="next-text">Both blockers the deployment audit flagged as "must fix before deploy" are now closed on the code side. The remaining half of the network-isolation gap (making the engine reachable only from the app) cannot be built until Phase F picks an actual hosting platform — but it is no longer the <i>only</i> thing standing between the engine and an open door, which was the real risk. Two items need a Founder decision: (a) the protein-balance pairing gap described above, and (b) whether member age should be added to the onboarding flow so the engine gets real ages instead of role-based stand-ins. One caveat repeated from earlier sessions: the app's TypeScript tests could not be executed in this environment (its package registry is blocked here, returning 403), so those were verified by type-checking, linting and formatting only — they do run for real in GitHub's CI, which was confirmed directly in the previous session.</div>
+      </div>
+    </div>
+  </div><!-- /page-s37 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

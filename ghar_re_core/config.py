@@ -13,7 +13,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SRC = os.path.join(ROOT, "data", "source")
 
-_CACHE = {}
+# Parsed-YAML cache, keyed by config file name.
+_CACHE: dict[str, object] = {}
 
 
 def _load(name):
@@ -42,11 +43,11 @@ class Config:
     def W(self, key):
         try:
             return self.base["base_weights"][key]
-        except KeyError:
+        except KeyError as e:
             raise KeyError(
                 f"BASE weight '{key}' not in base_weights.yaml — refusing to invent a value "
                 f"(Task 3 rule: flag missing params, never hardcode)."
-            )
+            ) from e
 
     @property
     def all_conf_k(self):

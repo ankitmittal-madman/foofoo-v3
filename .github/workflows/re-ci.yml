@@ -42,18 +42,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install packages (ghar_re_core + ghar_re_service, editable, with test extras)
+      - name: Install packages (ghar_re_core + ghar_re_service, editable, with test + lint extras)
         run: |
-          pip install -e ".[test]"
+          pip install -e ".[test,lint]"
           pip install -e "ghar_re_service[test]"
-      # No linter/type-checker is declared in pyproject.toml or ghar_re_service/pyproject.toml as
-      # of Phase E — introducing one (ruff/mypy/etc.) is a tool choice for the Founder to make, not
-      # something to pick silently here. This step is a placeholder that fails loudly if that
-      # changes without the workflow being updated, rather than silently doing nothing forever.
-      - name: Lint / type-check (none configured yet)
-        run: |
-          echo "No linter or type-checker is declared in pyproject.toml / ghar_re_service/pyproject.toml."
-          echo "Skipping by design — see comment in .github/workflows/re-ci.yml. Add the step here"
-          echo "once a tool is chosen, rather than introducing one silently in this workflow."
-      - name: pytest — ghar_re_core (16) + ghar_re_service (15) + golden-master (1)
+      # Lint + format check. ruff config lives in the root pyproject.toml and covers BOTH packages,
+      # so the two halves of the RE cannot drift into different style rules (Phase C.5 Task 3,
+      # replacing the Phase E placeholder that noted no tool had been chosen yet).
+      - name: Lint (ruff)
+        run: python3 -m ruff check ghar_re_core ghar_re_service
+      # Format check covers ghar_re_service ONLY, deliberately. ghar_re_core is the frozen,
+      # golden-master-locked math: running the formatter over it would rewrite ~150 places in code
+      # whose output is deliberately pinned, for zero correctness gain. Lint (above) still checks
+      # BOTH packages for real defects — it is only auto-formatting that stops at the service edge.
+      - name: Format check (ruff, service only — see note)
+        run: python3 -m ruff format --check ghar_re_service
+      # Invoked as `python3 -m mypy`, NOT bare `mypy`, on purpose: the module form resolves imports
+      # against the running interpreter's own site-packages, so third-party stubs (fastapi ships
+      # py.typed) are found regardless of how the runner lays out its Python install.
+      - name: Type check (mypy)
+        run: python3 -m mypy ghar_re_core ghar_re_service/ghar_re_service
+      - name: pytest — ghar_re_core (17, incl. golden-master) + ghar_re_service (32)
         run: python3 -m pytest ghar_re_core/tests/ ghar_re_service/tests/ -v
