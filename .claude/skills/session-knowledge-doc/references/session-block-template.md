@@ -31,6 +31,37 @@ Inject above `<!-- SESSIONS_INJECT -->`:
     <div class="page-subtitle">{{ONE_SENTENCE_PLAIN_ENGLISH_SUMMARY}}</div>
   </div>
 
+  <!-- ══ BEFORE / AFTER / FILES CHANGED ══
+       This is the most important section for a non-technical PM.
+       Always write this FIRST before any other section.
+       Plain English only — no filenames in Before/After, no jargon.
+       Files Changed: real paths, comma-separated, monospace.
+  -->
+  <div class="impact-bar">
+    <div class="impact-col impact-before">
+      <div class="impact-label">⛔ Before this session</div>
+      <div class="impact-text">{{WHAT_USER_COULD_NOT_DO_PLAIN_ENGLISH}}</div>
+    </div>
+    <div class="impact-arrow">→</div>
+    <div class="impact-col impact-after">
+      <div class="impact-label">✅ After this session</div>
+      <div class="impact-text">{{WHAT_USER_CAN_NOW_DO_PLAIN_ENGLISH}}</div>
+    </div>
+  </div>
+
+  <!-- ── Files changed this session ── -->
+  <div class="files-changed">
+    <div class="files-changed-label">📁 Files changed this session</div>
+    <div class="files-changed-list">
+      {{REPEAT_FOR_EACH_FILE:
+      <span class="fc-file">
+        <span class="fc-path">{{FILE_PATH}}</span>
+        <span class="tag {{TAG_CLASS}}">{{TAG_LABEL}}</span>
+      </span>
+      }}
+    </div>
+  </div>
+
   <!-- ── Summary card ── -->
   <div class="session-card">
     <div class="session-card-header">
@@ -142,6 +173,19 @@ Inject above `<!-- SESSIONS_INJECT -->`:
 
         <div class="dd-label">What this does</div>
         <div class="dd-text">{{2_3_SENTENCES_PLAIN_ENGLISH_NO_JARGON}}</div>
+
+        <div class="dd-label">Input → Output</div>
+        <div class="dd-io">
+          <div class="dd-io-col dd-io-in">
+            <div class="dd-io-label">Input</div>
+            <div class="dd-io-text">{{WHAT_GOES_IN_PLAIN_ENGLISH}}</div>
+          </div>
+          <div class="dd-io-arrow">→</div>
+          <div class="dd-io-col dd-io-out">
+            <div class="dd-io-label">Output</div>
+            <div class="dd-io-text">{{WHAT_COMES_OUT_PLAIN_ENGLISH}}</div>
+          </div>
+        </div>
 
         <div class="dd-label">Flow through it</div>
         <div class="dd-flow">
