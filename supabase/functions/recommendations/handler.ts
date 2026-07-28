@@ -22,6 +22,9 @@ import { validateRequest, validateResponse } from "./contract.ts";
 import { callRecommendationEngine, type ReResult } from "./re-client.ts";
 import { buildFallbackResponse } from "./fallback.ts";
 import { recordRecommendationEvent } from "./events.ts";
+import { maybeLogSummary, recordRequest } from "./metrics.ts";
+
+const SERVICE_NAME = "recommendations";
 
 export interface RecommendationDeps {
   loadHousehold?: (
@@ -73,15 +76,23 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     const householdId = (typeof body.household_id === "string" ? body.household_id : null) ??
       claims.userId ?? null;
 
+    // request_id: use the caller's if supplied, else the request's trace id (already a UUIDv4).
+    // Bound onto a child logger NOW so every log line for the rest of this request — auth already
+    // resolved above, compose/RE-call/response-handling below — carries the SAME id without each
+    // call site having to remember to pass it (Phase D Task 1).
+    const requestId = (typeof body.request_id === "string" && body.request_id)
+      ? body.request_id
+      : ctx.traceId;
+    const log = ctx.logger.child({ request_id: requestId, service: SERVICE_NAME });
+    const eventCtx = { ...ctx, logger: log };
+
+    log.info("recommendation.auth_ok", { user_id: claims.userId });
+
     // Fetch household + context (STUB until the live table exists — see compose.ts).
     const { household, householdId: hid } = await loadHousehold(ctx, householdId);
     // TODO(founder-decision): once the live households table exists, enforce ownership here:
     //   requireOwnership(claims, household.profile_id)  — Edge Functions are the auth boundary.
-
-    // request_id: use the caller's if supplied, else the request's trace id (already a UUIDv4).
-    const requestId = (typeof body.request_id === "string" && body.request_id)
-      ? body.request_id
-      : ctx.traceId;
+    log.info("recommendation.composed", { household_id: hid });
 
     const contextOverride = (body.context && typeof body.context === "object")
       ? body.context as Record<string, unknown>
@@ -91,51 +102,79 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     // Validate the OUTGOING payload against the shared contract BEFORE calling the RE (RE-DOC-10 §15).
     const reqCheck = validateRequest(payload);
     if (!reqCheck.valid) {
+      recordRequest("error");
+      maybeLogSummary(log);
       throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
         detail: `composed payload failed ghar-re-v1 contract: ${reqCheck.errors.join("; ")}`,
       });
     }
 
-    const result = await callRe(payload, requestId, ctx.config, ctx.logger);
+    // Latency measured HERE (edge-function-side clock) — this is the real user-facing wait for
+    // the RE call, per Task 2 ("the one with the real user-facing clock").
+    const reStart = performance.now();
+    const result = await callRe(payload, requestId, ctx.config, log);
+    const latencyMs = Math.round(performance.now() - reStart);
 
     if (result.ok) {
       // Defensive fail-closed check: pass through only if the RE's body is contract-conformant.
       const respCheck = validateResponse(result.body);
       if (respCheck.valid) {
-        await recordEvent(ctx, {
+        const warnings = Array.isArray(result.body.warnings) ? result.body.warnings : [];
+        // Task 4: zero/partial-eligible-dishes is a distinct outcome, never lumped into "error".
+        const outcome = warnings.length > 0 ? "partial" : "success";
+        log.info("recommendation.re_call_done", {
+          outcome,
+          latency_ms: latencyMs,
+          warnings: warnings.length,
+        });
+        await recordEvent(eventCtx, {
           requestId,
           householdId: hid,
-          outcome: "success",
+          outcome,
           plateCount: plateCount(result.body),
           reServed: true,
+          latencyMs,
         });
+        recordRequest(outcome);
+        maybeLogSummary(log);
         // Pass through plates[]/contributions[] AS-IS (RE-DOC-11 §6 — no second translation layer),
         // additively stamping the trace id.
         return jsonContract(result.body, ctx.traceId, 200);
       }
-      ctx.logger.warn("re_response.invalid", { request_id: requestId, errors: respCheck.errors });
+      log.warn("re_response.invalid", { latency_ms: latencyMs, errors: respCheck.errors });
       const fb = buildFallbackResponse(requestId, "invalid RE response");
-      await recordEvent(ctx, {
+      await recordEvent(eventCtx, {
         requestId,
         householdId: hid,
         outcome: "bad_body",
         plateCount: plateCount(fb),
         reServed: false,
         detail: respCheck.errors.join("; "),
+        latencyMs,
       });
+      recordRequest("fallback");
+      maybeLogSummary(log);
       return jsonContract(fb, ctx.traceId, 200);
     }
 
     // RE failure (timeout/network/http/bad_body) → fallback plate, still a valid 200 (RE-DOC-10 §11).
+    log.warn("recommendation.re_call_failed", {
+      outcome: result.kind,
+      latency_ms: latencyMs,
+      detail: result.detail,
+    });
     const fb = buildFallbackResponse(requestId, result.kind);
-    await recordEvent(ctx, {
+    await recordEvent(eventCtx, {
       requestId,
       householdId: hid,
       outcome: result.kind,
       plateCount: plateCount(fb),
       reServed: false,
       detail: result.detail,
+      latencyMs,
     });
+    recordRequest(result.kind === "timeout" ? "timeout_fallback" : "fallback");
+    maybeLogSummary(log);
     return jsonContract(fb, ctx.traceId, 200);
   };
 }

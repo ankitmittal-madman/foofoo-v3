@@ -5,6 +5,7 @@ lives here; all recommendation math is in ghar_re_core, all composition in engin
 """
 from __future__ import annotations
 
+import time
 import uuid
 from contextlib import asynccontextmanager
 
@@ -43,11 +44,13 @@ def readyz():
 
 @app.get("/v1/meta")
 def meta():
-    # Versions only — no request-specific data.
+    # Versions plus lightweight process-local counters (Phase D Task 3) — no metrics backend,
+    # cheap and replaceable wholesale once Phase F picks real monitoring.
     body = {
         "api_version": API_VERSION,
         "engine_version": ENGINE_VERSION,
         "config_version": state.config.versions["config"] if state.config else "unloaded",
+        "metrics": state.counters.as_dict(),
     }
     schemas.validate_meta(body)
     return body
@@ -55,24 +58,42 @@ def meta():
 
 @app.post("/v1/recommendations")
 def recommendations(payload: dict = Body(...), request: Request = None):
+    t0 = time.time()
     request_id = payload.get("request_id") or (request.headers.get("X-Request-Id") if request else None) or str(uuid.uuid4())
     payload.setdefault("request_id", request_id)
+    log_event("request.received", request_id=request_id)
 
     # 503 if called before startup finished loading providers.
     if not state.ready:
+        state.counters.record("error")
+        log_event("request.rejected", request_id=request_id, outcome="error", detail="service_not_ready",
+                   latency_ms=round((time.time() - t0) * 1000, 1))
         return JSONResponse(status_code=503, content={"error": "service_not_ready", "request_id": request_id})
 
     # parse/validate against the Phase A contract (additive/open — unknown fields ignored)
     try:
         schemas.validate_request(payload)
     except schemas.ContractError as e:
-        log_event("request.invalid", request_id=request_id, error=str(e))
+        state.counters.record("error")
+        log_event("request.invalid", request_id=request_id, outcome="error", error=str(e),
+                   latency_ms=round((time.time() - t0) * 1000, 1))
         return JSONResponse(status_code=422, content={"error": "invalid_request", "detail": str(e), "request_id": request_id})
 
     # call the engine (composition → ghar_re_core pipeline → response)
-    response = engine.run(payload, state.catalogue, state.config, state.registry)
+    try:
+        response = engine.run(payload, state.catalogue, state.config, state.registry)
+        # fail-closed: validate our OWN response before returning (RE-DOC-10 §15)
+        schemas.validate_response(response)
+    except Exception as e:
+        state.counters.record("error")
+        log_event("request.error", request_id=request_id, outcome="error", error=str(e),
+                   latency_ms=round((time.time() - t0) * 1000, 1))
+        return JSONResponse(status_code=500, content={"error": "internal_error", "request_id": request_id})
 
-    # fail-closed: validate our OWN response before returning (RE-DOC-10 §15)
-    schemas.validate_response(response)
-    log_event("request.ok", request_id=request_id, plates=len(response["plates"]), warnings=len(response["warnings"]))
+    # Task 4: a household that legitimately can't reach 7 plates is a distinct "partial" outcome,
+    # never lumped into "error" — warnings[] is populated by engine.run, not raised as an exception.
+    outcome = "partial" if response["warnings"] else "success"
+    state.counters.record(outcome)
+    log_event("request.ok", request_id=request_id, outcome=outcome, plates=len(response["plates"]),
+               warnings=len(response["warnings"]), latency_ms=round((time.time() - t0) * 1000, 1))
     return response

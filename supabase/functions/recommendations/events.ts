@@ -13,6 +13,7 @@ import type { RequestContext } from "../_shared/types/context.ts";
 
 export type RecommendationOutcome =
   | "success"
+  | "partial" // RE served plates but warnings[] non-empty — e.g. <7 eligible dishes (Phase D Task 4)
   | "timeout"
   | "network"
   | "http"
@@ -26,6 +27,7 @@ export interface RecommendationEventInput {
   plateCount: number;
   reServed: boolean; // true = plates came from the RE; false = fallback
   detail?: string;
+  latencyMs?: number; // RE call latency, measured edge-function-side (Phase D Task 2)
 }
 
 /**
@@ -46,6 +48,7 @@ export function recordRecommendationEvent(
     plate_count: ev.plateCount,
     re_served: ev.reServed,
     detail: ev.detail,
+    latency_ms: ev.latencyMs,
   });
   return Promise.resolve();
 }

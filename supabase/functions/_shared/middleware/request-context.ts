@@ -13,7 +13,10 @@ import type { Handler } from "./types.ts";
 /** Create the base context for a request (called by the handler wrapper, see api/handler.ts). */
 export function buildContext(req: Request): RequestContext {
   const config = getConfig();
-  const traceId = req.headers.get("x-trace-id") ?? newTraceId();
+  // x-request-id is the cross-service convention used with the RE (RE-DOC-10 §9); x-trace-id is
+  // the WP-8B framework default. Honoring both means an inbound request_id survives as the trace
+  // id from the very first log line (Phase D Task 1 — no separate id to reconcile downstream).
+  const traceId = req.headers.get("x-request-id") ?? req.headers.get("x-trace-id") ?? newTraceId();
   const url = new URL(req.url);
   const logger = createLogger(config.logLevel, {
     trace_id: traceId,

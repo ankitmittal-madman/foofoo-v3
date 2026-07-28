@@ -617,8 +617,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🗄</span> S33 · Migration 033 goes live + WP-9 gaps closed (FD-16/17)
       <span class="nav-badge">Jul 19</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s34')">
+    <div class="nav-item" onclick="showPage('s34')">
       <span class="nav-icon">🧩</span> S34 · Ghar RE v1.0 — engine, service &amp; edge function
+      <span class="nav-badge">Jul 28</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s35')">
+      <span class="nav-icon">📊</span> S35 · Ghar RE v1.0 Phase D — observability
       <span class="nav-badge">Jul 28</span>
     </div>
     <!-- NAV_INJECT -->
@@ -5279,7 +5283,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s33 -->
 
-  <div id="page-s34" class="page-content">
+  <div id="page-s34" class="page-content" style="display:none">
 
     <div class="page-header">
       <div class="page-title">S34 · Ghar RE v1.0 — engine, service &amp; edge function</div>
@@ -5534,6 +5538,65 @@ function deepDiveFeature(featureLabel){
     </script>
 
   </div><!-- /page-s34 -->
+
+  <div id="page-s35" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S35 · Ghar RE v1.0 Phase D — observability (request tracing, structured logs, lightweight metrics)</div>
+      <div class="page-subtitle">Made every recommendation request traceable end to end across both services, put a latency/outcome number on every log line, and added simple counters — no new infrastructure, nothing deployed.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">If a recommendation call went wrong, there was no reliable way to find every log line for that ONE request — the edge function's own id and the "request id" used in business logs could silently differ, the recommendation engine logged almost nothing about a request's timing, and a household that legitimately couldn't reach 7 meal plates was invisible — not tracked as its own outcome anywhere.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">One request id now appears on every log line on both sides, from the moment a call arrives to the moment it responds. Every log line says how long the recommendation-engine call took and how it ended (success / partial / timeout / fallback / error). Simple built-in counters exist on both sides — no new monitoring service — and a household that gets fewer than 7 plates now shows up as its own tracked "partial" outcome, not lumped in with real errors.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/main.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/lifecycle.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/events.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/metrics.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/middleware/request-context.ts</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 28, 2026<br>Phase D · observability only</div>
+      </div>
+      <div class="session-card-desc">
+        This is Phase D from the frozen RE-DOC-10 phase table — observability only, explicitly not deployment or CI/CD (those are Phase F, later). Four things:
+        <br><br>
+        <b>1. One id, everywhere.</b> The edge function's business-level "request id" and its infrastructure-level "trace id" could previously diverge if a caller sent a custom one. Fixed by (a) binding the request id onto a "child logger" the moment it's known, so every subsequent log line inherits it automatically instead of each call site having to remember to add it, and (b) teaching the very first line of the edge function to also recognise the industry-standard <code>X-Request-Id</code> header (it only looked for <code>x-trace-id</code> before), so the id is consistent from the first log line, not just from the business logic onward. Verified live: a test call with <code>X-Request-Id: demo-req-42</code> produced 6 log lines across the whole request — auth, compose, RE-call, response — every one carrying <code>demo-req-42</code>.
+        <br><br>
+        <b>2. Every log line now says how it ended and how long it took.</b> The recommendation engine (Python) previously logged almost nothing about a request — no "request received" line, no timing, and a crash inside it wasn't even caught or logged. Now every path (received → validated/rejected → computed/crashed → responded) is logged with a `service` name, an `outcome`, and how many milliseconds it took. On the edge function side, the call to the recommendation engine previously wasn't timed at all on success — only a timeout produced a log line. Now the actual wait time is measured on the edge function's own clock (the real user-facing one) and attached to every outcome, success included.
+        <br><br>
+        <b>3. Simple built-in counters, nothing fancy.</b> Both sides now count requests/successes/partial-results/errors/fallbacks in memory — no metrics database, no dashboard. The recommendation engine exposes its counters on its existing <code>/v1/meta</code> endpoint (checked live: after one test call it correctly reported <code>requests_total: 1, success_total: 1</code>). The edge function logs a periodic one-line summary every 50 requests instead, since it doesn't have an equivalent endpoint to extend. Both are deliberately throwaway — meant to be replaced once Phase F picks real monitoring, not a design commitment.
+        <br><br>
+        <b>4. "Not quite enough plates" is now its own category.</b> If a household can only be served fewer than 7 meal plates, the recommendation engine already noted this in a `warnings` list, but the edge function's own logging treated it exactly the same as a full success, and there was no separate counter for it. Now both sides recognise this as a distinct "partial" outcome — logged and counted separately from both hard errors and from full 7-plate successes.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">6</div><div class="stat-l">Files touched</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">2</div><div class="stat-l">Services covered</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">15/15</div><div class="stat-l">Python tests still passing</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Deploys / PRs / merges</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — Founder review, then Phase E or F</div>
+        <div class="next-text">This session deliberately stopped at observability only, per RE-DOC-10's phase table — no containerization, no deploy target, no CI/CD. Waiting for review before Phase E (contract tests / CI) or Phase F (an actual deployment with real monitoring, which is what these throwaway counters get replaced by). One honest caveat: the edge function's own Deno test suite (<code>deno test</code>) could not be run in this session's sandbox — its <code>jsr.io</code> package registry returned 403 (an environment restriction, unrelated to this change). Verified instead with <code>deno check</code> (passed), <code>deno lint</code>/<code>deno fmt</code> (clean), and a live manual run of the actual handler with fake dependencies, which produced the real log trail quoted above. The Python side's full test suite did run and passed (15/15).</div>
+      </div>
+    </div>
+  </div><!-- /page-s35 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

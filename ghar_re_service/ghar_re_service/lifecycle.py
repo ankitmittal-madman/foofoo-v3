@@ -18,6 +18,9 @@ from ghar_re_service.providers import (
 from ghar_re_service.modules import build_registry
 
 
+SERVICE_NAME = "ghar_re_service"
+
+
 # --- structured JSON logging (RE-DOC-10 §10 — logs span two languages, so no plain text) ---
 def _make_logger() -> logging.Logger:
     logger = logging.getLogger("ghar_re_service")
@@ -33,7 +36,35 @@ LOG = _make_logger()
 
 
 def log_event(event: str, **fields):
-    LOG.info(json.dumps({"event": event, **fields}))
+    """Every line is JSON and carries `service` (Phase D, RE-DOC-10 observability)."""
+    LOG.info(json.dumps({"event": event, "service": SERVICE_NAME, **fields}))
+
+
+@dataclass
+class Counters:
+    """Lightweight in-process counters (Phase D Task 3) — cheap, removable, no metrics backend.
+    Reset on process restart; exposed read-only via GET /v1/meta."""
+    requests_total: int = 0
+    success_total: int = 0
+    partial_total: int = 0   # warnings[] non-empty but request otherwise succeeded (Task 4)
+    errors_total: int = 0    # invalid request or unhandled exception
+
+    def record(self, outcome: str) -> None:
+        self.requests_total += 1
+        if outcome == "success":
+            self.success_total += 1
+        elif outcome == "partial":
+            self.partial_total += 1
+        else:
+            self.errors_total += 1
+
+    def as_dict(self) -> dict:
+        return {
+            "requests_total": self.requests_total,
+            "success_total": self.success_total,
+            "partial_total": self.partial_total,
+            "errors_total": self.errors_total,
+        }
 
 
 @dataclass
@@ -45,6 +76,7 @@ class AppState:
     catalogue: Optional[object] = None
     registry: Optional[List] = None
     ready: bool = False
+    counters: Counters = field(default_factory=Counters)
 
 
 def startup(state: AppState) -> AppState:
