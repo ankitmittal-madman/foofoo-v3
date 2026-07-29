@@ -31,6 +31,12 @@ from ghar_re_core import config as core_config
 from ghar_re_core.catalogue import Catalogue, Dish
 from ghar_re_core.config import Config
 from ghar_re_service.auth import DEFAULT_MAX_SKEW_SECONDS
+from ghar_re_service.ratelimit import (
+    DEFAULT_MAX_REQUESTS_PER_MINUTE,
+    DEFAULT_MAX_TRACKED_CLIENTS,
+    DEFAULT_WINDOW_SECONDS,
+    SlidingWindowRateLimiter,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -236,3 +242,65 @@ class EnvAuthConfigProvider:
         skew = int(raw_skew) if raw_skew else DEFAULT_MAX_SKEW_SECONDS
 
         return AuthConfig(secret=secret, max_skew_seconds=skew)
+
+
+# ---------------------------------------------------------------------------
+# Rate limiting (public-ingress hardening — see ratelimit.py's docstring)
+# ---------------------------------------------------------------------------
+# Read through a provider for the same reason the secret is: "where does this value come from" stays
+# in one swappable place. Tunable by environment because the right ceiling depends on real traffic
+# (Supabase's egress is NAT'd, so one address can legitimately carry many users) — an operator must
+# be able to raise it with `fly secrets set` / a config change and a restart, not a code change.
+
+
+@dataclass(frozen=True)
+class RateLimitConfig:
+    """Resolved rate-limit settings. max_requests == 0 disables the limiter entirely."""
+
+    max_requests: int = DEFAULT_MAX_REQUESTS_PER_MINUTE
+    window_seconds: int = DEFAULT_WINDOW_SECONDS
+    max_tracked_clients: int = DEFAULT_MAX_TRACKED_CLIENTS
+
+    def build(self) -> SlidingWindowRateLimiter:
+        return SlidingWindowRateLimiter(
+            max_requests=self.max_requests,
+            window_seconds=self.window_seconds,
+            max_tracked_clients=self.max_tracked_clients,
+        )
+
+
+@runtime_checkable
+class RateLimitConfigProvider(Protocol):
+    def load(self) -> RateLimitConfig: ...
+
+
+class EnvRateLimitConfigProvider:
+    """The one v1 adapter: reads the limit from the environment.
+
+    A malformed value RAISES at startup rather than silently reverting to the default. A typo in a
+    rate limit is the kind of thing that would otherwise be discovered during the incident it failed
+    to prevent — the same reasoning as EnvAuthConfigProvider's int(skew) above.
+    """
+
+    MAX_VAR = "GHAR_RE_RATE_LIMIT_PER_MINUTE"
+    WINDOW_VAR = "GHAR_RE_RATE_LIMIT_WINDOW_SECONDS"
+    TRACKED_VAR = "GHAR_RE_RATE_LIMIT_MAX_CLIENTS"
+
+    def __init__(self, environ: dict | None = None):
+        self._environ = environ if environ is not None else os.environ
+
+    def _int(self, var: str, default: int) -> int:
+        raw = (self._environ.get(var) or "").strip()
+        if not raw:
+            return default
+        try:
+            return int(raw)
+        except ValueError:
+            raise RuntimeError(f"[ratelimit] {var} must be an integer, got {raw!r}") from None
+
+    def load(self) -> RateLimitConfig:
+        return RateLimitConfig(
+            max_requests=self._int(self.MAX_VAR, DEFAULT_MAX_REQUESTS_PER_MINUTE),
+            window_seconds=self._int(self.WINDOW_VAR, DEFAULT_WINDOW_SECONDS),
+            max_tracked_clients=self._int(self.TRACKED_VAR, DEFAULT_MAX_TRACKED_CLIENTS),
+        )

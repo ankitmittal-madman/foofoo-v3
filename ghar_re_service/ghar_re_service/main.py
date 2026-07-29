@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 from fastapi import Body, FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from ghar_re_service import auth, engine, schemas
+from ghar_re_service import auth, engine, ratelimit, schemas
 from ghar_re_service.lifecycle import AppState, log_event, startup
 from ghar_re_service.version import API_VERSION, ENGINE_VERSION
 
@@ -88,6 +88,65 @@ async def verify_signature(request: Request, call_next):
         return JSONResponse(
             status_code=401,
             content={"error": "unauthorized", "detail": e.reason, "request_id": request_id},
+        )
+
+    return await call_next(request)
+
+
+# Paths the rate limiter guards. /v1/recommendations is the expensive one (HMAC + full pipeline);
+# /v1/meta is included because public ingress made it internet-reachable too and it is unauthed by
+# design (RE-DOC-10 §4).
+#
+# /healthz and /readyz are deliberately EXEMPT. Fly's proxy probes them on a fixed interval, and a
+# limiter that shed a health check would make the platform believe the machine is unhealthy and
+# restart it — a rate limit that causes the very outage it exists to prevent.
+RATE_LIMITED_PATHS = frozenset({"/v1/recommendations", "/v1/meta"})
+
+
+# REGISTERED SECOND, RUNS FIRST. Starlette builds its middleware stack so that the most recently
+# added middleware is the OUTERMOST layer — so this one sees the request before verify_signature
+# above does. That ordering is the whole point: a flood is shed before any HMAC is computed, which
+# is what protects the signature check rather than merely sitting behind it. Moving this decorator
+# above verify_signature would silently invert it and cost exactly the CPU this is meant to save.
+# test_ratelimit.py pins the order: an unsigned over-limit request must return 429, not 401.
+@app.middleware("http")
+async def enforce_rate_limit(request: Request, call_next):
+    """Shed requests from a client that exceeds the configured per-minute allowance, with 429."""
+    if request.url.path not in RATE_LIMITED_PATHS:
+        return await call_next(request)
+
+    limiter = state.rate_limiter
+    # FAILS OPEN, unlike the signature check next door — and the asymmetry is deliberate. A limiter
+    # that is not loaded yet is a missing safety damper; refusing traffic over it would turn a
+    # degraded defence into a self-inflicted outage. The boundary that must fail CLOSED is auth, and
+    # it does (503 above when state.auth is None), independently of anything here.
+    if limiter is None or not limiter.enabled:
+        return await call_next(request)
+
+    key = ratelimit.client_key(
+        request.headers.get(ratelimit.CLIENT_IP_HEADER),
+        request.client.host if request.client else None,
+    )
+    decision = limiter.check(key, time.time())
+    if not decision.allowed:
+        state.counters.record_rate_limited()
+        # The client key (an IP) is NOT logged: it is personal data under DPDP, and the operational
+        # question "are we shedding traffic?" is answered by the count alone.
+        log_event(
+            "request.rate_limited",
+            request_id=request.headers.get(auth.REQUEST_ID_HEADER),
+            outcome="rate_limited",
+            path=request.url.path,
+            retry_after=decision.retry_after,
+        )
+        return JSONResponse(
+            status_code=429,
+            content={
+                "error": "rate_limited",
+                "detail": "too many requests",
+                "request_id": request.headers.get(auth.REQUEST_ID_HEADER),
+            },
+            headers={"Retry-After": str(decision.retry_after)},
         )
 
     return await call_next(request)
