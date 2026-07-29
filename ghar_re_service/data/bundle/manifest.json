@@ -1,0 +1,19 @@
+{
+  "bundle_format": 1,
+  "bundle_version": "sha256:5bad97fad9a0f4a8",
+  "catalogue_sha256": "cb533565a3fcfb6bcc4d7c5b62e6edd676e21cdf0f3323bbb73900ae6f8eabb8",
+  "catalogue_source": "ghar_re_core.fixtures.DISHES (golden sample)",
+  "config_sha256": {
+    "base_weights.yaml": "479e0e645dd04b2478fcf81f1507ae8fe91de218618ae01ed704095adf7b11f8",
+    "community_priors.csv": "a908e6a6b818acd446edbbd664392e503ddfe35376ffa2788b91d11e749617be",
+    "derivation_params.yaml": "53042325b7819bcf5aff949b96efa7448ca99d1466c9f084c0485917f975f907",
+    "distance_weights.yaml": "5e42767f74483c7e4469984c611f1dd8cef018ba1c9cc93be3fee1671eda9d6b",
+    "filters.yaml": "c7a26cce47205f372e1839c857830d5cbe595e5b40543fe9dec216100e1cf044",
+    "ingredients_v5.csv": "a0518a020041f33f39683389317757a76bd9004771aa6ff67e272f3b5087ba09",
+    "pairing_rules.yaml": "4a25b060bd670f8a81dda89f1870ed62d74aa9a027c303ea49b0cbdf811f1716",
+    "q15_weights.yaml": "59aaccfff883b68a2b5a74a9947adf58de8a53d17f96b8e12ed1b7af791a0486",
+    "weather_rules.yaml": "d69c4eac4967aa455d15d0b418d856841c67f8a91380740f9f2a7c40215911ad"
+  },
+  "created_at": "2026-07-29T06:07:07.013776+00:00",
+  "dish_count": 39
+}

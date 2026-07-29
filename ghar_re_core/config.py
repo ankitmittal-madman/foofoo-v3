@@ -11,7 +11,19 @@ import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-SRC = os.path.join(ROOT, "data", "source")
+
+# Where the YAML/CSV config layer is read from.
+#
+# Default: <repo>/data/source — correct when running from a checked-out repo (the reference
+# pipeline, the tests, local dev).
+#
+# Override via GHAR_RE_CONFIG_DIR: required in a CONTAINER, where ghar_re_core is pip-installed
+# into site-packages and `ROOT` therefore resolves to site-packages — a directory that has no
+# data/source beneath it. This is the concrete reason RE-DOC-10 §8 calls for a baked bundle: the
+# service points this at the bundle's config/ directory at startup. Unset, behaviour is byte-for-
+# byte what it was before this seam existed (the golden-master test pins that).
+CONFIG_DIR_VAR = "GHAR_RE_CONFIG_DIR"
+SRC = os.environ.get(CONFIG_DIR_VAR) or os.path.join(ROOT, "data", "source")
 
 # Parsed-YAML cache, keyed by config file name.
 _CACHE: dict[str, object] = {}

@@ -1,0 +1,18 @@
+config_version: 1.0
+generated_from: Core Spine v1.0 (S2)
+generated_on: 2026-07-01
+# NOTE: implementation artifact derived from FROZEN specs. If a spec changes, update this file (RFC), never hard-code.
+
+# Ghar RE — BASE score weights   [SOURCE: Core Spine FROZEN §S2 PART B]
+# BASE = sum_k W_k * conf_k * m_k(dish|profile,ctx)   (conf_k = 1.0 in v1)
+base_weights:
+  W_PALETTE: 1.00   # regional fit (anchor)
+  W_SLOT:    0.60   # meal-slot fit
+  W_WEATHER: 0.40   # transient weather (signed)
+  W_AGE:     0.35   # age mildness/texture floors
+  W_HOUSE:   0.35   # household structure fit
+  W_SIG:     0.30   # signature/iconic boost
+  W_SEASON:  0.25   # standing season baseline
+  W_EFFORT:  0.40   # D2 effort module (context-dependent)
+confidence:
+  all_conf_k: 1.0   # v1 pins every module confidence to 1.0; v2 calibrates [SP-F3]

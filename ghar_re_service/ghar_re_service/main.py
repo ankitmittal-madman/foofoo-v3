@@ -115,6 +115,9 @@ def meta():
         "api_version": API_VERSION,
         "engine_version": ENGINE_VERSION,
         "config_version": state.config.versions["config"] if state.config else "unloaded",
+        # Which immutable snapshot is actually serving (RE-DOC-10 §8). None when running from repo
+        # files rather than a baked image — that distinction is exactly what this field is for.
+        "bundle_version": (state.bundle or {}).get("bundle_version"),
         "metrics": state.counters.as_dict(),
     }
     schemas.validate_meta(body)

@@ -1,0 +1,38 @@
+config_version: 1.0
+generated_from: D1-D7 FROZEN v1.0 (S4-5)
+generated_on: 2026-07-01
+# NOTE: implementation artifact derived from FROZEN specs. If a spec changes, update this file (RFC), never hard-code.
+
+# Ghar RE — Household Intelligence Layer D1-D7  [SOURCE: D1-D7 FROZEN §4-5]
+D1_income:
+  weights: {a0: -1.5, a_earn: 1.2, a_dep: 0.8, a_city: 1.0, a_cook: 1.4, a_eat: 0.7, a_age: 0.5}
+  band_cuts: {low_below: 0.40, high_at_or_above: 0.70}
+  conf_lo: 0.5
+  city_tier_n: {tier1: 1.0, tier2: 0.6, tier3: 0.3}
+  age_factor: {"<=24": 0.5, "25-34": 0.85, "35-50": 1.0, "51-64": 0.8, "65+": 0.5}
+  eatout_divisor: 4
+D2_time_route:
+  effort_ceiling: {family: 1.0, hired_cook: 0.81, self_weekday: 0.40, self_weekend: 0.80, order_tiffin: 0.10}
+  W_EFFORT: 0.40
+  p_over: 1.0
+  avail_discount: 0.9
+D3_adventurousness:
+  weights: {b0: 0.0, b_age: 0.35, b_hh: 0.25, b_inc: 0.15, b_migr: 0.15, b_eat: 0.10}
+  age_novelty: {"<=24": 1.0, "25-34": 0.8, "35-50": 0.5, "51-64": 0.35, "65+": 0.2}
+  hh_novelty: {single: 0.9, couple: 0.8, couple_kids: 0.4, couple_kids_parents: 0.3, joint: 0.35, flatmates: 0.85}
+  rho_floor: 0.05
+  rho_span_v1: 0.05      # v1 max discovery ~0.10 (familiarity-first)
+D4_blend:
+  weights: {c0: 0.75, c_elder: 0.15, c_age: 0.10, c_tenure: 0.35, blend_min: 0.30}
+  tenure_n_default: 0.3  # v1 default (tenure not asked); v2 learns [D-F3]
+  slot_offsets: {breakfast_min: 0.80, lunch_delta: -0.10, dinner_delta: 0.0}
+D5_household:
+  spice_tol: {weaning: 1, toddler: 1, child: 2, teen: 4, adult: 4, senior: 3}
+  penalties: {p_spice: 0.3, p_tex: 0.5}
+  heaviness_ceiling_senior: 2
+  variety_pressure: {single: 0.2, couple: 0.5, couple_kids: 0.8, couple_kids_parents: 0.7, joint: 0.4, flatmates: 0.3}
+D6_constraints:
+  community_prior_file: community_priors.csv   # soft; overridden by explicit Q5-Q8; decays v2
+  condition_demotions: placeholder            # [PARKED] no clinical research
+D7_latent:
+  status: v2_only                              # never asked; evidence-accumulation -> confirm-prompt

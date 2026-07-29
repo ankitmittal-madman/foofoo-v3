@@ -1,0 +1,33 @@
+# Docker build context excludes (Phase F).
+#
+# The build context is the repo root, so this file is what keeps the image small and — more
+# importantly — keeps things OUT of it that have no business in a deployed artefact.
+
+.git
+.github
+.claude
+.pytest_cache
+**/__pycache__
+**/*.pyc
+*.egg-info
+**/*.egg-info
+
+# Raw seed spreadsheets and ETL source CSVs. The engine never reads these at runtime — its config
+# comes from the baked bundle (RE-DOC-10 §8), which export_bundle.py builds from an explicit
+# allow-list. Excluding the whole directory also guarantees no raw dish/ingredient data can end up
+# in a shipped image by accident.
+data/
+
+# Everything below is either another service or documentation — none of it belongs in the RE image.
+supabase/
+database/
+docs/
+KNOWLEDGE.html
+*.md
+!ghar_re_service/README.md
+
+# Tests and dev tooling: the image runs the service, it does not run the suite.
+ghar_re_core/tests/
+ghar_re_service/tests/
+.venv
+venv

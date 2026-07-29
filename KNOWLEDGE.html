@@ -629,9 +629,13 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔒</span> S36 · Ghar RE v1.0 Phase E — golden-master test + CI gate
       <span class="nav-badge">Jul 28</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s37')">
+    <div class="nav-item" onclick="showPage('s37')">
       <span class="nav-icon">🔐</span> S37 · Ghar RE Phase C.5 — RE auth, real app tables, ruff/mypy
       <span class="nav-badge">Jul 28</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s38')">
+      <span class="nav-icon">🚢</span> S38 · Ghar RE Phase F — deployable image, bundle &amp; Fly config
+      <span class="nav-badge">Jul 29</span>
     </div>
     <!-- NAV_INJECT -->
   </div>
@@ -5664,7 +5668,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s36 -->
-  <div id="page-s37" class="page-content">
+  <div id="page-s37" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S37 · Ghar RE Phase C.5 — engine now checks who's calling, real household data, Python code checks</div>
       <div class="page-subtitle">Closed the two security/data gaps the deployment audit found before they could ship, replaced the hardcoded fake household with real database reads, and turned on automatic Python code checking.</div>
@@ -5727,6 +5731,70 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s37 -->
+  <div id="page-s38" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S38 · Ghar RE Phase F — the engine is now packageable and deployable (but not yet deployed)</div>
+      <div class="page-subtitle">Made the recommendation engine able to run outside a code checkout by baking its data into a versioned, self-contained bundle — and prepared everything needed to put it on a real server, without actually deploying it.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The recommendation engine only worked when run from a full copy of the project folder — it reached out to files sitting next to the code to find its settings, its ingredient list and its data contract. Move it anywhere else and it would crash on startup. There was no container, no server configuration, and no way to say which exact version of the food data a running engine was using.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">All the data the engine needs is now snapshotted into one sealed, versioned bundle that travels with it. The engine was proven to start and serve real recommendations with the original project folder completely out of reach — the exact condition it faces on a server. Every running copy now reports which data snapshot it's using, so "are these two servers running the same food data?" is answerable by comparing one short code. A container recipe and full server configuration are written and ready for you to run.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/scripts/export_bundle.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/data/bundle/ (catalogue + config snapshot)</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/Dockerfile</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/fly.toml</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">.dockerignore</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/tests/test_bundle.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/README.md (deploy runbook)</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/config.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/catalogue.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/schemas.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/providers.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">.github/workflows/re-ci.yml</span><span class="tag tag-cfg">Config</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 29, 2026<br>Phase F · prepared, NOT deployed</div>
+      </div>
+      <div class="session-card-desc">
+        <b>1. A sealed, versioned data bundle.</b> The engine needs three things that don't live inside its own code: seven settings files, an ingredient master list (which drives allergy and Jain safety checks), and the data contract it shares with the app. All three were being found by "look in the folder next to me" — which works in a code checkout and fails the moment the engine is packaged up and moved. A new export step now snapshots all of it into one bundle with a version stamp. That stamp is a <i>fingerprint of the contents</i>, not a timestamp: the same data always produces the same stamp, so comparing two servers is a one-line check rather than guesswork. The stamp shows up on the engine's status endpoint and in its startup logs.
+        <br><br>
+        <b>2. A container recipe with everything pinned.</b> Written as a two-stage build so the tools used to assemble it don't ship inside the final result. Every version is nailed down exactly — Python and all four dependencies — because a rebuild that silently picks up a newer library is how a working system quietly stops working. It runs as a non-root user and writes nothing to disk. The build itself fails if the data bundle didn't make it in, rather than producing an image that only breaks once it's live and serving people.
+        <br><br>
+        <b>3. Server configuration for Fly.io.</b> Configured to always keep at least one machine running — deliberately not the cheaper "shut down when idle" mode, because this sits in the path of every single recommendation and a cold start would be a delay the user feels. Two separate health checks: one asking "is the process alive?" and a different one asking "has it finished loading its data?". Using the wrong one for the wrong job is a classic way to create a server that restarts forever without ever finishing startup. No public address is configured, so it isn't reachable from the open internet.
+        <br><br>
+        <b>4. Secrets kept out of the repository.</b> The shared secret the app and engine use to prove calls are genuine is set through Fly's encrypted secret store, never committed. Exact commands are in the runbook, including a way to keep the value out of your shell history. This is the only secret the engine needs — it holds no database credentials at all, by design.
+        <br><br>
+        <b>A real bug this session caught — and the reason it was caught.</b> Rather than just writing the container recipe and declaring it done, the engine was installed and run under the container's <i>actual</i> conditions, with the project folder unreachable. It crashed — on a third file nobody had noticed: the ingredient master list, read at startup through its own hardcoded path. Reviewing the code alone had found two such paths; running it found the third. That file is now part of the bundle and the engine starts cleanly.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">56/56</div><div class="stat-l">Python tests passing</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">7</div><div class="stat-l">New bundle tests</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">3</div><div class="stat-l">Container-breaking paths fixed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Real deploys executed</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — your review, then you run the deploy</div>
+        <div class="next-text"><b>Nothing was deployed and no cloud resources were created.</b> Two things genuinely could not be checked here and are written up plainly in the runbook rather than assumed: the container image has <b>never actually been built</b> (this sandbox blocks downloading base images — so the recipe is unbuilt and unrun, though its runtime conditions were reproduced faithfully and everything passed), and <code>fly.toml</code> has <b>never been read by Fly's own tool</b>, so its exact key names are unvalidated. Run <code>docker build</code> and <code>fly config validate</code> first. The biggest genuinely open question: Supabase Edge Functions don't run on Fly, so they almost certainly cannot reach a Fly-private address — the runbook lays out three options and recommends one, but this needs your decision before the two halves can talk to each other. Also still on the list, deferred by you: the G6 protein-balance pairing fix.</div>
+      </div>
+    </div>
+  </div><!-- /page-s38 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

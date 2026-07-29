@@ -16,9 +16,21 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
-# contracts/ghar-re-v1.schema.json lives at repo root /contracts.
+# Where the contract document is read from.
+#
+# Default: <repo>/contracts/ghar-re-v1.schema.json — correct from a checked-out repo.
+#
+# Override via GHAR_RE_CONTRACT_PATH: required in a CONTAINER, where this package is installed into
+# site-packages and the relative walk above lands outside the image's copy of the repo. The
+# Dockerfile copies the contract to an explicit path and sets this variable.
+#
+# The contract is deliberately NOT copied into the catalogue/config bundle: Phase E's contract-check
+# CI gate asserts the repo contains exactly ONE ghar-re-v1.schema.json, so that both services
+# provably read the same file. A second committed copy would defeat the very thing that check
+# protects, hence a path override instead.
+CONTRACT_PATH_VAR = "GHAR_RE_CONTRACT_PATH"
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_CONTRACT_PATH = os.path.normpath(
+_CONTRACT_PATH = os.environ.get(CONTRACT_PATH_VAR) or os.path.normpath(
     os.path.join(_HERE, "..", "..", "contracts", "ghar-re-v1.schema.json")
 )
 

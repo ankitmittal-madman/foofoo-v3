@@ -5,9 +5,9 @@ name: re-ci
 # (single verify job, path-scoped triggers) so both sides of the RE follow one convention.
 on:
   push:
-    paths: ["ghar_re_core/**", "ghar_re_service/**", "contracts/**", ".github/workflows/re-ci.yml"]
+    paths: ["ghar_re_core/**", "ghar_re_service/**", "contracts/**", "data/source/**", ".github/workflows/re-ci.yml"]
   pull_request:
-    paths: ["ghar_re_core/**", "ghar_re_service/**", "contracts/**", ".github/workflows/re-ci.yml"]
+    paths: ["ghar_re_core/**", "ghar_re_service/**", "contracts/**", "data/source/**", ".github/workflows/re-ci.yml"]
 
 jobs:
   # RE-DOC-10 §14: neither side's suite is allowed to merge unless the contract itself is sound —
@@ -62,5 +62,10 @@ jobs:
       # py.typed) are found regardless of how the runner lays out its Python install.
       - name: Type check (mypy)
         run: python3 -m mypy ghar_re_core ghar_re_service/ghar_re_service
-      - name: pytest — ghar_re_core (17, incl. golden-master) + ghar_re_service (32)
+      # Phase F / RE-DOC-10 §8: the committed bundle is what gets baked into the image, so a stale
+      # one means the deployed engine silently serves different config from the repo. --check
+      # rebuilds from data/source and compares the content hash; it writes nothing.
+      - name: Catalogue/config bundle is current
+        run: python3 -m ghar_re_service.scripts.export_bundle --check
+      - name: pytest — ghar_re_core (17, incl. golden-master) + ghar_re_service (39)
         run: python3 -m pytest ghar_re_core/tests/ ghar_re_service/tests/ -v

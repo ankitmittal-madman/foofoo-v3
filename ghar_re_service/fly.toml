@@ -1,0 +1,97 @@
+# Ghar RE v1.0 — Fly.io deployment config (Phase F Tasks 3/5, RE-DOC-10 §13).
+#
+# NOT YET DEPLOYED. This file is prepared for a human to run `fly deploy` — see
+# ghar_re_service/README.md for the exact command sequence. Nothing here has been validated
+# against a live Fly.io account; see the README's "what could not be verified" section.
+#
+# Three constraints from RE-DOC-10 §13 drive everything below:
+#   1. minimum-instance floor, NOT scale-to-zero — this sits on the critical path of every
+#      recommendation, so a cold start is a user-visible stall (see [http_service] below);
+#   2. reachable only from the Edge Function layer — no public ingress (see the note on
+#      auto_stop/force_https and the deliberate absence of a `[[services]]` public port);
+#   3. secrets: the shared HMAC key only, never a DB credential (see [env] — it is NOT here).
+
+app = "ghar-re"
+primary_region = "bom"   # Mumbai — closest Fly region to the Indian user base this serves.
+
+[build]
+  dockerfile = "Dockerfile"
+
+# ---------------------------------------------------------------------------
+# Runtime environment. NON-SECRET values only.
+# ---------------------------------------------------------------------------
+# The shared HMAC secret is deliberately absent: it is set with `fly secrets set` so it lives in
+# Fly's encrypted store and is injected at runtime, never committed here. See README §Secrets.
+# FOOFOO_ENV=production also arms the fail-closed guard in providers.EnvAuthConfigProvider — with
+# it set, the service REFUSES to start if the real secret is missing, rather than silently falling
+# back to the dev secret that is published in this repo.
+[env]
+  FOOFOO_ENV = "production"
+  LOG_LEVEL = "info"
+  # Paths are already baked into the image (see Dockerfile ENV); repeated here only where an
+  # operator might reasonably want to override without rebuilding. Bundle/contract paths are
+  # deliberately NOT repeated — they are image-internal and should not drift from the image.
+
+# ---------------------------------------------------------------------------
+# PRIVATE NETWORKING (Task 5) — no public ingress.
+# ---------------------------------------------------------------------------
+# There is intentionally NO [http_service] block and NO [[services]] block with a public port.
+# On Fly, an app without a public service is unreachable from the internet, but IS reachable
+# over 6PN (Fly's private WireGuard mesh) at `<app>.internal` from other apps in the same
+# organisation. That is the only path the Edge Function should use.
+#
+# DEFENSE-IN-DEPTH, NOT THE ONLY BOUNDARY (Task 5 explicitly): since Phase C.5, the RE verifies
+# an HMAC signature on every /v1/recommendations call and rejects unsigned, tampered, or replayed
+# requests with a 401 before parsing. Network isolation is now the SECOND layer. If the two were
+# ever in tension, the signature check is the one that must not be weakened — it is the boundary
+# that still holds if the network boundary is misconfigured. Before Phase C.5 this file would have
+# been the only thing standing between the engine and an open door; it no longer is.
+#
+# `internal_port` matches the Dockerfile's EXPOSE/uvicorn port.
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+  # The catalogue+config bundle is held in memory after startup. 512MB is a starting point for the
+  # 39-dish golden sample; re-measure before the real 810-dish catalogue lands (Phase G).
+
+# ---------------------------------------------------------------------------
+# Machine floor — RE-DOC-10 §13's "not true scale-to-zero".
+# ---------------------------------------------------------------------------
+[http_service]
+  internal_port = 8080
+  force_https = false          # no public TLS terminator; traffic arrives over private 6PN
+  auto_stop_machines = false   # NEVER stop — a stopped machine means a cold start on a user request
+  auto_start_machines = true
+  min_machines_running = 1     # the explicit floor RE-DOC-10 §13 requires
+
+  # /readyz gates traffic during a rollout: a new machine is not sent requests until its catalogue
+  # and config are fully loaded into memory (RE-DOC-10 §7/§12). Without this, a deploy would send
+  # real recommendations to a process still reading its bundle.
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "15s"
+    method = "GET"
+    timeout = "3s"
+    path = "/readyz"
+
+# Liveness: /healthz answers 200 as soon as the process is listening, regardless of load state
+# (RE-DOC-10 §12). It is deliberately a DIFFERENT check from /readyz above — using /readyz for
+# liveness would make Fly kill a machine that is merely still loading, producing a restart loop
+# that never completes startup.
+[checks]
+  [checks.liveness]
+    type = "http"
+    port = 8080
+    method = "GET"
+    path = "/healthz"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "15s"
+
+# ---------------------------------------------------------------------------
+# Deploy strategy — rollback-able independently of the Edge Function (RE-DOC-10 §13).
+# ---------------------------------------------------------------------------
+[deploy]
+  # Rolling: bring up a new machine, wait for its /readyz, then retire the old one — so there is
+  # never a window with zero ready machines serving the recommendation path.
+  strategy = "rolling"

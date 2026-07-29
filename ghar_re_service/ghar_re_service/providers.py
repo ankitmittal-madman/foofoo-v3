@@ -2,10 +2,18 @@
 Provider interfaces (RE-DOC-11 §1/§2) — the seams that let the RE's data sources change over 5–10
 years without touching any recommendation math.
 
-v1 ships EXACTLY ONE adapter per interface (RE-DOC-11 "What NOT to over-build"):
+Adapters shipped (RE-DOC-11 "What NOT to over-build" — one per interface, plus the Phase F
+bundle pair that makes the service deployable):
   - LocalSnapshotCatalogueProvider  — the golden-sample catalogue from ghar_re_core.fixtures
   - YamlFileConfigProvider          — the data/source/*.yaml + community_priors.csv config layer
+  - BundleCatalogueProvider         — catalogue from the baked image bundle (RE-DOC-10 §8)
+  - BundleConfigProvider            — config from the baked image bundle (RE-DOC-10 §8)
   - EnvAuthConfigProvider           — the shared service-to-service secret (RE-DOC-10 §9)
+
+The Local*/Yaml* pair reads the checked-out REPO (correct for tests and local dev); the Bundle*
+pair reads the immutable snapshot baked into the container image (correct in deployment, and the
+only pair that works there — see export_bundle.py's docstring for why). resolve_providers() below
+picks between them by looking for a bundle, so neither environment needs to be configured by hand.
 
 Every ghar_re_core module depends only on the returned CatalogueSnapshot / EngineConfig objects,
 never on file paths or "how" the data arrived. A future PostgresCatalogueProvider / RemoteConfig-
@@ -14,6 +22,7 @@ Provider is a new class here with zero changes to derivation/scoring/pairing.
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass
 from typing import Any, Protocol, runtime_checkable
@@ -79,6 +88,91 @@ class YamlFileConfigProvider:
         cfg = Config()  # reads the YAML/CSV config layer
         core_config.set_active_config(cfg)  # inject: core modules now read THIS config
         return cfg
+
+
+# ---------------------------------------------------------------------------
+# Bundle providers (Phase F, RE-DOC-10 §8) — the immutable snapshot baked into the image
+# ---------------------------------------------------------------------------
+# Layout produced by ghar_re_service/scripts/export_bundle.py:
+#   <bundle>/manifest.json    bundle_version + per-file checksums
+#   <bundle>/catalogue.json   the dish dicts (Catalogue's own constructor shape)
+#   <bundle>/config/*.yaml    the engine's YAML/CSV config layer, verbatim
+#
+# GHAR_RE_BUNDLE_DIR overrides the location; the default sits beside the installed service package
+# so it travels with the image.
+BUNDLE_DIR_VAR = "GHAR_RE_BUNDLE_DIR"
+_SERVICE_PKG_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_BUNDLE_DIR = os.path.join(os.path.dirname(_SERVICE_PKG_DIR), "data", "bundle")
+
+
+def bundle_dir() -> str:
+    """The configured bundle directory (may not exist — callers check)."""
+    return os.environ.get(BUNDLE_DIR_VAR) or DEFAULT_BUNDLE_DIR
+
+
+def bundle_manifest(directory: str | None = None) -> dict | None:
+    """Read the bundle manifest, or None when no bundle is present."""
+    path = os.path.join(directory or bundle_dir(), "manifest.json")
+    if not os.path.isfile(path):
+        return None
+    with open(path) as fh:
+        return json.load(fh)
+
+
+class BundleCatalogueProvider:
+    """Catalogue from the baked bundle's catalogue.json.
+
+    The bundle stores the raw dish dicts, which is exactly what Catalogue's constructor takes — so
+    this reconstructs an in-memory catalogue identical to the fixtures-backed one, with no bespoke
+    deserialization that could drift from the fixture shape.
+    """
+
+    def __init__(self, directory: str | None = None):
+        self._dir = directory or bundle_dir()
+
+    def load(self) -> CatalogueSnapshot:
+        with open(os.path.join(self._dir, "catalogue.json")) as fh:
+            dish_dicts = json.load(fh)
+        return Catalogue(dish_dicts)
+
+
+class BundleConfigProvider:
+    """Config from the baked bundle's config/ directory.
+
+    Points ghar_re_core.config at the bundled config BEFORE constructing Config(), because that
+    module resolves its source directory at import time from GHAR_RE_CONFIG_DIR. Without this the
+    container would try to read <site-packages>/data/source and fail at startup — the exact break
+    RE-DOC-10 §8 exists to prevent.
+    """
+
+    def __init__(self, directory: str | None = None):
+        self._dir = directory or bundle_dir()
+
+    def load(self) -> EngineConfig:
+        config_dir = os.path.join(self._dir, "config")
+        os.environ[core_config.CONFIG_DIR_VAR] = config_dir
+        # config.SRC was bound at import time; repoint it so an already-imported module also
+        # reads the bundle (import order must not decide where config comes from).
+        core_config.SRC = config_dir
+        core_config._CACHE.clear()  # noqa: SLF001 — drop anything parsed from the pre-override path
+        cfg = Config()
+        core_config.set_active_config(cfg)
+        return cfg
+
+
+def resolve_providers() -> tuple[CatalogueProvider, ConfigProvider, dict | None]:
+    """Pick bundle providers when a bundle is present, repo providers otherwise.
+
+    Deliberately automatic rather than an env flag someone must remember to set: in the image the
+    bundle is always there (so deployment uses it), and in a checked-out repo without an exported
+    bundle it isn't (so tests and local dev keep their current behaviour unchanged). Returns the
+    manifest too, so startup can log and /v1/meta can report which snapshot is actually serving.
+    """
+    manifest = bundle_manifest()
+    if manifest is not None:
+        directory = bundle_dir()
+        return BundleCatalogueProvider(directory), BundleConfigProvider(directory), manifest
+    return LocalSnapshotCatalogueProvider(), YamlFileConfigProvider(), None
 
 
 # ---------------------------------------------------------------------------

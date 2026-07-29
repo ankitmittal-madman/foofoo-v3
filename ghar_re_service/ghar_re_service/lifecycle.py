@@ -18,8 +18,7 @@ from ghar_re_service.providers import (
     CatalogueProvider,
     ConfigProvider,
     EnvAuthConfigProvider,
-    LocalSnapshotCatalogueProvider,
-    YamlFileConfigProvider,
+    resolve_providers,
 )
 
 SERVICE_NAME = "ghar_re_service"
@@ -76,13 +75,17 @@ class Counters:
 class AppState:
     """Process-wide state built at startup and read by the routes."""
 
-    config_provider: ConfigProvider = field(default_factory=YamlFileConfigProvider)
-    catalogue_provider: CatalogueProvider = field(default_factory=LocalSnapshotCatalogueProvider)
+    # Left None so startup() can resolve bundle-vs-repo providers together (they must agree —
+    # a bundled catalogue with repo config, or vice versa, would be an incoherent snapshot).
+    # Tests still inject an explicit pair, which bypasses resolution entirely.
+    config_provider: ConfigProvider | None = None
+    catalogue_provider: CatalogueProvider | None = None
     auth_provider: AuthConfigProvider = field(default_factory=EnvAuthConfigProvider)
     config: object | None = None
     catalogue: object | None = None
     registry: list | None = None
     auth: AuthConfig | None = None
+    bundle: dict | None = None  # baked-bundle manifest when serving from an image (RE-DOC-10 §8)
     ready: bool = False
     counters: Counters = field(default_factory=Counters)
 
@@ -97,6 +100,20 @@ def startup(state: AppState) -> AppState:
     # Only the skew is logged — the secret's value is never logged, not even truncated.
     state.auth = state.auth_provider.load()
     log_event("startup.auth_loaded", max_skew_seconds=state.auth.max_skew_seconds)
+
+    # 0b. data source. Bundle when one is baked into the image, repo files otherwise. Resolved as a
+    # PAIR so catalogue and config always come from the same snapshot. Explicitly-injected
+    # providers (tests) win and skip resolution.
+    if state.catalogue_provider is None or state.config_provider is None:
+        cat_p, cfg_p, manifest = resolve_providers()
+        state.catalogue_provider = state.catalogue_provider or cat_p
+        state.config_provider = state.config_provider or cfg_p
+        state.bundle = manifest
+    log_event(
+        "startup.source_resolved",
+        source="bundle" if state.bundle else "repo_files",
+        bundle_version=(state.bundle or {}).get("bundle_version"),
+    )
 
     # 1. config
     state.config = state.config_provider.load()

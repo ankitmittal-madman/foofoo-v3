@@ -1,0 +1,18 @@
+config_version: 1.0
+generated_from: Core Spine v1.0 (S2 PART A + S1)
+generated_on: 2026-07-01
+# NOTE: implementation artifact derived from FROZEN specs. If a spec changes, update this file (RFC), never hard-code.
+
+# Ghar RE — hard filters + feature normalization  [SOURCE: Core Spine FROZEN §S2 PART A + §S1]
+hard_filters:            # run BEFORE scoring; remove from candidate set
+  A1_diet: [veg, eggetarian, non_veg]     # + meat_exclusions; veg_day applies veg for that day
+  A2_jain: jain_compatible == 'Y' if H.is_jain
+  A3_allergen: exclude if any dish allergen in H.allergens   # BASIC pass; hidden-derivative PRE-LAUNCH [SP-F13]
+  A4_weaning: texture/spice floor if weaning_present
+  A5_mode_fasting: farali_compatible(x) when Fasting on   # farali flag = deferred derive
+  A6_calorie: optional user lens (plate-level), not correctness
+normalization:
+  effort:   "clip(total_minutes / T_CAP, 0, 1)"   # T_CAP = 60
+  difficulty_map: {easy: 0.0, medium: 0.5, hard: 1.0}
+  calories: "clip((calories - 30) / 770, 0, 1)"
+T_CAP: 60

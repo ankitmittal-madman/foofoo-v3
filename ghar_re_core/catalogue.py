@@ -67,10 +67,14 @@ class Catalogue:
         return list(self._by_hero_role.get(role, []))
 
 
-# ingredient master attributes (real, from ingredients_v5.csv) for jain/allergen derivation
+# ingredient master attributes (real, from ingredients_v5.csv) for jain/allergen derivation.
+# Resolved through config.SRC (not a hardcoded ../data/source walk) so it follows
+# GHAR_RE_CONFIG_DIR into the baked bundle — this read happens at IMPORT time, so the path must
+# already be correct when the module loads, before any provider runs.
 import csv as _csv, os as _os
+from ghar_re_core import config as _cfg
 _ING = {}
-with open(_os.path.join(_os.path.dirname(__file__), "..", "data", "source", "ingredients_v5.csv")) as _f:
+with open(_os.path.join(_cfg.SRC, "ingredients_v5.csv")) as _f:
     for _r in _csv.DictReader(_f):
         _ING[_r["name"]] = dict(
             category=_r["category"],
