@@ -637,8 +637,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🚢</span> S38 · Ghar RE Phase F — deployable image, bundle &amp; Fly config
       <span class="nav-badge">Jul 29</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s39')">
+    <div class="nav-item" onclick="showPage('s39')">
       <span class="nav-icon">🛡️</span> S39 · Ghar RE Phase F follow-up — public ingress + rate limiting
+      <span class="nav-badge">Jul 29</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s40')">
+      <span class="nav-icon">🔎</span> S40 · Ground-truth audit — two engines found, roadmap &amp; topology written
       <span class="nav-badge">Jul 29</span>
     </div>
     <!-- NAV_INJECT -->
@@ -1680,6 +1684,21 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Settled the reachability question left open by S38 — Supabase can't join Fly's private network or offer fixed egress IPs, so the engine takes public traffic with the signed-request check as the sole gate, now shielded by a per-source rate limiter that runs before any signature maths. Next: your review, then the real deploy.</div>
     </div>
   </div>
+  <div class="tl-row">
+    <div class="tl-spine"><div class="tl-dot" style="background:#6d28d9"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f1e9fd;color:#6d28d9">S40</span>
+      <div class="tl-title">Ground-truth audit — two recommendation engines found, roadmap &amp; topology documents written</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s40')">RE-DOC-12 (status/roadmap)</span>
+        <span class="tl-chip" onclick="showPage('s40')">RE-DOC-13 (topology)</span>
+        <span class="tl-chip" onclick="showPage('s40')">legacy TS engine retired, undocumented</span>
+        <span class="tl-chip" onclick="showPage('s40')">authorization gap found, unfixed</span>
+        <span class="tl-chip" onclick="showPage('s40')">77/77 Python tests re-confirmed</span>
+      </div>
+      <div class="tl-note">Read-only audit, zero code/schema changes. Verified every claim about tables, auth, and CI against the live repo rather than trusting prior summaries — found that a much older TypeScript recommendation engine (with its own extensive governance history) is no longer on the live request path, with no decision on record saying so, and that an existing, tested ownership check is not wired into the recommendations handler. Both flagged for a Founder decision, not fixed here. Next: decide the legacy engine's disposition, and decide/fix the authorization gap.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2040,6 +2059,8 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">ghar_re_service/ghar_re_service/providers.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S39</td><td class="fr-desc">Added the rate-limit config provider — env-tunable, and loud rather than silent on a malformed value</td></tr>
 <tr><td class="fr-file mono">ghar_re_service/ghar_re_service/lifecycle.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S39</td><td class="fr-desc">Builds the limiter at startup (so bad config fails visibly) and counts shed requests separately from errors</td></tr>
 <tr><td class="fr-file mono">ghar_re_service/README.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S39</td><td class="fr-desc">Runbook rewritten for public ingress: https URL, the unsigned-request check, rate-limit behaviour, Cloudflare note</td></tr>
+<tr><td class="fr-file">docs/architecture/RE-DOC-12_Ghar_RE_Status_and_Roadmap_v1_0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S40</td><td class="fr-desc">Ground-truth status of the Python RE — every claim evidenced; found the legacy TS engine is retired-in-fact but undocumented, and household_context is unwired dead weight</td></tr>
+<tr><td class="fr-file">docs/architecture/RE-DOC-13_Ghar_RE_Deployment_Topology_v1_0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S40</td><td class="fr-desc">Component-by-component deployment map (Edge Functions, Ghar RE, Postgres) with failure modes and an explicit list of what cannot be verified without live Fly/Supabase access</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2259,6 +2280,26 @@ function deepDiveFeature(featureLabel){
   <div class="decision-q">Why does the limiter let traffic through when it fails, while the security check blocks it?</div>
   <div class="decision-a">They protect against different things. A missing safety damper should never become a self-inflicted outage, so if the limiter hasn't loaded, requests pass to the security check. A missing secret is the opposite: the engine refuses to start rather than serve anything unverified. The asymmetry is deliberate, not an oversight.</div>
   <div class="decision-meta">S39 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">There's an older recommendation engine in this codebase with its own extensive governance history — is it still running?</div>
+  <div class="decision-a">No. Checked directly: nothing that handles a real user request imports it — only its own test files do. The Python engine this project has been building is what actually serves recommendations today. The older engine's own database setup script says outright that it is retired, but no governance document anywhere actually records that as a decision — it was simply true in the code and unrecorded everywhere else. Surfaced this session, not resolved: whether to formally archive it, keep it as reference, or remove it is a call for the Founder, not made here.</div>
+  <div class="decision-meta">S40 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Is there really no table called "households"?</div>
+  <div class="decision-a">Correct, and it's deliberate, not missing. The existing user-profile table already serves as the household's identity — adding a second "households" table would have forked that identity in two, when every other table that scopes data to a household already keys off the profile table. This was a decision made two sessions ago and confirmed accurate this session.</div>
+  <div class="decision-meta">S40 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Can a signed-in user request another household's recommendation history right now?</div>
+  <div class="decision-a">Yes, and this is a real, live gap, not a documentation issue. An ownership check already exists elsewhere in this exact codebase and is already tested — it's simply never been called on the recommendations path. A leftover code comment blames a missing database table, but that table has existed for two sessions; the real reason is that nobody wired the check in yet. The fix is a one-line change using an already-tested function, but it changes security behaviour, so it was reported here rather than patched without sign-off.</div>
+  <div class="decision-meta">S40 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why weren't the TypeScript-side automated tests actually run this session?</div>
+  <div class="decision-a">The environment's network restrictions block one of the package sources those tests need to download (jsr.io returns a hard refusal) — the same category of restriction that already prevents a real cloud deployment from happening here. Rather than guess at a pass count, the session states plainly that 81 test cases exist by direct count, and that none of them were confirmed to actually pass this session.</div>
+  <div class="decision-meta">S40 · Jul 29</div>
 </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -5854,7 +5895,7 @@ function deepDiveFeature(featureLabel){
     </div>
   </div><!-- /page-s38 -->
 
-  <div id="page-s39" class="page-content">
+  <div id="page-s39" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S39 · Ghar RE Phase F follow-up — the engine opens to the internet, guarded by its signature check</div>
       <div class="page-subtitle">Settled how the app actually reaches the engine: it will be publicly reachable, and the signed-request check is now the only thing protecting it — so that check was itself given a shield against being flooded.</div>
@@ -5914,6 +5955,61 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s39 -->
+
+  <div id="page-s40" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S40 · Ground-truth audit — nothing built, everything checked, two roadmap documents written</div>
+      <div class="page-subtitle">No code changed this session. Every claim in the last several sessions' documents was checked directly against the actual files, tests, and database migrations — and one thing nobody had written down anywhere surfaced: there are two separate recommendation engines in this repository, and only one of them is actually running.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Everything anyone knew about "is it really wired up?" lived scattered across prior sessions' own summaries, trusted at face value. Nobody had checked, in one pass, whether the database tables the engine is supposed to read from actually exist under the names the code expects, whether the security check really rejects a bad request, or whether an older piece of recommendation code — written long before this Python engine existed — was still quietly wired into anything live.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Every item was checked by actually reading the file, running the test, or querying the migration ledger — not by trusting a prior summary. Almost everything held up. But one real, previously undocumented fact came out of it: this repository contains an entirely separate, older recommendation engine (written in a different language, with its own dozen-plus governance decisions on record) that is no longer connected to anything a real user request touches — and nowhere had anyone written down that it was retired. Two new documents now capture, respectively, "what's actually true today and what's left before launch" and "how the pieces are actually wired together, including the parts nobody can verify without real cloud access."</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">docs/architecture/RE-DOC-12_Ghar_RE_Status_and_Roadmap_v1_0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/architecture/RE-DOC-13_Ghar_RE_Deployment_Topology_v1_0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was checked this session</div>
+        <div class="session-card-meta">July 29, 2026<br>Read-only audit · zero code, config, or schema changes</div>
+      </div>
+      <div class="session-card-desc">
+        <b>1. The two-engine finding.</b> A large governance document (the Founder Decision Register) turns out to describe, in exhaustive detail, an older TypeScript recommendation engine and its own database tables — but that engine is now reachable only from its own test files, not from anything a live request touches. The engine actually serving recommendations today is the newer Python one this project has been building for the last several sessions. Nobody had ever written down "the old one is retired" as an actual decision — it was simply true in the code and nowhere else. This is now on the record.
+        <br><br>
+        <b>2. Everything about the real database tables checked out, with one correction.</b> The four new tables built two sessions ago for household answers, situational context, and event history all exist exactly as documented, and the request-building code genuinely reads from them rather than any placeholder data. One nuance worth knowing: there was never a table literally named "households" — the household's identity lives on the existing user-profile table instead, which was a deliberate choice made at the time and is exactly what the code assumes.
+        <br><br>
+        <b>3. The security check is real, tested, and still the only gate.</b> Sent an unsigned request, a tampered one, a stale one, and a correctly signed one straight at the running engine — each got exactly the response it should. 77 out of 77 automated checks on the Python side passed.
+        <br><br>
+        <b>4. Two things found broken or unfinished, reported rather than fixed.</b> First: a leftover comment in the code still says a database table "doesn't exist yet" when it has existed for two sessions — harmless on its own, but it was hiding a second, more real problem underneath it: a security check that already exists elsewhere in this same codebase, and is already tested, has never actually been wired into the recommendation request path. Right now, a signed-in user could ask for another household's recommendation history by supplying that household's ID directly, and nothing stops them. This needs a decision and a fix — deliberately not made this session, since the brief was to audit, not to patch.
+        <br><br>
+        <b>5. What genuinely can and cannot be checked from here.</b> The automated test suite for the TypeScript side could not be run at all — the environment's network restrictions block one of the package sources it needs, the same category of block that already stops a real cloud deployment from happening here. That is stated plainly in the new roadmap document rather than guessed at.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">77/77</div><div class="stat-l">Python tests, run and confirmed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">2</div><div class="stat-l">Recommendation engines found (1 retired, undocumented)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b91c1c">1</div><div class="stat-l">Real authorization gap found, unfixed by design</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Code/schema changes made</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — two decisions worth your attention</div>
+        <div class="next-text"><b>Nothing was fixed this session on purpose.</b> Two things surfaced that need a call from you rather than a silent patch: (1) whether the old, retired recommendation engine and its database tables should be formally archived, kept as reference, or removed — right now it just sits there, undecided; (2) the authorization gap in item 4 above is a real, live issue — any signed-in user can currently request another household's data by ID — and fixing it is a one-line change using a function that already exists and is already tested, but it touches security behavior so it wasn't done without your sign-off. Both are written up in full in the new roadmap document, alongside everything that still has to happen before a real catalogue (810 dishes) and real launch: an allergen safety table that is explicitly not yet complete, and several data-population steps the engine's own design documents already call out as pre-launch requirements.</div>
+      </div>
+    </div>
+  </div><!-- /page-s40 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
