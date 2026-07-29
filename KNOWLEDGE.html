@@ -633,8 +633,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔐</span> S37 · Ghar RE Phase C.5 — RE auth, real app tables, ruff/mypy
       <span class="nav-badge">Jul 28</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s38')">
+    <div class="nav-item" onclick="showPage('s38')">
       <span class="nav-icon">🚢</span> S38 · Ghar RE Phase F — deployable image, bundle &amp; Fly config
+      <span class="nav-badge">Jul 29</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s39')">
+      <span class="nav-icon">🛡️</span> S39 · Ghar RE Phase F follow-up — public ingress + rate limiting
       <span class="nav-badge">Jul 29</span>
     </div>
     <!-- NAV_INJECT -->
@@ -1661,6 +1665,21 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Rebuilt the recommendation engine end-to-end (schema → tested engine → HTTP service + contract → edge function) and fixed the Stop hook so the knowledge-book check actually fires on committed work. Next: live table locations, then deploy.</div>
     </div>
   </div>
+  <div class="tl-row">
+    <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#e6f4ef;color:#0e7a5a">S39</span>
+      <div class="tl-title">Ghar RE Phase F follow-up — public ingress, HMAC as sole boundary, rate limiting</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s39')">public ingress decision</span>
+        <span class="tl-chip" onclick="showPage('s39')">force_https on</span>
+        <span class="tl-chip" onclick="showPage('s39')">ratelimit.py (300/min/IP)</span>
+        <span class="tl-chip" onclick="showPage('s39')">limiter ahead of HMAC</span>
+        <span class="tl-chip" onclick="showPage('s39')">21 new tests</span>
+      </div>
+      <div class="tl-note">Settled the reachability question left open by S38 — Supabase can't join Fly's private network or offer fixed egress IPs, so the engine takes public traffic with the signed-request check as the sole gate, now shielded by a per-source rate limiter that runs before any signature maths. Next: your review, then the real deploy.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -1844,18 +1863,20 @@ function deepDiveFeature(featureLabel){
   </div>
   <div class="detail-drawer" id="draw-mod-ghar-re-service">
     <div class="dd-label">What this does</div>
-    <div class="dd-text">A thin FastAPI web service that hosts the engine. It loads the catalogue and config at startup through swappable providers, exposes POST /v1/recommendations plus /healthz and /readyz, and validates every request/response against the shared contract. It contains no maths of its own.</div>
+    <div class="dd-text">A thin FastAPI web service that hosts the engine. It loads the catalogue and config at startup through swappable providers, exposes POST /v1/recommendations plus /healthz and /readyz, and validates every request/response against the shared contract. It contains no maths of its own. Since S39 it is designed to face the public internet, so two guards sit in front of every call: a rate limiter, then a signature check.</div>
     <div class="dd-label">Files / tables in this module</div>
     <div class="dd-text">
-      <code>main.py</code> — the FastAPI routes (translation only)<br>
-      <code>providers.py</code> — Catalogue/Config provider interfaces + one adapter each<br>
+      <code>main.py</code> — the FastAPI routes (translation only), plus the two guards in front of them<br>
+      <code>providers.py</code> — Catalogue/Config/auth/rate-limit provider interfaces + one adapter each<br>
       <code>modules.py</code> — wraps each score factor so the response can explain itself<br>
+      <code>auth.py</code> — verifies the signature on every call; the only thing protecting the engine now that it is publicly reachable<br>
+      <code>ratelimit.py</code> — caps requests per source per minute, and deliberately runs <i>before</i> auth.py so a flood is turned away before any cryptographic work happens<br>
       <code>engine.py / schemas.py / lifecycle.py</code> — request→response composition, schema validation, startup<br>
     </div>
     <div class="dd-label">How it helps the app</div>
-    <div class="dd-text">It lets the app talk to the engine over a normal web call with a stable contract, and lets the data sources (catalogue, config) be swapped later without touching the maths.</div>
+    <div class="dd-text">It lets the app talk to the engine over a normal web call with a stable contract, and lets the data sources (catalogue, config) be swapped later without touching the maths. The two guards are what make it safe to expose that call over the internet at all — which S39 established it has to be, because our app's servers cannot reach a private one.</div>
     <div class="dd-label">Last touched</div>
-    <div class="dd-text">S34 · Jul 28</div>
+    <div class="dd-text">S39 · Jul 29 (rate limiter + public-ingress posture; originally S34)</div>
   </div>
 </div>
 <div class="detail-item">
@@ -2012,6 +2033,13 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">supabase/functions/_shared/config/config.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S34</td><td class="fr-desc">Added GHAR_RE_SERVICE_URL/SECRET config (production-required, dev-defaulted)</td></tr>
 <tr><td class="fr-file mono">.claude/hooks/check-knowledge-book.sh</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S34</td><td class="fr-desc">Fixed the Stop hook to detect committed branch work, not just uncommitted changes</td></tr>
 <tr><td class="fr-file mono">docs/architecture/ghar-re/</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S34</td><td class="fr-desc">Moved the 6 canonical Ghar RE specs out of docs/temp into a grouped folder</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/ratelimit.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S39</td><td class="fr-desc">Sliding-window per-IP rate limiter with bounded memory — runs ahead of signature verification so floods are shed before any HMAC is computed</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/tests/test_ratelimit.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S39</td><td class="fr-desc">21 tests: window behaviour, per-IP isolation, memory bound, health-probe exemption, and the limiter-before-HMAC ordering</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/fly.toml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S39</td><td class="fr-desc">Public ingress made explicit; force_https on, concurrency backstop added, rate limit exposed as a tunable env value</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/main.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S39</td><td class="fr-desc">Rate-limit middleware registered so it runs before the signature check; /healthz and /readyz exempt</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/providers.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S39</td><td class="fr-desc">Added the rate-limit config provider — env-tunable, and loud rather than silent on a malformed value</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/lifecycle.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S39</td><td class="fr-desc">Builds the limiter at startup (so bad config fails visibly) and counts shed requests separately from errors</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/README.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S39</td><td class="fr-desc">Runbook rewritten for public ingress: https URL, the unsigned-request check, rate-limit behaviour, Cloudflare note</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2201,6 +2229,36 @@ function deepDiveFeature(featureLabel){
   <div class="decision-q">Why did the knowledge-book Stop hook never fire?</div>
   <div class="decision-a">It only inspected uncommitted changes; the workflow commits everything before the turn ends, so the tree was always clean at Stop time. Fixed to also inspect committed branch work (branch vs origin/main), so session-knowledge-doc now actually fires.</div>
   <div class="decision-meta">S34 · Jul 28</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Private network or public internet — how does the app actually reach the engine?</div>
+  <div class="decision-a">Public, over an encrypted connection. Founder decision. The private-network plan cannot work: the part of our app that calls the engine runs on Supabase's infrastructure, which cannot join Fly's private network and cannot present a fixed set of addresses to allow through — so neither private-only access nor an address allowlist is available to us. This is now a recorded decision with its reasoning, not an open gap.</div>
+  <div class="decision-meta">S39 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">If the engine is on the public internet, what actually protects it?</div>
+  <div class="decision-a">The signed-request check, and only that. Every call must carry a signature computed from the exact request bytes and a secret held only in Fly's and Supabase's encrypted stores; unsigned, altered, wrong-secret and replayed requests are refused before the request is even read. The important consequence is stated plainly rather than softened: there is no longer a network layer behind it to catch a mistake in that code, so it is the one thing that must never be weakened.</div>
+  <div class="decision-meta">S39 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why build a rate limiter in our own code instead of using the hosting platform's?</div>
+  <div class="decision-a">Fly's proxy has no per-source rate limiting — its only related setting caps how many requests run <i>at the same time</i>, which a determined caller sidesteps by sending them one after another instead. Both are now in place: the platform setting as a memory backstop, and our own limiter as the actual rate cap.</div>
+  <div class="decision-meta">S39 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why does the limiter run before the signature check rather than after?</div>
+  <div class="decision-a">Because the whole purpose is to protect the signature check. Placed after it, every flooded request would already have cost the engine its cryptographic work, and the limiter would be decorative. It relies on a subtle framework ordering rule, so a test pins it: an unsigned request that is over the limit must be answered "too many requests", not "unauthorised" — the latter would prove the expensive step ran first.</div>
+  <div class="decision-meta">S39 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why is the limit set so high, and why are health checks exempt?</div>
+  <div class="decision-a">Our app's calls arrive from a small pool of shared addresses, so many genuine users look like one caller — a tight cap would throttle customers rather than attackers. It is adjustable without rebuilding. Health checks are exempt because refusing the platform's "are you alive?" probe would get the machine declared dead and restarted, making the protection cause the exact outage it exists to prevent.</div>
+  <div class="decision-meta">S39 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why does the limiter let traffic through when it fails, while the security check blocks it?</div>
+  <div class="decision-a">They protect against different things. A missing safety damper should never become a self-inflicted outage, so if the limiter hasn't loaded, requests pass to the security check. A missing secret is the opposite: the engine refuses to start rather than serve anything unverified. The asymmetry is deliberate, not an oversight.</div>
+  <div class="decision-meta">S39 · Jul 29</div>
 </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -5731,7 +5789,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s37 -->
-  <div id="page-s38" class="page-content">
+  <div id="page-s38" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S38 · Ghar RE Phase F — the engine is now packageable and deployable (but not yet deployed)</div>
       <div class="page-subtitle">Made the recommendation engine able to run outside a code checkout by baking its data into a versioned, self-contained bundle — and prepared everything needed to put it on a real server, without actually deploying it.</div>
@@ -5795,6 +5853,67 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s38 -->
+
+  <div id="page-s39" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S39 · Ghar RE Phase F follow-up — the engine opens to the internet, guarded by its signature check</div>
+      <div class="page-subtitle">Settled how the app actually reaches the engine: it will be publicly reachable, and the signed-request check is now the only thing protecting it — so that check was itself given a shield against being flooded.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The server configuration was written assuming the engine would sit on a private network that only our own app could reach, with the signed-request check as a backup layer behind it. But that plan could not actually work: the part of our app that calls the engine runs on Supabase's servers, which cannot join a private network on Fly and cannot even promise a fixed set of addresses to allow through. So the deployment was blocked on an unanswered question, and the instructions told you to expect no public address.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The question is answered and written down as a decision: the engine is reachable over the public internet, encrypted, and the signed-request check is the real and only gate. Because that check is now the only thing in the way, it no longer stands alone in the open — a limiter in front of it caps how many requests any single source can make per minute, so a flood is turned away cheaply instead of making the engine do expensive signature maths thousands of times. The deployment instructions now match what will actually happen, including the fact that a public address showing up is correct rather than a mistake.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/ratelimit.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/tests/test_ratelimit.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/fly.toml</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/README.md (deploy runbook)</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/main.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/providers.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/lifecycle.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">.github/workflows/re-ci.yml</span><span class="tag tag-cfg">Config</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 29, 2026<br>Phase F follow-up · still NOT deployed</div>
+      </div>
+      <div class="session-card-desc">
+        <b>1. The networking decision, recorded as a decision.</b> Last session left one genuinely open question: could the app actually reach the engine on a private network? The answer is no — Supabase's servers can't join Fly's private network, and they can't guarantee a fixed list of addresses we could allow through instead. So the engine accepts public traffic. What matters is that this is now written down as a settled choice with its reasoning, not left as a gap someone later has to rediscover. The configuration file and the runbook were both corrected to say the same thing.
+        <br><br>
+        <b>2. Traffic is now encrypted in transit.</b> Previously the setting that forces encrypted connections was deliberately switched off, on the reasoning that a private network already encrypts everything. That reasoning no longer holds, so it was switched on. This matters more than it sounds: the requests carry household composition — who lives there, ages, dietary and allergy information — which is personal data and has no business crossing the internet readable.
+        <br><br>
+        <b>3. A limiter in front of the signature check.</b> With the signature check now the only gate, anything on the internet can make the engine do cryptographic work simply by sending it something. The limiter caps each source to 300 requests a minute and turns away the excess before any of that work happens. The ordering is the entire point — placed the other way round it would be decoration, since the expensive step would already have run. That ordering is deliberately locked in by a test, because it depends on a subtle framework behaviour that a future well-meaning tidy-up could easily reverse without noticing.
+        <br><br>
+        <b>4. Four judgement calls inside the limiter worth knowing about.</b> The cap is deliberately <i>generous</i>, because our app's traffic arrives from a small number of shared addresses — many real users can look like one caller, so a tight cap would throttle customers rather than attackers; it's adjustable without rebuilding anything. Health checks are exempt, because turning away the platform's "are you alive?" probe would get the machine killed and restarted — a protection causing the exact outage it exists to prevent. If the limiter fails to load, traffic passes through, whereas if the security secret is missing the engine refuses to start; a missing safety damper shouldn't cause an outage, but a missing lock must never be treated as an open door. And its memory is capped, because remembering one entry per address is itself a way to exhaust the machine when the addresses are attacker-chosen.
+        <br><br>
+        <b>A contradiction found in last session's configuration.</b> The previous file carried a comment stating there was intentionally no public entry point — while the block that <i>creates</i> a public entry point sat twenty lines below it. On Fly, that block is precisely the public service declaration. So the private-only intention was never actually achieved by the file; a deploy would have been publicly reachable regardless of what the comment claimed. Harmless now that public access is the deliberate choice, but the wrong comment was recorded and corrected rather than quietly deleted, because anyone who had read it was misled about what would ship.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">77/77</div><div class="stat-l">Python tests passing</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">21</div><div class="stat-l">New rate-limit tests</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">300</div><div class="stat-l">Requests/min per source</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Real deploys executed</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — your review, then you run the deploy</div>
+        <div class="next-text"><b>Still nothing deployed and no cloud resources created.</b> Beyond the automated tests, the engine was run for real and driven over actual HTTP: the limiter let requests through up to the cap then returned "too many requests" with a wait-time, a second source was unaffected, twenty health checks in a row all passed, a properly signed request still returned a full seven-plate plan, and no address was written to the logs. Two things still cannot be checked from here and are stated plainly in the runbook rather than assumed: the 300-per-minute figure has never met real traffic, and the way we identify the caller relies on Fly's documented behaviour rather than an observed request — if that turns out wrong the limiter becomes over-strict rather than unsafe, and one glance at the logs after deploying will confirm it. The single most important check after going live is in the runbook: send an unsigned request and confirm it is refused. Still deferred by you: the G6 protein-balance pairing fix.</div>
+      </div>
+    </div>
+  </div><!-- /page-s39 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

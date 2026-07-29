@@ -7,8 +7,8 @@
 # Three constraints from RE-DOC-10 §13 drive everything below:
 #   1. minimum-instance floor, NOT scale-to-zero — this sits on the critical path of every
 #      recommendation, so a cold start is a user-visible stall (see [http_service] below);
-#   2. reachable only from the Edge Function layer — no public ingress (see the note on
-#      auto_stop/force_https and the deliberate absence of a `[[services]]` public port);
+#   2. reachable BY the Edge Function layer — which, per the founder decision recorded below,
+#      means public ingress guarded by HMAC, not private-only networking;
 #   3. secrets: the shared HMAC key only, never a DB credential (see [env] — it is NOT here).
 
 app = "ghar-re"
@@ -28,26 +28,42 @@ primary_region = "bom"   # Mumbai — closest Fly region to the Indian user base
 [env]
   FOOFOO_ENV = "production"
   LOG_LEVEL = "info"
+  # Per-client request ceiling (providers.EnvRateLimitConfigProvider). Non-secret, and deliberately
+  # here rather than baked into the image so it can be retuned with a `fly deploy` alone — no
+  # rebuild — when real traffic shows the default is wrong. Raise it if legitimate traffic is being
+  # shed (Supabase's egress is NAT'd, so one address carries many users — see ratelimit.py).
+  # Set to "0" to disable the limiter entirely.
+  GHAR_RE_RATE_LIMIT_PER_MINUTE = "300"
   # Paths are already baked into the image (see Dockerfile ENV); repeated here only where an
   # operator might reasonably want to override without rebuilding. Bundle/contract paths are
   # deliberately NOT repeated — they are image-internal and should not drift from the image.
 
 # ---------------------------------------------------------------------------
-# PRIVATE NETWORKING (Task 5) — no public ingress.
+# PUBLIC INGRESS — deliberate and founder-confirmed. HMAC is the trust boundary.
 # ---------------------------------------------------------------------------
-# There is intentionally NO [http_service] block and NO [[services]] block with a public port.
-# On Fly, an app without a public service is unreachable from the internet, but IS reachable
-# over 6PN (Fly's private WireGuard mesh) at `<app>.internal` from other apps in the same
-# organisation. That is the only path the Edge Function should use.
+# SETTLED DECISION, NOT A GAP. Supabase Edge Functions run on Supabase's infrastructure, cannot join
+# Fly's 6PN private mesh, and cannot present a fixed egress IP range — so neither private-only
+# networking nor an IP allowlist is available to us. The service therefore accepts public ingress,
+# and the HMAC signature check (auth.py, Phase C.5) is the SOLE trust boundary rather than the
+# second of two.
 #
-# DEFENSE-IN-DEPTH, NOT THE ONLY BOUNDARY (Task 5 explicitly): since Phase C.5, the RE verifies
-# an HMAC signature on every /v1/recommendations call and rejects unsigned, tampered, or replayed
-# requests with a 401 before parsing. Network isolation is now the SECOND layer. If the two were
-# ever in tension, the signature check is the one that must not be weakened — it is the boundary
-# that still holds if the network boundary is misconfigured. Before Phase C.5 this file would have
-# been the only thing standing between the engine and an open door; it no longer is.
+# What that boundary actually does: every /v1/recommendations call must carry
+# `X-Ghar-Signature: t=<unix>,v1=<hex>`, an HMAC-SHA256 over the raw request bytes keyed on a shared
+# secret that exists only in Fly's and Supabase's encrypted secret stores. Unsigned, tampered,
+# wrong-secret and replayed (>5 min) requests are rejected 401 BEFORE the body is parsed or the
+# engine is touched, with a constant-time comparison. Someone who can reach this port still cannot
+# get a recommendation out of it without the secret.
 #
-# `internal_port` matches the Dockerfile's EXPOSE/uvicorn port.
+# Because that check is now the only thing in the way, it is itself protected: the limiter in
+# ratelimit.py runs AHEAD of signature verification, so a flood is shed before any HMAC is computed.
+#
+# `fly ips list` WILL now show a public IPv4/IPv6. That is expected and correct — not a regression.
+#
+# NOTE ON THE PREVIOUS REVISION: the comment here used to claim there was "intentionally no
+# [http_service] block" while that block was in fact present below. On Fly, [http_service] IS the
+# public service declaration, so the private-only intent was never actually achieved by this file.
+# Recorded rather than quietly dropped, because anyone who read the old comment was misled about
+# what was deployed.
 [[vm]]
   size = "shared-cpu-1x"
   memory = "512mb"
@@ -58,11 +74,21 @@ primary_region = "bom"   # Mumbai — closest Fly region to the Indian user base
 # Machine floor — RE-DOC-10 §13's "not true scale-to-zero".
 # ---------------------------------------------------------------------------
 [http_service]
-  internal_port = 8080
-  force_https = false          # no public TLS terminator; traffic arrives over private 6PN
+  internal_port = 8080         # matches the Dockerfile's EXPOSE / uvicorn port
+  force_https = true           # public now: redirect plain HTTP, so a signed request never crosses
+                               # the internet in cleartext. The Edge Function must use https://.
   auto_stop_machines = false   # NEVER stop — a stopped machine means a cold start on a user request
   auto_start_machines = true
   min_machines_running = 1     # the explicit floor RE-DOC-10 §13 requires
+
+  # Concurrency ceiling — a BACKSTOP, not the rate limit. Fly's proxy offers no per-IP rate limiting,
+  # which is why the real limiter lives in-process (ratelimit.py). This caps how many requests are
+  # in flight at once, which is what keeps a burst from exhausting a 512MB shared-cpu-1x machine.
+  # The two are complementary: this bounds concurrency, that bounds rate.
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200           # past this, prefer routing to another machine
+    hard_limit = 250           # refuse beyond this rather than thrash
 
   # /readyz gates traffic during a rollout: a new machine is not sent requests until its catalogue
   # and config are fully loaded into memory (RE-DOC-10 §7/§12). Without this, a deploy would send
@@ -77,7 +103,8 @@ primary_region = "bom"   # Mumbai — closest Fly region to the Indian user base
 # Liveness: /healthz answers 200 as soon as the process is listening, regardless of load state
 # (RE-DOC-10 §12). It is deliberately a DIFFERENT check from /readyz above — using /readyz for
 # liveness would make Fly kill a machine that is merely still loading, producing a restart loop
-# that never completes startup.
+# that never completes startup. Both probe paths are exempt from the rate limiter (main.py), so a
+# traffic spike can never cause the platform to declare a healthy machine dead.
 [checks]
   [checks.liveness]
     type = "http"

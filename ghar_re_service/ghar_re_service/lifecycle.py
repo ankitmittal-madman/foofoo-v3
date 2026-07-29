@@ -18,8 +18,11 @@ from ghar_re_service.providers import (
     CatalogueProvider,
     ConfigProvider,
     EnvAuthConfigProvider,
+    EnvRateLimitConfigProvider,
+    RateLimitConfigProvider,
     resolve_providers,
 )
+from ghar_re_service.ratelimit import SlidingWindowRateLimiter
 
 SERVICE_NAME = "ghar_re_service"
 
@@ -52,6 +55,11 @@ class Counters:
     success_total: int = 0
     partial_total: int = 0  # warnings[] non-empty but request otherwise succeeded (Task 4)
     errors_total: int = 0  # invalid request or unhandled exception
+    # Requests shed by the rate limiter before reaching signature verification. Tracked separately
+    # from errors_total on purpose: a 429 is the service working as designed, and folding it into
+    # the error count would make "is the engine unhealthy?" unanswerable from /v1/meta during
+    # exactly the traffic spike you would want to read that number.
+    rate_limited_total: int = 0
 
     def record(self, outcome: str) -> None:
         self.requests_total += 1
@@ -62,12 +70,18 @@ class Counters:
         else:
             self.errors_total += 1
 
+    def record_rate_limited(self) -> None:
+        """Counted outside record() — a shed request never reached the engine, so it is not one of
+        requests_total's success/partial/error outcomes."""
+        self.rate_limited_total += 1
+
     def as_dict(self) -> dict:
         return {
             "requests_total": self.requests_total,
             "success_total": self.success_total,
             "partial_total": self.partial_total,
             "errors_total": self.errors_total,
+            "rate_limited_total": self.rate_limited_total,
         }
 
 
@@ -81,10 +95,12 @@ class AppState:
     config_provider: ConfigProvider | None = None
     catalogue_provider: CatalogueProvider | None = None
     auth_provider: AuthConfigProvider = field(default_factory=EnvAuthConfigProvider)
+    rate_limit_provider: RateLimitConfigProvider = field(default_factory=EnvRateLimitConfigProvider)
     config: object | None = None
     catalogue: object | None = None
     registry: list | None = None
     auth: AuthConfig | None = None
+    rate_limiter: SlidingWindowRateLimiter | None = None
     bundle: dict | None = None  # baked-bundle manifest when serving from an image (RE-DOC-10 §8)
     ready: bool = False
     counters: Counters = field(default_factory=Counters)
@@ -100,6 +116,17 @@ def startup(state: AppState) -> AppState:
     # Only the skew is logged — the secret's value is never logged, not even truncated.
     state.auth = state.auth_provider.load()
     log_event("startup.auth_loaded", max_skew_seconds=state.auth.max_skew_seconds)
+
+    # 0a. rate limiter. Built here (not lazily on first request) so a malformed limit is a startup
+    # failure an operator sees in `fly logs`, not a surprise during the first burst of traffic.
+    rl_cfg = state.rate_limit_provider.load()
+    state.rate_limiter = rl_cfg.build()
+    log_event(
+        "startup.rate_limit_loaded",
+        enabled=state.rate_limiter.enabled,
+        max_requests=rl_cfg.max_requests,
+        window_seconds=rl_cfg.window_seconds,
+    )
 
     # 0b. data source. Bundle when one is baked into the image, repo files otherwise. Resolved as a
     # PAIR so catalogue and config always come from the same snapshot. Explicitly-injected

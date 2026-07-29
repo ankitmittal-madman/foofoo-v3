@@ -150,45 +150,55 @@ fly deploy --config ghar_re_service/fly.toml --dockerfile ghar_re_service/Docker
            --image-label v1.0.0 .
 ```
 
-### 5. Verify the deploy (from inside the private network)
+### 5. Verify the deploy
 
-The app has **no public ingress** (see Network isolation below), so these run through Fly:
+The app has **public ingress** by design (see the section below), so these run directly:
 
 ```bash
 fly status --app ghar-re                 # expect 1 machine, state "started", health checks passing
 fly logs --app ghar-re                   # expect startup.ready + source_resolved with bundle_version
 
-# Reach the private address from a throwaway machine in the same org:
-fly ssh console --app ghar-re -C "wget -qO- http://localhost:8080/healthz"
-fly ssh console --app ghar-re -C "wget -qO- http://localhost:8080/readyz"
-fly ssh console --app ghar-re -C "wget -qO- http://localhost:8080/v1/meta"
+curl https://ghar-re.fly.dev/healthz
+curl https://ghar-re.fly.dev/readyz
+curl https://ghar-re.fly.dev/v1/meta
+
+fly ips list --app ghar-re               # a public v4/v6 address IS expected here — see below
 ```
 
 Confirm `/v1/meta`'s `bundle_version` matches what `export_bundle` printed locally. If it does not,
 the running image is not built from the bundle you think it is.
 
+**Then confirm the trust boundary is actually live** — this is the single most important check in
+this runbook, because public ingress means the signature check is the only thing protecting the
+engine:
+
+```bash
+# MUST return 401 {"error":"unauthorized","detail":"missing_signature"}.
+# If this returns anything else, take the app down (`fly scale count 0 --app ghar-re`) and fix it
+# before doing anything else.
+curl -i -X POST https://ghar-re.fly.dev/v1/recommendations \
+     -H 'content-type: application/json' -d '{}'
+```
+
 ### 6. Point the Edge Function at it (Task 6)
 
-`GHAR_RE_SERVICE_URL` should become the Fly **private** address:
+`GHAR_RE_SERVICE_URL` is the app's **public HTTPS** address:
 
 ```
-http://ghar-re.internal:8080
+https://ghar-re.fly.dev
 ```
 
 Set it as a Supabase Edge Function secret (it is not sensitive, but it lives with the other config):
 
 ```bash
-npx supabase secrets set GHAR_RE_SERVICE_URL="http://ghar-re.internal:8080"
+npx supabase secrets set GHAR_RE_SERVICE_URL="https://ghar-re.fly.dev"
 npx supabase secrets set GHAR_RE_SERVICE_SECRET="<the same value from step 3>"
 npx supabase secrets list
 ```
 
-Note `http://`, not `https://` — traffic over Fly's 6PN mesh is already encrypted at the network
-layer, and the RE serves plain HTTP inside it (no TLS terminator is configured, by design).
-
-⚠️ **This URL only resolves from inside Fly's private network.** Supabase Edge Functions run on
-Supabase's infrastructure, **not** on Fly — so `*.internal` will **not** resolve from them. See the
-next section; this is the one open question that needs a decision before the two halves can talk.
+Note `https://`, not `http://`: the request crosses the public internet, and `force_https = true`
+in `fly.toml` redirects plain HTTP. The signature protects against tampering, but TLS is what keeps
+the request body — household composition, i.e. personal data — private in transit.
 
 **Does the Phase C guard still make sense here?** Yes, and more so. `config.ts` requires both
 `GHAR_RE_SERVICE_URL` and `GHAR_RE_SERVICE_SECRET` in production and hard-fails without them, while
@@ -199,43 +209,86 @@ considering (not changed here — it is your call): `config.ts` still lets **sta
 fallback, flagged `[TODO Phase F]` in that file. If staging ever gets its own deployed RE, staging
 should be held to the same requirement as production.
 
-## Network isolation — now defense-in-depth, not the only boundary (Task 5)
+## Public ingress and the trust boundary (Task 5 — settled)
 
-**This changed materially in Phase C.5.** The RE now verifies an HMAC signature on every
-`/v1/recommendations` call and rejects unsigned, tampered, wrong-secret, or replayed (>5 min)
-requests with a `401` *before parsing the body or doing any computation*. Network isolation is
-therefore the **second** layer.
+**This is a deliberate, confirmed design decision, not an unresolved gap.**
 
-Before Phase C.5, this config was the only thing standing between the engine and an open endpoint —
-a misconfigured network meant a completely unauthenticated service. That is no longer true. If the
-two ever conflict, **the signature check is the one that must not be weakened**: it is the boundary
-that still holds when the network boundary is misconfigured.
+Supabase Edge Functions run on Supabase's infrastructure, cannot join Fly's 6PN private mesh, and
+**cannot present a fixed egress IP range**. Private-only networking and IP allowlisting are both
+therefore unavailable to us. The RE accepts **public ingress**, and:
 
-How it is configured: `fly.toml` declares no public service, so Fly assigns no public IP. The app is
-reachable only over 6PN (Fly's private WireGuard mesh) at `ghar-re.internal` from other apps in the
-same organisation.
+> **HMAC signature verification is the trust boundary.** Not a second layer behind the network —
+> the actual and only one.
 
-```bash
-fly ips list --app ghar-re      # expect NO public v4/v6 address
-```
+Earlier revisions of this document treated network isolation as the primary boundary with the
+signature as defence-in-depth. That is now inverted, and the practical consequences are worth being
+blunt about: any misbehaviour in `auth.py` is directly internet-exposed. There is no network layer
+left to catch it.
 
-### If the Edge Function must reach it from outside Fly's network
+### What the boundary actually enforces
 
-This is the likely case, since Supabase Edge Functions do not run on Fly. Options, roughly in order
-of preference:
+Every `POST /v1/recommendations` must carry `X-Ghar-Signature: t=<unix>,v1=<hex>` — an HMAC-SHA256
+over the **raw request bytes**, keyed on a secret held only in Fly's and Supabase's encrypted secret
+stores. Rejected with `401`, *before the body is parsed or the engine is touched*:
 
-1. **Fly private-network egress from Supabase** — not currently possible; Supabase Edge Functions
-   cannot join a Fly 6PN mesh. Listed only to rule it out explicitly.
-2. **Public ingress + signature + IP allowlist.** Add an `[http_service]` public port to `fly.toml`,
-   set `force_https = true`, put `GHAR_RE_SERVICE_URL=https://ghar-re.fly.dev`, and restrict source
-   IPs to Supabase's egress ranges with a Fly proxy rule or an in-app allowlist. The HMAC check is
-   what actually protects the endpoint here; the allowlist narrows exposure. **Do not do this
-   without also confirming the signature check is live** — verify with an unsigned `curl` that
-   returns `401`.
-3. **A WireGuard tunnel** from a small relay you control into the Fly mesh, with the Edge Function
-   calling the relay. More moving parts; only worth it if (2) is unacceptable.
+| Case | `detail` |
+|---|---|
+| No signature header | `missing_signature` |
+| Header present but unparseable | `malformed_signature` |
+| Timestamp more than 5 minutes from server clock (replay) | `stale_signature` |
+| Body tampered with, or signed with the wrong secret | `invalid_signature` |
 
-Whichever is chosen, `GHAR_RE_SERVICE_URL` changes accordingly and the secret does not.
+The comparison is constant-time (`hmac.compare_digest`), so the secret cannot be recovered byte by
+byte through timing. Someone who can reach the port still cannot get a recommendation out of it.
+
+`fly ips list` **will** show a public IPv4/IPv6. That is expected and correct.
+
+### Rate limiting (Task 2)
+
+Because the HMAC check is now the sole boundary and is internet-reachable, anything that can send
+bytes can make the service compute an HMAC. A limiter therefore runs **ahead of** signature
+verification, so a flood is shed before any HMAC is computed.
+
+| Property | Behaviour |
+|---|---|
+| Algorithm | Sliding window, per client IP (`Fly-Client-IP`, set by Fly's proxy) |
+| Default | **300 requests / minute / IP** — `GHAR_RE_RATE_LIMIT_PER_MINUTE` in `fly.toml` `[env]` |
+| Over limit | `429` + `Retry-After` header; counted at `/v1/meta` as `rate_limited_total` |
+| Paths guarded | `/v1/recommendations`, `/v1/meta` |
+| Paths exempt | `/healthz`, `/readyz` — shedding a platform probe would get the machine restarted |
+| Disable | Set `GHAR_RE_RATE_LIMIT_PER_MINUTE = "0"` |
+
+Four things about it are deliberate and worth knowing before you tune it:
+
+1. **The default is generous on purpose.** Supabase's egress is NAT'd, so one source address can
+   legitimately carry many end users. A tight per-IP cap throttles real traffic, not attackers.
+   If you see `rate_limited_total` climbing while users complain, **raise it** — it is an `[env]`
+   value, so a `fly deploy` picks it up with no rebuild.
+2. **It is per machine.** The window lives in process memory (`--workers 1`, `min_machines_running
+   = 1`, so today one machine = one window). Scale to N machines and the effective ceiling becomes
+   N × the limit. Shared enforcement would need Redis; not worth it at this size.
+3. **It fails open.** If the limiter has not loaded, requests pass through to the signature check.
+   The asymmetry with auth — which fails *closed*, returning `503` — is intentional: a missing
+   damper should not become a self-inflicted outage, whereas a missing secret must never let
+   unauthenticated traffic through.
+4. **It is a volume damper, not a WAF.** It stops one noisy source from burning CPU on signature
+   verification. Distributed floods are out of scope — see the Cloudflare note below.
+
+`[http_service.concurrency]` in `fly.toml` (soft 200 / hard 250) is a separate, complementary
+backstop: it bounds how many requests are *in flight at once*, where the limiter bounds *rate*.
+Fly's proxy has no per-IP rate limiting of its own, which is why the limiter is in-process.
+
+### Later, if needed: Cloudflare in front (Task 4 — note only, not implemented)
+
+If distributed/bot traffic ever becomes a real problem, the standard approach needs no application
+change: point a Cloudflare-managed hostname at the Fly app, add the hostname with
+`fly certs add re.<your-domain>`, enable Cloudflare's proxy (orange cloud) with Bot Fight Mode and a
+rate-limiting rule, then change `GHAR_RE_SERVICE_URL` to the Cloudflare hostname. One caveat that
+matters for the in-process limiter: traffic would then arrive from Cloudflare's IPs, so
+`Fly-Client-IP` becomes Cloudflare's edge rather than the true client, and per-IP limiting would
+need to read `CF-Connecting-IP` instead — **only** trustworthy once direct Fly access is restricted
+to Cloudflare's ranges, otherwise the header is forgeable. Deliberately not built now: it is real
+configuration work and unnecessary at current traffic.
 
 ## Rollback
 
@@ -263,7 +316,14 @@ Verified locally, without cloud access:
 | Signed `POST /v1/recommendations` → 200 with 7 plates | ✅ |
 | Unsigned → 401 `missing_signature`; wrong secret → 401 `invalid_signature`; stale → 401 `stale_signature` | ✅ |
 | `FOOFOO_ENV=production` with no secret → refuses to start | ✅ |
-| Full Python suite (56 tests incl. golden master) | ✅ |
+| Rate limiter sheds over-limit traffic with 429 + `Retry-After` | ✅ |
+| Limiter runs **before** signature verification (unsigned over-limit request → 429, not 401 — proves no HMAC was computed) | ✅ |
+| `/healthz` + `/readyz` never rate limited (25 probes at a 2/min limit → all 200) | ✅ |
+| Limiter is per-IP; one noisy source does not shed another caller's traffic | ✅ |
+| Tracking table stays bounded under 500 rotating source IPs (no memory-exhaustion vector) | ✅ |
+| 429s counted as `rate_limited_total`, not folded into `errors_total` | ✅ |
+| `fly.toml` parses as valid TOML; `force_https=true`, `min_machines_running=1`, distinct `/healthz` + `/readyz` checks, no secret in `[env]` | ✅ |
+| Full Python suite (77 tests incl. golden master) | ✅ |
 
 ## Could NOT be verified without real platform access
 
@@ -276,16 +336,23 @@ Stated plainly rather than assumed:
    from outside the repo, only the bundle and contract reachable) and everything passed — which is
    what caught the `ingredients_v5.csv` import-time break — but that is a simulation of the
    container, not the container. **Run `docker build` first, before `fly deploy`.**
-2. **`fly.toml` has never been parsed by flyctl.** Key names, nesting, and especially the
-   `[checks]` vs `[[http_service.checks]]` split are written from the documented schema, not
-   validated. Run `fly config validate --config ghar_re_service/fly.toml` before deploying.
+2. **`fly.toml` has never been parsed by flyctl.** It is valid TOML and the invariants above were
+   asserted programmatically, but key *names* and nesting — especially the `[checks]` vs
+   `[[http_service.checks]]` split and `[http_service.concurrency]` — are written from the
+   documented schema, not validated by the tool that consumes them. Run
+   `fly config validate --config ghar_re_service/fly.toml` before deploying.
 3. **No Fly.io account, org, app, region, or secret exists.** Nothing was provisioned.
 4. **`primary_region = "bom"` is a judgement call**, not a measurement — chosen as the closest
    region to the Indian user base. Confirm it against `fly platform regions`.
 5. **The 512MB VM size is an estimate** for the 39-dish golden sample. Re-measure before Phase G's
    810-dish catalogue.
-6. **Whether Supabase Edge Functions can reach `*.internal` at all** — they almost certainly cannot
-   (they do not run on Fly). This is the single biggest open item; see the section above.
+6. **The rate limit has never seen real traffic.** 300/min/IP is a starting point chosen against
+   NAT'd Supabase egress, not a measurement. Watch `rate_limited_total` at `/v1/meta` after the
+   first real load and tune `GHAR_RE_RATE_LIMIT_PER_MINUTE` accordingly.
+7. **`Fly-Client-IP` is trusted on the documented behaviour of fly-proxy**, not on an observed
+   request. If Fly does not populate it as documented, the limiter falls back to the socket peer —
+   which behind the proxy is the proxy itself, collapsing all callers into one bucket and
+   over-limiting. Confirm with one real request's logs after deploying.
 
 ## Deferred / TODO
 
@@ -294,6 +361,11 @@ Stated plainly rather than assumed:
       curry/kebab plates miss a bonus they were designed to earn. Fixing it **changes
       recommendation output**, so it needs the golden files regenerated in the same PR for the diff
       to be reviewable. Deliberately deferred by the Founder — not part of Phase F.
-- [ ] Decide the Supabase → Fly reachability approach (section above).
+- [x] ~~Decide the Supabase → Fly reachability approach.~~ **Settled:** public ingress + HMAC (no
+      fixed Supabase egress range exists, so private networking and IP allowlisting are both off the
+      table). See "Public ingress and the trust boundary" above.
+- [ ] Tune `GHAR_RE_RATE_LIMIT_PER_MINUTE` once real traffic volume is known.
 - [ ] Consider holding staging to the same secret requirement as production (`config.ts` TODO).
 - [ ] Pin the base image by digest once a real build has produced one.
+- [ ] Optional, only if bot/DDoS traffic appears: put Cloudflare in front (note in the section
+      above — deliberately not built).
