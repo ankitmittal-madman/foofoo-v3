@@ -275,3 +275,31 @@ def test_catalogue_handles_missing_sig_band():
     ctx = make_context(slot="dinner", season="transitional")
     assert S.sig(dish) == 0.0
     S.base(dish, theta, ctx)  # must not raise
+
+
+# ---------------------------------------------------------------------------
+# 14. Every real cuisine (data/source/cuisines_v4.csv) must resolve to a real zone via
+# K.CUISINE_GROUP_MAP -> K.ZONE_MAP. The confirmed Phase G bug was exactly a coverage gap here:
+# ghar_re_core.catalogue's cuisine->cuisine_group lookup only covered fixtures.py's 10-cuisine
+# list, so 536 of 810 real-catalogue dishes (66%) silently got zone=None, which pushed
+# pairing.cuisine_dist()'s cuisine_coherence hard gate into its harshest fallback for most
+# cross-cuisine combinations (concretely: jain_couple_ahmedabad got only 3 of 7 plates instead of
+# 7). This test catches a future cuisines_v4.csv update that reintroduces an unmapped cuisine
+# before it's rediscovered by hand.
+# ---------------------------------------------------------------------------
+def test_cuisine_zone_coverage():
+    import csv
+    import os
+
+    from ghar_re_core.config import SRC
+
+    group_zone = {z[0]: z[1] for z in K.ZONE_MAP}
+    unmapped = []
+    with open(os.path.join(SRC, "cuisines_v4.csv"), newline="") as fh:
+        for row in csv.DictReader(fh):
+            name = row["name"]
+            group = K.CUISINE_GROUP_MAP.get(name)
+            zone = group_zone.get(group) if group else None
+            if zone is None:
+                unmapped.append((name, group))
+    assert unmapped == [], f"cuisines with no resolvable zone (name, cuisine_group): {unmapped}"
