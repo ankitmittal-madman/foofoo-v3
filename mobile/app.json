@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "FooFoo",
+    "slug": "foofoo-mobile",
+    "scheme": "foofoo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.foofoo.mobile"
+    },
+    "android": {
+      "package": "app.foofoo.mobile"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router"],
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}
