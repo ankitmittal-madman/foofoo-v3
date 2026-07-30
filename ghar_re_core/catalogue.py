@@ -23,7 +23,13 @@ class Dish:
         self.cuisine_group = _CUISINE_GROUP.get(d["cuisine"])
         self.state_origin = _CUISINE_STATE.get(d["cuisine"])
         self.zone = _GROUP_ZONE.get(self.cuisine_group)
-        self.sig_score = K.BAND_TO_SCORE[d["sig_band"]]
+        # sig_band is None for any dish with no KB-sourced/curated signature score (real-catalogue
+        # dishes not yet scored in sig_scores_v1.csv — see ghar_re_service/scripts/build_catalogue.py).
+        # That is a legitimate "not yet scored" state, not an error: base()'s W_SIG term is meant to
+        # contribute nothing for an unscored dish, matching base_weights.yaml's own additive model
+        # (BASE = Σ W_k·conf_k·m_k — an absent term is 0, never a fabricated score).
+        sig_band = d["sig_band"]
+        self.sig_score = K.BAND_TO_SCORE[sig_band] if sig_band is not None else 0.0
         # ingredient token set (main + all) for ING-block / same-base / allergen work
         self.ingredient_names = [i for i, _ in d["ingredients"]]
         self.main_ingredients = [i for i, m in d["ingredients"] if m]

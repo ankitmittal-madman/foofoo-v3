@@ -253,3 +253,25 @@ def test_community_prior_vs_kb_c1_conflict_report(capsys):
             print(f"  {c['state']}: {c['kind']}  (KB={c['kb']} / CSV={c['csv']})")
     # This is a report, not an assertion on conflict count; it must simply run and surface state.
     assert isinstance(conflicts, list)
+
+
+# ---------------------------------------------------------------------------
+# 13. sig_band=None (dish not yet KB-scored — e.g. real-catalogue dishes with no sig_scores_v1.csv
+# row) must be a legitimate "no signature contribution" state, never a KeyError and never a
+# fabricated band/score (Phase G Task 3a).
+# ---------------------------------------------------------------------------
+def test_catalogue_handles_missing_sig_band():
+    unscored = dict(F.DISHES[0])
+    unscored["name"] = "Unscored Test Dish"
+    unscored["sig_band"] = None
+
+    cat = Catalogue([unscored])
+    dish = cat.get("Unscored Test Dish")
+    assert dish.sig_score == 0.0, "sig_band=None must yield sig_score 0.0, not a fabricated band"
+
+    # sig(dish) — the BASE §B4 term scoring.py actually reads — must also be 0.0, and base() must
+    # not raise for a dish with no signature score.
+    theta = derive_theta(HH["single_professional_blr"])
+    ctx = make_context(slot="dinner", season="transitional")
+    assert S.sig(dish) == 0.0
+    S.base(dish, theta, ctx)  # must not raise

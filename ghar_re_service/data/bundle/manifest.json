@@ -1,8 +1,8 @@
 {
   "bundle_format": 1,
-  "bundle_version": "sha256:5bad97fad9a0f4a8",
-  "catalogue_sha256": "cb533565a3fcfb6bcc4d7c5b62e6edd676e21cdf0f3323bbb73900ae6f8eabb8",
-  "catalogue_source": "ghar_re_core.fixtures.DISHES (golden sample)",
+  "bundle_version": "sha256:6a9754c75d942b2f",
+  "catalogue_sha256": "619440e346dfa207dbd3a2db897aef5eee6bf84d18ddf0816b93ba2947f54484",
+  "catalogue_source": "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue (real 810-dish catalogue)",
   "config_sha256": {
     "base_weights.yaml": "479e0e645dd04b2478fcf81f1507ae8fe91de218618ae01ed704095adf7b11f8",
     "community_priors.csv": "a908e6a6b818acd446edbbd664392e503ddfe35376ffa2788b91d11e749617be",
@@ -14,6 +14,6 @@
     "q15_weights.yaml": "59aaccfff883b68a2b5a74a9947adf58de8a53d17f96b8e12ed1b7af791a0486",
     "weather_rules.yaml": "d69c4eac4967aa455d15d0b418d856841c67f8a91380740f9f2a7c40215911ad"
   },
-  "created_at": "2026-07-29T06:07:07.013776+00:00",
-  "dish_count": 39
+  "created_at": "2026-07-30T09:54:08.558024+00:00",
+  "dish_count": 810
 }
