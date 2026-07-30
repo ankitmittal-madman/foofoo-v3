@@ -85,7 +85,7 @@ disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]
 # Third-party packages that ship no type stubs.
-module = ["yaml.*", "jsonschema.*"]
+module = ["yaml.*", "jsonschema.*", "openpyxl.*"]
 ignore_missing_imports = true
 
 [tool.setuptools]
