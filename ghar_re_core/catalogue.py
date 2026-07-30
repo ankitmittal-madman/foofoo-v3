@@ -8,9 +8,24 @@ while staying faithful to the seeded schema. Zone is resolved cuisine -> cuisine
 from ghar_re_core import fixtures as F
 from ghar_re_core import knowledge as K
 
-# cuisine -> cuisine_group (from fixtures.CUISINES)
-_CUISINE_GROUP = {c[0]: c[2] for c in F.CUISINES}
-# cuisine -> state_origin
+# cuisine -> cuisine_group, from K.CUISINE_GROUP_MAP (all 65 real cuisines — data/source/
+# cuisines_v4.csv, transcribed in knowledge.py). NOT fixtures.CUISINES (only 10 entries) — that was
+# the confirmed Phase G bug: any real-catalogue dish whose cuisine wasn't one of those 10 got
+# cuisine_group=None -> zone=None (measured: 536/810, 66%), which silently pushed
+# pairing.cuisine_dist()'s cuisine_coherence hard gate into its harshest fallback for most
+# cross-cuisine dry+liquid combinations. Verified identical to fixtures.CUISINES for all 10 legacy
+# cuisines, so this introduces no drift in the 39-dish golden-master lock.
+_CUISINE_GROUP = dict(K.CUISINE_GROUP_MAP)
+# cuisine -> state_origin. Deliberately still fixtures.CUISINES-only, NOT switched to
+# cuisines_v4.csv's state_origin column: that column uses different string formats for cuisines
+# also present in fixtures.CUISINES (e.g. udupi "Karnataka" vs cuisines_v4.csv's
+# "Karnataka (Udupi)", mughlai "Delhi" vs "Delhi/UP") and scoring._cuis() does an EXACT string
+# match against a household's home state for its highest-value (1.00) term — switching sources
+# here would silently change BASE scores for the 39-dish golden sample too, not just add coverage
+# for the real catalogue. Real-catalogue dishes' state_origin=None (and the resulting loss of the
+# _cuis() same-state 1.00 bonus) is therefore a real, separate, still-open gap — same root cause,
+# different consumer, deliberately not fixed in this commit to keep this a single, low-risk,
+# zone-resolution-only change.
 _CUISINE_STATE = {c[0]: c[4] for c in F.CUISINES}
 # cuisine_group -> zone (KB §R1)
 _GROUP_ZONE = {z[0]: z[1] for z in K.ZONE_MAP}

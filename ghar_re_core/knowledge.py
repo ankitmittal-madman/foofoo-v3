@@ -30,7 +30,68 @@ ZONE_MAP = [
     ("chinese_asian",    "Global",    187, "real"),   # foreign/other -> Global
     ("continental",      "Global",    187, "real"),
     ("italian",          "Global",    187, "real"),
+    # The remaining cuisine_group values from cuisines_v4.csv (real 810-dish catalogue) that
+    # weren't yet enumerated above — all genuinely foreign, so the KB §R1 "foreign/other -> Global"
+    # rule (already the comment on chinese_asian above) now covers ALL of them explicitly instead
+    # of only 3 of ~14. dish_count=187 matches the existing Global rows: it's the ZONE's total
+    # (chinese_asian 50 + continental 33 + italian 30 + japanese 15 + thai 12 + korean 10 +
+    # middle_eastern 10 + mexican 9 + vietnamese 8 + burmese 5 + bhutanese 4 + mediterranean 1 +
+    # anglo_indian 0 + american 0 = 187 in the real catalogue), repeated per row exactly like the
+    # three existing Global rows already do — not a per-cuisine_group count.
+    ("japanese",         "Global",    187, "real"),
+    ("korean",           "Global",    187, "real"),
+    ("thai",             "Global",    187, "real"),
+    ("vietnamese",       "Global",    187, "real"),
+    ("middle_eastern",   "Global",    187, "real"),
+    ("mexican",          "Global",    187, "real"),
+    ("american",         "Global",    187, "real"),
+    ("burmese",          "Global",    187, "real"),
+    ("bhutanese",        "Global",    187, "real"),
+    ("mediterranean",    "Global",    187, "real"),
+    # anglo_indian: genuinely a boundary case (colonial-era Indian/British fusion, cuisines_v4.csv
+    # gives it state_origin='Pan-India' rather than any single region or foreign country) — not a
+    # core North/South/West/East/Central/Northeast/PanIndia regional palette, so it falls under the
+    # KB's own "...or OTHER" half of "foreign/other -> Global", not a silent guess.
+    ("anglo_indian",     "Global",    187, "real"),
 ]
+
+# ---------------------------------------------------------------------------
+# cuisine (data/source/cuisines_v4.csv `name`) -> cuisine_group, transcribed verbatim from that
+# file (all 65 rows — real 810-dish catalogue's actual cuisine list, not the 10-cuisine fixture
+# subset). This is the fix for the confirmed Phase G bug: ghar_re_core.catalogue previously built
+# its cuisine->cuisine_group lookup from ghar_re_core.fixtures.CUISINES (only 10 entries), so any
+# real-catalogue dish whose cuisine wasn't one of those 10 got cuisine_group=None -> zone=None
+# (measured: 536 of 810 real dishes, 66%). Transcribed as a static table (like fixtures.CUISINES
+# already is) rather than read live from cuisines_v4.csv at runtime, because a live CSV read would
+# need cuisines_v4.csv added to ghar_re_service/scripts/export_bundle.py's CONFIG_FILES allow-list
+# to keep working inside a baked deployment bundle — out of scope for this fix (export_bundle.py is
+# explicitly not touched here). Verified identical to fixtures.CUISINES for all 10 legacy cuisines
+# (same cuisine_group in both sources), so this introduces no drift for the 39-dish golden sample.
+CUISINE_GROUP_MAP = {
+    "american": "american", "andhra": "south_indian", "anglo_indian": "anglo_indian",
+    "arunachali": "northeast_indian", "assamese": "east_indian", "awadhi": "mughlai_nawabi",
+    "bengali": "east_indian", "bhutanese": "bhutanese", "bihari": "north_indian",
+    "bundelkhandi": "north_indian", "burmese": "burmese", "chettinad": "south_indian",
+    "chhattisgarhi": "central_indian", "chinese_authentic": "chinese_asian",
+    "continental": "continental", "coorg": "south_indian", "delhi": "north_indian",
+    "goan": "west_indian", "gujarati": "west_indian", "himachali": "north_indian",
+    "hyderabadi": "mughlai_nawabi", "indian_bakery": "street_food",
+    "indian_tibetan": "chinese_asian", "indo_chinese": "chinese_asian", "indori": "central_indian",
+    "italian": "italian", "japanese": "japanese", "jharkhandi": "east_indian",
+    "karnataka": "south_indian", "kashmiri": "north_indian", "kerala": "south_indian",
+    "kolhapuri": "west_indian", "konkani": "west_indian", "korean": "korean",
+    "kutchi": "west_indian", "lebanese": "middle_eastern", "madhya_pradesh": "central_indian",
+    "maharashtrian": "west_indian", "malabar": "south_indian", "malvani": "west_indian",
+    "mangalorean": "south_indian", "manipuri": "northeast_indian", "mediterranean": "mediterranean",
+    "meghalayan": "northeast_indian", "mexican": "mexican",
+    "middle_eastern_generic": "middle_eastern", "mizo": "northeast_indian",
+    "mughlai": "mughlai_nawabi", "naga": "northeast_indian", "odia": "east_indian",
+    "parsi": "west_indian", "punjabi": "north_indian", "rajasthani": "north_indian",
+    "sikkimese": "northeast_indian", "sindhi": "north_indian",
+    "street_food_generic": "street_food", "tamil": "south_indian", "telangana": "south_indian",
+    "thai": "thai", "tripuri": "northeast_indian", "udupi": "south_indian", "up": "north_indian",
+    "uttarakhandi": "north_indian", "vidarbha": "west_indian", "vietnamese": "vietnamese",
+}
 
 # State -> zone (KB §R1 "State→zone" line). Rajasthan flagged palette-North/diet-West (⚑).
 STATE_ZONE = {
