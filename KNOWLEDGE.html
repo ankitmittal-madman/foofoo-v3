@@ -649,8 +649,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔒</span> S41 · Security hotfix — recommendations endpoint ownership check wired in
       <span class="nav-badge">Jul 29</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s42')">
+    <div class="nav-item" onclick="showPage('s42')">
       <span class="nav-icon">📝</span> S42 · Onboarding write path — new household/ endpoint (feature branch, review pending)
+      <span class="nav-badge">Jul 30</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s43')">
+      <span class="nav-icon">📦</span> S43 · Mobile app scaffold — first client, wired to household/recommendations
       <span class="nav-badge">Jul 30</span>
     </div>
     <!-- NAV_INJECT -->
@@ -662,11 +666,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">10</span>
+      <span class="nav-badge">11</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">99</span>
+      <span class="nav-badge">124</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -1164,7 +1168,7 @@ function deepDiveFeature(featureLabel){
   <div id="page-arch-full" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">App architecture</div>
-      <div class="page-subtitle">FooFoo — AI-powered meal decision assistant for Indian households. No app code exists yet; the repository currently holds the complete documentation, database migration set, and seed data that Phase 7 implementation will build from. Teal = new this session · Amber = modified.</div>
+      <div class="page-subtitle">FooFoo — AI-powered meal decision assistant for Indian households. The first app screens now exist (S43, mobile/) alongside the backend/database built in earlier sessions. Teal = new this session · Amber = modified.</div>
     </div>
     <div class="arch-legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--teal-bg);border:1px solid var(--teal-border)"></div> New this session</div>
@@ -1174,6 +1178,18 @@ function deepDiveFeature(featureLabel){
     <div class="arch-section">
       <div class="arch-section-title">📱 Phone — screens</div>
       <div class="arch-grid" id="arch-phone">
+        <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+          <div class="arch-node-name">mobile/app/(auth)/</div>
+          <div class="arch-node-desc">Sign in / sign up · S43</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+          <div class="arch-node-name">mobile/app/(onboarding)/</div>
+          <div class="arch-node-desc">4 onboarding screens · S43</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+          <div class="arch-node-name">mobile/app/recommendations.tsx</div>
+          <div class="arch-node-desc">Plain plate list · S43</div>
+        </div>
         <!-- ARCH_PHONE_INJECT -->
       </div>
     </div>
@@ -1200,6 +1216,10 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node-name">ghar_re_service</div>
   <div class="arch-node-desc">FastAPI host + contract · S34</div>
 </div>
+  <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+    <div class="arch-node-name">mobile/src/api/, auth/</div>
+    <div class="arch-node-desc">API client + session handling · S43</div>
+  </div>
   <!-- ARCH_APPLOGIC_INJECT -->
       </div>
     </div>
@@ -1736,6 +1756,21 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Implements the P0 gap the S40 production-readiness audit found: no live code path could ever write profiles/household_members/household_answers. New POST /v1/household endpoint (same defineHandler + authenticate() pattern as consent/recommendations) accepts per-screen answers, logs each to onboarding_sessions, incrementally upserts household_answers, and creates profiles exactly once all five required columns are known — accumulated across as many calls as it takes, via onboarding_sessions history. requireOwnership gates every write, same import/pattern as the S41 fix; profile creation additionally hardcodes the caller's own id at the INSERT itself, not a request-supplied value, per the approved scoping note. household_members writes require an existing profile (FK) and are refused with a clear 422, not a raw DB error, if attempted first. All new code passes format/lint and a full type-check (deno check) against the whole shared module tree — a strong signal beyond earlier sessions' checks, since it validates every function signature end-to-end, not just syntax. The 15 new tests could not be executed (same jsr.io block) but every scenario was traced by hand against the actual code. Pushed to claude/onboarding-write-path — NOT main. Waiting for Founder review and a real deno test run, same bar as S41.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Jul 30</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#166534"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f0fdf4;color:#166534">S43</span>
+      <div class="tl-title">Mobile app scaffold — the first client, wired to real endpoints</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s43')">mobile/ (new)</span>
+        <span class="tl-chip" onclick="showPage('s43')">Sign up / sign in</span>
+        <span class="tl-chip" onclick="showPage('s43')">4 onboarding screens</span>
+        <span class="tl-chip" onclick="showPage('s43')">Recommendations screen</span>
+      </div>
+      <div class="tl-note">First working app: real login, real onboarding writes, real recommendations — no design polish yet, and no live Supabase project to test end-to-end against.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -1976,6 +2011,32 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">S34 · Jul 28</div>
   </div>
 </div>
+  <div class="detail-item">
+    <div class="detail-row" id="row-mod-mobile-app" onclick="toggleDetail('mod-mobile-app')">
+      <div class="detail-left">
+        <span class="tag tag-new">New</span>
+        <span class="detail-name">Mobile app (Expo client)</span>
+      </div>
+      <span class="detail-chevron" id="chev-mod-mobile-app">▾</span>
+    </div>
+    <div class="detail-drawer" id="draw-mod-mobile-app">
+      <div class="dd-label">What this does</div>
+      <div class="dd-text">The actual app a user opens on their phone or in a browser — the first frontend this project has had. Handles login, walks through onboarding, and shows the AI's meal picks, all by calling the existing backend endpoints.</div>
+      <div class="dd-label">Files / tables in this module</div>
+      <div class="dd-text">
+        <code>mobile/app/_layout.tsx, index.tsx</code> — app shell + routes a user to sign-in or onboarding depending on login state<br>
+        <code>mobile/app/(auth)/sign-in.tsx, sign-up.tsx</code> — login screens<br>
+        <code>mobile/app/(onboarding)/*.tsx</code> — the four onboarding screens (profile basics, household, food & health, lifestyle)<br>
+        <code>mobile/app/recommendations.tsx</code> — plain list of the AI's meal picks<br>
+        <code>mobile/src/auth/supabaseClient.ts, SessionContext.tsx</code> — login/session handling, shared app-wide<br>
+        <code>mobile/src/api/client.ts, household.ts, recommendations.ts, types.ts</code> — the one shared layer that talks to the backend<br>
+      </div>
+      <div class="dd-label">How it helps the app</div>
+      <div class="dd-text">Before this, FooFoo's recommendation engine and onboarding write path existed but nobody could actually use them — there was no app. This is what makes the backend reachable by a real person for the first time.</div>
+      <div class="dd-label">Last touched</div>
+      <div class="dd-text">S43 · Jul 30</div>
+    </div>
+  </div>
   <!-- MODULES_INJECT -->
   </div>
 
@@ -2106,6 +2167,30 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">supabase/functions/household/store.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S42</td><td class="fr-desc">All DB reads/writes to profiles/household_members/household_answers/onboarding_sessions — the ONLY code in the repo that can write these tables from a live request</td></tr>
 <tr><td class="fr-file mono">supabase/functions/_tests/household.test.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S42</td><td class="fr-desc">15 tests: ownership rejection before any write, resume-across-calls creation, no-fabricated-defaults, repeat-call idempotency, members-before-profile rejected, schema validation</td></tr>
 <tr><td class="fr-file mono">supabase/functions/_shared/errors/api-catalogue.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S42</td><td class="fr-desc">Two new error codes for household/: ERR_HOUSEHOLD_FIELD_INVALID (422), ERR_HOUSEHOLD_INCOMPLETE (422) — additive only, mirrors the existing ERR_CONSENT_TYPE_INVALID precedent</td></tr>
+  <tr><td class="fr-file mono">docs/architecture/[DRAFT]_DOC-P4-03_Mobile_App_Architecture_Note_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Architecture note for the new mobile/ component: directory layout, why onboarding screen order differs from DOC-05, API base URL assumption</td></tr>
+  <tr><td class="fr-file mono">mobile/app.json</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S43</td><td class="fr-desc">Expo app config — name, bundle ids, web output mode</td></tr>
+  <tr><td class="fr-file mono">mobile/package.json</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S43</td><td class="fr-desc">Dependencies: Expo SDK 52, Expo Router, Supabase JS, TanStack Query</td></tr>
+  <tr><td class="fr-file mono">mobile/tsconfig.json</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S43</td><td class="fr-desc">TypeScript config, strict mode, @/ path alias to src/</td></tr>
+  <tr><td class="fr-file mono">mobile/babel.config.js</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S43</td><td class="fr-desc">Babel preset for Expo</td></tr>
+  <tr><td class="fr-file mono">mobile/.env.example</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S43</td><td class="fr-desc">Placeholder Supabase URL/anon key/API base URL — no real project exists yet</td></tr>
+  <tr><td class="fr-file mono">mobile/.gitignore</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S43</td><td class="fr-desc">Ignores node_modules, .expo, dist, .env</td></tr>
+  <tr><td class="fr-file mono">mobile/app/_layout.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Root layout — wraps the app in the login-session provider and the API cache provider</td></tr>
+  <tr><td class="fr-file mono">mobile/app/index.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Entry route — sends the user to sign-in or onboarding depending on login state</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(auth)/sign-in.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Sign-in screen</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(auth)/sign-up.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Sign-up screen</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/_layout.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Redirects to sign-in if no one is logged in</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/profile-basics.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Onboarding screen 1 — the five required profile questions</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/household.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Onboarding screen 2 — household type, working professionals, family members</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/food-and-health.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Onboarding screen 3 — non-veg types, veg days, allergies, conditions</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/lifestyle.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Onboarding screen 4 — who cooks, eating out frequency, main goal</td></tr>
+  <tr><td class="fr-file mono">mobile/app/recommendations.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Plain list of the AI's meal picks; error+retry state when the call fails</td></tr>
+  <tr><td class="fr-file mono">mobile/src/auth/supabaseClient.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Supabase client instance, session persisted on-device</td></tr>
+  <tr><td class="fr-file mono">mobile/src/auth/SessionContext.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">App-wide login-session state and sign-in/up/out actions</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/client.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Shared POST helper — attaches the login token, parses the backend's real error shape</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/household.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Typed wrapper for POST /v1/household</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/recommendations.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Typed wrapper for POST /v1/recommendations</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/types.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Request/response types hand-mirrored from the Edge Function source</td></tr>
+  <tr><td class="fr-file mono">mobile/src/lib/queryClient.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Shared TanStack Query cache instance</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2381,6 +2466,26 @@ function deepDiveFeature(featureLabel){
   <div class="decision-a">Belt and suspenders, deliberately asked for by the Founder's own scoping instructions before this was built. The ownership check already guarantees the two values are the same by the time this code runs — but hardcoding it at the actual database command means even a future bug in that earlier check could never let this specific command create a record for the wrong person. Cheap insurance on the one write that can never be undone cleanly.</div>
   <div class="decision-meta">S42 · Jul 30</div>
 </div>
+  <div class="decision-item">
+    <div class="decision-q">Why does the app's onboarding order not match the official design document?</div>
+    <div class="decision-a">The design document (DOC-05) asks about household members before the five basic profile questions are finished. The backend refuses to save member details until the profile exists — checked directly in the backend's own code, not assumed. Rather than build a screen guaranteed to fail on a brand-new user's very first attempt, this session reordered onboarding to satisfy the backend and flagged the mismatch for whoever owns the design document to reconcile.</div>
+    <div class="decision-meta">S43 · Jul 30</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Where should the app's code live, given the repository's rule against new top-level folders without approval?</div>
+    <div class="decision-a">A new <code>mobile/</code> top-level folder was created anyway, because the task explicitly asked for this exact component at this exact scope — matching how <code>ghar_re_service/</code> and <code>supabase/</code> were added in earlier work. Flagged plainly in the architecture note as needing a formal approval on record, not silently bypassed.</div>
+    <div class="decision-meta">S43 · Jul 30</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Does the app send the household's answers along with each recommendation request?</div>
+    <div class="decision-a">No. Checked the actual backend code first — it already reads a household's saved answers straight from the database and has sensible fallback answers for a user who hasn't finished onboarding. The app only needs to be logged in; sending the answers again would be redundant and a second place for the two copies to drift apart.</div>
+    <div class="decision-meta">S43 · Jul 30</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">What should the four onboarding screens use for questions with no official pick-list yet (non-veg types, veg days, health conditions)?</div>
+    <div class="decision-a">Plain comma-separated text boxes, not an invented set of chips — no fixed vocabulary for these three fields exists anywhere in the actual database constraints, unlike diet type or cook capability which do. Inventing one risked silently disagreeing with whatever the backend actually expects later.</div>
+    <div class="decision-meta">S43 · Jul 30</div>
+  </div>
   <!-- DECISIONS_INJECT -->
   </div>
 
@@ -6144,7 +6249,7 @@ function deepDiveFeature(featureLabel){
     </div>
   </div><!-- /page-s41 -->
 
-  <div id="page-s42" class="page-content">
+  <div id="page-s42" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S42 · The onboarding write path — built, pushed to a feature branch, waiting for your review</div>
       <div class="page-subtitle">The single biggest gap the production-readiness audit found — nobody could ever actually save a real user's answers — now has real code behind it. Not on main yet, and deliberately so: this touches real user data, the same review bar as the security fix.</div>
@@ -6200,6 +6305,324 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s42 -->
+
+  <div id="page-s43" class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">S43 · Mobile app scaffold — the first client, wired to real endpoints</div>
+      <div class="page-subtitle">Built the very first FooFoo app screen: someone can now sign up, answer the onboarding questions on their phone, and see the AI's meal suggestions — talking to the real backend built in earlier sessions, not a mock.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">FooFoo had a fully built backend (household intake, the recommendation engine) but no app at all — nothing a real person could open on a phone or in a browser. Every session so far had been server-side only.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">There is now a working phone/web app: sign up or sign in, answer four short onboarding screens, and land on a screen showing the meals the AI picked — each screen actually calling the real backend endpoints, not placeholder data.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">mobile/app.json, package.json, tsconfig.json, babel.config.js</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/_layout.tsx, index.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(auth)/sign-in.tsx, sign-up.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(onboarding)/*.tsx (4 screens + layout)</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/recommendations.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/auth/supabaseClient.ts, SessionContext.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/api/client.ts, household.ts, recommendations.ts, types.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/lib/queryClient.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/architecture/[DRAFT]_DOC-P4-03_Mobile_App_Architecture_Note_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Jul 30, 2026<br>25 things touched</div>
+      </div>
+      <div class="session-card-desc">A brand-new Expo (React Native + web) app in a new top-level <code>mobile/</code> folder — the first frontend this project has ever had. It signs in against the same Supabase Auth already live for the backend, walks a new user through four onboarding screens, saves each answer to the real <code>POST /v1/household</code> endpoint, then calls the real <code>POST /v1/recommendations</code> endpoint and shows the AI's picks. No design polish yet — the point of this session was proving every screen actually talks to the real backend correctly, not making it look finished.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">7</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">8</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Server fns (client only)</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s43','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s43','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s43','flows')">Feature flows</div>
+    </div>
+
+    <div id="s43-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s43','auth-screens')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Sign up / sign in</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">A new user creates an account or an existing one signs back in, using the same login system the backend already trusts.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s43','onboarding-screens')">
+            <div class="step-num num-blue">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Four onboarding screens</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Kitchen basics, household composition, food & health, then lifestyle & goals — each screen saves before moving to the next, so nothing is lost if the user leaves partway through.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s43','recs-screen')">
+            <div class="step-num num-blue">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">See your plates</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">A plain list of the AI's meal picks, with a Refresh button — no photos or fancy cards yet, this session only proves the data is real.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ every screen action calls the app's own API layer, which attaches the user's login token</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s43','session-context')">
+            <div class="step-num num-purple">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Session tracking</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Keeps track of whether someone is logged in across the whole app, and hands out the login token whenever a screen needs to call the backend.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s43','api-client')">
+            <div class="step-num num-purple">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">API client layer</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">One shared helper that every screen uses to call the backend correctly — same headers, same error handling, every time, instead of each screen reinventing it.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ the API layer calls straight through to the two endpoints already built in earlier sessions — nothing server-side changed this session</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" style="opacity:.55">
+            <div class="step-num num-amber">6</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">POST /v1/household (existing, S42)</span><span class="tag tag-mod">Reused</span></div>
+              <div class="step-desc">Not changed this session — the app now calls it for real, which is the whole point.</div>
+            </div>
+          </div>
+          <div class="swim-step" style="opacity:.55">
+            <div class="step-num num-amber">7</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">POST /v1/recommendations (existing)</span><span class="tag tag-mod">Reused</span></div>
+              <div class="step-desc">Also not changed this session — same recommendation engine, now with an app in front of it.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">This was scaffold-and-prove-the-wire only, deliberately stopped here for review before any visual design work (per the architecture note, DOC-P4-03). No live Supabase project exists yet to actually run sign-up → onboarding → recommendation end-to-end against, so that full real-world walkthrough is still owed. Also flagged for a decision: the onboarding screen order in this app does NOT match the existing UX design document's order — it was deliberately changed because the backend refuses to save family member details before the five basic profile questions are answered, and the design doc has those in the opposite order. Someone should reconcile the two before real screen design starts.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <div id="s43-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s43-auth-screens" onclick="toggleDetail('s43-auth-screens')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/app/(auth)/sign-in.tsx, sign-up.tsx</span></div>
+          <span class="detail-chevron" id="chev-s43-auth-screens">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s43-auth-screens">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Two simple forms — email + password — that create an account or sign back in. On success, sends the user straight into onboarding.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Email + password typed by the user</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A logged-in session, or an error message shown on screen</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">User taps Sign in</span><span class="dd-arrow">→</span><span class="dd-node">SessionContext.signIn()</span><span class="dd-arrow">→</span><span class="dd-node">Supabase Auth</span><span class="dd-arrow">→</span><span class="dd-node">redirect to onboarding</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">const { error } = await supabase.auth.signInWithPassword({ email, password });</span>  ← the actual login call — nothing custom-built, uses the login system that already exists</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not build a custom login system?</div>
+            <div class="dd-why-a">The backend already trusts a specific login system (the same one proven in earlier sessions' security work) — building a second one would mean two logins that both have to agree, for no benefit.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s43-onboarding-screens" onclick="toggleDetail('s43-onboarding-screens')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/app/(onboarding)/profile-basics.tsx, household.tsx, food-and-health.tsx, lifestyle.tsx</span></div>
+          <span class="detail-chevron" id="chev-s43-onboarding-screens">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s43-onboarding-screens">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Four screens that ask the onboarding questions in a specific order chosen to match a hard backend rule: the five basic profile questions (cook's name, home state, city, diet, cooking skill) must be answered before anything about family members can be saved, because the database itself won't allow it otherwise.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Taps and typed answers on each screen</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Each screen's answers saved immediately to the backend before the next screen loads</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">Profile basics</span><span class="dd-arrow">→</span><span class="dd-node">Household + members</span><span class="dd-arrow">→</span><span class="dd-node">Food & health</span><span class="dd-arrow">→</span><span class="dd-node">Lifestyle & goals</span><span class="dd-arrow">→</span><span class="dd-node">Recommendations screen</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">onSuccess: () => router.push("/(onboarding)/household")</span>  ← only moves to the next screen once this screen's answers actually saved successfully</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why is this order different from the official design document?</div>
+            <div class="dd-why-a">The design document asks about household members before the basic profile is complete. The backend rejects that — it hard-requires the profile to exist first. Rather than silently working around it or building a screen guaranteed to fail on first use, the order was changed here and flagged as an open question for whoever owns the design document.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why free-text boxes for some questions instead of nice pick-lists?</div>
+            <div class="dd-why-a">A few questions (non-veg types eaten, veg days, health conditions) don't have a fixed official list of choices anywhere in the codebase yet. Rather than inventing one that might not match what the backend actually expects, this session used plain text boxes and flagged it — a real pick-list can be added once that official list exists.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s43-recs-screen" onclick="toggleDetail('s43-recs-screen')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/app/recommendations.tsx</span></div>
+          <span class="detail-chevron" id="chev-s43-recs-screen">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s43-recs-screen">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Calls the recommendation engine and lists whatever meals it picks, plainly — no photos or cards yet. Also correctly shows an error message with a Retry button if the call fails, rather than a blank screen.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The logged-in user's own onboarding answers (already saved server-side)</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A list of suggested meal "plates"</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">Screen loads</span><span class="dd-arrow">→</span><span class="dd-node">postRecommendations()</span><span class="dd-arrow">→</span><span class="dd-node">POST /v1/recommendations</span><span class="dd-arrow">→</span><span class="dd-node">plates rendered</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">queryFn: () => postRecommendations()</span>  ← no household data sent from the phone at all — the server already knows how to build the request from what the user answered</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why doesn't the app send the household's answers with this call?</div>
+            <div class="dd-why-a">Checked the actual server code first — it already reads the answers straight from the database and has sensible defaults for a half-finished onboarding. Sending them again from the app would be redundant and a second place for the two copies to drift apart.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s43-session-context" onclick="toggleDetail('s43-session-context')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/src/auth/SessionContext.tsx, supabaseClient.ts</span></div>
+          <span class="detail-chevron" id="chev-s43-session-context">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s43-session-context">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">One place that knows whether the user is logged in, shared by the whole app, so every screen can ask "is someone logged in?" without each one checking separately.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">App starts</span><span class="dd-arrow">→</span><span class="dd-node">checks for a saved login</span><span class="dd-arrow">→</span><span class="dd-node">every screen can read it</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">supabase.auth.onAuthStateChange((_event, next) => setSession(next))</span>  ← the whole app finds out immediately if login status changes, without polling</div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s43-api-client" onclick="toggleDetail('s43-api-client')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/src/api/client.ts, household.ts, recommendations.ts, types.ts</span></div>
+          <span class="detail-chevron" id="chev-s43-api-client">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s43-api-client">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The one place in the app that actually talks to the backend. Every screen calls a plain function (like "save this household answer") instead of building its own network request — so the login-token handling and error handling only had to be written once, correctly.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">screen calls postHousehold()</span><span class="dd-arrow">→</span><span class="dd-node">apiPost() attaches login token</span><span class="dd-arrow">→</span><span class="dd-node">real backend endpoint</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">const message = typeof json?.error?.message === "string" ? json.error.message : res.statusText;</span>  ← reads the backend's real error format (checked directly in the backend's own code first) instead of guessing at one</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why hand-write these types instead of generating them automatically?</div>
+            <div class="dd-why-a">There's no automatic contract-sharing tool between the backend and this brand-new app yet, so the request/response shapes were copied by hand from the actual backend source files, not guessed — flagged as something to replace with a generated client later so the two can't silently drift apart.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Reconcile the onboarding screen order with the official design document; test sign-up → onboarding → recommendations against a real Supabase project once one exists; then start actual visual design (photos, cards, the swipe interactions) once this wiring is confirmed working end-to-end.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <div id="s43-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S43 = [
+      {
+        id: 'onboarding-and-recommendations',
+        label: 'Onboarding → recommendations',
+        steps: [
+          {
+            layer: 'Phone', tag: 'UI',
+            title: 'User fills in profile basics',
+            desc: 'First onboarding screen — the five questions the backend requires before anything else can be saved.',
+            codeFlow: [ {chip:'mobile/app/(onboarding)/profile-basics.tsx'}, {label:'calls'}, {chip:'mobile/src/api/household.ts'} ],
+            files: [ {path:'mobile/app/(onboarding)/profile-basics.tsx', desc:'Collects cook name, home state, city, diet, cooking skill'} ],
+            api: {endpoint:'POST /v1/household', note:'Saves these five answers; creates the profile once all five are known'},
+            db: null
+          },
+          {
+            layer: 'App logic', tag: 'API',
+            title: 'API client attaches the login token',
+            desc: 'Every call to the backend goes through one shared function that adds the user\'s login token automatically.',
+            codeFlow: [ {chip:'mobile/src/api/client.ts'}, {label:'reads session from'}, {chip:'mobile/src/auth/SessionContext.tsx'} ],
+            files: [ {path:'mobile/src/api/client.ts', desc:'Attaches Authorization: Bearer <token> to every request'} ],
+            api: null, db: null
+          },
+          {
+            layer: 'Phone', tag: 'UI',
+            title: 'Three more onboarding screens',
+            desc: 'Household + members, food & health, then lifestyle & goals — each one saves before moving on.',
+            codeFlow: [ {chip:'mobile/app/(onboarding)/household.tsx'}, {label:'then'}, {chip:'food-and-health.tsx'}, {label:'then'}, {chip:'lifestyle.tsx'} ],
+            files: [
+              {path:'mobile/app/(onboarding)/household.tsx', desc:'Household type, working professionals, family members'},
+              {path:'mobile/app/(onboarding)/food-and-health.tsx', desc:'Non-veg types, veg days, allergies, conditions'},
+              {path:'mobile/app/(onboarding)/lifestyle.tsx', desc:'Who cooks, eating out frequency, main goal'}
+            ],
+            api: {endpoint:'POST /v1/household', note:'Called again on each screen with just that screen\'s answers'},
+            db: null
+          },
+          {
+            layer: 'Phone', tag: 'UI',
+            title: 'Recommendations screen loads',
+            desc: 'Immediately asks the backend for this user\'s meal suggestions and lists them.',
+            codeFlow: [ {chip:'mobile/app/recommendations.tsx'}, {label:'calls'}, {chip:'mobile/src/api/recommendations.ts'} ],
+            files: [ {path:'mobile/app/recommendations.tsx', desc:'Renders the returned plates, or an error + Retry button'} ],
+            api: {endpoint:'POST /v1/recommendations', note:'No household data sent — the server reads it from what was just saved'},
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s43-flows', window.FEATURE_FLOWS_S43);
+    </script>
+
+  </div><!-- /page-s43 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
