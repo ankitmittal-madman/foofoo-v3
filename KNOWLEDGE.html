@@ -2585,6 +2585,11 @@ function deepDiveFeature(featureLabel){
   <div class="decision-a">A leftover test expects a dish named exactly "Kanda Bhaji" (a known rainy-day comfort food for one region) to show up for a rainy-weather household — a name that exists in the old 39-dish hand-picked sample but not, under that exact spelling, anywhere in the real 810-dish menu. This is a naming gap in the data, not a scoring bug, and it was already known and reported before this session started. Fixing it means either renaming a real dish or teaching the engine to recognise near-matches, neither of which is a small, safe, single-purpose change — so it stays open and named rather than patched quickly under this branch's own scope.</div>
   <div class="decision-meta">S44 · Jul 30</div>
 </div>
+  <div class="decision-item">
+    <div class="decision-q">A real Supabase project exists now ("foofoo-v3", ACTIVE_HEALTHY) — but it had zero Edge Functions deployed. Deploy the two the app needs to make it actually work?</div>
+    <div class="decision-a">Yes — deployed household and recommendations directly to the live project (no code in this repo was changed; this was a deploy of the exact already-committed backend source, verified file-by-file against disk immediately beforehand, not from memory). One disclosed, deploy-only deviation: recommendations' contract.ts imports the shared ghar-re-v1 JSON schema from three directories up in this repo (`../../../contracts/...`), but the deploy sandbox only allows one directory above a function's own folder — confirmed by testing (`../_shared/...` worked, `../../deno.json` did not). Worked around by copying the schema file in flat next to contract.ts and pointing that one import at it for the deployed bundle only; the repo's own contract.ts is untouched and the two must be kept in sync by hand until proper CI/CD replaces this manual deploy path. Both functions came back status ACTIVE. Direct invocation to prove it end-to-end wasn't possible from this sandbox (outbound curl to Supabase is proxy-blocked here) — confirmed via Edge Function logs and the deploy response instead.</div>
+    <div class="decision-meta">S43 · Jul 30</div>
+  </div>
   <!-- DECISIONS_INJECT -->
   </div>
 
