@@ -17,6 +17,7 @@ import { createContainer } from "../_shared/di/container.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
+import { UserJourney } from "../_shared/logging/userJourney.ts";
 import type { ConsentService } from "../_shared/services/consent-service.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
@@ -52,6 +53,12 @@ export function makeConsentHandler(resolve: ConsentServiceResolver = defaultReso
 
     // IP-hash deferred (see ConsentService); pass null (column is nullable, DOC-P3-04 §03.4).
     const result = await resolve(ctx).captureConsent(consentReq, null);
+
+    UserJourney.logConsentDecision(
+      consentReq.profileId,
+      consentReq.consents.map((c) => ({ consentType: c.consentType, granted: c.granted })),
+      result.personalization_granted,
+    );
 
     // 201 Created per DOC-P3-06 §06.1.
     return jsonContract({ ...result }, ctx.traceId, 201);

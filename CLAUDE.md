@@ -13,16 +13,44 @@ dotfiles/.claude/CLAUDE.md is only the install source for skill files; its
 own activation table is never re-read once a skill is vendored in here —
 so this table, not that one, is what a session actually follows.
 
-Automatically activated, every session, no exception:
+**Amended 2026-07-30 (Founder directive, superseding the prior policy below):**
+Every installed skill under `.claude/skills/` — including all `audit-*`,
+`hygiene-*`, `install-*`, and `incident-*` skills previously gated to
+explicit slash-command invocation — is now automatically activated every
+session, applied as the task at hand needs it. A slash command still
+invokes a skill directly and explicitly; the change is that a session no
+longer has to wait for one before an applicable skill's discipline applies.
+Skills whose own SKILL.md declares "auto-fixes: never" (audit-dpdp,
+hygiene-secrets, incident-postmortem, audit-rollback-readiness) still never
+apply fixes automatically — always-on here means their checks/discipline
+run proactively, not that their no-autofix rule is lifted.
+
+Full always-on roster:
 - session-knowledge-doc — update KNOWLEDGE.html whenever code/DB/config/docs
   were touched this session (see Session End below)
 - coding-standards-enforcer — shapes new code as it's written (inline docs,
   structured logging), does not retrofit old code
 - debug-root-cause — activates on natural language ("this is broken", a
   pasted error), not just an explicit command
+- session-resume / session-resumption-protocol — reconstructs execution
+  state at session start from actually-read repo content
+- audit-dependencies, audit-edge-functions, audit-rls, audit-data-integrity,
+  audit-eas, audit-performance, audit-prelaunch, audit-api-contract,
+  audit-onboarding-funnel, audit-rollback-readiness — run proactively when
+  their subject matter is touched, not only on their slash command
+- audit-dpdp — checks proactively; report-only, never auto-fixes
+- hygiene-dead-code, hygiene-test-sync — run proactively, auto-fix on
+  confirmation as their own SKILL.md specifies
+- hygiene-secrets — checks proactively; report + rotation advice only,
+  never prints secret values, never auto-fixes
+- install-logging-infrastructure — applied when scaffolding new
+  code/services that need logging, not only on explicit request
+- incident-postmortem — report-only, drafted proactively once an incident
+  is resolved rather than waiting to be asked
 
-All other skills (audit-*, hygiene-*, install-*, incident-*) stay registered
-but inactive until the Founder or an explicit slash command invokes them.
+Previous policy (superseded, kept for record): all other skills stayed
+registered but inactive until the Founder or an explicit slash command
+invoked them.
 
 ## Session End (mandatory whenever code, DB, config, or docs were touched)
 Update KNOWLEDGE.html per .claude/skills/session-knowledge-doc/SKILL.md

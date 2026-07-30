@@ -8,6 +8,7 @@ discovery-dial cap), default carb attach (§S4.4 + KB §R2a).
 """
 from ghar_re_core.config import CONFIG
 from ghar_re_core import scoring as S
+from ghar_re_core import decision_log
 
 
 RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich"}
@@ -170,7 +171,7 @@ def build_plates(catalogue, theta, ctx, objective):
     return plates, scores
 
 
-def assemble_7(catalogue, theta, ctx, objective, n=7):
+def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None):
     plates, scores = build_plates(catalogue, theta, ctx, objective)
     plates.sort(key=lambda p: p["score"], reverse=True)
 
@@ -198,6 +199,12 @@ def assemble_7(catalogue, theta, ctx, objective, n=7):
     # A6 optional calorie lens (plate-level) — drop over-target plates if a target is set
     if ctx.get("calorie_target"):
         chosen = [p for p in chosen if S.pass_calorie(p["plate_calories"], ctx)]
+
+    # Decision logging only (see decision_log module docstring): reads the already-decided
+    # `plates`/`chosen`, never influences them. A no-op unless a handler is attached to the
+    # "ghar_re_core.decision" logger.
+    decision_log.log_assemble7_decision(household_label, ctx, objective, plates, chosen)
+
     return chosen
 
 
