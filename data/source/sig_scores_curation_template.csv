@@ -1,0 +1,64 @@
+dish_name,suggested_band,state_origin,why_flagged,sig_score,evidence_confidence,owner,method
+Butter Chicken,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Dal Makhani,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Sarson Ka Saag,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + region_food_affinity=0.95 + combo primary role,TBD,TBD,TBD,TBD
+Tandoori Chicken,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Chole,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Rajma,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Aloo Gobhi,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Aloo Paratha,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Gobhi Paratha,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Paneer Paratha,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Dal Tadka,SUGGESTION - NOT FINAL (regional_hero),Punjab,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Bedmi Puri,SUGGESTION - NOT FINAL (regional_hero),Delhi,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Aloo Sabzi (Delhi style),SUGGESTION - NOT FINAL (regional_hero),Delhi,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Dahi Bhalla,SUGGESTION - NOT FINAL (regional_hero),Delhi,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Chaat Papdi,SUGGESTION - NOT FINAL (regional_hero),Delhi,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Nihari,SUGGESTION - NOT FINAL (regional_hero),Delhi/UP,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Biryani (Mughlai Chicken),SUGGESTION - NOT FINAL (regional_hero),Delhi/UP,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Galouti Kebab,SUGGESTION - NOT FINAL (regional_hero),Lucknow/UP,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Lucknowi Biryani,SUGGESTION - NOT FINAL (regional_hero),Lucknow/UP,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Hyderabadi Chicken Biryani,SUGGESTION - NOT FINAL (regional_hero),Hyderabad,tier_1 + user-facing + region_food_affinity=0.95 + combo primary role,TBD,TBD,TBD,TBD
+Hyderabadi Mutton Biryani,SUGGESTION - NOT FINAL (regional_hero),Hyderabad,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Mirchi Ka Salan,SUGGESTION - NOT FINAL (regional_hero),Hyderabad,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Double Ka Meetha,SUGGESTION - NOT FINAL (regional_hero),Hyderabad,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Irani Chai,SUGGESTION - NOT FINAL (regional_hero),Hyderabad,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Idli,SUGGESTION - NOT FINAL (regional_hero),Tamil Nadu,tier_1 + user-facing + region_food_affinity=0.95 + combo primary role,TBD,TBD,TBD,TBD
+Sambar,SUGGESTION - NOT FINAL (regional_hero),Tamil Nadu,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Medu Vada,SUGGESTION - NOT FINAL (regional_hero),Tamil Nadu,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Uttapam,SUGGESTION - NOT FINAL (regional_hero),Tamil Nadu,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Curd Rice,SUGGESTION - NOT FINAL (regional_hero),Tamil Nadu,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Filter Coffee,SUGGESTION - NOT FINAL (regional_hero),Tamil Nadu,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Kerala Fish Curry,SUGGESTION - NOT FINAL (regional_hero),Kerala,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Appam with Stew,SUGGESTION - NOT FINAL (regional_hero),Kerala,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Puttu,SUGGESTION - NOT FINAL (regional_hero),Kerala,tier_1 + user-facing + region_food_affinity=0.90 + combo primary role,TBD,TBD,TBD,TBD
+Banana Chips,SUGGESTION - NOT FINAL (regional_hero),Kerala,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Sadya Thali,SUGGESTION - NOT FINAL (regional_hero),Kerala,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Bisi Bele Bath,SUGGESTION - NOT FINAL (regional_hero),Karnataka,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Ragi Mudde,SUGGESTION - NOT FINAL (regional_hero),Karnataka,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Akki Rotti,SUGGESTION - NOT FINAL (regional_hero),Karnataka,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Mysore Pak,SUGGESTION - NOT FINAL (regional_hero),Karnataka,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Machher Jhol,SUGGESTION - NOT FINAL (regional_hero),West Bengal,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Shorshe Ilish,SUGGESTION - NOT FINAL (regional_hero),West Bengal,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Kosha Mangsho,SUGGESTION - NOT FINAL (regional_hero),West Bengal,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Mishti Doi,SUGGESTION - NOT FINAL (regional_hero),West Bengal,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Rasgulla,SUGGESTION - NOT FINAL (regional_hero),West Bengal,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Vada Pav,SUGGESTION - NOT FINAL (regional_hero),Maharashtra,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Misal Pav,SUGGESTION - NOT FINAL (regional_hero),Maharashtra,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Puran Poli,SUGGESTION - NOT FINAL (regional_hero),Maharashtra,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Poha,SUGGESTION - NOT FINAL (regional_hero),Maharashtra,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Pav Bhaji,SUGGESTION - NOT FINAL (regional_hero),Maharashtra,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Dhokla,SUGGESTION - NOT FINAL (regional_hero),Gujarat,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Thepla,SUGGESTION - NOT FINAL (regional_hero),Gujarat,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Undhiyu,SUGGESTION - NOT FINAL (regional_hero),Gujarat,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Khandvi,SUGGESTION - NOT FINAL (regional_hero),Gujarat,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Fafda Jalebi,SUGGESTION - NOT FINAL (regional_hero),Gujarat,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Goan Fish Curry,SUGGESTION - NOT FINAL (regional_hero),Goa,tier_1 + user-facing + region_food_affinity=0.95,TBD,TBD,TBD,TBD
+Vindaloo (Pork),SUGGESTION - NOT FINAL (regional_hero),Goa,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Xacuti (Chicken),SUGGESTION - NOT FINAL (regional_hero),Goa,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Bebinca,SUGGESTION - NOT FINAL (regional_hero),Goa,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Chole Tikki,SUGGESTION - NOT FINAL (regional_hero),Pan-India,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Pithla,SUGGESTION - NOT FINAL (regional_hero),Maharashtra,tier_1 + user-facing + combo primary role,TBD,TBD,TBD,TBD
+Tahiri,SUGGESTION - NOT FINAL (regional_hero),Uttar Pradesh,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
+Khichdi,SUGGESTION - NOT FINAL (regional_hero),Uttar Pradesh,tier_1 + user-facing + region_food_affinity=0.90,TBD,TBD,TBD,TBD
+Puri,SUGGESTION - NOT FINAL (regional_hero),Uttar Pradesh,tier_1 + user-facing + region_food_affinity=0.85,TBD,TBD,TBD,TBD
