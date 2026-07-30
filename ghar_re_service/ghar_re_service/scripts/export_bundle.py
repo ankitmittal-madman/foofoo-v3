@@ -11,11 +11,17 @@ service would fail at startup. RE-DOC-10 §8 answers this with an immutable, ver
 into the image at build time, loaded once at startup, never fetched from a database at runtime.
 
 SOURCE OF TRUTH FOR THIS BUNDLE
-The golden-sample fixtures (ghar_re_core.fixtures.DISHES) plus the YAML/CSV config layer — NOT the
-real 810-dish catalogue and NOT Postgres. RE-DOC-10 §8 describes the eventual export as pulling
-from Postgres; that swap is a separate, later task (Phase G) and is deliberately out of scope here.
-The bundle FORMAT is identical either way, which is the point: swapping the source later changes
-this script only, and nothing in the service or the engine.
+The real 810-dish catalogue (data/source/dishes.xlsx, transformed by
+ghar_re_service.scripts.build_catalogue — Phase G Task 1) plus the YAML/CSV config layer — NOT the
+39-dish golden-sample fixtures (ghar_re_core.fixtures.DISHES) and NOT Postgres. RE-DOC-10 §8
+describes the eventual export as pulling from Postgres; that swap remains a separate, later task.
+The bundle FORMAT is identical either way, which is the point: swapping the source only ever
+changes this script (and now build_catalogue.py), never the service or the engine.
+
+build_catalogue.build_catalogue() also returns a BuildReport (unresolved ingredient tokens,
+hidden-allergen-risk dishes, unresolved cuisines, sig_band stub count) — printed to stdout on every
+build so these known, open data gaps stay visible rather than disappearing into a clean-looking
+bundle. See build_catalogue.py's module docstring for the full account of each gap.
 
 DETERMINISM
 bundle_version is a content hash (sha256 over the canonical serialization of everything in the
@@ -39,12 +45,14 @@ import shutil
 import sys
 from datetime import UTC, datetime
 
-from ghar_re_core import fixtures as F
+from ghar_re_service.scripts import build_catalogue as BC
 
 # The config layer the ENGINE reads at runtime. Deliberately an explicit allow-list, not a
 # directory glob: data/source also holds seed spreadsheets and ETL CSVs (dishes.xlsx,
 # ingredients_v5.csv, ...) that are inputs to the seed pipeline, not runtime engine config. Baking
 # those into the image would inflate it and blur what the engine actually depends on.
+# dishes.xlsx itself is read directly by build_catalogue.py (Phase G Task 1), not listed here —
+# it's a catalogue INPUT the transform consumes at build time, not a runtime config file.
 CONFIG_FILES = (
     "base_weights.yaml",
     "distance_weights.yaml",
@@ -69,7 +77,10 @@ DEFAULT_SOURCE_DIR = os.path.join(_REPO_ROOT, "data", "source")
 DEFAULT_OUT_DIR = os.path.join(_SERVICE_ROOT, "data", "bundle")
 
 BUNDLE_FORMAT_VERSION = 1
-CATALOGUE_SOURCE = "ghar_re_core.fixtures.DISHES (golden sample)"
+CATALOGUE_SOURCE = (
+    "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue "
+    "(real 810-dish catalogue)"
+)
 
 
 def _canonical(obj) -> bytes:
@@ -82,19 +93,48 @@ def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def collect_catalogue() -> list[dict]:
-    """The raw dish dicts.
+def collect_catalogue(source_dir: str) -> tuple[list[dict], BC.BuildReport]:
+    """The raw dish dicts, plus the BuildReport of everything build_catalogue.py flagged rather
+    than silently papering over (unresolved ingredients, hidden-allergen-risk dishes, unresolved
+    cuisines, sig_band stubs — see build_catalogue.py's module docstring).
 
     Deliberately the dicts, not constructed Dish objects: ghar_re_core.catalogue.Catalogue takes
     exactly this shape as its constructor argument, so the bundle round-trips into an identical
     in-memory catalogue with no bespoke deserialization logic to drift.
     """
-    return [dict(d) for d in F.DISHES]
+    dishes, report = BC.build_catalogue(source_dir)
+    return [dict(d) for d in dishes], report
+
+
+def _print_report(report: BC.BuildReport) -> None:
+    """Surface the known, open data gaps on every build — never silent, never blocking."""
+    print(f"[build_catalogue] {report.dish_count} dishes transformed.", file=sys.stderr)
+    print(
+        f"[build_catalogue] incomplete ING-blocks: {len(report.incomplete_ing_blocks)}",
+        file=sys.stderr,
+    )
+    print(
+        f"[build_catalogue] unresolved cuisines: {len(report.unresolved_cuisines)}",
+        file=sys.stderr,
+    )
+    print(
+        f"[build_catalogue] hidden-allergen-risk dishes (hing/asafoetida — NOT auto-filtered, "
+        f"hidden-derivative allergen layer remains an open P0 gap): "
+        f"{len(report.hidden_allergen_risk)}",
+        file=sys.stderr,
+    )
+    print(
+        f"[build_catalogue] sig_band matched from KB examples: {len(report.sig_band_matched)}; "
+        f"left None/stub: {report.sig_band_stub_count} "
+        "(sig_scores_v1.csv referenced by the KB does not exist in this repo)",
+        file=sys.stderr,
+    )
 
 
 def build_bundle(source_dir: str, out_dir: str) -> dict:
     """Write the bundle to out_dir and return its manifest."""
-    catalogue = collect_catalogue()
+    catalogue, report = collect_catalogue(source_dir)
+    _print_report(report)
 
     missing = [f for f in CONFIG_FILES if not os.path.isfile(os.path.join(source_dir, f))]
     if missing:
