@@ -670,7 +670,7 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">124</span>
+      <span class="nav-badge">129</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -2030,6 +2030,7 @@ function deepDiveFeature(featureLabel){
         <code>mobile/app/recommendations.tsx</code> — plain list of the AI's meal picks<br>
         <code>mobile/src/auth/supabaseClient.ts, SessionContext.tsx</code> — login/session handling, shared app-wide<br>
         <code>mobile/src/api/client.ts, household.ts, recommendations.ts, types.ts</code> — the one shared layer that talks to the backend<br>
+        <code>mobile/src/theme/theme.ts, global.css, src/hooks/useTheme.ts, useColorScheme.ts(.web), src/components/ThemedText.tsx, ThemedView.tsx</code> — light/dark theming primitives ported from scareme21-create/NewFoo's Expo scaffold; not wired into any screen yet<br>
       </div>
       <div class="dd-label">How it helps the app</div>
       <div class="dd-text">Before this, FooFoo's recommendation engine and onboarding write path existed but nobody could actually use them — there was no app. This is what makes the backend reachable by a real person for the first time.</div>
@@ -2191,6 +2192,11 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">mobile/src/api/recommendations.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Typed wrapper for POST /v1/recommendations</td></tr>
   <tr><td class="fr-file mono">mobile/src/api/types.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Request/response types hand-mirrored from the Edge Function source</td></tr>
   <tr><td class="fr-file mono">mobile/src/lib/queryClient.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Shared TanStack Query cache instance</td></tr>
+  <tr><td class="fr-file mono">mobile/src/theme/theme.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Colors/Fonts/Spacing design tokens, light+dark — ported from scareme21-create/NewFoo's Expo scaffold</td></tr>
+  <tr><td class="fr-file mono">mobile/src/theme/global.css</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Web font-stack CSS variables used by theme.ts's Fonts.web</td></tr>
+  <tr><td class="fr-file mono">mobile/src/hooks/useColorScheme.ts, useColorScheme.web.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Light/dark scheme detection, web variant re-computes after hydration</td></tr>
+  <tr><td class="fr-file mono">mobile/src/hooks/useTheme.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Resolves the current color scheme to its theme tokens</td></tr>
+  <tr><td class="fr-file mono">mobile/src/components/ThemedText.tsx, ThemedView.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Theme-aware Text/View primitives — not yet used by any existing screen</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2484,6 +2490,11 @@ function deepDiveFeature(featureLabel){
   <div class="decision-item">
     <div class="decision-q">What should the four onboarding screens use for questions with no official pick-list yet (non-veg types, veg days, health conditions)?</div>
     <div class="decision-a">Plain comma-separated text boxes, not an invented set of chips — no fixed vocabulary for these three fields exists anywhere in the actual database constraints, unlike diet type or cook capability which do. Inventing one risked silently disagreeing with whatever the backend actually expects later.</div>
+    <div class="decision-meta">S43 · Jul 30</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Someone asked to "pick the entire front end" from an outside repo (scareme21-create/NewFoo) — was there actually a front end there to take?</div>
+    <div class="decision-a">Checked directly rather than assuming: the linked path was backend Python code, and that repo's real frontend folder was the untouched default Expo template (its own demo "FooFoo is alive" screen, no real onboarding or login, its API config pointing at a different, incompatible backend). Reported this back plainly instead of importing boilerplate wholesale. Once it was clear only the light/dark theming layer (colors, fonts, spacing, ThemedText/ThemedView) was worth reusing, only that was ported in — this app's own screens and backend calls are untouched.</div>
     <div class="decision-meta">S43 · Jul 30</div>
   </div>
   <!-- DECISIONS_INJECT -->
@@ -6336,6 +6347,9 @@ function deepDiveFeature(featureLabel){
         <span class="fc-file"><span class="fc-path">mobile/src/api/client.ts, household.ts, recommendations.ts, types.ts</span><span class="tag tag-new">New</span></span>
         <span class="fc-file"><span class="fc-path">mobile/src/lib/queryClient.ts</span><span class="tag tag-new">New</span></span>
         <span class="fc-file"><span class="fc-path">docs/architecture/[DRAFT]_DOC-P4-03_Mobile_App_Architecture_Note_v1.0.md</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/theme/theme.ts, global.css</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/hooks/useColorScheme.ts, useColorScheme.web.ts, useTheme.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/components/ThemedText.tsx, ThemedView.tsx</span><span class="tag tag-new">New</span></span>
       </div>
     </div>
 
