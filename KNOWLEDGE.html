@@ -670,7 +670,7 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">129</span>
+      <span class="nav-badge">140</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -2024,16 +2024,21 @@ function deepDiveFeature(featureLabel){
       <div class="dd-text">The actual app a user opens on their phone or in a browser — the first frontend this project has had. Handles login, walks through onboarding, and shows the AI's meal picks, all by calling the existing backend endpoints.</div>
       <div class="dd-label">Files / tables in this module</div>
       <div class="dd-text">
-        <code>mobile/app/_layout.tsx, index.tsx</code> — app shell + routes a user to sign-in or onboarding depending on login state<br>
-        <code>mobile/app/(auth)/sign-in.tsx, sign-up.tsx</code> — login screens<br>
-        <code>mobile/app/(onboarding)/*.tsx</code> — the four onboarding screens (profile basics, household, food & health, lifestyle)<br>
+        <code>mobile/app/_layout.tsx</code> — app shell: loads Fraunces/Mukta brand fonts, holds splash until ready, wraps everything in the Ghar theme<br>
+        <code>mobile/app/index.tsx</code> — routes to splash-2 (signed out) or onboarding (signed in)<br>
+        <code>mobile/app/splash-2.tsx</code> — welcome/value screen, links into sign-in<br>
+        <code>mobile/app/(auth)/sign-in.tsx</code> — combined sign-in/sign-up toggle screen<br>
+        <code>mobile/app/create-id.tsx</code> — captures the display name after sign-up; also submits it as the required primary_cook_name<br>
+        <code>mobile/app/(onboarding)/step-1.tsx .. step-5.tsx</code> — the real 5-screen onboarding (household, location, diet, health, last details incl. required cooking skill)<br>
         <code>mobile/app/recommendations.tsx</code> — plain list of the AI's meal picks<br>
         <code>mobile/src/auth/supabaseClient.ts, SessionContext.tsx</code> — login/session handling, shared app-wide<br>
         <code>mobile/src/api/client.ts, household.ts, recommendations.ts, types.ts</code> — the one shared layer that talks to the backend<br>
-        <code>mobile/src/theme/theme.ts, global.css, src/hooks/useTheme.ts, useColorScheme.ts(.web), src/components/ThemedText.tsx, ThemedView.tsx</code> — light/dark theming primitives ported from scareme21-create/NewFoo's Expo scaffold; not wired into any screen yet<br>
+        <code>mobile/src/theme/index.tsx</code> — the Ghar visual system (terracotta/cream, Fraunces/Mukta) actually used by every real screen<br>
+        <code>mobile/src/theme/theme.ts, hooks/, components/ThemedText.tsx, ThemedView.tsx</code> — the earlier, plainer light/dark tokens (kept for parity, not currently used by any screen)<br>
+        <code>mobile/src/onboarding/</code> — the shared answer store, chip/header components, state list, and the answers→backend mapping layer (toHouseholdWrite.ts)<br>
       </div>
       <div class="dd-label">How it helps the app</div>
-      <div class="dd-text">Before this, FooFoo's recommendation engine and onboarding write path existed but nobody could actually use them — there was no app. This is what makes the backend reachable by a real person for the first time.</div>
+      <div class="dd-text">Before this, FooFoo's recommendation engine and onboarding write path existed but nobody could actually use them — there was no app. This is what makes the backend reachable by a real person for the first time, and now with a real, considered visual identity rather than placeholder styling.</div>
       <div class="dd-label">Last touched</div>
       <div class="dd-text">S43 · Jul 30</div>
     </div>
@@ -2197,6 +2202,17 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">mobile/src/hooks/useColorScheme.ts, useColorScheme.web.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Light/dark scheme detection, web variant re-computes after hydration</td></tr>
   <tr><td class="fr-file mono">mobile/src/hooks/useTheme.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Resolves the current color scheme to its theme tokens</td></tr>
   <tr><td class="fr-file mono">mobile/src/components/ThemedText.tsx, ThemedView.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Theme-aware Text/View primitives — not yet used by any existing screen</td></tr>
+  <tr><td class="fr-file mono">mobile/app/splash-2.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Welcome/value screen — ported from scareme21-create/NewFoo, links to sign-in</td></tr>
+  <tr><td class="fr-file mono">mobile/app/create-id.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Captures display name after sign-up; submits it as profiles.primary_cook_name</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(auth)/sign-in.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S43</td><td class="fr-desc">Replaced with NewFoo's toggle sign-in/sign-up screen (sign-up.tsx removed, merged in)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/step-1.tsx .. step-5.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">5-screen onboarding ported from NewFoo, rewired to POST /v1/household; replaces the 4 plain Phase-1 screens</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/_layout.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S43</td><td class="fr-desc">Now wraps the stack in OnboardingProvider so answers persist across steps</td></tr>
+  <tr><td class="fr-file mono">mobile/app/_layout.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S43</td><td class="fr-desc">Loads Fraunces/Mukta brand fonts, holds splash until ready, wraps app in the Ghar ThemeProvider</td></tr>
+  <tr><td class="fr-file mono">mobile/app/index.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S43</td><td class="fr-desc">Signed-out users now land on splash-2 instead of sign-in directly</td></tr>
+  <tr><td class="fr-file mono">mobile/src/theme/index.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Ghar theme (terracotta/cream, Fraunces/Mukta) — ported from NewFoo, the real visual system behind the new screens</td></tr>
+  <tr><td class="fr-file mono">mobile/src/onboarding/OnboardingContext.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Shared answer store for the 5-screen flow; adds currentCity + cookCapability fields NewFoo's flow never collected</td></tr>
+  <tr><td class="fr-file mono">mobile/src/onboarding/toHouseholdWrite.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Maps onboarding answers to this repo's real question_key vocabulary — NOT NewFoo's own toProfile.ts, which targets a payload shape this backend doesn't have</td></tr>
+  <tr><td class="fr-file mono">mobile/src/onboarding/OnboardingChips.tsx, OnboardingHeader.tsx, indianStates.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Shared chip-picker, step-progress header, and the 36-state list — ported from NewFoo verbatim (backend-independent)</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2495,6 +2511,16 @@ function deepDiveFeature(featureLabel){
   <div class="decision-item">
     <div class="decision-q">Someone asked to "pick the entire front end" from an outside repo (scareme21-create/NewFoo) — was there actually a front end there to take?</div>
     <div class="decision-a">Checked directly rather than assuming: the linked path was backend Python code, and that repo's real frontend folder was the untouched default Expo template (its own demo "FooFoo is alive" screen, no real onboarding or login, its API config pointing at a different, incompatible backend). Reported this back plainly instead of importing boilerplate wholesale. Once it was clear only the light/dark theming layer (colors, fonts, spacing, ThemedText/ThemedView) was worth reusing, only that was ported in — this app's own screens and backend calls are untouched.</div>
+    <div class="decision-meta">S43 · Jul 30</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">The same outside repo (NewFoo) was checked again later and now had real screens — should we still just port the theme, or take the whole flow this time?</div>
+    <div class="decision-a">Took the whole visual flow this time (sign-in, name capture, 5-step onboarding) since it was now genuinely built and well-designed — but rewrote every screen's submit logic to call this project's real backend, rather than copying the other repo's own (incompatible) network calls. Two fields that flow never asked for (current city, cooking skill level) were added because this project's backend won't create a user profile without them.</div>
+    <div class="decision-meta">S43 · Jul 30</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Adding expo-splash-screen broke the web build with a cryptic "Module implementation must be a class" error — why, and how was it found?</div>
+    <div class="decision-a">Reproduced in a real headless browser and read the actual console error rather than guessing from the symptom. It resolved to a package version built for a much newer version of Expo than this app targets — the same root cause already flagged earlier this session for two other packages (this sandbox can't reach Expo's own version-lookup service, so plain installs grab whatever's newest instead of what's compatible). Fixed by pinning the exact compatible versions by hand, then re-verified with fresh screenshots that the fix actually worked.</div>
     <div class="decision-meta">S43 · Jul 30</div>
   </div>
   <!-- DECISIONS_INJECT -->

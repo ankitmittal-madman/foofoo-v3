@@ -13,7 +13,7 @@ export default function Index() {
     );
   }
 
-  if (!session) return <Redirect href="/(auth)/sign-in" />;
+  if (!session) return <Redirect href="/splash-2" />;
 
   // Phase 1 always routes a signed-in user back into onboarding's first screen; it is idempotent
   // (household/handler.ts never re-creates an existing profile) so re-visiting is safe, and Phase 1

@@ -133,6 +133,56 @@ correct these two.
 - No offline/retry/error-state handling beyond TanStack Query defaults — acceptable for Phase 1's
   "prove the wire" goal, not for ship-readiness.
 
+## Addendum — visual design ported from scareme21-create/NewFoo (post-Phase-1)
+The Founder pointed at `github.com/scareme21-create/NewFoo` twice, asking to "pick the entire
+front end." Two separate visits found two very different states of that repo:
+
+1. **First visit**: `ghar_api/app` (the linked path) is backend Python (FastAPI), not frontend.
+   That repo's actual frontend (`foofoo/`) was unmodified `create-expo-app` boilerplate — no real
+   screens. Only its light/dark theme tokens were worth porting (done then, unchanged now).
+2. **Second visit** (this addendum): the same repo had gained a real, well-designed onboarding
+   flow — sign-in, create-id (name capture), a 5-screen onboarding flow, and a "Ghar" warm
+   terracotta/cream visual system (Fraunces + Mukta fonts). Still built against the same
+   incompatible FastAPI backend (`/v1/onboarding`, different field names, GPS location capture,
+   Cloudinary dish photos, a `/v1/analytics` endpoint) as visit 1 — none of that backend surface
+   exists in foofoo-v3.
+
+Per Founder direction ("port screens, rewire to our backend, dropping GPS/Cloudinary/analytics"),
+this session replaced Phase 1's 4 plain onboarding screens with a straight visual/UX port of
+NewFoo's 5-screen flow (`mobile/src/theme/index.tsx`'s Ghar theme, `mobile/src/onboarding/`'s
+chip/header components, `mobile/app/(onboarding)/step-1..5.tsx`, plus `splash-2.tsx` and
+`create-id.tsx`), with every submit rewired to this repo's real `POST /v1/household` via a new
+`mobile/src/onboarding/toHouseholdWrite.ts` mapping layer — not the source repo's own
+`toProfile.ts`, which targets a payload shape that does not exist here.
+
+**Two required fields NewFoo's flow never asked for, added here:** `current_city` (source only
+had an optional GPS-derived city; dropped GPS, so Screen 2 now asks directly) and
+`cook_capability` (source never collected this at all; added to Screen 5 as the one required
+question on an otherwise fully-skippable screen — flagged as a deliberate deviation from source's
+"everything optional" design intent for that screen, forced by `PROFILE_REQUIRED_FIELDS`).
+
+**Value-vocabulary mismatches resolved in `toHouseholdWrite.ts`, not silently passed through:**
+`eggetarian` → `egg`, `order_in` → `order_tiffin`, fractional eat-out cadence → integer (our
+`q14_eat_out_per_week` is `z.number().int()`), allergen chip tokens → `allergen_flags` bitmask
+(compose.ts's frozen 7-bit model) instead of the source's own allergen-slug array. Age-range chips
+map onto `household_members.conditions` (MEMBER_CONDITIONS vocab) only where a clear equivalent
+exists (`0-2`→`baby_6_18m`, `60+`→`elderly_member`, etc.) — a lossy, disclosed approximation, not a
+precise model.
+
+**Dependency-pinning bug actually surfaced, not just theoretical this time:** adding
+`expo-splash-screen` via plain `npm install` (same proxy-blocked-`expo install` constraint as the
+earlier `expo-asset`/`expo-font` gap) resolved to v57.x — built for a much newer Expo SDK — and
+broke web rendering outright (`Error: Module implementation must be a class`). Diagnosed via a
+headless-browser console-log check, then fixed by hand-pinning `expo-font` (`~13.0.3`),
+`expo-splash-screen` (`~0.29.13`), and `expo-asset` (`~11.0.1`) to their actual SDK 52 versions.
+Re-verified working via headless-browser screenshots of splash, sign-in, and create-id after the
+fix. This confirms the earlier-flagged pinning gap is a real, active risk, not a hypothetical one —
+re-running `npx expo install --fix` from an unrestricted network remains the correct permanent fix.
+
+**Not ported:** NewFoo's `final-dish-intro`/`final-dish`/`final-dish-style2`/`plan.tsx` screens
+(Cloudinary dish photos, feedback/analytics calls) — out of scope per Founder direction. This
+repo's existing plain `recommendations.tsx` screen is unchanged.
+
 ## Versioning & Placement
 Placed under `docs/architecture/` per the P4 series (application-layer architecture, companion to
 DOC-P4-00/DOC-P4-02). DRAFT until Founder reviews; STOP CONDITION per task instructions — no further

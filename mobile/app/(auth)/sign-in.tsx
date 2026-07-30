@@ -1,64 +1,163 @@
+/**
+ * Sign in / Create account (email + password) — ported from scareme21-create/NewFoo's
+ * sign-in.tsx. Uses supabase directly (not SessionContext's thinner wrapper) so the
+ * signup-without-session case (email confirmation required) can be handled explicitly,
+ * same as source; SessionContext's own onAuthStateChange listener still picks up the
+ * resulting session automatically for the rest of the app. Post sign-up now routes to
+ * /create-id and post sign-in to /recommendations — this repo's real screens, not
+ * source's /plan (which was never built here) or /authed (a throwaway source screen,
+ * not ported).
+ */
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
-import { Link, router } from "expo-router";
-import { useSession } from "@/auth/SessionContext";
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+
+import { supabase } from "@/auth/supabaseClient";
+import { useTheme } from "@/theme";
+
+type Mode = "signin" | "signup";
 
 export default function SignIn() {
-  const { signIn } = useSession();
+  const t = useTheme();
+  const params = useLocalSearchParams<{ mode?: string }>();
+  const [mode, setMode] = useState<Mode>(params.mode === "signup" ? "signup" : "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  async function onSubmit() {
-    setSubmitting(true);
-    setError(null);
-    const { error: signInError } = await signIn(email, password);
-    setSubmitting(false);
-    if (signInError) {
-      setError(signInError);
-      return;
+  const canSubmit = email.trim().length > 0 && password.length >= 6 && !loading;
+  const title = mode === "signin" ? "Welcome back" : "Create your account";
+  const cta = mode === "signin" ? "Sign In" : "Create Account";
+
+  function switchMode(m: Mode) {
+    setMode(m);
+    setErrorMsg(null);
+    setNotice(null);
+  }
+
+  async function handleSubmit() {
+    setLoading(true);
+    setErrorMsg(null);
+    setNotice(null);
+    try {
+      if (mode === "signup") {
+        const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
+        if (error) {
+          setErrorMsg(error.message);
+          return;
+        }
+        if (!data.session) {
+          setNotice("Account created. Check your email to confirm, then sign in.");
+          setMode("signin");
+          return;
+        }
+        router.replace("/create-id");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (error) {
+          setErrorMsg(error.message);
+          return;
+        }
+        router.replace("/recommendations");
+      }
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    router.replace("/(onboarding)/profile-basics");
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>FooFoo</Text>
-      <Text style={styles.subtitle}>Sign in</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Pressable style={styles.button} onPress={onSubmit} disabled={submitting}>
-        <Text style={styles.buttonText}>{submitting ? "Signing in..." : "Sign in"}</Text>
+    <KeyboardAvoidingView
+      style={[styles.container, { backgroundColor: t.colors.background }]}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <Pressable style={styles.flex} onPress={() => Keyboard.dismiss()} accessible={false}>
+        <View style={styles.content}>
+          <View style={[styles.toggle, { backgroundColor: t.colors.surfaceMuted, borderColor: t.colors.border }]}>
+            {(["signin", "signup"] as Mode[]).map((m) => {
+              const active = mode === m;
+              return (
+                <Pressable
+                  key={m}
+                  onPress={() => switchMode(m)}
+                  style={[styles.toggleItem, active && { backgroundColor: t.colors.selected }]}
+                >
+                  <Text
+                    style={[
+                      styles.toggleLabel,
+                      { fontFamily: t.fonts.bodySemiBold, color: active ? t.colors.onSelected : t.colors.textSecondary },
+                    ]}
+                  >
+                    {m === "signin" ? "Sign In" : "Sign Up"}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <Text style={[styles.title, { color: t.colors.heading, fontFamily: t.fonts.headlineBold }]}>{title}</Text>
+
+          <Text style={[styles.label, { color: t.colors.textSecondary, fontFamily: t.fonts.bodyMedium }]}>EMAIL</Text>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@example.com"
+            placeholderTextColor={t.colors.textSecondary}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
+            style={[styles.input, { backgroundColor: t.colors.surface, borderColor: t.colors.border, color: t.colors.text, fontFamily: t.fonts.body }]}
+          />
+
+          <Text style={[styles.label, { color: t.colors.textSecondary, fontFamily: t.fonts.bodyMedium }]}>PASSWORD</Text>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="At least 6 characters"
+            placeholderTextColor={t.colors.textSecondary}
+            secureTextEntry
+            autoCapitalize="none"
+            editable={!loading}
+            style={[styles.input, { backgroundColor: t.colors.surface, borderColor: t.colors.border, color: t.colors.text, fontFamily: t.fonts.body }]}
+          />
+
+          {errorMsg ? <Text style={[styles.msg, { color: t.colors.primary, fontFamily: t.fonts.bodyMedium }]}>{errorMsg}</Text> : null}
+          {notice ? <Text style={[styles.msg, { color: t.colors.success, fontFamily: t.fonts.bodyMedium }]}>{notice}</Text> : null}
+
+          <Pressable
+            disabled={!canSubmit}
+            onPress={handleSubmit}
+            style={[styles.button, { backgroundColor: canSubmit ? t.colors.selected : t.colors.disabled }]}
+          >
+            {loading ? (
+              <ActivityIndicator color={t.colors.onSelected} />
+            ) : (
+              <Text style={[styles.buttonLabel, { fontFamily: t.fonts.bodySemiBold, color: canSubmit ? t.colors.onSelected : t.colors.onDisabled }]}>
+                {cta} →
+              </Text>
+            )}
+          </Pressable>
+        </View>
       </Pressable>
-      <Link href="/(auth)/sign-up" style={styles.link}>
-        <Text>No account? Sign up</Text>
-      </Link>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 24, gap: 12 },
-  title: { fontSize: 32, fontWeight: "700", textAlign: "center" },
-  subtitle: { fontSize: 18, textAlign: "center", marginBottom: 12, color: "#6B6B6B" },
-  input: { borderWidth: 1, borderColor: "#D1D1D1", borderRadius: 8, padding: 12 },
-  button: { backgroundColor: "#1F7A3F", borderRadius: 8, padding: 14, alignItems: "center" },
-  buttonText: { color: "white", fontWeight: "600" },
-  error: { color: "#C0392B" },
-  link: { textAlign: "center", marginTop: 8 },
+  container: { flex: 1, justifyContent: "center", paddingHorizontal: 28 },
+  flex: { flex: 1, justifyContent: "center" },
+  content: { alignSelf: "stretch" },
+  toggle: { flexDirection: "row", borderRadius: 28, borderWidth: 1, padding: 4, marginBottom: 28 },
+  toggleItem: { flex: 1, height: 44, borderRadius: 24, alignItems: "center", justifyContent: "center" },
+  toggleLabel: { fontSize: 14 },
+  title: { fontSize: 30, lineHeight: 36, marginBottom: 24 },
+  label: { fontSize: 12, letterSpacing: 1, marginBottom: 8, marginTop: 8 },
+  input: { height: 52, borderRadius: 14, borderWidth: 1, paddingHorizontal: 16, fontSize: 16, marginBottom: 8 },
+  msg: { fontSize: 14, marginTop: 8, marginBottom: 4 },
+  button: { height: 56, borderRadius: 28, alignItems: "center", justifyContent: "center", marginTop: 24 },
+  buttonLabel: { fontSize: 16 },
 });
