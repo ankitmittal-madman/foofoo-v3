@@ -9,7 +9,7 @@
 - `CHANGELOG.md` (this file) — initialised by the `install-logging-infrastructure` skill.
 - Lightweight client logger `mobile/src/lib/logger.ts` (Expo/React Native, AsyncStorage-backed,
   hot-path friendly) — replaces the bare `console.warn` in `mobile/src/auth/supabaseClient.ts`.
-- Transaction export script `scripts/export-txn-logs.mjs` — exports
+- Transaction export script `ops/scripts/export-txn-logs.mjs` — exports
   `public.recommendation_events` / `public.feedback_events` / `public.interaction_events` /
   `public.suggestion_logs` rows to plain-English per-user and per-system daily log files under
   `ops/logs/session-log/`.

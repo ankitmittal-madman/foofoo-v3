@@ -21,9 +21,9 @@
  * output shape below (per-user narrative / system daily summary).
  *
  * USAGE
- *   node scripts/export-txn-logs.mjs                  # today, live DB
- *   node scripts/export-txn-logs.mjs --date 2026-07-29
- *   node scripts/export-txn-logs.mjs --dry-run         # fixture data, no network/env required
+ *   node ops/scripts/export-txn-logs.mjs                  # today, live DB
+ *   node ops/scripts/export-txn-logs.mjs --date 2026-07-29
+ *   node ops/scripts/export-txn-logs.mjs --dry-run         # fixture data, no network/env required
  *
  * ENV (server-side names already used by supabase/functions/_shared/config/config.ts):
  *   SUPABASE_URL                 — project URL
@@ -48,7 +48,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const TZ = "Asia/Kolkata";
-const REPO_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
+const REPO_ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const OUT_USERS = join(REPO_ROOT, "ops", "logs", "session-log", "users");
 const OUT_SYSTEM = join(REPO_ROOT, "ops", "logs", "session-log", "system");
 

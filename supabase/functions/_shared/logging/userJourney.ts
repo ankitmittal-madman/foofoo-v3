@@ -31,7 +31,7 @@ import { createLogger, type Logger } from "./logger.ts";
 const journeyLog: Logger = createLogger("info", { event: "user_journey" });
 
 /** Max narrative entries kept per profile in the in-memory ring buffer (dev/QA aid only — this
- * is NOT a durable store; `scripts/export-txn-logs.mjs` is the durable, DB-backed equivalent). */
+ * is NOT a durable store; `ops/scripts/export-txn-logs.mjs` is the durable, DB-backed equivalent). */
 const MAX_ENTRIES_PER_PROFILE = 200;
 
 interface JourneyEntry {

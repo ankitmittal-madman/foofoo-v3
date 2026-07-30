@@ -15,7 +15,7 @@ change log, transaction export, user journey logger, RE decision logger) were sc
 | Lightweight client logger (mobile) | Scaffolded | `mobile/src/lib/logger.ts` |
 | User Journey Logger | Scaffolded + wired into 3 handlers | `supabase/functions/_shared/logging/userJourney.ts` |
 | Decision Logger (RE) | Scaffolded + wired into `assemble_7` | `ghar_re_core/decision_log.py` |
-| Transaction export script | Scaffolded | `scripts/export-txn-logs.mjs` |
+| Transaction export script | Scaffolded | `ops/scripts/export-txn-logs.mjs` |
 | Change log | Scaffolded | `CHANGELOG.md` |
 | Output dirs for export script | Created (empty, `.gitkeep`) | `ops/logs/session-log/users/`, `ops/logs/session-log/system/` |
 
@@ -24,12 +24,12 @@ change log, transaction export, user journey logger, RE decision logger) were sc
 | File | Line | Issue | Suggested fix |
 |---|---|---|---|
 | `mobile/src/auth/supabaseClient.ts` | 11 (pre-fix) | Raw `console.warn` for missing env vars | Fixed this session — now calls `logger.warn(...)` from the new `mobile/src/lib/logger.ts` |
-| `scripts/export-txn-logs.mjs` | multiple | Uses `console.log`/`console.error` directly | Accepted exception — a standalone CLI script, same convention as the existing `ghar_re_service/ghar_re_service/scripts/export_bundle.py`'s `print()`-based CLI output; not product/request-path code, so the "never call console.* directly" rule (which targets app code funneled through a structured sink) does not apply here. |
+| `ops/scripts/export-txn-logs.mjs` | multiple | Uses `console.log`/`console.error` directly | Accepted exception — a standalone CLI script, same convention as the existing `ghar_re_service/ghar_re_service/scripts/export_bundle.py`'s `print()`-based CLI output; not product/request-path code, so the "never call console.* directly" rule (which targets app code funneled through a structured sink) does not apply here. |
 
 Full-repo grep after the fix (`console.(log|warn|error)` in `*.ts/*.tsx/*.js/*.jsx`, excluding
 `node_modules`, the logger files themselves, and `userJourney`): **zero remaining hits.**
 `*.mjs` files are excluded from that grep's include-list by the skill's own Step 7 pattern; the
-one hit found by extending the check manually (`scripts/export-txn-logs.mjs`) is the accepted CLI
+one hit found by extending the check manually (`ops/scripts/export-txn-logs.mjs`) is the accepted CLI
 exception above.
 
 ## Change log status
