@@ -657,8 +657,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">📦</span> S43 · Mobile app scaffold — first client, wired to household/recommendations
       <span class="nav-badge">Jul 30</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s44')">
+    <div class="nav-item" onclick="showPage('s44')">
       <span class="nav-icon">🍽️</span> S44 · Ghar RE Phase G — real 810-dish catalogue swapped in (feature branch, review pending)
+      <span class="nav-badge">Jul 30</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s45')">
+      <span class="nav-icon">⚙️</span> S45 · All dotfiles skills vendored, slash-command gate removed
       <span class="nav-badge">Jul 30</span>
     </div>
     <!-- NAV_INJECT -->
@@ -670,11 +674,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">11</span>
+      <span class="nav-badge">12</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">170</span>
+      <span class="nav-badge">191</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -1223,6 +1227,10 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
     <div class="arch-node-name">mobile/src/api/, auth/</div>
     <div class="arch-node-desc">API client + session handling · S43</div>
+  </div>
+  <div class="arch-node is-new" onclick="jumpModule('claude-skills-library')">
+    <div class="arch-node-name">.claude/skills/</div>
+    <div class="arch-node-desc">Org skill library (20 skills) + CLAUDE.md policy · S45</div>
   </div>
   <!-- ARCH_APPLOGIC_INJECT -->
       </div>
@@ -1791,6 +1799,21 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Six commits, one feature branch: (1) a new script transforms the real 810-dish spreadsheet into the exact shape the engine already expects, flagging every gap (missing macros, a few unresolved ingredients, hidden-allergen risk) instead of guessing; (2) the deployable image's build step was pointed at that real transform instead of the 39-dish sample, and — caught in the same branch — actually re-run so the packaged file itself has the real 810, not just the code path; (3) fixed a crash on any real dish with no iconicity score, by treating "not scored yet" as contributing nothing rather than erroring; (4) proved the fix with a real regression run across all 4 test households, then found and fixed a second, more serious bug the same run exposed — 536 of 810 real dishes (66%) were silently "region unknown" because the cuisine→region lookup only knew the old sample's 10 cuisines, concretely costing one Jain household 4 of its 7 meal suggestions; fixed by teaching it all 57 real cuisines' actual regions, verified the old 39-dish sample's behaviour is completely unchanged; (5) brought over sig_scores_v1.csv — a file the engine's knowledge base has referenced since it was written but which never existed in this repo — from a separate data-authoring branch, and wired the real-menu script to actually read it (810/810 dishes matched, 0 unresolved), replacing a rough 12-dish guess. Final check before review: the frozen API contract re-validated against real 810-dish responses across all 7 households (21/21 combinations, 0 violations) and the service's math re-confirmed to exactly match the engine's core math on 516 real dishes (0 drift). Full suite: 26/26. Two pre-existing gaps confirmed unchanged, not newly introduced (one dish name from the old sample doesn't exist in the real menu; two households don't get the exact same specific weather/Jain "whole meal" dishes the old sample gave them — an expected consequence of a bigger, different menu, not a bug). Pushed to claude/phase-g-catalogue-migration-kppmgx — NOT main. Waiting for Founder review.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Jul 30</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#5145b8"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f0effe;color:#5145b8">S45</span>
+      <div class="tl-title">All dotfiles skills vendored in; slash-command gate removed on audit/hygiene skills</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s45')">14 new skill folders</span>
+        <span class="tl-chip" onclick="showPage('s45')">install-logging references (5 files)</span>
+        <span class="tl-chip" onclick="showPage('s45')">CLAUDE.md activation policy rewritten</span>
+        <span class="tl-chip" onclick="showPage('s45')">never-autofix skills unchanged</span>
+      </div>
+      <div class="tl-note">Repo tooling/governance only — no app code, DB, or screens touched. Next: confirm the new always-on policy actually fires on a real task, not just that the policy text changed.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2063,6 +2086,45 @@ function deepDiveFeature(featureLabel){
       <div class="dd-text">S43 · Jul 30</div>
     </div>
   </div>
+  <div class="detail-item">
+    <div class="detail-row" id="row-mod-claude-skills-library" onclick="toggleDetail('mod-claude-skills-library')">
+      <div class="detail-left">
+        <span class="tag tag-cfg">Config</span>
+        <span class="detail-name">.claude/skills/ (organization skill library)</span>
+      </div>
+      <span class="detail-chevron" id="chev-mod-claude-skills-library">▾</span>
+    </div>
+    <div class="detail-drawer" id="draw-mod-claude-skills-library">
+      <div class="dd-label">What this does</div>
+      <div class="dd-text">Each subfolder is one organization-standard skill — a written instruction set Claude Code follows for a recurring kind of task (auditing dependencies, checking RLS policies, writing a postmortem, keeping this very knowledge book updated). This repo maintains its own copy of the skills it needs rather than reading them live from the separate dotfiles repo, and this repo's own CLAUDE.md — not the dotfiles copy — is the authoritative word on which skills auto-run versus wait for a slash command.</div>
+      <div class="dd-label">Files / tables in this module</div>
+      <div class="dd-text">
+        <code>.claude/skills/session-knowledge-doc/</code> — maintains KNOWLEDGE.html itself (this file)<br>
+        <code>.claude/skills/coding-standards-enforcer/</code> — shapes inline docs + structured logging as new code is written<br>
+        <code>.claude/skills/debug-root-cause/</code> — evidence-based debugging discipline<br>
+        <code>.claude/skills/session-resume/, session-resumption-protocol/</code> — reconstructs repo execution state at session start from actually-read files<br>
+        <code>.claude/skills/audit-dpdp/, audit-rls/</code> — pre-existing audits (DPDP compliance, RLS policy correctness)<br>
+        <code>.claude/skills/audit-api-contract/</code> — new S45: frontend/backend request-response shape agreement<br>
+        <code>.claude/skills/audit-data-integrity/</code> — new S45: FK violations, orphaned records, NULL/empty fields<br>
+        <code>.claude/skills/audit-dependencies/</code> — new S45: dependency/security/duplicate-package audit<br>
+        <code>.claude/skills/audit-eas/</code> — new S45: Expo/EAS pre-submission checklist<br>
+        <code>.claude/skills/audit-edge-functions/</code> — new S45: backend function error-boundary audit<br>
+        <code>.claude/skills/audit-onboarding-funnel/</code> — new S45: onboarding drop-off point audit<br>
+        <code>.claude/skills/audit-performance/</code> — new S45: performance baseline vs. documented NFR targets<br>
+        <code>.claude/skills/audit-prelaunch/</code> — new S45: pre-launch checklist automation<br>
+        <code>.claude/skills/hygiene-dead-code/</code> — new S45: unused code/orphaned file removal<br>
+        <code>.claude/skills/hygiene-secrets/</code> — new S45: secrets mapping (report + rotation advice only, never autofix)<br>
+        <code>.claude/skills/hygiene-test-sync/</code> — new S45: keeps a test mirror synced with real business logic<br>
+        <code>.claude/skills/incident-postmortem/</code> — new S45: structures a resolved incident into a postmortem (report only)<br>
+        <code>.claude/skills/install-logging-infrastructure/</code> — new S45: scaffolds the org-standard logging stack, plus 5 reference templates<br>
+        <code>CLAUDE.md</code> — this repo's own authoritative Skill Activation Policy; as of S45, every installed skill above activates automatically as the task needs it, except never-autofix skills (audit-dpdp, hygiene-secrets, incident-postmortem, audit-rollback-readiness) which still never apply fixes automatically<br>
+      </div>
+      <div class="dd-label">How it helps the app</div>
+      <div class="dd-text">Before S45, 14 of these 20 skills simply didn't exist in this repo, so an audit or hygiene sweep could only ever happen if someone remembered to fetch it from dotfiles first. Now the full library is present and — per Founder directive — active by default, so evidence-based checks (data integrity, API contract drift, onboarding drop-off, dependency security) can surface proactively during a session instead of only when explicitly requested.</div>
+      <div class="dd-label">Last touched</div>
+      <div class="dd-text">S45 · Jul 30</div>
+    </div>
+  </div>
   <!-- MODULES_INJECT -->
   </div>
 
@@ -2245,6 +2307,26 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">ghar_re_service/data/bundle/manifest.json</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">The packaged bundle's own version fingerprint, updated to match the regenerated real catalogue</td></tr>
 <tr><td class="fr-file mono">ghar_re_service/pyproject.toml</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Added openpyxl as a real dependency — the real-menu transform needs it to read the spreadsheet</td></tr>
 <tr><td class="fr-file mono">pyproject.toml</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Told the type-checker openpyxl ships no type hints of its own, same treatment already given to two other third-party packages</td></tr>
+<tr><td class="fr-file mono">.claude/skills/audit-api-contract/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — verifies frontend/backend request-response shape agreement</td></tr>
+<tr><td class="fr-file mono">.claude/skills/audit-data-integrity/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — FK violations, orphaned records, NULL/empty field checks</td></tr>
+<tr><td class="fr-file mono">.claude/skills/audit-dependencies/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — dependency/security/duplicate-package audit</td></tr>
+<tr><td class="fr-file mono">.claude/skills/audit-eas/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — Expo/EAS pre-submission checklist</td></tr>
+<tr><td class="fr-file mono">.claude/skills/audit-edge-functions/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — backend function error-boundary audit</td></tr>
+<tr><td class="fr-file mono">.claude/skills/audit-onboarding-funnel/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — onboarding drop-off point audit</td></tr>
+<tr><td class="fr-file mono">.claude/skills/audit-performance/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — performance baseline vs. documented NFR targets</td></tr>
+<tr><td class="fr-file mono">.claude/skills/audit-prelaunch/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — pre-launch checklist automation</td></tr>
+<tr><td class="fr-file mono">.claude/skills/hygiene-dead-code/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — unused code/orphaned file removal</td></tr>
+<tr><td class="fr-file mono">.claude/skills/hygiene-secrets/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — secrets mapping; report + rotation advice only, never autofix</td></tr>
+<tr><td class="fr-file mono">.claude/skills/hygiene-test-sync/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — keeps a test mirror synced with real business logic</td></tr>
+<tr><td class="fr-file mono">.claude/skills/incident-postmortem/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — structures a resolved incident into a postmortem; report only</td></tr>
+<tr><td class="fr-file mono">.claude/skills/install-logging-infrastructure/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — scaffolds the org-standard logging stack</td></tr>
+<tr><td class="fr-file mono">.claude/skills/install-logging-infrastructure/references/changelog-template.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Starter CHANGELOG.md structure used by install-logging-infrastructure</td></tr>
+<tr><td class="fr-file mono">.claude/skills/install-logging-infrastructure/references/structured-logger-template.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Starter structured-logger code template</td></tr>
+<tr><td class="fr-file mono">.claude/skills/install-logging-infrastructure/references/system-logger-template.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Starter system-logger code template</td></tr>
+<tr><td class="fr-file mono">.claude/skills/install-logging-infrastructure/references/transaction-export-template.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Starter transaction-log export script template</td></tr>
+<tr><td class="fr-file mono">.claude/skills/install-logging-infrastructure/references/user-journey-logger-template.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Starter user-journey logger code template</td></tr>
+<tr><td class="fr-file mono">.claude/skills/session-resumption-protocol/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — controls how a session reconstructs repo execution state at start</td></tr>
+<tr><td class="fr-file mono">CLAUDE.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S45</td><td class="fr-desc">Skill Activation Policy amended — every installed skill now auto-activates as needed instead of waiting on a slash command; never-autofix skills unchanged</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2590,6 +2672,26 @@ function deepDiveFeature(featureLabel){
     <div class="decision-a">Yes — deployed household and recommendations directly to the live project (no code in this repo was changed; this was a deploy of the exact already-committed backend source, verified file-by-file against disk immediately beforehand, not from memory). One disclosed, deploy-only deviation: recommendations' contract.ts imports the shared ghar-re-v1 JSON schema from three directories up in this repo (`../../../contracts/...`), but the deploy sandbox only allows one directory above a function's own folder — confirmed by testing (`../_shared/...` worked, `../../deno.json` did not). Worked around by copying the schema file in flat next to contract.ts and pointing that one import at it for the deployed bundle only; the repo's own contract.ts is untouched and the two must be kept in sync by hand until proper CI/CD replaces this manual deploy path. Both functions came back status ACTIVE. Direct invocation to prove it end-to-end wasn't possible from this sandbox (outbound curl to Supabase is proxy-blocked here) — confirmed via Edge Function logs and the deploy response instead.</div>
     <div class="decision-meta">S43 · Jul 30</div>
   </div>
+<div class="decision-item">
+  <div class="decision-q">Why import all 14 missing dotfiles skills in one pass instead of only the ones actually needed right now?</div>
+  <div class="decision-a">Explicit Founder instruction this session — bring this repo's skill library up to full parity with the dotfiles source in one pass, rather than continuing to fetch one skill at a time only when a specific task happens to need it.</div>
+  <div class="decision-meta">S45 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why remove the slash-command gate for audit/hygiene/install/incident skills?</div>
+  <div class="decision-a">Explicit Founder directive this session, stated in CLAUDE.md as superseding the prior policy. The old policy is kept in the file as a labeled "superseded, kept for record" note rather than deleted, per this repo's own Version & Lifecycle Rules.</div>
+  <div class="decision-meta">S45 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">If every skill is now "always on," why do audit-dpdp, hygiene-secrets, incident-postmortem, and audit-rollback-readiness still never apply fixes automatically?</div>
+  <div class="decision-a">That constraint is declared inside each of those skills' own SKILL.md files, independent of this repo's activation-policy table. This session's change only affects how eagerly a skill's checks/discipline can start running (proactively vs. waiting for a slash command) — it says nothing about what a skill is allowed to do once it runs, so a skill's own no-autofix rule stands untouched.</div>
+  <div class="decision-meta">S45 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Is this session a real app feature that needs a Phone/App-logic/Database/Server swim lane like other sessions?</div>
+  <div class="decision-a">No — nothing here touched a screen, a database, or a server function, so forcing a 4-lane flow would mean inventing steps that didn't happen. This session is represented as App-logic/config-only steps (skill files added, CLAUDE.md policy updated), and the Feature Flows tab uses a single Middleware-layer entry rather than a fabricated multi-layer walkthrough.</div>
+  <div class="decision-meta">S45 · Jul 30</div>
+</div>
   <!-- DECISIONS_INJECT -->
   </div>
 
@@ -6731,7 +6833,7 @@ function deepDiveFeature(featureLabel){
     </script>
     </div><!-- /page-s43 -->
 
-  <div id="page-s44" class="page-content">
+  <div id="page-s44" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S44 &middot; Ghar RE Phase G &mdash; the real 810-dish catalogue replaces the 39-dish sample (feature branch, review pending)</div>
       <div class="page-subtitle">Every recommendation the engine has ever produced, in every session before this one, came from 39 invented sample dishes &mdash; never the real menu. This branch swaps that sample for the actual 810-dish catalogue, fixes two bugs the swap exposed, and gives every one of those 810 dishes a real (if still founder-unreviewed) signature score instead of none at all. Not on main &mdash; six commits, one feature branch, waiting for review.</div>
@@ -6797,6 +6899,225 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s44 -->
+  <div id="page-s45" class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">S45 &middot; All dotfiles skills vendored in, and the slash-command gate removed</div>
+      <div class="page-subtitle">The repo now carries every organization skill Claude Code has (not just 6 of 20), and per an explicit Founder instruction, sessions no longer have to wait for a slash command before an installed skill's discipline can kick in.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">&#9940; Before this session</div>
+        <div class="impact-text">Only 6 of the 20 organization skills in the dotfiles library actually existed in this repo's <code>.claude/skills/</code> folder. The other 14 &mdash; every audit-*, hygiene-*, install-logging, incident-postmortem, and session-resumption-protocol skill &mdash; were simply missing, so Claude Code could never run them here at all, slash command or not. And even for skills that did exist, this repo's CLAUDE.md said audit-*/hygiene-*/install-*/incident-* only ever activate on an explicit slash command &mdash; never on their own.</div>
+      </div>
+      <div class="impact-arrow">&rarr;</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">&#9989; After this session</div>
+        <div class="impact-text">All 20 organization skills now physically exist in this repo. And the activation rule changed: every installed skill (except the always-report-only/never-autofix ones, which still never auto-fix) can now activate proactively when its subject matter comes up in a session &mdash; a slash command still works and still invokes a skill directly, but a session no longer has to wait for one first.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">&#128193; Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">.claude/skills/ (14 new skill folders, 19 files)</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">CLAUDE.md</span><span class="tag tag-cfg">Config</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Jul 30, 2026<br>20 things touched</div>
+      </div>
+      <div class="session-card-desc">This was a repo-tooling/governance session, not an app feature &mdash; no screens, no database, no server functions. Two things happened: (1) the 14 organization skill folders that existed in the separate dotfiles repo but were never copied into this one were copied in &mdash; each is one <code>SKILL.md</code> file, except <code>install-logging-infrastructure</code> which also brings 5 reference template files; (2) this repo's own CLAUDE.md &mdash; which is the authoritative activation policy for this repo, not the dotfiles copy &mdash; was amended, per an explicit Founder instruction this session, to remove the "wait for a slash command" gate from every audit/hygiene/install/incident skill. Skills whose own SKILL.md says "never auto-fix" (audit-dpdp, hygiene-secrets, incident-postmortem, audit-rollback-readiness) keep that constraint untouched &mdash; only their checks now run proactively, their fixes still don't.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">6 &rarr; 20</div><div class="stat-l">Skills present in this repo</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">19</div><div class="stat-l">New skill files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Server fns touched</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s45','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s45','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s45','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s45-swim" class="view-pane active">
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s45','skills-vendored')">
+            <div class="step-num num-purple">1</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">14 org skill folders copied into .claude/skills/</span>
+                <span class="tag tag-cfg">Config</span>
+              </div>
+              <div class="step-desc">Copied every organization skill from the dotfiles repo that this repo was still missing &mdash; each one a self-contained instruction file Claude Code can follow.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s45','claude-md-policy')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">CLAUDE.md's activation policy rewritten</span>
+                <span class="tag tag-cfg">Config</span>
+              </div>
+              <div class="step-desc">The rule that said "audit/hygiene/install/incident skills only run on an explicit slash command" was replaced, per Founder instruction, with "every installed skill activates automatically as the task needs it" &mdash; except that never-autofix skills still never autofix.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">No always-on skill has actually been exercised end-to-end yet under the new policy (e.g. an audit triggered proactively mid-task, not via slash command) &mdash; worth confirming in a future session that a skill actually does fire on its own when its subject matter comes up, not just that the policy text now says it should.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s45-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s45-skills-vendored" onclick="toggleDetail('s45-skills-vendored')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Config</span>
+            <span class="detail-name">.claude/skills/ (14 new folders)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s45-skills-vendored">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s45-skills-vendored">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Each folder is one organization skill &mdash; a written instruction set Claude Code follows when a matching task comes up (an audit, a hygiene sweep, an incident writeup). Before this session, this repo only had 6 of the 20 skills that exist in the shared dotfiles library; the other 14 physically didn't exist here, so there was nothing for any activation policy to even point at.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">The 14 missing SKILL.md files (plus install-logging-infrastructure's 5 reference templates), read directly from ../dotfiles/.claude/skills/</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">19 new files under this repo's own .claude/skills/, committed and pushed</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">../dotfiles/.claude/skills/*</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">copied verbatim</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">./.claude/skills/*</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">committed (dd2b824)</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">.claude/skills/install-logging-infrastructure/references/*.md (5 files)</span>  &larr; the one skill in this batch that carries reference templates alongside its SKILL.md, preserved as its own subfolder</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why import all 14 missing skills instead of just the ones needed right now?</div>
+            <div class="dd-why-a">Explicit Founder instruction this session &mdash; bring the repo's skill library up to parity with dotfiles in one pass, rather than importing skills piecemeal each time one happens to be needed.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s45-claude-md-policy" onclick="toggleDetail('s45-claude-md-policy')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Config</span>
+            <span class="detail-name">CLAUDE.md &mdash; Skill Activation Policy</span>
+          </div>
+          <span class="detail-chevron" id="chev-s45-claude-md-policy">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s45-claude-md-policy">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">This is the section of CLAUDE.md that this repo itself declares as the authoritative source of truth for which skills run automatically versus on-demand &mdash; overriding the dotfiles copy of the same table once a skill is vendored in here.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">Old policy: only session-knowledge-doc, coding-standards-enforcer, debug-root-cause auto-run; everything else needs a slash command</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">New policy: every installed skill auto-activates as the task needs it; never-autofix skills still never autofix</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">Founder directive</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">CLAUDE.md Skill Activation Policy edited</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">old policy kept as superseded record, not deleted</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">Skills whose own SKILL.md declares "auto-fixes: never" ... still never apply fixes automatically</span>  &larr; the one constraint this session deliberately did NOT remove</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why remove the slash-command gate instead of leaving it as-is?</div>
+            <div class="dd-why-a">Explicit Founder directive this session, stated as superseding the prior policy &mdash; not a judgement call made unilaterally.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why do never-autofix skills still never autofix, even under the new "always active" policy?</div>
+            <div class="dd-why-a">That constraint lives in each skill's own SKILL.md (audit-dpdp, hygiene-secrets, incident-postmortem, audit-rollback-readiness), independent of this repo's activation-policy table. Changing how eagerly a skill's checks run doesn't touch what that skill is allowed to do once it runs.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Confirm the new always-on policy actually fires in practice on a real task (e.g. an audit-* skill's discipline kicking in mid-session without a slash command), not just that CLAUDE.md now says it should.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s45-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S45 = [
+      {
+        id: 'repo-skill-governance-update',
+        label: 'Repo skill governance update',
+        steps: [
+          {
+            layer: 'Middleware',
+            tag: 'POLICY',
+            title: 'Missing skills copied in from dotfiles',
+            desc: 'The 14 organization skills this repo never had are copied in verbatim from the separate dotfiles repo, each as its own folder under .claude/skills/.',
+            codeFlow: [ {chip:'.claude/skills/audit-api-contract/SKILL.md'}, {label:'+ 13 more SKILL.md'}, {chip:'.claude/skills/install-logging-infrastructure/references/*.md'} ],
+            files: [
+              {path:'.claude/skills/audit-api-contract/SKILL.md', desc:'Verifies frontend/backend request-response shape agreement'},
+              {path:'.claude/skills/install-logging-infrastructure/SKILL.md', desc:'Scaffolds the org-standard logging stack'},
+              {path:'.claude/skills/install-logging-infrastructure/references/changelog-template.md', desc:'Starter CHANGELOG.md structure'},
+              {path:'.claude/skills/session-resumption-protocol/SKILL.md', desc:'Controls how a session reconstructs repo execution state at start'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Middleware',
+            tag: 'POLICY',
+            title: 'CLAUDE.md activation policy amended',
+            desc: 'This repo\'s own Skill Activation Policy section is rewritten so every installed skill runs proactively instead of waiting for a slash command, per explicit Founder instruction.',
+            codeFlow: [ {chip:'CLAUDE.md'}, {label:'edited in place, old policy kept as superseded record'} ],
+            files: [
+              {path:'CLAUDE.md', desc:'Repo-wide operating guide; this session amended only its Skill Activation Policy section'}
+            ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s45-flows', window.FEATURE_FLOWS_S45);
+    </script>
+
+  </div><!-- /page-s45 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
