@@ -50,7 +50,7 @@ export default function Recommendations() {
       <Pressable style={styles.button} onPress={() => refetch()} disabled={isRefetching}>
         <Text style={styles.buttonText}>{isRefetching ? "Refreshing..." : "Refresh"}</Text>
       </Pressable>
-      <Pressable style={styles.secondaryButton} onPress={() => router.replace("/(onboarding)/profile-basics")}>
+      <Pressable style={styles.secondaryButton} onPress={() => router.replace("/(onboarding)/step-1")}>
         <Text style={styles.secondaryButtonText}>Back to onboarding</Text>
       </Pressable>
     </ScrollView>
