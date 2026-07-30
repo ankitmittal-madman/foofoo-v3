@@ -641,8 +641,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🛡️</span> S39 · Ghar RE Phase F follow-up — public ingress + rate limiting
       <span class="nav-badge">Jul 29</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s40')">
+    <div class="nav-item" onclick="showPage('s40')">
       <span class="nav-icon">🔎</span> S40 · Ground-truth audit — two engines found, roadmap &amp; topology written
+      <span class="nav-badge">Jul 29</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s41')">
+      <span class="nav-icon">🔒</span> S41 · Security hotfix — recommendations endpoint ownership check wired in
       <span class="nav-badge">Jul 29</span>
     </div>
     <!-- NAV_INJECT -->
@@ -1699,6 +1703,20 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Read-only audit, zero code/schema changes. Verified every claim about tables, auth, and CI against the live repo rather than trusting prior summaries — found that a much older TypeScript recommendation engine (with its own extensive governance history) is no longer on the live request path, with no decision on record saying so, and that an existing, tested ownership check is not wired into the recommendations handler. Both flagged for a Founder decision, not fixed here. Next: decide the legacy engine's disposition, and decide/fix the authorization gap.</div>
     </div>
   </div>
+  <div class="tl-row">
+    <div class="tl-spine"><div class="tl-dot" style="background:#b91c1c"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fde8e8;color:#b91c1c">S41</span>
+      <div class="tl-title">Security hotfix — household-ownership check wired into the recommendations endpoint</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s41')">requireOwnership() called</span>
+        <span class="tl-chip" onclick="showPage('s41')">stale comment removed</span>
+        <span class="tl-chip" onclick="showPage('s41')">3 new tests</span>
+        <span class="tl-chip" onclick="showPage('s41')">gap from S40 closed</span>
+      </div>
+      <div class="tl-note">Closed the authorization gap S40's audit found and deliberately left unfixed. Same import, same call pattern, same error response as the already-correct consent endpoint — runs before any household/context data is fetched, so an unauthorized household_id never reaches compose.ts. Three tests added: mismatched id refused with nothing downstream called, own id allowed through, and the default (no id supplied) unchanged. Deno suite could not be executed in this sandbox (same jsr.io network block already disclosed in S40); format/lint checks passed and the error-handling path was traced by hand against an already-passing test's proven pattern. Python suite re-run in full: 77/77, unaffected. Next: run the TypeScript suite for real before merging.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2061,6 +2079,8 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">ghar_re_service/README.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S39</td><td class="fr-desc">Runbook rewritten for public ingress: https URL, the unsigned-request check, rate-limit behaviour, Cloudflare note</td></tr>
 <tr><td class="fr-file">docs/architecture/RE-DOC-12_Ghar_RE_Status_and_Roadmap_v1_0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S40</td><td class="fr-desc">Ground-truth status of the Python RE — every claim evidenced; found the legacy TS engine is retired-in-fact but undocumented, and household_context is unwired dead weight</td></tr>
 <tr><td class="fr-file">docs/architecture/RE-DOC-13_Ghar_RE_Deployment_Topology_v1_0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S40</td><td class="fr-desc">Component-by-component deployment map (Edge Functions, Ghar RE, Postgres) with failure modes and an explicit list of what cannot be verified without live Fly/Supabase access</td></tr>
+<tr><td class="fr-file mono">supabase/functions/recommendations/handler.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S41</td><td class="fr-desc">requireOwnership(claims, householdId) wired in before any data fetch — closes the S40 authorization gap; stale "STUB until the live table exists" comment removed</td></tr>
+<tr><td class="fr-file mono">supabase/functions/_tests/recommendations.test.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S41</td><td class="fr-desc">3 new tests: mismatched household_id refused (loadHousehold/RE/event all uncalled), own id allowed, default-to-own-id unchanged</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2300,6 +2320,21 @@ function deepDiveFeature(featureLabel){
   <div class="decision-q">Why weren't the TypeScript-side automated tests actually run this session?</div>
   <div class="decision-a">The environment's network restrictions block one of the package sources those tests need to download (jsr.io returns a hard refusal) — the same category of restriction that already prevents a real cloud deployment from happening here. Rather than guess at a pass count, the session states plainly that 81 test cases exist by direct count, and that none of them were confirmed to actually pass this session.</div>
   <div class="decision-meta">S40 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why is this fix so small — one import, one function call?</div>
+  <div class="decision-a">Because the fix this needed already existed. The same ownership check that protects the consent endpoint is already written, already tested, and already correct — it just wasn't being called from this second endpoint. Closing the gap meant calling it in the right place, not writing new authorization logic that would itself need to be trusted.</div>
+  <div class="decision-meta">S41 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why does the check run before the household data is even fetched, rather than after?</div>
+  <div class="decision-a">So an unauthorized request never touches another household's data at all — not the database read, not the call to the recommendation engine, not the write to the event history. Checking ownership after the fetch would mean the data was already read from the database before being refused, which is a weaker guarantee even if the response never reached the caller.</div>
+  <div class="decision-meta">S41 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">The new tests couldn't be run directly here — how confident is the fix, really?</div>
+  <div class="decision-a">The two changed files pass every check available without the blocked network access: formatting and lint, both of which parse and validate the code's structure. Beyond that, the exact error-handling path the new tests depend on was traced by hand against the code that actually implements it, line by line, and it is the identical path an already-passing test in the same file already proves works for a different error. That is real evidence, not a guess — but it is not the same as watching the test runner say "3 passed," and the honest next step is stated plainly: run it for real before merging.</div>
+  <div class="decision-meta">S41 · Jul 29</div>
 </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -5956,7 +5991,7 @@ function deepDiveFeature(featureLabel){
     </div>
   </div><!-- /page-s39 -->
 
-  <div id="page-s40" class="page-content">
+  <div id="page-s40" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S40 · Ground-truth audit — nothing built, everything checked, two roadmap documents written</div>
       <div class="page-subtitle">No code changed this session. Every claim in the last several sessions' documents was checked directly against the actual files, tests, and database migrations — and one thing nobody had written down anywhere surfaced: there are two separate recommendation engines in this repository, and only one of them is actually running.</div>
@@ -6010,6 +6045,59 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s40 -->
+
+  <div id="page-s41" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S41 · Security hotfix — closing the household-ownership gap the audit found</div>
+      <div class="page-subtitle">The gap the last session found and deliberately did not fix — any signed-in user could ask for another household's recommendation data by supplying its id — is closed. One import, one function call, placed before any data is fetched.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">A signed-in user could send a request for someone else's household by putting that household's id straight in the request body, and the recommendations endpoint would fetch and serve that other household's data without checking whether the caller actually owned it. The check needed to stop this already existed elsewhere in this exact codebase — it is what protects the consent endpoint — but nobody had wired it into this one. A leftover code comment blamed a missing database table for the gap, but that table had existed for two sessions; the real reason was simply that the call was never made.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The exact same ownership check the consent endpoint already uses now runs on every recommendation request, before any household or context data is fetched — a caller asking for a household that isn't theirs is refused immediately, and nothing downstream (the data fetch, the engine call, the event log) ever runs. The stale comment is gone. Three new tests prove it: a mismatched id is refused and nothing downstream fires, a caller's own id is allowed through normally, and leaving the id off (the common case) still defaults to the caller's own household exactly as before.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_tests/recommendations.test.ts</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 29, 2026<br>Security hotfix — smallest possible change, nothing else touched</div>
+      </div>
+      <div class="session-card-desc">
+        <b>1. The ownership check, wired in.</b> The exact same function the consent endpoint already calls — already tested, already proven correct — is now called on the recommendations endpoint too, with the same pattern: same import, same call, same error on failure. It runs immediately after figuring out which household the request is asking about, and before anything is fetched from the database.
+        <br><br>
+        <b>2. Placement matters here.</b> The check runs before the household/context data is loaded, before the request is sent to the recommendation engine, and before anything is written to the event history. An unauthorized request now stops at the very first gate — it never touches a database read, an engine call, or a log write for data it had no right to see.
+        <br><br>
+        <b>3. The stale comment is gone.</b> The old comment said the fix was blocked on a database table that "doesn't exist yet." That table has existed since the tables were built two sessions ago — the real blocker was only that nobody had made the call. Left uncorrected, a future session could have trusted that comment over the actual code and assumed there was nothing to fix.
+        <br><br>
+        <b>4. Three tests, one for each outcome that matters.</b> A request for a household the caller does not own is refused, and none of the downstream work happens (proven by counting calls to the data-fetch, the engine call, and the event write — all three stay at zero). A request for the caller's own household still works normally. And the common case — no household id supplied at all, which defaults to the caller's own — still works exactly as it did before this change.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#b91c1c">1</div><div class="stat-l">Authorization gap closed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#1a56db">2</div><div class="stat-l">Files changed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">3</div><div class="stat-l">New tests proving the fix</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">77/77</div><div class="stat-l">Python tests, unaffected, re-confirmed</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — could not run the new tests directly in this environment</div>
+        <div class="next-text">The same network restriction that blocks a real cloud deployment here also blocks the package source the TypeScript test runner needs (jsr.io returns a hard refusal) — this was already true and disclosed in the prior audit session, not new to this one. What could be checked here was checked thoroughly: the two changed files pass formatting and lint checks that don't need that network access, and the exact error-handling code path the new tests rely on was traced by hand, line by line, against the same pattern an already-passing test in this file already proves works. The Python side is fully unaffected and was re-run in full to confirm nothing regressed. <b>Run the TypeScript suite yourself before merging</b> — the exact command is <code>cd supabase && deno test --allow-env functions/_tests/recommendations.test.ts</code>, matching what CI already runs on every push.</div>
+      </div>
+    </div>
+  </div><!-- /page-s41 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

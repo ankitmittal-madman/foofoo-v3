@@ -277,6 +277,70 @@ Deno.test("malformed composed payload is rejected before the RE is called (400, 
   });
 });
 
+// ── 5b. ownership — a household_id the caller does not own is rejected before compose.ts runs ────
+Deno.test("household_id owned by another user is rejected before loadHousehold/compose runs (403)", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    let loadCalled = 0;
+    let reCalled = 0;
+    let eventCalled = 0;
+    const deps: RecommendationDeps = {
+      loadHousehold: () => {
+        loadCalled++;
+        return Promise.resolve({ household: TEST_HOUSEHOLD, householdId: USER_ID, stubbed: false });
+      },
+      recordEvent: () => {
+        eventCalled++;
+        return Promise.resolve();
+      },
+      callRe: (_payload, requestId) => {
+        reCalled++;
+        return Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) });
+      },
+    };
+    // The authenticated caller is USER_ID (see pipeline()'s fake verifier); this request asks for
+    // a DIFFERENT household's data.
+    const res = await pipeline(deps)(post({
+      household_id: "22222222-2222-2222-2222-222222222222",
+    }));
+    assertEquals(res.status, API_ERRORS.ERR_OWNERSHIP_MISMATCH.httpStatus); // 403
+    const json = await res.json();
+    assertEquals(json.error.code, API_ERRORS.ERR_OWNERSHIP_MISMATCH.code);
+    // Nothing downstream of the ownership check ran: no household load, no RE call, no event write.
+    assertEquals(loadCalled, 0);
+    assertEquals(reCalled, 0);
+    assertEquals(eventCalled, 0);
+  });
+});
+
+Deno.test("household_id equal to the caller's own id is allowed through", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
+      callRe: (_payload, requestId) =>
+        Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) }),
+    };
+    const res = await pipeline(deps)(post({ household_id: USER_ID }));
+    assertEquals(res.status, 200);
+  });
+});
+
+Deno.test("omitting household_id defaults to the caller's own id and is allowed through", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
+      callRe: (_payload, requestId) =>
+        Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) }),
+    };
+    const res = await pipeline(deps)(post());
+    assertEquals(res.status, 200);
+  });
+});
+
 // ── 5. Phase C.5 composition — live-table row shapes → contract-valid Q1–Q15 ─────────────────────
 // These exercise the PURE mapping functions only (no Supabase client, no database): the row shapes
 // they take are exactly what compose.ts selects from public.profiles / household_answers /

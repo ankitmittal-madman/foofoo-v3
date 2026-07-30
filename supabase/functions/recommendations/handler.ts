@@ -2,14 +2,17 @@
  * POST /v1/recommendations — business handler (Phase C).
  *
  * THIN orchestration handler (frozen architecture: Edge Functions own auth/DB, the RE owns math).
- * Flow (RE-DOC-10 §9): authenticate (middleware) → fetch household+context → compose + validate the
- * ghar-re-v1 request → signed call to the RE (timeout/retry) → pass the response through as-is
- * (RE-DOC-11 §6) → log the outcome. On any RE failure, return a fallback plate as a valid 200.
+ * Flow (RE-DOC-10 §9): authenticate (middleware) → verify ownership of the target household
+ * (DOC-P3-06 §05, same boundary as consent/handler.ts) → fetch household+context → compose +
+ * validate the ghar-re-v1 request → signed call to the RE (timeout/retry) → pass the response
+ * through as-is (RE-DOC-11 §6) → log the outcome. On any RE failure, return a fallback plate as a
+ * valid 200.
  *
  * No recommendation math here. Deps are injectable so the handler is unit-testable without a live
  * RE (default deps use the real client/loader/event-writer).
  */
 import { requireAuth } from "../_shared/auth/authorize.ts";
+import { requireOwnership } from "../_shared/auth/authenticate.ts";
 import { jsonContract } from "../_shared/api/response.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
@@ -76,6 +79,12 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     const householdId = (typeof body.household_id === "string" ? body.household_id : null) ??
       claims.userId ?? null;
 
+    // Sole Surface-B authorization boundary (DOC-P3-06 §05), same as consent/handler.ts: JWT
+    // user_id must equal the target household id. Runs BEFORE any household/context data is
+    // fetched, so an unauthorized caller supplying someone else's household_id never reaches
+    // compose.ts at all.
+    requireOwnership(claims, householdId);
+
     // request_id: use the caller's if supplied, else the request's trace id (already a UUIDv4).
     // Bound onto a child logger NOW so every log line for the rest of this request — auth already
     // resolved above, compose/RE-call/response-handling below — carries the SAME id without each
@@ -88,10 +97,9 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
 
     log.info("recommendation.auth_ok", { user_id: claims.userId });
 
-    // Fetch household + context (STUB until the live table exists — see compose.ts).
+    // Fetch household + context from the live `public` tables (compose.ts) — ownership already
+    // verified above.
     const { household, householdId: hid, stubbed } = await loadHousehold(ctx, householdId);
-    // TODO(founder-decision): once the live households table exists, enforce ownership here:
-    //   requireOwnership(claims, household.profile_id)  — Edge Functions are the auth boundary.
     log.info("recommendation.composed", { household_id: hid, stubbed });
 
     const contextOverride = (body.context && typeof body.context === "object")
