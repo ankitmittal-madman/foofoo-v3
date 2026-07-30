@@ -44,12 +44,25 @@ def test_bundle_version_is_deterministic(built, tmp_path):
     assert second["catalogue_sha256"] == first["catalogue_sha256"]
 
 
+def _copy_source_tree(dest_parent):
+    """Copy data/source/ AND its sibling sig_scores_v1.csv into an isolated tmp dir, mirroring
+    the real repo layout (build_catalogue.load_sig_scores() resolves that file one level ABOVE
+    source_dir, per data/source/README.md's own `../sig_scores_v1.csv` config-table entry — a
+    bare copy of data/source/ alone is no longer a self-contained source tree)."""
+    src = dest_parent / "src"
+    shutil.copytree(export_bundle.DEFAULT_SOURCE_DIR, src)
+    real_sig_scores = os.path.join(
+        os.path.dirname(export_bundle.DEFAULT_SOURCE_DIR), "sig_scores_v1.csv"
+    )
+    shutil.copy(real_sig_scores, dest_parent / "sig_scores_v1.csv")
+    return src
+
+
 def test_bundle_version_changes_when_config_changes(built, tmp_path):
     """A changed config file MUST produce a different version — otherwise a stale image could
     silently claim to be current."""
     out, original = built
-    tampered_src = tmp_path / "src"
-    shutil.copytree(export_bundle.DEFAULT_SOURCE_DIR, tampered_src)
+    tampered_src = _copy_source_tree(tmp_path)
     target = tampered_src / "filters.yaml"
     target.write_text(target.read_text() + "\n# changed\n")
 
@@ -59,8 +72,7 @@ def test_bundle_version_changes_when_config_changes(built, tmp_path):
 
 def test_missing_config_file_fails_loudly(tmp_path):
     """An incomplete bundle must fail at BUILD time, not as a confusing crash inside a container."""
-    partial = tmp_path / "src"
-    shutil.copytree(export_bundle.DEFAULT_SOURCE_DIR, partial)
+    partial = _copy_source_tree(tmp_path)
     (partial / "filters.yaml").unlink()
     with pytest.raises(FileNotFoundError, match="filters.yaml"):
         export_bundle.build_bundle(str(partial), str(tmp_path / "out"))

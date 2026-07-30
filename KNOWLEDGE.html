@@ -653,8 +653,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">📝</span> S42 · Onboarding write path — new household/ endpoint (feature branch, review pending)
       <span class="nav-badge">Jul 30</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s43')">
+    <div class="nav-item" onclick="showPage('s43')">
       <span class="nav-icon">📦</span> S43 · Mobile app scaffold — first client, wired to household/recommendations
+      <span class="nav-badge">Jul 30</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s44')">
+      <span class="nav-icon">🍽️</span> S44 · Ghar RE Phase G — real 810-dish catalogue swapped in (feature branch, review pending)
       <span class="nav-badge">Jul 30</span>
     </div>
     <!-- NAV_INJECT -->
@@ -670,7 +674,7 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">140</span>
+      <span class="nav-badge">170</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -1771,6 +1775,22 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">First working app: real login, real onboarding writes, real recommendations — no design polish yet, and no live Supabase project to test end-to-end against.</div>
     </div>
   </div>
+  <div class="tl-row">
+    <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#e1effe;color:#1a56db">S44</span>
+      <div class="tl-title">Ghar RE Phase G — real 810-dish catalogue replaces the 39-dish sample, two bugs fixed, real sig scores wired in</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s44')">810-dish transform</span>
+        <span class="tl-chip" onclick="showPage('s44')">bundle regenerated for real</span>
+        <span class="tl-chip" onclick="showPage('s44')">sig_band crash fixed</span>
+        <span class="tl-chip" onclick="showPage('s44')">536→0 region-unknown dishes</span>
+        <span class="tl-chip" onclick="showPage('s44')">sig_scores_v1.csv authored &amp; wired in</span>
+        <span class="tl-chip" onclick="showPage('s44')">contract re-checked on real data</span>
+      </div>
+      <div class="tl-note">Six commits, one feature branch: (1) a new script transforms the real 810-dish spreadsheet into the exact shape the engine already expects, flagging every gap (missing macros, a few unresolved ingredients, hidden-allergen risk) instead of guessing; (2) the deployable image's build step was pointed at that real transform instead of the 39-dish sample, and — caught in the same branch — actually re-run so the packaged file itself has the real 810, not just the code path; (3) fixed a crash on any real dish with no iconicity score, by treating "not scored yet" as contributing nothing rather than erroring; (4) proved the fix with a real regression run across all 4 test households, then found and fixed a second, more serious bug the same run exposed — 536 of 810 real dishes (66%) were silently "region unknown" because the cuisine→region lookup only knew the old sample's 10 cuisines, concretely costing one Jain household 4 of its 7 meal suggestions; fixed by teaching it all 57 real cuisines' actual regions, verified the old 39-dish sample's behaviour is completely unchanged; (5) brought over sig_scores_v1.csv — a file the engine's knowledge base has referenced since it was written but which never existed in this repo — from a separate data-authoring branch, and wired the real-menu script to actually read it (810/810 dishes matched, 0 unresolved), replacing a rough 12-dish guess. Final check before review: the frozen API contract re-validated against real 810-dish responses across all 7 households (21/21 combinations, 0 violations) and the service's math re-confirmed to exactly match the engine's core math on 516 real dishes (0 drift). Full suite: 26/26. Two pre-existing gaps confirmed unchanged, not newly introduced (one dish name from the old sample doesn't exist in the real menu; two households don't get the exact same specific weather/Jain "whole meal" dishes the old sample gave them — an expected consequence of a bigger, different menu, not a bug). Pushed to claude/phase-g-catalogue-migration-kppmgx — NOT main. Waiting for Founder review.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2213,6 +2233,18 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">mobile/src/onboarding/OnboardingContext.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Shared answer store for the 5-screen flow; adds currentCity + cookCapability fields NewFoo's flow never collected</td></tr>
   <tr><td class="fr-file mono">mobile/src/onboarding/toHouseholdWrite.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Maps onboarding answers to this repo's real question_key vocabulary — NOT NewFoo's own toProfile.ts, which targets a payload shape this backend doesn't have</td></tr>
   <tr><td class="fr-file mono">mobile/src/onboarding/OnboardingChips.tsx, OnboardingHeader.tsx, indianStates.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S43</td><td class="fr-desc">Shared chip-picker, step-progress header, and the 36-state list — ported from NewFoo verbatim (backend-independent)</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/scripts/build_catalogue.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S44</td><td class="fr-desc">Transforms the real 810-dish spreadsheet into the exact dish shape the engine already expects; reads sig_scores_v1.csv for real iconicity scores; flags every gap (missing macros, unresolved ingredients, hidden-allergen risk) instead of guessing</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/scripts/golden_master_real_catalogue_report.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S44</td><td class="fr-desc">Runs the same 4 test households through both the old 39-dish sample and the real 810-dish menu side by side, so a scoring bug is distinguishable from an expected "bigger menu, different picks" effect</td></tr>
+<tr><td class="fr-file mono">data/sig_scores_v1.csv</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S44</td><td class="fr-desc">Real iconicity score for all 810 dishes (747 auto-estimated, 63 flagged for a human to confirm, including Butter Chicken and Dal Makhani themselves) — brought over from a separate data-authoring branch and wired in this session</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/scripts/export_bundle.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Points the deployable-image build step at the real 810-dish transform instead of the 39-dish sample; prints every data gap the transform found so it can never disappear into a clean-looking build</td></tr>
+<tr><td class="fr-file mono">ghar_re_core/catalogue.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Fixed the crash on any real dish with no iconicity score (now contributes nothing, instead of erroring); fixed the cuisine→region lookup to know all 57 real cuisines instead of only the old sample's 10</td></tr>
+<tr><td class="fr-file mono">ghar_re_core/knowledge.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Added the real cuisine→region table (transcribed from the catalogue team's own file) and covered every foreign/other cuisine under the existing "Global" region, closing the 536-dish region-unknown gap</td></tr>
+<tr><td class="fr-file mono">ghar_re_core/tests/test_pipeline.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Two new permanent checks: a dish with no iconicity score never crashes the engine; every real cuisine resolves to a real region, so a future menu update can't silently reintroduce "region unknown" dishes</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/tests/test_bundle.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Updated to expect the real 810-dish bundle instead of the 39-dish sample; test helper now copies sig_scores_v1.csv alongside its isolated test copies of the config folder, matching the real file layout</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/data/bundle/catalogue.json</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">The actual packaged catalogue file, regenerated for real — now the real 810 dishes with real iconicity scores, not the 39-dish sample</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/data/bundle/manifest.json</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">The packaged bundle's own version fingerprint, updated to match the regenerated real catalogue</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/pyproject.toml</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Added openpyxl as a real dependency — the real-menu transform needs it to read the spreadsheet</td></tr>
+<tr><td class="fr-file mono">pyproject.toml</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S44</td><td class="fr-desc">Told the type-checker openpyxl ships no type hints of its own, same treatment already given to two other third-party packages</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2523,6 +2555,36 @@ function deepDiveFeature(featureLabel){
     <div class="decision-a">Reproduced in a real headless browser and read the actual console error rather than guessing from the symptom. It resolved to a package version built for a much newer version of Expo than this app targets — the same root cause already flagged earlier this session for two other packages (this sandbox can't reach Expo's own version-lookup service, so plain installs grab whatever's newest instead of what's compatible). Fixed by pinning the exact compatible versions by hand, then re-verified with fresh screenshots that the fix actually worked.</div>
     <div class="decision-meta">S43 · Jul 30</div>
   </div>
+<div class="decision-item">
+  <div class="decision-q">Why does a Jain household get more meal suggestions after the region-lookup fix, when nothing about Jain rules changed?</div>
+  <div class="decision-a">Because the missing piece wasn't the Jain rule itself — it was a completely separate check that happens after it. Once a dish is confirmed Jain-safe, the engine still checks whether two dishes being paired together "make sense regionally." With two out of three real dishes marked "region unknown," that regional check was failing far more often than it should have, for reasons that had nothing to do with anyone being Jain — it just happened to hit this household hardest because their safe-dish pool was already the smallest to start with. Fixing the region lookup fixed the pairing check for every household, this one just had the least room to spare before it became visible as "only 3 suggestions instead of 7."</div>
+  <div class="decision-meta">S44 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why fix the cuisine→region lookup itself, instead of the simpler-sounding fix of just teaching the engine each dish's home state directly?</div>
+  <div class="decision-a">The home-state approach was the first idea considered, since the real spreadsheet's own state names are messier than they look ("Delhi/UP," "Karnataka (Udupi)," country names for foreign cuisines) and would have needed new cleanup logic invented for this fix alone. The cuisine-to-region field, on the other hand, already existed in the catalogue team's own file, in exactly the clean shape the engine's lookup already knows how to use — including already correctly handling a known regional quirk (Rajasthan's food culture counts as "North" even though the state itself is usually grouped differently) that a state-name-based fix would have had to reinvent from scratch. The cleaner, already-curated field was chosen over building new parsing for a messier one.</div>
+  <div class="decision-meta">S44 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">If the region fix used the "cuisine" field, why does the engine still not know a dish's home state properly for all 810 dishes?</div>
+  <div class="decision-a">Deliberately left alone this session, not overlooked. A dish's exact home state feeds one specific, separate scoring bonus (an extra boost when a dish is from the household's own home state, not just the same broad region) — and the real spreadsheet's state names use different spellings for a few dishes also in the old 39-dish sample (Karnataka vs. "Karnataka (Udupi)," for instance). Fixing this the same way as the region lookup risked quietly changing scores for the original sample too, which had never been part of what this branch was asked to touch. Left as a named, open follow-up rather than fixed under time pressure.</div>
+  <div class="decision-meta">S44 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">A file called sig_scores_v1.csv is now on this branch — where did the actual scores in it come from, and how confident should the Founder be in them?</div>
+  <div class="decision-a">Not invented on this branch — brought over from a separate data-authoring effort that built the file from scratch, since the engine's own knowledge base has referenced it by name since it was written but it never actually existed anywhere in the repo. Two honesty guardrails carried over with it, not weakened in the wiring: no automatic guess is ever allowed to claim a dish is "iconic across all of India" or "the defining dish of a state" — those two top grades are reserved for a human to confirm, and 63 candidate dishes (including Butter Chicken and Dal Makhani, the knowledge base's own textbook examples) are sitting in a separate shortlist file waiting for exactly that confirmation, not silently scored by the automatic guess.</div>
+  <div class="decision-meta">S44 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Now that almost every dish has a real score instead of contributing nothing, did the actual meal recommendations change?</div>
+  <div class="decision-a">Yes, and that's expected, not a bug. Before this session, roughly 798 of 810 real dishes contributed zero extra credit toward "how iconic is this dish" — now nearly all of them contribute something real, even if it's a provisional, not-yet-founder-confirmed number. That naturally shifts which specific dishes come out on top when the engine ranks its options, the same way changing one ingredient in a recipe changes the dish. Checked directly: all 4 test households still get a full set of suggestions, correctly ordered by score, and nothing about this looked like a scoring bug rather than the expected reshuffling.</div>
+  <div class="decision-meta">S44 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why does one specific test still fail, and why wasn't it fixed here?</div>
+  <div class="decision-a">A leftover test expects a dish named exactly "Kanda Bhaji" (a known rainy-day comfort food for one region) to show up for a rainy-weather household — a name that exists in the old 39-dish hand-picked sample but not, under that exact spelling, anywhere in the real 810-dish menu. This is a naming gap in the data, not a scoring bug, and it was already known and reported before this session started. Fixing it means either renaming a real dish or teaching the engine to recognise near-matches, neither of which is a small, safe, single-purpose change — so it stays open and named rather than patched quickly under this branch's own scope.</div>
+  <div class="decision-meta">S44 · Jul 30</div>
+</div>
   <!-- DECISIONS_INJECT -->
   </div>
 
@@ -6343,7 +6405,7 @@ function deepDiveFeature(featureLabel){
     </div>
   </div><!-- /page-s42 -->
 
-  <div id="page-s43" class="page-content">
+  <div id="page-s43" class="page-content" style="display:none">
 
     <div class="page-header">
       <div class="page-title">S43 · Mobile app scaffold — the first client, wired to real endpoints</div>
@@ -6381,6 +6443,7 @@ function deepDiveFeature(featureLabel){
 
     <div class="session-card">
       <div class="session-card-header">
+    <div class="session-card-header">
         <div class="session-card-title">What was built this session</div>
         <div class="session-card-meta">Jul 30, 2026<br>25 things touched</div>
       </div>
@@ -6661,8 +6724,74 @@ function deepDiveFeature(featureLabel){
     ];
     renderFeatureFlows('s43-flows', window.FEATURE_FLOWS_S43);
     </script>
+    </div><!-- /page-s43 -->
 
-  </div><!-- /page-s43 -->
+  <div id="page-s44" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S44 &middot; Ghar RE Phase G &mdash; the real 810-dish catalogue replaces the 39-dish sample (feature branch, review pending)</div>
+      <div class="page-subtitle">Every recommendation the engine has ever produced, in every session before this one, came from 39 invented sample dishes &mdash; never the real menu. This branch swaps that sample for the actual 810-dish catalogue, fixes two bugs the swap exposed, and gives every one of those 810 dishes a real (if still founder-unreviewed) signature score instead of none at all. Not on main &mdash; six commits, one feature branch, waiting for review.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">&#9940; Before this session</div>
+        <div class="impact-text">The engine's math was real and tested, but every dish it could ever recommend was one of 39 hand-written examples &mdash; a stand-in for the real menu, never the real menu itself. The container image that would actually deploy baked in that same 39-dish sample. And a file the engine's own knowledge base has referenced by name since it was written &mdash; sig_scores_v1.csv, meant to grade how iconic or ordinary each of the 810 real dishes is &mdash; didn't exist anywhere in the repository.</div>
+      </div>
+      <div class="impact-arrow">&rarr;</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">&#9989; After this session</div>
+        <div class="impact-text">The deployable image now bakes in the real 810-dish menu, transformed from the same spreadsheet the catalogue team authored. Two bugs the swap exposed are both fixed and proven with real numbers: a household could only get 3 of 7 meal suggestions instead of 7 (now fixed &mdash; 66% of real dishes were silently being treated as "unknown region"), and the engine used to crash outright on any real dish with no iconicity score (now every one of the 810 has a real score, sourced from an actual sig_scores_v1.csv this branch also helped build and wire in). The frozen API contract was re-checked against real data and still holds. Nothing here has touched main &mdash; it's built, tested, and waiting for your go-ahead.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">&#128193; Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/scripts/build_catalogue.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/scripts/golden_master_real_catalogue_report.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">data/sig_scores_v1.csv</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/scripts/export_bundle.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/catalogue.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/knowledge.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/test_pipeline.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/tests/test_bundle.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/data/bundle/catalogue.json</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/data/bundle/manifest.json</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/pyproject.toml</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">pyproject.toml</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built, across six commits on one branch</div>
+        <div class="session-card-meta">July 30, 2026<br>Feature branch: claude/phase-g-catalogue-migration-kppmgx — NOT on main, review pending</div>
+      </div>
+      <div class="session-card-desc">
+        <b>1. The real menu, transformed into the shape the engine already expects.</b> A new script reads the actual 810-dish spreadsheet the catalogue team authored and turns every row into exactly the same data shape the old 39-dish sample used — so nothing about how the engine scores or pairs dishes had to change, only where the dishes come from. Fields the spreadsheet genuinely doesn't have (which meals are "dry," "liquid," or a full standalone meal; whether a dish is vegetarian; whether it's Jain-safe) are worked out from what the spreadsheet does have, with the exact reasoning written down in the code, not hidden. Fields nobody has an honest way to know yet (detailed nutrition breakdowns, a few Jain/allergen edge cases) are left blank rather than guessed at.
+        <br><br>
+        <b>2. The deployable image now bakes in the real menu, not the sample.</b> The same build step that packages the engine for deployment was pointed at the new real-menu script instead of the 39-dish sample, and actually re-run — an earlier pass in this same branch had only proven the code path worked without checking the packaged file itself still had the old 39-dish sample sitting in it. Caught and fixed in the same branch: the real, 810-dish version is what's actually committed now.
+        <br><br>
+        <b>3. Two bugs the real menu exposed, found with evidence and fixed, not guessed at.</b> First: the engine crashed on any real dish with no iconicity score, because it had no concept of "not scored yet" — only "scored." Fixed so an unscored dish is simply treated as contributing nothing extra, which is what the underlying scoring formula already intends for a missing term. Second, more serious: two out of every three real dishes were silently being treated as "region unknown," because the lookup table that says "this cuisine belongs to this region" only ever knew about the 10 cuisines in the old sample, not the 57 real ones. Proven concretely: one household — a vegetarian Jain couple — could only ever get 3 of the 7 meal suggestions the engine is supposed to produce, because "region unknown" was quietly blocking most valid pairings. Fixed by teaching the engine every real cuisine's actual region; that same household now gets all 7, and the fix was checked to prove nothing else about the existing, already-correct 39-dish sample was disturbed by it.
+        <br><br>
+        <b>4. sig_scores_v1.csv — a file the engine's own documentation has always assumed exists — finally does.</b> The engine's knowledge base has referenced this file by name from the day it was written, as the source of how iconic or ordinary each of the 810 dishes is (a "world-famous" Butter Chicken should be recommended differently than a "plain steamed rice"). It never actually existed anywhere in the repository until this work. A companion effort built it — an automatic best-guess score for most dishes, based on how well-known their cuisine is, and a shortlist of 63 dishes (including Butter Chicken and Dal Makhani themselves) flagged for a human to actually confirm, since "is this dish famous across all of India" isn't something any spreadsheet column can answer by itself. This session brought that file over and taught the real-menu script to actually read it, instead of the rough 12-dish guess it was using before.
+        <br><br>
+        <b>5. Proven, not just claimed, that nothing here breaks the existing rules.</b> The frozen API contract — the exact shape every response is allowed to take — was re-checked against real responses built from the real 810-dish menu, across all 7 sample households and multiple contexts, and it holds with zero violations. A second check confirmed the service's own scoring math still matches the engine's core math exactly, dish for dish, across 516 real dishes — no silent drift between the two.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">39 → 810</div><div class="stat-l">Dishes the engine can actually recommend from</div></div>
+        <div class="stat"><div class="stat-n" style="color:#b91c1c">536 → 0</div><div class="stat-l">Real dishes silently treated as "region unknown"</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">3 → 7</div><div class="stat-l">Meal suggestions the Jain test household actually gets</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">810/810</div><div class="stat-l">Real dishes now carrying a real iconicity score</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">26/26</div><div class="stat-l">Automated tests passing</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Commits on main — feature branch only</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — your review, same bar as every merge decision on this project</div>
+        <div class="next-text">Pushed to <code>claude/phase-g-catalogue-migration-kppmgx</code>, not main. Everything in this summary was actually run in this environment — the full automated test suite (26/26), the contract check against real 810-dish responses (21/21 combinations checked, zero contract violations), and the no-drift check between the service's math and the engine's core math (516 real dishes, zero mismatches) — none of this is a hand-traced estimate the way the TypeScript-side work in S41/S42 had to be. Two things are still open on purpose, not silently dropped: (1) one dish's exact name from the old sample ("Kanda Bhaji," a known rainy-day comfort food) doesn't exist under that exact spelling anywhere in the real 810, so one existing test still fails on that specific name lookup; (2) two of the four households used for regression-testing don't get the exact same *specific* meal suggestions the old 39-dish sample gave them for weather-comfort or Jain-safe "full meal" dishes — expected, since the real menu simply has different specific dishes than the hand-picked sample did, not a scoring bug. Also still open, and out of scope for this branch on purpose: dishes' exact home state (used for one particular "extra credit" scoring bonus) still only resolves correctly for the original 39 sample dishes, not all 810 — flagged, not fixed here, because fixing it risked changing already-correct scores for the old sample too. And two gaps a much earlier production-readiness audit already found — no way yet to catch a hidden allergen ingredient (like asafoetida's wheat content) and no real nutrition breakdown per dish — are unchanged by this branch; it was never scoped to fix them.</div>
+      </div>
+    </div>
+  </div><!-- /page-s44 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

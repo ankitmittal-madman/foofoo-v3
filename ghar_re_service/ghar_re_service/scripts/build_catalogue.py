@@ -12,7 +12,7 @@ derivation modules, CatalogueProvider/ConfigProvider) changes because of this mo
 THIS MODULE ONLY BUILDS THE LIST OF DISH DICTS (+ a gap report). Wiring it into export_bundle.py
 is a separate step (Phase G Task 1 proper), deliberately not done here.
 
-SOURCE FILES READ (all under data/source/, resolved the same way export_bundle.py resolves it)
+SOURCE FILES READ (under data/source/ unless noted, resolved the same way export_bundle.py does)
   dishes.xlsx                  sheet "dishes_810" — the 810 authored dishes. NOTE: row 1 of the
                                 sheet is blank; the real header is row 2 (openpyxl 0-indexed: header
                                 = rows[1], data starts at rows[2]).
@@ -20,8 +20,9 @@ SOURCE FILES READ (all under data/source/, resolved the same way export_bundle.p
   ingredient_aliases_v2.csv      Hindi/regional alias -> canonical ingredient name.
   cuisines_v4.csv                cuisine -> cuisine_group / state_origin / tier.
   term_synonyms_v2.csv           dish-name-level synonyms (Pani Puri / Gol Gappa / Puchka / ...).
-  ghar_knowledge_base_v0_2.md     sig-score band definitions, read via ghar_re_core.knowledge
-                                  (SIG_SCORE_BANDS) rather than re-parsed here — see _sig_band().
+  ../sig_scores_v1.csv           i.e. data/sig_scores_v1.csv (one level ABOVE data/source/, per
+                                  data/source/README.md's own config table) — dish_name -> band,
+                                  authored separately (KB0.2 §S1/§S2). See load_sig_scores().
 
 FIELDS DERIVED, NOT SOURCED (documented per-field below — never fabricated, always flagged)
   diet              -> from ingredient diet_type: 'non_veg' if any ingredient is non_veg, else
@@ -35,17 +36,18 @@ FIELDS DERIVED, NOT SOURCED (documented per-field below — never fabricated, al
                         for the curry/single-vs-liquid split), reverse-engineered from the
                         dish_category -> hero_role correlation observed across all 39 golden-sample
                         dishes (see _hero_role() for the exact rules and its known blind spot).
-  sig_band/sig_score -> ONLY set when the dish name matches one of the specific dishes the KB's own
-                        SIG_SCORE_BANDS definitions name as examples (ghar_re_core.knowledge —
-                        transcribed verbatim from the KB, data_source='real'). The KB itself
-                        (ghar_knowledge_base_v0_2.md line ~161) says all 810 draft scores are
-                        supposed to live in a separate file, sig_scores_v1.csv — THAT FILE DOES NOT
-                        EXIST ANYWHERE IN THIS REPO (verified: `find` for it returns nothing). This
-                        is the single biggest data gap this transform surfaces: every dish not
-                        name-matched against the KB's own examples gets sig_band=None (Catalogue's
-                        Dish class currently requires a valid sig_band key to look up sig_score —
-                        making 750+ dishes with sig_band=None loadable is a follow-up, out of scope
-                        for this module, which only builds dish dicts).
+  sig_band/sig_score -> read from ../sig_scores_v1.csv (i.e. data/sig_scores_v1.csv — one level
+                        above source_dir, exactly where data/source/README.md's own config table
+                        entry `../sig_scores_v1.csv` resolves), keyed on dish_name. That file was
+                        authored separately (see its own generator, data/source/
+                        generate_sig_scores_v1.py, on a different branch) with 747 AUTO_DRAFT rows
+                        (heuristic-assigned, capped at regional_hero) and 63 PENDING_FOUNDER_REVIEW
+                        rows (same heuristic band, flagged for founder attention — still a real,
+                        usable value, not a placeholder to null out). Both kinds are used as-is
+                        here; this module doesn't distinguish them further. A dish whose name has
+                        no row in sig_scores_v1.csv even after normalization (case/whitespace)
+                        gets sig_band=None and is added to report.sig_band_unmatched — see
+                        _normalize_name() and load_sig_scores().
   macro              -> only 'calories' is populated (dishes.xlsx has a Calories column); every
                         other macro field (protein_g/fibre_g/fat_g/carbs_g/sugar_g/sodium_mg) is
                         left as None. No macro breakdown exists anywhere in data/source/. Nothing
@@ -81,7 +83,6 @@ from __future__ import annotations
 
 import csv
 import os
-import re
 from dataclasses import dataclass, field
 
 import openpyxl
@@ -101,6 +102,10 @@ INGREDIENTS_CSV = "ingredients_v5.csv"
 INGREDIENT_ALIASES_CSV = "ingredient_aliases_v2.csv"
 CUISINES_CSV = "cuisines_v4.csv"
 TERM_SYNONYMS_CSV = "term_synonyms_v2.csv"
+# Lives at data/sig_scores_v1.csv — ONE LEVEL ABOVE source_dir (data/source/), matching
+# data/source/README.md's own config table entry `../sig_scores_v1.csv` resolved relative to
+# that README's own directory. NOT inside data/source/ like every other file this module reads.
+SIG_SCORES_CSV = "sig_scores_v1.csv"
 
 # Ingredient categories (ingredients_v5.csv `category` column) treated as "the point of the dish"
 # for the is_main approximation. See module docstring's known blind spot re: dairy/paneer.
@@ -122,8 +127,10 @@ class BuildReport:
     incomplete_ing_blocks: list[tuple[str, list[str]]] = field(default_factory=list)
     unresolved_cuisines: list[tuple[str, str]] = field(default_factory=list)
     hidden_allergen_risk: list[tuple[str, list[str]]] = field(default_factory=list)
-    sig_band_stub_count: int = 0
+    # sig_scores_v1.csv join (dish_name -> band). matched = (dish_name, band); unmatched = dish
+    # names with no resolvable row even after normalization — target is an empty list.
     sig_band_matched: list[tuple[str, str]] = field(default_factory=list)
+    sig_band_unmatched: list[str] = field(default_factory=list)
 
 
 def _split(cell: str | None) -> list[str]:
@@ -185,19 +192,31 @@ def load_dish_synonyms(source_dir: str) -> dict[str, list[str]]:
     return out
 
 
-def _sig_band_examples() -> dict[str, str]:
-    """dish name (lowercased) -> band_name, for the specific example dishes the KB's own
-    SIG_SCORE_BANDS definitions name (ghar_re_core.knowledge, transcribed verbatim, data_source
-    'real'). This is the ONLY source of sig_band for the real catalogue — see module docstring's
-    GAP note on the missing sig_scores_v1.csv file."""
+def _normalize_name(name: str) -> str:
+    """Case/whitespace-insensitive join key, so incidental casing or whitespace differences
+    between dishes.xlsx and sig_scores_v1.csv (two files authored independently, on separate
+    branches) don't silently drop a dish to sig_band=None. Collapses internal whitespace runs
+    too, not just leading/trailing."""
+    return " ".join(name.strip().split()).casefold()
+
+
+def load_sig_scores(source_dir: str) -> dict[str, str]:
+    """normalized dish_name -> band, from ../sig_scores_v1.csv (data/sig_scores_v1.csv — one
+    level above source_dir). Every row (both AUTO_DRAFT and PENDING_FOUNDER_REVIEW status) is
+    used as-is: PENDING_FOUNDER_REVIEW rows already carry a real, conservative heuristic band,
+    not a placeholder to be treated as absent. A row whose band isn't one of the 6 known KB0.2
+    §S1 bands (data corruption, not a naming issue) is skipped and NOT counted as a join match —
+    it would fail exactly the same way a missing row does downstream (Catalogue.Dish's
+    K.BAND_TO_SCORE lookup), so treating it as unmatched is honest, not silent.
+    """
+    path = os.path.join(os.path.dirname(source_dir), SIG_SCORES_CSV)
     out: dict[str, str] = {}
-    for _score, band_name, definition, _src in K.SIG_SCORE_BANDS:
-        for name in re.findall(r"([A-Za-z][A-Za-z ']+[A-Za-z])(?:,|\))", definition):
-            out[name.strip().lower()] = band_name
+    with open(path, newline="", encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            band = row["band"]
+            if band in K.BAND_TO_SCORE:
+                out[_normalize_name(row["dish_name"])] = band
     return out
-
-
-_SIG_BAND_EXAMPLES = _sig_band_examples()
 
 
 def resolve_ingredient(
@@ -279,6 +298,7 @@ def transform_dish_row(
     alias_map: dict[str, str],
     cuisine_map: dict[str, dict],
     dish_synonyms: dict[str, list[str]],
+    sig_scores_map: dict[str, str],
     report: BuildReport,
 ) -> dict:
     name = row["Dish Name"]
@@ -322,11 +342,11 @@ def transform_dish_row(
     cats = set(_split(row["Dish Category"]))
     hero_role = _hero_role(cats, name, first_ingredient_diet)
 
-    sig_band = _SIG_BAND_EXAMPLES.get(name.strip().lower())
+    sig_band = sig_scores_map.get(_normalize_name(name))
     if sig_band:
         report.sig_band_matched.append((name, sig_band))
     else:
-        report.sig_band_stub_count += 1
+        report.sig_band_unmatched.append(name)
 
     alt_names = _split(row["Alternate Names"])
     synonyms = dish_synonyms.get(name.strip().lower(), [])
@@ -340,7 +360,7 @@ def transform_dish_row(
         "cuisine": cuisine,
         "diet": diet,
         "hero_role": hero_role,
-        "sig_band": sig_band,  # None for ~all 810 dishes — see module docstring GAP note
+        "sig_band": sig_band,  # from sig_scores_v1.csv; None only if the join failed — see report
         "spice_level": row["Spice Level"],
         "sweetness": row["Sweetness"],
         "heaviness": row["Heaviness"],
@@ -400,10 +420,13 @@ def build_catalogue(source_dir: str = DEFAULT_SOURCE_DIR) -> tuple[list[dict], B
     alias_map = load_ingredient_aliases(source_dir)
     cuisine_map = load_cuisines(source_dir)
     dish_synonyms = load_dish_synonyms(source_dir)
+    sig_scores_map = load_sig_scores(source_dir)
 
     report = BuildReport()
     dishes = [
-        transform_dish_row(row, ing_map, alias_map, cuisine_map, dish_synonyms, report)
+        transform_dish_row(
+            row, ing_map, alias_map, cuisine_map, dish_synonyms, sig_scores_map, report
+        )
         for row in _read_dish_rows(source_dir)
     ]
     report.dish_count = len(dishes)
@@ -416,5 +439,7 @@ if __name__ == "__main__":
     print(f"Incomplete ING-blocks: {len(report.incomplete_ing_blocks)}")
     print(f"Unresolved cuisines: {len(report.unresolved_cuisines)}")
     print(f"Hidden-allergen-risk dishes: {len(report.hidden_allergen_risk)}")
-    print(f"sig_band matched from KB examples: {len(report.sig_band_matched)}")
-    print(f"sig_band left None (stub): {report.sig_band_stub_count}")
+    print(f"sig_band matched from sig_scores_v1.csv: {len(report.sig_band_matched)}")
+    print(f"sig_band unmatched (join failed): {len(report.sig_band_unmatched)}")
+    if report.sig_band_unmatched:
+        print(f"  unmatched dishes: {report.sig_band_unmatched}")

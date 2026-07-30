@@ -19,9 +19,10 @@ The bundle FORMAT is identical either way, which is the point: swapping the sour
 changes this script (and now build_catalogue.py), never the service or the engine.
 
 build_catalogue.build_catalogue() also returns a BuildReport (unresolved ingredient tokens,
-hidden-allergen-risk dishes, unresolved cuisines, sig_band stub count) — printed to stdout on every
-build so these known, open data gaps stay visible rather than disappearing into a clean-looking
-bundle. See build_catalogue.py's module docstring for the full account of each gap.
+hidden-allergen-risk dishes, unresolved cuisines, sig_scores_v1.csv join-match/unmatched counts) —
+printed to stdout on every build so these known, open data gaps stay visible rather than
+disappearing into a clean-looking bundle. See build_catalogue.py's module docstring for the full
+account of each gap.
 
 DETERMINISM
 bundle_version is a content hash (sha256 over the canonical serialization of everything in the
@@ -96,7 +97,7 @@ def _sha256_bytes(data: bytes) -> str:
 def collect_catalogue(source_dir: str) -> tuple[list[dict], BC.BuildReport]:
     """The raw dish dicts, plus the BuildReport of everything build_catalogue.py flagged rather
     than silently papering over (unresolved ingredients, hidden-allergen-risk dishes, unresolved
-    cuisines, sig_band stubs — see build_catalogue.py's module docstring).
+    cuisines, sig_scores_v1.csv join mismatches — see build_catalogue.py's module docstring).
 
     Deliberately the dicts, not constructed Dish objects: ghar_re_core.catalogue.Catalogue takes
     exactly this shape as its constructor argument, so the bundle round-trips into an identical
@@ -124,11 +125,16 @@ def _print_report(report: BC.BuildReport) -> None:
         file=sys.stderr,
     )
     print(
-        f"[build_catalogue] sig_band matched from KB examples: {len(report.sig_band_matched)}; "
-        f"left None/stub: {report.sig_band_stub_count} "
-        "(sig_scores_v1.csv referenced by the KB does not exist in this repo)",
+        f"[build_catalogue] sig_band matched from sig_scores_v1.csv: "
+        f"{len(report.sig_band_matched)}; unmatched (join failed): "
+        f"{len(report.sig_band_unmatched)}",
         file=sys.stderr,
     )
+    if report.sig_band_unmatched:
+        print(
+            f"[build_catalogue] sig_band unmatched dishes: {report.sig_band_unmatched}",
+            file=sys.stderr,
+        )
 
 
 def build_bundle(source_dir: str, out_dir: str) -> dict:
