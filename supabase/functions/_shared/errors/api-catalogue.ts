@@ -62,6 +62,22 @@ export const API_ERRORS = {
     retriable: false,
     message: "Onboarding is already complete for this profile.",
   },
+  /** 422 — well-formed household/onboarding write, but a question_key is unrecognized or its
+   *  answer_value falls outside that field's CHECK-constraint vocabulary (household/schema.ts). */
+  ERR_HOUSEHOLD_FIELD_INVALID: {
+    code: "ERR_HOUSEHOLD_FIELD_INVALID",
+    httpStatus: 422,
+    retriable: false,
+    message: "One or more answers are not valid for their field.",
+  },
+  /** 422 — household_members supplied before the household's required profile fields are known,
+   *  i.e. before public.profiles can exist yet (its FK requires a profiles row first). */
+  ERR_HOUSEHOLD_INCOMPLETE: {
+    code: "ERR_HOUSEHOLD_INCOMPLETE",
+    httpStatus: 422,
+    retriable: false,
+    message: "Household setup is not complete yet — required profile fields are still missing.",
+  },
 } as const satisfies Record<string, ErrorSpec>;
 
 export type ApiErrorCode = keyof typeof API_ERRORS;

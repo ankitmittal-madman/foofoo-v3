@@ -645,9 +645,13 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🔎</span> S40 · Ground-truth audit — two engines found, roadmap &amp; topology written
       <span class="nav-badge">Jul 29</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s41')">
+    <div class="nav-item" onclick="showPage('s41')">
       <span class="nav-icon">🔒</span> S41 · Security hotfix — recommendations endpoint ownership check wired in
       <span class="nav-badge">Jul 29</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s42')">
+      <span class="nav-icon">📝</span> S42 · Onboarding write path — new household/ endpoint (feature branch, review pending)
+      <span class="nav-badge">Jul 30</span>
     </div>
     <!-- NAV_INJECT -->
   </div>
@@ -1717,6 +1721,21 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Closed the authorization gap S40's audit found and deliberately left unfixed. Same import, same call pattern, same error response as the already-correct consent endpoint — runs before any household/context data is fetched, so an unauthorized household_id never reaches compose.ts. Three tests added: mismatched id refused with nothing downstream called, own id allowed through, and the default (no id supplied) unchanged. Deno suite could not be executed in this sandbox (same jsr.io network block already disclosed in S40); format/lint checks passed and the error-handling path was traced by hand against an already-passing test's proven pattern. Python suite re-run in full: 77/77, unaffected. Next: run the TypeScript suite for real before merging.</div>
     </div>
   </div>
+  <div class="tl-row">
+    <div class="tl-spine"><div class="tl-dot" style="background:#5145b8"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#eeecfb;color:#5145b8">S42</span>
+      <div class="tl-title">Onboarding write path built — supabase/functions/household/, feature branch only</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s42')">POST /v1/household</span>
+        <span class="tl-chip" onclick="showPage('s42')">requireOwnership reused</span>
+        <span class="tl-chip" onclick="showPage('s42')">no fabricated defaults</span>
+        <span class="tl-chip" onclick="showPage('s42')">resume across calls</span>
+        <span class="tl-chip" onclick="showPage('s42')">15 new tests</span>
+      </div>
+      <div class="tl-note">Implements the P0 gap the S40 production-readiness audit found: no live code path could ever write profiles/household_members/household_answers. New POST /v1/household endpoint (same defineHandler + authenticate() pattern as consent/recommendations) accepts per-screen answers, logs each to onboarding_sessions, incrementally upserts household_answers, and creates profiles exactly once all five required columns are known — accumulated across as many calls as it takes, via onboarding_sessions history. requireOwnership gates every write, same import/pattern as the S41 fix; profile creation additionally hardcodes the caller's own id at the INSERT itself, not a request-supplied value, per the approved scoping note. household_members writes require an existing profile (FK) and are refused with a clear 422, not a raw DB error, if attempted first. All new code passes format/lint and a full type-check (deno check) against the whole shared module tree — a strong signal beyond earlier sessions' checks, since it validates every function signature end-to-end, not just syntax. The 15 new tests could not be executed (same jsr.io block) but every scenario was traced by hand against the actual code. Pushed to claude/onboarding-write-path — NOT main. Waiting for Founder review and a real deno test run, same bar as S41.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2081,6 +2100,12 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file">docs/architecture/RE-DOC-13_Ghar_RE_Deployment_Topology_v1_0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S40</td><td class="fr-desc">Component-by-component deployment map (Edge Functions, Ghar RE, Postgres) with failure modes and an explicit list of what cannot be verified without live Fly/Supabase access</td></tr>
 <tr><td class="fr-file mono">supabase/functions/recommendations/handler.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S41</td><td class="fr-desc">requireOwnership(claims, householdId) wired in before any data fetch — closes the S40 authorization gap; stale "STUB until the live table exists" comment removed</td></tr>
 <tr><td class="fr-file mono">supabase/functions/_tests/recommendations.test.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S41</td><td class="fr-desc">3 new tests: mismatched household_id refused (loadHousehold/RE/event all uncalled), own id allowed, default-to-own-id unchanged</td></tr>
+<tr><td class="fr-file mono">supabase/functions/household/index.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S42</td><td class="fr-desc">POST /v1/household entrypoint — verbatim defineHandler + authenticate() pattern, same as consent/recommendations</td></tr>
+<tr><td class="fr-file mono">supabase/functions/household/handler.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S42</td><td class="fr-desc">Orchestrates the 4-step write: log screens → upsert household_answers → create profiles once complete → write household_members; requireOwnership gates every write, injectable deps for testing</td></tr>
+<tr><td class="fr-file mono">supabase/functions/household/schema.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S42</td><td class="fr-desc">Validation + the question_key vocabulary (destination column names, not the retired legacy RE's vocabulary) — structural 400 vs semantic 422, same split as consent-schema.ts</td></tr>
+<tr><td class="fr-file mono">supabase/functions/household/store.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S42</td><td class="fr-desc">All DB reads/writes to profiles/household_members/household_answers/onboarding_sessions — the ONLY code in the repo that can write these tables from a live request</td></tr>
+<tr><td class="fr-file mono">supabase/functions/_tests/household.test.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S42</td><td class="fr-desc">15 tests: ownership rejection before any write, resume-across-calls creation, no-fabricated-defaults, repeat-call idempotency, members-before-profile rejected, schema validation</td></tr>
+<tr><td class="fr-file mono">supabase/functions/_shared/errors/api-catalogue.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S42</td><td class="fr-desc">Two new error codes for household/: ERR_HOUSEHOLD_FIELD_INVALID (422), ERR_HOUSEHOLD_INCOMPLETE (422) — additive only, mirrors the existing ERR_CONSENT_TYPE_INVALID precedent</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2335,6 +2360,26 @@ function deepDiveFeature(featureLabel){
   <div class="decision-q">The new tests couldn't be run directly here — how confident is the fix, really?</div>
   <div class="decision-a">The two changed files pass every check available without the blocked network access: formatting and lint, both of which parse and validate the code's structure. Beyond that, the exact error-handling path the new tests depend on was traced by hand against the code that actually implements it, line by line, and it is the identical path an already-passing test in the same file already proves works for a different error. That is real evidence, not a guess — but it is not the same as watching the test runner say "3 passed," and the honest next step is stated plainly: run it for real before merging.</div>
   <div class="decision-meta">S41 · Jul 29</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why a brand-new endpoint instead of adding this to the existing recommendations or consent endpoint?</div>
+  <div class="decision-a">Both existing endpoints already own one specific resource each — this project's established pattern is one endpoint per resource, not one endpoint that does several unrelated things. Folding household creation into either existing one would have made a single handler responsible for two very different kinds of writes with different validation rules, which is exactly the kind of tangle this project's own pattern already avoids elsewhere.</div>
+  <div class="decision-meta">S42 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Where do a household's answers live before all five required pieces are known and the record can actually be created?</div>
+  <div class="decision-a">In the same permanent answer-by-answer history table that was already built two sessions ago for exactly this purpose, before this session ever started. Nothing new had to be invented for it — the table's own shape (one row per question, per screen, over time) already assumes a multi-step flow, it just had nothing writing to it yet.</div>
+  <div class="decision-meta">S42 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">What happens if someone tries to add family-member details before the household itself is created?</div>
+  <div class="decision-a">Refused, with a clear, specific message — not a confusing database error. This isn't a judgment call this session made; it's a hard requirement underneath the data itself, since a family member's record can only exist if it's linked to a household record that exists first. Flagged explicitly as worth double-checking against the real onboarding flow once a frontend exists, in case that ordering ever feels wrong in practice.</div>
+  <div class="decision-meta">S42 · Jul 30</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Why does profile creation hardcode the caller's own identity instead of trusting the already-passed ownership check?</div>
+  <div class="decision-a">Belt and suspenders, deliberately asked for by the Founder's own scoping instructions before this was built. The ownership check already guarantees the two values are the same by the time this code runs — but hardcoding it at the actual database command means even a future bug in that earlier check could never let this specific command create a record for the wrong person. Cheap insurance on the one write that can never be undone cleanly.</div>
+  <div class="decision-meta">S42 · Jul 30</div>
 </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -6046,7 +6091,7 @@ function deepDiveFeature(featureLabel){
     </div>
   </div><!-- /page-s40 -->
 
-  <div id="page-s41" class="page-content">
+  <div id="page-s41" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S41 · Security hotfix — closing the household-ownership gap the audit found</div>
       <div class="page-subtitle">The gap the last session found and deliberately did not fix — any signed-in user could ask for another household's recommendation data by supplying its id — is closed. One import, one function call, placed before any data is fetched.</div>
@@ -6098,6 +6143,63 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s41 -->
+
+  <div id="page-s42" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S42 · The onboarding write path — built, pushed to a feature branch, waiting for your review</div>
+      <div class="page-subtitle">The single biggest gap the production-readiness audit found — nobody could ever actually save a real user's answers — now has real code behind it. Not on main yet, and deliberately so: this touches real user data, the same review bar as the security fix.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Every screen the app could ever ask — name, region, diet, who cooks — had nowhere to actually land. The database tables were built two sessions ago, but nothing anywhere in the code could write to them. Every single request, for every user, forever, would have looked exactly like a brand-new visitor who'd never answered a question — because as far as the database was concerned, that was true.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A new endpoint accepts a household's answers — one screen at a time or several at once — and remembers them properly across multiple visits, the way a real onboarding flow needs to: someone can answer three questions today, close the app, and come back tomorrow to finish without losing anything. Once the five pieces of information that are always required are known, the household is created for real — but only then, and only once, and only ever for the person who is actually logged in. Nothing here is guessed or invented if the user hasn't said it yet.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/household/index.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/household/handler.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/household/schema.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/household/store.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_tests/household.test.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/errors/api-catalogue.ts</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">July 30, 2026<br>Feature branch: claude/onboarding-write-path — NOT on main, review pending</div>
+      </div>
+      <div class="session-card-desc">
+        <b>1. A new endpoint, built the same way the last two were.</b> Same wiring pattern as the consent and recommendations endpoints — nothing new invented, just the same shape applied a third time. It accepts however many answers a caller has ready, logs each one to a permanent history, and keeps a running "current state" view that updates incrementally rather than requiring everything at once.
+        <br><br>
+        <b>2. Same ownership rule as the security fix, applied from day one.</b> A caller can only ever write their own household's data — checked before a single write happens, the same import and the same pattern the security fix just proved out. For the very first creation of a household specifically, there's a second, even stronger guarantee underneath that check: the actual database command that creates the record is hard-wired to use the logged-in person's own identity, not anything read from the request — so even a bug in the check above couldn't let it create a record for the wrong person.
+        <br><br>
+        <b>3. Nothing invented, ever, if the answer isn't known yet.</b> The household record can't be created until five specific pieces of information are all known — and if one is still missing, the endpoint simply doesn't create it yet rather than filling the gap with a guess. This was the standing rule already established elsewhere in this project (never fabricate a value a real user hasn't actually provided), applied here for the first time to a brand-new write path rather than an existing one.
+        <br><br>
+        <b>4. A genuinely resumable flow, not a one-shot form.</b> Answers given today and answers given next week both count — a table already built two sessions ago for exactly this purpose (an append-only log of every answer, one row per question) turned out to be the right place to accumulate partial progress, so nothing new had to be invented for it. Family member details (children, elders, their specific needs) can only be added once the household itself exists, since one literally depends on the other existing first — attempting it out of order is refused with a clear, specific error rather than a confusing failure.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">4</div><div class="stat-l">New files, one new endpoint</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">15</div><div class="stat-l">New tests</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Fabricated defaults</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Commits on main — feature branch only</div></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">Next — your review, same bar as the security fix</div>
+        <div class="next-text">Pushed to <code>claude/onboarding-write-path</code>, not main — this is real user-data write surface and gets the same scrutiny the auth fix did, not a fast-track merge. The new code compiles cleanly and passes every check available without a live database (structure, style, and a full type-check of the whole new module against the rest of the codebase). The 15 new tests could not actually be run here — the same sandbox network restriction that blocks the TypeScript test runner generally, disclosed plainly in earlier sessions, not new to this one — so each test's outcome was instead worked through by hand against the real code, one at a time, the same way the security fix's tests were checked before you ran them for real. <b>Run <code>cd supabase && deno test --allow-env functions/_tests/household.test.ts</code> yourself before this goes anywhere near main.</b> One open design question worth your attention: family-member details can only be added once the household record exists, because the database itself requires it — if that ordering ever feels wrong for the real onboarding flow, it's worth flagging now rather than after a frontend is built against it.</div>
+      </div>
+    </div>
+  </div><!-- /page-s42 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
