@@ -1,0 +1,811 @@
+dish_name,sig_score,band,evidence_confidence,coverage_confidence,owner,method,version,status
+Butter Chicken,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Dal Makhani,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Sarson Ka Saag,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Makki Ki Roti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tandoori Chicken,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Paneer Tikka,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Amritsari Fish Fry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chole,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Rajma,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Palak Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aloo Gobhi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Paneer Butter Masala,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shahi Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Tikka,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Seekh Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kadhi Pakora,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aloo Paratha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Gobhi Paratha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Paneer Paratha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Naan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Garlic Naan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kulcha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lassi (Sweet),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lassi (Salted),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Matar Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dal Tadka,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Bhindi Masala,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Baingan Bharta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dum Aloo,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Jeera Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pindi Chole,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Keema Matar,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Phulka,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tawa Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhatura,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bedmi Puri,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Aloo Sabzi (Delhi style),0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Dahi Bhalla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Aloo Tikki,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pav Bhaji (Delhi style),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Parantha (Plain),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mooli Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chur Chur Naan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chaat Papdi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Kachori (Dal),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhel Puri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sev Puri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Bhurji,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mughlai Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rabri Jalebi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kulfi Falooda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rumali Roti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Nihari,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Mutton Korma,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Biryani (Mughlai Chicken),0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Shami Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mughlai Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pasanda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mutton Rogan Josh,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Galouti Kebab,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Kakori Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lucknowi Biryani,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Tunday Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Stew (Awadhi),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Nahari Kulcha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sheermal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Zarda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Phirni,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Haleem,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rezala,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Baida Roti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Warqi Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Chicken Biryani,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Hyderabadi Mutton Biryani,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Mirchi Ka Salan,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Double Ka Meetha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Bagara Baingan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pathar Ka Gosht,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lukhmi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Khubani Ka Meetha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Marag,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dalcha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Osmania Biscuit,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dum Ka Murgh,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bagara Khana,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Egg Biryani,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Irani Chai,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Tahari,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Qubani Ka Meetha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Achari Gosht,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Masala Dosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Plain Dosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Idli,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Sambar,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Rasam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Coconut Chutney,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Medu Vada,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Uttapam,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Pongal (Ven),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pongal (Sweet),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Curd Rice,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Lemon Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tamarind Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tomato Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kootu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Poriyal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Avial,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kuzhambu (Vathal),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Payasam (Semiya),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Appam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rasam Vada,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thali Meals (South Indian),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Chettinad,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chettinad Egg Curry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paniyaram,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Murukku,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kothu Parotta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Parotta (Kerala/Tamil),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Filter Coffee,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Sundal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kerala Fish Curry,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Appam with Stew,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Puttu,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Kadala Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fish Molee,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kerala Prawn Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Avial (Kerala),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Olan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Parippu Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Banana Chips,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Sadya Thali,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Kerala Parotta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Beef Fry (Kerala),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Payasam (Ada),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Palada Payasam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Malabar Biryani,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pathiri,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Unniyappam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Erissery,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mutta Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bisi Bele Bath,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Ragi Mudde,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Neer Dosa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Jolada Rotti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chitranna,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Set Dosa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Goli Baje,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Akki Rotti,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Mangalorean Fish Gassi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kori Rotti,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mysore Pak,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Obbattu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Vangi Bath,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kesari Bath,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Saaru,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Machher Jhol,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Shorshe Ilish,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Aloo Posto,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Luchi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Cholar Dal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kosha Mangsho,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Mishti Doi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Sandesh,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rasgulla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Begun Bhaja,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chingri Malai Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Doi Maach,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shukto,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Macher Kalia,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pitha (Patishapta),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ghugni,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mochar Ghonto,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aam Doi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Steamed Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Muri Ghonto,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Vada Pav,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Misal Pav,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Puran Poli,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Thalipeeth,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sabudana Khichdi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Poha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Usal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhakri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pav Bhaji,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Batata Vada,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bharli Vangi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sol Kadhi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Amti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kombdi Vade (Malvani),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tambda Rassa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pandhra Rassa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Modak,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shrikhand,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ukdiche Modak,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kothimbir Vadi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dhokla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Thepla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Undhiyu,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Khandvi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Fafda Jalebi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Dal Dhokli,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gujarati Kadhi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sev Tamatar,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Handvo,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Patra,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Basundi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gathiya,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mohanthal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Khakhra,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aam Shrikhand,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rotla,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Methi Na Gota,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Khichu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Muthiya,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Goan Fish Curry,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Vindaloo (Pork),0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Xacuti (Chicken),0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Bebinca,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Sorpotel,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ros Omelette,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fish Recheado,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pao (Goan Bread),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Prawn Balchao,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Goan Prawn Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Cafreal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sannas,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Samosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kathi Roll,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pakora (Mixed Veg),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pani Puri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bread Pakora,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chole Tikki,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Ragda Pattice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Momos (Steamed Veg),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Momos (Chicken),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fried Momos,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dosa (Street Style),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Roll,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Jalebi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gulab Jamun,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gajar Ka Halwa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hakka Noodles,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Veg Fried Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Manchurian (Veg),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chilli Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chilli Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Manchow Soup (Veg),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Spring Roll,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Fried Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Manchurian,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paneer 65,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Honey Chilli Potato,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Schezwan Noodles,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paneer Chilli Dry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dragon Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dal Baati,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Churma,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Laal Maas,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gatte Ki Sabzi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ker Sangri,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pyaaz Ki Kachori,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Achari Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Papad Ki Sabzi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bajra Roti,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Barfi (Kaju),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pasta Arrabiata,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Margherita Pizza,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pasta Alfredo,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Garlic Bread,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bruschetta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Grilled Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Caesar Salad,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mushroom Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+French Fries,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Grilled Sandwich,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paneer Steak,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tomato Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Veg Burger,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Maggi Noodles,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Burger,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rogan Josh,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dum Aloo (Kashmiri),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Yakhni,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kahwa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Noon Chai,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gushtaba,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Modur Pulao,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Haak (Kashmiri Greens),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhakarwadi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gongura Chicken,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pulihora,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gutti Vankaya,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Andhra Chicken Curry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Boti Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Cham Cham,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sakinalu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Natu Kodi Pulusu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Litti Chokha,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sattu Paratha,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thekua,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dal Pitha,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chana Ghugni,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chapli Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Koki,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Poha Jalebi (Indori),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhutte Ka Kees,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Parsi Dhansak,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Stuffed Capsicum,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Changezi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mix Veg,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chikki (Peanut),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dabeli,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Onion Dosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ghee Roast Dosa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mysore Masala Dosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dal Pakwan,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rava Upma,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Idiyappam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kerala Egg Roast,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thoran (Cabbage),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Meen Pollichathu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Manga Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Vazhakka Bajji,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Vengaya Sambar,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bombay Sandwich,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kolkata Biryani,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chingri Bhaja,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Posto Bora,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dhokar Dalna,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chanar Dalna,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Jhalmuri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Payesh,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Telebhaja Platter,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aamti (Kokum),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pithla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Matki Usal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aamras,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chakli,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sabudana Vada,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kolhapuri Misal,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Daulat Ki Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Khichu (Papdi No Lot),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lilva Kachori,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dudhi Halwa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Korma,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Fried Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ghevar,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kathi Kebab Wrap,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gongura Pachadi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mutton Nihari,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sheermal with Nihari,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gujarati Dal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Biryani Rice (Plain),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hot and Sour Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Kheer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kheer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ras Malai,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sohan Halwa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kulfi (Malai),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Haleem,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Keema Samosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Khichdi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aloo Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Papdi Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Imarti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Crispy Corn,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Veg Manchow Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Lollipop,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chilli Fish,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken 65,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tahiri,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Khichdi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Puri,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Aloo Puri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Baati Chokha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Goan Sausage Pulao,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Xacuti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fried Bombil,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ambot Tik,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Feni Spiked Cashew Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kachhi Haldi Ki Sabzi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Makhaniya Lassi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Methi Bajra Puri,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Jonna Rotte,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Nadru Yakhni,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Goshtaba,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kashmiri Pulao,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pepper Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kozhi Varuval,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thayir Vadai,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Vendakkai Poriyal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paruppu Rasam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Keerai Masiyal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mor Kuzhambu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bisi Bele Bath Mix Veg,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kerala Chicken Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pazhampori,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Podimas,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aloo Dum (Bengali),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Macher Matha Diye Moong Dal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chhanar Jilipi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tok Dal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chingri Cutlet,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Masala Bhaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kadhai Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thalipeeth (Multi-grain),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kolambi Bhaat,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Solkadhi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kadhai Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Patra Ni Machhi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Salli Boti,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Akuri,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Butter Naan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Stuffed Naan (Paneer),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Malai Tikka,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tandoori Paneer Tikka,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chana Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shahi Tukda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aloo Chhole,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paneer Bhurji,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tandoori Roti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Mirchi Bajji,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Andhra Prawn Fry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pesarattu Upma,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bobbatlu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pachi Pulusu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Laccha Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mag Ni Dal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Veg Club Sandwich,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Malai Kofta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Masala Omelette,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Boiled Egg,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chai,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kadai Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chaas,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hyderabadi Biryani (Veg),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pasta Carbonara,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gnocchi in Tomato Sauce,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ravioli (Spinach Ricotta),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Arancini,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Frittata,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Cannoli,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gelato,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Panini (Grilled Veg),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fettuccine Alfredo,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Cacio e Pepe,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pasta Pomodoro,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Panzanella,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Spaghetti Bolognese,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Italian Meatballs,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Parmesan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tortellini Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Panini (Chicken),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Insalata Mista,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Minestrone Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Focaccia,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ciabatta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Caprese Salad,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Affogato,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tiramisu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Marinara Breadsticks,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Cream of Tomato Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Broccoli Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+French Onion Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Corn Chowder,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Greek Salad,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Coleslaw,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Garden Salad,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pasta Salad,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mashed Potatoes,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mac and Cheese,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Nachos with Salsa,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Steak,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fish and Chips,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lamb Chops,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Nuggets,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Potato Wedges,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Onion Rings,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Waffles,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Quiche (Vegetable),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Scrambled Eggs on Toast,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+French Omelette,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Wrap,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pancakes,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Malpua,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chilli Garlic Noodles,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Veg Crispy,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Burnt Garlic Fried Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paneer Chilli Gravy,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mushroom Chilli,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Baby Corn Manchurian,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Chilli,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Schezwan Noodles,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dragon Prawns,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Prawn Hakka Noodles,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+American Chop Suey,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Veg Manchurian Dry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mawa Kachori,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Wonton Soup,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dim Sum (Veg),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Szechuan Chicken,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kung Pao Chicken,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sweet and Sour Chicken,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mapo Tofu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Steamed Bao (Veg),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Satay,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Vegetable Stir Fry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Noodle Soup,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Drop Soup,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Szechuan Fried Rice,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bread Omelette,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Corn Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Raj Kachori,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Matar Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hara Bhara Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paneer Tikka Roll,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Masala Papad,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aloo Bonda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Veg Cutlet,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Toast Sandwich,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Keema Samosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Roll (Kolkata),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mutton Roll,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fish Fry (Street Style),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Egg Bhurji Pav,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Omelette Pav,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Boiled Egg Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kulfi (Paan),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Balushahi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gujiya,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Meen Kulambu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Methi Matar Malai,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mirchi Vada,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thandai,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fruit Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Falooda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tandoori Momos,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Missi Roti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kurkure Bhindi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhutta (Roasted Corn),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Miso Soup,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ramen (Chicken),0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tempura (Veg),0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sushi (Veg Roll),0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Edamame,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Teriyaki Chicken,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gyoza,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Katsu Curry,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Yakitori,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Japanese Fried Rice,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Udon Noodles,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Onigiri,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Karaage,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Okonomiyaki,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mochi,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pad Thai (Veg),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Green Curry (Veg),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Red Curry (Chicken),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tom Yum Soup (Prawn),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tom Kha Gai,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thai Fried Rice (Chicken),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Som Tam,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thai Basil Chicken,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pad See Ew,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Massaman Curry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thai Fish Cakes,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mango Sticky Rice,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kimchi Fried Rice,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tteokbokki,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Japchae,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Korean Fried Chicken,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bulgogi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bibimbap (Veg),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bibimbap (Chicken),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dakgalbi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gyeran Mari,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Korean Corn Cheese,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pho (Chicken),0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Banh Mi (Pork),0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Vietnamese Spring Roll (Fresh),0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Banh Xeo,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bun Cha,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Vietnamese Coffee,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tofu Pho,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Com Tam,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Hummus,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Falafel,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shawarma (Chicken),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tabbouleh,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Baba Ganoush,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pita Bread,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fattoush,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kofta Kebab,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Shawarma Plate,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Stuffed Grape Leaves,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Tacos,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Burrito,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Quesadilla (Veg),0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Guacamole,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bean Burrito,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mexican Rice,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Enchilada,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Churros,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Khow Suey,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mohinga,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Burmese Tea Leaf Salad,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shan Noodles,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Burmese Samosa Soup,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ema Datshi,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kewa Datshi,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Phaksha Paa,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Jasha Maroo,0.40,common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Masor Tenga,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aloo Pitika,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Khar,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Duck Curry (Assamese),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pork with Bamboo Shoot,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ou Tenga Fish Curry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Til Pitha,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kumura Khar,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bora Saul Rice,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Narikol Laru,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Smoked Pork with Bamboo Shoot,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Naga Pork Curry,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Axone Chutney,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Raja Mirchi Chutney,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Galho,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Anishi Curry,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Naga Fish Curry,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Smoked Chicken (Naga),0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Eromba,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Singju,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kangshoi,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chamthong,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paknam,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gundruk Soup,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sel Roti,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chhurpi Soup,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kinema Curry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Phagshapa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Jadoh,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tungrymbai,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dohneiiong,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Nakham Bitchi,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bai,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sawhchiar,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Koat Pitha,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Thukpa (Arunachali),0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pika Pila,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lukter,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mui Borok,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Berma,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Wahan Mosdeng,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dalma,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pakhala Bhaat,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chhena Poda,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rasabali,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Santula,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Machha Besara,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Saga Bhaja,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Enduri Pitha,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Khaja (Odia),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Machha Jhola,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kosha Murgi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Daab Chingri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ilish Bhaja,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fish Chop,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Prawn Malaikari,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mutton Chaap,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kolkata Chicken Roll,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kolkata Fish Fry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Labra,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Narkel Naru,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sondesh (Nolen Gur),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pantua,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rajbhog,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shukni,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chholar Dal with Luchi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhopali Gosht Korma,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhopali Biryani,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Daal Bafla,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mawa Bati,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhopali Kebab,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chakki Ki Shaak,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shahi Shikanji,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Indori Namkeen,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Garadu Chaat,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Khopra Patties,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shikanji (Indori),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Indori Poha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Fara,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Muthiya (CG),0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bore Baasi,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aamat,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chila (CG),0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Angakar Roti,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dubki Kadhi,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhutte Ka Kees (Indori),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gongura Mutton,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Punugulu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Royyala Iguru,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chepala Pulusu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Natukodi Fry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dappalam,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Uggani,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gavvalu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ariselu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sakinalu (Telangana),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Murgh Musallam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mutton Biryani (Lucknowi),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paneer Do Pyaza,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bellam Garelu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pootharekulu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Borugu Undalu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mamsam Pulusu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pesarattu MLC,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chettinad Fish Curry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chettinad Mutton,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Athirasam,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kavuni Arisi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Sukka (Chettinad),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Ghee Roast,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Prawn Sukka,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pundi Curry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mangalore Buns,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mushroom Ghee Roast,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rava Idli,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Saagu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Uddina Vada (Udupi),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Meen Mappas,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Irachi Stew,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pathiri (Malabar),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Koottu Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Theeyal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chakka Pradhaman,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Meen Varuthathu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lyodur Tschaman,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rishta,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aab Gosht,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tchok Wangan,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rajasthani Pyaaz Kachori,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Paneer Manchurian,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pakodi Ki Kadhi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bajra Khichdi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Mohan Thaal,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Peda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Besan Gatte,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bajra Roti (Rajasthani),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Banarasi Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Banarasi Thandai,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Matar Ki Tikki,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tamatar Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Revdi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Gujhiya,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lucknowi Kebab Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dham Thali,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Madra (Chana),0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Babru,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Siddu,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aktori,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chha Gosht,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tudkiya Bhath,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kafuli,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bhatt Ki Churkani,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chainsoo,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Jhangora Kheer,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bal Mithai,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Singodi,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Phaanu,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dubuk,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Patande,0.20,utility,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Bihari Kebab,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Kadhi Badi (Bihari),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Goan Egg Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Poee Bread,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Serradura,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Dodol,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Berry Pulao,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Lagan Nu Custard,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sev Biryanji,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tisrya Masala,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Malvani Mutton Curry,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Masala Bhaat (Maharashtrian),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pesarattu,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pithla Bhakri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sabudana Vada (Maharashtrian),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Aamras (Maharashtrian),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rabri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Ram Ladoo,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Rava Dosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Safed Maas,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sai Bhaji,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Koki (Sindhi),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Chicken Korma (Mughlai),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sarva Pindi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sev Usal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shakarkandi Chaat,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Shikampur Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sindhi Kadhi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Surti Locho,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Sweet Corn Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Taar Gosht,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Tabak Maaz,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Upma,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Zunka Bhakri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
+Pepper Chicken (Tamil),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
