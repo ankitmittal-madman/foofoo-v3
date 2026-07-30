@@ -18,7 +18,7 @@ def recommend(household, ctx, catalogue=None):
     cat = catalogue or Catalogue()
     theta = derive_theta(household)
     objective = household.get("q15_objective") or CONFIG.default_objective
-    plates = pairing.assemble_7(cat, theta, ctx, objective, n=7)
+    plates = pairing.assemble_7(cat, theta, ctx, objective, n=7, household_label=household.get("label"))
     return dict(
         household=household["label"],
         theta=theta,

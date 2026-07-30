@@ -22,6 +22,7 @@ import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 
+import { UserJourney } from "../_shared/logging/userJourney.ts";
 import { parseHouseholdWriteRequest } from "./schema.ts";
 import {
   accumulatedProfileFields,
@@ -130,6 +131,12 @@ export function makeHouseholdHandler(deps: HouseholdDeps = {}): Handler {
       membersWritten = await upsertMembers(ctx, householdId, parsed.members);
       log.info("household.members_written", { count: membersWritten });
     }
+
+    UserJourney.logOnboardingStep(
+      householdId,
+      parsed.screens.map((s) => s.screenId),
+      { profileCreated: createdThisCall, membersWritten: membersWritten || undefined },
+    );
 
     return jsonContract(
       {

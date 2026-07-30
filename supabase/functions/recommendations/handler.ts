@@ -17,6 +17,7 @@ import { jsonContract } from "../_shared/api/response.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
+import { UserJourney } from "../_shared/logging/userJourney.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 
@@ -153,6 +154,10 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
         });
         recordRequest(outcome);
         maybeLogSummary(log);
+        UserJourney.logRecommendationOutcome(hid, outcome, plateCount(result.body), {
+          latencyMs,
+          reServed: true,
+        });
         // Pass through plates[]/contributions[] AS-IS (RE-DOC-11 §6 — no second translation layer),
         // additively stamping the trace id.
         return jsonContract(result.body, ctx.traceId, 200);
@@ -171,6 +176,11 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
       });
       recordRequest("fallback");
       maybeLogSummary(log);
+      UserJourney.logRecommendationOutcome(hid, "bad_body", plateCount(fb), {
+        latencyMs,
+        detail: respCheck.errors.join("; "),
+        reServed: false,
+      });
       return jsonContract(fb, ctx.traceId, 200);
     }
 
@@ -193,6 +203,11 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     });
     recordRequest(result.kind === "timeout" ? "timeout_fallback" : "fallback");
     maybeLogSummary(log);
+    UserJourney.logRecommendationOutcome(hid, result.kind, plateCount(fb), {
+      latencyMs,
+      detail: result.detail,
+      reServed: false,
+    });
     return jsonContract(fb, ctx.traceId, 200);
   };
 }
