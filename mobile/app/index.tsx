@@ -18,5 +18,5 @@ export default function Index() {
   // Phase 1 always routes a signed-in user back into onboarding's first screen; it is idempotent
   // (household/handler.ts never re-creates an existing profile) so re-visiting is safe, and Phase 1
   // has no "onboarding complete" flag to branch on yet.
-  return <Redirect href="/(onboarding)/profile-basics" />;
+  return <Redirect href="/(onboarding)/step-1" />;
 }
