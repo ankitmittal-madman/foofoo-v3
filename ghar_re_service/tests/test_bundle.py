@@ -66,16 +66,21 @@ def test_missing_config_file_fails_loudly(tmp_path):
         export_bundle.build_bundle(str(partial), str(tmp_path / "out"))
 
 
-def test_bundle_catalogue_matches_fixture_catalogue(built):
-    """The bundled catalogue must reconstruct the same dish set the fixtures produce — the bundle
-    is a snapshot of the golden sample, not a lossy re-encoding of it."""
+def test_bundle_catalogue_matches_build_catalogue_output(built):
+    """The bundled catalogue must reconstruct the same dish set build_catalogue.py produces — the
+    bundle is a snapshot of the real 810-dish catalogue (Phase G), not a lossy re-encoding of it.
+
+    Superseded from comparing against the 39-dish golden-sample fixtures: export_bundle.py was
+    wired to build_catalogue.py (Phase G Task 2), so the bundle no longer sources from
+    ghar_re_core.fixtures.DISHES at all — that comparison would now fail by design, not by bug.
+    """
     out, _ = built
-    from ghar_re_core.catalogue import Catalogue
+    from ghar_re_service.scripts import build_catalogue
 
     bundled = providers.BundleCatalogueProvider(out).load()
-    direct = Catalogue()
-    assert len(bundled.dishes) == len(direct.dishes)
-    assert {d.name for d in bundled.dishes} == {d.name for d in direct.dishes}
+    fresh_dishes, _report = build_catalogue.build_catalogue()
+    assert len(bundled.dishes) == len(fresh_dishes)
+    assert {d.name for d in bundled.dishes} == {d["name"] for d in fresh_dishes}
 
 
 def test_engine_runs_from_bundle_without_repo_config(built, monkeypatch):
