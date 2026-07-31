@@ -76,6 +76,14 @@ const INITIAL_ANSWERS: OnboardingAnswers = {
 
 const SPLIT_AGE_HOUSEHOLDS: HouseholdType[] = ["couple_kids", "couple_kids_parents", "joint"];
 
+/**
+ * isSplitAgeHousehold — whether Screen 5 should ask for two separate age bands (eldest +
+ * youngest) instead of one, based on the household type chosen on Screen 1. True for any
+ * household that plausibly spans generations (kids and/or grandparents); false for single,
+ * couple, or flatmate households where one age band covers everyone relevant.
+ * @param household - the household type answered on Screen 1, or null if not yet answered.
+ * @returns true if Screen 5's age question should show the eldest/youngest split.
+ */
 export function isSplitAgeHousehold(household: HouseholdType | null): boolean {
   return household != null && SPLIT_AGE_HOUSEHOLDS.includes(household);
 }
@@ -88,6 +96,15 @@ type OnboardingContextValue = {
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
 
+/**
+ * OnboardingProvider — wraps the 5-step onboarding flow (mounted once in the onboarding group
+ * layout) and holds the in-memory answer bag every step screen reads from and writes to via
+ * useOnboarding(). Answers live only in memory for the duration of the flow — each step also
+ * submits its own slice to the backend immediately via postHousehold, so this context is not
+ * the durable source of truth, just the shared scratch pad the UI reads while the user is
+ * mid-flow.
+ * @param children - the onboarding step screens, rendered once this provider is mounted.
+ */
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [answers, setAnswersState] = useState<OnboardingAnswers>(INITIAL_ANSWERS);
 
@@ -102,6 +119,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;
 }
 
+/**
+ * useOnboarding — reads the current answer bag and the setAnswers/reset actions from
+ * OnboardingProvider. Every onboarding step screen (step-1..step-5) calls this to read the
+ * user's prior answers and patch in new ones as they're made. Throws if called outside the
+ * provider, since that indicates a screen was rendered outside the onboarding flow.
+ * @returns the current answers, a patch function (`setAnswers`), and a full `reset`.
+ */
 export function useOnboarding(): OnboardingContextValue {
   const ctx = useContext(OnboardingContext);
   if (!ctx) {

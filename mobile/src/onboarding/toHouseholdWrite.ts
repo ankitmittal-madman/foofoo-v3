@@ -56,6 +56,14 @@ const ALLERGEN_BITS: Record<string, number> = {
   sesame: 64,
 };
 
+/**
+ * allergenFlags — packs the user's selected allergen chips into the single bitmask integer
+ * profiles.allergen_flags expects (ALLERGEN_BITS above), OR-ing together each selected
+ * allergen's bit. Any allergen not in ALLERGEN_BITS (currently just "others", which is
+ * collect-only and carried separately as free text) contributes no bit.
+ * @param allergens - the allergen chip values the user selected on Screen 4 (e.g. ["dairy", "soy"]).
+ * @returns the combined bitmask to send as profiles.allergen_flags.
+ */
 function allergenFlags(allergens: string[]): number {
   return allergens.reduce((bits, a) => bits | (ALLERGEN_BITS[a] ?? 0), 0);
 }
@@ -165,6 +173,13 @@ export function step5ToPayload(a: OnboardingAnswers): HouseholdWritePayload {
   return { screens, members };
 }
 
+/**
+ * isSplitAge — whether this household answered Screen 5's age question with two separate
+ * bands (eldest/youngest) rather than one, so step5ToPayload knows which age field(s) to read
+ * when building the best-effort household_members condition row(s).
+ * @param a - the full onboarding answer bag.
+ * @returns true if householdType is one of the multi-generation types (kids and/or parents/joint).
+ */
 function isSplitAge(a: OnboardingAnswers): boolean {
   return a.householdType === "couple_kids" || a.householdType === "couple_kids_parents" || a.householdType === "joint";
 }

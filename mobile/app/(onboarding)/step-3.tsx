@@ -50,6 +50,13 @@ const DAYS: Option[] = [
   { value: "sunday", label: "Sun" },
 ];
 
+/**
+ * hasFollowUp — whether the chosen diet needs the extra meat-preference/veg-days questions
+ * below the diet grid. Only non-veg and eggetarian diets have anything further to ask; veg,
+ * jain, and vegan diets are already fully specified by the diet choice alone.
+ * @param diet - the diet the user just selected, or null before any selection.
+ * @returns true if the follow-up section(s) should be shown and auto-scrolled into view.
+ */
 function hasFollowUp(diet: DietChoice | null): boolean {
   return diet === "non_veg" || diet === "eggetarian";
 }
@@ -154,6 +161,13 @@ export default function OnboardingStep3() {
   );
 }
 
+/**
+ * DietCard — one selectable card in the Screen 3 diet grid (Vegetarian, Eggetarian, etc.),
+ * showing the diet's title, subtitle, and a colored dot matching its "tone" (plant/egg/meat).
+ * @param option - the diet choice this card represents, with its display copy and tone.
+ * @param selected - whether this is the user's current diet pick; swaps colors accordingly.
+ * @param onPress - called when the user taps the card to select this diet.
+ */
 function DietCard({ option, selected, onPress }: { option: DietOption; selected: boolean; onPress: () => void }) {
   const t = useTheme();
   const toneColor = option.tone === "plant" ? t.colors.success : option.tone === "egg" ? t.colors.accent : t.colors.primary;
@@ -174,6 +188,14 @@ function DietCard({ option, selected, onPress }: { option: DietOption; selected:
   );
 }
 
+/**
+ * FollowUp — a labeled section wrapper for the diet-specific follow-up questions (meat
+ * preferences, veg-only days) that appear below the diet grid once the user has picked a diet
+ * that needs more detail (non-veg or eggetarian).
+ * @param label - the section's all-caps heading (e.g. "MEAT PREFERENCES").
+ * @param hint - optional helper copy shown under the label, above the actual chip options.
+ * @param children - the chip group (or other content) this section wraps.
+ */
 function FollowUp({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   const t = useTheme();
   return (
