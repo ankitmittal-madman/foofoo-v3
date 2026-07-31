@@ -13,6 +13,7 @@
 import { BaseRepository } from "./base-repository.ts";
 import { AppError } from "../errors/app-error.ts";
 import { ERROR_CATALOGUE } from "../errors/catalogue.ts";
+import { withTimeout } from "../utils/timeout.ts";
 import type { ConsentType } from "../validation/consent-schema.ts";
 
 /** A row to be inserted into public.consent_records (columns per DOC-P3-04 §03.4). */
@@ -44,10 +45,13 @@ export class ConsentRepository extends BaseRepository implements IConsentReposit
    * `granted_at` is the DB DEFAULT now() value, selected back per the contract.
    */
   async insertConsents(rows: ConsentInsertRow[]): Promise<RecordedConsent[]> {
-    const { data, error } = await this.db
-      .from("consent_records")
-      .insert(rows)
-      .select("consent_type, granted, granted_at");
+    const { data, error } = await withTimeout(
+      this.db
+        .from("consent_records")
+        .insert(rows)
+        .select("consent_type, granted, granted_at"),
+      "consent.insertConsents",
+    );
 
     if (error) {
       // Never leak the raw DB error to the client (DOC-P3-07); log the code, throw a 500.

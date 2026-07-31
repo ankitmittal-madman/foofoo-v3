@@ -15,6 +15,7 @@
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { type MemberWrite, PROFILE_REQUIRED_FIELDS, type ScreenAnswer } from "./schema.ts";
+import { withTimeout } from "../_shared/utils/timeout.ts";
 
 // ---------------------------------------------------------------------------
 // Pure helpers (no I/O) — exported for direct unit testing, same convention as compose.ts's
@@ -59,14 +60,17 @@ export async function insertOnboardingSessionRows(
 ): Promise<void> {
   if (screens.length === 0) return;
   const db = createServiceRoleClient(ctx.config);
-  const { error } = await db.from("onboarding_sessions").insert(
-    screens.map((s) => ({
-      profile_id: profileId,
-      screen_id: s.screenId,
-      question_key: s.questionKey,
-      answer_value: s.answerValue ?? null,
-      skipped: s.skipped,
-    })),
+  const { error } = await withTimeout(
+    db.from("onboarding_sessions").insert(
+      screens.map((s) => ({
+        profile_id: profileId,
+        screen_id: s.screenId,
+        question_key: s.questionKey,
+        answer_value: s.answerValue ?? null,
+        skipped: s.skipped,
+      })),
+    ),
+    "household.insertOnboardingSessionRows",
   );
   // Unlike recommendations/events.ts's best-effort recommendation_events write, this one is NOT
   // best-effort: onboarding_sessions is the accumulation source of truth profile creation reads
@@ -87,9 +91,12 @@ export async function upsertHouseholdAnswers(
 ): Promise<void> {
   if (Object.keys(patch).length === 0) return;
   const db = createServiceRoleClient(ctx.config);
-  const { error } = await db.from("household_answers").upsert(
-    { profile_id: profileId, updated_at: new Date().toISOString(), ...patch },
-    { onConflict: "profile_id" },
+  const { error } = await withTimeout(
+    db.from("household_answers").upsert(
+      { profile_id: profileId, updated_at: new Date().toISOString(), ...patch },
+      { onConflict: "profile_id" },
+    ),
+    "household.upsertHouseholdAnswers",
   );
   if (error) throw error;
 }
@@ -109,12 +116,15 @@ export async function accumulatedProfileFields(
   profileId: string,
 ): Promise<Record<string, unknown>> {
   const db = createServiceRoleClient(ctx.config);
-  const { data, error } = await db
-    .from("onboarding_sessions")
-    .select("question_key, answer_value, skipped, answered_at")
-    .eq("profile_id", profileId)
-    .eq("skipped", false)
-    .order("answered_at", { ascending: true });
+  const { data, error } = await withTimeout(
+    db
+      .from("onboarding_sessions")
+      .select("question_key, answer_value, skipped, answered_at")
+      .eq("profile_id", profileId)
+      .eq("skipped", false)
+      .order("answered_at", { ascending: true }),
+    "household.accumulatedProfileFields",
+  );
   if (error) throw error;
 
   const rows = (data ?? []) as {
@@ -132,39 +142,65 @@ export async function accumulatedProfileFields(
   return accumulated;
 }
 
-/** Does a profiles row already exist for this household? */
+/**
+ * Does a profiles row already exist for this household? NON-AUTHORITATIVE — a cheap fast-path
+ * read only, used to skip loading accumulated fields when the caller already knows a profile
+ * exists. It is deliberately NOT relied on to decide whether to write (see
+ * `upsertProfileIfAbsent` below, which is what closes the check-then-act race, MEDIUM audit
+ * finding — a stale read here can at worst cause one harmless extra atomic upsert attempt, never
+ * a double-insert).
+ */
 export async function profileExists(ctx: RequestContext, profileId: string): Promise<boolean> {
   const db = createServiceRoleClient(ctx.config);
-  const { data, error } = await db
-    .from("profiles")
-    .select("id")
-    .eq("id", profileId)
-    .maybeSingle();
+  const { data, error } = await withTimeout(
+    db.from("profiles").select("id").eq("id", profileId).maybeSingle(),
+    "household.profileExists",
+  );
   if (error) throw error;
   return data !== null;
 }
 
 /**
- * Create the profiles row — ONCE. `callerUserId` is a SEPARATE parameter from any request-supplied
- * id, and this function always inserts `id: callerUserId` — never a value threaded from the
- * request body. This is the "enforce profiles.id = claims.userId at the query level, not a
- * post-hoc check" requirement: even if the ownership check earlier in the handler had a bug, this
- * INSERT is structurally incapable of creating a profile for anyone but the authenticated caller.
+ * Atomically create the profiles row exactly once, even under concurrent retries — the
+ * check-then-act race the audit flagged (`profileExists()` → `createProfile()` could double-insert
+ * when two requests both observe "not exists" before either write lands). Fixed here with a single
+ * `INSERT ... ON CONFLICT (id) DO NOTHING` (supabase-js `upsert(..., { ignoreDuplicates: true })`):
+ * Postgres itself serializes the two concurrent inserts on the `id` primary key, so at most one can
+ * ever win, and the loser's statement is a guaranteed no-op rather than a unique-violation error.
+ *
+ * `RETURNING` (via `.select()`) only reports rows the INSERT actually affected — a row skipped by
+ * `DO NOTHING` because it already existed is never returned. That makes the returned row COUNT
+ * itself the atomicity signal: `> 0` means THIS call created the row; `0` means it already existed
+ * (created by a concurrent or earlier call). No separate follow-up SELECT is needed to know which.
+ *
+ * `callerUserId` is a SEPARATE parameter from any request-supplied id, and this function always
+ * upserts `id: callerUserId` — never a value threaded from the request body (same defense-in-depth
+ * rationale as the previous `createProfile`: the ownership check in handler.ts is not the only
+ * thing standing between an authenticated caller and writing someone else's profile).
  *
  * `fields` must already contain all five PROFILE_REQUIRED_FIELDS — the caller (handler.ts) gates
- * this. Optional profiles columns not present in `fields` are simply omitted from the INSERT, so
- * Postgres applies the column's own DEFAULT (religious_pref='all', allergen_flags=0,
- * city_overlay_weight=0.50, push_notification_time='07:00:00') rather than a value invented here —
- * that DEFAULT is the schema's own mechanism for "not yet asked", not a fabrication (FD-11).
+ * this. Optional profiles columns not present in `fields` are simply omitted, so Postgres applies
+ * the column's own DEFAULT (religious_pref='all', allergen_flags=0, city_overlay_weight=0.50,
+ * push_notification_time='07:00:00') rather than a value invented here (FD-11).
+ *
+ * @returns true if this call created the row, false if a profiles row for `callerUserId` already
+ *   existed (including one created a moment earlier by a concurrent retry of this same request).
  */
-export async function createProfile(
+export async function upsertProfileIfAbsent(
   ctx: RequestContext,
   callerUserId: string,
   fields: Record<string, unknown>,
-): Promise<void> {
+): Promise<boolean> {
   const db = createServiceRoleClient(ctx.config);
-  const { error } = await db.from("profiles").insert({ id: callerUserId, ...fields });
+  const { data, error } = await withTimeout(
+    db
+      .from("profiles")
+      .upsert({ id: callerUserId, ...fields }, { onConflict: "id", ignoreDuplicates: true })
+      .select("id"),
+    "household.upsertProfileIfAbsent",
+  );
   if (error) throw error;
+  return (data ?? []).length > 0;
 }
 
 /**
@@ -189,15 +225,18 @@ export async function upsertHouseholdMembers(
   const toUpdate = members.filter((m) => m.id);
 
   if (toInsert.length > 0) {
-    const { error } = await db.from("household_members").insert(
-      toInsert.map((m) => ({
-        profile_id: profileId,
-        member_name: m.memberName ?? null,
-        conditions: m.conditions ?? [],
-        allergen_flags: m.allergenFlags ?? 0,
-        diet_type: m.dietType ?? null,
-        is_active: m.isActive ?? true,
-      })),
+    const { error } = await withTimeout(
+      db.from("household_members").insert(
+        toInsert.map((m) => ({
+          profile_id: profileId,
+          member_name: m.memberName ?? null,
+          conditions: m.conditions ?? [],
+          allergen_flags: m.allergenFlags ?? 0,
+          diet_type: m.dietType ?? null,
+          is_active: m.isActive ?? true,
+        })),
+      ),
+      "household.upsertHouseholdMembers.insert",
     );
     if (error) throw error;
   }
@@ -211,11 +250,14 @@ export async function upsertHouseholdMembers(
     if (m.isActive !== undefined) patch.is_active = m.isActive;
     if (Object.keys(patch).length === 0) continue;
 
-    const { error } = await db
-      .from("household_members")
-      .update(patch)
-      .eq("id", m.id as string)
-      .eq("profile_id", profileId);
+    const { error } = await withTimeout(
+      db
+        .from("household_members")
+        .update(patch)
+        .eq("id", m.id as string)
+        .eq("profile_id", profileId),
+      "household.upsertHouseholdMembers.update",
+    );
     if (error) throw error;
   }
 
