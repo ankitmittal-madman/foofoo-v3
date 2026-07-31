@@ -12,6 +12,7 @@ export interface ErrorSpec {
   readonly message: string;
 }
 
+/** Foundation-level error specs (auth/validation/rate-limit/internal) — see file header. */
 export const ERROR_CATALOGUE = {
   AUTH_REQUIRED: {
     code: "AUTH_REQUIRED",

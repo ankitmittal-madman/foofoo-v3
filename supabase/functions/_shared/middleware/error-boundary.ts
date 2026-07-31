@@ -10,6 +10,14 @@ import { AppError } from "../errors/app-error.ts";
 import { ERROR_CATALOGUE } from "../errors/catalogue.ts";
 import type { Handler, Middleware } from "./types.ts";
 
+/**
+ * Error-boundary middleware — catches everything thrown downstream and serializes it safely (see
+ * file header).
+ * Trigger: wraps every handler in the always-on infrastructure pipeline.
+ * Writes to: nothing — only the HTTP response.
+ * Reads from: nothing.
+ * Error codes: passes through any AppError's own code; unknown errors become ERROR_CATALOGUE.INTERNAL.
+ */
 export const errorBoundary: Middleware = (next: Handler): Handler => {
   return async (req, ctx) => {
     try {

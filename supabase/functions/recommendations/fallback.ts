@@ -11,6 +11,13 @@
  */
 import { API_VERSION } from "./meta.ts";
 
+/**
+ * Build the single hardcoded safe-default plate response used whenever the RE cannot be used.
+ * @param requestId - correlation id, echoed into `request_id` and the fallback plate_id
+ * @param reason - short machine string describing why the RE result was rejected (timeout/network/
+ *   http/bad_body/etc.) — surfaced to the caller inside the `warnings[]` entry, not as an error
+ * @returns a contract-conformant 200 body carrying one comfort plate plus a `warnings` entry
+ */
 export function buildFallbackResponse(requestId: string, reason: string): Record<string, unknown> {
   return {
     request_id: requestId,

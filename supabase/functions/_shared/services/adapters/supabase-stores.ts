@@ -35,6 +35,12 @@ function dbFail(op: string, message: string): never {
 
 // ── Plan persistence (public.week_plans + public.plan_slots) ─────────────────────────────────────
 
+/**
+ * SupabaseWeekPlanStore — concrete WeekPlanStore backed by public.week_plans/plan_slots.
+ * Writes to: public.week_plans (header upsert), public.plan_slots (slot upsert/update).
+ * Reads from: nothing beyond the row it just wrote (via `.select().single()` to get the new id).
+ * Error codes: ERROR_CATALOGUE.INTERNAL (via dbFail) on any underlying DB error.
+ */
 export class SupabaseWeekPlanStore implements WeekPlanStore {
   constructor(private readonly db: SupabaseClient) {}
 
@@ -100,6 +106,13 @@ export class SupabaseWeekPlanStore implements WeekPlanStore {
 
 // ── Onboarding writes (profiles, household_members, onboarding_sessions, user_re_state/vectors) ──
 
+/**
+ * SupabaseOnboardingStore — concrete OnboardingStore backed by the live `public`/`re_engine` schemas.
+ * Writes to: public.profiles, public.household_members, public.onboarding_sessions,
+ * re_engine.user_re_state, re_engine.user_taste_vectors.
+ * Reads from: public.consent_records (personalization check), public.profiles (completion check).
+ * Error codes: ERROR_CATALOGUE.INTERNAL (via dbFail) on any underlying DB error.
+ */
 export class SupabaseOnboardingStore implements OnboardingStore {
   constructor(private readonly db: SupabaseClient) {}
 
@@ -209,6 +222,12 @@ export class SupabaseOnboardingStore implements OnboardingStore {
 
 // ── Recommendations caller-load path ─────────────────────────────────────────────────────────────
 
+/**
+ * SupabasePlanSlotStore — concrete PlanSlotStore backed by public.plan_slots/week_plans.
+ * Reads from: public.plan_slots joined to public.week_plans (to scope by owning profile_id).
+ * Writes to: nothing — read-only lookup of the slot's fixed class code.
+ * Error codes: ERROR_CATALOGUE.INTERNAL (via dbFail) on any underlying DB error.
+ */
 export class SupabasePlanSlotStore implements PlanSlotStore {
   constructor(private readonly db: SupabaseClient) {}
 
@@ -346,6 +365,15 @@ function assertNotNull<T>(value: T | null, field: string, dishId: string): T {
   return value;
 }
 
+/**
+ * SupabaseCandidateRepository — concrete CandidateRepository for the RE's LF-D01/LF-D07 candidate
+ * pool (dishes joined to ingredients/tags/cuisines, flat-queried per the file's own FK-metadata note).
+ * Reads from: re_engine.re_class_dish_options, public.dishes, public.dish_ingredients,
+ * public.ingredients, public.dish_tags, public.tags, public.cuisines.
+ * Writes to: nothing — read-only.
+ * Error codes: ERROR_CATALOGUE.INTERNAL on any underlying DB error, or on a safety-relevant field
+ * (diet_type/is_jain/cuisine_group) unexpectedly being null.
+ */
 export class SupabaseCandidateRepository implements CandidateRepository {
   constructor(private readonly db: SupabaseClient) {}
 

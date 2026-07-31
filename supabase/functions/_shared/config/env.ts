@@ -12,6 +12,8 @@ export interface EnvVarSpec {
   readonly secret: boolean;
 }
 
+/** The full set of environment variable specs this project reads (see file header). Consumed only
+ * by config.ts's typed loader — never read directly via Deno.env.get() elsewhere. */
 export const ENV_VARS = {
   ENVIRONMENT: { key: "FOOFOO_ENV", required: false, secret: false },
   LOG_LEVEL: { key: "LOG_LEVEL", required: false, secret: false },

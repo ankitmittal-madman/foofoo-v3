@@ -77,6 +77,18 @@ export interface SlotRequest {
   readonly excludeDishIds?: Set<string>;
 }
 
+/**
+ * RecommendationEngine — the single reusable RE core (see file header for the full pipeline).
+ *
+ * Trigger: invoked identically by /v1/recommendations, the nightly plan CRON, and the onboarding
+ * orchestrator — never re-implemented per caller.
+ * Writes to: nothing directly — returns plain Slate/GeneratedWeekPlan objects; persistence is the
+ * caller's concern.
+ * Reads from: the injected EngineDeps ports (candidates, never-list, suppression, cohort priors,
+ * taste vectors, personal history, bandit state, context multipliers, cohort resolution, config).
+ * Error codes: none — throws only on a genuinely unexpected port failure; safety violations are
+ * handled internally (dish dropped and the gate re-checked), never surfaced as an error.
+ */
 export class RecommendationEngine {
   private readonly d: EngineDeps;
 

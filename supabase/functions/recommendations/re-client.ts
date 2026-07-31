@@ -17,7 +17,9 @@
  */
 import type { Logger } from "../_shared/logging/logger.ts";
 
+/** Hard timeout for a single RE call attempt, in ms (RE-DOC-10 §11) — never retried on timeout. */
 export const RE_TIMEOUT_MS = 2500;
+/** Path appended to `cfg.gharReServiceUrl` to reach the RE's recommendation endpoint. */
 export const RE_PATH = "/v1/recommendations";
 
 export type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
@@ -52,6 +54,15 @@ export async function hmacHex(secret: string, message: string): Promise<string> 
   return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/**
+ * Build the request headers for one signed call to the RE, per the auth scheme documented at the
+ * top of this file (timestamp + HMAC-SHA256 signature over `${timestamp}.${rawBody}`).
+ * @param secret - the shared RE service secret (`cfg.gharReServiceSecret`), never logged
+ * @param rawBody - the exact JSON string being sent — must match byte-for-byte what is POSTed
+ * @param requestId - correlation id echoed back as `X-Request-Id` for RE-side log correlation
+ * @param now - injectable clock (ms since epoch) so tests get deterministic signatures
+ * @returns the header map to attach to the outgoing fetch call
+ */
 export async function buildSignatureHeaders(
   secret: string,
   rawBody: string,

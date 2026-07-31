@@ -27,6 +27,11 @@ const counters: Counters = {
 
 const SUMMARY_EVERY = 50;
 
+/**
+ * Increment the module-level counters for one completed recommendations request.
+ * @param outcome - which bucket this request landed in; "timeout_fallback" increments both
+ *   `timeout_total` and `fallback_total` since a timeout always results in a served fallback plate
+ */
 export function recordRequest(
   outcome: "success" | "partial" | "timeout_fallback" | "fallback" | "error",
 ): void {
@@ -51,6 +56,7 @@ export function recordRequest(
   }
 }
 
+/** Return a copy of the current in-process counters (safe to log/inspect without mutation risk). */
 export function snapshotMetrics(): Counters {
   return { ...counters };
 }

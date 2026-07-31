@@ -58,6 +58,11 @@ const ALLERGEN_BITS: ReadonlyArray<readonly [number, string]> = [
   [64, "sesame"],
 ];
 
+/**
+ * Decode a profiles.allergen_flags bitfield into the RE's allergen token vocabulary.
+ * @param flags - profiles.allergen_flags (7-bit household-wide union, migration 010's trigger)
+ * @returns the subset of ALLERGEN_BITS names whose bit is set, in bit order
+ */
 export function allergenTokens(flags: number): string[] {
   return ALLERGEN_BITS.filter(([bit]) => (flags & bit) !== 0).map(([, name]) => name);
 }
@@ -83,6 +88,12 @@ const ROLE_DEFAULT_AGE: Readonly<Record<string, number>> = {
   adult: 32,
 };
 
+/**
+ * Map a household_members.conditions[] array to the RE's single `role` field, most-constraining
+ * condition first.
+ * @param conditions - one member's conditions[] (household_members, migration 033 vocabulary)
+ * @returns one of "weaning" | "toddler" | "senior" | "child" | "teen" | "adult"
+ */
 export function memberRole(conditions: string[]): string {
   const c = new Set(conditions);
   // Ordered most-constraining first: a member tagged both baby_6_18m and picky_child must be
@@ -95,6 +106,13 @@ export function memberRole(conditions: string[]): string {
   return "adult";
 }
 
+/**
+ * Build one RE-facing MemberAge from a household_members row, filling `age` from ROLE_DEFAULT_AGE
+ * only when the column is NULL — the role (derived from real conditions[] data) is what actually
+ * drives safety-critical filters, never the fallback number itself.
+ * @param row - the member's `age` and `conditions` columns (household_members)
+ * @returns the RE contract's { role, age } shape for this member
+ */
 export function toMemberAge(row: { age: number | null; conditions: string[] | null }): MemberAge {
   const role = memberRole(row.conditions ?? []);
   return { role, age: row.age ?? ROLE_DEFAULT_AGE[role] ?? ROLE_DEFAULT_AGE.adult };
