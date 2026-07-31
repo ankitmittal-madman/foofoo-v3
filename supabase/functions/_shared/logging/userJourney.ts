@@ -58,6 +58,8 @@ function record(profileId: string, category: JourneyEntry["category"], narrative
   journeyLog.info(narrative, { profile: key, category });
 }
 
+/** Public API of the user journey logger — see file header for full context. Each method below
+ * carries its own trigger/vocabulary doc comment. */
 export const UserJourney = {
   /**
    * One onboarding write call (POST /v1/household) — a household submitted answers for one or

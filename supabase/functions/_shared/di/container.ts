@@ -12,6 +12,8 @@ import { ConsentRepository } from "../repositories/consent-repository.ts";
 import { ConsentService } from "../services/consent-service.ts";
 import type { RequestContext } from "../types/context.ts";
 
+/** Per-request DI container — lazily builds and caches the db client, telemetry sink, and
+ * repository/service graph for the lifetime of one request (see file header). */
 export class Container {
   private readonly ctx: RequestContext;
   private _db: SupabaseClient | null = null;

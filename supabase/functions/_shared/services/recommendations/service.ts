@@ -54,6 +54,17 @@ export interface RecommendationsResponse {
   readonly dishes: Array<{ dish_id: string; rank: number; score: number; reason_tags: string[] }>;
 }
 
+/**
+ * RecommendationService — orchestrates a single-slot RE call for POST /v1/recommendations (see
+ * file header).
+ *
+ * Trigger: called by the recommendations endpoint's handler for one slate refresh.
+ * Writes to: the fixed plan slot's slate, via WeekPlanStore.updateSlotSlate.
+ * Reads from: user_re_state/constraints/members (via ReStateStore) and the existing plan slot's
+ * class code (via PlanSlotStore) — the class never changes on refresh (LF-L03).
+ * Error codes: ERR_VALIDATION_FAILED (no RE state for user), ERR_PLAN_NOT_FOUND (plan not yet
+ * generated for the requested slot).
+ */
 export class RecommendationService {
   constructor(
     private readonly reState: ReStateStore,
@@ -62,6 +73,13 @@ export class RecommendationService {
     private readonly weekPlanStore: WeekPlanStore,
   ) {}
 
+  /**
+   * Generate and persist a fresh slate for one existing plan slot.
+   * @param req - the target user/slot/date/context plus any dishes to exclude
+   * @returns the persisted slate id and the ranked dish list
+   * @throws AppError ERR_VALIDATION_FAILED if the user has no RE state yet
+   * @throws AppError ERR_PLAN_NOT_FOUND if no plan slot exists for the requested date/mealSlot
+   */
   async recommend(req: RecommendationsRequest): Promise<RecommendationsResponse> {
     const loaded = await this.reState.loadUser(req.userId);
     if (!loaded) {

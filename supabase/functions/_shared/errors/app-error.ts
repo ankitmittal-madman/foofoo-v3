@@ -8,6 +8,15 @@
  */
 import type { ErrorSpec } from "./catalogue.ts";
 
+/**
+ * AppError — the single error type thrown across the backend.
+ *
+ * Trigger: thrown by handlers/services/repositories whenever a request cannot proceed (auth
+ * failure, validation failure, not-found, internal error, etc).
+ * Reads from: an ErrorSpec from either errors/catalogue.ts (foundation codes) or
+ * errors/api-catalogue.ts (client-facing codes).
+ * Error codes: whichever ErrorSpec.code the caller supplies — see catalogue.ts / api-catalogue.ts.
+ */
 export class AppError extends Error {
   readonly code: string;
   readonly httpStatus: number;

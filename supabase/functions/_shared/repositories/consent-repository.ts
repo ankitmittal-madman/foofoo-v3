@@ -37,6 +37,7 @@ export interface IConsentRepository {
   insertConsents(rows: ConsentInsertRow[]): Promise<RecordedConsent[]>;
 }
 
+/** ConsentRepository — the sole data-access point for public.consent_records (see file header). */
 export class ConsentRepository extends BaseRepository implements IConsentRepository {
   /**
    * Append consent rows and return the recorded (consent_type, granted, granted_at) triples.
