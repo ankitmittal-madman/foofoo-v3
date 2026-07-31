@@ -1,3 +1,10 @@
+/**
+ * Shared Supabase client for the whole app — the single source of the user's auth session
+ * (used by SessionContext, sign-in.tsx, create-id.tsx) and the JWT that api/client.ts attaches
+ * to every backend call. Session storage is AsyncStorage-backed with auto-refresh, so a signed-in
+ * user stays signed in across app restarts. Reads its project URL/anon key from
+ * EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY (see .env.example).
+ */
 import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";

@@ -16,6 +16,12 @@ import { ThemeProvider, useTheme } from "@/theme";
 // flashes a system font before Fraunces/Mukta load.
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
+/**
+ * RootLayout — the top-level expo-router layout for the entire app. Loads the Fraunces/Mukta
+ * brand fonts before releasing the native splash screen (so the first frame never flashes a
+ * system font), and wraps every screen in the app's three global providers: TanStack Query
+ * (queryClient), Supabase session (SessionProvider), and the "ghar" brand theme (ThemeProvider).
+ */
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     Fraunces_600SemiBold,
@@ -46,6 +52,11 @@ export default function RootLayout() {
   );
 }
 
+/**
+ * RootNavigator — the actual expo-router `<Stack>` that renders whichever screen the current
+ * route resolves to (splash, auth, onboarding, or recommendations), themed with the active
+ * "ghar" background color so route transitions never flash an unthemed white/black frame.
+ */
 function RootNavigator() {
   const t = useTheme();
   return (

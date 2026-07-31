@@ -57,6 +57,13 @@ export default function Recommendations() {
   );
 }
 
+/**
+ * PlateCard — one recommended meal in the plates list, showing its dish name(s), any
+ * supporting side, and a debug-style meta line (form + final score) useful while Phase 1
+ * is proving the recommendation wire rather than a polished dish presentation.
+ * @param plate - one plate object from the recommendations API response, as returned by the
+ *                Recommendation Engine for the caller's household.
+ */
 function PlateCard({ plate }: { plate: Plate }) {
   return (
     <View style={styles.card}>

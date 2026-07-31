@@ -138,6 +138,20 @@ export default function OnboardingStep4() {
   );
 }
 
+/**
+ * OtherInput — the free-text box that appears under Allergies or Medical Conditions once the
+ * user selects the "Others" chip, letting them describe what wasn't in the preset list.
+ * @param value - the current free-text entry (allergensOther or medicalConditionsOther).
+ * @param onChangeText - called as the user types, to update the corresponding answer field.
+ * @param placeholder - hint text shown in the empty box (differs per section).
+ * @param onLayout - reports this box's position so the screen can auto-scroll it into view
+ *                    right after "Others" is selected.
+ * @param onFocus - scrolls the screen to the end when the user taps into the box, so the
+ *                   keyboard doesn't cover it.
+ * @param error - whether to show the box in its error state (user tried to continue with
+ *                "Others" selected but this field left blank).
+ * @param errorText - the message shown under the box when `error` is true.
+ */
 function OtherInput({ value, onChangeText, placeholder, onLayout, onFocus, error, errorText }: {
   value: string; onChangeText: (v: string) => void; placeholder: string;
   onLayout?: (e: LayoutChangeEvent) => void; onFocus?: () => void;

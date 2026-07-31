@@ -8,6 +8,15 @@ export type ThemedTextProps = TextProps & {
   themeColor?: ThemeColor;
 };
 
+/**
+ * ThemedText — a plain React Native `Text` that colors itself from the active light/dark
+ * theme (via useTheme) and applies one of a fixed set of typographic presets, so screens
+ * built on the older theme system don't need to hand-roll font size/weight per style.
+ * @param type - which built-in text style to apply (title, subtitle, small, link, etc.);
+ *               defaults to "default" (16px body text).
+ * @param themeColor - which theme color token to use for the text color (defaults to "text");
+ *                      matches one of theme/theme.ts's `Colors` keys.
+ */
 export function ThemedText({ style, type = "default", themeColor, ...rest }: ThemedTextProps) {
   const theme = useTheme();
 

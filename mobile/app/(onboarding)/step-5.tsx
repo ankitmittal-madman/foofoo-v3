@@ -152,6 +152,14 @@ export default function OnboardingStep5() {
   );
 }
 
+/**
+ * Section — a labeled block wrapping one of Screen 5's optional questions (age group, who
+ * cooks, cooking skill, eat-out frequency, cooking objective), each with its own heading and
+ * an optional helper line.
+ * @param label - the section's all-caps heading (e.g. "YOUR COOKING SKILL").
+ * @param hint - optional helper copy shown under the label (e.g. noting a field is required).
+ * @param children - the chip group this section wraps.
+ */
 function Section({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   const t = useTheme();
   return (
