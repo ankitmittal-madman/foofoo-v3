@@ -37,6 +37,11 @@ def _dish(name, cuisine, diet, hero_role, sig_band, spice, heaviness, meal_type,
           primary_taste=("savoury",), mouthfeel=("moist",), aroma=("mild",),
           fermentation="none", serving_temp="hot", difficulty="medium",
           calories=None, prep=15, cook=25, alt_names=None, synonyms=None):
+    """Build one golden-sample dish dict (the same shape the DB's ghar_re.dishes table + joins
+    would produce) from the required tags/attributes below, defaulting calories to the macro
+    dict's value when not given separately. This is purely a fixture-authoring convenience —
+    every dish built here is invented ('ai_generated') golden-sample data, not real catalogue
+    data."""
     cal = calories if calories is not None else macro["calories"]
     return dict(
         name=name, cuisine=cuisine, diet=diet, hero_role=hero_role, sig_band=sig_band,
@@ -56,6 +61,8 @@ def _dish(name, cuisine, diet, hero_role, sig_band, spice, heaviness, meal_type,
     )
 
 def _m(cal, protein, fibre, fat, carbs, sugar, sodium):
+    """Build a dish's macro-nutrient dict (calories, protein/fibre/fat/carbs/sugar in grams,
+    sodium in mg) — a small helper so each _dish() call below doesn't repeat these field names."""
     return dict(calories=cal, protein_g=protein, fibre_g=fibre, fat_g=fat,
                 carbs_g=carbs, sugar_g=sugar, sodium_mg=sodium)
 
