@@ -31,12 +31,19 @@ def recommend(household, ctx, catalogue=None):
 def make_context(slot="dinner", season="transitional", weekday="Monday",
                  weather_condition=None, temp_c=None, is_raining=False,
                  active_modes=None, calorie_target=None):
+    """Build the `ctx` dict recommend() needs — the meal slot, season, weekday, and (mocked)
+    weather conditions plus any active modes (e.g. fasting) or calorie target for this run.
+    All arguments are optional and default to a plain weekday dinner with no weather/mode/
+    calorie constraints."""
     return dict(slot=slot, season=season, weekday=weekday,
                 weather_condition=weather_condition, temp_c=temp_c, is_raining=is_raining,
                 active_modes=active_modes or [], calorie_target=calorie_target)
 
 
 def format_result(res):
+    """Render one recommend() result as a short human-readable text block (household, key
+    derived-profile facts, and the 7 scored plates) — used by the CLI demo below, not by any
+    scoring logic."""
     lines = [f"Household: {res['household']}  |  objective={res['objective']}  |  "
              f"{res['versions']['spine']} · {res['versions']['kb']} · {res['versions']['config']}",
              f"  region={res['theta']['region']['value']} blend={res['theta']['blend']['value']} "

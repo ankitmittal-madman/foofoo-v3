@@ -113,6 +113,9 @@ STATE_ZONE = {
 # Transcribed exactly from the three KB §R3 tables (heroes with their ✓/⚑ markers).
 # ---------------------------------------------------------------------------
 def _ch(zone, weather, name, verified):
+    """Build one COMFORT_HERO_MAP row. `verified` (True/False, matching the KB's own ✓/⚑ markers)
+    decides the row's data_source: a KB-verified hero is 'real', an unverified one is 'stub' —
+    this keeps that provenance rule in one place instead of repeating it on every row below."""
     return (zone, weather, name, verified, "real" if verified else "stub")
 
 COMFORT_HERO_MAP = [

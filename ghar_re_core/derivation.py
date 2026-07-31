@@ -17,6 +17,8 @@ VERSION = "D-layer v1.0"
 
 
 def _sigmoid(x):
+    """Standard logistic sigmoid, squashing any real number into (0, 1). Used to turn the D1
+    income-proxy weighted sum into a 0-1 'income score'."""
     return 1.0 / (1.0 + math.exp(-x))
 
 
@@ -28,6 +30,8 @@ def field(value, source, kind, stability, confidence=1.0):
 
 
 def _age_band(age):
+    """Map a member's numeric age to one of the five age bands (<=24, 25-34, 35-50, 51-64, 65+)
+    the derivation weight tables (age_factor, age_novelty, etc.) are keyed by."""
     if age <= 24:
         return "<=24"
     if age <= 34:
@@ -199,6 +203,9 @@ def derive_theta(hh):
 # Reads from the loaded EngineConfig (CONFIG.community_priors), NOT from a file directly, so this
 # derivation module has zero file-path knowledge (RE-DOC-11 §1/§2). The config LOADER owns the I/O.
 def _community_prior(state):
+    """Look up the community dietary-prior row (zone, diet_lean, default_non_veg_cadence) for a
+    household's home state. Returns None if the state has no configured prior — a legitimate
+    'no soft default available' case, not an error."""
     return CONFIG.community_priors.get(state)
 
 
@@ -210,4 +217,6 @@ _CITY_STATE = {
 
 
 def _state_of_city(city):
+    """Resolve a current-residence city to its state, for computing the household's 'local' zone
+    in D4. Falls back to returning the input unchanged for any city not in the lookup table."""
     return _CITY_STATE.get(city, city)
