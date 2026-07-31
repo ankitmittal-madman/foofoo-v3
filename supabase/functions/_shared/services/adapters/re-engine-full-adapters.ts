@@ -1,6 +1,15 @@
 /**
  * Recommendation Engine — remaining port adapters (Phase F, onboarding-wiring work).
  *
+ * ⚠️ NOT ON THE LIVE MOBILE PATH (Founder decision, 2026-07-30) — this file implements adapters for
+ * the LEGACY TypeScript RE engine (`re_engine.*` schema), which
+ * `docs/architecture/RE-DOC-12_Ghar_RE_Status_and_Roadmap_v1_0.md` already documented, before this
+ * session, as not on the live request path — migration 034 itself calls it "the OLD
+ * persona/cohort/weight-ladder RE" and "retired." The actual live recommendations path is the
+ * Python `ghar_re_core`/`ghar_re_service` pair, called via HTTP from `recommendations/compose.ts`,
+ * which never touches `re_engine.*`. Kept as a real, tested reference implementation in case this
+ * engine is ever revived — not deployed into any client-facing flow today.
+ *
  * WP-8D (`_shared/services/re/*`) defined 11 ports the reusable RecommendationEngine depends on
  * (`_shared/services/re/ports.ts`). Before this file, only ONE had a live Supabase-backed adapter
  * (`SupabaseCandidateRepository`, in `supabase-stores.ts`) — every other port existed only as a

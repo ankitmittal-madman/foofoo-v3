@@ -1,16 +1,24 @@
 /**
  * POST /v1/onboarding — business handler (DOC-P3-06 §06.2).
  *
- * CRITICAL audit fix (ops/audits/audit-edge-functions/edge-function-audit.md): the fully-built
- * `OnboardingOrchestrator` (`_shared/services/onboarding/orchestrator.ts`) was never wired to a
- * deployed Edge Function — this file + index.ts is that wiring. THIN handler, same discipline as
- * consent/handler.ts and household/handler.ts: parse → authorize (ownership) → delegate → envelope.
+ * ⚠️ NOT ON THE LIVE MOBILE PATH — READ BEFORE TOUCHING (Founder decision, 2026-07-30).
+ * `docs/architecture/RE-DOC-12_Ghar_RE_Status_and_Roadmap_v1_0.md` (written before this session)
+ * already documented that this repo contains TWO independent recommendation engines: the
+ * TypeScript one this handler's `OnboardingOrchestrator` depends on (`_shared/services/re/*.ts`,
+ * the `re_engine.*`/`re_meal_classes`/`re_cohort_class_priors` schema) — which migration 034
+ * itself calls "the OLD persona/cohort/weight-ladder RE" and states is "retired" — and the actual
+ * live path, the Python `ghar_re_core`/`ghar_re_service` pair that `recommendations/compose.ts`
+ * calls via HTTP. The mobile app's real onboarding write path is `household/handler.ts`, not this
+ * function. This file is now a complete, deployable, spec-compliant implementation of DOC-P3-06
+ * §06.2 against the LEGACY engine — kept deliberately (Founder decision) as a real reference
+ * implementation in case that engine is ever revived, NOT wired into any client. Do not assume
+ * this function runs in production just because it exists and typechecks.
  *
- * The consent gate (HIGH audit finding — DPDP personalization-consent enforcement had no live
- * enforcement point) and the idempotency 409 (DOC-P3-06 §06.2/§08) are BOTH already implemented
- * inside the orchestrator itself (`isPersonalizationGranted` / `isOnboardingComplete` checks at the
- * top of `completeOnboarding`) — this handler does not duplicate them, it only has to actually call
- * the orchestrator for those checks to run at all.
+ * THIN handler, same discipline as consent/handler.ts and household/handler.ts: parse → authorize
+ * (ownership) → delegate → envelope. The consent gate (personalization-consent enforcement) and
+ * the idempotency 409 (DOC-P3-06 §06.2/§08) are implemented inside the orchestrator itself
+ * (`isPersonalizationGranted` / `isOnboardingComplete` checks at the top of `completeOnboarding`)
+ * — real logic, exercised by this function, just not reachable from the live app today.
  */
 import { requireAuth } from "../_shared/auth/authorize.ts";
 import { requireOwnership } from "../_shared/auth/authenticate.ts";
