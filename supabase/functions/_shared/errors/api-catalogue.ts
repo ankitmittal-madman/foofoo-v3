@@ -64,6 +64,23 @@ export const API_ERRORS = {
     retriable: false,
     message: "Onboarding is already complete for this profile.",
   },
+  /** 404 — no export job found at the caller's own storage prefix for the requested
+   *  export_job_id (DOC-P3-06 §06.7 polling sub-resource). Never distinguishes "wrong id" from
+   *  "someone else's id" — both look identical to the caller, by design (no ownership leak). */
+  ERR_EXPORT_JOB_NOT_FOUND: {
+    code: "ERR_EXPORT_JOB_NOT_FOUND",
+    httpStatus: 404,
+    retriable: false,
+    message: "Export job not found.",
+  },
+  /** 400 — POST /v1/user/delete's confirmation_phrase safety gate did not match exactly
+   *  (DOC-P3-06 §06.8 / DCR-P3-06-005). */
+  ERR_CONFIRMATION_PHRASE_MISMATCH: {
+    code: "ERR_CONFIRMATION_PHRASE_MISMATCH",
+    httpStatus: 400,
+    retriable: false,
+    message: "confirmation_phrase did not match the required value.",
+  },
   /** 422 — well-formed household/onboarding write, but a question_key is unrecognized or its
    *  answer_value falls outside that field's CHECK-constraint vocabulary (household/schema.ts). */
   ERR_HOUSEHOLD_FIELD_INVALID: {

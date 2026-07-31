@@ -11,6 +11,7 @@
  */
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
+import { withTimeout } from "../_shared/utils/timeout.ts";
 
 export type RecommendationOutcome =
   | "success"
@@ -66,20 +67,23 @@ export async function recordRecommendationEvent(
 
   try {
     const db = createServiceRoleClient(ctx.config);
-    const { error } = await db.from("recommendation_events").insert({
-      profile_id: ev.householdId,
-      request_id: ev.requestId,
-      slot: ev.slot ?? null,
-      outcome: ev.outcome,
-      re_served: ev.reServed,
-      plate_count: ev.plateCount,
-      plates: ev.plates ?? null,
-      latency_ms: ev.latencyMs ?? null,
-      detail: ev.detail ?? null,
-      engine_version: ev.engineVersion ?? null,
-      config_version: ev.configVersion ?? null,
-      data_source: "real",
-    });
+    const { error } = await withTimeout(
+      db.from("recommendation_events").insert({
+        profile_id: ev.householdId,
+        request_id: ev.requestId,
+        slot: ev.slot ?? null,
+        outcome: ev.outcome,
+        re_served: ev.reServed,
+        plate_count: ev.plateCount,
+        plates: ev.plates ?? null,
+        latency_ms: ev.latencyMs ?? null,
+        detail: ev.detail ?? null,
+        engine_version: ev.engineVersion ?? null,
+        config_version: ev.configVersion ?? null,
+        data_source: "real",
+      }),
+      "recommendations.events.record",
+    );
     if (error) throw error;
   } catch (e) {
     ctx.logger.warn("recommendation_event.persist_failed", {
