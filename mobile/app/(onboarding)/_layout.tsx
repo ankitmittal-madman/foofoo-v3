@@ -9,7 +9,7 @@ export default function OnboardingLayout() {
   if (loading) return null;
   if (!session) return <Redirect href="/(auth)/sign-in" />;
   return (
-    <OnboardingProvider>
+    <OnboardingProvider userId={session.user.id}>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: t.colors.background } }} />
     </OnboardingProvider>
   );

@@ -13,7 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/auth/supabaseClient";
 import { useTheme } from "@/theme";
 import { postHousehold } from "@/api/household";
-import { ApiError } from "@/api/client";
+import { describeApiError } from "@/api/errorMessages";
 
 export default function CreateId() {
   const t = useTheme();
@@ -35,7 +35,9 @@ export default function CreateId() {
         [],
       );
     },
-    onSuccess: () => router.replace("/(onboarding)/step-1"),
+    // Consent (DOC-P3-06 §06.1) must be captured before step-1's dietary/preference collection
+    // begins (Fix 5) — create-id now routes into the consent screen first, not straight to step-1.
+    onSuccess: () => router.replace("/(onboarding)/consent"),
   });
 
   const canContinue = name.trim().length > 0 && !mutation.isPending;
@@ -69,7 +71,7 @@ export default function CreateId() {
 
           {mutation.isError ? (
             <Text style={[styles.msg, { color: t.colors.primary, fontFamily: t.fonts.bodyMedium }]}>
-              {mutation.error instanceof ApiError ? mutation.error.message : "Could not save your name. Please try again."}
+              {describeApiError(mutation.error)}
             </Text>
           ) : null}
 
