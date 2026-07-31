@@ -29,6 +29,11 @@ SERVICE_NAME = "ghar_re_service"
 
 # --- structured JSON logging (RE-DOC-10 §10 — logs span two languages, so no plain text) ---
 def _make_logger() -> logging.Logger:
+    """Build (once) the module-wide structured logger that every `log_event()` call writes to.
+
+    Idempotent by checking `logger.handlers` first, so re-importing this module (tests, reloads)
+    never attaches a second stdout handler and doubles every log line.
+    """
     logger = logging.getLogger("ghar_re_service")
     if not logger.handlers:
         h = logging.StreamHandler(sys.stdout)
@@ -62,6 +67,12 @@ class Counters:
     rate_limited_total: int = 0
 
     def record(self, outcome: str) -> None:
+        """Tally one completed /v1/recommendations request under its outcome bucket.
+
+        `outcome` is one of "success" / "partial" / anything else (treated as an error) — called
+        once per request by the route handler in main.py, never for requests shed by the rate
+        limiter (those go through `record_rate_limited()` instead).
+        """
         self.requests_total += 1
         if outcome == "success":
             self.success_total += 1
@@ -76,6 +87,8 @@ class Counters:
         self.rate_limited_total += 1
 
     def as_dict(self) -> dict:
+        """Snapshot the current counters as a plain dict — this is exactly the `metrics` field
+        GET /v1/meta returns to callers, read-only and reset only on process restart."""
         return {
             "requests_total": self.requests_total,
             "success_total": self.success_total,

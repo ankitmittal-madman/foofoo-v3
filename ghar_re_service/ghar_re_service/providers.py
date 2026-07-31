@@ -56,6 +56,9 @@ class CatalogueSnapshot(Protocol):
 
 @runtime_checkable
 class CatalogueProvider(Protocol):
+    """Anything that can hand back a CatalogueSnapshot at startup — the seam a future
+    PostgresCatalogueProvider would implement with zero changes to callers."""
+
     def load(self) -> CatalogueSnapshot: ...
 
 
@@ -82,6 +85,9 @@ EngineConfig = Config
 
 @runtime_checkable
 class ConfigProvider(Protocol):
+    """Anything that can hand back an EngineConfig at startup — the seam a future
+    RemoteConfigProvider would implement with zero changes to callers."""
+
     def load(self) -> EngineConfig: ...
 
 
@@ -205,6 +211,9 @@ class AuthConfig:
 
 @runtime_checkable
 class AuthConfigProvider(Protocol):
+    """Anything that can hand back the resolved shared-secret AuthConfig at startup — the seam a
+    future SecretsManagerAuthConfigProvider would implement with zero changes to auth.py/main.py."""
+
     def load(self) -> AuthConfig: ...
 
 
@@ -271,6 +280,9 @@ class RateLimitConfig:
 
 @runtime_checkable
 class RateLimitConfigProvider(Protocol):
+    """Anything that can hand back the resolved RateLimitConfig at startup — read through a
+    provider for the same "where does this value come from" reason as AuthConfigProvider."""
+
     def load(self) -> RateLimitConfig: ...
 
 
