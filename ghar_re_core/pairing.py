@@ -18,6 +18,9 @@ RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich"}
 # §S4.2 pairing guardrails
 # ---------------------------------------------------------------------------
 def both_rich(d, l):
+    """True if BOTH the dry dish `d` and liquid dish `l` are rich/heavy (buttery, creamy,
+    ghee-rich, or coconut-rich) — the pairing hard gate that stops two heavy gravies being
+    served together (KB §N1 row 1)."""
     # G1 (KB §N1 row 1): no two heavy/creamy gravies.
     return bool(set(d.richness) & RICH_TAGS) and bool(set(l.richness) & RICH_TAGS)
 
@@ -27,6 +30,10 @@ COCONUT = {"coconut_fresh", "coconut_milk", "coconut_desiccated", "dried_coconut
 
 
 def same_base(d, l):
+    """True if the dry dish `d` and liquid dish `l` share the same underlying base (both
+    coconut-dominant, both built on the same primary dal/pulse, or both tomato-onion gravies) —
+    the pairing hard gate that stops two too-similar-tasting dishes being served together
+    (KB §N1 row 2)."""
     # G2 (KB §N1 row 2): not two tomato-onion / two coconut / same primary dal.
     # Proxy for the §1 ING base-cosine gate, using MAIN ingredients.
     dm, lm = set(d.main_ingredients), set(l.main_ingredients)
@@ -43,6 +50,9 @@ def same_base(d, l):
 
 
 def cuisine_dist(d, l):
+    """How far apart two dishes' cuisines are, on the hierarchical scale from
+    distance_weights.yaml: 0 (same cuisine) < same cuisine_group < same broad zone < else.
+    Used by allowed() to decide whether a cross-cuisine pair is coherent enough to serve."""
     # §1 hierarchical cuisine distance (distance_weights.yaml cuisine_hierarchy_distance).
     ch = CONFIG.distance["cuisine_hierarchy_distance"]
     if d.cuisine == l.cuisine:
@@ -56,6 +66,9 @@ def cuisine_dist(d, l):
 
 
 def allowed(d, l):
+    """Whether a dry dish `d` and liquid dish `l` may be formed into a pair at all. Checks every
+    configured hard gate (not-both-rich, not-same-base, cuisine-coherence) — the pair is only
+    ever built if ALL of them pass; any single violation rejects the pair outright."""
     # HARD gates — pair not formed if any violated (pairing_rules.yaml hard_gates).
     hg = CONFIG.pairing["hard_gates"]
     if hg.get("not_both_rich") and both_rich(d, l):
@@ -69,6 +82,9 @@ def allowed(d, l):
 
 
 def compat(d, l):
+    """How well-matched an ALREADY-ALLOWED dry+liquid pair is, as a single number from -1 to +1:
+    positive for good richness balance and protein-veg balance, negative when both dishes share
+    the same dominant taste. Used to nudge (not gate) the pair's combined plate_score."""
     # SOFT terms -> compat in [-1,+1] (pairing_rules.yaml soft_terms).
     b_balance = CONFIG.soft("b_balance")
     b_protein = CONFIG.soft("b_protein")
@@ -104,6 +120,9 @@ def compat(d, l):
 # §S4.3 plate score
 # ---------------------------------------------------------------------------
 def plate_score(plate, scores):
+    """The final score for one candidate plate: for a dry+liquid pair, the two dishes' individual
+    scores summed and adjusted by their compat() bonus/penalty; for a single/standalone plate,
+    just that one dish's score. This is the number assemble_7 sorts plates by."""
     lam = CONFIG.lambda_pair
     if plate["form"] == "pair":
         d, l = plate["dry"], plate["liquid"]
@@ -116,6 +135,9 @@ def plate_score(plate, scores):
 # §S4.4 + KB §R2a — default carb attach (editable). liquid-hero type first, else region.
 # ---------------------------------------------------------------------------
 def default_carb(plate, theta):
+    """Which carb/support ('Rice', 'Roti', 'Poori', or None) should be attached to a served
+    plate, decided first by the liquid hero's own type (e.g. sambar -> Rice) and falling back to
+    the household's region. Standalone plates (already a complete meal) get no support."""
     if plate["form"] == "standalone":
         return None                            # standalone gets NO support
     # hero used for the by-type rule = the liquid hero (pair) or the single hero
@@ -172,6 +194,14 @@ def build_plates(catalogue, theta, ctx, objective):
 
 
 def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None):
+    """The final "which 7 plates does this household get" decision (§S4.6). Greedily walks every
+    candidate plate best-score-first, skipping any plate that reuses an already-served hero dish
+    (no-duplicate guard) and capping how many 'experimental'/discovery plates can be served
+    (discovery-dial cap, driven by the household's rho_disc). Attaches a default carb/support to
+    each chosen plate, optionally drops plates over a calorie target, logs the decision (see
+    decision_log module), and returns the final list of plates actually served — the household's
+    dish pool for this context. `n` defaults to 7 (one plate for each of the 7 configured slots);
+    `household_label` is passed through only for logging."""
     plates, scores = build_plates(catalogue, theta, ctx, objective)
     plates.sort(key=lambda p: p["score"], reverse=True)
 
@@ -209,17 +239,23 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None):
 
 
 def _plate_dishes(p):
+    """The list of underlying Dish objects that make up plate `p` — both dishes for a pair,
+    or just the one hero dish for a single/standalone."""
     if p["form"] == "pair":
         return [p["dry"], p["liquid"]]
     return [p["hero"]]
 
 
 def _plate_calories(p):
+    """Total calories for plate `p`, summing every dish it contains (treating a missing calorie
+    value as 0 rather than failing)."""
     cals = sum((d.calories or 0) for d in _plate_dishes(p))
     return cals
 
 
 def plate_label(p):
+    """A short human-readable name for plate `p` (e.g. 'Rajma + Steamed Rice  (+ Rice)') used in
+    the CLI demo output and decision-log entries — never used in scoring."""
     if p["form"] == "pair":
         s = f"{p['dry'].name} + {p['liquid'].name}"
     else:

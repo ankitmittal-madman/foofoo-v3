@@ -17,7 +17,7 @@ import { StepHeader } from "@/onboarding/OnboardingHeader";
 import { ChipGroup, type ChipOption } from "@/onboarding/OnboardingChips";
 import { step4ToScreens } from "@/onboarding/toHouseholdWrite";
 import { postHousehold } from "@/api/household";
-import { ApiError } from "@/api/client";
+import { describeApiError } from "@/api/errorMessages";
 
 const ALLERGENS: ChipOption[] = [
   { value: "peanuts", label: "Peanut" },
@@ -44,7 +44,7 @@ const MEDICAL_CONDITIONS: ChipOption[] = [
 export default function OnboardingStep4() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
-  const { answers, setAnswers } = useOnboarding();
+  const { answers, setAnswers, setCurrentStep } = useOnboarding();
 
   const scrollRef = useRef<ScrollView>(null);
   const pendingScroll = useRef<string | null>(null);
@@ -52,7 +52,10 @@ export default function OnboardingStep4() {
 
   const mutation = useMutation({
     mutationFn: () => postHousehold(step4ToScreens(answers), []),
-    onSuccess: () => router.push("/(onboarding)/step-5"),
+    onSuccess: () => {
+      setCurrentStep(5);
+      router.push("/(onboarding)/step-5");
+    },
   });
 
   function toggleOption(field: "allergens" | "medicalConditions", otherField: "allergensOther" | "medicalConditionsOther", value: string) {
@@ -124,7 +127,7 @@ export default function OnboardingStep4() {
 
         {mutation.isError ? (
           <Text style={[styles.errorText, { color: t.colors.primary, fontFamily: t.fonts.bodyMedium }]}>
-            {mutation.error instanceof ApiError ? mutation.error.message : "Something went wrong"}
+            {describeApiError(mutation.error)}
           </Text>
         ) : null}
       </ScrollView>
@@ -138,6 +141,20 @@ export default function OnboardingStep4() {
   );
 }
 
+/**
+ * OtherInput — the free-text box that appears under Allergies or Medical Conditions once the
+ * user selects the "Others" chip, letting them describe what wasn't in the preset list.
+ * @param value - the current free-text entry (allergensOther or medicalConditionsOther).
+ * @param onChangeText - called as the user types, to update the corresponding answer field.
+ * @param placeholder - hint text shown in the empty box (differs per section).
+ * @param onLayout - reports this box's position so the screen can auto-scroll it into view
+ *                    right after "Others" is selected.
+ * @param onFocus - scrolls the screen to the end when the user taps into the box, so the
+ *                   keyboard doesn't cover it.
+ * @param error - whether to show the box in its error state (user tried to continue with
+ *                "Others" selected but this field left blank).
+ * @param errorText - the message shown under the box when `error` is true.
+ */
 function OtherInput({ value, onChangeText, placeholder, onLayout, onFocus, error, errorText }: {
   value: string; onChangeText: (v: string) => void; placeholder: string;
   onLayout?: (e: LayoutChangeEvent) => void; onFocus?: () => void;

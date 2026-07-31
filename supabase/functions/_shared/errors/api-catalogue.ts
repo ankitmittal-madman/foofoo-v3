@@ -12,6 +12,8 @@
  */
 import type { ErrorSpec } from "./catalogue.ts";
 
+/** Immutable client-facing error codes (DOC-P3-06 §21.1) — see file header. Each entry is annotated
+ * above with the endpoint/condition that raises it. */
 export const API_ERRORS = {
   /** 400 — request is malformed / fails structural validation (DOC-P3-06 §21.1, §07 Stage 1). */
   ERR_VALIDATION_FAILED: {

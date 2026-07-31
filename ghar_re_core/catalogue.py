@@ -32,7 +32,17 @@ _GROUP_ZONE = {z[0]: z[1] for z in K.ZONE_MAP}
 
 
 class Dish:
+    """One dish, wrapped from a raw dish dict (fixtures.DISHES shape) into an object with
+    computed zone/state-origin/signature-score fields ready for the scoring/pairing modules.
+
+    A PM-relevant summary: this is "one row of the menu" plus the extra context (which region
+    it belongs to, how famous/iconic it is) the recommendation engine needs to score it.
+    """
+
     def __init__(self, d):
+        """Build a Dish from a raw dish dict, resolving its zone (via cuisine -> cuisine_group ->
+        zone_map) and signature score (via its sig_band) at construction time so downstream code
+        never has to redo that lookup."""
         self.__dict__.update(d)
         self.id = "md5:" + d["name"]
         self.cuisine_group = _CUISINE_GROUP.get(d["cuisine"])
@@ -50,9 +60,14 @@ class Dish:
         self.main_ingredients = [i for i, m in d["ingredients"] if m]
 
     def has_tag(self, field, value):
+        """Return True if this dish's `field` (a list attribute, e.g. 'texture' or 'richness')
+        contains `value`. Used by scoring/pairing to check tag membership without every caller
+        needing to know a field might be missing."""
         return value in getattr(self, field, []) or []
 
     def __repr__(self):
+        """Short human-readable label for debugging/logging, e.g. '<Dish Rajma [North/liquid]
+        sig=0.6>' — not used in any scoring decision."""
         return f"<Dish {self.name} [{self.zone}/{self.hero_role}] sig={self.sig_score}>"
 
 
@@ -61,6 +76,9 @@ class Catalogue:
     how the data was loaded (RE-DOC-11 §1) — a future PostgresCatalogueProvider returns the same shape."""
 
     def __init__(self, dish_dicts=None):
+        """Build the in-memory catalogue from a list of raw dish dicts (defaults to the golden
+        fixtures, F.DISHES, when none is passed) and build the by-name/by-id/by-zone/by-hero-role
+        lookup indices used everywhere else in the engine."""
         self.dishes = [Dish(d) for d in (dish_dicts or F.DISHES)]
         self.by_name = {d.name: d for d in self.dishes}
         # in-memory indices (built once; RE-DOC-10 §7 "build in-memory indices")
@@ -72,19 +90,27 @@ class Catalogue:
             self._by_hero_role.setdefault(d.hero_role, []).append(d)
 
     def __iter__(self):
+        """Iterate over every dish in the catalogue (lets `for d in catalogue:` work)."""
         return iter(self.dishes)
 
     def get(self, name):
+        """Look up a dish by its exact name. Returns None if no dish has that name."""
         return self.by_name.get(name)
 
     # --- CatalogueSnapshot read interface (RE-DOC-11 §1) ---
     def get_dish(self, dish_id):
+        """Look up a dish by its stable id (the 'md5:<name>' identifier). Returns None if not
+        found — the id format is what a future Postgres-backed catalogue would also use."""
         return self.by_id.get(dish_id)
 
     def by_zone(self, zone):
+        """All dishes whose resolved regional zone (North/South/East/West/...) matches `zone`.
+        Returns a new list each call so callers can't accidentally mutate the index."""
         return list(self._by_zone.get(zone, []))
 
     def by_hero_role(self, role):
+        """All dishes with the given hero_role ('dry', 'liquid', 'single', 'standalone', or
+        'support') — the grouping the pairing engine uses to build dry+liquid plate pairs."""
         return list(self._by_hero_role.get(role, []))
 
 
@@ -106,6 +132,10 @@ with open(_os.path.join(_cfg.SRC, "ingredients_v5.csv")) as _f:
 
 
 def ingredient_info(name):
+    """Look up an ingredient's master attributes (category, whether it's an allergen and which
+    kind, whether it's Jain-compatible) by its canonical name. Returns an empty dict if the
+    ingredient isn't in the master list — callers treat that as 'no known attributes', not
+    an error."""
     return _ING.get(name, {})
 
 

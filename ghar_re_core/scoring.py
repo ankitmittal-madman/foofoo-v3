@@ -13,6 +13,9 @@ from ghar_re_core import catalogue as C
 # PART A — HARD FILTERS (§S2 PART A). A dish survives iff ALL predicates hold.
 # =====================================================================================
 def pass_diet(dish, theta, ctx):
+    """A1 hard filter: does this dish match the household's diet (Q5) and meat exclusions (Q6)?
+    A veg_egg mode or a configured veg-day can temporarily tighten a non-veg/eggetarian household
+    to veg for that one session — a restriction only, never a loosening."""
     # A1 diet (Q5/Q6). veg_egg mode / veg-day can tighten to veg for the session.
     diet = theta["diet"]["value"]
     modes = ctx.get("active_modes", [])
@@ -38,17 +41,27 @@ def pass_diet(dish, theta, ctx):
 
 
 def pass_jain(dish, theta, ctx):
+    """A2 hard filter: if the household is Jain (Q8), only Jain-compatible dishes pass. Not
+    negotiable by any mode or context — Jain observance is always enforced when set."""
     # A2 Jain (Q8) — HARD.
     return (not theta["is_jain"]["value"]) or (dish.jain_compatible == "Y")
 
 
 def pass_allergen(dish, theta, ctx):
+    """A3 hard filter, safety-critical: rejects any dish carrying an allergen the household has
+    declared (Q9/Q10). Only covers explicit-ingredient allergens (the hidden-derivative /
+    cross-contamination layer is explicitly out of scope for this version)."""
     # A3 allergen (Q9/Q10) — SAFETY-CRITICAL basic pass (hidden-derivative layer out of scope).
     hh_allergens = set(theta["allergens"]["value"])
     return not (C.dish_allergens(dish) & hh_allergens)
 
 
 def pass_weaning(dish, theta, ctx):
+    """A4 hard filter, applied only to SHARED-hero plates: when the household has a weaning-age
+    member, a dish must be low-spice (<=1) AND soft/smooth/mashable-textured AND free of
+    crunchy/crispy/dense/chewy textures. This is the one age-driven HARD filter in the engine —
+    every other age effect (spice ceiling, texture floor for non-weaning cases) is a soft demote
+    in m_age(), not a rejection."""
     # A4 weaning (D5 age) — the ONE age HARD filter, applied to SHARED-hero plates.
     # spice_level <= 1 AND soft/smooth/mashable texture AND no whole nuts/seeds/hard.
     if not theta["weaning_present"]["value"]:
@@ -65,6 +78,8 @@ def pass_weaning(dish, theta, ctx):
 
 
 def pass_mode_fasting(dish, theta, ctx):
+    """A5 hard filter, only active when 'fasting' is in the context's active_modes: restricts to
+    farali (fasting-permitted) dishes. A no-op filter (everything passes) outside fasting mode."""
     # A5 fasting mode — farali_compatible only when Fasting is on.
     if "fasting" not in ctx.get("active_modes", []):
         return True
@@ -72,6 +87,9 @@ def pass_mode_fasting(dish, theta, ctx):
 
 
 def pass_calorie(plate_cals, ctx):
+    """A6 optional, plate-level filter: if the context sets a calorie_target, rejects plates that
+    exceed it by more than the configured epsilon tolerance (default 10%). Always passes when no
+    target is set — this filter is off by default."""
     # A6 optional calorie lens (plate-level). Off unless a target is set.
     target = ctx.get("calorie_target")
     if not target:
@@ -100,6 +118,9 @@ def eligible(dish, theta, ctx, shared_hero=True):
 # PART B — BASE score (§S2 PART B).  BASE = Σ_k W_k · conf_k · m_k  (+ PRIOR).  conf_k=1.0 v1.
 # =====================================================================================
 def _cuis(dish, state):
+    """§B1 cuis(x, state): how well a dish's cuisine matches a given state, from 1.00 (exact same
+    state of origin) down to 0.40 (same broad zone) to 0.0 (no relation) — the core regional-fit
+    building block m_palette() blends across a household's home and local state."""
     # §B1 cuis(x,S): 1.00 same state, 0.70 same parent, 0.40 same group/zone, 0.15 adjacent, else 0.
     if dish.state_origin == state:
         return 1.00
@@ -111,6 +132,10 @@ def _cuis(dish, state):
 
 
 def m_palette(dish, theta):
+    """§B1 regional-fit BASE term: how well a dish matches this household's palette, blending
+    its home-state fit and local-state fit by the D4 blend ratio. Experimental-tier dishes are
+    further scaled down by rho_disc (the household's discovery/familiarity dial), so adventurous
+    households see more of them and cautious ones see fewer."""
     # §B1 regional fit, D4-blended (blend home vs local). experimental gated by rho_disc.
     blend = theta["blend"]["value"]
     home = theta["home_state"]["value"]
@@ -122,11 +147,18 @@ def m_palette(dish, theta):
 
 
 def m_slot(dish, ctx):
+    """§B2 BASE term: 1.0 if this dish is valid for the current meal slot (breakfast/lunch/
+    dinner/snacks), else 0.0 — a dish that doesn't fit the slot contributes nothing here (it may
+    still be filtered out entirely elsewhere)."""
     # §B2: 1 if slot in dish.meal_type else 0.
     return 1.0 if ctx["slot"] in dish.meal_type else 0.0
 
 
 def m_season(dish, ctx):
+    """§B3 BASE term: how well a dish fits the standing season (summer/winter/monsoon), reusing
+    the dish's weather_affinity tags as a proxy for seasonal thermal fit. Returns 1.0 for a
+    strong seasonal match, 0.5 as a neutral default, 0.0 for a clear seasonal mismatch (e.g. a
+    deep-fried heavy dish in summer)."""
     # §B3 standing seasonal thermal fit, reusing WE weather_affinity tags. Signed→[0,1]-ish.
     season = ctx.get("season")
     wa = set(dish.weather_affinity)
@@ -148,11 +180,17 @@ def m_season(dish, ctx):
 
 
 def sig(dish):
+    """§B4 signature-boost BASE term: how famous/iconic this dish is, taken directly from its
+    pre-computed sig_score (0 for an unscored dish, up to 1.0 for a national icon like Butter
+    Chicken or Masala Dosa)."""
     # §B4 signature boost — graded sig(x) in [0,1] from sig_scores (KB §S1 band rule).
     return dish.sig_score
 
 
 def m_age(dish, theta):
+    """§B5/D5 BASE term: softly demotes (never hard-rejects) a dish whose spice level exceeds the
+    household's spice ceiling, or whose texture violates a soft-texture floor (e.g. for a
+    household with a senior member) — the graded counterpart to the hard weaning filter."""
     # §B5/D5: soft demote spice above ceiling and texture-floor violations.
     d5 = CONFIG.D("D5_household")
     p_spice, p_tex = d5["penalties"]["p_spice"], d5["penalties"]["p_tex"]
@@ -167,6 +205,9 @@ def m_age(dish, theta):
 
 
 def m_household(dish, theta):
+    """§B6 BASE term: how well a dish fits this household's structure — e.g. a batch-friendly
+    whole-meal dish scores higher for a joint/large household, and a mild/familiar dish scores
+    higher for a kid-heavy household with high variety pressure."""
     # §B6 household structure soft-fit. single->one-pot; couple+kids->mild/familiar; joint->batch.
     bp = theta["batch_posture"]["value"]
     fit = 0.5
@@ -208,6 +249,9 @@ def m_weather(dish, theta, ctx):
 
 
 def prior_boost(dish, theta, ctx):
+    """§B8 BASE term: sums up every authored PRIOR[zone][slot] boost (KB §R2) that applies to
+    this dish for the household's region and the current meal slot — e.g. a small extra lift for
+    "idli/dosa" dishes at South breakfast. Zero if no configured prior matches."""
     # §B8 PRIOR[zone][slot] additive authored boost (KB §R2), matched tolerantly to the dish.
     zone = theta["region"]["value"]
     slot = ctx["slot"]
@@ -239,14 +283,22 @@ def base(dish, theta, ctx):
 # PART C — Q15 GAIN (§S3). GAIN = 1 + Σ_g gamma[obj][g]·gs_g(x). kappa pinned 1.0 (v1).
 # =====================================================================================
 def _cal_n(dish):
+    """Normalize a dish's calorie count to a 0-1 scale (0 at ~30 kcal, 1 at ~800 kcal), for use
+    as a sub-signal in the Q15 gain-score components below. Returns 0.0 for a dish with no
+    recorded calories."""
     return max(0.0, min((dish.calories - 30) / 770.0, 1.0)) if dish.calories else 0.0
 
 
 def _heaviness_n(dish):
+    """Normalize a dish's 1-3 heaviness rating to a 0-1 scale, for use as a sub-signal in the
+    Q15 gain-score components below. Returns 0.0 for a dish with no recorded heaviness."""
     return (dish.heaviness - 1) / 2.0 if dish.heaviness else 0.0
 
 
 def gs_indulgence(dish):
+    """Q15 gain-score component: how 'indulgent' a dish is (rich/fried/heavy/high-calorie),
+    averaged from richness tags, cooking method, heaviness, and calories into a single 0-1
+    score. Feeds gain_q15() for objectives like 'awesome_taste' that reward indulgence."""
     rich = {"buttery", "creamy", "ghee_rich", "coconut_rich", "oily"}
     fried = {"deep_fried", "shallow_fried", "dum_cooked"}
     return sum([
@@ -258,6 +310,9 @@ def gs_indulgence(dish):
 
 
 def gs_light(dish):
+    """Q15 gain-score component: how 'light' a dish is (the inverse of indulgence) — plain/light
+    richness, light cooking methods, and low calories/heaviness. Feeds gain_q15() for objectives
+    like 'healthy_living' that reward lighter dishes."""
     light = {"light", "plain"}
     lightcook = {"steamed", "boiled", "grilled", "raw", "tempered"}
     return sum([
@@ -269,6 +324,10 @@ def gs_light(dish):
 
 
 def gs_protein(dish):
+    """Q15 gain-score component: how protein-forward a dish is, proxied from its diet type and
+    dish category (non_veg/egg dishes and dal/kebab/egg categories score higher) until real
+    macro-gram protein data is available in a future version. Feeds gain_q15() for objectives
+    like 'into_fitness'."""
     # proxy (diet+category) until dish_macro real grams in v2.
     protein_cat = {"dal_lentil", "kebab", "egg_dish"}
     proxy = 0.6 if (dish.diet in ("non_veg", "egg") or set(dish.dish_category) & protein_cat) else 0.2
@@ -280,6 +339,10 @@ def gs_protein(dish):
 
 
 def gain_q15(dish, objective):
+    """§S3 GAIN_Q15: the multiplier applied to a dish's BASE score based on the household's
+    stated Q15 objective (e.g. 'awesome_taste', 'healthy_living', 'into_fitness'), computed as
+    1 plus a weighted combination of the indulgence/light/protein gain-score components, clamped
+    to the configured gain_bounds. Falls back to the default objective if none is given."""
     cfg = CONFIG
     obj = objective or cfg.default_objective
     g = cfg.gamma(obj)
@@ -336,6 +399,10 @@ def _comfort_heroes_for(theta, weather_tag):
 
 
 def _prior_matches(dish, match_kind, match_value):
+    """Check whether a dish satisfies one PRIOR_ZONE_SLOT row's match rule. `match_kind` selects
+    how to interpret `match_value`: a name substring, a dish_category tag, a hero_role, a
+    cuisine, or (for 'structure'/'attribute' rows describing a whole PLATE like
+    'roti+sabzi+dal') a composite whole-meal/thali dish that carries every token."""
     mv = match_value.lower()
     if match_kind == "dish_name":
         return mv in dish.name.lower()
@@ -357,6 +424,9 @@ def _prior_matches(dish, match_kind, match_value):
 
 
 def _zone_state(zone):
+    """Pick one representative state for a broad zone (e.g. 'Delhi' for North), used by
+    m_palette() when it needs a concrete state to score local-palette fit against. Defaults to
+    Delhi for any unrecognized zone."""
     # representative state for a zone (for local-palette m_palette). Uses KB STATE_ZONE inverse.
     rep = {"North": "Delhi", "South": "Tamil Nadu", "East": "West Bengal",
            "West": "Maharashtra", "Central": "Madhya Pradesh", "Northeast": "Assam"}

@@ -36,6 +36,16 @@ export interface SchedulerResult {
   readonly failed: number;
 }
 
+/**
+ * NightlyPlanScheduler — batches week-plan generation across every eligible user.
+ *
+ * Trigger: the 23:30 UTC CRON job (LF-L01, DOC-P3-03 §14) — calls this shared service directly,
+ * never the public HTTP recommendations endpoint (DCR-P3-06-007).
+ * Writes to: week plan tables via the injected WeekPlanStore (toPersistable/persistWeekPlan).
+ * Reads from: the injected EligibleUsersStore (users active within the last 7 days).
+ * Error codes: none — per-user failures are caught, logged, and counted in SchedulerResult rather
+ * than thrown, so one bad household never aborts the whole batch.
+ */
 export class NightlyPlanScheduler {
   constructor(
     private readonly users: EligibleUsersStore,

@@ -17,7 +17,7 @@ import { useOnboarding, type HouseholdType } from "@/onboarding/OnboardingContex
 import { StepHeader } from "@/onboarding/OnboardingHeader";
 import { step1ToScreens } from "@/onboarding/toHouseholdWrite";
 import { postHousehold } from "@/api/household";
-import { ApiError } from "@/api/client";
+import { describeApiError } from "@/api/errorMessages";
 
 type DotKind = "adult" | "kid" | "elder";
 type HouseholdOption = { value: HouseholdType; title: string; subtitle: string; dots: DotKind[] };
@@ -33,6 +33,13 @@ const HOUSEHOLDS: HouseholdOption[] = [
 
 type EarnerOption = { value: number; display: string; label: string };
 
+/**
+ * earnerOptionsFor — decides which "working professionals" chip choices to offer, based on
+ * the household type just picked. Single-person households never ask this question at all
+ * (empty array); couples cap out at 2, everyone else (families, flatmates) can go up to "3+".
+ * @param household - the household type selected above, or null before any selection.
+ * @returns the earner-count chip options to render, or an empty array to skip the question.
+ */
 function earnerOptionsFor(household: HouseholdType | null): EarnerOption[] {
   if (household === null || household === "single") return [];
   const one: EarnerOption = { value: 1, display: "1", label: "person" };
@@ -44,7 +51,7 @@ function earnerOptionsFor(household: HouseholdType | null): EarnerOption[] {
 export default function OnboardingStep1() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
-  const { answers, setAnswers } = useOnboarding();
+  const { answers, setAnswers, setCurrentStep } = useOnboarding();
 
   const household = answers.householdType;
   const earners = answers.workingProfessionals;
@@ -58,7 +65,10 @@ export default function OnboardingStep1() {
 
   const mutation = useMutation({
     mutationFn: () => postHousehold(step1ToScreens(answers), []),
-    onSuccess: () => router.push("/(onboarding)/step-2"),
+    onSuccess: () => {
+      setCurrentStep(2);
+      router.push("/(onboarding)/step-2");
+    },
   });
 
   function selectHousehold(value: HouseholdType) {
@@ -75,7 +85,7 @@ export default function OnboardingStep1() {
 
   return (
     <View style={[styles.root, { backgroundColor: t.colors.background, paddingTop: insets.top + t.spacing.md }]}>
-      <StepHeader current={1} total={5} showBack={false} />
+      <StepHeader current={1} total={5} />
 
       <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={[styles.eyebrow, { color: t.colors.primary, fontFamily: t.fonts.bodySemiBold }]}>STEP 1 — YOUR HOME</Text>
@@ -143,7 +153,7 @@ export default function OnboardingStep1() {
 
         {mutation.isError ? (
           <Text style={[styles.errorText, { color: t.colors.primary, fontFamily: t.fonts.bodyMedium }]}>
-            {mutation.error instanceof ApiError ? mutation.error.message : "Something went wrong"}
+            {describeApiError(mutation.error)}
           </Text>
         ) : null}
       </ScrollView>
@@ -163,6 +173,15 @@ export default function OnboardingStep1() {
   );
 }
 
+/**
+ * PersonDots — the small row of colored dots on each household card (e.g. two adult dots for
+ * "Couple", an extra smaller dot for a kid or elder) giving an at-a-glance visual of who's in
+ * that household type, before the user reads the title text.
+ * @param kinds - which dot types to draw, in order (first one is the "hero" dot, colored
+ *                differently from the rest).
+ * @param selected - whether this card is currently chosen — swaps the dot colors to their
+ *                    on-selected variants so they stay visible against the selected background.
+ */
 function PersonDots({ kinds, selected }: { kinds: DotKind[]; selected: boolean }) {
   const t = useTheme();
   const sizeFor = (k: DotKind) => (k === "kid" ? 6 : k === "elder" ? 8 : 10);

@@ -7,6 +7,11 @@
  */
 import type { Handler, Middleware } from "./types.ts";
 
+/**
+ * Compose a list of middleware into a single handler-wrapping function.
+ * @param middlewares - pipeline pieces, listed outermost-first (see file header for canonical order)
+ * @returns a function that wraps a base Handler with all middleware applied
+ */
 export function compose(middlewares: Middleware[]): (handler: Handler) => Handler {
   return (handler: Handler): Handler => middlewares.reduceRight((next, mw) => mw(next), handler);
 }

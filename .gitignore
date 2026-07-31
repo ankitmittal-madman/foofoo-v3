@@ -9,6 +9,10 @@
 # Hook-generated log — noise, not source (session-knowledge-doc skill)
 .claude/hooks/knowledge-book-warnings.log
 
+# Transient git worktrees created for isolated background agents — each is a
+# full working copy with its own .git link, never a real repo change
+.claude/worktrees/
+
 # Python bytecode (ghar_re_core + ghar_re_service)
 __pycache__/
 *.pyc

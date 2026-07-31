@@ -30,6 +30,9 @@ _CACHE: dict[str, object] = {}
 
 
 def _load(name):
+    """Read and parse one YAML config file from SRC by filename, caching the result so the same
+    file is never re-parsed twice in a process. `name` is a bare filename like
+    'base_weights.yaml', not a full path."""
     if name not in _CACHE:
         with open(os.path.join(SRC, name)) as f:
             _CACHE[name] = yaml.safe_load(f)
@@ -40,6 +43,10 @@ class Config:
     """Immutable-at-runtime view over the YAML configs (frozen in memory once loaded)."""
 
     def __init__(self):
+        """Load every YAML config file this engine needs (weights, pairing rules, weather rules,
+        filters, derivation params) plus community_priors.csv, all in one go, so a Config
+        instance is a complete, ready-to-use snapshot of "the rules the engine runs on right
+        now"."""
         self.base = _load("base_weights.yaml")
         self.distance = _load("distance_weights.yaml")
         self.q15 = _load("q15_weights.yaml")
@@ -53,6 +60,9 @@ class Config:
 
     # --- BASE weights (base_weights.yaml <- Core Spine §S2 §B9) ---
     def W(self, key):
+        """Look up one named BASE-score weight (e.g. 'W_PALETTE', 'W_SIG') from
+        base_weights.yaml. Raises KeyError (rather than defaulting to 0 or guessing) if the
+        weight isn't configured, per the project's "never invent a number" rule."""
         try:
             return self.base["base_weights"][key]
         except KeyError as e:
@@ -63,11 +73,17 @@ class Config:
 
     @property
     def all_conf_k(self):
+        """The confidence multiplier applied to every BASE-score term. Pinned to 1.0 for v1
+        (base_weights.yaml + README rule 4) — a future version could vary this per module."""
         # v1 pins every module confidence to 1.0 (base_weights.yaml + README rule 4).
         return self.base["confidence"]["all_conf_k"]
 
     # --- Q15 gain (q15_weights.yaml <- §S3) ---
     def gamma(self, objective):
+        """The gamma weight table for one Q15 objective (e.g. 'awesome_taste',
+        'healthy_living') — how much each gain-score component (indulgence/light/protein)
+        should count for a household with that stated objective. Raises KeyError if the
+        objective isn't configured."""
         g = self.q15["gamma"].get(objective)
         if g is None:
             raise KeyError(f"Q15 objective '{objective}' not in q15_weights.yaml gamma table.")
@@ -75,44 +91,65 @@ class Config:
 
     @property
     def kappa_v1(self):
+        """The v1-pinned kappa scaling constant used in the GAIN_Q15 formula (always 1.0 in
+        this version)."""
         return self.q15["kappa"]["v1_value"]      # pinned 1.0 in v1
 
     @property
     def gain_bounds(self):
+        """The (min, max) clamp applied to a dish's final GAIN_Q15 multiplier, so no objective
+        can push a dish's score arbitrarily high or low."""
         return tuple(self.q15["gain_bounds"])
 
     @property
     def default_objective(self):
+        """The Q15 objective to use when a household hasn't stated one (q15_objective is
+        empty/missing)."""
         return self.q15["default_objective"]
 
     # --- pairing (pairing_rules.yaml <- §S4) ---
     @property
     def lambda_pair(self):
+        """The weight controlling how much a pair's compat() bonus/penalty can move its combined
+        plate score, in the plate_score formula (§S4.3)."""
         return self.pairing["plate"]["lambda_pair"]
 
     @property
     def theta_region(self):
+        """The maximum allowed cuisine distance between a dry and liquid dish before the
+        cuisine-coherence hard gate rejects the pair (pairing.allowed())."""
         return self.pairing["hard_gates"]["theta_region"]
 
     def soft(self, key):
+        """Look up one named soft pairing term (e.g. 'b_balance', 'b_protein', 'p_sametaste')
+        from pairing_rules.yaml — the small bonuses/penalties compat() adds up."""
         return self.pairing["soft_terms"][key]
 
     # --- weather (weather_rules.yaml <- §S2 m_weather + KB §Z2) ---
     @property
     def weather_thresholds(self):
+        """The temperature (°C) cut-offs that classify the injected weather context as
+        'hot_weather' or 'cold_weather'."""
         return self.weather["thermal_thresholds"]
 
     @property
     def weather_magnitude(self):
+        """The signed weight (W_WEATHER) applied to the weather-comfort term in the BASE score —
+        how much a matching/mismatching dish is boosted or demoted for the current weather."""
         return self.weather["magnitude"]           # = W_WEATHER, signed
 
     # --- filters / normalization (filters.yaml <- §S2 PART A + §S1) ---
     @property
     def T_CAP(self):
+        """The normalization cap used when scaling raw scores into their final range
+        (filters.yaml)."""
         return self.filters["T_CAP"]
 
     # --- derivation params (derivation_params.yaml <- D1-D7) ---
     def D(self, node):
+        """Look up the full parameter block for one D1-D7 derivation node (e.g. 'D1_income',
+        'D5_household') from derivation_params.yaml — everything derivation.py needs to compute
+        that node's household-profile fields."""
         return self.derivation[node]
 
     # --- community priors (community_priors.csv <- KB §C1) ---
@@ -120,6 +157,9 @@ class Config:
     # file themselves (RE-DOC-11 §1/§2). Keyed by state -> {state, zone, diet_lean, cadence}.
     @property
     def community_priors(self):
+        """State -> community dietary-prior row (state, zone, diet_lean, default_non_veg_cadence)
+        from community_priors.csv, loaded once and cached. This is the soft default derivation.py
+        falls back to when a household hasn't explicitly answered Q5-Q8 in enough detail."""
         if self._community_priors is None:
             import csv
             self._community_priors = {}
@@ -143,6 +183,9 @@ _active = None
 
 
 def active_config():
+    """Return the Config currently in effect, creating the default YAML-from-data/source Config
+    the first time it's needed. This is what CONFIG (the proxy every core module imports)
+    delegates to on every attribute access."""
     global _active
     if _active is None:
         _active = Config()
@@ -158,6 +201,8 @@ def set_active_config(cfg):
 class _ConfigProxy:
     """Delegates every attribute/method access to the current active Config."""
     def __getattr__(self, name):
+        """Forward any attribute/method lookup (e.g. CONFIG.W(...), CONFIG.lambda_pair) to
+        whichever Config is currently active, so callers never hold a stale reference."""
         return getattr(active_config(), name)
 
 

@@ -23,6 +23,9 @@ from ghar_re_core import scoring as S
 
 @dataclass
 class ModuleResult:
+    """One scoring module's output for one dish — both the raw number used in BASE and the
+    metadata that becomes one entry of the response's open `contributions[]` array."""
+
     value: float  # the module's raw m_k(x) output
     confidence: float = 1.0  # conf_k (v1 pinned 1.0)
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -30,6 +33,12 @@ class ModuleResult:
 
 
 class ScoringModule(Protocol):
+    """Interface every BASE-score component (m_palette, m_slot, ..., prior_boost) satisfies.
+
+    `weight_key` names the config.base_weights entry the registry multiplies this module's value
+    by (None means an additive term with a fixed weight of 1.0, e.g. prior_boost).
+    """
+
     name: str
     weight_key: str | None  # config base_weights key; None => additive weight 1.0
 
@@ -50,6 +59,8 @@ class _FnModule:
         self._arg_kind = arg_kind  # 'dish' | 'dish_theta' | 'dish_ctx' | 'dish_theta_ctx'
 
     def score(self, dish, profile, context) -> ModuleResult:
+        """Call the wrapped ghar_re_core function with whichever of (dish, profile, context) its
+        `arg_kind` says it needs, and wrap the raw float in a ModuleResult."""
         if self._arg_kind == "dish":
             v = self._fn(dish)
         elif self._arg_kind == "dish_theta":

@@ -4,7 +4,34 @@
  *   - household/schema.ts (HOUSEHOLD_ANSWERS_SCHEMAS, PROFILE_SCHEMAS, memberEnvelope)
  *   - household/handler.ts's jsonContract response shape
  *   - recommendations/contract.ts + contracts/ghar-re-v1.schema.json (RecommendationResponse)
+ *   - consent-schema.ts + docs/architecture/[ACTIVE]_DOC-P3-06_API_Contract_Specification_v1.2.md §06.1
  */
+
+// ---- POST /v1/consent -------------------------------------------------------
+
+export type ConsentType = "personalization" | "analytics" | "push_notifications" | "data_retention";
+
+export interface ConsentInput {
+  consent_type: ConsentType;
+  granted: boolean;
+}
+
+export interface ConsentRequest {
+  profile_id: string;
+  consents: ConsentInput[];
+  privacy_policy_version: string;
+}
+
+export interface ConsentRecorded {
+  consent_type: ConsentType;
+  granted: boolean;
+  granted_at: string;
+}
+
+export interface ConsentResponse {
+  recorded: ConsentRecorded[];
+  personalization_granted: boolean;
+}
 
 // ---- POST /v1/household ----------------------------------------------------
 

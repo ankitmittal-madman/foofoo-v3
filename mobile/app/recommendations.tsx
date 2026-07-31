@@ -1,8 +1,9 @@
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { router, Redirect } from "expo-router";
 import { postRecommendations } from "@/api/recommendations";
-import { ApiError } from "@/api/client";
+import { fetchOnboardingStatus } from "@/api/household";
+import { describeApiError } from "@/api/errorMessages";
 import type { Plate, RecommendationsResponse } from "@/api/types";
 
 /**
@@ -10,14 +11,28 @@ import type { Plate, RecommendationsResponse } from "@/api/types";
  * `plates[]` the RE returns, no photos/cards/swipe. recommendations/handler.ts always returns a
  * valid 200 (RE failure -> fallback plate), so this screen has no "recommendation failed" case to
  * design for; only the network/auth failure path needs an error state.
+ *
+ * Completeness guard (audit-onboarding-funnel HIGH finding): this screen previously had none —
+ * a user with an incomplete profile (e.g. reached via a stale deep link) would silently get a
+ * generic fallback plate forever. Now shares the same source of truth as index.tsx/sign-in.tsx
+ * (household.ts's fetchOnboardingStatus) and redirects into onboarding if incomplete, before
+ * spending a recommendations call on a profile that can't yet produce a real one.
  */
 export default function Recommendations() {
-  const { data, isLoading, isError, error, refetch, isRefetching } = useQuery<RecommendationsResponse>({
-    queryKey: ["recommendations"],
-    queryFn: () => postRecommendations(),
+  const statusQuery = useQuery({
+    queryKey: ["onboarding-status"],
+    queryFn: fetchOnboardingStatus,
+    retry: false,
   });
 
-  if (isLoading) {
+  const recsQuery = useQuery<RecommendationsResponse>({
+    queryKey: ["recommendations"],
+    queryFn: () => postRecommendations(),
+    // Don't spend a recommendations call until we know the profile is complete enough to serve one.
+    enabled: statusQuery.data?.complete === true,
+  });
+
+  if (statusQuery.isPending) {
     return (
       <View style={styles.center}>
         <ActivityIndicator />
@@ -25,18 +40,43 @@ export default function Recommendations() {
     );
   }
 
-  if (isError) {
+  if (statusQuery.isError) {
+    // Can't verify completeness (e.g. offline) — don't guess either way; offer retry rather than
+    // silently redirecting into onboarding (which could interrupt someone who is, in fact, done).
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>
-          {error instanceof ApiError ? error.message : "Could not load recommendations"}
-        </Text>
-        <Pressable style={styles.button} onPress={() => refetch()}>
+        <Text style={styles.error}>{describeApiError(statusQuery.error)}</Text>
+        <Pressable style={styles.button} onPress={() => statusQuery.refetch()}>
           <Text style={styles.buttonText}>Retry</Text>
         </Pressable>
       </View>
     );
   }
+
+  if (statusQuery.data?.complete !== true) {
+    return <Redirect href="/(onboarding)/consent" />;
+  }
+
+  if (recsQuery.isLoading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  if (recsQuery.isError) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.error}>{describeApiError(recsQuery.error)}</Text>
+        <Pressable style={styles.button} onPress={() => recsQuery.refetch()}>
+          <Text style={styles.buttonText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  const data = recsQuery.data;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -47,16 +87,23 @@ export default function Recommendations() {
       {data?.plates.map((plate: Plate) => (
         <PlateCard key={plate.plate_id} plate={plate} />
       ))}
-      <Pressable style={styles.button} onPress={() => refetch()} disabled={isRefetching}>
-        <Text style={styles.buttonText}>{isRefetching ? "Refreshing..." : "Refresh"}</Text>
+      <Pressable style={styles.button} onPress={() => recsQuery.refetch()} disabled={recsQuery.isRefetching}>
+        <Text style={styles.buttonText}>{recsQuery.isRefetching ? "Refreshing..." : "Refresh"}</Text>
       </Pressable>
-      <Pressable style={styles.secondaryButton} onPress={() => router.replace("/(onboarding)/step-1")}>
+      <Pressable style={styles.secondaryButton} onPress={() => router.replace("/(onboarding)/consent")}>
         <Text style={styles.secondaryButtonText}>Back to onboarding</Text>
       </Pressable>
     </ScrollView>
   );
 }
 
+/**
+ * PlateCard — one recommended meal in the plates list, showing its dish name(s), any
+ * supporting side, and a debug-style meta line (form + final score) useful while Phase 1
+ * is proving the recommendation wire rather than a polished dish presentation.
+ * @param plate - one plate object from the recommendations API response, as returned by the
+ *                Recommendation Engine for the caller's household.
+ */
 function PlateCard({ plate }: { plate: Plate }) {
   return (
     <View style={styles.card}>

@@ -74,6 +74,14 @@ export interface VarietyViolation {
   readonly detail: string;
 }
 
+/**
+ * Validate a set of planned slots against the rolling variety-window rules (LF-F02, see doc
+ * comment above PlannedSlot for the rule summary).
+ * @param slots - the chosen dishes in slot order, with their variety dimensions
+ * @param rules - the configured re_variety_rules (caps + override conditions)
+ * @param isMonsoon - whether the monsoon override should raise the fried-method cap
+ * @returns the list of violations found; empty means the plan is compliant
+ */
 export function checkVarietyWindow(
   slots: PlannedSlot[],
   rules: VarietyRule[],

@@ -76,10 +76,14 @@ def validate_request(payload: Any) -> None:
 
 
 def validate_response(payload: Any) -> None:
+    """Validate an outgoing recommendation response against the Phase A contract before it is
+    returned to the caller — the fail-closed check RE-DOC-10 §15 requires (the RE checks its own
+    output shape, it never trusts that engine.run() got the wire format right by construction)."""
     _validate(_RESPONSE, payload, "response")
 
 
 def validate_meta(payload: Any) -> None:
+    """Validate the GET /v1/meta response body against the Phase A MetaResponse contract."""
     _validate(_META, payload, "meta")
 
 

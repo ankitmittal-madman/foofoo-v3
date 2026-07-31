@@ -53,12 +53,25 @@ const ThemeContext = createContext<ThemeContextValue>({
   setThemeName: () => {},
 });
 
+/**
+ * ThemeProvider — wraps the whole app (mounted once in app/_layout.tsx, nested inside
+ * SessionProvider) and makes the "ghar" brand theme (colors, spacing, radius, fonts) available
+ * to every screen via useTheme(). Only one theme currently exists, so `setThemeName` is
+ * forward-looking scaffolding rather than something any screen calls today.
+ * @param children - the rest of the app tree, themed once this provider is mounted.
+ */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeName, setThemeName] = useState<ThemeName>("ghar");
   const value = useMemo(() => ({ theme: themes[themeName], themeName, setThemeName }), [themeName]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
+/**
+ * useTheme — reads the active brand theme object (colors/spacing/radius/fonts) that every
+ * real onboarding, sign-in, and splash screen renders with. This is the "ghar" theme system,
+ * not the older light/dark `@/hooks/useTheme` used by ThemedText/ThemedView.
+ * @returns the current Theme object, e.g. `t.colors.background`, `t.fonts.headlineBold`.
+ */
 export function useTheme(): Theme {
   return useContext(ThemeContext).theme;
 }

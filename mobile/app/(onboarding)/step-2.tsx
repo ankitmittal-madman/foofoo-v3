@@ -18,12 +18,12 @@ import { StepHeader } from "@/onboarding/OnboardingHeader";
 import { INDIAN_STATES } from "@/onboarding/indianStates";
 import { step2ToScreens } from "@/onboarding/toHouseholdWrite";
 import { postHousehold } from "@/api/household";
-import { ApiError } from "@/api/client";
+import { describeApiError } from "@/api/errorMessages";
 
 export default function OnboardingStep2() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
-  const { answers, setAnswers } = useOnboarding();
+  const { answers, setAnswers, setCurrentStep } = useOnboarding();
 
   const [pickerOpen, setPickerOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -34,7 +34,10 @@ export default function OnboardingStep2() {
 
   const mutation = useMutation({
     mutationFn: () => postHousehold(step2ToScreens(answers), []),
-    onSuccess: () => router.push("/(onboarding)/step-3"),
+    onSuccess: () => {
+      setCurrentStep(3);
+      router.push("/(onboarding)/step-3");
+    },
   });
 
   const filtered = useMemo(() => {
@@ -86,7 +89,7 @@ export default function OnboardingStep2() {
 
         {mutation.isError ? (
           <Text style={[styles.errorText, { color: t.colors.primary, fontFamily: t.fonts.bodyMedium }]}>
-            {mutation.error instanceof ApiError ? mutation.error.message : "Something went wrong"}
+            {describeApiError(mutation.error)}
           </Text>
         ) : null}
       </ScrollView>

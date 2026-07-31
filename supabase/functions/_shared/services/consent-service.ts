@@ -21,6 +21,14 @@ export interface ConsentResponse {
   readonly personalization_granted: boolean;
 }
 
+/**
+ * ConsentService — orchestrates LF-M01 captureConsent() (see file header).
+ *
+ * Trigger: called by consent/handler.ts for every POST /v1/consent request.
+ * Writes to: public.consent_records, via the injected IConsentRepository (append-only inserts).
+ * Reads from: nothing directly — the request itself supplies the consent decisions.
+ * Error codes: none thrown directly — propagates whatever the repository throws.
+ */
 export class ConsentService extends BaseService {
   private readonly repo: IConsentRepository;
 

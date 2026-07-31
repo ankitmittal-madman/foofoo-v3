@@ -177,6 +177,17 @@ export function assertNoConflictingLifeStageTags(conditions: readonly string[]):
   }
 }
 
+/**
+ * OnboardingOrchestrator — owns onboarding logic and orchestrates the RE Engine for the first
+ * week plan (see file header).
+ *
+ * Trigger: called by the onboarding endpoint's handler for the completing onboarding write.
+ * Writes to: profiles / household_members / onboarding_sessions / user_re_state / taste vectors
+ * (via the injected OnboardingStore), plus week_plans/plan_slots (via WeekPlanStore).
+ * Reads from: the injected OnboardingStore (consent + completion checks) and CohortResolutionRepository.
+ * Error codes: ERR_CONSENT_REQUIRED (personalization not granted), ERR_ONBOARDING_ALREADY_COMPLETE
+ * (idempotency guard), ERR_VALIDATION_FAILED (via assertNoConflictingLifeStageTags).
+ */
 export class OnboardingOrchestrator {
   constructor(
     private readonly store: OnboardingStore,
