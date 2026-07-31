@@ -92,7 +92,7 @@ function fakeStore() {
     upsertAnswers: 0,
     loadAccumulated: 0,
     checkProfileExists: 0,
-    createProfileRow: 0,
+    upsertProfileRow: 0,
     upsertMembers: 0,
   };
 
@@ -125,10 +125,12 @@ function fakeStore() {
       calls.checkProfileExists++;
       return Promise.resolve(profile !== null);
     },
-    createProfileRow: (_ctx, callerUserId, fields) => {
-      calls.createProfileRow++;
+    upsertProfileRow: (_ctx, callerUserId, fields) => {
+      calls.upsertProfileRow++;
+      // Mirrors the real atomic upsert's semantics: only report `created` when no row existed yet.
+      const created = profile === null;
       profile = { id: callerUserId, ...fields };
-      return Promise.resolve();
+      return Promise.resolve(created);
     },
     upsertMembers: (_ctx, _id, memberList) => {
       calls.upsertMembers++;
@@ -168,7 +170,7 @@ Deno.test("household_id owned by another user is rejected before ANY store funct
     assertEquals(calls.upsertAnswers, 0);
     assertEquals(calls.loadAccumulated, 0);
     assertEquals(calls.checkProfileExists, 0);
-    assertEquals(calls.createProfileRow, 0);
+    assertEquals(calls.upsertProfileRow, 0);
     assertEquals(calls.upsertMembers, 0);
   });
 });
@@ -216,7 +218,7 @@ Deno.test("profile is NOT created while a required field is still missing (no fa
     assertEquals(json.profile_created, false);
     assertEquals(json.profile_exists, false);
     assertEquals(json.missing_required_fields, ["cook_capability"]);
-    assertEquals(calls.createProfileRow, 0); // never called — no value was invented
+    assertEquals(calls.upsertProfileRow, 0); // never called — no value was invented
     assertEquals(getProfile(), null);
   });
 });
@@ -250,7 +252,7 @@ Deno.test("a household can be created across multiple calls (resume-after-partia
     const j2 = await r2.json();
     assertEquals(j2.profile_created, false);
     assertEquals(j2.missing_required_fields, ["cook_capability"]);
-    assertEquals(calls.createProfileRow, 0); // still not created — 4 of 5 known
+    assertEquals(calls.upsertProfileRow, 0); // still not created — 4 of 5 known
 
     // Call 3: the final field completes the set.
     const r3 = await app(post({ screens: [screen("cook_capability", "intermediate")] }));
@@ -258,7 +260,7 @@ Deno.test("a household can be created across multiple calls (resume-after-partia
     assertEquals(j3.profile_created, true);
     assertEquals(j3.profile_exists, true);
     assertEquals(j3.missing_required_fields, []);
-    assertEquals(calls.createProfileRow, 1);
+    assertEquals(calls.upsertProfileRow, 1);
 
     const profile = getProfile() as Record<string, unknown>;
     assertEquals(profile.id, USER_ID); // claims.userId, not anything client-supplied
@@ -280,7 +282,7 @@ Deno.test("a repeat call after the profile already exists does not re-create it"
     const app = pipeline(deps);
 
     await app(post({ screens: COMPLETE_ANSWERS }));
-    assertEquals(calls.createProfileRow, 1);
+    assertEquals(calls.upsertProfileRow, 1);
 
     // Repeat the SAME complete payload again — must not create a second profile.
     const res = await app(post({ screens: COMPLETE_ANSWERS }));
@@ -288,7 +290,7 @@ Deno.test("a repeat call after the profile already exists does not re-create it"
     assertEquals(res.status, 200);
     assertEquals(json.profile_created, false); // already existed BEFORE this call
     assertEquals(json.profile_exists, true);
-    assertEquals(calls.createProfileRow, 1); // still exactly one, never two
+    assertEquals(calls.upsertProfileRow, 1); // still exactly one, never two
   });
 });
 

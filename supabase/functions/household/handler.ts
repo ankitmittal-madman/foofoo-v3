@@ -27,12 +27,12 @@ import { parseHouseholdWriteRequest } from "./schema.ts";
 import {
   accumulatedProfileFields,
   buildHouseholdAnswersPatch,
-  createProfile,
   insertOnboardingSessionRows,
   missingRequiredProfileFields,
   profileExists,
   upsertHouseholdAnswers,
   upsertHouseholdMembers,
+  upsertProfileIfAbsent,
 } from "./store.ts";
 
 const SERVICE_NAME = "household";
@@ -42,7 +42,8 @@ export interface HouseholdDeps {
   upsertAnswers?: typeof upsertHouseholdAnswers;
   loadAccumulated?: typeof accumulatedProfileFields;
   checkProfileExists?: typeof profileExists;
-  createProfileRow?: typeof createProfile;
+  /** Atomic create (MEDIUM audit fix — replaces the old check-then-act createProfileRow). */
+  upsertProfileRow?: typeof upsertProfileIfAbsent;
   upsertMembers?: typeof upsertHouseholdMembers;
 }
 
@@ -52,7 +53,7 @@ export function makeHouseholdHandler(deps: HouseholdDeps = {}): Handler {
   const upsertAnswers = deps.upsertAnswers ?? upsertHouseholdAnswers;
   const loadAccumulated = deps.loadAccumulated ?? accumulatedProfileFields;
   const checkProfileExists = deps.checkProfileExists ?? profileExists;
-  const createProfileRow = deps.createProfileRow ?? createProfile;
+  const upsertProfileRow = deps.upsertProfileRow ?? upsertProfileIfAbsent;
   const upsertMembers = deps.upsertMembers ?? upsertHouseholdMembers;
 
   return async (req, ctx: RequestContext) => {
@@ -99,7 +100,12 @@ export function makeHouseholdHandler(deps: HouseholdDeps = {}): Handler {
     log.info("household.answers_upserted", { fields: Object.keys(answersPatch) });
 
     // 3. Profile creation — gated on all five required fields being known, accumulated across
-    // however many calls it took. Never re-created if a profiles row already exists.
+    // however many calls it took. The preliminary `exists` read below is a fast-path OPTIMIZATION
+    // ONLY (skips loading accumulated fields when we already know a profile is there) — it is not
+    // relied on for correctness. The actual write (upsertProfileRow) is a single atomic
+    // INSERT..ON CONFLICT DO NOTHING, so even if this read is stale under concurrent retries (two
+    // requests both observing `exists === false`), at most one of them ever creates the row —
+    // MEDIUM audit fix for the check-then-act race this handler previously had.
     let exists = await checkProfileExists(ctx, householdId);
     let createdThisCall = false;
     let missing: string[] = [];
@@ -108,14 +114,20 @@ export function makeHouseholdHandler(deps: HouseholdDeps = {}): Handler {
       const accumulated = await loadAccumulated(ctx, householdId);
       missing = missingRequiredProfileFields(accumulated);
       if (missing.length === 0) {
-        // claims.userId, NOT householdId — see createProfile's own doc comment. The two are
-        // already guaranteed equal by requireOwnership above; this is belt-and-suspenders so the
-        // INSERT itself cannot create a profile for anyone but the authenticated caller, even if a
-        // future change to the ownership check above had a bug.
-        await createProfileRow(ctx, claims.userId, accumulated);
-        createdThisCall = true;
+        // claims.userId, NOT householdId — see createProfile's own doc comment (upsertProfileIfAbsent
+        // in store.ts). The two are already guaranteed equal by requireOwnership above; this is
+        // belt-and-suspenders so the write itself cannot create a profile for anyone but the
+        // authenticated caller, even if a future change to the ownership check above had a bug.
+        createdThisCall = await upsertProfileRow(ctx, claims.userId, accumulated);
+        // The row is guaranteed to exist after a successful atomic upsert, whether THIS call
+        // created it (createdThisCall === true) or a concurrent/earlier call already had
+        // (createdThisCall === false, ON CONFLICT DO NOTHING skipped it) — either way it's there.
         exists = true;
-        log.info("household.profile_created", { household_id: householdId });
+        if (createdThisCall) {
+          log.info("household.profile_created", { household_id: householdId });
+        } else {
+          log.info("household.profile_already_existed", { household_id: householdId });
+        }
       }
     }
 

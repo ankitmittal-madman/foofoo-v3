@@ -17,6 +17,7 @@
  */
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
+import { withTimeout } from "../_shared/utils/timeout.ts";
 
 export interface MemberAge {
   role?: string;
@@ -210,19 +211,30 @@ export async function loadHouseholdRaw(
 
   const db = createServiceRoleClient(ctx.config);
 
-  // Three independent reads, issued concurrently — none depends on another's result.
+  // Three independent reads, issued concurrently — none depends on another's result. Each is
+  // individually timeout-guarded (MEDIUM audit fix) so one stalled connection can't hang the
+  // whole Promise.all past the platform's own function-timeout with no typed error.
   const [profileRes, answersRes, membersRes] = await Promise.all([
-    db.from("profiles")
-      .select("id, home_state, current_city, diet_type, religious_pref, allergen_flags")
-      .eq("id", profileId).maybeSingle(),
-    db.from("household_answers")
-      .select(
-        "q1_household_type, q2_working_professionals, q6_nonveg_types, q7_veg_days, " +
-          "q10_allergy_other, q11_conditions, q13_who_cooks, q14_eat_out_per_week, q15_objective",
-      )
-      .eq("profile_id", profileId).maybeSingle(),
-    db.from("household_members")
-      .select("age, conditions").eq("profile_id", profileId).eq("is_active", true),
+    withTimeout(
+      db.from("profiles")
+        .select("id, home_state, current_city, diet_type, religious_pref, allergen_flags")
+        .eq("id", profileId).maybeSingle(),
+      "recommendations.compose.loadProfile",
+    ),
+    withTimeout(
+      db.from("household_answers")
+        .select(
+          "q1_household_type, q2_working_professionals, q6_nonveg_types, q7_veg_days, " +
+            "q10_allergy_other, q11_conditions, q13_who_cooks, q14_eat_out_per_week, q15_objective",
+        )
+        .eq("profile_id", profileId).maybeSingle(),
+      "recommendations.compose.loadAnswers",
+    ),
+    withTimeout(
+      db.from("household_members")
+        .select("age, conditions").eq("profile_id", profileId).eq("is_active", true),
+      "recommendations.compose.loadMembers",
+    ),
   ]);
 
   // A read ERROR is not the same as "no rows" — surface it rather than silently serving defaults,
@@ -265,15 +277,18 @@ export async function loadLatestContext(
   profileId: string,
 ): Promise<Record<string, unknown> | undefined> {
   const db = createServiceRoleClient(ctx.config);
-  const { data, error } = await db.from("household_context")
-    .select(
-      "slot, season, weekday, weather_condition, temp_c, is_raining, humidity, " +
-        "active_modes, calorie_target",
-    )
-    .eq("profile_id", profileId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const { data, error } = await withTimeout(
+    db.from("household_context")
+      .select(
+        "slot, season, weekday, weather_condition, temp_c, is_raining, humidity, " +
+          "active_modes, calorie_target",
+      )
+      .eq("profile_id", profileId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    "recommendations.compose.loadLatestContext",
+  );
 
   if (error) throw error;
   if (!data) return undefined;

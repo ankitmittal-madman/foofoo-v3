@@ -19,5 +19,16 @@ major_version = 15
 # Edge Functions verify JWT by default; individual functions opt out (e.g. /v1/health) in later WPs.
 verify_jwt = true
 
+# Scheduled/internal jobs (Phase F) — never reachable with a user JWT by design (DOC-P3-06 §04):
+# invoked by pg_cron/service-role, not a browser/mobile client. Registering the actual pg_cron
+# schedule is a separate, database/-scoped step (flagged in the Phase F work-package report, not
+# done here) — this config change only stops the platform gateway rejecting the scheduler's own
+# invocation for lack of a user JWT it was never meant to carry.
+[functions.cron-hard-delete]
+verify_jwt = false
+
+[functions.cron-retention-purge]
+verify_jwt = false
+
 [auth]
 enabled = true
