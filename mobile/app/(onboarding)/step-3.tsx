@@ -17,7 +17,7 @@ import { StepHeader } from "@/onboarding/OnboardingHeader";
 import { ChipGroup, type ChipOption } from "@/onboarding/OnboardingChips";
 import { step3ToScreens } from "@/onboarding/toHouseholdWrite";
 import { postHousehold } from "@/api/household";
-import { ApiError } from "@/api/client";
+import { describeApiError } from "@/api/errorMessages";
 
 type Option = ChipOption;
 type DietToneKey = "plant" | "egg" | "meat";
@@ -64,7 +64,7 @@ function hasFollowUp(diet: DietChoice | null): boolean {
 export default function OnboardingStep3() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
-  const { answers, setAnswers } = useOnboarding();
+  const { answers, setAnswers, setCurrentStep } = useOnboarding();
 
   const diet = answers.diet;
   const canContinue = diet !== null;
@@ -74,7 +74,10 @@ export default function OnboardingStep3() {
 
   const mutation = useMutation({
     mutationFn: () => postHousehold(step3ToScreens(answers), []),
-    onSuccess: () => router.push("/(onboarding)/step-4"),
+    onSuccess: () => {
+      setCurrentStep(4);
+      router.push("/(onboarding)/step-4");
+    },
   });
 
   function selectDiet(value: DietChoice) {
@@ -141,7 +144,7 @@ export default function OnboardingStep3() {
 
         {mutation.isError ? (
           <Text style={[styles.errorText, { color: t.colors.primary, fontFamily: t.fonts.bodyMedium }]}>
-            {mutation.error instanceof ApiError ? mutation.error.message : "Something went wrong"}
+            {describeApiError(mutation.error)}
           </Text>
         ) : null}
       </ScrollView>

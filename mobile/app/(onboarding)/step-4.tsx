@@ -17,7 +17,7 @@ import { StepHeader } from "@/onboarding/OnboardingHeader";
 import { ChipGroup, type ChipOption } from "@/onboarding/OnboardingChips";
 import { step4ToScreens } from "@/onboarding/toHouseholdWrite";
 import { postHousehold } from "@/api/household";
-import { ApiError } from "@/api/client";
+import { describeApiError } from "@/api/errorMessages";
 
 const ALLERGENS: ChipOption[] = [
   { value: "peanuts", label: "Peanut" },
@@ -44,7 +44,7 @@ const MEDICAL_CONDITIONS: ChipOption[] = [
 export default function OnboardingStep4() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
-  const { answers, setAnswers } = useOnboarding();
+  const { answers, setAnswers, setCurrentStep } = useOnboarding();
 
   const scrollRef = useRef<ScrollView>(null);
   const pendingScroll = useRef<string | null>(null);
@@ -52,7 +52,10 @@ export default function OnboardingStep4() {
 
   const mutation = useMutation({
     mutationFn: () => postHousehold(step4ToScreens(answers), []),
-    onSuccess: () => router.push("/(onboarding)/step-5"),
+    onSuccess: () => {
+      setCurrentStep(5);
+      router.push("/(onboarding)/step-5");
+    },
   });
 
   function toggleOption(field: "allergens" | "medicalConditions", otherField: "allergensOther" | "medicalConditionsOther", value: string) {
@@ -124,7 +127,7 @@ export default function OnboardingStep4() {
 
         {mutation.isError ? (
           <Text style={[styles.errorText, { color: t.colors.primary, fontFamily: t.fonts.bodyMedium }]}>
-            {mutation.error instanceof ApiError ? mutation.error.message : "Something went wrong"}
+            {describeApiError(mutation.error)}
           </Text>
         ) : null}
       </ScrollView>

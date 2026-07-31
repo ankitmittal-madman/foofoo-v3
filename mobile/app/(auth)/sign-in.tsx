@@ -14,6 +14,8 @@ import { router, useLocalSearchParams } from "expo-router";
 
 import { supabase } from "@/auth/supabaseClient";
 import { useTheme } from "@/theme";
+import { fetchOnboardingStatus } from "@/api/household";
+import { logger } from "@/lib/logger";
 
 type Mode = "signin" | "signup";
 
@@ -60,7 +62,19 @@ export default function SignIn() {
           setErrorMsg(error.message);
           return;
         }
-        router.replace("/recommendations");
+        // Fix (audit-onboarding-funnel HIGH finding): this used to route straight to
+        // /recommendations regardless of whether onboarding had ever been completed, bypassing it
+        // entirely and contradicting index.tsx's own routing rule. Both now share the same source
+        // of truth (household.ts's fetchOnboardingStatus — see its header comment). If the status
+        // check itself fails (e.g. network), fail toward onboarding rather than assuming
+        // completion — same reasoning as index.tsx's fallback, and it's idempotent to revisit.
+        const status = await fetchOnboardingStatus().catch((e) => {
+          logger.warn("sign_in.onboarding_status_check_failed", {
+            detail: e instanceof Error ? e.message : String(e),
+          });
+          return null;
+        });
+        router.replace(status?.complete ? "/recommendations" : "/(onboarding)/consent");
       }
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : "Something went wrong. Please try again.");

@@ -17,7 +17,7 @@ import { useOnboarding, type HouseholdType } from "@/onboarding/OnboardingContex
 import { StepHeader } from "@/onboarding/OnboardingHeader";
 import { step1ToScreens } from "@/onboarding/toHouseholdWrite";
 import { postHousehold } from "@/api/household";
-import { ApiError } from "@/api/client";
+import { describeApiError } from "@/api/errorMessages";
 
 type DotKind = "adult" | "kid" | "elder";
 type HouseholdOption = { value: HouseholdType; title: string; subtitle: string; dots: DotKind[] };
@@ -51,7 +51,7 @@ function earnerOptionsFor(household: HouseholdType | null): EarnerOption[] {
 export default function OnboardingStep1() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
-  const { answers, setAnswers } = useOnboarding();
+  const { answers, setAnswers, setCurrentStep } = useOnboarding();
 
   const household = answers.householdType;
   const earners = answers.workingProfessionals;
@@ -65,7 +65,10 @@ export default function OnboardingStep1() {
 
   const mutation = useMutation({
     mutationFn: () => postHousehold(step1ToScreens(answers), []),
-    onSuccess: () => router.push("/(onboarding)/step-2"),
+    onSuccess: () => {
+      setCurrentStep(2);
+      router.push("/(onboarding)/step-2");
+    },
   });
 
   function selectHousehold(value: HouseholdType) {
@@ -82,7 +85,7 @@ export default function OnboardingStep1() {
 
   return (
     <View style={[styles.root, { backgroundColor: t.colors.background, paddingTop: insets.top + t.spacing.md }]}>
-      <StepHeader current={1} total={5} showBack={false} />
+      <StepHeader current={1} total={5} />
 
       <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={[styles.eyebrow, { color: t.colors.primary, fontFamily: t.fonts.bodySemiBold }]}>STEP 1 — YOUR HOME</Text>
@@ -150,7 +153,7 @@ export default function OnboardingStep1() {
 
         {mutation.isError ? (
           <Text style={[styles.errorText, { color: t.colors.primary, fontFamily: t.fonts.bodyMedium }]}>
-            {mutation.error instanceof ApiError ? mutation.error.message : "Something went wrong"}
+            {describeApiError(mutation.error)}
           </Text>
         ) : null}
       </ScrollView>
