@@ -22,6 +22,13 @@ state = AppState()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """FastAPI lifespan hook — runs the startup load sequence once before the app accepts traffic.
+
+    Trigger: process boot (ASGI server startup), not a client-facing route.
+    Reads/writes: populates the process-wide `state` (AppState) — auth, config, catalogue,
+    indices, rate limiter, registry — via `startup()`. `/readyz` only returns 200 once this
+    has completed.
+    """
     startup(state)  # load auth → config → catalogue → indices → registry → ready
     yield
 
@@ -154,13 +161,27 @@ async def enforce_rate_limit(request: Request, call_next):
 
 @app.get("/healthz")
 def healthz():
-    # Liveness: 200 as soon as the process is up, regardless of load state (RE-DOC-10 §12).
+    """Liveness probe.
+
+    Trigger: GET /healthz — called by the deploy platform's health-check probe, unauthenticated
+    and not rate-limited (see SIGNED_PATHS/RATE_LIMITED_PATHS above).
+    Reads/writes: nothing — always 200 as soon as the process is up, regardless of load state
+    (RE-DOC-10 §12), so it never reflects catalogue/config readiness.
+    Error codes: none — this endpoint cannot fail while the process is running.
+    """
     return {"status": "alive"}
 
 
 @app.get("/readyz")
 def readyz():
-    # Readiness: 200 only once catalogue + config are loaded (traffic gate).
+    """Readiness probe.
+
+    Trigger: GET /readyz — called by the deploy platform to decide whether to route traffic to
+    this instance, unauthenticated and not rate-limited.
+    Reads/writes: reads `state.ready` only (set True once `startup()` finishes loading
+    auth/config/catalogue/registry).
+    Error codes: 503 (`{"status": "loading"}`) while startup hasn't finished; 200 once ready.
+    """
     if state.ready:
         return {"status": "ready"}
     return JSONResponse(status_code=503, content={"status": "loading"})
@@ -168,6 +189,14 @@ def readyz():
 
 @app.get("/v1/meta")
 def meta():
+    """Reports service/engine/config/bundle versions and lightweight in-process request counters.
+
+    Trigger: GET /v1/meta — unauthenticated by design (RE-DOC-10 §4: "no auth data"), but IS
+    rate-limited since public ingress made it internet-reachable.
+    Reads/writes: reads `state.config`, `state.bundle`, `state.counters` only — no external I/O.
+    Error codes: none directly; the response is validated against the MetaResponse contract
+    before returning (raises internally if the service's own shape ever drifted from the schema).
+    """
     # Versions plus lightweight process-local counters (Phase D Task 3) — no metrics backend,
     # cheap and replaceable wholesale once Phase F picks real monitoring.
     body = {
@@ -191,6 +220,19 @@ def recommendations(
     # would break request parsing entirely.
     payload: dict = Body(...),  # noqa: B008
 ):
+    """Produce a household's recommended plates (the RE's one compute endpoint).
+
+    Trigger: POST /v1/recommendations — the sole SIGNED_PATH and RATE_LIMITED_PATH; requires a
+    valid HMAC signature (verify_signature middleware, checked before this handler runs) and is
+    subject to the sliding-window rate limiter (enforce_rate_limit middleware).
+    Reads/writes: reads `state.catalogue`/`state.config`/`state.registry` (loaded at startup,
+    never mutated per-request) and calls `engine.run()` for the actual composition; writes only
+    to `state.counters` (in-process, not persisted) and structured logs via `log_event`.
+    Error codes: 503 `service_not_ready` if called before startup finishes; 422
+    `invalid_request` if the payload fails the Phase A contract; 500 `internal_error` on any
+    unhandled exception from the engine; 200 with the validated response otherwise (warnings[]
+    non-empty is still a 200 "partial" outcome, never an error — see Task 4 note below).
+    """
     # `request` is annotated as a bare Request (not Request | None) deliberately: FastAPI
     # special-cases that exact type to inject the live request object, and always supplies it for
     # a route — so it is never None. Annotating it Optional makes FastAPI try to treat it as a
