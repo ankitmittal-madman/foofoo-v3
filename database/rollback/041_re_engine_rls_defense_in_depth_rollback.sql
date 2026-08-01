@@ -1,0 +1,38 @@
+-- Rollback: 041_re_engine_rls_defense_in_depth.sql
+GRANT EXECUTE ON FUNCTION public.rls_auto_enable() TO PUBLIC, anon, authenticated;
+
+ALTER TABLE re_engine.dish_features DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.never_list DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.not_today_suppression DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_addon_classes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_addon_dish_options DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_city_migration_overlays DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_city_overlay_config DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_class_affinity_config DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_class_dish_options DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_cohort_class_priors DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_cohorts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_confidence_config DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_context_multipliers DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_dish_bandit_state DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_dish_regional_affinity DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_engine_versions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_event_weights DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_festival_calendar DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_household_addon_plans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_main_cohorts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_meal_class_overlap_rules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_meal_classes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_nonveg_logic DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_persona_assignment_rules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_personas DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_routing_rules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_scoring_config DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_states DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_subcohorts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_variety_rules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_weekly_class_plans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.re_weight_ladder_config DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.user_re_state DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.user_taste_vectors DISABLE ROW LEVEL SECURITY;
+ALTER TABLE re_engine.variety_window_state DISABLE ROW LEVEL SECURITY;
