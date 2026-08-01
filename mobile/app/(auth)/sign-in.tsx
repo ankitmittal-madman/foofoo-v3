@@ -88,7 +88,7 @@ export default function SignIn() {
       style={[styles.container, { backgroundColor: t.colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Pressable style={styles.flex} onPress={() => Keyboard.dismiss()} accessible={false}>
+      <Pressable style={styles.flex} onPress={() => Platform.OS !== "web" && Keyboard.dismiss()} accessible={false}>
         <View style={styles.content}>
           <View style={[styles.toggle, { backgroundColor: t.colors.surfaceMuted, borderColor: t.colors.border }]}>
             {(["signin", "signup"] as Mode[]).map((m) => {

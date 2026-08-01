@@ -47,7 +47,7 @@ export default function CreateId() {
       style={[styles.container, { backgroundColor: t.colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Pressable style={styles.flex} onPress={() => Keyboard.dismiss()} accessible={false}>
+      <Pressable style={styles.flex} onPress={() => Platform.OS !== "web" && Keyboard.dismiss()} accessible={false}>
         <View style={styles.content}>
           <Text style={[styles.title, { color: t.colors.heading, fontFamily: t.fonts.headlineBold }]}>
             What should we{"\n"}call you?

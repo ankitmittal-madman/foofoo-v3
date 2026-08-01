@@ -2697,6 +2697,11 @@ function deepDiveFeature(featureLabel){
   <div class="decision-a">No — nothing here touched a screen, a database, or a server function, so forcing a 4-lane flow would mean inventing steps that didn't happen. This session is represented as App-logic/config-only steps (skill files added, CLAUDE.md policy updated), and the Feature Flows tab uses a single Middleware-layer entry rather than a fabricated multi-layer walkthrough.</div>
   <div class="decision-meta">S45 · Jul 30</div>
 </div>
+  <div class="decision-item">
+    <div class="decision-q">Founder reported: on web, clicking into the "what should we call you" name field showed no cursor and focus left immediately — why, and was it only that one screen?</div>
+    <div class="decision-a">Root-caused, not guessed: both create-id.tsx and sign-in.tsx wrap their whole screen in a Pressable whose only job is "tap outside a field to dismiss the keyboard" on native. On the web build that same tap also fires for a tap landing *inside* the text field itself (the click bubbles up), and react-native-web's Keyboard.dismiss() unconditionally blurs whatever element currently has focus — confirmed by reading its own source (TextInputState.blurTextInput(currentlyFocusedField())). So focusing the field immediately re-triggered blurring that same field. Fixed by only calling Keyboard.dismiss() on native (Platform.OS !== "web") in both files — on web the wrapper's tap-to-dismiss job is a no-op now, which is correct since there's no on-screen keyboard to dismiss there anyway. Checked step-4.tsx's separate Keyboard.dismiss() call too — that one only fires from an explicit Continue-button validation-failure handler, not a tap-through wrapper, so it wasn't affected and was left alone.</div>
+    <div class="decision-meta">S43 · Aug 1</div>
+  </div>
   <!-- DECISIONS_INJECT -->
   </div>
 
