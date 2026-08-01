@@ -24,7 +24,20 @@
   scoring, ranking, or the plates returned (verified against the golden-master test).
 - `logs/hygiene-reports/logging-compliance.md` — logging infrastructure install/compliance report.
 
+### Added
+- `database/migrations/041_re_engine_rls_defense_in_depth.sql` (+ rollback) — enables Row Level
+  Security on all 34 `re_engine.*` tables (closing a CRITICAL finding from Supabase's security
+  advisor) and revokes the stray `anon`/`authenticated` EXECUTE grant on `public.rls_auto_enable()`.
+  Verified beforehand that `anon`/`authenticated` already held no `SCHEMA USAGE` on `re_engine`, so
+  this is defense-in-depth, not a functional access change.
+
 ### Changed
+- Live Supabase project (`foofoo-v3`, `cmkswalqpmmqojwdmqbv`) — applied migrations 034–038 (the
+  `ghar_re` schema), which existed in the repo but had never been run against the live database.
+  Seeded `ghar_re.cuisine_groups`/`cuisines`/`dishes` from `database/seeds/120`/`121`. Confirmed via
+  direct row counts that `public.*`/`re_engine.*` catalogue and reference data were already fully
+  seeded — an earlier in-session claim that the database was empty was based on a stale row-count
+  statistic, not a real count, and was corrected.
 - `mobile/src/auth/supabaseClient.ts` — startup env-var check now logs via the new client logger
   instead of a raw `console.warn`.
 - `ghar_re_core/pairing.py` (`assemble_7`) — added an optional `household_label` parameter and a
