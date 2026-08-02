@@ -172,6 +172,7 @@ def derive_theta(hh):
     heaviness_ceiling = d5["heaviness_ceiling_senior"] if has_senior else 3
     variety_pressure = d5["variety_pressure"][hh["q1_household_type"]]
     batch_posture = 1 if hh["q1_household_type"] in ("joint", "couple_kids_parents") else 0
+    theta["household_type"] = field(hh["q1_household_type"], "explicit", "explicit", "stable")
     theta["weaning_present"] = field(has_weaning, "D5", "derived", "stable")
     theta["spice_ceiling"] = field(spice_ceiling, "D5", "derived", "stable")
     theta["texture_floor"] = field(texture_floor, "D5", "derived", "stable")

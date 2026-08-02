@@ -54,6 +54,7 @@ class Config:
         self.weather = _load("weather_rules.yaml")
         self.filters = _load("filters.yaml")
         self.derivation = _load("derivation_params.yaml")
+        self.cohort = _load("cohort_weights.yaml")
         self.versions = dict(spine="Spine v1.0", kb="KB v0.2",
                              config="Config v%s" % self.base["config_version"])
         self._community_priors = None
@@ -151,6 +152,13 @@ class Config:
         'D5_household') from derivation_params.yaml — everything derivation.py needs to compute
         that node's household-profile fields."""
         return self.derivation[node]
+
+    # --- class-first cohort weight (cohort_weights.yaml <- WP-15 / master-formula w_cohort) ---
+    @property
+    def w_cohort(self):
+        """The w_cohort weight in the Core Spine master formula's `w_cohort·S_cohort` term
+        (WP-15's implementation of it — see scoring.s_cohort / knowledge.cohort_class_mix)."""
+        return self.cohort["cohort"]["w_cohort"]
 
     # --- community priors (community_priors.csv <- KB §C1) ---
     # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a

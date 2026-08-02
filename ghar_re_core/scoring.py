@@ -376,9 +376,23 @@ def gain_q15(dish, objective):
     return max(lo, min(hi, raw))
 
 
+def s_cohort(dish, theta, ctx):
+    """§WP-15 S_cohort(x;cohort): implementation of the Core Spine master formula's
+    `w_cohort·S_cohort` term (present in the formula since Spine v1.0, unimplemented until now —
+    score() below previously computed only BASE×GAIN). 1.0 if this dish's curated class
+    (K.dish_to_class_code) is part of the household's theta-derived cohort's actual class plan
+    for this slot/day-type (K.cohort_class_mix), else 0.0. Revives RE-DOC-03's class-taxonomy/
+    cohort-prior science on a LIVE theta-matched cohort — never a stored fixed persona, never a
+    hard filter."""
+    class_code = K.dish_to_class_code(dish.name)
+    if class_code is None:
+        return 0.0
+    return 1.0 if class_code in K.cohort_class_mix(theta, ctx) else 0.0
+
+
 def score(dish, theta, ctx, objective):
-    """score = BASE × GAIN_Q15  (+ w_pref·S_pref[=0 v1]  − PENALTY[handled in assemble])."""
-    return base(dish, theta, ctx) * gain_q15(dish, objective)
+    """score = BASE × GAIN_Q15 + w_cohort·S_cohort  (+ w_pref·S_pref[=0 v1] − PENALTY[assemble])."""
+    return base(dish, theta, ctx) * gain_q15(dish, objective) + CONFIG.w_cohort * s_cohort(dish, theta, ctx)
 
 
 # ---------------------------------------------------------------------------

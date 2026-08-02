@@ -1,0 +1,8 @@
+config_version: 1.0
+generated_from: Core Spine FROZEN master formula (w_cohort . S_cohort term) + WP-15 Class-Enriched RE
+# w_cohort: weight for the new class-first cohort-fit term, S_cohort(x;cohort) in {0.0, 1.0}
+# (K.cohort_class_mix / scoring.s_cohort). Deliberately modest: real dish->class curated coverage
+# is ~16% of the catalogue today (see knowledge.py class-first section), so this should nudge
+# matched dishes, not dominate BASE. Raise only after coverage/founder review (WP-15 Future register).
+cohort:
+  w_cohort: 0.15

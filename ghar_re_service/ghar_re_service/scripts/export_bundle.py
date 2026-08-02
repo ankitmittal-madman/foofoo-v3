@@ -62,11 +62,21 @@ CONFIG_FILES = (
     "weather_rules.yaml",
     "filters.yaml",
     "derivation_params.yaml",
+    "cohort_weights.yaml",
     "community_priors.csv",
     # Ingredient MASTER attributes (category / allergen flags / Jain compatibility) — read by
     # ghar_re_core.catalogue at import time for allergen + Jain derivation. This is ingredient
     # reference data, NOT the dish catalogue; the real 810-dish swap remains a separate task.
     "ingredients_v5.csv",
+)
+
+# class_first_v1/ subdirectory files (WP-15 class-cohort layer — ghar_re_core.knowledge reads
+# these via the same config.SRC seam as everything above, so they must ship in the bundle too;
+# see knowledge.py's class-first section for what each file is and how it was generated).
+CLASS_FIRST_FILES = (
+    "meal_class_master.csv",
+    "class_dish_options.csv",
+    "cohort_matrix.csv",
 )
 
 _HERE = os.path.dirname(os.path.abspath(__file__))  # .../ghar_re_service/scripts
@@ -142,6 +152,11 @@ def build_bundle(source_dir: str, out_dir: str) -> dict:
     _print_report(report)
 
     missing = [f for f in CONFIG_FILES if not os.path.isfile(os.path.join(source_dir, f))]
+    missing += [
+        os.path.join("class_first_v1", f)
+        for f in CLASS_FIRST_FILES
+        if not os.path.isfile(os.path.join(source_dir, "class_first_v1", f))
+    ]
     if missing:
         # Fail loudly rather than shipping a partial bundle — a config file silently missing from
         # the image surfaces as a confusing startup crash inside a container.
@@ -157,6 +172,12 @@ def build_bundle(source_dir: str, out_dir: str) -> dict:
             raw = fh.read()
         config_hashes[name] = _sha256_bytes(raw)
         config_payload[name] = raw.decode("utf-8")
+    for name in CLASS_FIRST_FILES:
+        rel = f"class_first_v1/{name}"
+        with open(os.path.join(source_dir, "class_first_v1", name), "rb") as fh:
+            raw = fh.read()
+        config_hashes[rel] = _sha256_bytes(raw)
+        config_payload[rel] = raw.decode("utf-8")
 
     catalogue_hash = _sha256_bytes(_canonical(catalogue))
 
@@ -190,7 +211,7 @@ def build_bundle(source_dir: str, out_dir: str) -> dict:
     tmp_dir = out_dir + ".tmp"
     if os.path.isdir(tmp_dir):
         shutil.rmtree(tmp_dir)
-    os.makedirs(os.path.join(tmp_dir, "config"), exist_ok=True)
+    os.makedirs(os.path.join(tmp_dir, "config", "class_first_v1"), exist_ok=True)
 
     with open(os.path.join(tmp_dir, "catalogue.json"), "w") as fh:
         json.dump(catalogue, fh, sort_keys=True, separators=(",", ":"), default=str)
