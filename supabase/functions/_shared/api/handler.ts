@@ -6,6 +6,12 @@
  * logging → [endpoint-specific middleware]). Endpoints (WP-8C onward) supply their business
  * handler + any extra middleware (auth, validation, rate-limit); this wrapper supplies the
  * always-on infrastructure. No business logic lives here.
+ *
+ * CORS (see ./cors.ts): every function here requires a JWT, and the platform gateway's own
+ * verify_jwt check runs before any app code, including on the browser's CORS preflight OPTIONS
+ * request — which never carries an Authorization header by spec. Native app callers (iOS/Android
+ * via React Native's fetch) never trigger a CORS preflight at all, so this was invisible there —
+ * only surfaced once someone tested the web target.
  */
 import { buildContext, requestLogging } from "../middleware/request-context.ts";
 import { errorBoundary } from "../middleware/error-boundary.ts";

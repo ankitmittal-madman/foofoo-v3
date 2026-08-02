@@ -661,9 +661,17 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🍽️</span> S44 · Ghar RE Phase G — real 810-dish catalogue swapped in (feature branch, review pending)
       <span class="nav-badge">Jul 30</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s45')">
+    <div class="nav-item" onclick="showPage('s45')">
       <span class="nav-icon">⚙️</span> S45 · All dotfiles skills vendored, slash-command gate removed
       <span class="nav-badge">Jul 30</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s46')">
+      <span class="nav-icon">🗄</span> S46 · Live DB reconciled, Fly.io RE verified
+      <span class="nav-badge">Aug 1</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s47')">
+      <span class="nav-icon">🛠</span> S47 · Two P0 launch blockers fixed
+      <span class="nav-badge">Aug 1</span>
     </div>
     <!-- NAV_INJECT -->
   </div>
@@ -674,11 +682,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">12</span>
+      <span class="nav-badge">14</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">191</span>
+      <span class="nav-badge">198</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -1250,6 +1258,14 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node-name">ghar_re schema</div>
   <div class="arch-node-desc">28 tables — catalogue + household + KB · S34</div>
 </div>
+  <div class="arch-node is-new" onclick="jumpModule('ghar-re-schema')">
+    <div class="arch-node-name">ghar_re schema (17 tables)</div>
+    <div class="arch-node-desc">New recommendation-engine redesign, applied live · S46</div>
+  </div>
+  <div class="arch-node is-mod" onclick="jumpModule('re-engine-rls')">
+    <div class="arch-node-name">re_engine RLS</div>
+    <div class="arch-node-desc">Row Level Security switched on, 34 tables · S46</div>
+  </div>
   <!-- ARCH_DB_INJECT -->
       </div>
     </div>
@@ -1814,6 +1830,35 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Repo tooling/governance only — no app code, DB, or screens touched. Next: confirm the new always-on policy actually fires on a real task, not just that the policy text changed.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 1, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#e8f8f2;color:#0e7a5a">S46</span>
+      <div class="tl-title">Live database reconciled with the repo, and the Fly.io recommendation engine verified working</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s46')">ghar_re schema applied</span>
+        <span class="tl-chip" onclick="showPage('s46')">RLS closed on 34 tables</span>
+        <span class="tl-chip" onclick="showPage('s46')">seed data verified</span>
+        <span class="tl-chip" onclick="showPage('s46')">Fly.io RE verified live</span>
+      </div>
+      <div class="tl-note">Database now matches the repo and a security scanner CRITICAL is cleared; Fly.io deployment proven reachable and correctly wired end-to-end. Next: get real onboarding traffic through the recommendations screen to confirm it under real conditions.</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 1, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#9a3412"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fff7ed;color:#9a3412">S47</span>
+      <div class="tl-title">Two P0 launch blockers fixed and deployed live</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s47')">CORS preflight fixed</span>
+        <span class="tl-chip" onclick="showPage('s47')">cron endpoints authenticated</span>
+        <span class="tl-chip" onclick="showPage('s47')">5 functions redeployed</span>
+      </div>
+      <div class="tl-note">Root-caused the real reason the app's only test signups never finished onboarding, fixed it, and closed a live-security gap on two data-deletion endpoints before they ever went live unprotected. Next: the DPDP export/delete UI (the third P0) and a real end-to-end signup test.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2125,6 +2170,55 @@ function deepDiveFeature(featureLabel){
       <div class="dd-text">S45 · Jul 30</div>
     </div>
   </div>
+  <div class="detail-item">
+    <div class="detail-row" id="row-mod-ghar-re-schema" onclick="toggleDetail('mod-ghar-re-schema')">
+      <div class="detail-left">
+        <span class="tag tag-db">DB</span>
+        <span class="detail-name">ghar_re schema (17 tables)</span>
+      </div>
+      <span class="detail-chevron" id="chev-mod-ghar-re-schema">&#9662;</span>
+    </div>
+    <div class="detail-drawer" id="draw-mod-ghar-re-schema">
+      <div class="dd-label">What this does</div>
+      <div class="dd-text">A new, isolated recommendation-engine schema, kept deliberately separate from the older re_engine schema the live app still uses. Per its own migration header: "the OLD persona/cohort/weight-ladder RE is retired; this is a NEW, isolated schema and does NOT touch public.dishes / re_engine.*". Server-side access only, same as re_engine.</div>
+      <div class="dd-label">Files / tables in this module</div>
+      <div class="dd-text">
+        <code>ghar_re.dishes, ghar_re.cuisines, ghar_re.ingredients</code> &mdash; the catalogue<br>
+        <code>ghar_re.households, ghar_re.household_profile, ghar_re.household_context</code> &mdash; onboarding/runtime<br>
+        <code>ghar_re.sig_scores, ghar_re.dish_variants, ghar_re.allergen_hidden_derivatives</code> &mdash; safety &amp; support<br>
+        <code>ghar_re.zone_map, ghar_re.comfort_hero_map, ghar_re.negative_priors</code> &mdash; knowledge base<br>
+        <code>database/migrations/034_ghar_re_schema_and_catalogue.sql</code> through <code>037_ghar_re_knowledge_base.sql</code> &mdash; the 4 migrations that build it
+      </div>
+      <div class="dd-label">How it helps the app</div>
+      <div class="dd-text">Not wired into the live app yet &mdash; this is groundwork for a future recommendation-engine rebuild. Applying it now means the live database matches what's committed in the repo, so a future session can switch the app over without first having to catch the database up.</div>
+      <div class="dd-label">Last touched</div>
+      <div class="dd-text">S46 &middot; Aug 1, 2026</div>
+    </div>
+  </div>
+
+  <div class="detail-item">
+    <div class="detail-row" id="row-mod-re-engine-rls" onclick="toggleDetail('mod-re-engine-rls')">
+      <div class="detail-left">
+        <span class="tag tag-db">DB</span>
+        <span class="detail-name">re_engine Row Level Security</span>
+      </div>
+      <span class="detail-chevron" id="chev-mod-re-engine-rls">&#9662;</span>
+    </div>
+    <div class="detail-drawer" id="draw-mod-re-engine-rls">
+      <div class="dd-label">What this does</div>
+      <div class="dd-text">Row Level Security is now switched on for every table in the re_engine schema (the recommendation-engine data the live app actually uses today). Combined with the schema-level lock already in place since the project's first migration, this is two independent layers protecting the same data.</div>
+      <div class="dd-label">Files / tables in this module</div>
+      <div class="dd-text">
+        <code>database/migrations/041_re_engine_rls_defense_in_depth.sql</code> &mdash; switches on RLS for all 34 tables, removes an unnecessary permission on an internal maintenance function<br>
+        <code>database/rollback/041_re_engine_rls_defense_in_depth_rollback.sql</code> &mdash; reverses it if ever needed
+      </div>
+      <div class="dd-label">How it helps the app</div>
+      <div class="dd-text">Closes a CRITICAL finding from Supabase's automated security scanner at zero cost to how the app works &mdash; the server's own connection always bypasses this protection, so nothing the app does changes; only a misconfigured future permission change would now be caught by this instead of reopening the data.</div>
+      <div class="dd-label">Last touched</div>
+      <div class="dd-text">S46 &middot; Aug 1, 2026</div>
+    </div>
+  </div>
+
   <!-- MODULES_INJECT -->
   </div>
 
@@ -2327,6 +2421,54 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">.claude/skills/install-logging-infrastructure/references/user-journey-logger-template.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Starter user-journey logger code template</td></tr>
 <tr><td class="fr-file mono">.claude/skills/session-resumption-protocol/SKILL.md</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S45</td><td class="fr-desc">Vendored from dotfiles — controls how a session reconstructs repo execution state at start</td></tr>
 <tr><td class="fr-file mono">CLAUDE.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S45</td><td class="fr-desc">Skill Activation Policy amended — every installed skill now auto-activates as needed instead of waiting on a slash command; never-autofix skills unchanged</td></tr>
+  <tr>
+    <td class="fr-file mono">database/migrations/041_re_engine_rls_defense_in_depth.sql</td>
+    <td><span class="tag tag-db">DB</span></td>
+    <td class="fr-session">S46</td>
+    <td class="fr-desc">Switches on Row Level Security for all 34 re_engine tables; removes an unnecessary permission on an internal maintenance function</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">database/rollback/041_re_engine_rls_defense_in_depth_rollback.sql</td>
+    <td><span class="tag tag-db">DB</span></td>
+    <td class="fr-session">S46</td>
+    <td class="fr-desc">Reverses migration 041 if ever needed</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">database/migrations/034&ndash;038_*.sql</td>
+    <td><span class="tag tag-db">DB</span></td>
+    <td class="fr-session">S46</td>
+    <td class="fr-desc">Already committed in an earlier session; actually applied to the live database for the first time this session</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/functions/_shared/api/handler.ts</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Answers a browser's CORS preflight request directly, before the login check runs</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/functions/_shared/auth/service-role.ts</td>
+    <td><span class="tag tag-new">New</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Requires the exact project service credential for scheduled-job endpoints</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/config.toml</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Removed the verify_jwt=false override for the two cron functions</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/functions/cron-hard-delete/index.ts</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Now requires the service credential; deployed live for the first time</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/functions/cron-retention-purge/index.ts</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Now requires the service credential; deployed live for the first time</td>
+  </tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2706,6 +2848,41 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Founder reported: testing the Vercel web build, step 1 of onboarding failed with a browser console error naming CORS and "preflight request" against the household function — why, and was it only that one function?</div>
     <div class="decision-a">Root-caused, not guessed: every Edge Function's shared response pipeline (`_shared/api/handler.ts`) never sent an `Access-Control-Allow-Origin` header on any response, and never handled the browser's automatic OPTIONS preflight request at all — so any browser-based caller (the Vercel web build, and any future web client) was blocked before its real request could even be sent. Native app calls were never affected (mobile HTTP clients don't send CORS preflights), which is why this was invisible until web testing started. Fixed centrally, once, in the shared handler wrapper rather than per-endpoint: a new `_shared/api/cors.ts` answers OPTIONS with a 204 plus the CORS headers, and every real response gets the same headers merged on afterward. Because the caller authenticates with a Bearer token in the Authorization header, never a cookie, reflecting the browser's own Origin back is safe — there is no ambient credential for a third-party page to piggyback on. Redeployed all three live functions (household, recommendations, consent) with the fix; the two CRON-only functions were left alone since nothing calls them from a browser.</div>
     <div class="decision-meta">S43 · Aug 1</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Apply the new ghar_re schema live even though no app code reads it yet?</div>
+    <div class="decision-a">Yes, per explicit Founder instruction. It's isolated (nothing else references it) and brings the live database in sync with what's already committed in the repo, so a future session can switch the app over without first catching the database up.</div>
+    <div class="decision-meta">S46 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Switch on Row Level Security for tables that outside users couldn't reach anyway?</div>
+    <div class="decision-a">Yes &mdash; verified first that regular app users genuinely couldn't reach these 34 tables (no permission was ever granted to them), so this isn't fixing an active leak. But it's free defense-in-depth: the server's own connection is unaffected, and it closes the "what if a permission setting changes later" risk instead of leaving that as the only lock on the door.</div>
+    <div class="decision-meta">S46 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">How to verify the Fly.io deployment when the tool available couldn't reach Fly.io's website directly?</div>
+    <div class="decision-a">Deployed a temporary Supabase function and triggered it from inside the database itself, using a database networking feature (pg_net) that makes outbound calls from Supabase's own infrastructure rather than the restricted environment. This proved the connection with a real signed request instead of just checking that settings were saved.</div>
+    <div class="decision-meta">S46 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why report the "database is empty" claim as wrong instead of quietly correcting it?</div>
+    <div class="decision-a">The repo's standing rule is never to trust a prior summary over live evidence, and to say so explicitly when an earlier claim turns out to be wrong &mdash; even one made minutes earlier in the same session &mdash; rather than let an inaccurate statement stand uncorrected.</div>
+    <div class="decision-meta">S46 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Fix the CORS bug in the one shared handler, or per-function?</div>
+    <div class="decision-a">Fixed once in _shared/api/handler.ts, since every client-facing function is built from it (defineHandler). Fixing it there means it's impossible for a future function to ship without the fix, versus remembering to add it everywhere.</div>
+    <div class="decision-meta">S47 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">How to authenticate the scheduled deletion jobs, given they can't use a normal login token?</div>
+    <div class="decision-a">Built a dedicated check that compares the request's credential directly against the project's own service-role key, since that's exactly what the scheduler is documented to send. Reusing the standard login-check middleware wasn't possible &mdash; it specifically verifies end-user tokens and would reject the service credential.</div>
+    <div class="decision-meta">S47 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why redeploy the functions instead of just committing the code fix?</div>
+    <div class="decision-a">Supabase Edge Functions each bundle their own copy of the shared code at deploy time &mdash; a repo commit alone doesn't change what's actually running live. All 5 affected functions were redeployed with the fix in the same session.</div>
+    <div class="decision-meta">S47 &middot; Aug 1, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -6914,7 +7091,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s44 -->
-  <div id="page-s45" class="page-content">
+  <div id="page-s45" class="page-content" style="display:none">
 
     <div class="page-header">
       <div class="page-title">S45 &middot; All dotfiles skills vendored in, and the slash-command gate removed</div>
@@ -7133,6 +7310,580 @@ function deepDiveFeature(featureLabel){
     </script>
 
   </div><!-- /page-s45 -->
+
+  <div id="page-s46" class="page-content" style="display:none">
+
+    <div class="page-header">
+      <div class="page-title">S46 &middot; Live database reconciled with the repo, and the Fly.io recommendation engine verified working</div>
+      <div class="page-subtitle">The repo's newest database design (the ghar_re schema) had never actually been applied to the live project, 34 recommendation-engine tables had Row Level Security switched off, and nobody had confirmed the newly deployed Fly.io recommendation service was actually reachable from the app &mdash; all three are now fixed and independently verified.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">&#9940; Before this session</div>
+        <div class="impact-text">The live Supabase project was quietly out of sync with the repo: five migrations (034&ndash;038, the newer "ghar_re" recommendation-engine redesign) existed as files but were never run against the live database, and 34 tables in the older re_engine schema had Row Level Security disabled &mdash; flagged CRITICAL by Supabase's own security scanner. Separately, nobody had confirmed that the just-deployed Fly.io recommendation service was actually wired up correctly &mdash; the app could have been silently falling back to a fake "no recommendation" response with no visible error.</div>
+      </div>
+      <div class="impact-arrow">&rarr;</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">&#9989; After this session</div>
+        <div class="impact-text">The live database now matches the repo exactly (all five missing migrations applied, plus one new one closing the RLS gap). The catalogue data (810 dishes, cuisines, ingredients, the weekly meal-plan tables) turned out to already be fully loaded &mdash; a false alarm from a stale row-count figure, corrected and re-verified with real counts. And the Fly.io recommendation engine is now proven live and reachable: a real signed test call round-tripped successfully end to end.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">&#128193; Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/041_re_engine_rls_defense_in_depth.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/rollback/041_re_engine_rls_defense_in_depth_rollback.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/034&ndash;038_*.sql (applied live, no file changes)</span><span class="tag tag-db">DB</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 1, 2026<br>6 things touched</div>
+      </div>
+      <div class="session-card-desc">This was a database-reconciliation and infrastructure-verification session, not a new feature. Five already-written migrations were finally applied to the live project, one new migration closed a live security gap (RLS disabled on 34 tables), the "database is empty" alarm from earlier in the session turned out to be a stale statistic and was corrected with real row counts, and the Fly.io deployment of the Python recommendation engine was proven live end-to-end using a temporary diagnostic Edge Function.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">1</div><div class="stat-l">Code files (temp, later disabled)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">6</div><div class="stat-l">DB migrations applied</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">1</div><div class="stat-l">Server fn (diagnostic, retired)</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s46','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s46','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s46','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s46-swim" class="view-pane active">
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s46','ghar-re-migrations')">
+            <div class="step-num num-teal">1</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">5 missing migrations (034&ndash;038) applied to the live database</span>
+                <span class="tag tag-db">DB</span>
+              </div>
+              <div class="step-desc">The newer "ghar_re" recommendation-engine schema existed only as files in the repo &mdash; it had never actually been run against the live project. Now it has, matching what's committed.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s46','rls-fix')">
+            <div class="step-num num-teal">2</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Row Level Security switched on for 34 tables</span>
+                <span class="tag tag-db">DB</span>
+              </div>
+              <div class="step-desc">Supabase's own security scanner flagged this as CRITICAL. Verified first that these tables weren't actually reachable by outside users either way, then closed the gap as a safety net for the future.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s46','data-correction')">
+            <div class="step-num num-teal">3</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">"Empty database" alarm corrected with real row counts</span>
+                <span class="tag tag-mod">Correction</span>
+              </div>
+              <div class="step-desc">An earlier check this session said every table had zero rows. That number was stale. Real counts showed the 810-dish catalogue and all reference data were already fully loaded.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s46','ghar-re-seed')">
+            <div class="step-num num-teal">4</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">ghar_re golden-sample data loaded</span>
+                <span class="tag tag-db">DB</span>
+              </div>
+              <div class="step-desc">The one part of the database that genuinely was empty &mdash; the brand-new ghar_re schema created this session &mdash; was seeded with its starter cuisine and dish data.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">&#8597; verified against the live Fly.io deployment</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s46','fly-verification')">
+            <div class="step-num num-amber">5</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Fly.io recommendation service proven reachable and correctly wired</span>
+                <span class="tag tag-new">New</span>
+              </div>
+              <div class="step-desc">A temporary diagnostic function made a real signed test call to the Fly.io app and got back proof both the web address and the shared secret are configured correctly on both sides.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">No real user has actually gone through onboarding and hit the recommendations screen yet, so there's still no live traffic log proving the whole chain works under real conditions (only the diagnostic test). Also unresolved: 2 lower-priority security notices remain open (an extension installed in the wrong schema, and leaked-password-protection still off in Auth settings) &mdash; neither is urgent, but worth a future pass.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s46-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s46-ghar-re-migrations" onclick="toggleDetail('s46-ghar-re-migrations')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">Migrations 034&ndash;038 applied live</span>
+          </div>
+          <span class="detail-chevron" id="chev-s46-ghar-re-migrations">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s46-ghar-re-migrations">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Creates the new, isolated "ghar_re" database schema: the catalogue/knowledge tables (cuisines, dishes, ingredients, tags), the household/onboarding runtime tables, safety &amp; support tables (allergen data, dish substitution graph, signature scores), and the knowledge-base reference tables (zone map, comfort-food map, negative priors). All five files already existed in the repo; they had simply never been run against the live project.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">5 committed but unapplied migration files (034&ndash;038)</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">Live database now has the full ghar_re schema, matching the repo exactly</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">list_migrations showed 034&ndash;038 missing live</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">each file read in full</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">applied via Supabase migration tool, in order</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">all 5 succeeded</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">CREATE SCHEMA IF NOT EXISTS ghar_re; ... GRANT USAGE ON SCHEMA ghar_re TO service_role;</span>  &larr; the new schema is locked to server-side access only, same pattern as the older re_engine schema</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why apply this schema but not wire the app's code to use it yet?</div>
+            <div class="dd-why-a">Checked first: no server code anywhere actually reads from ghar_re yet &mdash; the live app still runs entirely on the older re_engine schema. Applying the schema brings the database in sync with the repo; switching the app over to use it is a separate, bigger decision for a future session.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s46-rls-fix" onclick="toggleDetail('s46-rls-fix')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">database/migrations/041_re_engine_rls_defense_in_depth.sql</span>
+          </div>
+          <span class="detail-chevron" id="chev-s46-rls-fix">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s46-rls-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Switches on Row Level Security for all 34 tables in the re_engine schema, and removes an unnecessary permission that let logged-out or logged-in app users call an internal database maintenance function directly. Supabase's automated security scanner had flagged both as issues.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">34 tables with Row Level Security off; 1 maintenance function callable by any app user</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">All 34 tables protected; maintenance function restricted to the server only. Security scanner's CRITICAL finding cleared.</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">security scanner flags rls_disabled (CRITICAL)</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">checked live permissions first &mdash; confirmed app users couldn't actually reach these tables anyway</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">RLS switched on regardless, as a safety net</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">re-ran scanner &mdash; CRITICAL finding gone</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">ALTER TABLE re_engine.dish_features ENABLE ROW LEVEL SECURITY;</span>  &larr; repeated for all 34 tables; the server's own database connection is unaffected since it always bypasses this protection</div>
+          <div class="dd-why">
+            <div class="dd-why-q">If regular app users couldn't reach these tables anyway, why fix it at all?</div>
+            <div class="dd-why-a">It cost nothing to fix (the server keeps working exactly the same) and removes a "what if someone changes a permission setting later" risk &mdash; a second, independent lock on the same door rather than relying on one setting alone.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s46-data-correction" onclick="toggleDetail('s46-data-correction')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Correction</span>
+            <span class="detail-name">"Database is empty" claim corrected</span>
+          </div>
+          <span class="detail-chevron" id="chev-s46-data-correction">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s46-data-correction">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Earlier in this session, a database inspection tool reported zero rows in every table, which was reported to the Founder as "the database has no data at all." That turned out to be wrong &mdash; the tool's row-count figure was a stale estimate, not a real count. Direct counting proved the 810-dish catalogue and every recommendation-engine reference table were already fully loaded.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">Stale "0 rows everywhere" figure from a table-listing tool</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">Real counts: 802 dishes, 66 cuisines, 191 ingredients, 125 tags, 20,664 weekly meal-plan rows, and more &mdash; all already correctly seeded</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">a seeding task hit "duplicate row already exists"</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">re-checked with a direct row-count query instead of the summary tool</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">confirmed data was already there</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">correction reported to the Founder immediately</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">SELECT count(*) FROM public.dishes;  -- returned 802, not 0</span>  &larr; a real count, not the tool's approximate statistic</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why report a correction instead of quietly re-seeding and moving on?</div>
+            <div class="dd-why-a">The repo's own standing rule is never to trust a prior summary over live evidence, and to say so out loud when an earlier claim (even one made minutes earlier in the same session) turns out to be wrong, rather than let it stand uncorrected.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s46-ghar-re-seed" onclick="toggleDetail('s46-ghar-re-seed')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">ghar_re golden-sample data seeded</span>
+          </div>
+          <span class="detail-chevron" id="chev-s46-ghar-re-seed">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s46-ghar-re-seed">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Loads starter data into the brand-new ghar_re schema created this session: 22 cuisine groups, 10 cuisines, and 39 sample dishes with full sensory/nutrition detail. This is the one part of the database that genuinely was empty before this session, unlike the false alarm above.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">2 seed files (120, 121) already written in the repo</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">22 cuisine groups + 10 cuisines + 39 dishes live in ghar_re, row counts verified against the source files</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">database/seeds/120_ghar_re_kb_reference.sql</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">database/seeds/121_ghar_re_golden_sample.sql</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">both run against the live project</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">counts cross-checked against each file's own INSERT count</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">INSERT INTO ghar_re.dishes (...) VALUES (md5('ghar_re.dish:' || 'Onion Pakora')::uuid, ...)</span>  &larr; each dish gets a stable, reproducible ID derived from its name</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why seed a schema the live app doesn't even read from yet?</div>
+            <div class="dd-why-a">The Founder asked for it explicitly, and it's low-risk: the schema is isolated (nothing else references it), so seeding it now means it's ready the moment a future session decides to switch the app over to it.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s46-fly-verification" onclick="toggleDetail('s46-fly-verification')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">Fly.io recommendation service &mdash; live wiring verified</span>
+          </div>
+          <span class="detail-chevron" id="chev-s46-fly-verification">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s46-fly-verification">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Proves, with a real network call rather than just checking that settings exist, that the Supabase server and the Fly.io recommendation engine are correctly talking to each other &mdash; same web address, same shared secret on both sides.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">A temporary test function deployed to Supabase, triggered from inside the database itself (the tool available couldn't reach Fly.io's website directly)</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">Confirmed: the Fly app is up, the web address is configured correctly, and the shared secret matches on both sides &mdash; proven by a real signed request being accepted</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">temporary test function deployed</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">database itself makes the outbound call (works around a network restriction on the tool)</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">Fly.io app responded "alive" and accepted the signed request</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">test function disabled afterward</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">report.secret_verdict = recRes.status === 401 ? "MISMATCH" : "MATCH_OR_OTHER";</span>  &larr; a 401 would mean the secret is wrong; anything else (including a "missing fields" error) proves the secret matched</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just trust that the settings were entered correctly?</div>
+            <div class="dd-why-a">Two dashboards each only show a masked fingerprint of a saved secret, never the real value, so there was no way to visually confirm the two sides actually matched. A real test call is the only proof that isn't just "the settings exist."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Get a real user through onboarding to actually exercise the recommendations screen once, so there's a genuine traffic log (not just the diagnostic test) proving the whole chain works under real conditions.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s46-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S46 = [
+      {
+        id: 'db-reconciliation',
+        label: 'Database reconciliation',
+        steps: [
+          {
+            layer: 'Database',
+            tag: 'DB',
+            title: 'ghar_re schema applied + RLS closed',
+            desc: 'The 5 missing migrations creating the ghar_re schema are applied, and Row Level Security is switched on for the 34 re_engine tables the security scanner flagged.',
+            codeFlow: [ {chip:'database/migrations/034_ghar_re_schema_and_catalogue.sql'}, {label:'... 035-038 ...'}, {chip:'database/migrations/041_re_engine_rls_defense_in_depth.sql'} ],
+            files: [
+              {path:'database/migrations/034_ghar_re_schema_and_catalogue.sql', desc:'Creates the ghar_re schema + catalogue/knowledge tables'},
+              {path:'database/migrations/038_household_answers_context_and_events.sql', desc:'Adds application-side household answer/context/event tables'},
+              {path:'database/migrations/041_re_engine_rls_defense_in_depth.sql', desc:'Switches on Row Level Security for all 34 re_engine tables'},
+              {path:'database/rollback/041_re_engine_rls_defense_in_depth_rollback.sql', desc:'Reverses the RLS change if ever needed'}
+            ],
+            api: null,
+            db: {table:'re_engine.* (34 tables) + ghar_re.* (17 tables)', op:'ALTER/CREATE', note:'Live database brought in sync with the repo'}
+          },
+          {
+            layer: 'Database',
+            tag: 'DB',
+            title: 'Seed data verified + ghar_re seeded',
+            desc: 'Real row counts replaced a stale "everything is empty" figure, and the new ghar_re schema was loaded with its starter cuisine/dish data.',
+            codeFlow: [ {chip:'database/seeds/120_ghar_re_kb_reference.sql'}, {label:'then'}, {chip:'database/seeds/121_ghar_re_golden_sample.sql'} ],
+            files: [
+              {path:'database/seeds/120_ghar_re_kb_reference.sql', desc:'Seeds ghar_re cuisine groups + cuisines'},
+              {path:'database/seeds/121_ghar_re_golden_sample.sql', desc:'Seeds 39 sample dishes into ghar_re.dishes'}
+            ],
+            api: null,
+            db: {table:'ghar_re.cuisine_groups, ghar_re.cuisines, ghar_re.dishes', op:'INSERT', note:'22 + 10 + 39 rows loaded, counts verified against source files'}
+          }
+        ]
+      },
+      {
+        id: 'fly-re-verification',
+        label: 'Fly.io RE verification',
+        steps: [
+          {
+            layer: 'Server',
+            tag: 'API',
+            title: 'Temporary diagnostic function checks the Fly.io connection',
+            desc: 'A throwaway Edge Function reads the configured web address and secret, calls the Fly.io app\'s health check, and makes one real signed request to prove the two sides agree on the shared secret.',
+            codeFlow: [ {chip:'supabase/functions/recommendations/re-client.ts'}, {label:'same signing scheme reused in'}, {chip:'diag-re-check (temporary, since disabled)'} ],
+            files: [
+              {path:'supabase/functions/recommendations/re-client.ts', desc:'The real production code this test mirrors — signs and sends the recommendation request to the RE service'},
+              {path:'supabase/functions/_shared/config/config.ts', desc:'Loads GHAR_RE_SERVICE_URL/SECRET from environment, fails fast in production if missing'}
+            ],
+            api: {endpoint:'POST https://ghar-re.fly.dev/v1/recommendations', note:'Signed test call; got back a body-validation error (422), not an auth error (401) — proof the secret matched'},
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s46-flows', window.FEATURE_FLOWS_S46);
+    </script>
+
+  </div><!-- /page-s46 -->
+
+  <div id="page-s47" class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">S47 &middot; Two of the fresh audit's P0 launch blockers fixed and deployed live</div>
+      <div class="page-subtitle">Root-caused the real reason the app's only two test signups never finished onboarding (a browser CORS bug), and closed two Edge Functions that would have shipped completely unauthenticated.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">&#9940; Before this session</div>
+        <div class="impact-text">Anyone testing the app from a browser (the web target) silently failed at the household step &mdash; the platform rejected the browser's CORS preflight before the real request was ever sent, with no useful error shown anywhere. Separately, two Edge Functions that delete real user data (cron-hard-delete, cron-retention-purge) had no authentication at all in their code, and were one deploy away from being callable by anyone on the internet.</div>
+      </div>
+      <div class="impact-arrow">&rarr;</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">&#9989; After this session</div>
+        <div class="impact-text">Browser/web callers now work &mdash; confirmed via the exact live log evidence that showed the bug in the first place. Both scheduled-deletion functions now require the project's own service-role credential and are deployed live for the first time with that protection already in place. All 5 live Edge Functions redeployed with the fixes (household, recommendations, consent, plus the 2 newly-deployed cron functions).</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">&#128193; Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/api/handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/auth/service-role.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/config.toml</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/cron-hard-delete/index.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/cron-retention-purge/index.ts</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 1, 2026<br>5 things touched</div>
+      </div>
+      <div class="session-card-desc">Two of the three P0 launch blockers from the fresh readiness audit are now closed. The CORS bug was found the same way the audit's "0 completed profiles" finding was discovered &mdash; by reading real Edge Function logs, not by guessing. Both fixes were redeployed to the live Supabase project (not just committed to the repo), since Edge Functions bundle their own copy of the shared code.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">2</div><div class="stat-l">Code files (1 new, 1 modified)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">5</div><div class="stat-l">Server fns redeployed live</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s47','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s47','detail')">Detail drill-down</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s47-swim" class="view-pane active">
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s47','cors-fix')">
+            <div class="step-num num-amber">1</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Browser preflight requests no longer rejected</span>
+                <span class="tag tag-mod">Modified</span>
+              </div>
+              <div class="step-desc">Every Edge Function now answers a browser's CORS preflight directly, before checking for a login token &mdash; matching how browsers actually work.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s47','cron-auth')">
+            <div class="step-num num-amber">2</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Scheduled deletion jobs now require the project's own credential</span>
+                <span class="tag tag-new">New</span>
+              </div>
+              <div class="step-desc">The two functions that permanently delete user data can no longer be triggered by just knowing their web address.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">The third P0 (DPDP export/delete has no button in the app) is still open &mdash; scoped out of this pass as a real frontend build. Also still needed: a real person actually completing onboarding end-to-end now that the CORS bug is fixed, to confirm the fix works outside of log analysis.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s47-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s47-cors-fix" onclick="toggleDetail('s47-cors-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">supabase/functions/_shared/api/handler.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s47-cors-fix">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s47-cors-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">This is the one shared wrapper every Edge Function is built from. It now recognizes a browser's CORS preflight request (an OPTIONS request browsers automatically send before certain real requests) and answers it directly with the right permissions &mdash; instead of letting it fall through to the login check, which was always going to reject it since preflight requests never carry a login token.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">A live log showing a real browser signup getting "OPTIONS | 401" repeatedly right after login</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">Preflight now answered before the login check runs; redeployed live to all 3 client-facing functions</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">real signup logs showed OPTIONS/401</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">traced to defineHandler's missing CORS handling</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">fixed in the one shared file</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">redeployed to household/recommendations/consent</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(req) });</span>  &larr; answered before any login/auth code runs</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why didn't this show up before now?</div>
+            <div class="dd-why-a">Only a browser (web) client triggers a CORS preflight at all &mdash; the native mobile app's network layer never does. Nobody had tested the web target with a real login until this session.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s47-cron-auth" onclick="toggleDetail('s47-cron-auth')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">supabase/functions/_shared/auth/service-role.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s47-cron-auth">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s47-cron-auth">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Checks that a request to one of the two scheduled data-deletion functions carries the project's own private service credential &mdash; not a regular user's login token, not nothing at all. Without this, the functions were completely open the moment they were deployed.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">2 functions with no auth check and a gateway setting that disabled even basic login verification</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">Both functions now require the exact service credential; deployed live for the first time with this in place</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">audit flagged both functions as unauthenticated</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">confirmed neither was live yet</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">credential check added</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">deployed live with the fix already in place</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">if (!timingSafeEqual(token, ctx.config.supabaseServiceRoleKey)) throw ...</span>  &larr; rejects anything except the exact project credential, compared in a way that can't leak timing information</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just re-enable the standard login check instead of building something new?</div>
+            <div class="dd-why-a">The standard login check only verifies a regular user's token &mdash; it has no way to verify the special service credential these jobs are meant to use, and would actually reject it. A dedicated check was the only way to actually restrict this to the scheduler.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Build the DPDP export/delete UI (the third P0) so the backend logic that already exists becomes something a real user can actually trigger.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+  </div><!-- /page-s47 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

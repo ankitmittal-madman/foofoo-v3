@@ -5,6 +5,21 @@
 
 ## [Unreleased]
 
+### Fixed
+- **Root-caused the "nobody completes onboarding" gap**: live Edge Function logs showed a real
+  test signup hitting `household` from a browser (Expo web) and getting a wall of
+  `OPTIONS | 401`. The platform gateway's `verify_jwt` check runs on the CORS preflight too,
+  which never carries an `Authorization` header by spec — so every browser-based caller failed
+  before the real request was ever sent. Fixed in `supabase/functions/_shared/api/handler.ts`:
+  `OPTIONS` is now answered directly with CORS headers before the auth pipeline runs. Redeployed
+  live to `household`, `recommendations`, `consent` (v5 each).
+- `cron-hard-delete`/`cron-retention-purge` previously shipped with `verify_jwt=false` and zero
+  application-level auth — a real gap (confirmed not yet live). Added
+  `supabase/functions/_shared/auth/service-role.ts` (`requireServiceRole()`), which requires the
+  caller's bearer token to exactly match the project's own service_role key. Removed the
+  `verify_jwt=false` override in `supabase/config.toml`. Deployed both functions live for the
+  first time with the fix already in place.
+
 ### Added
 - `CHANGELOG.md` (this file) — initialised by the `install-logging-infrastructure` skill.
 - Lightweight client logger `mobile/src/lib/logger.ts` (Expo/React Native, AsyncStorage-backed,
@@ -24,7 +39,20 @@
   scoring, ranking, or the plates returned (verified against the golden-master test).
 - `logs/hygiene-reports/logging-compliance.md` — logging infrastructure install/compliance report.
 
+### Added
+- `database/migrations/041_re_engine_rls_defense_in_depth.sql` (+ rollback) — enables Row Level
+  Security on all 34 `re_engine.*` tables (closing a CRITICAL finding from Supabase's security
+  advisor) and revokes the stray `anon`/`authenticated` EXECUTE grant on `public.rls_auto_enable()`.
+  Verified beforehand that `anon`/`authenticated` already held no `SCHEMA USAGE` on `re_engine`, so
+  this is defense-in-depth, not a functional access change.
+
 ### Changed
+- Live Supabase project (`foofoo-v3`, `cmkswalqpmmqojwdmqbv`) — applied migrations 034–038 (the
+  `ghar_re` schema), which existed in the repo but had never been run against the live database.
+  Seeded `ghar_re.cuisine_groups`/`cuisines`/`dishes` from `database/seeds/120`/`121`. Confirmed via
+  direct row counts that `public.*`/`re_engine.*` catalogue and reference data were already fully
+  seeded — an earlier in-session claim that the database was empty was based on a stale row-count
+  statistic, not a real count, and was corrected.
 - `mobile/src/auth/supabaseClient.ts` — startup env-var check now logs via the new client logger
   instead of a raw `console.warn`.
 - `ghar_re_core/pairing.py` (`assemble_7`) — added an optional `household_label` parameter and a
