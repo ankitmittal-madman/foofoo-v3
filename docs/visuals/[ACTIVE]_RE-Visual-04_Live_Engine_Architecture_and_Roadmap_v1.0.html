@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghar RE — Live Engine Architecture &amp; Roadmap</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#0f1117;color:#e8e8e8;padding:24px;min-height:100vh}
+h1{font-size:22px;color:#fff;margin-bottom:4px}
+.sub{font-size:13px;color:#888;margin-bottom:6px;max-width:820px;line-height:1.5}
+.callout{background:#1a1400;border:1px solid #6b4a00;border-radius:10px;padding:14px 18px;margin:18px 0;font-size:13px;color:#e8c874;line-height:1.6;max-width:900px}
+.callout b{color:#ffdb7a}
+nav{display:flex;gap:8px;margin:20px 0;flex-wrap:wrap}
+nav button{background:#1a1d26;border:1px solid #2a2d3a;color:#ccc;padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;transition:.15s}
+nav button:hover{background:#22263080}
+nav button.active{background:#2c3450;border-color:#4A5FA0;color:#fff}
+section{display:none}
+section.show{display:block}
+
+/* ---- pipeline ---- */
+.pipeline{display:flex;flex-direction:column;gap:2px;max-width:820px}
+.stage{background:#151820;border:1px solid #2a2d3a;border-left:4px solid #4A5FA0;border-radius:8px;padding:14px 18px;cursor:pointer}
+.stage:hover{background:#1a1e28}
+.stage .stage-head{display:flex;justify-content:space-between;align-items:center}
+.stage .stage-name{font-weight:700;font-size:14px}
+.stage .stage-tag{font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:10px}
+.tag-live{background:#0f2a1c;color:#5cbf82}
+.tag-gap{background:#2e1212;color:#e07a7a}
+.stage-body{display:none;margin-top:10px;font-size:12.5px;color:#bbb;line-height:1.6}
+.stage.open .stage-body{display:block}
+.stage .stage-code{font-family:ui-monospace,monospace;background:#0c0e14;padding:2px 6px;border-radius:4px;color:#8fd0ff;font-size:11.5px}
+.arrow{text-align:center;color:#555;font-size:14px;padding:2px 0}
+
+/* ---- module registry ---- */
+.modgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;max-width:900px;margin-top:14px}
+.modcard{background:#151820;border:1px solid #2a2d3a;border-radius:8px;padding:12px}
+.modcard .mn{font-family:ui-monospace,monospace;font-size:12.5px;color:#8fd0ff;font-weight:700}
+.modcard .md{font-size:11.5px;color:#999;margin-top:4px;line-height:1.5}
+
+/* ---- roadmap ---- */
+.rm{display:flex;flex-direction:column;gap:0;max-width:900px}
+.rmphase{display:flex;gap:16px;position:relative;padding-bottom:28px}
+.rmphase:last-child{padding-bottom:0}
+.rmphase::before{content:'';position:absolute;left:19px;top:38px;bottom:0;width:2px;background:#2a2d3a}
+.rmphase:last-child::before{display:none}
+.rmdot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;z-index:1}
+.rmbody{background:#151820;border:1px solid #2a2d3a;border-radius:10px;padding:16px 18px;flex:1}
+.rmtitle{font-weight:700;font-size:14.5px;margin-bottom:4px}
+.rmml{font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+.no-ml{background:#0f2a1c;color:#5cbf82}
+.is-ml{background:#2a1e00;color:#e0a94a}
+.rmdesc{font-size:12.5px;color:#bbb;line-height:1.6;margin-top:6px}
+.rmdone{font-size:11.5px;color:#7a8a99;margin-top:8px;font-style:italic}
+
+/* ---- gaps ---- */
+.gap{background:#151820;border:1px solid #2a2d3a;border-left:4px solid #993C1D;border-radius:8px;padding:14px 18px;margin-bottom:10px;max-width:820px}
+.gap .gt{font-weight:700;font-size:13.5px;margin-bottom:4px}
+.gap .gd{font-size:12.5px;color:#bbb;line-height:1.6}
+
+footer{margin-top:40px;padding-top:16px;border-top:1px solid #2a2d3a;font-size:11px;color:#666;max-width:820px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<h1>Ghar RE — Live Engine Architecture &amp; Roadmap</h1>
+<p class="sub">The actually-deployed recommendation engine (<code>ghar_re_core</code> / <code>ghar_re_service</code>, Python, Fly.io) — distinct from the earlier RE-Visual-01/02/03, which describe a legacy TypeScript engine confirmed as dead code and deleted this session. Companion document: <code>[DRAFT]_WP-14_RE_Intelligence_Roadmap_v1.0.md</code>.</p>
+
+<div class="callout">
+<b>Why this doesn't jump straight to ML:</b> <code>public.feedback_events</code> has 0 rows, live-verified. There is no interaction signal to learn from yet — only "a plate was served," never "a user liked or rejected it." The roadmap below sequences a class-based module registry and real feedback capture <i>before</i> any learned ranking, matching how Zomato/Swiggy/Netflix's own recommendation systems actually evolved historically.
+</div>
+
+<nav>
+  <button class="active" data-s="pipeline">Live pipeline</button>
+  <button data-s="registry">Class-based registry (proposed)</button>
+  <button data-s="roadmap">Roadmap</button>
+  <button data-s="gaps">Known data gaps</button>
+</nav>
+
+<section id="pipeline" class="show">
+  <div class="pipeline">
+    <div class="stage open">
+      <div class="stage-head"><span class="stage-name">1 · Derive household profile (θ)</span><span class="stage-tag tag-live">live</span></div>
+      <div class="stage-body"><span class="stage-code">ghar_re_core/derivation.py::derive_theta()</span> — raw Q1–Q15 onboarding answers → region, blend, income band, spice ceiling, is_jain, weaning_present, rho_disc (discovery dial), veg_days, meat exclusions.</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-name">2 · Hard filters (A1–A5)</span><span class="stage-tag tag-live">live</span></div>
+      <div class="stage-body"><span class="stage-code">scoring.py::eligible()</span> — diet, jain, allergen (basic pass only — hidden-derivative layer not yet wired, see Known Gaps), weaning floor, fasting mode. Pass/fail only, no scoring. Reduces the 810-dish catalogue to the eligible pool for this household+context.</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-name">3 · BASE scoring — Σ W_k · conf_k · m_k(x)</span><span class="stage-tag tag-live">live</span></div>
+      <div class="stage-body">Every eligible dish scored by summing 8 weighted terms: <span class="stage-code">m_palette, m_slot, m_season, sig, m_age, m_household, m_weather, prior_boost</span>. Currently hand-written functions called directly in <span class="stage-code">base()</span> — not yet the pluggable <span class="stage-code">ScoringModule</span> registry RE-DOC-11 §7 specifies. See "Class-based registry" tab.</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-name">4 · GAIN_Q15 objective multiplier</span><span class="stage-tag tag-live">live</span></div>
+      <div class="stage-body">The household's stated objective (awesome_taste / healthy_living / into_fitness / protein_calculator) reweights the BASE score.</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-name">5 · Pairing guardrails + compat()</span><span class="stage-tag tag-live">live</span></div>
+      <div class="stage-body"><span class="stage-code">pairing.py::allowed()/compat()</span> — hard gates (no two rich gravies, no two same-base dishes, cuisine coherence) plus a soft richness/protein-balance nudge. Known data-scope gap: the protein-balance term only checks one of its four named categories (flagged in code, not fixed — a scoring-output-changing decision for the Founder).</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-name">6 · Assemble-7 (greedy MMR-style)</span><span class="stage-tag tag-live">live</span></div>
+      <div class="stage-body"><span class="stage-code">pairing.py::assemble_7()</span> — best-score-first, no-duplicate-hero guard, discovery-dial cap for experimental/exploratory plates (driven by rho_disc). Deterministic: same household + same context always produces the same 7 plates (see WP-8G, "Refresh" variety gap).</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-name">7 · Decision trace (funnel + near-misses)</span><span class="stage-tag tag-gap">DB live, RE not yet deployed</span></div>
+      <div class="stage-body">Added this session (WP-12): per-request funnel counts through each filter stage, served plates, and top-5 near-miss alternatives with a concrete reason each lost. <span class="stage-code">recommendation_events.decision_trace</span> column is live; the updated <span class="stage-code">ghar_re_service</span> has not been redeployed to Fly.io yet, so it's still NULL on real requests.</div>
+    </div>
+  </div>
+</section>
+
+<section id="registry">
+  <p class="sub" style="margin-bottom:16px">RE-DOC-11 §7 already specifies this — it is not implemented yet. Today's 8 BASE terms are plain functions; this is what turns them into the registry ML plugs into later (§8) with zero changes to the composition loop.</p>
+  <div class="modgrid">
+    <div class="modcard"><div class="mn">m_palette</div><div class="md">Regional/cuisine fit vs. home state blend</div></div>
+    <div class="modcard"><div class="mn">m_slot</div><div class="md">Meal-slot appropriateness</div></div>
+    <div class="modcard"><div class="mn">m_season</div><div class="md">Seasonal thermal fit</div></div>
+    <div class="modcard"><div class="mn">sig</div><div class="md">Dish iconicity/signature score</div></div>
+    <div class="modcard"><div class="mn">m_age</div><div class="md">Household member age-band fit</div></div>
+    <div class="modcard"><div class="mn">m_household</div><div class="md">Structure fit (batch, variety pressure)</div></div>
+    <div class="modcard"><div class="mn">m_weather</div><div class="md">Transient comfort-hero weather lift</div></div>
+    <div class="modcard"><div class="mn">prior_boost</div><div class="md">Authored zone×slot KB priors</div></div>
+    <div class="modcard" style="border-color:#4a5fa0;border-style:dashed"><div class="mn" style="color:#8fa8ff">s_pref (future)</div><div class="md">Learned preference module — same protocol, Phase 3</div></div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="rm">
+    <div class="rmphase">
+      <div class="rmdot" style="background:#1A5C38;color:#fff">0</div>
+      <div class="rmbody">
+        <div class="rmtitle">Data foundation<span class="rmml no-ml">no ML</span></div>
+        <div class="rmdesc">Wire <code>feedback_events</code> end-to-end (Edge Function + minimal accept/reject mobile UI — also closes WP-11's own P1 gap). Wire <code>household_context</code> so context reflects real history, not a hardcoded default. Resolve the comfort-hero data gaps (Kanda Bhaji / Pithla-Bhakri) with domain input.</div>
+        <div class="rmdone">Done when: real accept/reject signals exist for actual served recommendations.</div>
+      </div>
+    </div>
+    <div class="rmphase">
+      <div class="rmdot" style="background:#4A3FA0;color:#fff">1</div>
+      <div class="rmbody">
+        <div class="rmtitle">Class-based module registry<span class="rmml no-ml">no ML</span></div>
+        <div class="rmdesc">Implement the <code>ScoringModule</code> protocol (RE-DOC-11 §7). Migrate all 8 BASE terms into registered modules with config-driven weights. Must be score-neutral — a refactor, not a rescoring — proven by the existing golden-master tests.</div>
+        <div class="rmdone">Done when: base() is a registry loop, not hand-written summation, and every existing test still passes unchanged.</div>
+      </div>
+    </div>
+    <div class="rmphase">
+      <div class="rmdot" style="background:#854F0B;color:#fff">2</div>
+      <div class="rmbody">
+        <div class="rmtitle">Variety / exploration<span class="rmml no-ml">no ML</span></div>
+        <div class="rmdesc">WP-8G's <code>exclude_dish_ids</code> contract extension, plus a lightweight non-learned exploration mechanism (epsilon-greedy or a simple class-level bandit). Needs only served/rejected counts, not labels. The single biggest "feels intelligent" lever available before any ML — refresh stops being deterministic.</div>
+        <div class="rmdone">Done when: two consecutive Refresh calls can legitimately differ, explainable via decision_trace.</div>
+      </div>
+    </div>
+    <div class="rmphase">
+      <div class="rmdot" style="background:#D85A30;color:#fff">3</div>
+      <div class="rmbody">
+        <div class="rmtitle">First learned module — s_pref<span class="rmml is-ml">ML, gated on Phase 0 volume</span></div>
+        <div class="rmdesc">Once feedback_events has real density, add a learned preference module (start simple — logistic regression or a small GBDT over structured features + existing module scores; label = accepted/rejected). Plugs into the Phase 1 registry with zero composition-loop changes, per RE-DOC-11 §8.</div>
+        <div class="rmdone">Done when: a real held-out evaluation shows improved acceptance over the rule-only baseline, and it's disable-by-config.</div>
+      </div>
+    </div>
+    <div class="rmphase">
+      <div class="rmdot" style="background:#666;color:#fff">4</div>
+      <div class="rmbody">
+        <div class="rmtitle">Collaborative signal<span class="rmml is-ml">ML, gated on density</span></div>
+        <div class="rmdesc">Two-tower retrieval or ALS-style CF, gated on interaction density crossing a real threshold — out of scope to design in detail before Phase 3 even ships.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gaps">
+  <div class="gap">
+    <div class="gt">West-MH rain comfort hero missing from the real catalogue</div>
+    <div class="gd">"Kanda Bhaji" (KB §R3 West-MH rain comfort hero) does not exist under that name — or any close spelling — in the real 810-dish catalogue. Confirmed by direct search this session. A second entry ("Pithla-Bhakri" vs. the real "Pithla Bhakri") has a hyphen/space mismatch with the same silent-no-op effect. Flagged at the data source (<code>ghar_re_core/knowledge.py</code>), not fixed — picking a replacement dish is a domain call.</div>
+  </div>
+  <div class="gap">
+    <div class="gt">household_context unwired</div>
+    <div class="gd">Table exists, RLS applied, one read function exists — but nothing calls it and nothing writes to it. Every request uses caller-supplied context or a hardcoded default, never real recent history.</div>
+  </div>
+  <div class="gap">
+    <div class="gt">Allergen hidden-derivative table inert (pre-launch blocker)</div>
+    <div class="gd">The Core Spine's own §D states allergen filtering is "not safe-complete" until this lands. <code>ghar_re.allergen_hidden_derivatives</code> exists but <code>is_active=false</code>.</div>
+  </div>
+  <div class="gap">
+    <div class="gt">Fallback plate is one hardcoded dish, not per-zone</div>
+    <div class="gd">Every RE failure serves the same pan-India Moong Dal Khichdi regardless of the caller's region, diverging from RE-DOC-10 §11's "cached-per-zone default plate set" spec.</div>
+  </div>
+</section>
+
+<footer>Built from a direct read of RE-DOC-10/11/12, ghar_re_core/scoring.py, pairing.py, knowledge.py, and live Supabase queries this session — not from a prior summary. See [DRAFT]_WP-14_RE_Intelligence_Roadmap_v1.0.md for full citations. RE-Visual-01/02/03 in this same folder describe the legacy TypeScript engine, deleted as dead code this session — left as-is, a historical record of a different system, not updated or removed here.</footer>
+
+<script>
+document.querySelectorAll('nav button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('section').forEach(x=>x.classList.remove('show'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.s).classList.add('show');
+  });
+});
+document.querySelectorAll('.stage').forEach(s=>{
+  s.addEventListener('click',()=>s.classList.toggle('open'));
+});
+</script>
+</body>
+</html>
