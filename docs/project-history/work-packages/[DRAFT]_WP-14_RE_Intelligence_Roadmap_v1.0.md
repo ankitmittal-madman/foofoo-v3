@@ -7,6 +7,8 @@
 **Builds on:** RE-DOC-10 (Production Implementation Plan), RE-DOC-11 (Extensibility Review), RE-DOC-12 (Status and Roadmap, 2026-07-29 ground-truth audit), this session's S57 (decision-trace feature), S59 (legacy engine deletion), and today's Kanda Bhaji root-cause finding.
 **Governance basis:** Core Spine FROZEN doc (`docs/architecture/ghar-re/ghar_re_v1_0_core_spine_FROZEN.md`) — consumed, not modified. RE-DOC-11's scope discipline applies here too: nothing below proposes moving the service boundary (Python RE, stateless, Edge Functions own DB/auth stays fixed).
 
+**Update (2026-08-02, later same day):** the "Wire `feedback_events` end-to-end" item (line 56 below) is now built — `POST /v1/feedback` (`supabase/functions/feedback/`) writes accept/edit/swap/like/dislike/shown_not_tapped signals, and `mobile/app/recommendations.tsx` has Like/Not-for-me/I'll-cook-this buttons calling it. Not yet marked "Done" per this WP's own criterion (line 57): the criterion requires real signals accumulated from actual usage, and this build has not yet run in production — the capture mechanism now exists, the data does not yet. `household_context` wiring (the other half of that item) and the two comfort-hero data gaps remain untouched by this update.
+
 ---
 
 ## Executive Summary

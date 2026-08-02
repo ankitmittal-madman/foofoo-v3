@@ -130,3 +130,25 @@ export interface RecommendationsResponse {
   warnings?: string[];
   trace_id: string;
 }
+
+// ---- POST /v1/feedback (WP-15) ----------------------------------------------
+
+export type FeedbackEventType = "accept" | "edit" | "swap" | "like" | "dislike" | "shown_not_tapped";
+
+export interface FeedbackRequest {
+  /** RecommendationsResponse.request_id — the only recommendation identifier this client is ever
+   * given; the backend resolves it to the matching recommendation_events row (feedback/events.ts). */
+  request_id: string;
+  event_type: FeedbackEventType;
+  /** plate.hero_dish_names[i] — resolved server-side to public.dishes.id by name. */
+  dish_name?: string;
+  slot?: string;
+  detail?: Record<string, unknown>;
+}
+
+export interface FeedbackResponse {
+  id: string;
+  event_type: FeedbackEventType;
+  recorded_at: string;
+  trace_id: string;
+}

@@ -1,0 +1,250 @@
+/**
+ * WP-15 feedback tests (POST /v1/feedback) — the instrumentation prerequisite WP-14 identified
+ * for the Core Spine's `w_pref·S_pref` term. Covers validation, the assembled pipeline with an
+ * injected fake `recordEvent` (no live database or GoTrue required), and error propagation from
+ * events.ts's ownership/ not-found checks. Mirrors the consent.test.ts / recommendations.test.ts
+ * style (withEnv + injected fakes + assembled pipeline).
+ */
+import { assertEquals, assertObjectMatch, assertThrows } from "@std/assert";
+import {
+  API_ERRORS,
+  authenticate,
+  defineHandler,
+  FEEDBACK_EVENT_TYPES,
+  parseFeedbackRequest,
+  resetConfigCacheForTests,
+} from "../_shared/mod.ts";
+import type { AuthClaims } from "../_shared/mod.ts";
+import { AppError } from "../_shared/errors/app-error.ts";
+import { makeFeedbackHandler } from "../feedback/handler.ts";
+import type { FeedbackEventInput, FeedbackEventResult } from "../feedback/events.ts";
+
+const REQUIRED_ENV = {
+  SUPABASE_URL: "http://localhost:54321",
+  SUPABASE_ANON_KEY: "anon-test-key",
+  SUPABASE_SERVICE_ROLE_KEY: "service-test-key",
+};
+
+function withEnv(vars: Record<string, string>, fn: () => void | Promise<void>) {
+  const prev: Record<string, string | undefined> = {};
+  for (const [k, v] of Object.entries(vars)) {
+    prev[k] = Deno.env.get(k);
+    Deno.env.set(k, v);
+  }
+  try {
+    return fn();
+  } finally {
+    for (const k of Object.keys(vars)) {
+      if (prev[k] === undefined) Deno.env.delete(k);
+      else Deno.env.set(k, prev[k]!);
+    }
+    resetConfigCacheForTests();
+  }
+}
+
+const USER_ID = "11111111-1111-1111-1111-111111111111";
+const REQUEST_ID = "22222222-2222-2222-2222-222222222222";
+
+function validBody(overrides: Record<string, unknown> = {}) {
+  return {
+    request_id: REQUEST_ID,
+    event_type: "like",
+    dish_name: "Masala Dosa",
+    slot: "breakfast",
+    ...overrides,
+  };
+}
+
+// ── Validation ────────────────────────────────────────────────────────────────────────────────
+
+Deno.test("parseFeedbackRequest accepts a well-formed body", () => {
+  const req = parseFeedbackRequest(validBody());
+  assertEquals(req.requestId, REQUEST_ID);
+  assertEquals(req.eventType, "like");
+  assertEquals(req.dishName, "Masala Dosa");
+});
+
+Deno.test("parseFeedbackRequest accepts a body with no dish_name (e.g. 'accept' the whole plate)", () => {
+  const req = parseFeedbackRequest({ request_id: REQUEST_ID, event_type: "accept" });
+  assertEquals(req.dishName, undefined);
+});
+
+Deno.test("parseFeedbackRequest rejects a missing request_id (400)", () => {
+  const body = validBody();
+  // deno-lint-ignore no-explicit-any
+  delete (body as any).request_id;
+  const e = assertThrows(() => parseFeedbackRequest(body), AppError);
+  assertEquals(e.code, API_ERRORS.ERR_VALIDATION_FAILED.code);
+  assertEquals(e.httpStatus, 400);
+});
+
+Deno.test("parseFeedbackRequest rejects an empty request_id (400)", () => {
+  const e = assertThrows(
+    () => parseFeedbackRequest(validBody({ request_id: "" })),
+    AppError,
+  );
+  assertEquals(e.httpStatus, 400);
+});
+
+Deno.test("parseFeedbackRequest rejects an unknown event_type with ERR_FEEDBACK_EVENT_TYPE_INVALID (422)", () => {
+  const e = assertThrows(
+    () => parseFeedbackRequest(validBody({ event_type: "super_like" })),
+    AppError,
+  );
+  assertEquals(e.code, API_ERRORS.ERR_FEEDBACK_EVENT_TYPE_INVALID.code);
+  assertEquals(e.httpStatus, 422);
+});
+
+Deno.test("FEEDBACK_EVENT_TYPES matches the feedback_events CHECK constraint (migration 038)", () => {
+  assertEquals(
+    [...FEEDBACK_EVENT_TYPES].sort(),
+    ["accept", "dislike", "edit", "like", "shown_not_tapped", "swap"].sort(),
+  );
+});
+
+// ── Assembled pipeline (authenticate → handler → injected recordEvent) ──────────────────────────
+
+function fakeRecordEvent(
+  result: FeedbackEventResult | (() => never),
+): (ctx: unknown, ev: FeedbackEventInput) => Promise<FeedbackEventResult> {
+  return (_ctx, _ev) => {
+    if (typeof result === "function") result();
+    return Promise.resolve(result as FeedbackEventResult);
+  };
+}
+
+function buildPipeline(recordEvent: ReturnType<typeof fakeRecordEvent>) {
+  const handler = makeFeedbackHandler({ recordEvent });
+  const verifier = () => Promise.resolve({ userId: USER_ID, role: "authenticated" } as AuthClaims);
+  return defineHandler(handler, { middleware: [authenticate(verifier)] });
+}
+
+Deno.test("POST /v1/feedback happy path returns 201 with contract-shaped body", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    let seenInput: FeedbackEventInput | undefined;
+    const recordEvent = (_ctx: unknown, ev: FeedbackEventInput) => {
+      seenInput = ev;
+      return Promise.resolve({
+        id: "33333333-3333-3333-3333-333333333333",
+        createdAt: "2026-08-02T00:00:00.000Z",
+        dishResolved: true,
+      });
+    };
+    const pipeline = buildPipeline(recordEvent);
+    const req = new Request("http://localhost/v1/feedback", {
+      method: "POST",
+      headers: { Authorization: "Bearer good", "content-type": "application/json" },
+      body: JSON.stringify(validBody()),
+    });
+    const res = await pipeline(req);
+    assertEquals(res.status, 201);
+    const json = await res.json();
+    assertObjectMatch(json, { event_type: "like" });
+    assertEquals(typeof json.id, "string");
+    assertEquals(typeof json.trace_id, "string");
+    // profile_id passed to the writer is the JWT user_id, never a client-supplied field —
+    // feedback is always about the caller's own recommendation, so there is nothing to spoof.
+    assertEquals(seenInput?.profileId, USER_ID);
+    assertEquals(seenInput?.requestId, REQUEST_ID);
+  });
+});
+
+Deno.test("POST /v1/feedback returns 422 for an unknown event_type before recordEvent is ever called", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const recordEvent = fakeRecordEvent(() => {
+      throw new Error("recordEvent must not be called when validation fails");
+    });
+    const pipeline = buildPipeline(recordEvent);
+    const req = new Request("http://localhost/v1/feedback", {
+      method: "POST",
+      headers: { Authorization: "Bearer good", "content-type": "application/json" },
+      body: JSON.stringify(validBody({ event_type: "super_like" })),
+    });
+    const res = await pipeline(req);
+    assertEquals(res.status, 422);
+    const json = await res.json();
+    assertEquals(json.error.code, API_ERRORS.ERR_FEEDBACK_EVENT_TYPE_INVALID.code);
+  });
+});
+
+Deno.test("POST /v1/feedback propagates ERR_RECOMMENDATION_EVENT_NOT_FOUND (404) from the writer", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const recordEvent = () =>
+      Promise.reject(
+        new AppError(API_ERRORS.ERR_RECOMMENDATION_EVENT_NOT_FOUND, {
+          context: { request_id: REQUEST_ID },
+        }),
+      );
+    const pipeline = buildPipeline(recordEvent);
+    const req = new Request("http://localhost/v1/feedback", {
+      method: "POST",
+      headers: { Authorization: "Bearer good", "content-type": "application/json" },
+      body: JSON.stringify(validBody()),
+    });
+    const res = await pipeline(req);
+    assertEquals(res.status, 404);
+    const json = await res.json();
+    assertEquals(json.error.code, API_ERRORS.ERR_RECOMMENDATION_EVENT_NOT_FOUND.code);
+  });
+});
+
+Deno.test("POST /v1/feedback propagates ERR_OWNERSHIP_MISMATCH (403) when the recommendation_event belongs to another profile", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const recordEvent = () =>
+      Promise.reject(
+        new AppError(API_ERRORS.ERR_OWNERSHIP_MISMATCH, {
+          detail: "recommendation_event belongs to a different profile",
+        }),
+      );
+    const pipeline = buildPipeline(recordEvent);
+    const req = new Request("http://localhost/v1/feedback", {
+      method: "POST",
+      headers: { Authorization: "Bearer good", "content-type": "application/json" },
+      body: JSON.stringify(validBody()),
+    });
+    const res = await pipeline(req);
+    assertEquals(res.status, 403);
+  });
+});
+
+Deno.test("POST /v1/feedback returns 401 when unauthenticated", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const handler = makeFeedbackHandler({
+      recordEvent: fakeRecordEvent(() => {
+        throw new Error("must not be called");
+      }),
+    });
+    const pipeline = defineHandler(handler, {
+      middleware: [authenticate(() => Promise.reject(new Error("no token")))],
+    });
+    const req = new Request("http://localhost/v1/feedback", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(validBody()),
+    });
+    const res = await pipeline(req);
+    assertEquals(res.status, 401);
+  });
+});
+
+Deno.test("POST /v1/feedback returns 405 for a non-POST method", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const pipeline = buildPipeline(
+      fakeRecordEvent(() => {
+        throw new Error("must not be called");
+      }),
+    );
+    const req = new Request("http://localhost/v1/feedback", {
+      method: "GET",
+      headers: { Authorization: "Bearer good" },
+    });
+    const res = await pipeline(req);
+    assertEquals(res.status, 405);
+  });
+});

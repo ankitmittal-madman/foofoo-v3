@@ -38,6 +38,8 @@ export type { JwtVerifier } from "./auth/authenticate.ts";
 export { validate, z } from "./validation/validate.ts";
 export { CONSENT_TYPES, parseConsentRequest } from "./validation/consent-schema.ts";
 export type { ConsentInput, ConsentRequest, ConsentType } from "./validation/consent-schema.ts";
+export { FEEDBACK_EVENT_TYPES, parseFeedbackRequest } from "./validation/feedback-schema.ts";
+export type { FeedbackEventType, FeedbackRequest } from "./validation/feedback-schema.ts";
 
 // middleware
 export { buildContext, compose, errorBoundary, requestLogging } from "./middleware/index.ts";

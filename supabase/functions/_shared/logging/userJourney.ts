@@ -21,6 +21,9 @@
  *   - recommendation   <- supabase/functions/recommendations/handler.ts (outcome vocabulary:
  *                          success | partial | timeout | network | http | bad_body | fallback,
  *                          per public.recommendation_events CHECK, migration 038)
+ *   - feedback         <- supabase/functions/feedback/handler.ts (WP-15; event_type vocabulary:
+ *                          accept | edit | swap | like | dislike | shown_not_tapped, per
+ *                          public.feedback_events CHECK, migration 038)
  *
  * NO PII and NO secrets (DOC-P3-07 §16 / DPDP): profile ids are truncated to 8 chars before being
  * used as either the log key or appearing in a narrative string; no email, JWT, or raw answer
@@ -36,7 +39,7 @@ const MAX_ENTRIES_PER_PROFILE = 200;
 
 interface JourneyEntry {
   ts: string;
-  category: "onboarding" | "consent" | "recommendation";
+  category: "onboarding" | "consent" | "recommendation" | "feedback";
   narrative: string;
 }
 
@@ -137,6 +140,30 @@ export const UserJourney = {
     }
     if (opts?.latencyMs !== undefined) narrative += ` (${opts.latencyMs}ms)`;
     record(profileId, "recommendation", narrative);
+  },
+
+  /**
+   * One POST /v1/feedback call resolved (WP-15) — real event_type vocabulary from
+   * public.feedback_events (migration 038): accept | edit | swap | like | dislike |
+   * shown_not_tapped. This is the substrate the Core Spine's `w_pref·S_pref` term (pinned to 0
+   * in v1) will eventually learn from — logged here purely as narrative, no scoring effect yet.
+   */
+  logFeedbackRecorded(
+    profileId: string,
+    eventType: "accept" | "edit" | "swap" | "like" | "dislike" | "shown_not_tapped",
+    dishResolved: boolean,
+  ): void {
+    const verb: Record<typeof eventType, string> = {
+      accept: "accepted a served plate as-is",
+      edit: "edited a served plate",
+      swap: "swapped a dish out of a served plate",
+      like: "liked a dish",
+      dislike: "disliked a dish",
+      shown_not_tapped: "was shown a dish they didn't tap on",
+    };
+    const narrative = `Household ${verb[eventType]}` +
+      (dishResolved ? "." : " (dish not yet matched to the catalogue — recorded anyway).");
+    record(profileId, "feedback", narrative);
   },
 
   /** Return the full plain-English journey for one profile, oldest first — for a debugging
