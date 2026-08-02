@@ -24,7 +24,12 @@ import {
 import type { AuthClaims } from "../_shared/mod.ts";
 import { type HouseholdDeps, makeHouseholdHandler } from "../household/handler.ts";
 import { buildHouseholdAnswersPatch, missingRequiredProfileFields } from "../household/store.ts";
-import { parseHouseholdWriteRequest, type ScreenAnswer, targetFor } from "../household/schema.ts";
+import {
+  type MemberWrite,
+  parseHouseholdWriteRequest,
+  type ScreenAnswer,
+  targetFor,
+} from "../household/schema.ts";
 
 const REQUIRED_ENV = {
   SUPABASE_URL: "http://localhost:54321",
@@ -86,7 +91,7 @@ function fakeStore() {
   const sessions: { question_key: string; answer_value: unknown; skipped: boolean }[] = [];
   const answers: Record<string, unknown> = {};
   let profile: Record<string, unknown> | null = null;
-  const members: Record<string, unknown>[] = [];
+  const members: MemberWrite[] = [];
   const calls = {
     insertScreens: 0,
     upsertAnswers: 0,
