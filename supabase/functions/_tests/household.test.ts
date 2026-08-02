@@ -38,14 +38,14 @@ const REQUIRED_ENV = {
   FOOFOO_ENV: "local",
 };
 
-function withEnv(vars: Record<string, string>, fn: () => void | Promise<void>) {
+async function withEnv(vars: Record<string, string>, fn: () => void | Promise<void>) {
   const prev: Record<string, string | undefined> = {};
   for (const [k, v] of Object.entries(vars)) {
     prev[k] = Deno.env.get(k);
     Deno.env.set(k, v);
   }
   try {
-    return fn();
+    return await fn();
   } finally {
     for (const k of Object.keys(vars)) {
       if (prev[k] === undefined) Deno.env.delete(k);
