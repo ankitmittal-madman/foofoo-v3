@@ -1940,6 +1940,20 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Founder hit another 500 on a fresh test profile at step 5 (profile creation, gated on the 5 required fields, finally attempting to fire). Fresh Postgres logs showed a DIFFERENT FK violation this time: "insert or update on table \"profiles\" violates foreign key constraint \"profiles_home_state_fkey\"". Traced to indianStates.ts's Screen 2 picker: it lists full display names ("Madhya Pradesh") and step2ToScreens sent that name straight through as home_state's answer_value, but profiles.home_state REFERENCES re_engine.re_states(state_code) — the 2-letter code ("MP"), not the name. schema.ts's own validation only checks non-empty string, so this passed app-level validation every time and only ever failed at the DB insert. Verified the exact 36-state/UT name-to-code mapping against the live re_states table (exact match, no ambiguity) and added it as STATE_NAME_TO_CODE, mapped through in step2ToScreens — same pattern as the file's other _MAP constants. This is a MOBILE APP fix, not a database migration — no live DB change this time. Next: Founder to retest from create-id with a fresh profile once this deploys; any prior test profile that already recorded the bad state name in onboarding_sessions will self-correct the moment step 2 is resubmitted (latest answer wins).</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#64748b"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f1f5f9;color:#64748b">S54</span>
+      <div class="tl-title">"Refresh" returning identical dishes investigated — deterministic-by-design, not a bug; scoped as a DRAFT work package instead of patched ad hoc</div>
+      <div class="tl-chips">
+        <span class="tl-chip">test_03 never completed (home_state bug, pre-fix)</span>
+        <span class="tl-chip">test_04 is the real live household</span>
+        <span class="tl-chip">[DRAFT]_WP-8G_Recommendation_Variety_on_Refresh_v1.0.md</span>
+      </div>
+      <div class="tl-note">Two things confirmed via live data before touching anything: (1) "test_03" never actually got a profiles row — it's the profile that hit the home_state FK bug fixed in S53 — the recommendations the Founder was viewing all belonged to "test_04" (the only real profile row, home_state correctly "MP"), confirmed via recommendation_events showing 9 identical successful calls all against that one profile_id; (2) Refresh returning the same plates every time is Phase 1 working as documented, not broken — the mobile client sends no context overrides, the live RE (Fly.io ghar_re_core) is fully deterministic (grepped pipeline.py/scoring.py/engine.py/schemas.py for seed/random/shuffle: zero matches), and the shared contract has no exclusion-list field at all. A real fix needs a contract change + ghar_re_service update + Fly.io redeploy — cross-service work that would either violate handler.ts's own documented "pass through AS-IS, no second translation layer" rule if faked in the Edge Function, or require redeploying a service this session can't safely touch. Founder chose to scope it properly rather than patch around the rule: drafted WP-8G proposing two options (contract-level exclusion vs. mobile-side context variation) for future review — no code/contract/service changes made. Next: Founder to retest onboarding as a genuinely fresh signup (from create-id, not a direct step-1 URL) to get a real, complete test_0x household; WP-8G awaits prioritization before any implementation.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
