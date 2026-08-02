@@ -37,7 +37,9 @@ export function requireServiceRole(): Middleware {
         throw new AppError(API_ERRORS.ERR_UNAUTHENTICATED, { detail: "missing/malformed bearer" });
       }
       if (!timingSafeEqual(token, ctx.config.supabaseServiceRoleKey)) {
-        throw new AppError(API_ERRORS.ERR_UNAUTHENTICATED, { detail: "bearer is not service_role" });
+        throw new AppError(API_ERRORS.ERR_UNAUTHENTICATED, {
+          detail: "bearer is not service_role",
+        });
       }
       return await next(req, ctx);
     };
