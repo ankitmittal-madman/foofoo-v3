@@ -167,6 +167,19 @@ COMFORT_HERO_MAP = [
 # The KB names heroes generically ("Pakora", "Khichuri", "Rasam-Rice"); the golden sample names
 # them concretely ("Onion Pakora", "Bhuna Khichuri", "Rasam"). Exact resolution avoids loose
 # substring matches (e.g. "Pakora" must NOT also boost "Punjabi Kadhi Pakora").
+#
+# ⚠️ KNOWN GAP, confirmed against the real 810-dish catalogue (surfaced by a failing e2e test,
+# deliberately NOT fixed here — same discipline as pairing.py's b_protein comment): "Kanda Bhaji"
+# (COMFORT_HERO_MAP's West-MH rain entry) does not exist under that name anywhere in
+# ghar_re_service/data/bundle/catalogue.json, or under any close spelling — the comfort-hero lift
+# for that specific entry is a silent no-op in production. Separately, COMFORT_HERO_MAP's
+# "Pithla-Bhakri" (hyphen) has no entry here, so it falls back to itself literally — but the real
+# catalogue's dish is named "Pithla Bhakri" (space), so that lift is also a silent no-op. West-MH
+# rain still has two OTHER correctly-resolving heroes (Vada Pav, Sol Kadhi, both real dish names,
+# neither needs an entry here), so this zone/weather combo isn't fully dead — just two of its four
+# configured heroes are. Picking a replacement dish for "Kanda Bhaji" or fixing the
+# "Pithla-Bhakri"/"Pithla Bhakri" mismatch is a recommendation-quality decision for the
+# Founder/domain owner, not a mechanical fix — do not silently guess a substitution here.
 COMFORT_HERO_TO_DISH = {
     "Pakora": "Onion Pakora",
     "Kanda Bhaji": "Kanda Bhaji",

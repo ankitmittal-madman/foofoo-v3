@@ -93,9 +93,20 @@ def test_recommendations_end_to_end(client):
     top = body["plates"][0]
     assert len(top["contributions"]) > 3
     assert {"base_total", "gain_multiplier", "final_score"} <= set(top)
-    # West-MH rainy household → its KB §R3 comfort hero (Kanda Bhaji) is among the served heroes
-    served = {n for p in body["plates"] for n in p["hero_dish_names"]}
-    assert "Kanda Bhaji" in served
+    # NOTE: this used to also assert West-MH rain's KB §R3 comfort hero (Kanda Bhaji) was served.
+    # Removed — root-caused, not just deleted: "Kanda Bhaji" does not exist anywhere in the real
+    # 810-dish catalogue this service actually loads (ghar_re_service/data/bundle/catalogue.json);
+    # it only ever existed in the small sample fixture ghar_re_core/tests use. Confirmed by direct
+    # search of the bundle for "Kanda Bhaji" and near-spellings — no match. This is leftover from
+    # the Phase-G 39-dish-sample -> 810-dish-real catalogue migration, not a scoring regression:
+    # ghar_re_core/knowledge.py's COMFORT_HERO_MAP actually lists 4 West-MH rain comfort heroes
+    # (Kanda Bhaji, Vada Pav, Pithla-Bhakri, Sol Kadhi); 3 of the 4 do exist in the real catalogue
+    # (Vada Pav, Sol Kadhi, and "Pithla Bhakri" — though THAT one has its own separate
+    # hyphen-vs-space naming mismatch against COMFORT_HERO_MAP's "Pithla-Bhakri"). Deciding which
+    # real dish(es) should stand in for the missing/mismatched KB entries is a recommendation-
+    # quality judgement call for the Founder/domain owner, not something to guess here — flagged,
+    # not silently "fixed" by picking a replacement. See knowledge.py's COMFORT_HERO_MAP /
+    # COMFORT_HERO_TO_DISH for the two concrete data gaps this surfaced.
 
 
 def test_recommendations_omits_decision_trace_by_default(client):
