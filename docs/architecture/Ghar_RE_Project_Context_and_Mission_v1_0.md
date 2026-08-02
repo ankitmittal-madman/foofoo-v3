@@ -10,9 +10,19 @@ FooFoo is an AI-powered meal decision assistant for Indian households — person
 
 **We are NOT starting a new application.** We are continuing inside the existing FooFoo repository to preserve authentication, UI, the Supabase project, APIs, deployment configuration, infrastructure, and Git history. **Only the Recommendation Engine is being redesigned**, per the 4 canonical Ghar RE documents already uploaded to this Project. Those documents are the sole source of truth for RE architecture — nothing else, old or new, overrides them.
 
-## 2. What is RETIRED (do not resurrect)
+## 2. What is RETIRED (do not resurrect) — AMENDED 2026-08-02, see §2A
 
 The old Recommendation Engine design — 41 fixed personas, cohort-based `FinalScore` scoring, class-first candidate generation, the interaction-count weight ladder, the 4-state (DAU-based) evolution model — is fully superseded. It does not apply to this Project. If old terminology (persona, cohort, class plan, weight ladder tiers) surfaces anywhere, treat it as legacy vocabulary, not a design constraint.
+
+**This section is partially superseded — never edited in place, kept verbatim above per the repo's Version & Lifecycle Rules (never delete a superseded statement; stamp and keep both). See §2A immediately below for the amendment and docs/project-history/work-packages/[DRAFT]_WP-15_Class_Enriched_Recommendation_v1.0.md for the full rationale and certificate reference.**
+
+## 2A. AMENDMENT (2026-08-02) — class-taxonomy/cohort-prior SCIENCE un-retired; FIXED PERSONAS remain retired
+
+Founder directive, WP-15: the *candidate-generation architecture* named in §2 (41 FIXED personas, class-first as the sole path from household to dish pool, the literal interaction-count weight-ladder mechanism, the 4-state DAU evolution model) **remains retired** — none of it has been reinstated, and none of it should be inferred from what follows.
+
+What changed: the Core Spine FROZEN master formula has always contained a `w_cohort·S_cohort(x;cohort)` term (Spine v1.0, unimplemented until WP-15 — `scoring.score()` computed only `BASE×GAIN_Q15` before this). WP-15 implements that already-existing, already-frozen formula slot using the *class-taxonomy and cohort-prior science* from the original design (131 meal classes, cohort-level class plans, sourced from the real `Indian_Meal_Cohort_Persona_DB_v3.xlsx` data asset already listed as reusable in §4 above) — **matched live from θ** (home_state + household_type + D2 time_route) on every request, never stored or looked up by a fixed persona ID, and applied only as one soft additive score term, never as a candidate-generation gate or a hard filter.
+
+In short: the science is un-retired; the persona-ID/class-only-candidate-generation architecture that §2 objected to is not. Nothing in the current filter → BASE → GAIN → pairing → Assemble-7 pipeline was removed or bypassed to do this — see WP-15 for the exact code diff and the honest, measured 129/810 (~16%) curated-catalogue coverage this ships with.
 
 ## 3. Tech stack & infrastructure (unchanged, still applies)
 

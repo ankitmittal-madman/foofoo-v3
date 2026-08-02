@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ghar RE — Class-First Vision vs. Live Engine (WP-15)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#121821; --panel2:#0f141c; --ink:#e8edf2; --muted:#93a1b1;
+    --retired:#a35b3b; --retired-soft:#2a1c16; --live:#3b7ba3; --live-soft:#122431;
+    --merge:#5f9e6e; --merge-soft:#12241a; --border:#232c38; --chip:#1b2430;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6f9; --panel:#ffffff; --panel2:#f8f9fb; --ink:#1b2430; --muted:#5b6b7c;
+      --retired-soft:#fbe9e1; --live-soft:#e6f1f8; --merge-soft:#e7f4ea; --border:#dde3ea; --chip:#eef1f5;}
+  }
+  :root[data-theme="dark"]{ --bg:#0b0f14; --panel:#121821; --panel2:#0f141c; --ink:#e8edf2; --muted:#93a1b1;
+      --retired-soft:#2a1c16; --live-soft:#122431; --merge-soft:#12241a; --border:#232c38; --chip:#1b2430;}
+  :root[data-theme="light"]{ --bg:#f4f6f9; --panel:#ffffff; --panel2:#f8f9fb; --ink:#1b2430; --muted:#5b6b7c;
+      --retired-soft:#fbe9e1; --live-soft:#e6f1f8; --merge-soft:#e7f4ea; --border:#dde3ea; --chip:#eef1f5;}
+
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; line-height:1.45;}
+  header{padding:28px 24px 12px; max-width:1400px; margin:0 auto;}
+  h1{font-size:1.5rem; margin:0 0 6px;}
+  .sub{color:var(--muted); font-size:0.95rem; max-width:900px;}
+  .banner{max-width:1400px; margin:14px auto 0; padding:14px 18px; border-radius:10px;
+    background:var(--merge-soft); border:1px solid var(--border); font-size:0.9rem;}
+  .banner b{color:var(--merge);}
+  .legend{display:flex; gap:18px; flex-wrap:wrap; margin:14px auto 0; max-width:1400px; padding:0 24px; font-size:0.85rem; color:var(--muted);}
+  .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle;}
+  .d-retired{background:var(--retired);} .d-live{background:var(--live);} .d-merge{background:var(--merge);}
+
+  .wrap{max-width:1400px; margin:20px auto 60px; padding:0 24px;
+    display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:900px){ .wrap{grid-template-columns:1fr;} }
+
+  .col{background:var(--panel); border:1px solid var(--border); border-radius:14px; overflow:hidden;}
+  .col-head{padding:16px 18px; border-bottom:1px solid var(--border);}
+  .col-head h2{margin:0; font-size:1.05rem;}
+  .col-head span{font-size:0.8rem; color:var(--muted);}
+  .col.retired .col-head{background:var(--retired-soft);}
+  .col.live .col-head{background:var(--live-soft);}
+
+  .steps{padding:14px 16px;}
+  .step{border:1px solid var(--border); border-radius:10px; margin-bottom:10px; background:var(--panel2); overflow:hidden;}
+  .step-head{padding:11px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+  .step-head:hover{background:var(--chip);}
+  .step-title{font-weight:600; font-size:0.92rem;}
+  .step-tag{font-size:0.7rem; padding:2px 8px; border-radius:999px; white-space:nowrap;}
+  .tag-retired{background:var(--retired-soft); color:var(--retired); border:1px solid var(--retired);}
+  .tag-live{background:var(--live-soft); color:var(--live); border:1px solid var(--live);}
+  .tag-new{background:var(--merge-soft); color:var(--merge); border:1px solid var(--merge);}
+  .step-body{max-height:0; overflow:hidden; transition:max-height .25s ease; font-size:0.86rem; color:var(--muted); padding:0 14px;}
+  .step.open .step-body{max-height:600px; padding:0 14px 14px;}
+  .chev{transition:transform .2s ease; opacity:0.6; font-size:0.8rem;}
+  .step.open .chev{transform:rotate(90deg);}
+  code{background:var(--chip); padding:1px 5px; border-radius:4px; font-size:0.82em;}
+  .arrow{text-align:center; color:var(--muted); font-size:1.2rem; margin:-4px 0 2px;}
+
+  .footer-note{max-width:1400px; margin:0 auto 60px; padding:0 24px; font-size:0.85rem; color:var(--muted);}
+  .footer-note h3{color:var(--ink); font-size:1rem; margin-bottom:6px;}
+  table{width:100%; border-collapse:collapse; font-size:0.85rem; margin-top:8px;}
+  th,td{border:1px solid var(--border); padding:8px 10px; text-align:left;}
+  th{background:var(--chip);}
+</style>
+</head>
+<body>
+<header>
+  <h1>Ghar RE — Class-First Vision vs. the Live Engine, side by side</h1>
+  <div class="sub">Left: the original RE-DOC-01–05 "class-first" journey (household → persona → cohort → class plan → dish pool), formally retired 2026-07-13 in <code>Ghar_RE_Project_Context_and_Mission_v1_0.md §2</code>. Right: what actually runs today in <code>ghar_re_core</code>/<code>ghar_re_service</code>, including WP-15's new class-cohort layer that un-retires the SCIENCE (not the fixed-persona architecture) into the live pipeline. Click any step to expand.</div>
+</header>
+
+<div class="banner">
+  <b>What changed 2026-08-02 (WP-15):</b> the Core Spine master formula's <code>w_cohort·S_cohort</code>
+  term existed since Spine v1.0 but was never implemented. WP-15 fills that exact slot using the
+  class-taxonomy/cohort-prior science below — matched <b>live from θ</b> on every request, never from
+  a stored persona ID — as one additive score term inside the unchanged filter → BASE → GAIN → pairing
+  pipeline. See the <span class="dot d-merge"></span><b>green "NEW · WP-15"</b> steps on the right.
+</div>
+
+<div class="legend">
+  <span><span class="dot d-retired"></span>Retired (RE-DOC-01–05, do not resurrect as architecture)</span>
+  <span><span class="dot d-live"></span>Live today, pre-WP-15</span>
+  <span><span class="dot d-merge"></span>New in WP-15 — un-retired science, live code</span>
+</div>
+
+<div class="wrap">
+
+  <!-- LEFT: retired vision -->
+  <div class="col retired">
+    <div class="col-head">
+      <h2>RE-DOC-01–05 — the retired class-first vision</h2>
+      <span>Persona → cohort → class plan → dish pool. Superseded 2026-07-13.</span>
+    </div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">1. Household → one of 41 FIXED personas</span>
+          <span><span class="step-tag tag-retired">RETIRED</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">A household was mapped onto one of 41 hand-authored personas (RE-DOC-02).
+        A persona was a stored label, looked up once — not re-derived per request.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">2. Persona → Cohort (RE-DOC-03)</span>
+          <span><span class="step-tag tag-retired">RETIRED</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">Each persona carried a cohort assignment feeding <code>CohortPrior</code> in the
+        <code>FinalScore</code> formula: <code>w_cohort·CohortPrior + w_content·ContentMatch + w_history·PersonalHistory
+        + w_context·ContextFit + w_explore·ExplorationBonus − PenaltyTerms</code>.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">3. Cohort → Class Plan (26-class taxonomy)</span>
+          <span><span class="step-tag tag-retired">RETIRED</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">7 breakfast + 6 lunch + 8 dinner + 5 add-on classes. The cohort determined a
+        <b>class plan</b> — which classes of meal this household should be shown at all. This was the
+        candidate-GENERATION step, not a ranking nudge: dishes outside the plan's classes were never
+        considered.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">4. Class Plan → Dish Pool → Hard Constraints (SQL P0 gates)</span>
+          <span><span class="step-tag tag-retired">RETIRED</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">Only then were dishes within the planned classes filtered by diet/allergen/
+        religious/slot/never-list constraints, each requiring a named SQL query returning 0 rows pre-deploy.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">5. Weight-ladder interpolation (5 interaction tiers)</span>
+          <span><span class="step-tag tag-retired">RETIRED</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">As a household interacted more, <code>FinalScore</code>'s weights smoothly shifted
+        from cohort/content-heavy toward personal-history-heavy across 5 named tiers.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">6. Cold-start ladder + MMR variety + Never/Not-Today decay</span>
+          <span><span class="step-tag tag-retired">RETIRED</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">Day-0→60+ confidence ladder; <code>λ·Relevance − (1−λ)·maxSimilarity</code> variety
+        formula; permanent "Never" suppression vs. exponentially-decaying "Not Today" (<code>P0·e^(−λt)</code>).</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">7. 4-state DAU evolution (Research → Learning → Cluster → Full-Intelligence)</span>
+          <span><span class="step-tag tag-retired">RETIRED</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">The whole engine graduated through 4 modes keyed to daily-active-user volume,
+        eventually reaching cross-user clustering and two-tower/CF ML.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: live pipeline -->
+  <div class="col live">
+    <div class="col-head">
+      <h2>Live today — <code>ghar_re_core</code> + WP-15</h2>
+      <span>Filter → BASE → GAIN → cohort nudge → pairing → Assemble-7. No candidate-generation gate.</span>
+    </div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">1. Household → θ (Derived Household Profile), every request</span>
+          <span><span class="step-tag tag-live">LIVE</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body"><code>derivation.derive_theta()</code> computes D1–D7 fields live — income proxy,
+        origin/local blend, adventurousness, household constraints, community prior — with per-field
+        (value, confidence, source) metadata. No stored persona ID; θ is recomputed every call.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">2. Hard filters A1–A6 (diet, Jain, allergen, weaning, fasting, calorie)</span>
+          <span><span class="step-tag tag-live">LIVE</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body"><code>scoring.eligible()</code> — the ONLY gate that removes dishes from
+        consideration entirely. Unlike the retired class-plan step, nothing about meal "class" ever gates
+        candidates here.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">3. BASE score — 8 rule modules (B1–B8), additive</span>
+          <span><span class="step-tag tag-live">LIVE</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">m_palette, m_slot, m_season, sig, m_age, m_household, m_weather, prior_boost —
+        each a plain function summed in <code>scoring.base()</code>. Weather resolves to the household's OWN
+        regional comfort hero (KB §R3), never a generic pakora.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step new">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">3A. NEW — S_cohort: class-fit nudge from θ-matched cohort</span>
+          <span><span class="step-tag tag-new">NEW · WP-15</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body"><code>knowledge.dish_to_class_code()</code> looks up this dish's curated
+        meal-class (131-class taxonomy, <code>Class_Dish_Options_v3</code>, 129/810 real dishes matched — an
+        honest ~16%, never fuzzy-guessed). <code>knowledge.cohort_class_mix()</code> live-matches this
+        household (home_state + household_type + D2 time_route) into <code>Cohort_Matrix_v3</code>'s 2952
+        cohorts and reads that cohort's actual class plan for this slot/day-type. If the dish's class is in
+        that plan, <code>scoring.s_cohort()</code> returns 1.0, else 0.0 — never a filter, never a candidate
+        gate, only a soft additive term.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">4. Q15 GAIN — objective-based multiplier</span>
+          <span><span class="step-tag tag-live">LIVE</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">GAIN = 1 + κ·Σ γ[obj]·gs(x). κ pinned 1.0 in v1 (the weight-ladder's
+        successor mechanism — designed, not yet activated; needs real behaviour data).</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step new">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">4A. NEW — score = BASE×GAIN + w_cohort·S_cohort</span>
+          <span><span class="step-tag tag-new">NEW · WP-15</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">Fills the Core Spine master formula's <code>w_cohort·S_cohort</code> term —
+        present in the frozen formula since Spine v1.0, unimplemented until WP-15.
+        <code>w_cohort = 0.15</code> (modest, given ~16% coverage — see <code>cohort_weights.yaml</code>).
+        <code>w_pref·S_pref</code> remains 0 (v1, no feedback data — same constraint WP-14 already
+        identified).</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">5. Pairing guardrails + plate_score</span>
+          <span><span class="step-tag tag-live">LIVE</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body"><code>pairing.compat()</code> — no two rich gravies, no two same-base, no two
+        dry heroes, region coherence, richness balance. <code>plate_score = scored dry+liquid −
+        λ_pair·compat_penalty</code>.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">6. Assemble-7 — greedy select, no-duplicate guard only</span>
+          <span><span class="step-tag tag-live">LIVE</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">7 ranked plates. Variety is currently ONLY a no-duplicate guard — the
+        retired vision's full MMR/decay machinery (left, step 6) is deferred to v2/v3 pending real user
+        history (<code>Final_RE_...md</code> RES-F14), not reinstated by WP-15.</div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="step">
+        <div class="step-head" onclick="toggle(this)">
+          <span class="step-title">7. RE-DOC-10 phased roadmap (A–G), not a 4-state DAU model</span>
+          <span><span class="step-tag tag-live">LIVE</span><span class="chev">▸</span></span>
+        </div>
+        <div class="step-body">The evolution path today is RE-DOC-10's phase table + WP-14's sequenced
+        plan (module registry → feedback capture → learned module), not the retired 4-state DAU model.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-note">
+  <h3>What actually shipped vs. what's still open (WP-15)</h3>
+  <table>
+    <tr><th>Item</th><th>Status</th></tr>
+    <tr><td>θ-matched cohort layer (<code>s_cohort</code>) wired into the live master formula</td><td>Shipped, tested (91/91 passing)</td></tr>
+    <tr><td>Dish→class curated coverage</td><td>129/810 (~16%) — disclosed, not padded (WP15-F1 open)</td></tr>
+    <tr><td>Formal <code>ScoringModule</code> registry (RE-DOC-11 §7, WP-14)</td><td>Still open — <code>s_cohort</code> was added as a hand-written function like its siblings, same as everything else in <code>base()</code></td></tr>
+    <tr><td>Interaction-count weight ladder / κ decay</td><td>Still pinned 1.0 — needs real feedback data (WP15-F4, same constraint as WP-14)</td></tr>
+    <tr><td>MMR variety / recency decay / exploration policy</td><td>Still just a no-duplicate guard — deferred v2/v3</td></tr>
+    <tr><td>41 fixed personas / class-only candidate generation</td><td>Stays retired — never reinstated by this work</td></tr>
+  </table>
+</div>
+
+<script>
+function toggle(head){ head.parentElement.classList.toggle('open'); }
+</script>
+</body>
+</html>
