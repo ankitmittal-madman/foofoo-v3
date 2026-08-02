@@ -384,8 +384,8 @@ export class SupabaseTasteVectorRepository implements TasteVectorRepository {
    * decision made silently: flagged in the work-package report, needs a real materialized source
    * (migration) before this is trusted for production scoring.
    */
-  async getCohortAverageVector(_cohortId: string): Promise<number[]> {
-    return new Array(SupabaseTasteVectorRepository.DEFAULT_VECTOR_LENGTH).fill(0);
+  getCohortAverageVector(_cohortId: string): Promise<number[]> {
+    return Promise.resolve(new Array(SupabaseTasteVectorRepository.DEFAULT_VECTOR_LENGTH).fill(0));
   }
 
   /** Matches the modal `dishes.genome_vector` length observed live (249 of ~800 dishes = 10 dims). */
