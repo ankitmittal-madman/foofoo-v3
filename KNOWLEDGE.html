@@ -1968,6 +1968,20 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Founder shared an external GPT-produced live audit and asked for a plan to fix all gaps. Treated the second AI's report as untrusted input needing verification, not a finding on its own — ran the same live queries independently against project cmkswalqpmmqojwdmqbv before planning anything. Found 3 corrections: (1) GPT's "0 rows" claim for profiles/consent/recommendation_events was stale — this session's own test onboarding already put real data in (profiles=2, consent_records=12, recommendation_events=18); (2) GPT's "ghar_re has 28 tables with RLS disabled" was contradicted — all 28 currently have RLS ON, via a migration applied live TODAY with no matching repo file at all (a more specific drift finding than GPT's own); (3) GPT's "cron auth incompatible with scheduler model" mischaracterized a deliberate, already-documented decision in config.toml (service_role key IS a valid JWT, passes gateway verify_jwt by design) — the real gap is narrower: cron.job is simply empty, no jobs ever registered. Confirmed as real: no cron jobs (P0), only 6 of 9 repo functions actually deployed live (P1), CORS OPTIONS 401s (independently confirmed from this session's own earlier log pulls, not just GPT's claim), and migration ledger drift with 3 specific untracked live migrations named. Drafted WP-11 with corrected findings and a priority-ordered remediation plan; nothing executed — GitHub/Fly.io/EAS claims remain unverified pending equivalent live-tool access. Also flagged to Founder: rotate any token pasted into GPT's own session (not seen in this one).</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#e1effe;color:#1a56db">S56</span>
+      <div class="tl-title">Third readiness assessment (an Aug 1 Claude self-audit) reconciled into WP-11 — two of its three P0s confirmed already closed</div>
+      <div class="tl-chips">
+        <span class="tl-chip">artifact 3b18615d fetched &amp; fact-checked</span>
+        <span class="tl-chip">"no completed onboarding" P0 closed by this session's own S49-S54 fixes</span>
+        <span class="tl-chip">"unauthenticated cron" P0 already closed by prior S47</span>
+      </div>
+      <div class="tl-note">Founder pointed to an earlier Claude-authored audit (Aug 1, one day before this session) as a third input to the fix-everything plan. Fetched the full artifact and cross-checked its live-data claims against today's actual state instead of trusting it more just for sharing a model family with this session — same discipline already applied to the GPT audit. Result: 2 of its 3 headline P0s are now genuinely closed — "auth.users=2, profiles=0, nobody has ever finished onboarding" was fixed by this session's own S49-S54 FK/home_state bug fixes (profiles=2 now); "cron endpoints unauthenticated, verify_jwt=false" was already fixed in an earlier S47 session per config.toml's own documented history, before either audit ran. Its ghar_re-RLS-disabled P3 finding is also closed, via an untracked live migration already flagged in WP-11's migration-ledger item. Its still-open findings (onboarding function confirmed dead code via full import-graph trace, DPDP export/delete built-but-unreachable, no feedback/profile/settings UI, no CD/monitoring) were folded into WP-11 alongside GPT's matching findings, sharpening the P0 #3 item into an explicit deploy-vs-retire split. WP-11 now reconciles three independent assessments rather than one.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
