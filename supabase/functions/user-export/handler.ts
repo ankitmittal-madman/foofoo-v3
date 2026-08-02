@@ -67,7 +67,9 @@ async function createExportJob(ctx: RequestContext, ownerId: string): Promise<Re
     "userExport.upload",
   );
   if (error) {
-    throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: `export upload failed: ${error.message}` });
+    throw new AppError(ERROR_CATALOGUE.INTERNAL, {
+      detail: `export upload failed: ${error.message}`,
+    });
   }
 
   ctx.logger.info("user_export.job_created", { profile_id: ownerId, export_job_id: exportJobId });

@@ -90,8 +90,7 @@ export const UserJourney = {
     const summary = consents
       .map((c) => `${c.consentType.replace(/_/g, " ")}: ${c.granted ? "granted" : "declined"}`)
       .join("; ");
-    const narrative =
-      `Household recorded consent decisions — ${summary}. ` +
+    const narrative = `Household recorded consent decisions — ${summary}. ` +
       `Personalization is ${personalizationGranted ? "ON" : "OFF"} for this household.`;
     record(profileId, "consent", narrative);
   },
@@ -119,8 +118,7 @@ export const UserJourney = {
           `(fewer eligible dishes than usual for this household/context).`;
         break;
       case "fallback":
-        narrative =
-          `App served a fallback plate — the RE's response could not be used ` +
+        narrative = `App served a fallback plate — the RE's response could not be used ` +
           `(${opts?.detail ?? "reason not recorded"}).`;
         break;
       case "timeout":

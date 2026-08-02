@@ -10,7 +10,10 @@
 import { z } from "../_shared/validation/validate.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
-import type { MigrationBand, OnboardingAnswers } from "../_shared/services/onboarding/orchestrator.ts";
+import type {
+  MigrationBand,
+  OnboardingAnswers,
+} from "../_shared/services/onboarding/orchestrator.ts";
 
 /** household_members.conditions — the exact 15-value vocabulary (migration 033), mirrored from
  * household/schema.ts so OB-02 segments can be checked against the same live vocabulary. */

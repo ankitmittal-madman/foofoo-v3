@@ -69,7 +69,9 @@ function contextForSlot(slotDate: string, mealSlot: MealSlot): RecommendationCon
 }
 
 /** Build the POST /v1/onboarding handler. */
-export function makeOnboardingHandler(resolve: OnboardingOrchestratorResolver = defaultResolver): Handler {
+export function makeOnboardingHandler(
+  resolve: OnboardingOrchestratorResolver = defaultResolver,
+): Handler {
   return async (req, ctx) => {
     if (req.method !== "POST") {
       throw new AppError(ERROR_CATALOGUE.METHOD_NOT_ALLOWED);

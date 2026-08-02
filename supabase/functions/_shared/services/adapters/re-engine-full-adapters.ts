@@ -407,7 +407,9 @@ export class SupabasePersonalHistoryRepository implements PersonalHistoryReposit
     );
     if (error) dbFail("read interaction_events", error.message);
     const now = Date.now();
-    return ((data ?? []) as Array<{ event_type: string; rating: number | null; occurred_at: string }>)
+    return ((data ?? []) as Array<
+      { event_type: string; rating: number | null; occurred_at: string }
+    >)
       .map((r) => ({
         eventType: r.event_type,
         rating: r.rating,

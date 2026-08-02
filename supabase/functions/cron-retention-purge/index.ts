@@ -3,7 +3,12 @@
  * years, audit_log > 3 years — two separate policies, see retention-purge.ts). Same
  * unauthenticated-by-design posture as cron-hard-delete/index.ts — see that file's doc comment.
  */
-import { buildContext, compose, errorBoundary, requestLogging } from "../_shared/middleware/index.ts";
+import {
+  buildContext,
+  compose,
+  errorBoundary,
+  requestLogging,
+} from "../_shared/middleware/index.ts";
 import { jsonOk } from "../_shared/api/response.ts";
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import { RetentionPurgeScheduler } from "../_shared/services/scheduler/retention-purge.ts";

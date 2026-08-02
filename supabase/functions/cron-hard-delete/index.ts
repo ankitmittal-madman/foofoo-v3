@@ -9,7 +9,12 @@
  * the actual `pg_cron` schedule registration, both coordinated with the database-migration work
  * happening in parallel rather than done here.
  */
-import { buildContext, compose, errorBoundary, requestLogging } from "../_shared/middleware/index.ts";
+import {
+  buildContext,
+  compose,
+  errorBoundary,
+  requestLogging,
+} from "../_shared/middleware/index.ts";
 import { jsonOk } from "../_shared/api/response.ts";
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import { HardDeleteScheduler } from "../_shared/services/scheduler/hard-delete.ts";
