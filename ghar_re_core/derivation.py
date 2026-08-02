@@ -103,6 +103,12 @@ def derive_theta(hh):
     theta["home_state"] = field(hh["q3_home_state"], "explicit", "explicit", "stable")
     theta["home_zone"] = field(zone_home, "D4", "derived", "stable")
     theta["local_zone"] = field(zone_local, "D4", "derived", "stable")
+    # local_state + city_tier carried into θ (WP-16): the Cohort-Intelligence layer needs the
+    # CURRENT-residence state and its tier (T1/T2) to resolve the City_Migration_Overlay_v3 blend
+    # and the class-affinity model's city_tier feature. city_tier was already computed above for D1;
+    # exposing it here (as the excel's T1/T2 code) avoids re-deriving it in cohort_intel.
+    theta["local_state"] = field(_state_of_city(hh["q4_current_city"]), "D4", "derived", "stable")
+    theta["city_tier"] = field("T1" if city_tier == "tier1" else "T2", "D4", "derived", "stable")
     # region = the resolved palette zone; the more-weighted side wins for comfort-hero resolution.
     theta["region"] = field(zone_home if blend >= 0.5 else zone_local, "D4", "derived", "dynamic")
     # slot-specific blend (D4 slot offsets)

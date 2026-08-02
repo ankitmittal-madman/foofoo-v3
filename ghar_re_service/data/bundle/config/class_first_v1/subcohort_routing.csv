@@ -1,0 +1,42 @@
+main_cohort_id,main_cohort_label,sub_cohort_id,sub_cohort_label,maps_to_persona_id,persona_name,show_as_chip_text
+MC1,Just me / shared adult household,SC1A,student_hostel_budget,P01,Solo student/hostel budget,Solo student/hostel budget
+MC1,Just me / shared adult household,SC1B,solo_young_professional,P02,Solo young professional,Solo young professional
+MC1,Just me / shared adult household,SC1C,working_woman_alone,P03,Working woman living alone,Working woman living alone
+MC1,Just me / shared adult household,SC1D,flatmates_shared_kitchen,P37,Flatmates shared kitchen,Flatmates shared kitchen
+MC1,Just me / shared adult household,SC1E,migrant_adult_home_state,P28,Migrant in metro preserving home-state food,Migrant in metro preserving home-state food
+MC1,Just me / shared adult household,SC1F,desk_job_sedentary,P39,Desk-job sedentary household,Desk-job sedentary
+MC2,Couple household,SC2A,dink_couple,P04,DINK couple no children,DINK couple no children
+MC2,Couple household,SC2B,newly_married_mixed_state,P05,Newly married mixed-state couple,Newly married mixed-state couple
+MC2,Couple household,SC2C,planning_pregnancy,P06,Couple planning pregnancy,Couple planning pregnancy
+MC2,Couple household,SC2D,pregnant_household,P07,Pregnant woman household,Pregnant woman
+MC2,Couple household,SC2E,couple_with_infant_0_6m,P08,Couple with infant 0-6 months,Couple with infant 0-6 months
+MC2,Couple household,SC2F,couple_with_baby_6_18m,P09,Couple with baby 6-18 months,Couple with baby 6-18 months
+MC2,Couple household,SC2G,interstate_couple_mixed_cuisine,P29,Inter-state couple / mixed cuisine household,Inter-state couple / mixed cuisine
+MC3,Family with children,SC3A,family_with_toddler,P10,Nuclear family with toddler,Nuclear with toddler
+MC3,Family with children,SC3B,family_with_school_kids,P11,Nuclear family with school kids,Nuclear with school kids
+MC3,Family with children,SC3C,family_with_teenagers,P12,Family with teenagers,Family with teenagers
+MC3,Family with children,SC3D,child_picky_eater,P35,Child picky eater household,Child picky eater
+MC3,Family with children,SC3E,budget_family,P26,Budget/value-conscious family,Budget/value-conscious
+MC3,Family with children,SC3F,homemaker_elaborate_family,P40,Home-maker elaborate cooking family,Home-maker elaborate cooking
+MC4,Joint / elders / care household,SC4A,joint_multigeneration,P13,Joint/multi-generation family,Joint/multi-generation
+MC4,Joint / elders / care household,SC4B,elderly_couple,P14,Elderly couple,Elderly couple
+MC4,Joint / elders / care household,SC4C,recovery_senior_light,P36,Recovery/senior digestive light household,Recovery/senior digestive light
+MC4,Joint / elders / care household,SC4D,diabetic_low_gi_household,P15,Diabetic / low-GI household,Diabetic / low-GI
+MC4,Joint / elders / care household,SC4E,bp_heart_conscious,P16,Hypertension / heart conscious,Hypertension / heart conscious
+MC4,Joint / elders / care household,SC4F,child_plus_diabetic_elder_overlap,P41,Composite family: child + diabetic/elderly member,Composite: child + diabetic/elderly member
+MC5,Special goal or kitchen operating mode,SC5A,weight_loss_calorie_conscious,P17,Weight loss / calorie conscious,Weight loss / calorie conscious
+MC5,Special goal or kitchen operating mode,SC5B,gym_high_protein,P18,Gym/high-protein nonveg or egg-friendly,Gym/high-protein nonveg or egg-friendly
+MC5,Special goal or kitchen operating mode,SC5C,vegetarian_protein,P19,Vegetarian protein seeker,Vegetarian protein seeker
+MC5,Special goal or kitchen operating mode,SC5D,strict_jain,P20,Strict Jain household,Strict Jain
+MC5,Special goal or kitchen operating mode,SC5E,fasting_ritual,P21,Fasting/ritual observant household,Fasting/ritual observant
+MC5,Special goal or kitchen operating mode,SC5F,cook_assisted_skilled,P22,Cook-assisted household: skilled cook,Cook-assisted: skilled cook
+MC5,Special goal or kitchen operating mode,SC5G,cook_needs_instruction,P23,Cook-assisted: needs constant instruction,Cook-assisted: needs constant instruction
+MC5,Special goal or kitchen operating mode,SC5H,working_woman_managing_cook,P24,Working woman managing cook + office,Working woman managing cook + office
+MC5,Special goal or kitchen operating mode,SC5I,maid_dependent_batch_cook,P25,Maid-dependent minimal cooking / batch cook,Maid-dependent minimal cooking / batch cook
+MC5,Special goal or kitchen operating mode,SC5J,premium_experimental_foodie,P27,Premium experimental foodie,Premium experimental foodie
+MC5,Special goal or kitchen operating mode,SC5K,regular_nonveg_household,P30,Regular non-veg household,Regular non-veg
+MC5,Special goal or kitchen operating mode,SC5L,eggitarian_low_meat,P31,Eggitarian / low-meat household,Eggitarian / low-meat
+MC5,Special goal or kitchen operating mode,SC5M,seafood_coastal_nonveg,P32,Seafood/coastal non-veg household,Seafood/coastal non-veg
+MC5,Special goal or kitchen operating mode,SC5N,sunday_mutton_nonveg,P33,Mutton/Sunday special non-veg household,Mutton/Sunday special non-veg
+MC5,Special goal or kitchen operating mode,SC5O,home_veg_outside_nonveg,P34,"Vegetarian home, occasional outside non-veg","Vegetarian home, occasional outside non-veg"
+MC5,Special goal or kitchen operating mode,SC5P,field_work_heavy_breakfast,P38,Field-work heavy breakfast household,Field-work heavy breakfast

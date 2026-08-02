@@ -1,8 +1,18 @@
 config_version: 1.0
-generated_from: Core Spine FROZEN master formula (w_cohort . S_cohort term) + WP-15 Class-Enriched RE
-# w_cohort: weight for the new class-first cohort-fit term, S_cohort(x;cohort) in {0.0, 1.0}
-# (K.cohort_class_mix / scoring.s_cohort). Deliberately modest: real dish->class curated coverage
-# is ~16% of the catalogue today (see knowledge.py class-first section), so this should nudge
-# matched dishes, not dominate BASE. Raise only after coverage/founder review (WP-15 Future register).
+generated_from: Core Spine FROZEN master formula (w_cohort . S_cohort term) + WP-15 Class-Enriched RE + WP-16 Cohort Intelligence
+# w_cohort . S_cohort is the master-formula cohort term. WP-16 makes S_cohort a GRADED [0,1]
+# class-affinity (ghar_re_core.cohort_intel.class_affinity, learned from the persona DB's weekly
+# plan and migration-blended), replacing WP-15's binary 0/1 membership check.
+#
+# The weight is now COLD-START STRONG and DECAYS with real interaction volume (Founder directive
+# 2026-08-02): a brand-new household's slate should feel like the persona-DB plan; as genuine
+# accept/reject feedback accumulates the cohort prior should yield to learned personal signal.
+#   w_eff(n) = floor + (coldstart - floor) * 2^(-n / halflife)      n = ctx.interaction_count
+# NOTE: feedback_events currently has 0 production rows, so n=0 for every live household today and
+# w_eff = coldstart for everyone until real signals accrue — the decay mechanism exists, the data
+# to move along it does not yet (same honest constraint WP-14/WP-15 flagged).
 cohort:
-  w_cohort: 0.15
+  w_cohort: 0.15              # legacy WP-15 base weight (retained; = the decay floor below)
+  w_cohort_coldstart: 0.60    # strong at n=0 so cold-start feels like the persona-DB plan
+  w_cohort_floor: 0.15        # asymptotic weight once the household is well-learned
+  coldstart_halflife: 25      # interactions at which the extra cold-start lift has halved

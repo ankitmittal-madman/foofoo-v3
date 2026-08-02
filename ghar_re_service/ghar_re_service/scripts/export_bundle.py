@@ -70,13 +70,23 @@ CONFIG_FILES = (
     "ingredients_v5.csv",
 )
 
-# class_first_v1/ subdirectory files (WP-15 class-cohort layer — ghar_re_core.knowledge reads
-# these via the same config.SRC seam as everything above, so they must ship in the bundle too;
-# see knowledge.py's class-first section for what each file is and how it was generated).
+# class_first_v1/ subdirectory files. WP-15 shipped the first three (curated class taxonomy).
+# WP-16 (Cohort Intelligence) adds the trained class-affinity model + the migration/region/persona
+# reference tables ghar_re_core.cohort_intel reads via the same config.SRC seam — so they must ship
+# in the bundle too. All are produced offline by scripts/prepare_cohort_intel.py; see cohort_intel.py
+# and knowledge.py for what each file is.
 CLASS_FIRST_FILES = (
     "meal_class_master.csv",
     "class_dish_options.csv",
     "cohort_matrix.csv",
+    # WP-16 additions:
+    "cohort_class_model.json",   # trained factorized class-affinity model (the "intelligence")
+    "migration_overlay.csv",     # City_Migration_Overlay_v3 (home/local/national blend)
+    "state_profile.csv",         # state -> region_archetype (a model feature) + class pools
+    "nonveg_logic.csv",          # per-state nonveg/egg cadence (reference)
+    "persona_master.csv",        # 41 sub-cohort anchors (cohort_intel.cohort_membership)
+    "subcohort_routing.csv",     # main->sub cohort routing (reference)
+    "main_cohort_hierarchy.csv", # 5 onboarding main cohorts (reference)
 )
 
 _HERE = os.path.dirname(os.path.abspath(__file__))  # .../ghar_re_service/scripts

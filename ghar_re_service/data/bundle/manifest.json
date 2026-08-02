@@ -1,14 +1,21 @@
 {
   "bundle_format": 1,
-  "bundle_version": "sha256:656440e455932a13",
+  "bundle_version": "sha256:b4761d5a95505526",
   "catalogue_sha256": "7fde22df7b9edc2585a453cb1ef50301214ca577f6f99010a93b1500be59a8f1",
   "catalogue_source": "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue (real 810-dish catalogue)",
   "config_sha256": {
     "base_weights.yaml": "479e0e645dd04b2478fcf81f1507ae8fe91de218618ae01ed704095adf7b11f8",
     "class_first_v1/class_dish_options.csv": "922df79804b5769d7849ec2408bdc53b1350bcb8b56e9125292cac378a37f6ea",
+    "class_first_v1/cohort_class_model.json": "c8b4875e61ed4feb5085a3b4f8edccf4763b23040eb02d77ffd40882f2ca92d0",
     "class_first_v1/cohort_matrix.csv": "924eef1b40d3ad5336576aada9a44326a893deceea618be2c0d1be071a917ed1",
+    "class_first_v1/main_cohort_hierarchy.csv": "b8af74f203c6aa31b814dc8b0abf32842c61180eed5c29de63f488bfa8461a50",
     "class_first_v1/meal_class_master.csv": "c2b5a0841d08f48ef26f5a4dc2f2b2f79ef35b65efb205e0396f7e8a5f20a08f",
-    "cohort_weights.yaml": "42abe4d3d494cdb2c40a63918634bc61dc5e458184092cd3fe9f77530cc97974",
+    "class_first_v1/migration_overlay.csv": "44c1ac926988ad68e4e751fd078524057eebd19105a292640be6465ea665cf71",
+    "class_first_v1/nonveg_logic.csv": "e8e3c47fda0a39b4a0670afba94359d34253ff67b454d6d9308093e37c776e3e",
+    "class_first_v1/persona_master.csv": "5b7038e353114056f56ec207ba3b246379bfab51e0c291010c80089e4f9ccf8f",
+    "class_first_v1/state_profile.csv": "5da0b8e8edf25a06e24401e25ec4cf6aff17cc1c96ddcfe9b9645c2f07ad5abb",
+    "class_first_v1/subcohort_routing.csv": "1332849b7595216e0ac13c59ba76b315fed71a1226633a8b5a253419aafc83b3",
+    "cohort_weights.yaml": "23f7a98b293ec80078faec43bc8388ffdd2c13622a761e4486ddda90289cb536",
     "community_priors.csv": "a908e6a6b818acd446edbbd664392e503ddfe35376ffa2788b91d11e749617be",
     "derivation_params.yaml": "53042325b7819bcf5aff949b96efa7448ca99d1466c9f084c0485917f975f907",
     "distance_weights.yaml": "5e42767f74483c7e4469984c611f1dd8cef018ba1c9cc93be3fee1671eda9d6b",
@@ -18,6 +25,6 @@
     "q15_weights.yaml": "59aaccfff883b68a2b5a74a9947adf58de8a53d17f96b8e12ed1b7af791a0486",
     "weather_rules.yaml": "d69c4eac4967aa455d15d0b418d856841c67f8a91380740f9f2a7c40215911ad"
   },
-  "created_at": "2026-08-02T08:54:02.568945+00:00",
+  "created_at": "2026-08-02T11:19:01.483552+00:00",
   "dish_count": 810
 }

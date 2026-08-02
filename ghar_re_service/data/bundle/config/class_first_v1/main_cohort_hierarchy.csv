@@ -1,0 +1,6 @@
+main_cohort_id,main_cohort_label,user_understands_as
+MC1,Just me / shared adult household,"Single, student, professional, flatmate, migrant adult"
+MC2,Couple household,"DINK, newly married, mixed-state couple, trying/pregnant/new parents"
+MC3,Family with children,"Toddler, school kid, teen, picky child, family budget/value, homemaker family"
+MC4,Joint / elders / care household,"Joint family, elderly couple, recovery/senior, elder + child, chronic condition in family"
+MC5,Special goal or kitchen operating mode,"Health/fitness, Jain/fasting, nonveg mode, cook-assisted, maid-dependent, premium foodie"

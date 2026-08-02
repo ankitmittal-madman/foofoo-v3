@@ -1,11 +1,10 @@
 """
-WP-15 "Ghar RE v1.1 — Class-Enriched Recommendation" tests.
+WP-15 / WP-16 class-first cohort layer tests.
 
-Covers the new class-first cohort layer (knowledge.dish_to_class_code / cohort_class_mix,
-scoring.s_cohort, config.w_cohort): the theta-derived implementation of the Core Spine master
-formula's previously-unwired w_cohort·S_cohort term, sourced from the real (previously unused)
-Indian_Meal_Cohort_Persona_DB_v3.xlsx data asset. See knowledge.py's class-first section for the
-full design rationale.
+Covers the curated dish->class lookup (knowledge.dish_to_class_code) and the graded, cold-start-
+weighted S_cohort term (scoring.s_cohort, config.w_cohort_effective) — WP-16's graded successor to
+WP-15's binary membership check. The cohort MODEL itself (migration blend, generalization,
+holdout reproduction) is covered separately in test_cohort_intel.py.
 """
 import json
 import os
@@ -14,6 +13,7 @@ from ghar_re_core import fixtures as F
 from ghar_re_core import knowledge as K
 from ghar_re_core import scoring as S
 from ghar_re_core.catalogue import Catalogue
+from ghar_re_core.config import CONFIG
 from ghar_re_core.derivation import derive_theta
 from ghar_re_core.pipeline import make_context
 
@@ -21,6 +21,19 @@ HH = {h["id_key"]: h for h in F.HOUSEHOLDS}
 _BUNDLE_CATALOGUE = os.path.join(
     os.path.dirname(__file__), "..", "..", "ghar_re_service", "data", "bundle", "catalogue.json"
 )
+_SLOTS = ("breakfast", "lunch", "dinner", "snacks")
+
+
+def _lifted_dish_and_ctx(theta, cat):
+    """Find a (dish, ctx) where the cohort term actually lifts the dish (s_cohort>0), scanning
+    slots — which fixture dishes the cohort plan lifts is household+slot specific, so we don't
+    assume a particular slot has a match for the small 39-dish fixture catalogue."""
+    for slot in _SLOTS:
+        ctx = make_context(slot=slot, weekday="Monday")
+        for d in cat:
+            if S.s_cohort(d, theta, ctx) > 0:
+                return d, ctx
+    return None, None
 
 
 def test_dish_to_class_code_known_match_and_miss():
@@ -31,55 +44,57 @@ def test_dish_to_class_code_known_match_and_miss():
     assert K.dish_to_class_code("Totally Not A Real Dish Name XYZ") is None
 
 
-def test_cohort_class_mix_matches_household_state_and_is_slot_specific():
+def test_s_cohort_is_graded_zero_to_one_never_fabricated():
     theta = derive_theta(HH["single_professional_blr"])
-    ctx_dinner = make_context(slot="dinner", weekday="Monday")
-    ctx_lunch = make_context(slot="lunch", weekday="Monday")
-    mix_dinner = K.cohort_class_mix(theta, ctx_dinner)
-    mix_lunch = K.cohort_class_mix(theta, ctx_lunch)
-    assert isinstance(mix_dinner, set) and isinstance(mix_lunch, set)
-    # Karnataka is covered by the persona DB (Bengaluru/Karnataka cohorts exist) — real match, not empty.
-    assert len(mix_dinner) > 0
-    assert mix_dinner != mix_lunch  # slot-specific, not a single blob reused everywhere
-
-
-def test_cohort_class_mix_weekday_vs_weekend_can_differ():
-    theta = derive_theta(HH["single_professional_blr"])
-    weekday = K.cohort_class_mix(theta, make_context(slot="dinner", weekday="Monday"))
-    weekend = K.cohort_class_mix(theta, make_context(slot="dinner", weekday="Saturday"))
-    assert isinstance(weekday, set) and isinstance(weekend, set)
-
-
-def test_s_cohort_zero_for_unmatched_dish_never_fabricated():
-    theta = derive_theta(HH["single_professional_blr"])
-    ctx = make_context(slot="dinner")
+    ctx = make_context(slot="dinner", weekday="Monday")
     cat = Catalogue()
+    # unmatched dish (no curated class) -> exactly 0.0, never a guessed value
     unmatched = next(d for d in cat if K.dish_to_class_code(d.name) is None)
     assert S.s_cohort(unmatched, theta, ctx) == 0.0
+    # every dish's grade is within [0,1] (graded affinity, not binary and not unbounded)
+    for d in cat:
+        v = S.s_cohort(d, theta, ctx)
+        assert 0.0 <= v <= 1.0
 
 
-def test_s_cohort_contributes_additively_to_score_not_multiplicatively():
-    # score = BASE*GAIN + w_cohort*S_cohort. A dish with S_cohort=1 must score exactly
-    # w_cohort higher than the same dish scored via base()*gain_q15() alone.
+def test_s_cohort_contributes_additively_with_coldstart_weight():
+    # score = BASE*GAIN + w_cohort_effective(n)*S_cohort. The cohort term is additive: the full
+    # score minus BASE*GAIN must equal exactly w_cohort_effective(0)*S_cohort for a new household.
     theta = derive_theta(HH["single_professional_blr"])
-    ctx = make_context(slot="dinner")
     cat = Catalogue()
-    dish = next((d for d in cat if K.dish_to_class_code(d.name)), None)
-    if dish is None:
-        return  # golden-sample fixtures may have zero curated matches; real catalogue does (see below)
     objective = HH["single_professional_blr"].get("q15_objective")
+    dish, ctx = _lifted_dish_and_ctx(theta, cat)  # cold-start weight (no interaction_count in ctx)
+    assert dish is not None
     base_gain = S.base(dish, theta, ctx) * S.gain_q15(dish, objective)
     full = S.score(dish, theta, ctx, objective)
     contrib = S.s_cohort(dish, theta, ctx)
-    assert round(full - base_gain, 6) == round(0.15 * contrib, 6)  # CONFIG.w_cohort default
+    w = CONFIG.w_cohort_effective(0)
+    assert round(full - base_gain, 6) == round(w * contrib, 6)
+
+
+def test_coldstart_weight_decays_with_interaction_count():
+    # Strong at n=0, decays toward the floor with volume (the Founder cold-start directive).
+    w0 = CONFIG.w_cohort_effective(0)
+    w_half = CONFIG.w_cohort_effective(25)
+    w_big = CONFIG.w_cohort_effective(100000)
+    floor = CONFIG.cohort["cohort"]["w_cohort_floor"]
+    assert w0 > w_half > w_big
+    assert round(w_big, 4) == round(floor, 4)  # asymptotes to the floor
+    # ctx carries interaction_count through to the effective weight in score()
+    theta = derive_theta(HH["single_professional_blr"])
+    cat = Catalogue()
+    obj = HH["single_professional_blr"].get("q15_objective")
+    dish, ctx = _lifted_dish_and_ctx(theta, cat)
+    assert dish is not None
+    cold = S.score(dish, theta, ctx, obj)
+    warm = S.score(dish, theta, dict(ctx, interaction_count=100000), obj)
+    assert cold > warm  # the same dish is lifted more for a brand-new household
 
 
 def test_real_catalogue_coverage_is_honest_not_padded():
     """Documents the actual, measured coverage rate against the real 810-dish catalogue: ~16%.
-    This is a floor-check, not a target — it fails loudly if coverage silently regresses to 0
-    (e.g. a broken path), and it must never be "fixed" by loosening the exact-match rule in
-    dish_to_class_code (see knowledge.py's module docstring on why fuzzy matching is deliberately
-    out of scope here)."""
+    Floor-check, not a target: fails loudly if coverage silently regresses to 0 (e.g. a broken
+    path), and must never be "fixed" by loosening the exact-match rule in dish_to_class_code."""
     if not os.path.isfile(_BUNDLE_CATALOGUE):
         return  # bundle not built in this environment; core-only tests still cover the mechanism
     dishes = json.load(open(_BUNDLE_CATALOGUE))

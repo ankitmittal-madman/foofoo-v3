@@ -227,11 +227,12 @@
         </div>
         <div class="step-body"><code>knowledge.dish_to_class_code()</code> looks up this dish's curated
         meal-class (131-class taxonomy, <code>Class_Dish_Options_v3</code>, 129/810 real dishes matched — an
-        honest ~16%, never fuzzy-guessed). <code>knowledge.cohort_class_mix()</code> live-matches this
-        household (home_state + household_type + D2 time_route) into <code>Cohort_Matrix_v3</code>'s 2952
-        cohorts and reads that cohort's actual class plan for this slot/day-type. If the dish's class is in
-        that plan, <code>scoring.s_cohort()</code> returns 1.0, else 0.0 — never a filter, never a candidate
-        gate, only a soft additive term.</div>
+        honest ~16%, never fuzzy-guessed). <b>Updated 2026-08-02 (WP-16):</b> <code>s_cohort</code> is now
+        a <b>GRADED [0,1]</b> class affinity from <code>cohort_intel.class_affinity()</code> — a factorized
+        log-linear model <b>LEARNED from the persona DB's 20,664-row <code>Weekly_Class_Plan_v3</code></b>
+        (not a single-cohort-row lookup), so it generalizes to household feature-combos the excel never
+        enumerated, and it applies the <code>City_Migration_Overlay_v3</code> blend (the MP-in-Mumbai
+        science). Still matched LIVE from θ, still never a filter or candidate gate — only a soft additive term.</div>
       </div>
 
       <div class="arrow">↓</div>
@@ -253,10 +254,12 @@
           <span><span class="step-tag tag-new">NEW · WP-15</span><span class="chev">▸</span></span>
         </div>
         <div class="step-body">Fills the Core Spine master formula's <code>w_cohort·S_cohort</code> term —
-        present in the frozen formula since Spine v1.0, unimplemented until WP-15.
-        <code>w_cohort = 0.15</code> (modest, given ~16% coverage — see <code>cohort_weights.yaml</code>).
-        <code>w_pref·S_pref</code> remains 0 (v1, no feedback data — same constraint WP-14 already
-        identified).</div>
+        present in the frozen formula since Spine v1.0, unimplemented until WP-15. <b>WP-16:</b>
+        <code>w_cohort</code> is now <b>cold-start-strong and decays with interaction volume</b>
+        (<code>w_cohort_effective(n)</code>: 0.60 at n=0 → 0.15 floor, half-life 25) so a brand-new
+        household's slate feels like the persona-DB plan. Because <code>feedback_events</code> is empty,
+        n=0 for every live household today — the decay exists, the data to move along it does not yet.
+        <code>w_pref·S_pref</code> remains 0 (no feedback data — same constraint WP-14 identified).</div>
       </div>
 
       <div class="arrow">↓</div>

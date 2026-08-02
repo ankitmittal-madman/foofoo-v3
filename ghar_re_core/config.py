@@ -156,9 +156,23 @@ class Config:
     # --- class-first cohort weight (cohort_weights.yaml <- WP-15 / master-formula w_cohort) ---
     @property
     def w_cohort(self):
-        """The w_cohort weight in the Core Spine master formula's `w_cohort·S_cohort` term
-        (WP-15's implementation of it — see scoring.s_cohort / knowledge.cohort_class_mix)."""
+        """The legacy WP-15 w_cohort weight (= the WP-16 decay floor). Kept for back-compat; live
+        scoring uses w_cohort_effective() below, which is cold-start-strong and decays with data."""
         return self.cohort["cohort"]["w_cohort"]
+
+    def w_cohort_effective(self, interaction_count=0):
+        """WP-16 cold-start-strong, decaying w_cohort weight for the master formula's
+        `w_cohort·S_cohort` term. At interaction_count=0 (a brand-new household — the state of
+        EVERY live household today, feedback_events being empty) this returns the strong cold-start
+        weight so the slate feels like the persona-DB plan; it decays toward the floor with a
+        configured half-life as real accept/reject signal accrues. All three numbers come from
+        cohort_weights.yaml — nothing hardcoded (Task 3 rule)."""
+        c = self.cohort["cohort"]
+        coldstart = c.get("w_cohort_coldstart", c["w_cohort"])
+        floor = c.get("w_cohort_floor", c["w_cohort"])
+        half = c.get("coldstart_halflife", 25)
+        n = max(0, interaction_count or 0)
+        return floor + (coldstart - floor) * (2.0 ** (-n / half))
 
     # --- community priors (community_priors.csv <- KB §C1) ---
     # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a
