@@ -2011,6 +2011,20 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">CI's `python3 -m ruff check ghar_re_core ghar_re_service` failed on a comment line in engine.py exceeding 100 chars, introduced by S57's WP-12 change. Wrapped it, and caught + fixed the same issue in a new WP-12 test assertion in test_service.py while verifying. ruff check and ruff format --check both pass on the touched files now; 3 pre-existing unformatted files elsewhere in ghar_re_service (never touched by this session) left alone, out of scope.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#9a3412"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fff7ed;color:#9a3412">S59</span>
+      <div class="tl-title">Confirmed dead code deleted — retired local RE engine + never-deployed onboarding function (17 files, ~4,900 lines)</div>
+      <div class="tl-chips">
+        <span class="tl-chip">import-graph verified, not substring-grepped</span>
+        <span class="tl-chip">di/container.ts's hidden live dependency found and fixed</span>
+        <span class="tl-chip">diag-re-check still live — no delete tool available</span>
+      </div>
+      <div class="tl-note">Founder asked to remove stubs/dummy data broadly; scoped it down via AskUserQuestion to "delete confirmed dead code" specifically, since other candidates (fallback.ts's error-handling, dev-only secret defaults, mocked weather) are deliberate working mechanisms, not dummy data, and removing them would make failures worse not better. Both prior audits (Aug 1 Claude, GPT) had flagged the onboarding Edge Function and its dependency tree as unreachable — verified this directly via precise import-line grep (not filename substring matching, which false-positives badly on generic names like index.ts/engine.ts/types.ts) before deleting anything. Found one real subtlety along the way: _shared/di/container.ts's onboardingOrchestrator getter statically imported the entire dead cluster into the LIVE consent function's deploy bundle via createContainer(), even though the getter itself was never invoked at runtime (consent/handler.ts only ever touches .consentService) — removed the getter and its imports, confirmed no live handler references the deleted classes. Deleted: onboarding/ (3 files, never deployed per S49-era list_edge_functions check), _shared/services/re/* (9 files, the retired local TS engine — live path uses the Fly.io ghar_re_core service instead), services/adapters/*, services/recommendations/service.ts, services/planning/persistence.ts, services/scheduler/nightly-plan.ts, and 3 test files that exclusively tested the deleted cluster (would've failed deno test/check on unresolved imports otherwise). Updated 3 stale doc-comments that named the deleted files. diag-re-check — a deployed diagnostic function with zero source in the repo, pure production drift — could NOT be removed: no delete_edge_function tool is exposed via this session's Supabase MCP access; flagged for manual removal via the dashboard/CLI. Remaining stub/dummy categories (DPDP function deployment, unused stub tables) await separate scoping per the Founder's own prioritization.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
