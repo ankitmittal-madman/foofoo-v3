@@ -79,6 +79,7 @@ containing a known-risk ingredient by name/alias (hing/asafoetida, plus anything
 wheat-adjacent in allergen_type) so this stays a visible, named, open P0 gap rather than one that
 disappears into a catalogue that LOOKS allergen-safe.
 """
+
 from __future__ import annotations
 
 import csv
@@ -110,7 +111,12 @@ SIG_SCORES_CSV = "sig_scores_v1.csv"
 # Ingredient categories (ingredients_v5.csv `category` column) treated as "the point of the dish"
 # for the is_main approximation. See module docstring's known blind spot re: dairy/paneer.
 MAIN_INGREDIENT_CATEGORIES = {
-    "meat", "seafood", "egg", "lentil_legume", "vegetable", "leafy_green",
+    "meat",
+    "seafood",
+    "egg",
+    "lentil_legume",
+    "vegetable",
+    "leafy_green",
 }
 
 # Known-risk ingredient names/aliases for the hidden-allergen-derivative gap report. hing is the
@@ -270,9 +276,7 @@ def _hero_role(cats: set[str], name: str, first_ingredient_diet: str | None) -> 
 
 def _diet(resolved_ingredients: list[tuple[str, bool]], ing_map: dict[str, dict]) -> str:
     diet_types = {
-        ing_map[name]["diet_type"]
-        for name, ok in resolved_ingredients
-        if ok and name in ing_map
+        ing_map[name]["diet_type"] for name, ok in resolved_ingredients if ok and name in ing_map
     }
     if "non_veg" in diet_types:
         return "non_veg"
@@ -312,7 +316,8 @@ def transform_dish_row(
         report.incomplete_ing_blocks.append((name, unresolved))
 
     hidden_risk_hits = [
-        tok for tok, _ok in resolved
+        tok
+        for tok, _ok in resolved
         if tok.strip().lower() in HIDDEN_ALLERGEN_RISK_NAMES
         or alias_map.get(tok.strip().lower(), "").lower() in HIDDEN_ALLERGEN_RISK_NAMES
     ]
@@ -331,9 +336,7 @@ def transform_dish_row(
         )
         for resolved_name, _ok in resolved
     ]
-    first_ingredient_diet = (
-        ing_map.get(resolved[0][0], {}).get("diet_type") if resolved else None
-    )
+    first_ingredient_diet = ing_map.get(resolved[0][0], {}).get("diet_type") if resolved else None
 
     cuisine = row["Cuisines"]
     if cuisine not in cuisine_map:

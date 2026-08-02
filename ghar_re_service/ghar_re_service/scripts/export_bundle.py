@@ -79,8 +79,7 @@ DEFAULT_OUT_DIR = os.path.join(_SERVICE_ROOT, "data", "bundle")
 
 BUNDLE_FORMAT_VERSION = 1
 CATALOGUE_SOURCE = (
-    "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue "
-    "(real 810-dish catalogue)"
+    "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue (real 810-dish catalogue)"
 )
 
 

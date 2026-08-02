@@ -13,6 +13,7 @@ own dependency direction (ghar_re_service depends on ghar_re_core, never the rev
 
 Usage: python -m ghar_re_service.scripts.golden_master_real_catalogue_report
 """
+
 from __future__ import annotations
 
 from typing import cast
@@ -46,9 +47,11 @@ def main() -> None:
     sig_none_names = {d["name"] for d in real_dishes if d["sig_band"] is None}
 
     print(f"Fixture catalogue: {len(fixture_cat.dishes)} dishes")
-    print(f"Real catalogue:    {len(real_cat.dishes)} dishes "
-          f"({len(sig_none_names)} with sig_band=None, "
-          f"{len(real_cat.dishes) - len(sig_none_names)} KB-matched)")
+    print(
+        f"Real catalogue:    {len(real_cat.dishes)} dishes "
+        f"({len(sig_none_names)} with sig_band=None, "
+        f"{len(real_cat.dishes) - len(sig_none_names)} KB-matched)"
+    )
     print()
 
     print("=== Baseline: 39-dish fixture run vs committed golden JSON ===")
@@ -63,10 +66,14 @@ def main() -> None:
             print(f"  [PASS] {id_key}: exact match, no drift")
         else:
             baseline_fail += 1
-            print(f"  [FAIL] {id_key}: MISMATCH vs committed golden — this would be a real "
-                  f"scoring regression, independent of the Phase G catalogue swap")
-    print(f"  -> {baseline_pass} passed, {baseline_fail} failed "
-          f"(out of {len(GOLDEN_CASES)} household+context cases)")
+            print(
+                f"  [FAIL] {id_key}: MISMATCH vs committed golden — this would be a real "
+                f"scoring regression, independent of the Phase G catalogue swap"
+            )
+    print(
+        f"  -> {baseline_pass} passed, {baseline_fail} failed "
+        f"(out of {len(GOLDEN_CASES)} household+context cases)"
+    )
     print()
 
     print("=== Real 810-dish catalogue run: same household+context cases ===")
@@ -81,15 +88,18 @@ def main() -> None:
         fixture_plates = [_plate_summary(p) for p in res_fixture["plates"]]
         real_plates = [_plate_summary(p) for p in res_real["plates"]]
         if len(fixture_plates) != len(real_plates):
-            print(f"  *** PLATE COUNT DIFFERS: fixture={len(fixture_plates)} "
-                  f"real={len(real_plates)} -- flagged below, not silently ignored ***")
+            print(
+                f"  *** PLATE COUNT DIFFERS: fixture={len(fixture_plates)} "
+                f"real={len(real_plates)} -- flagged below, not silently ignored ***"
+            )
         for i, (fp, rp) in enumerate(zip(fixture_plates, real_plates, strict=False)):
             same_form = fp["form"] == rp["form"]
             same_hero = fp["hero_dish"] == rp["hero_dish"]
-            print(f"  plate {i}: fixture form={fp['form']!r} hero={fp['hero_dish']!r} "
-                  f"score={fp['score']}  |  real form={rp['form']!r} hero={rp['hero_dish']!r} "
-                  f"score={rp['score']}"
-                  + ("" if (same_form and same_hero) else "  <-- DIFFERS"))
+            print(
+                f"  plate {i}: fixture form={fp['form']!r} hero={fp['hero_dish']!r} "
+                f"score={fp['score']}  |  real form={rp['form']!r} hero={rp['hero_dish']!r} "
+                f"score={rp['score']}" + ("" if (same_form and same_hero) else "  <-- DIFFERS")
+            )
             for slot_name in ("hero_dish", "dry", "liquid"):
                 name = rp[slot_name]
                 total_dish_slots += 1 if name else 0
@@ -98,9 +108,11 @@ def main() -> None:
 
     print()
     print("=== sig_band=None fix: how often was it actually exercised ===")
-    print(f"  {len(exercised_sig_none)} of {total_dish_slots} served dish-slots (hero/dry/liquid, "
-          f"across all {len(GOLDEN_CASES)} households' plates) were filled by a dish with "
-          f"sig_band=None -- i.e. a dish that would have raised KeyError without the Task 3a fix.")
+    print(
+        f"  {len(exercised_sig_none)} of {total_dish_slots} served dish-slots (hero/dry/liquid, "
+        f"across all {len(GOLDEN_CASES)} households' plates) were filled by a dish with "
+        f"sig_band=None -- i.e. a dish that would have raised KeyError without the Task 3a fix."
+    )
     for id_key, plate_idx, slot_name, name in sorted(exercised_sig_none):
         print(f"    {id_key} plate {plate_idx} [{slot_name}]: {name!r}")
 
