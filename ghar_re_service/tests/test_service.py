@@ -119,7 +119,9 @@ def test_recommendations_include_decision_trace(client):
     assert 0 <= len(trace["alternatives_considered"]) <= 5
     # opting into the trace must never change which plates are actually served
     plain = _post(client, _req("couple_mumbai_mh")).json()
-    assert [p["hero_dish_ids"] for p in body["plates"]] == [p["hero_dish_ids"] for p in plain["plates"]]
+    traced_ids = [p["hero_dish_ids"] for p in body["plates"]]
+    plain_ids = [p["hero_dish_ids"] for p in plain["plates"]]
+    assert traced_ids == plain_ids
 
 
 def test_recommendations_tolerates_unknown_fields(client):
