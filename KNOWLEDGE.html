@@ -1926,6 +1926,20 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Founder hit the exact same "Internal server error" on step 1 again, immediately after S49's onboarding_sessions fix. Pulled fresh live Postgres logs rather than assuming it was the same already-fixed bug: this time the FK violation was on public.household_answers, not onboarding_sessions — S49's fix only repointed one of the two tables household/handler.ts writes before a profiles row can exist. household_answers.profile_id had the identical `PRIMARY KEY REFERENCES public.profiles(id)` shape; step 2 (upsertHouseholdAnswers) upserts it on every call, including a brand-new signup's very first one. Repointed to auth.users(id) — migration 043 + rollback, applied directly to the live project and verified via pg_constraint. household_context and recommendation_events were checked too: neither is written during the pre-profile onboarding path, so they're not affected. Next: Founder to retry onboarding end-to-end again; if it 500s a third time, check whether any other public-schema table with a profiles(id) FK is written before household_members's existing exists-gate gets there.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#b91c1c"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fef2f2;color:#b91c1c">S53</span>
+      <div class="tl-title">Third P0 onboarding 500: mobile app was sending the full state name instead of its 2-letter code</div>
+      <div class="tl-chips">
+        <span class="tl-chip">mobile/src/onboarding/toHouseholdWrite.ts</span>
+        <span class="tl-chip">STATE_NAME_TO_CODE, all 36 states/UTs</span>
+        <span class="tl-chip">frontend fix, not a DB migration</span>
+      </div>
+      <div class="tl-note">Founder hit another 500 on a fresh test profile at step 5 (profile creation, gated on the 5 required fields, finally attempting to fire). Fresh Postgres logs showed a DIFFERENT FK violation this time: "insert or update on table \"profiles\" violates foreign key constraint \"profiles_home_state_fkey\"". Traced to indianStates.ts's Screen 2 picker: it lists full display names ("Madhya Pradesh") and step2ToScreens sent that name straight through as home_state's answer_value, but profiles.home_state REFERENCES re_engine.re_states(state_code) — the 2-letter code ("MP"), not the name. schema.ts's own validation only checks non-empty string, so this passed app-level validation every time and only ever failed at the DB insert. Verified the exact 36-state/UT name-to-code mapping against the live re_states table (exact match, no ambiguity) and added it as STATE_NAME_TO_CODE, mapped through in step2ToScreens — same pattern as the file's other _MAP constants. This is a MOBILE APP fix, not a database migration — no live DB change this time. Next: Founder to retest from create-id with a fresh profile once this deploys; any prior test profile that already recorded the bad state name in onboarding_sessions will self-correct the moment step 2 is resubmitted (latest answer wins).</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
