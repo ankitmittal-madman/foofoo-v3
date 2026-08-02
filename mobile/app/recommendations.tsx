@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet } from "react-native";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { router, Redirect } from "expo-router";
 import { postRecommendations } from "@/api/recommendations";
+import { postFeedback } from "@/api/feedback";
 import { fetchOnboardingStatus } from "@/api/household";
 import { describeApiError } from "@/api/errorMessages";
-import type { Plate, RecommendationsResponse } from "@/api/types";
+import type { FeedbackEventType, Plate, RecommendationsResponse } from "@/api/types";
 
 /**
  * Phase 1: proves the wire, not the UI (task instruction §4) — plain list rendering of whatever
@@ -85,7 +87,7 @@ export default function Recommendations() {
         <Text style={styles.warning}>{data.warnings.join(" · ")}</Text>
       ) : null}
       {data?.plates.map((plate: Plate) => (
-        <PlateCard key={plate.plate_id} plate={plate} />
+        <PlateCard key={plate.plate_id} plate={plate} requestId={data.request_id} />
       ))}
       <Pressable style={styles.button} onPress={() => recsQuery.refetch()} disabled={recsQuery.isRefetching}>
         <Text style={styles.buttonText}>{recsQuery.isRefetching ? "Refreshing..." : "Refresh"}</Text>
@@ -99,12 +101,33 @@ export default function Recommendations() {
 
 /**
  * PlateCard — one recommended meal in the plates list, showing its dish name(s), any
- * supporting side, and a debug-style meta line (form + final score) useful while Phase 1
- * is proving the recommendation wire rather than a polished dish presentation.
- * @param plate - one plate object from the recommendations API response, as returned by the
- *                Recommendation Engine for the caller's household.
+ * supporting side, a debug-style meta line (form + final score) useful while Phase 1 is proving
+ * the recommendation wire rather than a polished dish presentation, and (WP-15) three feedback
+ * buttons that record what the user actually did with this plate via POST /v1/feedback.
+ *
+ * This is the mobile half of WP-15's feedback-capture instrumentation: `feedback_events` has
+ * existed since migration 038 but had no writer and no UI until now. Recording a reaction here
+ * has no effect on scoring yet (the Core Spine's `w_pref·S_pref` term stays pinned to 0 in v1) —
+ * this only starts building the history a future version could learn from.
+ * @param plate - one plate object from the recommendations API response.
+ * @param requestId - RecommendationsResponse.request_id, the only identifier the backend can
+ *                    resolve back to this specific recommendation (see api/feedback.ts).
  */
-function PlateCard({ plate }: { plate: Plate }) {
+function PlateCard({ plate, requestId }: { plate: Plate; requestId?: string }) {
+  const [sent, setSent] = useState<FeedbackEventType | null>(null);
+  const feedback = useMutation({
+    mutationFn: (eventType: FeedbackEventType) => {
+      if (!requestId) return Promise.reject(new Error("no request_id on this response"));
+      return postFeedback({
+        request_id: requestId,
+        event_type: eventType,
+        dish_name: plate.hero_dish_names?.[0],
+        slot: undefined,
+      });
+    },
+    onSuccess: (_data, eventType) => setSent(eventType),
+  });
+
   return (
     <View style={styles.card}>
       <Text style={styles.plateTitle}>
@@ -114,6 +137,40 @@ function PlateCard({ plate }: { plate: Plate }) {
       <Text style={styles.plateMeta}>
         {plate.form} · score {plate.final_score.toFixed(2)}
       </Text>
+      {sent ? (
+        <Text style={styles.feedbackSent}>
+          {sent === "like" ? "Thanks — glad you liked it!" : sent === "dislike"
+            ? "Got it — we'll show this less."
+            : "Noted, thanks!"}
+        </Text>
+      ) : (
+        <View style={styles.feedbackRow}>
+          <Pressable
+            style={styles.feedbackButton}
+            disabled={feedback.isPending || !requestId}
+            onPress={() => feedback.mutate("like")}
+          >
+            <Text style={styles.feedbackButtonText}>👍 Like</Text>
+          </Pressable>
+          <Pressable
+            style={styles.feedbackButton}
+            disabled={feedback.isPending || !requestId}
+            onPress={() => feedback.mutate("dislike")}
+          >
+            <Text style={styles.feedbackButtonText}>👎 Not for me</Text>
+          </Pressable>
+          <Pressable
+            style={styles.feedbackButton}
+            disabled={feedback.isPending || !requestId}
+            onPress={() => feedback.mutate("accept")}
+          >
+            <Text style={styles.feedbackButtonText}>✓ I'll cook this</Text>
+          </Pressable>
+        </View>
+      )}
+      {feedback.isError ? (
+        <Text style={styles.feedbackError}>Couldn't record that — try again.</Text>
+      ) : null}
     </View>
   );
 }
@@ -132,4 +189,15 @@ const styles = StyleSheet.create({
   secondaryButton: { alignItems: "center", padding: 8 },
   secondaryButtonText: { color: "#1F7A3F" },
   error: { color: "#C0392B", textAlign: "center" },
+  feedbackRow: { flexDirection: "row", gap: 8, marginTop: 6, flexWrap: "wrap" },
+  feedbackButton: {
+    borderWidth: 1,
+    borderColor: "#1F7A3F",
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  feedbackButtonText: { color: "#1F7A3F", fontSize: 13 },
+  feedbackSent: { color: "#1F7A3F", fontSize: 13, marginTop: 6 },
+  feedbackError: { color: "#C0392B", fontSize: 12, marginTop: 4 },
 });

@@ -97,6 +97,22 @@ export const API_ERRORS = {
     retriable: false,
     message: "Household setup is not complete yet — required profile fields are still missing.",
   },
+  /** 422 — well-formed feedback body, but event_type is not one of feedback_events.event_type's
+   *  CHECK values (migration 038). POST /v1/feedback, WP-15 feedback capture. */
+  ERR_FEEDBACK_EVENT_TYPE_INVALID: {
+    code: "ERR_FEEDBACK_EVENT_TYPE_INVALID",
+    httpStatus: 422,
+    retriable: false,
+    message: "event_type is not a recognized value.",
+  },
+  /** 404 — recommendation_event_id does not match any row in public.recommendation_events.
+   *  POST /v1/feedback, WP-15 feedback capture. */
+  ERR_RECOMMENDATION_EVENT_NOT_FOUND: {
+    code: "ERR_RECOMMENDATION_EVENT_NOT_FOUND",
+    httpStatus: 404,
+    retriable: false,
+    message: "Recommendation event not found.",
+  },
 } as const satisfies Record<string, ErrorSpec>;
 
 export type ApiErrorCode = keyof typeof API_ERRORS;
