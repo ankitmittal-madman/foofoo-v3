@@ -337,5 +337,11 @@ export function buildRequest(
   requestId: string,
 ): Record<string, unknown> {
   const context = { ...DEFAULT_CONTEXT, ...(contextOverride ?? {}) };
-  return { request_id: requestId, household, context };
+  // Always ask the RE for its decision trace (funnel + winners + near-miss alternatives) — this
+  // is what recordRecommendationEvent persists into recommendation_events.decision_trace so every
+  // request has a durable, per-user record of how the catalogue narrowed down to the served
+  // plates, not just the plates themselves. The RE only builds this payload when asked
+  // (ghar_re_core/decision_log.py), so requesting it is a small, bounded cost, not free — but
+  // WP-12 chose completeness (every event traced) over trimming it to on-demand.
+  return { request_id: requestId, household, context, include_decision_trace: true };
 }

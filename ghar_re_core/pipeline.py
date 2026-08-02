@@ -13,19 +13,33 @@ from ghar_re_core.derivation import derive_theta
 from ghar_re_core import pairing
 
 
-def recommend(household, ctx, catalogue=None):
-    """Run the full pipeline for one (household, context). Returns dict with theta + 7 plates."""
+def recommend(household, ctx, catalogue=None, with_trace=False):
+    """Run the full pipeline for one (household, context). Returns dict with theta + 7 plates.
+
+    `with_trace=True` additionally includes `decision_trace` in the result — the funnel
+    (catalogue_total -> after each hard filter -> final 7) plus the served plates and the
+    top near-miss alternatives with why each lost, for callers that want to expose or persist
+    "how did we get from the full catalogue to these plates" per request (see decision_log)."""
     cat = catalogue or Catalogue()
     theta = derive_theta(household)
     objective = household.get("q15_objective") or CONFIG.default_objective
-    plates = pairing.assemble_7(cat, theta, ctx, objective, n=7, household_label=household.get("label"))
-    return dict(
+    if with_trace:
+        plates, decision_trace = pairing.assemble_7(
+            cat, theta, ctx, objective, n=7, household_label=household.get("label"), with_trace=True,
+        )
+    else:
+        plates = pairing.assemble_7(cat, theta, ctx, objective, n=7, household_label=household.get("label"))
+        decision_trace = None
+    result = dict(
         household=household["label"],
         theta=theta,
         objective=objective,
         plates=plates,
         versions=CONFIG.versions,
     )
+    if with_trace:
+        result["decision_trace"] = decision_trace
+    return result
 
 
 def make_context(slot="dinner", season="transitional", weekday="Monday",

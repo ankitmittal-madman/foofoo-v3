@@ -36,6 +36,11 @@ export interface RecommendationEventInput {
   configVersion?: string;
   /** New user served neutral defaults — there is no profiles row to reference (see below). */
   stubbed?: boolean;
+  /** RE's decision_trace (funnel + winners + near-miss alternatives), stored as-is (jsonb) —
+   * present whenever the RE call succeeded, since compose.ts always sets
+   * include_decision_trace=true on the outgoing request (WP-12). Absent on fallback/error paths,
+   * since there was no RE decision to trace. */
+  decisionTrace?: unknown;
 }
 
 /**
@@ -80,6 +85,7 @@ export async function recordRecommendationEvent(
         detail: ev.detail ?? null,
         engine_version: ev.engineVersion ?? null,
         config_version: ev.configVersion ?? null,
+        decision_trace: ev.decisionTrace ?? null,
         data_source: "real",
       }),
       "recommendations.events.record",

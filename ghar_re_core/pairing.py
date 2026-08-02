@@ -193,7 +193,7 @@ def build_plates(catalogue, theta, ctx, objective):
     return plates, scores
 
 
-def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None):
+def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None, with_trace=False):
     """The final "which 7 plates does this household get" decision (§S4.6). Greedily walks every
     candidate plate best-score-first, skipping any plate that reuses an already-served hero dish
     (no-duplicate guard) and capping how many 'experimental'/discovery plates can be served
@@ -201,7 +201,13 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None):
     each chosen plate, optionally drops plates over a calorie target, logs the decision (see
     decision_log module), and returns the final list of plates actually served — the household's
     dish pool for this context. `n` defaults to 7 (one plate for each of the 7 configured slots);
-    `household_label` is passed through only for logging."""
+    `household_label` is passed through only for logging.
+
+    `with_trace=True` additionally returns (chosen, decision_trace) — the same funnel/winners/
+    alternatives payload log_assemble7_decision would log, built unconditionally via
+    decision_log.build_decision_trace() regardless of logger configuration, for callers (e.g.
+    pipeline.recommend()) that want to persist or return it rather than only log it."""
+    funnel = S.eligibility_funnel(catalogue, theta, ctx, shared_hero=True)
     plates, scores = build_plates(catalogue, theta, ctx, objective)
     plates.sort(key=lambda p: p["score"], reverse=True)
 
@@ -233,8 +239,11 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None):
     # Decision logging only (see decision_log module docstring): reads the already-decided
     # `plates`/`chosen`, never influences them. A no-op unless a handler is attached to the
     # "ghar_re_core.decision" logger.
-    decision_log.log_assemble7_decision(household_label, ctx, objective, plates, chosen)
+    decision_log.log_assemble7_decision(household_label, ctx, objective, plates, chosen, funnel)
 
+    if with_trace:
+        trace = decision_log.build_decision_trace(household_label, ctx, objective, plates, chosen, funnel)
+        return chosen, trace
     return chosen
 
 

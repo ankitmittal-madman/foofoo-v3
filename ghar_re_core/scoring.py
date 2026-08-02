@@ -98,6 +98,28 @@ def pass_calorie(plate_cals, ctx):
     return plate_cals <= target * (1 + eps)
 
 
+def eligibility_funnel(catalogue, theta, ctx, shared_hero=True):
+    """Non-authoritative, additive: replays eligible()'s EXACT filter order (A1-A5) over the
+    whole catalogue and reports how many dishes survive after each stage. NEVER used to decide
+    eligibility itself — eligible() below remains the sole source of truth for filtering; this
+    exists only so a caller can report the funnel breakdown ("802 total -> N after diet -> ...")
+    for observability, without eligible()'s early-return short-circuiting hiding the intermediate
+    counts. Reuses eligible()'s own pass_* functions, so the two can never silently drift apart.
+    Returns an ordered list of {"stage": str, "count": int} dicts, ending at the same count
+    len([d for d in catalogue if eligible(d, theta, ctx, shared_hero)]) would give."""
+    survivors = list(catalogue)  # materialize once — Catalogue is iterable but not sized
+    funnel = [{"stage": "catalogue_total", "count": len(survivors)}]
+    stages = [("after_diet_filter", pass_diet), ("after_jain_filter", pass_jain),
+              ("after_allergen_filter", pass_allergen)]
+    if shared_hero:
+        stages.append(("after_weaning_filter", pass_weaning))
+    stages.append(("after_fasting_filter", pass_mode_fasting))
+    for stage_name, check in stages:
+        survivors = [d for d in survivors if check(d, theta, ctx)]
+        funnel.append({"stage": stage_name, "count": len(survivors)})
+    return funnel
+
+
 def eligible(dish, theta, ctx, shared_hero=True):
     """All correctness/observance filters A1-A5 (A6 is plate-level, applied in pairing).
     shared_hero=False relaxes the weaning floor for the non-shared 'extra' plates of the 7."""

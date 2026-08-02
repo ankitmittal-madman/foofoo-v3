@@ -98,6 +98,30 @@ def test_recommendations_end_to_end(client):
     assert "Kanda Bhaji" in served
 
 
+def test_recommendations_omits_decision_trace_by_default(client):
+    r = _post(client, _req("couple_mumbai_mh"))
+    assert "decision_trace" not in r.json()
+
+
+def test_recommendations_include_decision_trace(client):
+    req = _req("couple_mumbai_mh")
+    req["include_decision_trace"] = True
+    r = _post(client, req)
+    assert r.status_code == 200
+    body = r.json()
+    trace = body["decision_trace"]
+    funnel = trace["funnel"]
+    assert funnel[0]["stage"] == "catalogue_total"
+    assert funnel[-1]["stage"] == "after_fasting_filter"
+    counts = [s["count"] for s in funnel]
+    assert counts == sorted(counts, reverse=True)
+    assert len(trace["winners"]) == len(body["plates"])
+    assert 0 <= len(trace["alternatives_considered"]) <= 5
+    # opting into the trace must never change which plates are actually served
+    plain = _post(client, _req("couple_mumbai_mh")).json()
+    assert [p["hero_dish_ids"] for p in body["plates"]] == [p["hero_dish_ids"] for p in plain["plates"]]
+
+
 def test_recommendations_tolerates_unknown_fields(client):
     req = _req()
     req["household"]["q99_future"] = "ignored"

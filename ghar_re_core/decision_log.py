@@ -40,21 +40,22 @@ def _plate_label(p) -> str:
     return plate_label(p)
 
 
-def log_assemble7_decision(household_label, ctx, objective, all_plates, chosen) -> None:
-    """Log one Assemble-7 decision. Call AFTER assemble_7 has already picked `chosen` from
-    `all_plates` — this function only reads both lists, never mutates or reorders them.
+def build_decision_trace(household_label, ctx, objective, all_plates, chosen, funnel=None) -> dict:
+    """Build the decision-trace dict for one Assemble-7 decision — the same payload
+    log_assemble7_decision below writes to the logger, but returned directly so a caller (e.g.
+    pipeline.recommend()) can include it in an API response regardless of whether any logging
+    handler is attached. Pure function: reads `all_plates`/`chosen`/`funnel`, never mutates them
+    and never influences what was already decided.
 
-    household_label: household["label"] from the fixtures/request, or None if unavailable
-        (the decision is still logged, just without a human-friendly household name).
+    household_label: household["label"] from the fixtures/request, or None if unavailable.
     ctx: the context dict (slot/season/weekday/... ) passed into assemble_7.
     objective: the resolved q15_objective string driving GAIN_Q15 weighting.
     all_plates: every candidate plate build_plates() scored, each already carrying 'score',
         'heroes', and 'experimental' — NOT yet filtered by the no-duplicate/discovery rules.
     chosen: the final list of plates actually served, already sorted best-first.
+    funnel: optional pre-computed scoring.eligibility_funnel() result (stage-by-stage dish
+        counts); included as-is under "funnel" when supplied, omitted entirely if None.
     """
-    if not LOG.isEnabledFor(logging.INFO):
-        return  # skip building the alternatives payload entirely when nobody is listening
-
     chosen_heroes: set = set()
     for p in chosen:
         chosen_heroes |= p["heroes"]
@@ -98,7 +99,7 @@ def log_assemble7_decision(household_label, ctx, objective, all_plates, chosen) 
             f"candidates passed the hard filters/pairing gates for this context."
         )
 
-    LOG.info(json.dumps({
+    trace = {
         "event": "re.assemble7_decision",
         "household": household_label,
         "slot": ctx.get("slot"),
@@ -106,4 +107,18 @@ def log_assemble7_decision(household_label, ctx, objective, all_plates, chosen) 
         "winners": winners,
         "alternatives_considered": alternatives,
         "reasoning": reasoning,
-    }, default=str))
+    }
+    if funnel is not None:
+        trace["funnel"] = funnel
+    return trace
+
+
+def log_assemble7_decision(household_label, ctx, objective, all_plates, chosen, funnel=None) -> None:
+    """Log one Assemble-7 decision via build_decision_trace() above. Call AFTER assemble_7 has
+    already picked `chosen` from `all_plates`. A no-op unless a handler is attached to the
+    "ghar_re_core.decision" logger (Python's standard "logging is a no-op until configured"
+    behaviour) — see the module docstring. Arguments match build_decision_trace()."""
+    if not LOG.isEnabledFor(logging.INFO):
+        return  # skip building the payload entirely when nobody is listening
+    trace = build_decision_trace(household_label, ctx, objective, all_plates, chosen, funnel)
+    LOG.info(json.dumps(trace, default=str))

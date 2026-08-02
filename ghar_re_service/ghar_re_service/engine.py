@@ -75,8 +75,12 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
     hh = build_household_dict(request["household"])
     ctx = build_context(request["context"])
     objective = hh.get("q15_objective") or config.default_objective
+    want_trace = bool(request.get("include_decision_trace"))
 
-    result = core_pipeline.recommend(hh, ctx, catalogue)  # the ONE implementation of the math
+    # the ONE implementation of the math; with_trace is opt-in and never changes which plates
+    # are served (decision_log module's own LOGGING-ONLY invariant, covered by
+    # ghar_re_core/tests/test_pipeline.py::test_decision_trace_never_changes_which_plates_are_served)
+    result = core_pipeline.recommend(hh, ctx, catalogue, with_trace=want_trace)
     plates_out: list[dict] = []
     warnings: list[str] = []
 
@@ -106,7 +110,7 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
             "for this household/context"
         )
 
-    return {
+    response = {
         "request_id": request_id,
         "api_version": API_VERSION,
         "engine_version": ENGINE_VERSION,
@@ -114,3 +118,6 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
         "plates": plates_out,
         "warnings": warnings,
     }
+    if want_trace and result.get("decision_trace") is not None:
+        response["decision_trace"] = result["decision_trace"]
+    return response

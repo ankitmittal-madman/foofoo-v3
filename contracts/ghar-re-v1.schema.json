@@ -102,7 +102,8 @@
       "properties": {
         "request_id": { "type": "string", "description": "UUID; if omitted the service generates one and echoes it back." },
         "household": { "$ref": "#/$defs/HouseholdRaw" },
-        "context": { "$ref": "#/$defs/HouseholdContext" }
+        "context": { "$ref": "#/$defs/HouseholdContext" },
+        "include_decision_trace": { "type": "boolean", "description": "Optional, defaults to false. When true, the response includes decision_trace: the funnel of how many catalogue dishes survived each hard filter (diet/jain/allergen/weaning/fasting), the served plates ranked, and the top near-miss alternatives with why each lost." }
       },
       "required": ["household", "context"]
     },
@@ -152,6 +153,11 @@
           "type": "array",
           "items": { "type": "string" },
           "description": "Non-fatal notes (e.g. 'only 5 of 7 plates could be formed'). Partial results are a valid 200, not an error (RE-DOC-10 §11)."
+        },
+        "decision_trace": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Present only when the request set include_decision_trace=true. Per-request explainability: funnel[] (ordered {stage, count} dish-survival counts through the hard filters), winners[] (the served plates, ranked), alternatives_considered[] (top near-misses with why_it_lost), and a plain-English reasoning string. Additive/open shape (RE-DOC-11 §6) — not further typed here."
         }
       },
       "required": ["request_id", "api_version", "engine_version", "config_version", "plates", "warnings"]

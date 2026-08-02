@@ -151,6 +151,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
           configVersion: typeof result.body.config_version === "string"
             ? result.body.config_version
             : undefined,
+          decisionTrace: result.body.decision_trace,
         });
         recordRequest(outcome);
         maybeLogSummary(log);

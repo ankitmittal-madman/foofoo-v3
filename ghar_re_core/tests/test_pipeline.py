@@ -303,3 +303,53 @@ def test_cuisine_zone_coverage():
             if zone is None:
                 unmapped.append((name, group))
     assert unmapped == [], f"cuisines with no resolvable zone (name, cuisine_group): {unmapped}"
+
+
+# ---------------------------------------------------------------------------
+# 15. decision_trace / funnel — recommend(with_trace=True) exposes how the catalogue narrows
+# down to the 7 served plates, per household+context (the funnel logging feature).
+# ---------------------------------------------------------------------------
+def test_recommend_without_trace_omits_decision_trace():
+    hh = HH["pure_veg_family"] if "pure_veg_family" in HH else next(iter(HH.values()))
+    res = recommend(hh, make_context(slot="dinner", season="transitional"), CAT)
+    assert "decision_trace" not in res, "decision_trace must be opt-in via with_trace=True"
+
+
+def test_decision_trace_funnel_is_monotonically_non_increasing_and_ends_at_eligible_count():
+    for k, hh in HH.items():
+        ctx = make_context(slot="dinner", season="transitional")
+        res = recommend(hh, ctx, CAT, with_trace=True)
+        funnel = res["decision_trace"]["funnel"]
+        assert funnel[0]["stage"] == "catalogue_total"
+        assert funnel[0]["count"] == len(list(CAT))
+        counts = [stage["count"] for stage in funnel]
+        assert counts == sorted(counts, reverse=True), f"{k}: funnel counts must never increase stage-to-stage"
+
+        # The funnel's last stage must agree exactly with eligible()'s own count for this
+        # household+context — eligibility_funnel() must never silently drift from eligible().
+        theta = derive_theta(hh)
+        eligible_count = sum(1 for d in CAT if S.eligible(d, theta, ctx, shared_hero=True))
+        assert funnel[-1]["count"] == eligible_count
+
+
+def test_decision_trace_winners_match_served_plates():
+    hh = next(iter(HH.values()))
+    res = recommend(hh, make_context(slot="dinner", season="transitional"), CAT, with_trace=True)
+    trace = res["decision_trace"]
+    assert len(trace["winners"]) == len(res["plates"])
+    assert len(trace["alternatives_considered"]) <= 5
+    for alt in trace["alternatives_considered"]:
+        assert alt["why_it_lost"]  # every alternative carries a concrete reason, never blank
+
+
+def test_decision_trace_never_changes_which_plates_are_served():
+    # LOGGING-ONLY invariant (decision_log module docstring): asking for the trace must never
+    # change the actual recommendation output.
+    for k, hh in HH.items():
+        ctx1 = make_context(slot="dinner", season="transitional")
+        ctx2 = make_context(slot="dinner", season="transitional")
+        plain = recommend(hh, ctx1, CAT)
+        traced = recommend(hh, ctx2, CAT, with_trace=True)
+        plain_ids = [p["dry"].name if p["form"] == "pair" else p["hero"].name for p in plain["plates"]]
+        traced_ids = [p["dry"].name if p["form"] == "pair" else p["hero"].name for p in traced["plates"]]
+        assert plain_ids == traced_ids, f"{k}: with_trace changed which plates were served"
