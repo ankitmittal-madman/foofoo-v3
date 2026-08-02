@@ -1998,6 +1998,19 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Founder asked whether every recommendation event is logged with the funnel of how many catalogue meals survive each filter stage. Traced the code and confirmed no — ghar_re_core/decision_log.py existed but is Python logging, inert unless a handler is attached, and grep confirmed the deployed ghar_re_service never attaches one or calls it — dead code in production. Implemented the real thing: scoring.py's new eligibility_funnel() replays eligible()'s exact filter order to report per-stage dish counts (never influencing filtering itself); decision_log.py's logic was extracted into build_decision_trace() so it can be returned directly, not only logged; assemble_7()/recommend() gained an opt-in with_trace=True that returns the funnel + served plates + top-5 near-miss alternatives with concrete rejection reasons, with default behavior proven byte-for-byte unchanged via a dedicated test. Added additive include_decision_trace (request)/decision_trace (response) fields to the shared contract — both schemas already permitted additionalProperties so this is a documentation-level change, not a break, confirmed against both the Python jsonschema and TS Ajv validators. Wired ghar_re_service/engine.py to honor the flag, applied migration 044 (recommendation_events.decision_trace jsonb) to the live DB, and wired compose.ts/events.ts/handler.ts to always request and persist the trace. Verified locally: pip-installed a working pytest environment this session didn't have before (pyyaml/fastapi/httpx/jsonschema/openpyxl), ran the full ghar_re_core + ghar_re_service suites — 84 passed, 1 pre-existing unrelated failure (confirmed pre-existing by running it against an unmodified checkout first). Deno-side changes (compose.ts/events.ts/handler.ts) could not be run through deno test/deno check (still no deno binary in this sandbox) — verified instead by reading the Ajv validator's additionalProperties handling and confirming no test asserts an exact payload shape. Drafted WP-12 documenting all of this plus the one real gap: ghar_re_service has not been redeployed to Fly.io from this session (no flyctl/credentials here), so decision_trace will stay NULL on every live recommendation_events row until someone with Fly access redeploys — DB and Edge Function halves are live now, RE half is written but not shipped.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#64748b"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f1f5f9;color:#64748b">S58</span>
+      <div class="tl-title">re-ci ruff lint failure fixed on WP-12's engine.py comment</div>
+      <div class="tl-chips">
+        <span class="tl-chip">E501 line-too-long</span>
+        <span class="tl-chip">ruff check + format both clean</span>
+      </div>
+      <div class="tl-note">CI's `python3 -m ruff check ghar_re_core ghar_re_service` failed on a comment line in engine.py exceeding 100 chars, introduced by S57's WP-12 change. Wrapped it, and caught + fixed the same issue in a new WP-12 test assertion in test_service.py while verifying. ruff check and ruff format --check both pass on the touched files now; 3 pre-existing unformatted files elsewhere in ghar_re_service (never touched by this session) left alone, out of scope.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
