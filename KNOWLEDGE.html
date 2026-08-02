@@ -1859,6 +1859,20 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Root-caused the real reason the app's only test signups never finished onboarding, fixed it, and closed a live-security gap on two data-deletion endpoints before they ever went live unprotected. Next: the DPDP export/delete UI (the third P0) and a real end-to-end signup test.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#64748b"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f1f5f9;color:#64748b">S48</span>
+      <div class="tl-title">CI deno fmt failure fixed on the two cron functions and the service-role guard</div>
+      <div class="tl-chips">
+        <span class="tl-chip">cron-retention-purge/index.ts</span>
+        <span class="tl-chip">cron-hard-delete/index.ts</span>
+        <span class="tl-chip">_shared/auth/service-role.ts</span>
+      </div>
+      <div class="tl-note">GitHub Actions' formatting check was failing on 3 files (over-width lines in the two cron entrypoints and the AppError call in service-role.ts). No local Deno toolchain available in this session, so the exact wraps CI reported were applied by hand rather than run through the formatter directly — same effect, no logic changed.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
