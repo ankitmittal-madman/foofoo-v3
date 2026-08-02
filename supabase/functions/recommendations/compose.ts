@@ -178,6 +178,30 @@ interface MemberRow {
   conditions: string[] | null;
 }
 
+// profiles.home_state is a 2-letter code ("MP") — it REFERENCES re_engine.re_states(state_code).
+// The RE keys every regional/cohort structure on the FULL NAME ("Madhya Pradesh"), so the code must
+// be mapped before the request is sent, or region resolution + the whole cohort layer silently
+// no-op and the household gets incoherent cross-regional plates (confirmed root cause, test_10).
+// The RE also normalizes this defensively (ghar_re_core.knowledge.normalize_state); doing it here
+// too fixes the request at the boundary whichever service redeploys first. Authoritative map:
+// mobile/src/onboarding/toHouseholdWrite.ts (name→code) — this is its inverse.
+const STATE_CODE_TO_NAME: Record<string, string> = {
+  AN: "Andaman & Nicobar Islands", AP: "Andhra Pradesh", AR: "Arunachal Pradesh", AS: "Assam",
+  BR: "Bihar", CH: "Chandigarh", CT: "Chhattisgarh",
+  DN: "Dadra & Nagar Haveli and Daman & Diu", DL: "Delhi", GA: "Goa", GJ: "Gujarat", HR: "Haryana",
+  HP: "Himachal Pradesh", JK: "Jammu & Kashmir", JH: "Jharkhand", KA: "Karnataka", KL: "Kerala",
+  LA: "Ladakh", LD: "Lakshadweep", MP: "Madhya Pradesh", MH: "Maharashtra", MN: "Manipur",
+  ML: "Meghalaya", MZ: "Mizoram", NL: "Nagaland", OD: "Odisha", PY: "Puducherry", PB: "Punjab",
+  RJ: "Rajasthan", SK: "Sikkim", TN: "Tamil Nadu", TS: "Telangana", TR: "Tripura",
+  UP: "Uttar Pradesh", UK: "Uttarakhand", WB: "West Bengal",
+};
+
+/** Map a 2-letter state code to its full name; pass through full names / unknown tokens unchanged. */
+function normalizeStateCode(value: string | null): string | null {
+  if (value == null) return value;
+  return STATE_CODE_TO_NAME[value.trim().toUpperCase()] ?? value;
+}
+
 /** Assemble HouseholdRaw from the three live row sets. Exported for direct unit testing. */
 export function composeHouseholdRaw(
   profile: ProfileRow,
@@ -190,7 +214,7 @@ export function composeHouseholdRaw(
     // q8: either signal means Jain — religious_pref is the primary field, but diet_type='jain' is
     // permitted by the profiles CHECK constraint too, so both are honoured (fail-safe direction).
     q8_is_jain: profile.religious_pref === "jain" || profile.diet_type === "jain",
-    q3_home_state: profile.home_state ?? NEW_HOUSEHOLD.q3_home_state,
+    q3_home_state: normalizeStateCode(profile.home_state) ?? NEW_HOUSEHOLD.q3_home_state,
     q4_current_city: profile.current_city ?? NEW_HOUSEHOLD.q4_current_city,
     q5_diet: profile.diet_type ?? NEW_HOUSEHOLD.q5_diet,
     q9_allergies: allergenTokens(profile.allergen_flags ?? 0),
