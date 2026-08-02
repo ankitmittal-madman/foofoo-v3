@@ -665,8 +665,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">⚙️</span> S45 · All dotfiles skills vendored, slash-command gate removed
       <span class="nav-badge">Jul 30</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s46')">
+    <div class="nav-item" onclick="showPage('s46')">
       <span class="nav-icon">🗄</span> S46 · Live DB reconciled, Fly.io RE verified
+      <span class="nav-badge">Aug 1</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s47')">
+      <span class="nav-icon">🛠</span> S47 · Two P0 launch blockers fixed
       <span class="nav-badge">Aug 1</span>
     </div>
     <!-- NAV_INJECT -->
@@ -682,7 +686,7 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">194</span>
+      <span class="nav-badge">198</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -1841,6 +1845,20 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Database now matches the repo and a security scanner CRITICAL is cleared; Fly.io deployment proven reachable and correctly wired end-to-end. Next: get real onboarding traffic through the recommendations screen to confirm it under real conditions.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 1, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#9a3412"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fff7ed;color:#9a3412">S47</span>
+      <div class="tl-title">Two P0 launch blockers fixed and deployed live</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s47')">CORS preflight fixed</span>
+        <span class="tl-chip" onclick="showPage('s47')">cron endpoints authenticated</span>
+        <span class="tl-chip" onclick="showPage('s47')">5 functions redeployed</span>
+      </div>
+      <div class="tl-note">Root-caused the real reason the app's only test signups never finished onboarding, fixed it, and closed a live-security gap on two data-deletion endpoints before they ever went live unprotected. Next: the DPDP export/delete UI (the third P0) and a real end-to-end signup test.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2421,6 +2439,36 @@ function deepDiveFeature(featureLabel){
     <td class="fr-session">S46</td>
     <td class="fr-desc">Already committed in an earlier session; actually applied to the live database for the first time this session</td>
   </tr>
+  <tr>
+    <td class="fr-file mono">supabase/functions/_shared/api/handler.ts</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Answers a browser's CORS preflight request directly, before the login check runs</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/functions/_shared/auth/service-role.ts</td>
+    <td><span class="tag tag-new">New</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Requires the exact project service credential for scheduled-job endpoints</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/config.toml</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Removed the verify_jwt=false override for the two cron functions</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/functions/cron-hard-delete/index.ts</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Now requires the service credential; deployed live for the first time</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">supabase/functions/cron-retention-purge/index.ts</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S47</td>
+    <td class="fr-desc">Now requires the service credential; deployed live for the first time</td>
+  </tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -2810,6 +2858,21 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why report the "database is empty" claim as wrong instead of quietly correcting it?</div>
     <div class="decision-a">The repo's standing rule is never to trust a prior summary over live evidence, and to say so explicitly when an earlier claim turns out to be wrong &mdash; even one made minutes earlier in the same session &mdash; rather than let an inaccurate statement stand uncorrected.</div>
     <div class="decision-meta">S46 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Fix the CORS bug in the one shared handler, or per-function?</div>
+    <div class="decision-a">Fixed once in _shared/api/handler.ts, since every client-facing function is built from it (defineHandler). Fixing it there means it's impossible for a future function to ship without the fix, versus remembering to add it everywhere.</div>
+    <div class="decision-meta">S47 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">How to authenticate the scheduled deletion jobs, given they can't use a normal login token?</div>
+    <div class="decision-a">Built a dedicated check that compares the request's credential directly against the project's own service-role key, since that's exactly what the scheduler is documented to send. Reusing the standard login-check middleware wasn't possible &mdash; it specifically verifies end-user tokens and would reject the service credential.</div>
+    <div class="decision-meta">S47 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why redeploy the functions instead of just committing the code fix?</div>
+    <div class="decision-a">Supabase Edge Functions each bundle their own copy of the shared code at deploy time &mdash; a repo commit alone doesn't change what's actually running live. All 5 affected functions were redeployed with the fix in the same session.</div>
+    <div class="decision-meta">S47 &middot; Aug 1, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -7238,7 +7301,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s45 -->
 
-  <div id="page-s46" class="page-content">
+  <div id="page-s46" class="page-content" style="display:none">
 
     <div class="page-header">
       <div class="page-title">S46 &middot; Live database reconciled with the repo, and the Fly.io recommendation engine verified working</div>
@@ -7633,6 +7696,184 @@ function deepDiveFeature(featureLabel){
     </script>
 
   </div><!-- /page-s46 -->
+
+  <div id="page-s47" class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">S47 &middot; Two of the fresh audit's P0 launch blockers fixed and deployed live</div>
+      <div class="page-subtitle">Root-caused the real reason the app's only two test signups never finished onboarding (a browser CORS bug), and closed two Edge Functions that would have shipped completely unauthenticated.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">&#9940; Before this session</div>
+        <div class="impact-text">Anyone testing the app from a browser (the web target) silently failed at the household step &mdash; the platform rejected the browser's CORS preflight before the real request was ever sent, with no useful error shown anywhere. Separately, two Edge Functions that delete real user data (cron-hard-delete, cron-retention-purge) had no authentication at all in their code, and were one deploy away from being callable by anyone on the internet.</div>
+      </div>
+      <div class="impact-arrow">&rarr;</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">&#9989; After this session</div>
+        <div class="impact-text">Browser/web callers now work &mdash; confirmed via the exact live log evidence that showed the bug in the first place. Both scheduled-deletion functions now require the project's own service-role credential and are deployed live for the first time with that protection already in place. All 5 live Edge Functions redeployed with the fixes (household, recommendations, consent, plus the 2 newly-deployed cron functions).</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">&#128193; Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/api/handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/auth/service-role.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/config.toml</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/cron-hard-delete/index.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/cron-retention-purge/index.ts</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 1, 2026<br>5 things touched</div>
+      </div>
+      <div class="session-card-desc">Two of the three P0 launch blockers from the fresh readiness audit are now closed. The CORS bug was found the same way the audit's "0 completed profiles" finding was discovered &mdash; by reading real Edge Function logs, not by guessing. Both fixes were redeployed to the live Supabase project (not just committed to the repo), since Edge Functions bundle their own copy of the shared code.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">2</div><div class="stat-l">Code files (1 new, 1 modified)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">5</div><div class="stat-l">Server fns redeployed live</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s47','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s47','detail')">Detail drill-down</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s47-swim" class="view-pane active">
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s47','cors-fix')">
+            <div class="step-num num-amber">1</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Browser preflight requests no longer rejected</span>
+                <span class="tag tag-mod">Modified</span>
+              </div>
+              <div class="step-desc">Every Edge Function now answers a browser's CORS preflight directly, before checking for a login token &mdash; matching how browsers actually work.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s47','cron-auth')">
+            <div class="step-num num-amber">2</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Scheduled deletion jobs now require the project's own credential</span>
+                <span class="tag tag-new">New</span>
+              </div>
+              <div class="step-desc">The two functions that permanently delete user data can no longer be triggered by just knowing their web address.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">The third P0 (DPDP export/delete has no button in the app) is still open &mdash; scoped out of this pass as a real frontend build. Also still needed: a real person actually completing onboarding end-to-end now that the CORS bug is fixed, to confirm the fix works outside of log analysis.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s47-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s47-cors-fix" onclick="toggleDetail('s47-cors-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">supabase/functions/_shared/api/handler.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s47-cors-fix">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s47-cors-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">This is the one shared wrapper every Edge Function is built from. It now recognizes a browser's CORS preflight request (an OPTIONS request browsers automatically send before certain real requests) and answers it directly with the right permissions &mdash; instead of letting it fall through to the login check, which was always going to reject it since preflight requests never carry a login token.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">A live log showing a real browser signup getting "OPTIONS | 401" repeatedly right after login</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">Preflight now answered before the login check runs; redeployed live to all 3 client-facing functions</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">real signup logs showed OPTIONS/401</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">traced to defineHandler's missing CORS handling</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">fixed in the one shared file</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">redeployed to household/recommendations/consent</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(req) });</span>  &larr; answered before any login/auth code runs</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why didn't this show up before now?</div>
+            <div class="dd-why-a">Only a browser (web) client triggers a CORS preflight at all &mdash; the native mobile app's network layer never does. Nobody had tested the web target with a real login until this session.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s47-cron-auth" onclick="toggleDetail('s47-cron-auth')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">supabase/functions/_shared/auth/service-role.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s47-cron-auth">&#9662;</span>
+        </div>
+        <div class="detail-drawer" id="draw-s47-cron-auth">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Checks that a request to one of the two scheduled data-deletion functions carries the project's own private service credential &mdash; not a regular user's login token, not nothing at all. Without this, the functions were completely open the moment they were deployed.</div>
+          <div class="dd-label">Input &#8594; Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in">
+              <div class="dd-io-label">Input</div>
+              <div class="dd-io-text">2 functions with no auth check and a gateway setting that disabled even basic login verification</div>
+            </div>
+            <div class="dd-io-arrow">&#8594;</div>
+            <div class="dd-io-col dd-io-out">
+              <div class="dd-io-label">Output</div>
+              <div class="dd-io-text">Both functions now require the exact service credential; deployed live for the first time with this in place</div>
+            </div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">audit flagged both functions as unauthenticated</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">confirmed neither was live yet</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">credential check added</span><span class="dd-arrow">&#8594;</span>
+            <span class="dd-node">deployed live with the fix already in place</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">if (!timingSafeEqual(token, ctx.config.supabaseServiceRoleKey)) throw ...</span>  &larr; rejects anything except the exact project credential, compared in a way that can't leak timing information</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just re-enable the standard login check instead of building something new?</div>
+            <div class="dd-why-a">The standard login check only verifies a regular user's token &mdash; it has no way to verify the special service credential these jobs are meant to use, and would actually reject it. A dedicated check was the only way to actually restrict this to the scheduler.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Build the DPDP export/delete UI (the third P0) so the backend logic that already exists becomes something a real user can actually trigger.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+  </div><!-- /page-s47 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

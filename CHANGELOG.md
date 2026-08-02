@@ -5,6 +5,21 @@
 
 ## [Unreleased]
 
+### Fixed
+- **Root-caused the "nobody completes onboarding" gap**: live Edge Function logs showed a real
+  test signup hitting `household` from a browser (Expo web) and getting a wall of
+  `OPTIONS | 401`. The platform gateway's `verify_jwt` check runs on the CORS preflight too,
+  which never carries an `Authorization` header by spec — so every browser-based caller failed
+  before the real request was ever sent. Fixed in `supabase/functions/_shared/api/handler.ts`:
+  `OPTIONS` is now answered directly with CORS headers before the auth pipeline runs. Redeployed
+  live to `household`, `recommendations`, `consent` (v5 each).
+- `cron-hard-delete`/`cron-retention-purge` previously shipped with `verify_jwt=false` and zero
+  application-level auth — a real gap (confirmed not yet live). Added
+  `supabase/functions/_shared/auth/service-role.ts` (`requireServiceRole()`), which requires the
+  caller's bearer token to exactly match the project's own service_role key. Removed the
+  `verify_jwt=false` override in `supabase/config.toml`. Deployed both functions live for the
+  first time with the fix already in place.
+
 ### Added
 - `CHANGELOG.md` (this file) — initialised by the `install-logging-infrastructure` skill.
 - Lightweight client logger `mobile/src/lib/logger.ts` (Expo/React Native, AsyncStorage-backed,
