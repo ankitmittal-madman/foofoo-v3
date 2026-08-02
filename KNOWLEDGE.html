@@ -1887,6 +1887,18 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Founder hit "Internal server error" on the very first onboarding screen (step 1 of 5). Confirmed via Supabase Postgres logs, not guessed from the minified client stack trace: household/handler.ts's step 1 writes to public.onboarding_sessions before step 3 can ever create the public.profiles row (profile creation is gated on 5 required fields that are themselves accumulated by reading onboarding_sessions back) — so onboarding_sessions.profile_id's FK to public.profiles(id) always failed on a brand-new signup's first call. profile_id has always really meant "the authenticated user id" (existing RLS policy already treats it that way), which exists in auth.users the instant someone is authenticated. Repointed the FK to auth.users(id) — migration 042 + matching rollback, applied directly to the live project (cmkswalqpmmqojwdmqbv) and verified via pg_constraint. No application code changed. Next: have the Founder retry the onboarding flow end-to-end to confirm step 1 now succeeds.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#64748b"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f1f5f9;color:#64748b">S50</span>
+      <div class="tl-title">Backend CI type-check failure fixed in household.test.ts</div>
+      <div class="tl-chips">
+        <span class="tl-chip">household.test.ts fake members store</span>
+      </div>
+      <div class="tl-note">CI's `deno test` type-check failed: the fake store's `members` array was typed `Record&lt;string, unknown&gt;[]`, but `upsertMembers`'s injected fake spreads `MemberWrite[]` into it — `MemberWrite` is an interface with no index signature, so TypeScript rejected the assignment. Retyped the array as `MemberWrite[]` (imported from household/schema.ts) rather than casting, since the fake only ever holds real MemberWrite values. No local Deno toolchain in this session to re-run the check directly; fix applied by reading the exact TS2345 error CI reported.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
