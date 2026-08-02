@@ -19,16 +19,17 @@ major_version = 15
 # Edge Functions verify JWT by default; individual functions opt out (e.g. /v1/health) in later WPs.
 verify_jwt = true
 
-# Scheduled/internal jobs (Phase F) — never reachable with a user JWT by design (DOC-P3-06 §04):
-# invoked by pg_cron/service-role, not a browser/mobile client. Registering the actual pg_cron
-# schedule is a separate, database/-scoped step (flagged in the Phase F work-package report, not
-# done here) — this config change only stops the platform gateway rejecting the scheduler's own
-# invocation for lack of a user JWT it was never meant to carry.
-[functions.cron-hard-delete]
-verify_jwt = false
-
-[functions.cron-retention-purge]
-verify_jwt = false
+# Scheduled/internal jobs (Phase F) — invoked by pg_cron via net.http_post carrying
+# `Authorization: Bearer <service_role key>` (see
+# ops/audits/audit-dpdp/RUNBOOK_schedule-retention-jobs-2026-07-30.md). A service_role key IS a
+# validly-signed project JWT, so it passes the platform gateway's default verify_jwt=true check
+# same as any other caller — no per-function override needed. A prior override here
+# (`verify_jwt = false`) removed gateway-level checking entirely, which combined with the absence
+# of any application-level check meant the bare URL, no token at all, could trigger a real
+# deletion run. Fixed this session: gateway check restored to the [functions] default above, and
+# requireServiceRole() (supabase/functions/_shared/auth/service-role.ts) now also rejects any
+# caller whose bearer token isn't this project's exact service_role key — closing the separate gap
+# where a regular signed-in user's own JWT would otherwise still pass gateway verification.
 
 [auth]
 enabled = true
