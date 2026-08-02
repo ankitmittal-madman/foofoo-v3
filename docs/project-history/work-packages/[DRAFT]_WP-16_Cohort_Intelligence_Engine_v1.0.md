@@ -68,7 +68,7 @@ Live evidence (real 810-dish catalogue, this session): a TN couple's cold-start 
 
 | ID | Item | What it needs |
 |---|---|---|
-| WP16-F1 | Raise dish→class coverage above ~16% (still 129/810; unchanged — a smarter model over a sparse dish→class map is still bounded by that map) | Founder-reviewed ingredient/genome-based matching (WP15-F1 carried forward; still exact-match-only by default) |
+| WP16-F1 | Raise dish→class coverage — **partially done**: 129 → **202/810** via a precision-safe, offline, unanimous-agreement matcher (`prepare_cohort_intel.generate_overrides` → committed `dish_class_overrides.csv`, consulted after the exact map; still NO runtime fuzzy). Ambiguous names (Chole, Poha) deliberately stay unmatched, not guessed. | Remaining ~75% needs founder-reviewed ingredient/genome matching for the genuinely ambiguous/absent names |
 | WP16-F2 | Consume `Meal_Class_Master_v3` richer per-class metadata (heaviness, cook_complexity) as an affinity refinement, not just class membership | A second signal in `class_affinity`; deliberately out of scope to keep this reviewable |
 | WP16-F3 | Add-on member plates (infant/toddler/pregnancy/lactation/elder) from `Addon_*` — generate an extra per-member plate as the RE-Visual shows | A pairing/assemble-7 change (new plate slot), not a shared-hero score term — a separate, larger design |
 | WP16-F4 | Calibrate `w_cohort_coldstart`/`halflife` and let the decay actually move | Real `feedback_events` volume (0 rows today) — the same blocking constraint as WP-14 Phase 3; the mechanism is built and disable-safe (set coldstart=floor) |

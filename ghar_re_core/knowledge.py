@@ -397,6 +397,7 @@ import csv as _csv
 import os as _os
 
 _DISH_TO_CLASS = None
+_DISH_OVERRIDES = None
 
 
 def _load_class_first_csv(name):
@@ -412,12 +413,23 @@ def _load_class_first_csv(name):
 
 
 def dish_to_class_code(dish_name):
-    """Curated dish_name -> meal_class_code lookup (Class_Dish_Options_v3, 1050 rows).
-    Case-insensitive EXACT match only — deliberately no fuzzy matching, so a coverage gap stays
-    an honest 0.0 rather than a guessed class. Returns None if this dish isn't in the curated set."""
-    global _DISH_TO_CLASS
+    """dish_name -> meal_class_code. Two static, checked-in sources, in precedence order:
+      1. the curated Class_Dish_Options_v3 map (case-insensitive EXACT match), then
+      2. dish_class_overrides.csv — WP16-F1's PRECISION-SAFE extension: real-catalogue dishes matched
+         offline to a class ONLY when every curated candidate agreed unanimously (see
+         prepare_cohort_intel.generate_overrides). Ambiguous names were left out, not guessed.
+    Still NO fuzzy matching at RUNTIME — both are static lookups, so a coverage gap stays an honest
+    0.0 rather than a live guess. Returns None if the dish is in neither source."""
+    global _DISH_TO_CLASS, _DISH_OVERRIDES
     if _DISH_TO_CLASS is None:
         _DISH_TO_CLASS = {}
         for r in _load_class_first_csv("class_dish_options.csv"):
             _DISH_TO_CLASS.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
-    return _DISH_TO_CLASS.get(dish_name.strip().lower())
+        _DISH_OVERRIDES = {}
+        try:
+            for r in _load_class_first_csv("dish_class_overrides.csv"):
+                _DISH_OVERRIDES.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
+        except FileNotFoundError:
+            pass  # overrides are optional; exact map still works without them
+    key = dish_name.strip().lower()
+    return _DISH_TO_CLASS.get(key) or _DISH_OVERRIDES.get(key)

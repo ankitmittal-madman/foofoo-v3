@@ -100,4 +100,6 @@ def test_real_catalogue_coverage_is_honest_not_padded():
     dishes = json.load(open(_BUNDLE_CATALOGUE))
     cat = Catalogue(dishes)
     matched = sum(1 for d in cat if K.dish_to_class_code(d.name))
-    assert 100 <= matched <= 160  # measured 129/810; wide-ish band so unrelated catalogue edits don't flake this
+    # WP16-F1 raised this from 129 (exact only) to 202 (exact + precision-safe unanimous overrides).
+    # Band, not a target: fails loudly on a silent regression to 0, without flaking on catalogue edits.
+    assert 175 <= matched <= 245

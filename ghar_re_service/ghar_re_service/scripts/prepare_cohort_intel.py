@@ -262,8 +262,70 @@ def train_model(wb, cohort_feats):
     return model
 
 
+import re  # noqa: E402  (kept near its only use — the offline override matcher below)
+
+CATALOGUE = os.path.join(REPO, "ghar_re_service", "data", "bundle", "catalogue.json")
+
+
+def _norm_tokens(name):
+    """Normalize a dish name to a token list for the override matcher: drop parenthetical
+    qualifiers ('Lassi (Sweet)' -> 'lassi'), lowercase, strip punctuation."""
+    name = re.sub(r"\([^)]*\)", "", name)
+    return re.sub(r"[^a-z0-9 ]", " ", name.lower()).split()
+
+
+def generate_overrides():
+    """WP16-F1: raise dish->class coverage PRECISION-SAFELY, offline, into a reviewed static file
+    (class_first_v1/dish_class_overrides.csv) that knowledge.dish_to_class_code consults AFTER the
+    exact curated map — so there is still NO fuzzy matching at runtime, only a checked-in lookup.
+
+    Rule: a real-catalogue dish that has no exact curated class is matched to a curated class ONLY
+    when EVERY curated dish name whose token set is a subset/superset of the dish's tokens agrees on
+    the same meal_class_code. Ambiguous dishes (e.g. 'Chole' -> chole-bhature vs rajma-chole; 'Poha'
+    -> multiple classes) stay unmatched (0.0) rather than being guessed wrong. This is deliberately
+    HIGH-PRECISION, not high-recall: a wrong class would push a dish into the wrong cohort plan,
+    which is worse than an honest 0. The output is committed and reviewable, never applied blind."""
+    if not os.path.isfile(CATALOGUE):
+        print("  (skip overrides: bundle catalogue.json not present)")
+        return
+    rows = list(_rows_csv(os.path.join(OUT, "class_dish_options.csv")))
+    exact = {}
+    cur = []  # (tokenset, class)
+    for r in rows:
+        toks = _norm_tokens(r["dish_name"])
+        if toks:
+            exact.setdefault(" ".join(toks), r["meal_class_code"])
+            cur.append((set(toks), r["meal_class_code"]))
+    with open(CATALOGUE) as cf:
+        dishes = [d["name"] for d in json.load(cf)]
+    overrides = []
+    for name in dishes:
+        toks = _norm_tokens(name)
+        key = " ".join(toks)
+        if not toks or key in exact:
+            continue  # empty or already covered by the exact curated map
+        dt = set(toks)
+        cands = {c for ts, c in cur if ts and (ts <= dt or dt <= ts)}
+        if len(cands) == 1:  # unanimous agreement -> safe
+            overrides.append((name, next(iter(cands))))
+    overrides.sort()
+    path = os.path.join(OUT, "dish_class_overrides.csv")
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["dish_name", "meal_class_code", "match_method"])
+        for name, code in overrides:
+            w.writerow([name, code, "unanimous_token_agreement"])
+    print(f"  wrote dish_class_overrides.csv ({len(overrides)} precision-safe overrides)")
+
+
+def _rows_csv(path):
+    """Small local CSV reader (the aux CSVs are already written by the time overrides run)."""
+    with open(path, newline="") as f:
+        yield from csv.DictReader(f)
+
+
 def main():
-    """Extract aux CSVs, then train and write cohort_class_model.json."""
+    """Extract aux CSVs, train the model, then generate the precision-safe dish->class overrides."""
     os.makedirs(OUT, exist_ok=True)
     wb = openpyxl.load_workbook(XLSX, read_only=True, data_only=True)
     extract_aux(wb)
@@ -278,6 +340,8 @@ def main():
         f"  wrote cohort_class_model.json ({model['meta']['n_label_examples']} label examples, "
         f"{len(model['slots'])} slot/day-type partitions, {size_kb:.0f} KB)"
     )
+    print("Generating precision-safe dish->class overrides (WP16-F1)...")
+    generate_overrides()
 
 
 if __name__ == "__main__":
