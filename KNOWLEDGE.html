@@ -1913,6 +1913,19 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Root-caused from CI's own stack trace (loadConfig throwing "Missing required environment variable" on a test's SECOND app() call), not guessed: household.test.ts's withEnv was a plain function doing `try { return fn(); } finally { ...cleanup... }` — since fn is async, fn() returns a pending promise immediately, so finally ran right away, wiping env vars and resetting the config cache while fn's own internal awaits were still pending. The first app() call inside a test always worked (its config read happens synchronously before fn() returns control); any second/third call ran after cleanup had already fired. Fixed by making withEnv async and awaiting fn() before cleanup. Exactly the 3 multi-call tests CI listed as failing, none of the single-call ones — consistent with the mechanism. Same copy-pasted bug exists (unexercised) in consent.test.ts, foundation.test.ts, and recommendations.test.ts — left alone since none of their current tests make more than one awaited call per withEnv block; flagged here for whoever adds one next.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#b91c1c"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fef2f2;color:#b91c1c">S52</span>
+      <div class="tl-title">P0 recurred on a second table: household_answers had the identical FK-ordering bug as onboarding_sessions</div>
+      <div class="tl-chips">
+        <span class="tl-chip">043_household_answers_profile_id_fk_to_auth_users.sql</span>
+        <span class="tl-chip">applied to live project, verified</span>
+      </div>
+      <div class="tl-note">Founder hit the exact same "Internal server error" on step 1 again, immediately after S49's onboarding_sessions fix. Pulled fresh live Postgres logs rather than assuming it was the same already-fixed bug: this time the FK violation was on public.household_answers, not onboarding_sessions — S49's fix only repointed one of the two tables household/handler.ts writes before a profiles row can exist. household_answers.profile_id had the identical `PRIMARY KEY REFERENCES public.profiles(id)` shape; step 2 (upsertHouseholdAnswers) upserts it on every call, including a brand-new signup's very first one. Repointed to auth.users(id) — migration 043 + rollback, applied directly to the live project and verified via pg_constraint. household_context and recommendation_events were checked too: neither is written during the pre-profile onboarding path, so they're not affected. Next: Founder to retry onboarding end-to-end again; if it 500s a third time, check whether any other public-schema table with a profiles(id) FK is written before household_members's existing exists-gate gets there.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
