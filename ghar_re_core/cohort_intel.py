@@ -189,7 +189,7 @@ def _softmax_scaled(scores):
 # Per-(household,slot/day-type) affinity cache. class_affinity() is called once per candidate dish
 # (~810/request) but depends only on theta + the ctx partition, so we compute the distribution once
 # and reuse it. Keyed by a signature of exactly the theta fields + ctx bits the computation reads.
-_AFF_CACHE = {}
+_AFF_CACHE: dict = {}
 _AFF_CACHE_MAX = 512
 
 
@@ -251,7 +251,7 @@ def _class_affinity_uncached(theta, ctx):
             blended[c] += w_nat            # national-modern push toward the overlay's modern classes
     top = max(blended.values()) if blended else 0.0
     if top <= 0:
-        return {c: 0.0 for c in vocab}
+        return dict.fromkeys(vocab, 0.0)
     return {c: round(blended[c] / top, 4) for c in vocab}
 
 

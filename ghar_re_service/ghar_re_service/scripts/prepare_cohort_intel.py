@@ -5,8 +5,8 @@ Reads data/source/Indian_Meal_Cohort_Persona_DB_v3.xlsx (the authored "science",
 produces the two RUNTIME artifacts the live engine actually loads (never the .xlsx at runtime):
 
   data/source/class_first_v1/
-    migration_overlay.csv      - City_Migration_Overlay_v3 (origin x destination -> home/local/national blend)
-    state_profile.csv          - State_Profile_v3 (state -> region_archetype, class pools, nonveg intensity)
+    migration_overlay.csv      - City_Migration_Overlay_v3 (origin x dest -> home/local/nat blend)
+    state_profile.csv          - State_Profile_v3 (state -> region_archetype, class pools, nonveg)
     nonveg_logic.csv           - NonVeg_Logic_v3 (state -> weekly nonveg/egg cadence)
     persona_master.csv         - Persona_Master_v3 (41 sub-cohort anchors + boost classes)
     subcohort_routing.csv      - Subcohort_Routing (main->sub cohort routing)
@@ -37,6 +37,7 @@ bundle lean (RE-DOC-10 section 8 baked-bundle contract).
 
 Run:  cd ghar_re_service && PYTHONPATH=..:. python3 -m ghar_re_service.scripts.prepare_cohort_intel
 """
+
 import csv
 import json
 import math
@@ -59,8 +60,12 @@ LAPLACE = 0.5  # smoothing so an unseen (feature,class) pair is small-but-nonzer
 # runtime by ghar_re_core.cohort_intel.theta_features() — that is the contract that makes the model
 # usable live rather than only replayable on the training cohorts.
 FEATURES = [
-    "state_ut", "region_archetype", "city_tier_code",
-    "main_cohort_id", "time_pressure", "nonveg_mode",
+    "state_ut",
+    "region_archetype",
+    "city_tier_code",
+    "main_cohort_id",
+    "time_pressure",
+    "nonveg_mode",
 ]
 
 
@@ -69,7 +74,7 @@ def _rows(ws):
     it = ws.iter_rows(values_only=True)
     header = [str(h) if h is not None else "" for h in next(it)]
     for r in it:
-        yield dict(zip(header, r))
+        yield dict(zip(header, r, strict=False))
 
 
 def _dump_csv(name, header, rows):
@@ -86,36 +91,93 @@ def _dump_csv(name, header, rows):
 def extract_aux(wb):
     """Extract the auxiliary reference sheets the runtime cohort layer joins against."""
     print("Extracting auxiliary CSVs...")
-    _dump_csv("migration_overlay.csv",
-              ["origin_state_ut", "destination_group_code", "destination_group_name",
-               "home_state_signature_weight", "current_city_lifestyle_weight",
-               "national_modern_weight", "overlay_meal_classes", "planning_rule"],
-              list(_rows(wb["City_Migration_Overlay_v3"])))
-    _dump_csv("state_profile.csv",
-              ["state_id", "state_ut", "region_archetype", "tier1_or_metro_proxy_cities",
-               "tier2_representative_cities", "nonveg_intensity", "primary_staple_base",
-               "breakfast_class_pool", "weekday_lunch_class_pool", "weekday_dinner_class_pool",
-               "weekend_special_class_pool", "snack_class_pool", "nonveg_class_pool"],
-              list(_rows(wb["State_Profile_v3"])))
-    _dump_csv("nonveg_logic.csv",
-              ["state_ut", "nonveg_intensity", "default_omnivore_meals_week",
-               "egg_meals_week_default", "chicken_meals_week_default",
-               "fish_or_seafood_meals_week_default", "mutton_or_red_meat_meals_week_default",
-               "preferred_nonveg_classes"],
-              list(_rows(wb["NonVeg_Logic_v3"])))
-    _dump_csv("persona_master.csv",
-              ["persona_id", "persona_name", "age_band", "household_stage", "lifecycle_health",
-               "cook_dependency", "time_pressure", "nonveg_mode", "bf_boost_classes",
-               "ld_boost_classes", "sn_boost_classes", "dn_boost_classes", "main_cohort_id",
-               "sub_cohort_id", "sub_cohort_label", "can_be_overlay"],
-              list(_rows(wb["Persona_Master_v3"])))
-    _dump_csv("subcohort_routing.csv",
-              ["main_cohort_id", "main_cohort_label", "sub_cohort_id", "sub_cohort_label",
-               "maps_to_persona_id", "persona_name", "show_as_chip_text"],
-              list(_rows(wb["Subcohort_Routing"])))
-    _dump_csv("main_cohort_hierarchy.csv",
-              ["main_cohort_id", "main_cohort_label", "user_understands_as"],
-              list(_rows(wb["Main_Cohort_Hierarchy"])))
+    _dump_csv(
+        "migration_overlay.csv",
+        [
+            "origin_state_ut",
+            "destination_group_code",
+            "destination_group_name",
+            "home_state_signature_weight",
+            "current_city_lifestyle_weight",
+            "national_modern_weight",
+            "overlay_meal_classes",
+            "planning_rule",
+        ],
+        list(_rows(wb["City_Migration_Overlay_v3"])),
+    )
+    _dump_csv(
+        "state_profile.csv",
+        [
+            "state_id",
+            "state_ut",
+            "region_archetype",
+            "tier1_or_metro_proxy_cities",
+            "tier2_representative_cities",
+            "nonveg_intensity",
+            "primary_staple_base",
+            "breakfast_class_pool",
+            "weekday_lunch_class_pool",
+            "weekday_dinner_class_pool",
+            "weekend_special_class_pool",
+            "snack_class_pool",
+            "nonveg_class_pool",
+        ],
+        list(_rows(wb["State_Profile_v3"])),
+    )
+    _dump_csv(
+        "nonveg_logic.csv",
+        [
+            "state_ut",
+            "nonveg_intensity",
+            "default_omnivore_meals_week",
+            "egg_meals_week_default",
+            "chicken_meals_week_default",
+            "fish_or_seafood_meals_week_default",
+            "mutton_or_red_meat_meals_week_default",
+            "preferred_nonveg_classes",
+        ],
+        list(_rows(wb["NonVeg_Logic_v3"])),
+    )
+    _dump_csv(
+        "persona_master.csv",
+        [
+            "persona_id",
+            "persona_name",
+            "age_band",
+            "household_stage",
+            "lifecycle_health",
+            "cook_dependency",
+            "time_pressure",
+            "nonveg_mode",
+            "bf_boost_classes",
+            "ld_boost_classes",
+            "sn_boost_classes",
+            "dn_boost_classes",
+            "main_cohort_id",
+            "sub_cohort_id",
+            "sub_cohort_label",
+            "can_be_overlay",
+        ],
+        list(_rows(wb["Persona_Master_v3"])),
+    )
+    _dump_csv(
+        "subcohort_routing.csv",
+        [
+            "main_cohort_id",
+            "main_cohort_label",
+            "sub_cohort_id",
+            "sub_cohort_label",
+            "maps_to_persona_id",
+            "persona_name",
+            "show_as_chip_text",
+        ],
+        list(_rows(wb["Subcohort_Routing"])),
+    )
+    _dump_csv(
+        "main_cohort_hierarchy.csv",
+        ["main_cohort_id", "main_cohort_label", "user_understands_as"],
+        list(_rows(wb["Main_Cohort_Hierarchy"])),
+    )
 
 
 def build_cohort_features(wb):
@@ -139,7 +201,7 @@ def build_cohort_features(wb):
 def train_model(wb, cohort_feats):
     """Fit the factorized class-affinity model from Weekly_Class_Plan_v3. Returns the JSON-able
     model dict. Counting-based ML: weighted class counts per (slot, day-type, feature, value),
-    turned into smoothed log-propensities. Deterministic — same xlsx always yields the same model."""
+    turned into smoothed log-propensities. Deterministic — same xlsx always gives the same model."""
     # counts[(slot, daytype)][feature][value][class] = weighted count
     counts = {(s, d): {f: {} for f in FEATURES} for s in SLOTS for d in DAYTYPES}
     classes = {(s, d): set() for s in SLOTS for d in DAYTYPES}
@@ -168,11 +230,16 @@ def train_model(wb, cohort_feats):
     model = {
         "meta": {
             "trained_from": "Indian_Meal_Cohort_Persona_DB_v3.xlsx :: Weekly_Class_Plan_v3",
-            "features": FEATURES, "rank_weights": RANK_WEIGHT, "laplace": LAPLACE,
-            "n_label_examples": n_examples, "model_type": "factorized_loglinear_naive_bayes",
-            "note": ("Per (slot,day-type,feature,value): smoothed class propensity. Runtime pools "
-                     "log-propensities across a household's feature values, softmax over classes, "
-                     "then scales so the top class = 1.0. See prepare_cohort_intel.py docstring."),
+            "features": FEATURES,
+            "rank_weights": RANK_WEIGHT,
+            "laplace": LAPLACE,
+            "n_label_examples": n_examples,
+            "model_type": "factorized_loglinear_naive_bayes",
+            "note": (
+                "Per (slot,day-type,feature,value): smoothed class propensity. Runtime pools "
+                "log-propensities across a household's feature values, softmax over classes, "
+                "then scales so the top class = 1.0. See prepare_cohort_intel.py docstring."
+            ),
         },
         "slots": {},
     }
@@ -207,8 +274,10 @@ def main():
     with open(path, "w") as f:
         json.dump(model, f, separators=(",", ":"), sort_keys=True)
     size_kb = os.path.getsize(path) / 1024.0
-    print(f"  wrote cohort_class_model.json ({model['meta']['n_label_examples']} label examples, "
-          f"{len(model['slots'])} slot/day-type partitions, {size_kb:.0f} KB)")
+    print(
+        f"  wrote cohort_class_model.json ({model['meta']['n_label_examples']} label examples, "
+        f"{len(model['slots'])} slot/day-type partitions, {size_kb:.0f} KB)"
+    )
 
 
 if __name__ == "__main__":
