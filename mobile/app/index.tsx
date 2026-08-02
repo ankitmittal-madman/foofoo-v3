@@ -32,11 +32,12 @@ export default function Index() {
 
   if (!session) return <Redirect href="/splash-2" />;
 
-  // On a failed status check (e.g. offline at cold start) we cannot safely assume onboarding is
-  // complete, so we fail toward onboarding rather than risk landing an incomplete profile on
-  // /recommendations (the exact HIGH finding this fixes). Re-entering onboarding for an
-  // already-complete profile is a harmless, idempotent no-op (household/handler.ts never
-  // re-creates an existing profile) — the two failure directions are not symmetric in cost.
-  const complete = statusQuery.data?.complete === true;
-  return <Redirect href={complete ? "/recommendations" : "/(onboarding)/consent"} />;
+  // TEMPORARY (testing, 2026-08-02): always restart the onboarding flow from the beginning on every
+  // app open, regardless of onboarding_completed, so a tester re-runs the full question flow each
+  // time and lands on a freshly-generated plate at the end. Re-entering onboarding for an already-
+  // complete profile is a harmless, idempotent no-op (household/handler.ts never re-creates an
+  // existing profile). REVERT this to the branch below before launch:
+  //   const complete = statusQuery.data?.complete === true;
+  //   return <Redirect href={complete ? "/recommendations" : "/(onboarding)/consent"} />;
+  return <Redirect href="/(onboarding)/consent" />;
 }
