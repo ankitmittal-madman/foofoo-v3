@@ -74,6 +74,23 @@ Live evidence (real 810-dish catalogue, this session): a TN couple's cold-start 
 | WP16-F4 | Calibrate `w_cohort_coldstart`/`halflife` and let the decay actually move | Real `feedback_events` volume (0 rows today) — the same blocking constraint as WP-14 Phase 3; the mechanism is built and disable-safe (set coldstart=floor) |
 | WP16-F5 | Persist a per-household `interaction_count` into `ctx` from real history (`household_context`/feedback) so the decay engages per user | The `household_context` wiring WP-14 Phase 0 already owns |
 
+## 6. WP-16.1 addendum — foreign-cuisine cold-start demote (2026-08-02, live-driven)
+
+Live testing (test_13: Gujarat couple in Pune) surfaced a real gap: with region now resolving
+correctly, a household's top plates became regionally coherent, but foreign dishes (zone=Global —
+Chinese/continental, 187/810 = 23% of the catalogue) still surfaced (e.g. "Veg Burger + Corn
+Chowder") because (a) they have no persona-DB class so `s_cohort=0` couldn't demote them, (b)
+`m_palette=0` doesn't penalise, only fails to reward, and (c) some carry an inflated `sig_score`
+(Veg Burger sig=0.75, a data-quality issue flagged separately). Since the persona-DB science is
+entirely regional Indian, a foreign dish is never on any cohort's plan. Added `s_foreign` +
+`CONFIG.foreign_demote_effective` (`cohort_weights.yaml::foreign_demote`): a cold-start-strong,
+decaying demote subtracted from zone=Global dishes on the same curve as `w_cohort`, so foreign food
+is pushed down for a brand-new regional household and resurfaces as real interest accrues.
+Config-gated (set `demote_coldstart: 0.0` to disable), soft (never a filter). Verified: test_13's
+slate drops "Veg Burger + Corn Chowder" and is all Indian regional, led by the correct Gujarati
+plates. Tunable product judgement — foreign food is legitimately popular in urban India, so it
+decays to a small floor rather than a hard exclusion. Open follow-up: correct inflated sig_scores.
+
 ## Critical Self-Review
 
 - The model is a **factorized Naive-Bayes-style affinity**, not deep learning or collaborative filtering. Calling it "ML" is accurate (parameters estimated from data, generalizes) but it is deliberately the *simplest* model that delivers generalization without fabricated data — a stronger model buys little until dish→class coverage (WP16-F1) and real feedback (WP16-F4) improve.

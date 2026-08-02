@@ -391,13 +391,25 @@ def s_cohort(dish, theta, ctx):
     return cohort_intel.class_affinity(theta, ctx).get(class_code, 0.0)
 
 
-def score(dish, theta, ctx, objective):
-    """score = BASE × GAIN_Q15 + w_cohort(n)·S_cohort  (+ w_pref·S_pref[=0 v1] − PENALTY[assemble]).
+def s_foreign(dish):
+    """§WP-16.1: 1.0 if this dish is foreign (zone=Global — Chinese/continental/etc.), else 0.0.
+    Foreign food is never in any persona-DB cohort plan, so at cold-start it carries a decaying
+    demote (see score / CONFIG.foreign_demote_effective). Never a filter — a soft demote only."""
+    return 1.0 if dish.zone == "Global" else 0.0
 
-    w_cohort(n) is the WP-16 cold-start-strong, decaying weight (CONFIG.w_cohort_effective), keyed
-    off ctx['interaction_count'] (0 for a new household — every live household today)."""
-    w = CONFIG.w_cohort_effective(ctx.get("interaction_count", 0))
-    return base(dish, theta, ctx) * gain_q15(dish, objective) + w * s_cohort(dish, theta, ctx)
+
+def score(dish, theta, ctx, objective):
+    """score = BASE × GAIN_Q15 + w_cohort(n)·S_cohort − foreign_demote(n)·S_foreign
+    (+ w_pref·S_pref[=0 v1] − PENALTY[assemble]).
+
+    Both cohort weight and foreign demote are WP-16 cold-start-strong, decaying with
+    ctx['interaction_count'] (0 for a new household — every live household today)."""
+    n = ctx.get("interaction_count", 0)
+    w = CONFIG.w_cohort_effective(n)
+    wf = CONFIG.foreign_demote_effective(n)
+    return (base(dish, theta, ctx) * gain_q15(dish, objective)
+            + w * s_cohort(dish, theta, ctx)
+            - wf * s_foreign(dish))
 
 
 # ---------------------------------------------------------------------------

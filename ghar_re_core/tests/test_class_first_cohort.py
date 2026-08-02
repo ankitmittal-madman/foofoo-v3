@@ -91,6 +91,28 @@ def test_coldstart_weight_decays_with_interaction_count():
     assert cold > warm  # the same dish is lifted more for a brand-new household
 
 
+def test_foreign_dishes_demoted_at_coldstart_and_decays():
+    """WP-16.1: a foreign (zone=Global) dish carries a cold-start demote that decays with interaction
+    volume; a regional Indian dish is never demoted. s_foreign is a pure 0/1 zone flag. Uses the real
+    bundle catalogue (the 39-dish fixture has no foreign dishes)."""
+    # the effective demote is strong at n=0 and decays toward the floor (config-level, no catalogue)
+    assert CONFIG.foreign_demote_effective(0) > CONFIG.foreign_demote_effective(100000)
+    if not os.path.isfile(_BUNDLE_CATALOGUE):
+        return  # bundle not built here; config-level decay still asserted above
+    cat = Catalogue(json.load(open(_BUNDLE_CATALOGUE)))
+    foreign = next(d for d in cat if d.zone == "Global")
+    indian = next(d for d in cat if d.zone and d.zone != "Global")
+    assert S.s_foreign(foreign) == 1.0 and S.s_foreign(indian) == 0.0
+    theta = derive_theta(HH["single_professional_blr"])
+    ctx = make_context(slot="dinner")
+    obj = HH["single_professional_blr"].get("q15_objective")
+    # the SAME foreign dish scores lower cold-start than warm; an Indian dish carries no foreign demote
+    assert S.score(foreign, theta, ctx, obj) < S.score(foreign, theta, dict(ctx, interaction_count=100000), obj)
+    base_gain = S.base(indian, theta, ctx) * S.gain_q15(indian, obj)
+    cohort_term = CONFIG.w_cohort_effective(0) * S.s_cohort(indian, theta, ctx)
+    assert round(S.score(indian, theta, ctx, obj), 6) == round(base_gain + cohort_term, 6)  # no demote term
+
+
 def test_real_catalogue_coverage_is_honest_not_padded():
     """Documents the actual, measured coverage rate against the real 810-dish catalogue: ~16%.
     Floor-check, not a target: fails loudly if coverage silently regresses to 0 (e.g. a broken

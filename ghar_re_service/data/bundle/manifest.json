@@ -1,6 +1,6 @@
 {
   "bundle_format": 1,
-  "bundle_version": "sha256:808edeffd6c5d9c1",
+  "bundle_version": "sha256:4a74e83c14c56e2f",
   "catalogue_sha256": "7fde22df7b9edc2585a453cb1ef50301214ca577f6f99010a93b1500be59a8f1",
   "catalogue_source": "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue (real 810-dish catalogue)",
   "config_sha256": {
@@ -16,7 +16,7 @@
     "class_first_v1/persona_master.csv": "5b7038e353114056f56ec207ba3b246379bfab51e0c291010c80089e4f9ccf8f",
     "class_first_v1/state_profile.csv": "5da0b8e8edf25a06e24401e25ec4cf6aff17cc1c96ddcfe9b9645c2f07ad5abb",
     "class_first_v1/subcohort_routing.csv": "1332849b7595216e0ac13c59ba76b315fed71a1226633a8b5a253419aafc83b3",
-    "cohort_weights.yaml": "23f7a98b293ec80078faec43bc8388ffdd2c13622a761e4486ddda90289cb536",
+    "cohort_weights.yaml": "773bce23fa0257215c6a2efe65244adcae7105ccd79d34bf8731f46842db02a0",
     "community_priors.csv": "a908e6a6b818acd446edbbd664392e503ddfe35376ffa2788b91d11e749617be",
     "derivation_params.yaml": "53042325b7819bcf5aff949b96efa7448ca99d1466c9f084c0485917f975f907",
     "distance_weights.yaml": "5e42767f74483c7e4469984c611f1dd8cef018ba1c9cc93be3fee1671eda9d6b",
@@ -26,6 +26,6 @@
     "q15_weights.yaml": "59aaccfff883b68a2b5a74a9947adf58de8a53d17f96b8e12ed1b7af791a0486",
     "weather_rules.yaml": "d69c4eac4967aa455d15d0b418d856841c67f8a91380740f9f2a7c40215911ad"
   },
-  "created_at": "2026-08-02T11:53:41.710622+00:00",
+  "created_at": "2026-08-02T13:41:04.621156+00:00",
   "dish_count": 810
 }

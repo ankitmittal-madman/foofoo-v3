@@ -174,6 +174,20 @@ class Config:
         n = max(0, interaction_count or 0)
         return floor + (coldstart - floor) * (2.0 ** (-n / half))
 
+    def foreign_demote_effective(self, interaction_count=0):
+        """WP-16.1 cold-start-strong, decaying demote subtracted from any foreign (zone=Global)
+        dish — the persona-DB science is entirely regional Indian, so foreign food has no cohort
+        anchor and should be pushed down for a brand-new regional household, resurfacing as real
+        interest accrues. Returns 0.0 if the foreign_demote block is absent (feature off)."""
+        fd = self.cohort.get("foreign_demote")
+        if not fd:
+            return 0.0
+        coldstart = fd.get("demote_coldstart", 0.0)
+        floor = fd.get("demote_floor", 0.0)
+        half = fd.get("halflife", 25)
+        n = max(0, interaction_count or 0)
+        return floor + (coldstart - floor) * (2.0 ** (-n / half))
+
     # --- community priors (community_priors.csv <- KB §C1) ---
     # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a
     # file themselves (RE-DOC-11 §1/§2). Keyed by state -> {state, zone, diet_lean, cadence}.

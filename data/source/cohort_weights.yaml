@@ -16,3 +16,18 @@ cohort:
   w_cohort_coldstart: 0.60    # strong at n=0 so cold-start feels like the persona-DB plan
   w_cohort_floor: 0.15        # asymptotic weight once the household is well-learned
   coldstart_halflife: 25      # interactions at which the extra cold-start lift has halved
+
+# FOREIGN-CUISINE COLD-START DEMOTE (WP-16.1). The persona-DB science is entirely REGIONAL INDIAN —
+# no cohort's class plan ever contains a foreign (zone=Global: Chinese/continental/etc.) dish, so at
+# cold-start a foreign dish has no cohort/palette anchor and can only rank on stray BASE terms
+# (e.g. an inflated sig_score — Veg Burger is mis-tagged sig=0.75). That let 23% of the catalogue
+# surface incoherently for regional households (test_13 Gujarat: "Veg Burger + Corn Chowder"). This
+# subtracts a demote from any zone=Global dish, COLD-START STRONG and decaying with interaction
+# volume on the SAME curve as w_cohort — so foreign food is pushed down for a brand-new regional
+# household but resurfaces naturally once someone actually accepts it. Set demote_coldstart: 0.0 to
+# disable entirely. This is a tunable product judgement (foreign food is legitimately popular in
+# urban India) — deliberately soft (a demote, never a hard filter), and it decays to a small floor.
+foreign_demote:
+  demote_coldstart: 0.80      # subtracted per zone=Global dish at n=0
+  demote_floor: 0.10          # asymptotic demote once the household is well-learned
+  halflife: 25                # same decay cadence as the cohort weight
