@@ -2,10 +2,11 @@
  * Hard-delete scheduler (Phase F) — LF-M03 `executeDataDeletion()`'s CRON half (DOC-P3-06 §06.8 /
  * DOC-P3-03 §15): "Hard-delete all personal data within 72h via CRON."
  *
- * Convention note: `_shared/services/scheduler/nightly-plan.ts` (LF-L01's CRON) was the only
- * existing scheduler in this codebase, and it was ITSELF never given a deployed Edge Function
- * entrypoint (confirmed by repo-wide search — only exercised in `_tests/re_integration.test.ts`).
- * This file follows the SAME shape (a pure, DI'd, unit-testable class + a separate deployed
+ * Convention note: `nightly-plan.ts` (LF-L01's CRON) was the only existing scheduler in this
+ * codebase at the time this file was written, and it was ITSELF never given a deployed Edge
+ * Function entrypoint (confirmed by repo-wide search — only exercised by its own tests). It and
+ * its test were deleted this session as confirmed dead code, unreachable from any live handler.
+ * This file follows the SAME shape it did (a pure, DI'd, unit-testable class + a separate deployed
  * entrypoint in `supabase/functions/cron-hard-delete/`) for consistency, per this task's own
  * instruction that "consistency between the two matters more than which exact mechanism you pick."
  * Registering the actual `pg_cron` schedule (`SELECT cron.schedule(...)`) is a `database/`-scoped

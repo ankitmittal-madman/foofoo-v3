@@ -9,8 +9,8 @@
  * Style/pattern deliberately mirrors recommendations/compose.ts and events.ts (direct
  * createServiceRoleClient calls, `if (error) throw error` — no repository/DI layer): those are the
  * established Phase C.5 convention for new `public`-schema write surfaces, not the older
- * repository-based pattern under `_shared/services/adapters/` (which backs the retired legacy RE
- * and is not the precedent to extend — S40 ground-truth audit).
+ * repository-based pattern that backed the retired legacy local RE (deleted this session — S40
+ * ground-truth audit confirmed it dead, unreachable from any live handler).
  */
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";

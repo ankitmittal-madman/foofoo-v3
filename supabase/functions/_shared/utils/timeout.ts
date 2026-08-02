@@ -30,8 +30,7 @@ export const DB_TIMEOUT_MS = 5000;
 /**
  * Race a promise against a timeout. On timeout, throws `AppError(ERROR_CATALOGUE.INTERNAL)` tagged
  * with `op` so logs/traces show exactly which internal call stalled — never leaked to the client
- * as anything but a generic 500 (DOC-P3-07), same discipline as `dbFail()` in
- * `_shared/services/adapters/supabase-stores.ts`.
+ * as anything but a generic 500 (DOC-P3-07).
  */
 export function withTimeout<T>(
   promise: PromiseLike<T>,
