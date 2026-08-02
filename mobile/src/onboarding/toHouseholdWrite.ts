@@ -100,10 +100,58 @@ export function step1ToScreens(a: OnboardingAnswers): ScreenAnswer[] {
   return screens;
 }
 
+// indianStates.ts's INDIAN_STATES is the full display name ("Madhya Pradesh"), but
+// profiles.home_state REFERENCES re_engine.re_states(state_code) — the 2-letter code ("MP"), not
+// the name. Verified 1:1 against the live re_states table (36 states/UTs, exact name match).
+const STATE_NAME_TO_CODE: Record<string, string> = {
+  "Andaman & Nicobar Islands": "AN",
+  "Andhra Pradesh": "AP",
+  "Arunachal Pradesh": "AR",
+  "Assam": "AS",
+  "Bihar": "BR",
+  "Chandigarh": "CH",
+  "Chhattisgarh": "CT",
+  "Dadra & Nagar Haveli and Daman & Diu": "DN",
+  "Delhi": "DL",
+  "Goa": "GA",
+  "Gujarat": "GJ",
+  "Haryana": "HR",
+  "Himachal Pradesh": "HP",
+  "Jammu & Kashmir": "JK",
+  "Jharkhand": "JH",
+  "Karnataka": "KA",
+  "Kerala": "KL",
+  "Ladakh": "LA",
+  "Lakshadweep": "LD",
+  "Madhya Pradesh": "MP",
+  "Maharashtra": "MH",
+  "Manipur": "MN",
+  "Meghalaya": "ML",
+  "Mizoram": "MZ",
+  "Nagaland": "NL",
+  "Odisha": "OD",
+  "Puducherry": "PY",
+  "Punjab": "PB",
+  "Rajasthan": "RJ",
+  "Sikkim": "SK",
+  "Tamil Nadu": "TN",
+  "Telangana": "TS",
+  "Tripura": "TR",
+  "Uttar Pradesh": "UP",
+  "Uttarakhand": "UK",
+  "West Bengal": "WB",
+};
+
 /** Screen 2 answers -> profiles.home_state/current_city (2 of the 5 profile-required fields). */
 export function step2ToScreens(a: OnboardingAnswers): ScreenAnswer[] {
   const screens: ScreenAnswer[] = [];
-  if (a.homeState) screens.push({ screen_id: "onboarding-step-2", question_key: "home_state", answer_value: a.homeState });
+  if (a.homeState) {
+    screens.push({
+      screen_id: "onboarding-step-2",
+      question_key: "home_state",
+      answer_value: STATE_NAME_TO_CODE[a.homeState] ?? a.homeState,
+    });
+  }
   if (a.currentCity) {
     screens.push({ screen_id: "onboarding-step-2", question_key: "current_city", answer_value: a.currentCity });
   }
