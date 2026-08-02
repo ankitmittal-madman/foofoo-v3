@@ -100,6 +100,27 @@ def test_migration_overlay_shifts_the_plan():
                for c in set(aff_home) | set(aff_migrant))
 
 
+def test_home_state_2letter_code_is_normalized_end_to_end():
+    """Regression for the confirmed production bug: the live app writes profiles.home_state as a
+    2-letter code ('MP'), but the engine keys on full names. Without normalization the region and
+    cohort layers silently no-op (test_10: MP/Mumbai got weird cross-regional plates). derive_theta
+    must normalize the code so region resolves and the cohort affinity is non-degenerate — and it
+    must be identical to passing the full name."""
+    from ghar_re_core import knowledge as K
+
+    assert K.normalize_state("MP") == "Madhya Pradesh"
+    assert K.normalize_state("mp") == "Madhya Pradesh"  # case-insensitive
+    assert K.normalize_state("Madhya Pradesh") == "Madhya Pradesh"  # identity for full names
+    assert K.normalize_state("Nowhere") == "Nowhere"  # unknown token passes through
+
+    code = derive_theta(_hh("MP", "Mumbai", household_type="couple_kids"))
+    name = derive_theta(_hh("Madhya Pradesh", "Mumbai", household_type="couple_kids"))
+    assert code["home_state"]["value"] == "Madhya Pradesh"
+    assert code["region"]["value"] == "Central" and code["region"]["value"] == name["region"]["value"]
+    ctx = make_context(slot="dinner", weekday="Saturday")
+    assert CI.class_affinity(code, ctx) == CI.class_affinity(name, ctx)  # code == full name, identical
+
+
 def test_cohort_membership_returns_ranked_anchors():
     theta = derive_theta(_hh("Kerala", "Kochi"))
     mem = CI.cohort_membership(theta, k=3)

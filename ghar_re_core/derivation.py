@@ -52,6 +52,11 @@ def _primary_age(ages):
 def derive_theta(hh):
     """hh = a raw household dict (fixtures.HOUSEHOLDS shape). Returns θ = {field_name: record}."""
     cfg = CONFIG
+    # Normalize q3_home_state: the live app writes a 2-letter code ("MP"), but every state-keyed
+    # structure in the engine keys on the full name ("Madhya Pradesh"). Without this the whole
+    # regional/cohort layer silently no-ops for real users (see knowledge.normalize_state). Identity
+    # for values already in full-name form, so fixtures/golden are unaffected.
+    hh = {**hh, "q3_home_state": K.normalize_state(hh["q3_home_state"])}
     theta = {}
     ages = hh["q12_member_ages"]
     size = len(ages)

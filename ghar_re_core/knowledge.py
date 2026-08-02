@@ -93,6 +93,41 @@ CUISINE_GROUP_MAP = {
     "uttarakhandi": "north_indian", "vidarbha": "west_indian", "vietnamese": "vietnamese",
 }
 
+# ---------------------------------------------------------------------------
+# State 2-letter code -> full name normalization.
+#
+# The live app writes profiles.home_state as the 2-letter code ("MP"), NOT the full name — it
+# REFERENCES re_engine.re_states(state_code) (see mobile/src/onboarding/toHouseholdWrite.ts, which
+# holds the authoritative name→code map for all 36 states/UTs). Every state-keyed structure in this
+# engine (STATE_ZONE, community_priors, the persona-DB cohort_matrix/state_profile, comfort heroes)
+# keys on the FULL NAME. So an unmapped code silently no-ops region resolution, comfort heroes,
+# community priors AND the WP-16 cohort layer — the confirmed root cause of "weird" cross-regional
+# plates for real users (test_10: home_state "MP" → region None → no cohort anchor). normalize_state()
+# is applied at the RE entry (derivation.derive_theta) so the engine is robust to BOTH the code and
+# the full name; a value that is already a full name (or an unknown token) passes through unchanged.
+# ---------------------------------------------------------------------------
+STATE_CODE_TO_NAME = {
+    "AN": "Andaman & Nicobar Islands", "AP": "Andhra Pradesh", "AR": "Arunachal Pradesh",
+    "AS": "Assam", "BR": "Bihar", "CH": "Chandigarh", "CT": "Chhattisgarh",
+    "DN": "Dadra & Nagar Haveli and Daman & Diu", "DL": "Delhi", "GA": "Goa", "GJ": "Gujarat",
+    "HR": "Haryana", "HP": "Himachal Pradesh", "JK": "Jammu & Kashmir", "JH": "Jharkhand",
+    "KA": "Karnataka", "KL": "Kerala", "LA": "Ladakh", "LD": "Lakshadweep", "MP": "Madhya Pradesh",
+    "MH": "Maharashtra", "MN": "Manipur", "ML": "Meghalaya", "MZ": "Mizoram", "NL": "Nagaland",
+    "OD": "Odisha", "PY": "Puducherry", "PB": "Punjab", "RJ": "Rajasthan", "SK": "Sikkim",
+    "TN": "Tamil Nadu", "TS": "Telangana", "TR": "Tripura", "UP": "Uttar Pradesh",
+    "UK": "Uttarakhand", "WB": "West Bengal",
+}
+
+
+def normalize_state(value):
+    """Map a 2-letter state code ('MP') to the full name the engine keys on ('Madhya Pradesh').
+    A value that is already a full name — or any token not in the code table — is returned
+    unchanged, so this is safe to apply unconditionally at the RE entry point."""
+    if value is None:
+        return value
+    return STATE_CODE_TO_NAME.get(value.strip().upper(), value)
+
+
 # State -> zone (KB §R1 "State→zone" line). Rajasthan flagged palette-North/diet-West (⚑).
 STATE_ZONE = {
     "Delhi": "North", "Punjab": "North", "Haryana": "North", "Uttar Pradesh": "North",
