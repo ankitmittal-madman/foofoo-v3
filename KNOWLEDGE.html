@@ -1954,6 +1954,20 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Two things confirmed via live data before touching anything: (1) "test_03" never actually got a profiles row — it's the profile that hit the home_state FK bug fixed in S53 — the recommendations the Founder was viewing all belonged to "test_04" (the only real profile row, home_state correctly "MP"), confirmed via recommendation_events showing 9 identical successful calls all against that one profile_id; (2) Refresh returning the same plates every time is Phase 1 working as documented, not broken — the mobile client sends no context overrides, the live RE (Fly.io ghar_re_core) is fully deterministic (grepped pipeline.py/scoring.py/engine.py/schemas.py for seed/random/shuffle: zero matches), and the shared contract has no exclusion-list field at all. A real fix needs a contract change + ghar_re_service update + Fly.io redeploy — cross-service work that would either violate handler.ts's own documented "pass through AS-IS, no second translation layer" rule if faked in the Edge Function, or require redeploying a service this session can't safely touch. Founder chose to scope it properly rather than patch around the rule: drafted WP-8G proposing two options (contract-level exclusion vs. mobile-side context variation) for future review — no code/contract/service changes made. Next: Founder to retest onboarding as a genuinely fresh signup (from create-id, not a direct step-1 URL) to get a real, complete test_0x household; WP-8G awaits prioritization before any implementation.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 2, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#e1effe;color:#1a56db">S55</span>
+      <div class="tl-title">External GPT launch-readiness audit fact-checked against live Supabase state; remediation plan drafted (WP-11)</div>
+      <div class="tl-chips">
+        <span class="tl-chip">3 GPT claims corrected via live MCP queries</span>
+        <span class="tl-chip">no cron jobs registered (confirmed P0)</span>
+        <span class="tl-chip">[DRAFT]_WP-11_Launch_Readiness_Remediation_Plan_v1.0.md</span>
+      </div>
+      <div class="tl-note">Founder shared an external GPT-produced live audit and asked for a plan to fix all gaps. Treated the second AI's report as untrusted input needing verification, not a finding on its own — ran the same live queries independently against project cmkswalqpmmqojwdmqbv before planning anything. Found 3 corrections: (1) GPT's "0 rows" claim for profiles/consent/recommendation_events was stale — this session's own test onboarding already put real data in (profiles=2, consent_records=12, recommendation_events=18); (2) GPT's "ghar_re has 28 tables with RLS disabled" was contradicted — all 28 currently have RLS ON, via a migration applied live TODAY with no matching repo file at all (a more specific drift finding than GPT's own); (3) GPT's "cron auth incompatible with scheduler model" mischaracterized a deliberate, already-documented decision in config.toml (service_role key IS a valid JWT, passes gateway verify_jwt by design) — the real gap is narrower: cron.job is simply empty, no jobs ever registered. Confirmed as real: no cron jobs (P0), only 6 of 9 repo functions actually deployed live (P1), CORS OPTIONS 401s (independently confirmed from this session's own earlier log pulls, not just GPT's claim), and migration ledger drift with 3 specific untracked live migrations named. Drafted WP-11 with corrected findings and a priority-ordered remediation plan; nothing executed — GitHub/Fly.io/EAS claims remain unverified pending equivalent live-tool access. Also flagged to Founder: rotate any token pasted into GPT's own session (not seen in this one).</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
