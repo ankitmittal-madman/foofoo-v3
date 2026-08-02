@@ -11,6 +11,7 @@ import { buildContext, requestLogging } from "../middleware/request-context.ts";
 import { errorBoundary } from "../middleware/error-boundary.ts";
 import { compose } from "../middleware/compose.ts";
 import type { Handler, Middleware } from "../middleware/types.ts";
+import { corsHeaders, corsPreflight } from "./cors.ts";
 
 export interface DefineHandlerOptions {
   /** Endpoint-specific middleware (auth, validation, rate-limit), applied inside the base pipeline. */
@@ -32,7 +33,11 @@ export function defineHandler(
   ])(handler);
 
   return async (req: Request): Promise<Response> => {
+    if (req.method === "OPTIONS") return corsPreflight(req);
     const ctx = buildContext(req);
-    return await pipeline(req, ctx);
+    const res = await pipeline(req, ctx);
+    const headers = new Headers(res.headers);
+    for (const [k, v] of Object.entries(corsHeaders(req))) headers.set(k, v);
+    return new Response(res.body, { status: res.status, headers });
   };
 }
