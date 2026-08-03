@@ -133,7 +133,8 @@ def norm_name(s):
     return re.sub(r"\s+", " ", s).strip()
 
 # ------------------------------------------------------------------ allergen map
-# Provenance: DOC-P3-03 §07 (line 163) — frozen 7-bit allergen model; CDM Invariant 3.
+# Provenance: DOC-P3-03 §07 (line 163) — allergen model, extended to 9 bits (WP-21: fish/mustard
+# were previously unmapped, a real safety gap for households with those allergies).
 ALLERGEN_BIT = {
     "peanuts": 1, "tree_nuts": 1,   # bit 0 — Nuts / peanuts
     "dairy": 2,                     # bit 1
@@ -142,9 +143,10 @@ ALLERGEN_BIT = {
     "egg_allergen": 16,             # bit 4
     "soy": 32,                      # bit 5
     "sesame": 64,                   # bit 6
-    # fish, mustard -> no bit in the frozen model (safety-scope decision, deferred).
+    "fish": 128,                    # bit 7
+    "mustard": 256,                 # bit 8
 }
-ALLERGEN_UNMAPPED = {"fish", "mustard"}
+ALLERGEN_UNMAPPED = set()
 
 DIFFICULTY_MAP = {"easy": "beginner", "medium": "intermediate", "hard": "advanced"}
 

@@ -3,7 +3,7 @@
  *
  * Covers, with an injected fake RE call / fake fetch (no live RE or GoTrue required):
  *   - successful call → 200, RE plates[]/contributions[] passed through as-is
- *   - timeout → fallback (valid 200 with a warning; NOT retried)
+ *   - timeout → 503 retryable error, no guessed plate (WP-21); NOT retried at the handler level
  *   - retry-then-succeed on a network-level failure (fetch throws once, then 200)
  *   - no retry on timeout (re-client)
  *   - schema-validation rejection of a malformed payload BEFORE it is sent (RE never called)
@@ -170,7 +170,7 @@ Deno.test("POST /v1/recommendations success passes RE plates[]/contributions[] t
 });
 
 // ── 2. timeout → fallback (no retry) ─────────────────────────────────────────────────────────────
-Deno.test("POST /v1/recommendations timeout returns a fallback plate (valid 200, not retried)", async () => {
+Deno.test("POST /v1/recommendations timeout returns a retryable error, not a guessed plate", async () => {
   await withEnv(REQUIRED_ENV, async () => {
     resetConfigCacheForTests();
     let called = 0;
@@ -187,13 +187,13 @@ Deno.test("POST /v1/recommendations timeout returns a fallback plate (valid 200,
       },
     };
     const res = await pipeline(deps)(post());
-    assertEquals(res.status, 200);
+    assertEquals(res.status, 503);
     const json = await res.json();
     assertEquals(called, 1); // timeout is NOT retried at the handler level
     assertEquals(json.engine_version, "fallback");
-    assertEquals(json.plates.length, 1);
-    assertEquals(json.plates[0].is_standalone, true);
-    assertStringIncludes(json.warnings[0], "RE unavailable");
+    assertEquals(json.plates, undefined);
+    assertEquals(json.error.code, "recommendation_engine_unavailable");
+    assertStringIncludes(json.error.reason, "timeout");
   });
 });
 

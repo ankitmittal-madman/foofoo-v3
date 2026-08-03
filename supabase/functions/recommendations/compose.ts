@@ -44,7 +44,9 @@ export interface HouseholdRaw {
 }
 
 /**
- * Allergen bitfield → RE allergen tokens (DOC-P3-02 §Allergen, the frozen 7-bit model).
+ * Allergen bitfield → RE allergen tokens (DOC-P3-02 §Allergen, extended to 9 bits — WP-21 closed
+ * the fish/mustard gap, previously unmapped and a real safety risk for households with those
+ * allergies).
  * profiles.allergen_flags already holds the household-wide union (members are OR-ed into it by the
  * fn_sync_profile_allergen_union trigger from migration 010), so reading the profile alone is
  * sufficient here — no separate member allergen pass is needed.
@@ -57,11 +59,13 @@ const ALLERGEN_BITS: ReadonlyArray<readonly [number, string]> = [
   [16, "egg"],
   [32, "soy"],
   [64, "sesame"],
+  [128, "fish"],
+  [256, "mustard"],
 ];
 
 /**
  * Decode a profiles.allergen_flags bitfield into the RE's allergen token vocabulary.
- * @param flags - profiles.allergen_flags (7-bit household-wide union, migration 010's trigger)
+ * @param flags - profiles.allergen_flags (9-bit household-wide union, migration 010's trigger)
  * @returns the subset of ALLERGEN_BITS names whose bit is set, in bit order
  */
 export function allergenTokens(flags: number): string[] {

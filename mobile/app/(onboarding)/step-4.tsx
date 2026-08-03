@@ -26,6 +26,8 @@ const ALLERGENS: ChipOption[] = [
   { value: "soy", label: "Soy" },
   { value: "sesame", label: "Sesame" },
   { value: "shellfish", label: "Shellfish" },
+  { value: "fish", label: "Fish" },
+  { value: "mustard", label: "Mustard" },
   { value: "others", label: "Others" },
 ];
 

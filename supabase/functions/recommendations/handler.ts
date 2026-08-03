@@ -182,10 +182,11 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
         detail: respCheck.errors.join("; "),
         reServed: false,
       });
-      return jsonContract(fb, ctx.traceId, 200);
+      return jsonContract(fb, ctx.traceId, 503);
     }
 
-    // RE failure (timeout/network/http/bad_body) → fallback plate, still a valid 200 (RE-DOC-10 §11).
+    // RE failure (timeout/network/http/bad_body) → surface as a retryable error, not a guessed
+    // plate (WP-21): a hardcoded dish ignores this household's actual allergies/diet.
     log.warn("recommendation.re_call_failed", {
       outcome: result.kind,
       latency_ms: latencyMs,
@@ -209,6 +210,6 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
       detail: result.detail,
       reServed: false,
     });
-    return jsonContract(fb, ctx.traceId, 200);
+    return jsonContract(fb, ctx.traceId, 503);
   };
 }

@@ -1,22 +1,28 @@
 /**
  * Fallback response (Phase C, RE-DOC-10 §11).
  *
- * When the RE is unreachable / times out / returns a bad body, the user must still see familiar
- * food, not an error. This returns a SINGLE hardcoded safe-default plate as a valid 200 response
- * (contract-conformant) with a `warnings` entry.
- *
- * ⚠️ STUB: a real per-zone cached default plate set is future work (RE-DOC-10 §11 "cached-per-zone
- * default"), not this task. This single pan-safe comfort plate (Moong Dal Khichdi — mild, veg,
- * jain-safe, weaning-safe) is a deliberate placeholder, flagged for replacement.
+ * When the RE is unreachable / times out / returns a bad body, we no longer guess a "safe" plate
+ * on the household's behalf — a single hardcoded dish (Moong Dal Khichdi) ignores each household's
+ * actual allergies/diet beyond jain/weaning-safety, which is a real safety risk, not just a UX gap.
+ * Until a real per-zone cached default plate set exists (RE-DOC-10 §11), the caller gets a real
+ * error surfaced to the user ("couldn't load your recommendations, try again") instead of a plate
+ * that may not respect their restrictions.
  */
 import { API_VERSION } from "./meta.ts";
 
+export class RecommendationEngineUnavailableError extends Error {
+  constructor(public readonly reason: string) {
+    super(`RE unavailable (${reason}); no safe default plate can be served without per-household diet/allergy data`);
+    this.name = "RecommendationEngineUnavailableError";
+  }
+}
+
 /**
- * Build the single hardcoded safe-default plate response used whenever the RE cannot be used.
- * @param requestId - correlation id, echoed into `request_id` and the fallback plate_id
+ * Build the error response used whenever the RE cannot be used.
+ * @param requestId - correlation id, echoed into `request_id`
  * @param reason - short machine string describing why the RE result was rejected (timeout/network/
- *   http/bad_body/etc.) — surfaced to the caller inside the `warnings[]` entry, not as an error
- * @returns a contract-conformant 200 body carrying one comfort plate plus a `warnings` entry
+ *   http/bad_body/etc.)
+ * @returns a contract-conformant error body (no plates) the client renders as a retryable failure
  */
 export function buildFallbackResponse(requestId: string, reason: string): Record<string, unknown> {
   return {
@@ -24,23 +30,10 @@ export function buildFallbackResponse(requestId: string, reason: string): Record
     api_version: API_VERSION,
     engine_version: "fallback",
     config_version: "fallback",
-    plates: [
-      {
-        plate_id: `fallback:${requestId}`,
-        form: "standalone",
-        hero_dish_ids: ["fallback:moong_dal_khichdi"],
-        hero_dish_names: ["Moong Dal Khichdi"],
-        support: null,
-        is_standalone: true,
-        plate_score: 0,
-        base_total: 0,
-        gain_multiplier: 1,
-        final_score: 0,
-        contributions: [],
-      },
-    ],
-    warnings: [
-      `RE unavailable (${reason}); served a cached safe-default plate. [STUB: single pan-safe plate; per-zone fallback set is future work]`,
-    ],
+    error: {
+      code: "recommendation_engine_unavailable",
+      message: "We couldn't load your recommendations right now. Please try again.",
+      reason,
+    },
   };
 }
