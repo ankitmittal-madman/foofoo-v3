@@ -1,0 +1,1 @@
+[{"migration_band": "lt_1yr", "city_overlay_weight": 0.15}, {"migration_band": "1_3yr", "city_overlay_weight": 0.3}, {"migration_band": "3_7yr", "city_overlay_weight": 0.5}, {"migration_band": "7plus_yr", "city_overlay_weight": 0.7}, {"migration_band": "skipped", "city_overlay_weight": 0.5}, {"migration_band": "native", "city_overlay_weight": 0}]
