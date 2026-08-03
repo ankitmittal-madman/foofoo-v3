@@ -70,6 +70,15 @@ jobs:
           if [ -n "$latest" ] && [ -f "$latest/summary.txt" ]; then
             echo "----- summary.txt -----"
             cat "$latest/summary.txt"
+            # Print every step's own log so a failure is visible right here in the job log,
+            # not only inside the uploaded artifact — the previous run of this gate failed
+            # on edge-functions and the actual Deno error only surfaced after downloading it.
+            for log in "$latest"/*/*.log; do
+              [ -f "$log" ] || continue
+              echo ""
+              echo "----- $(basename "$(dirname "$log")")/$(basename "$log") -----"
+              tail -c 8000 "$log"
+            done
           else
             echo "No report summary found."
           fi

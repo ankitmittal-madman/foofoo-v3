@@ -260,8 +260,13 @@ def step_edge(report_dir: Path) -> StepResult:
     cat = report_dir / "edge"
     cat.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
-    proc = subprocess.run(["deno", "test", "-A", str(fn_root)], cwd=REPO_ROOT,
-                          capture_output=True, text=True)
+    # Must run with cwd=supabase/ (not REPO_ROOT) and a path relative to it: the import map
+    # (@std/assert, zod, ajv, @supabase/supabase-js) lives in supabase/deno.json and Deno only
+    # picks up that config by walking up from the CURRENT WORKING DIRECTORY — an absolute path
+    # passed from a different cwd resolves those imports as missing (TS2307) even though the
+    # exact same test files pass under backend-ci.yml, which runs from this same working-directory.
+    proc = subprocess.run(["deno", "test", "--allow-env", "functions/_tests/"],
+                          cwd=fn_root.parent, capture_output=True, text=True)
     (cat / "deno.log").write_text(proc.stdout + proc.stderr, encoding="utf-8")
     ok = proc.returncode == 0
     return StepResult("edge-functions", "6", "pass" if ok else "fail", "P0",
