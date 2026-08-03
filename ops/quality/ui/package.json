@@ -1,0 +1,9 @@
+{
+  "name": "ghar-quality-ui-driver",
+  "private": true,
+  "description": "Playwright dependency for ops/quality/ui/run_ui.mjs (Phase 9-11 headless browser UI checks)",
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.62.1"
+  }
+}
