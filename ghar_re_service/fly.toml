@@ -1,8 +1,7 @@
 # Ghar RE v1.0 — Fly.io deployment config (Phase F Tasks 3/5, RE-DOC-10 §13).
 #
-# NOT YET DEPLOYED. This file is prepared for a human to run `fly deploy` — see
-# ghar_re_service/README.md for the exact command sequence. Nothing here has been validated
-# against a live Fly.io account; see the README's "what could not be verified" section.
+# DEPLOYED — live at ghar-re.fly.dev, verified 2026-08-03 (see README.md's Deployment section for
+# the exact health/readiness/bundle-version checks run against the live instance).
 #
 # Three constraints from RE-DOC-10 §13 drive everything below:
 #   1. minimum-instance floor, NOT scale-to-zero — this sits on the critical path of every

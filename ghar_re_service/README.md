@@ -35,10 +35,13 @@ Phases A–F. Weather is mocked (injected via the request). Catalogue = golden s
 
 # Deployment (Phase F)
 
-> **Status: PREPARED, NOT DEPLOYED.** Every artefact below is ready to run, but no real deploy has
-> been executed and no cloud infrastructure has been provisioned. The "Could not be verified"
-> section at the end lists exactly what remains unproven until someone runs these commands against
-> a real Fly.io account.
+> **Status: DEPLOYED.** Live at `ghar-re.fly.dev` (app `ghar-re`, region `bom`/served from `sin`).
+> Verified 2026-08-03 via `fly status`, `GET /healthz` → `{"status":"alive"}`, `GET /readyz` →
+> `{"status":"ready"}`, `GET /v1/meta` → `bundle_version: sha256:07506fd7d963dffb` (the real
+> 810-dish catalogue bundle). `GHAR_RE_SERVICE_URL`/`GHAR_RE_SERVICE_SECRET` are set as Supabase
+> Edge Function secrets and the `recommendations` function's live metrics already show successful
+> RE calls. This line previously said "PREPARED, NOT DEPLOYED" — that was stale; corrected after
+> live verification, not assumed from this file's own prior claim.
 
 ## The immutable bundle (RE-DOC-10 §8)
 
