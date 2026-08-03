@@ -33,11 +33,17 @@ def _hh():
 def _post(client, path, payload):
     raw = json.dumps(payload).encode()
     ts = int(time.time())
-    sig = hmac.new(DEV_INSECURE_SECRET.encode(), f"{ts}.".encode() + raw, hashlib.sha256).hexdigest()
-    return client.post(path, content=raw, headers={
-        "content-type": "application/json",
-        auth.SIGNATURE_HEADER: f"t={ts},v1={sig}",
-    })
+    sig = hmac.new(
+        DEV_INSECURE_SECRET.encode(), f"{ts}.".encode() + raw, hashlib.sha256
+    ).hexdigest()
+    return client.post(
+        path,
+        content=raw,
+        headers={
+            "content-type": "application/json",
+            auth.SIGNATURE_HEADER: f"t={ts},v1={sig}",
+        },
+    )
 
 
 def test_cold_start_returns_15_diverse_dishes(client):
@@ -47,7 +53,11 @@ def test_cold_start_returns_15_diverse_dishes(client):
     assert body["kind"] == "cold_start_top_dishes"
     assert len(body["dishes"]) == 15
     for d in body["dishes"]:
-        assert "meal_class_code" in d and "image_url" in d and d["slot"] in ("breakfast", "lunch", "dinner")
+        assert (
+            "meal_class_code" in d
+            and "image_url" in d
+            and d["slot"] in ("breakfast", "lunch", "dinner")
+        )
 
 
 def test_meal_plan_slot_options(client):
@@ -70,13 +80,17 @@ def test_class_dishes_reconciliation(client):
     lunch_classes = wk["days"][0]["slots"]["lunch"]
     assert lunch_classes, "no lunch classes offered"
     chosen = lunch_classes[0]["class_code"]
-    r = _post(client, "/v1/class-dishes",
-              {"household": _hh(), "slot": "lunch", "class_code": chosen, "weekday": "Monday"})
+    r = _post(
+        client,
+        "/v1/class-dishes",
+        {"household": _hh(), "slot": "lunch", "class_code": chosen, "weekday": "Monday"},
+    )
     assert r.status_code == 200
     opts = r.json()["options"]
     assert opts
     # multi-membership reconciliation: the chosen class is among each dish's memberships.
     from ghar_re_core import knowledge as K
+
     assert all(chosen in K.dish_to_class_codes(o["name"]) for o in opts)
 
 

@@ -12,7 +12,9 @@ import { API_VERSION } from "./meta.ts";
 
 export class RecommendationEngineUnavailableError extends Error {
   constructor(public readonly reason: string) {
-    super(`RE unavailable (${reason}); no safe default plate can be served without per-household diet/allergy data`);
+    super(
+      `RE unavailable (${reason}); no safe default plate can be served without per-household diet/allergy data`,
+    );
     this.name = "RecommendationEngineUnavailableError";
   }
 }
