@@ -677,8 +677,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🧩</span> S48 · Compositional cohort plan (WP-17)
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s49')">
+    <div class="nav-item" onclick="showPage('s49')">
       <span class="nav-icon">🧩</span> S49 · Multi-membership dish→class fix + WP-18 planning surfaces
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s50')">
+      <span class="nav-icon">🍆</span> S50 · Cited regional-name dish aliases (WP-19)
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -694,14 +698,14 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">212</span>
+      <span class="nav-badge">216</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">31</span>
+      <span class="nav-badge">35</span>
     </div>
   </div>
 </nav>
@@ -2723,6 +2727,10 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">data/source/recipes_v1.json / ghar_re_service/data/bundle/config/recipes_v1.json</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">Baked per-dish draft recipes consumed by the recipe endpoint</td></tr>
 <tr><td class="fr-file mono">ghar_re_service/tests/test_planning.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">End-to-end tests for all five WP-18 planning endpoints</td></tr>
 <tr><td class="fr-file mono">ghar_re_core/tests/test_meal_planner.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">Core tests for planner reconciliation, diversity, and Jain diet safety</td></tr>
+<tr><td class="fr-file mono">database/migrations/045_dish_name_synonyms_ontology.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">Extends ghar_re.dish_name_synonyms with alias_type/region/language/source_url/confidence; NOT VALID check requiring web-researched ('real') aliases to carry a source_url; index on region</td></tr>
+<tr><td class="fr-file mono">database/rollback/045_dish_name_synonyms_ontology_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">Drops the added columns/constraint/index; pre-existing synonym rows unaffected</td></tr>
+<tr><td class="fr-file mono">database/seeds/122_seed_dish_aliases.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">37 web-researched, cited aliases across 8 dishes; each row alias_type/region/language/source_url/confidence, data_source='real', idempotent ON CONFLICT DO NOTHING; drops any alias that is itself a distinct catalogue dish (Obbattu/Bobbatlu)</td></tr>
+<tr><td class="fr-file mono">database/validation/907_dish_ontology_validation.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">Fail-loud checks: WP-19 columns exist; every WP-19 'real' alias (alias_type IS NOT NULL) has source_url+confidence; alias_type valid; no orphan aliases</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3157,6 +3165,26 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why put a confidence floor and a cap on secondary memberships?</div>
     <div class="decision-a">To trade a little recall for precision. Without a floor and a per-dish cap (4), a generic dish that just echoes common words like "rice" or "soup" would flood many class pools. The WP-16.1 foreign-cuisine demote at ranking time is the second line of defence, but keeping the map itself clean is cheaper and clearer.</div>
     <div class="decision-meta">S49 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">New table or extend the existing one for the dish-name alias ontology?</div>
+    <div class="decision-a">Extend the existing ghar_re.dish_name_synonyms table — it already exists to hold dish aliases, and region_food_affinity already exists for regional affinity. Per the repo placement rule (no new table without an approved change), WP-19 adds columns to the table that is already the home for this data rather than creating a parallel one.</div>
+    <div class="decision-meta">S50 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why make the citation check constraint NOT VALID?</div>
+    <div class="decision-a">So a pre-existing legacy 'real' row without a source_url can't make the schema migration fail on first apply in production. NOT VALID skips the one-time scan of existing rows but still enforces the "web-researched aliases must carry a source_url" rule on every new or updated row. Found via real rollback + re-apply testing on a throwaway Postgres 16 with a legacy uncited row present.</div>
+    <div class="decision-meta">S50 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why scope validation 907 to alias_type IS NOT NULL?</div>
+    <div class="decision-a">WP-19 is responsible for validating its OWN cited rows, not the legacy pre-WP-19 synonym rows it didn't create. Scoping the citation/confidence checks to rows that carry an alias_type keeps the validation honest — it fails loud on any gap in WP-19's own data without falsely flagging older rows outside its remit.</div>
+    <div class="decision-meta">S50 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why filter out aliases that are themselves catalogue dishes?</div>
+    <div class="decision-a">Adding 'Gutti Vankaya' or 'Obbattu' as a synonym of another dish would conflate two distinct real catalogue entries into one. The seed drops any candidate alias that already exists as its own DISTINCT dish (Obbattu/Bobbatlu) so the ontology maps names to the same dish, never merges two genuinely different dishes.</div>
+    <div class="decision-meta">S50 &middot; Aug 3, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -8202,7 +8230,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s48 -->
-  <div id="page-s49" class="page-content">
+  <div id="page-s49" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S49 · Multi-membership dish→class fix (WP-17.1) + WP-18 planning surfaces</div>
       <div class="page-subtitle">Fixed the meal engine so it can actually fill child-friendly and family-dinner plans — a dish can now belong to several meal classes instead of just one, so behavioural dinner classes that used to be empty now have real dishes to show.</div>
@@ -8247,6 +8275,44 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s49 -->
+  <div id="page-s50" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S50 · Cited regional-name dish aliases (WP-19)</div>
+      <div class="page-subtitle">Started giving every dish its real regional names — so a Madhya Pradesh user living in Mumbai sees "Bharwa Baingan", not the unfamiliar Marathi name "Bharli Vangi" for the same dish.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The catalogue's canonical dish names are often the regionally-marked form that users from other states don't recognise — Bharli Vangi is the Marathi name for what a Hindi speaker calls Bharwa Baingan, a Telugu speaker calls Gutti Vankaya, and a Kannada speaker calls Ennegayi. The engine had a synonyms table but no sourced, regionalised alias data in it, so cross-region users saw names they didn't know for dishes they eat every week.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The dish-synonyms table is now a proper alias ontology — each alias carries its type, region, language, a web source it was researched from, and a confidence score — and the first web-researched, cited batch is seeded: 37 aliases across 8 dishes. Built and fully tested locally on Postgres 16, deploy-ready, but NOT yet applied to production (this environment has no Supabase credentials and the repo requires Founder-approved production deploys).</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/045_dish_name_synonyms_ontology.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/rollback/045_dish_name_synonyms_ontology_rollback.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/seeds/122_seed_dish_aliases.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/validation/907_dish_ontology_validation.sql</span><span class="tag tag-db">DB</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>4 things touched · commit aa841f5</div>
+      </div>
+      <div class="session-card-body">
+        <p><strong>1. Dish-name alias ontology (WP-19 — the headline).</strong> The catalogue's canonical dish names are often the regionally-marked form that users from other states don't recognise (Bharli Vangi = Bharwa Baingan in Hindi = Gutti Vankaya in Telugu = Ennegayi in Kannada). Migration 045 extends the existing ghar_re.dish_name_synonyms table into a sourced, regionalised alias ontology — adding alias_type, region, language, source_url and confidence, plus an index on region and a check constraint requiring every web-researched ('real') alias to carry a source_url. The constraint is added <strong>NOT VALID</strong> so a legacy uncited row can't make the migration fail on first apply, while still enforcing the citation rule on every new or updated row.</p>
+        <p><strong>2. First cited, web-researched batch (seed 122).</strong> 37 web-researched aliases across 8 dishes — Bharli Vangi, Poha, Baingan Bharta, Pithla, Chole, Puran Poli, Dhokla and Undhiyu. Every row carries its alias_type/region/language/source_url/confidence, is tagged data_source='real', and inserts idempotently via ON CONFLICT DO NOTHING. A safety filter drops any candidate alias that is itself a DISTINCT catalogue dish (Obbattu/Bobbatlu) so the ontology never conflates two genuinely different dishes. Validation 907 fail-loud checks that the WP-19 columns exist, every WP-19 'real' alias has a source_url and confidence, alias_type is a valid kind, and there are no orphan aliases.</p>
+        <p><strong>3. Tested end-to-end, not yet deployed.</strong> Full cycle exercised on a throwaway Postgres 16: first apply (even with a legacy uncited 'real' row present), seed, validation PASS, three negative constraint tests correctly REJECTED (uncited real / bad alias_type / confidence out of range), rollback, and clean re-apply. The app suite stays 116/116 green (WP-19 is SQL-only). Recorded honestly: the migration is built and fully tested locally and deploy-ready, but was NOT applied to production — this environment has no Supabase CLI/MCP/credentials and the repo requires Founder-approved production deploys.</p>
+        <p><strong>4. What's still pending.</strong> Only 8 of 810 dishes have researched aliases so far — the rest of the catalogue is to be filled by continued cited-research batches. Richer aliases also feed classify_dishes.py, which reads a dish's synonyms, so better alias coverage should improve dish→class matching down the line.</p>
+      </div>
+    </div>
+  </div><!-- /page-s50 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
