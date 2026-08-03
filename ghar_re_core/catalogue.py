@@ -139,11 +139,41 @@ def ingredient_info(name):
     return _ING.get(name, {})
 
 
+# Known hidden-derivative allergen carriers: an ingredient whose OWN is_allergen/allergen_type
+# columns in ingredients_v5.csv are correctly blank (pure asafoetida has no gluten) but whose
+# COMMERCIAL form commonly carries a hidden allergen as a filler/anti-caking carrier or process
+# byproduct. Authored here, not in ingredients_v5.csv, because it's a fact about the commercial
+# product's typical composition, not an intrinsic property of the ingredient itself. Add further
+# entries here if another hidden-derivative pairing is confirmed — this table, not a report-only
+# footnote, is what dish_allergens() (the actual A3 safety filter) reads. Each entry researched and
+# cited, not guessed:
+#   asafoetida (hing)  -> commercial hing is typically only ~5-20% pure resin, bulked with wheat
+#                         flour/gum as an anti-caking carrier.
+#   soy_sauce          -> traditionally brewed soy sauce (the common form; tamari is the gluten-free
+#                         exception, not the default) is fermented from roughly equal parts soybean
+#                         and WHEAT — it is not gluten-free unless the label says tamari/GF.
+#   sambar_powder      -> standard sambar podi recipes include hing as a listed spice component
+#                         (same wheat-carrier risk as raw asafoetida, inherited via the blend).
+#   chaat_masala       -> standard chaat masala recipes likewise list hing as a core ingredient.
+HIDDEN_DERIVATIVE_ALLERGENS = {
+    "asafoetida": "gluten",
+    "soy_sauce": "gluten",
+    "sambar_powder": "gluten",
+    "chaat_masala": "gluten",
+}
+
+
 def dish_allergens(dish):
-    """Explicit-ingredient allergen set (A3 BASIC pass; hidden-derivative layer is out of scope)."""
+    """Explicit-ingredient allergen set (A3 BASIC pass), plus the known hidden-derivative carriers
+    in HIDDEN_DERIVATIVE_ALLERGENS above (asafoetida, soy sauce, and the two hing-containing spice
+    blends — sambar powder, chaat masala). Still not a full hidden-derivative layer covering every
+    possible commercial-product risk, but no longer purely explicit-ingredient-only."""
     out = set()
     for ing in dish.ingredient_names:
         info = ingredient_info(ing)
         if info.get("is_allergen") and info.get("allergen_type"):
             out.add(info["allergen_type"])
+        hidden = HIDDEN_DERIVATIVE_ALLERGENS.get(ing)
+        if hidden:
+            out.add(hidden)
     return out

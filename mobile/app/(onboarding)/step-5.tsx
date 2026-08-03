@@ -123,7 +123,9 @@ export default function OnboardingStep5() {
     },
     onSuccess: () => {
       reset();
-      router.replace("/recommendations");
+      // WP-18: land on the cold-start preference primer (top-15 diverse dishes to like), not
+      // straight into the plain recommendations list — this is the new onboarding->plan flow.
+      router.replace("/cold-start");
     },
   });
 

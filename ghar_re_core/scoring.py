@@ -230,15 +230,21 @@ def m_age(dish, theta):
 def m_household(dish, theta):
     """§B6 BASE term: how well a dish fits this household's structure — e.g. a batch-friendly
     whole-meal dish scores higher for a joint/large household, and a mild/familiar dish scores
-    higher for a kid-heavy household with high variety pressure."""
-    # §B6 household structure soft-fit. single->one-pot; couple+kids->mild/familiar; joint->batch.
+    higher in proportion to the household's variety pressure (continuous, not a single cliff at
+    0.8) and how far below the household's spice ceiling the dish actually sits — so two dishes
+    in the same meal class no longer collapse to the same 0.5/0.7 fit for every household sharing
+    that class; the ranking now moves with the household's own batch/mildness posture."""
+    # §B6 household structure soft-fit. single->one-pot; couple+kids->mild/familiar (graded); joint->batch.
     bp = theta["batch_posture"]["value"]
+    vp = theta["variety_pressure"]["value"]
+    ceiling = theta["spice_ceiling"]["value"]
     fit = 0.5
     if bp and "whole_meal" in dish.dish_category:
-        fit = 0.7
-    if theta["variety_pressure"]["value"] >= 0.8 and dish.spice_level is not None and dish.spice_level <= 2:
-        fit = max(fit, 0.7)     # kid-heavy household leans mild/familiar
-    return fit
+        fit += 0.2
+    if dish.spice_level is not None and ceiling:
+        headroom = max(0.0, (ceiling - dish.spice_level) / ceiling)  # 1.0 mild, 0.0 at the ceiling
+        fit += vp * headroom * 0.3     # scales with household's own variety pressure, not a step
+    return min(1.0, fit)
 
 
 def m_weather(dish, theta, ctx):
@@ -288,18 +294,17 @@ def prior_boost(dish, theta, ctx):
 
 
 def base(dish, theta, ctx):
-    """BASE = Σ_k W_k·conf_k·m_k + PRIOR[zone][slot]  (§S2 PART B). conf_k pinned 1.0 (v1)."""
-    cfg = CONFIG
-    conf = cfg.all_conf_k
-    val = (cfg.W("W_PALETTE") * conf * m_palette(dish, theta)
-           + cfg.W("W_SLOT") * conf * m_slot(dish, ctx)
-           + cfg.W("W_SEASON") * conf * m_season(dish, ctx)
-           + cfg.W("W_SIG") * conf * sig(dish)
-           + cfg.W("W_AGE") * conf * m_age(dish, theta)
-           + cfg.W("W_HOUSE") * conf * m_household(dish, theta)
-           + cfg.W("W_WEATHER") * conf * m_weather(dish, theta, ctx)   # signed
-           + prior_boost(dish, theta, ctx))
-    return val
+    """BASE = Σ_k W_k·conf_k·m_k + PRIOR[zone][slot]  (§S2 PART B). conf_k pinned 1.0 (v1).
+
+    Delegates to ghar_re_core.modules_default.DEFAULT_REGISTRY's phase="base" modules (Phase 1
+    ScoringModule registry refactor) — the 7 W_k-weighted terms + prior_boost, combined as a
+    weighted sum. Each underlying m_palette/m_slot/.../prior_boost function body is UNCHANGED;
+    only how they're invoked/composed moved into the registry, so this is score-neutral by
+    construction. Imported lazily (not at module top) to avoid a circular import: modules_default
+    imports scoring's own functions to build its BoundModule wrappers."""
+    from ghar_re_core.modules_default import DEFAULT_REGISTRY
+    total, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="base")
+    return total
 
 
 # =====================================================================================
@@ -403,13 +408,16 @@ def score(dish, theta, ctx, objective):
     (+ w_pref·S_pref[=0 v1] − PENALTY[assemble]).
 
     Both cohort weight and foreign demote are WP-16 cold-start-strong, decaying with
-    ctx['interaction_count'] (0 for a new household — every live household today)."""
-    n = ctx.get("interaction_count", 0)
-    w = CONFIG.w_cohort_effective(n)
-    wf = CONFIG.foreign_demote_effective(n)
-    return (base(dish, theta, ctx) * gain_q15(dish, objective)
-            + w * s_cohort(dish, theta, ctx)
-            - wf * s_foreign(dish))
+    ctx['interaction_count'] (0 for a new household — every live household today).
+
+    The `w·S_cohort − wf·S_foreign` term is computed via DEFAULT_REGISTRY's phase="cohort"
+    modules (Phase 1 ScoringModule registry refactor): s_foreign's module models its effective
+    weight as NEGATIVE (see modules_default.py), so combine()'s plain weighted sum already nets
+    out to the same subtraction — no special-casing needed here. s_cohort/s_foreign's own bodies
+    are unchanged."""
+    from ghar_re_core.modules_default import DEFAULT_REGISTRY
+    cohort_val, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="cohort")
+    return base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val
 
 
 # ---------------------------------------------------------------------------

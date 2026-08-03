@@ -7,7 +7,7 @@ project_id = "foofoo"
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "re_engine"]
+schemas = ["public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
@@ -15,9 +15,12 @@ max_rows = 1000
 port = 54322
 major_version = 15
 
-[functions]
-# Edge Functions verify JWT by default; individual functions opt out (e.g. /v1/health) in later WPs.
-verify_jwt = true
+# Edge Functions verify JWT by default (the installed CLI's own implicit default for any function
+# with no [functions.<name>] override below — this CLI version (confirmed via `supabase init`'s own
+# generated template) only supports per-function verify_jwt tables, not a top-level [functions]
+# table; a bare `[functions]\nverify_jwt = true` is invalid TOML for it and breaks every command
+# that reads this config, including `functions deploy`. Fixed WP-20: removed that invalid top-level
+# table since true is already the default with no override present.
 
 # Scheduled/internal jobs (Phase F) — invoked by pg_cron via net.http_post carrying
 # `Authorization: Bearer <service_role key>` (see
@@ -26,7 +29,7 @@ verify_jwt = true
 # same as any other caller — no per-function override needed. A prior override here
 # (`verify_jwt = false`) removed gateway-level checking entirely, which combined with the absence
 # of any application-level check meant the bare URL, no token at all, could trigger a real
-# deletion run. Fixed this session: gateway check restored to the [functions] default above, and
+# deletion run. Fixed this session: gateway check restored to the default above, and
 # requireServiceRole() (supabase/functions/_shared/auth/service-role.ts) now also rejects any
 # caller whose bearer token isn't this project's exact service_role key — closing the separate gap
 # where a regular signed-in user's own JWT would otherwise still pass gateway verification.

@@ -55,6 +55,19 @@ _SLOT_COLS = {
 }
 _WEEKEND_POOL = "weekend_special_class_pool"
 
+# Tiffin/lunchbox-oriented classes never make sense on a holiday (Sat/Sun) — there's no school/office
+# box to pack — so class_plan() drops them outright on weekend days regardless of persona/state boost.
+_TIFFIN_CLASSES = {"BF_KID_TIFFIN", "SN_KIDS_TIFFIN_SNACK", "SN_SOUTH_TIFFIN_SNACK"}
+
+# "Gravy-rich / special / elaborate" lunch+dinner classes weekly_class_plan() guarantees at least one
+# of, per weekend day, so Saturday/Sunday don't default to the same routine plate as a weekday.
+_WEEKEND_SPECIAL_CLASSES = {
+    "LD_KADHI_CURD_CURRY", "LD_MILLET_ROTI_THALI", "LD_VEG_BIRYANI_SPECIAL", "LD_GUJARATI_THALI",
+    "LD_FESTIVE_THALI", "LD_WEEKEND_SPECIAL_REGIONAL", "LD_EGG_CURRY_BHURJI", "LD_CHICKEN_HOME_CURRY",
+    "LD_CHICKEN_BIRYANI_PULAO", "LD_MUTTON_SUNDAY_CURRY", "LD_FISH_CURRY_RICE", "LD_GOAN_XACUTI_CURRY",
+    "LD_MUSLIM_BIRYANI_KORMA", "LD_SUNDAY_OUTSIDE_NONVEG", "DN_LEFTOVER_THALI",
+}
+
 _NONVEG_MARKERS = ("CHICKEN", "FISH", "MUTTON", "PRAWN", "CRAB", "KEEMA", "PORK", "RED_MEAT",
                    "SEAFOOD", "NONVEG", "TANDOORI", "MUSLIM_BIRYANI", "SMOKED_PORK", "MEAT_STEW",
                    "XACUTI")
@@ -175,8 +188,15 @@ def resolve_persona(theta, k=2):
         s = 0.0
         s += 2.0 if p.get("main_cohort_id") == want_mc else 0.0
         # lifecycle is the decisive sub-cohort signal — weight it highest
-        if want_stage != "none" and _persona_stage(p.get("lifecycle_health")) == want_stage:
+        p_stage = _persona_stage(p.get("lifecycle_health"))
+        if want_stage != "none" and p_stage == want_stage:
             s += 4.0
+        elif want_stage == "none" and p_stage != "none":
+            # the household has NO dependent of any lifecycle stage — a persona that itself implies
+            # one (baby/toddler/school_child/elder/pregnancy) must be excluded, not merely un-boosted,
+            # or it can still win on cohort+diet+time-pressure alone and leak its kid/elder-only boost
+            # classes (e.g. BF_KID_TIFFIN) into a childless household's plan.
+            s -= 4.0
         s += 2.0 if _nv_family(p.get("nonveg_mode")) == want_nv else 0.0
         s += 1.0 if (p.get("time_pressure") or "").lower().replace("very ", "") == want_tp else 0.0
         scored.append((s, p))
@@ -308,6 +328,8 @@ def class_plan(theta, ctx):
             continue
         if not _diet_ok(theta, m):
             continue
+        if daytype == "weekend" and code in _TIFFIN_CLASSES:
+            continue  # Sat/Sun are holidays — no school/office box to pack, ever
         w *= _lifecycle_multiplier(theta, code, m)
         if w > 0:
             out[code] = w

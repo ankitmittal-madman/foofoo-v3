@@ -44,7 +44,9 @@ export interface HouseholdRaw {
 }
 
 /**
- * Allergen bitfield → RE allergen tokens (DOC-P3-02 §Allergen, the frozen 7-bit model).
+ * Allergen bitfield → RE allergen tokens (DOC-P3-02 §Allergen, extended to 9 bits — WP-21 closed
+ * the fish/mustard gap, previously unmapped and a real safety risk for households with those
+ * allergies).
  * profiles.allergen_flags already holds the household-wide union (members are OR-ed into it by the
  * fn_sync_profile_allergen_union trigger from migration 010), so reading the profile alone is
  * sufficient here — no separate member allergen pass is needed.
@@ -57,11 +59,13 @@ const ALLERGEN_BITS: ReadonlyArray<readonly [number, string]> = [
   [16, "egg"],
   [32, "soy"],
   [64, "sesame"],
+  [128, "fish"],
+  [256, "mustard"],
 ];
 
 /**
  * Decode a profiles.allergen_flags bitfield into the RE's allergen token vocabulary.
- * @param flags - profiles.allergen_flags (7-bit household-wide union, migration 010's trigger)
+ * @param flags - profiles.allergen_flags (9-bit household-wide union, migration 010's trigger)
  * @returns the subset of ALLERGEN_BITS names whose bit is set, in bit order
  */
 export function allergenTokens(flags: number): string[] {
@@ -178,7 +182,8 @@ interface MemberRow {
   conditions: string[] | null;
 }
 
-// profiles.home_state is a 2-letter code ("MP") — it REFERENCES re_engine.re_states(state_code).
+// profiles.home_state is a 2-letter code ("MP") — it REFERENCES public.re_states(state_code)
+// (WP-20: re-homed from re_engine.re_states, migration 046, ahead of that schema's retirement).
 // The RE keys every regional/cohort structure on the FULL NAME ("Madhya Pradesh"), so the code must
 // be mapped before the request is sent, or region resolution + the whole cohort layer silently
 // no-op and the household gets incoherent cross-regional plates (confirmed root cause, test_10).
@@ -382,13 +387,22 @@ export async function loadLatestContext(
   };
 }
 
-/** Assemble the ghar-re-v1 request. `contextOverride` (from the request body) wins over defaults. */
+/** Assemble the ghar-re-v1 request. `contextOverride` (from the request body) wins over defaults.
+ * `interactionCount` (§0.2), when supplied, is merged into `context` BEFORE the payload is
+ * returned — i.e. before validateRequest() runs at the handler's call site — since
+ * `w_cohort_effective`/`foreign_demote_effective` (ghar_re_core/config.py) both key off
+ * `ctx['interaction_count']` and were dead code paths (always `n=0`) without a real caller ever
+ * populating it. */
 export function buildRequest(
   household: HouseholdRaw,
   contextOverride: Record<string, unknown> | undefined,
   requestId: string,
+  interactionCount?: number,
 ): Record<string, unknown> {
-  const context = { ...DEFAULT_CONTEXT, ...(contextOverride ?? {}) };
+  const context: Record<string, unknown> = { ...DEFAULT_CONTEXT, ...(contextOverride ?? {}) };
+  if (typeof interactionCount === "number") {
+    context.interaction_count = interactionCount;
+  }
   // Always ask the RE for its decision trace (funnel + winners + near-miss alternatives) — this
   // is what recordRecommendationEvent persists into recommendation_events.decision_trace so every
   // request has a durable, per-user record of how the catalogue narrowed down to the served
@@ -396,4 +410,81 @@ export function buildRequest(
   // (ghar_re_core/decision_log.py), so requesting it is a small, bounded cost, not free — but
   // WP-12 chose completeness (every event traced) over trimming it to on-demand.
   return { request_id: requestId, household, context, include_decision_trace: true };
+}
+
+/**
+ * Write the context a request actually used into `household_context` (§0.2). Nothing in the repo
+ * ever INSERTed into this table before this — `loadLatestContext` only ever read it, so every
+ * request fell through to DEFAULT_CONTEXT or a one-shot caller override. Writing the RESOLVED
+ * context (default-merged, override-applied — whatever `buildRequest` actually sent) on every
+ * successful request makes each row a true historical record, so the household's NEXT call
+ * naturally reflects real history via `loadLatestContext` instead of always defaulting.
+ *
+ * Best-effort like recordRecommendationEvent: a telemetry write must never fail an otherwise
+ * successful recommendation request. Callers must wrap this in try/catch (or rely on this
+ * function never throwing) — see handler.ts's call site for the established pattern.
+ */
+export async function recordHouseholdContext(
+  ctx: RequestContext,
+  profileId: string,
+  context: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const db = createServiceRoleClient(ctx.config);
+    const weather = (context.weather && typeof context.weather === "object")
+      ? context.weather as Record<string, unknown>
+      : {};
+    const { error } = await withTimeout(
+      db.from("household_context").insert({
+        profile_id: profileId,
+        slot: context.slot ?? null,
+        season: context.season ?? null,
+        weekday: context.weekday ?? null,
+        weather_condition: weather.condition ?? null,
+        temp_c: weather.temp_c ?? null,
+        is_raining: weather.is_raining ?? null,
+        humidity: weather.humidity ?? null,
+        active_modes: Array.isArray(context.active_modes) ? context.active_modes : [],
+        calorie_target: context.calorie_target ?? null,
+        data_source: "real",
+      }),
+      "recommendations.compose.recordHouseholdContext",
+    );
+    if (error) throw error;
+  } catch (e) {
+    ctx.logger.warn("household_context.persist_failed", {
+      profile_id: profileId,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+  }
+}
+
+/**
+ * Count this household's total feedback_events rows (§0.2) — the `interaction_count` the master
+ * scoring formula's cohort-decay terms (`w_cohort_effective`/`foreign_demote_effective`) key off.
+ * A cheap indexed count (`idx_feedback_events_profile` covers `profile_id`) rather than a full
+ * row fetch. Returns 0 (never throws) on a lookup failure, matching that formula's own graceful
+ * degrade-to-zero-history behaviour rather than blocking the request over a secondary read.
+ */
+export async function countInteractions(
+  ctx: RequestContext,
+  profileId: string,
+): Promise<number> {
+  try {
+    const db = createServiceRoleClient(ctx.config);
+    const { count, error } = await withTimeout(
+      db.from("feedback_events")
+        .select("id", { count: "exact", head: true })
+        .eq("profile_id", profileId),
+      "recommendations.compose.countInteractions",
+    );
+    if (error) throw error;
+    return count ?? 0;
+  } catch (e) {
+    ctx.logger.warn("interaction_count.lookup_failed", {
+      profile_id: profileId,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+    return 0;
+  }
 }

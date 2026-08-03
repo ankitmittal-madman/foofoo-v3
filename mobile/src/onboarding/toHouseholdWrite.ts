@@ -45,8 +45,8 @@ const OBJECTIVE_MAP: Record<string, string> = {
   into_fitness: "into_fitness",
 };
 
-// compose.ts's ALLERGEN_BITS (the frozen 7-bit model) — 'others' has no bit; it is
-// collect-only, carried through allergensOther/q10_allergy_other instead.
+// compose.ts's ALLERGEN_BITS (extended to 9 bits, WP-21 — fish/mustard were a real safety gap) —
+// 'others' has no bit; it is collect-only, carried through allergensOther/q10_allergy_other instead.
 const ALLERGEN_BITS: Record<string, number> = {
   peanuts: 1, // the live catalogue's plural spelling maps to the engine's 'nuts' bit
   dairy: 2,
@@ -54,6 +54,8 @@ const ALLERGEN_BITS: Record<string, number> = {
   shellfish: 8,
   soy: 32,
   sesame: 64,
+  fish: 128,
+  mustard: 256,
 };
 
 /**

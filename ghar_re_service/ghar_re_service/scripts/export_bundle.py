@@ -145,9 +145,10 @@ def _print_report(report: BC.BuildReport) -> None:
         file=sys.stderr,
     )
     print(
-        f"[build_catalogue] hidden-allergen-risk dishes (hing/asafoetida — NOT auto-filtered, "
-        f"hidden-derivative allergen layer remains an open P0 gap): "
-        f"{len(report.hidden_allergen_risk)}",
+        f"[build_catalogue] hidden-allergen-risk dishes (hing/asafoetida — now actively excluded "
+        f"for gluten-allergic households via ghar_re_core.catalogue.HIDDEN_DERIVATIVE_ALLERGENS, "
+        f"not just reported; broader hidden-derivative coverage beyond this one pairing remains "
+        f"open): {len(report.hidden_allergen_risk)}",
         file=sys.stderr,
     )
     print(

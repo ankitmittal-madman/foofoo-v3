@@ -92,6 +92,10 @@ export default function Recommendations() {
       <Pressable style={styles.button} onPress={() => recsQuery.refetch()} disabled={recsQuery.isRefetching}>
         <Text style={styles.buttonText}>{recsQuery.isRefetching ? "Refreshing..." : "Refresh"}</Text>
       </Pressable>
+      {/* WP-18: the new onboarding->plan flow (cold-start -> weekly-plan -> daily-plan -> recipe) */}
+      <Pressable style={styles.secondaryButton} onPress={() => router.push("/cold-start")}>
+        <Text style={styles.secondaryButtonText}>Try the new weekly plan</Text>
+      </Pressable>
       <Pressable style={styles.secondaryButton} onPress={() => router.replace("/(onboarding)/consent")}>
         <Text style={styles.secondaryButtonText}>Back to onboarding</Text>
       </Pressable>

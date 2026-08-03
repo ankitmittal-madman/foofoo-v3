@@ -52,6 +52,8 @@ class StepResult:
     reason: str = ""       # why skipped/blocked
     artifacts: list[str] = field(default_factory=list)
     failures: list[dict] = field(default_factory=list)
+    cases: list[dict] = field(default_factory=list)  # every testcase (not just failures), for
+    # steps that want a per-parametrization breakdown (e.g. quality-recsys's 100 personas)
 
 
 def _log(report_dir: Path, msg: str) -> None:
@@ -62,15 +64,21 @@ def _log(report_dir: Path, msg: str) -> None:
     print(line, flush=True)
 
 
-def _parse_junit(xml_path: Path) -> tuple[int, int, int, list[dict]]:
-    """Parse a JUnit XML file into (passed, failed, skipped, failure-detail list)."""
+def _parse_junit(xml_path: Path) -> tuple[int, int, int, list[dict], list[dict]]:
+    """Parse a JUnit XML file into (passed, failed, skipped, failure-detail list, all-cases list).
+
+    `all-cases` records every testcase's outcome (not just failures) so callers that need a
+    per-parametrization breakdown (e.g. one row per persona) can render one without re-running
+    pytest or inventing a second data source.
+    """
     if not xml_path.exists():
-        return 0, 0, 0, []
+        return 0, 0, 0, [], []
     tree = ET.parse(xml_path)
     root = tree.getroot()
     suites = root.iter("testsuite")
     total = fails = errors = skips = 0
     failures: list[dict] = []
+    cases: list[dict] = []
     for s in suites:
         total += int(s.get("tests", 0))
         fails += int(s.get("failures", 0))
@@ -78,14 +86,18 @@ def _parse_junit(xml_path: Path) -> tuple[int, int, int, list[dict]]:
         skips += int(s.get("skipped", 0))
         for case in s.iter("testcase"):
             bad = case.find("failure") if case.find("failure") is not None else case.find("error")
+            name = f"{case.get('classname', '')}::{case.get('name', '')}"
             if bad is not None:
-                failures.append({
-                    "test": f"{case.get('classname', '')}::{case.get('name', '')}",
-                    "message": (bad.get("message") or "").strip()[:500],
-                })
+                failures.append({"test": name, "message": (bad.get("message") or "").strip()[:500]})
+                status = "fail"
+            elif case.find("skipped") is not None:
+                status = "skip"
+            else:
+                status = "pass"
+            cases.append({"test": name, "status": status})
     failed = fails + errors
     passed = total - failed - skips
-    return passed, failed, skips, failures
+    return passed, failed, skips, failures, cases
 
 
 def _run_pytest(report_dir: Path, name: str, phase: str, priority: str, target: str,
@@ -102,7 +114,7 @@ def _run_pytest(report_dir: Path, name: str, phase: str, priority: str, target: 
         cwd=REPO_ROOT, env=_ENV, capture_output=True, text=True,
     )
     log.write_text(proc.stdout + "\n" + proc.stderr, encoding="utf-8")
-    passed, failed, skipped, failures = _parse_junit(junit)
+    passed, failed, skipped, failures, cases = _parse_junit(junit)
     status = "pass" if failed == 0 and proc.returncode in (0, 5) else "fail"
     return StepResult(
         name=name, phase=phase, status=status, priority=priority,
@@ -110,7 +122,7 @@ def _run_pytest(report_dir: Path, name: str, phase: str, priority: str, target: 
         passed=passed, failed=failed, skipped=skipped,
         duration_s=round(time.time() - t0, 2),
         artifacts=[str(junit.relative_to(report_dir)), str(log.relative_to(report_dir))],
-        failures=failures,
+        failures=failures, cases=cases,
     )
 
 
@@ -260,8 +272,13 @@ def step_edge(report_dir: Path) -> StepResult:
     cat = report_dir / "edge"
     cat.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
-    proc = subprocess.run(["deno", "test", "-A", str(fn_root)], cwd=REPO_ROOT,
-                          capture_output=True, text=True)
+    # Must run with cwd=supabase/ (not REPO_ROOT) and a path relative to it: the import map
+    # (@std/assert, zod, ajv, @supabase/supabase-js) lives in supabase/deno.json and Deno only
+    # picks up that config by walking up from the CURRENT WORKING DIRECTORY — an absolute path
+    # passed from a different cwd resolves those imports as missing (TS2307) even though the
+    # exact same test files pass under backend-ci.yml, which runs from this same working-directory.
+    proc = subprocess.run(["deno", "test", "--allow-env", "functions/_tests/"],
+                          cwd=fn_root.parent, capture_output=True, text=True)
     (cat / "deno.log").write_text(proc.stdout + proc.stderr, encoding="utf-8")
     ok = proc.returncode == 0
     return StepResult("edge-functions", "6", "pass" if ok else "fail", "P0",
@@ -467,6 +484,7 @@ def _write_reports(report_dir: Path, steps: list[StepResult], verdict: dict, met
         f"<td>{(s.summary or s.reason)}</td></tr>" for s in steps)
     unver = "".join(f"<li>{u}</li>" for u in verdict["unverified_p0_surfaces"]) or "<li>none</li>"
     launch_color = "#137333" if verdict["can_launch_today"] else "#b3261e"
+    persona_section = _render_persona_breakdown(steps)
     html = f"""<!doctype html><html><head><meta charset="utf-8">
 <title>Ghar Quality Report</title><style>
 body{{font-family:system-ui,Arial;margin:2rem;color:#1a1a1a}}
@@ -494,8 +512,44 @@ tr.warn td:nth-child(3){{color:#9a6700}}
 <p class="verdict">Launch today: {'YES' if verdict['can_launch_today'] else 'NO'} — {verdict['launch_readiness']}</p>
 <h2>Steps</h2><table><tr><th>Step</th><th>Phase</th><th>Status</th><th>Priority</th><th>Detail</th></tr>{rows}</table>
 <h2>Unverified P0 surfaces</h2><ul>{unver}</ul>
+{persona_section}
 </body></html>"""
     (report_dir / "summary.html").write_text(html, encoding="utf-8")
+
+
+def _render_persona_breakdown(steps: list[StepResult]) -> str:
+    """Render a per-persona breakdown table for the quality-recsys step's 100-persona roster.
+
+    JUnit records one testcase per (assertion function, persona-id) parametrization, e.g.
+    `test_persona_http_outcome[allergy_peanut_veg]`. Group cases by the bracketed persona id and
+    show, per persona, how many of its behavioural assertions passed/failed/skipped — sourced
+    directly from the JUnit cases already parsed for the step, not a new test run.
+    """
+    step = next((s for s in steps if s.name == "quality-recsys"), None)
+    if step is None or not step.cases:
+        return ""
+    by_persona: dict[str, dict[str, int]] = {}
+    for case in step.cases:
+        test = case["test"]
+        key = test.rsplit("[", 1)[1].rstrip("]") if "[" in test else test
+        if key == "NOTSET":
+            # pytest's placeholder id for a parametrize list that is currently empty (e.g. no
+            # persona sets expect_warnings yet) — not a real persona, would inflate the count.
+            continue
+        counts = by_persona.setdefault(key, {"pass": 0, "fail": 0, "skip": 0})
+        counts[case["status"]] += 1
+    rows = []
+    for key in sorted(by_persona):
+        c = by_persona[key]
+        status = "fail" if c["fail"] else ("skip" if c["pass"] == 0 else "pass")
+        rows.append(
+            f"<tr class='{status}'><td>{key}</td><td>{status.upper()}</td>"
+            f"<td>{c['pass']}</td><td>{c['fail']}</td><td>{c['skip']}</td></tr>")
+    return (
+        f"<h2>Persona breakdown — quality-recsys ({len(by_persona)} personas)</h2>"
+        "<table><tr><th>Persona key</th><th>Status</th><th>Assertions passed</th>"
+        f"<th>Failed</th><th>Skipped</th></tr>{''.join(rows)}</table>"
+    )
 
 
 def main() -> int:
@@ -503,6 +557,13 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Ghar production quality orchestrator")
     ap.add_argument("--quick", action="store_true", help="skip the perf benchmark")
     ap.add_argument("--report-root", default=str(QUALITY_DIR / "reports"))
+    ap.add_argument(
+        "--ci", action="store_true",
+        help="CI mode: exit non-zero ONLY on a real test/step FAILURE. A skipped/blocked P0 "
+             "surface (e.g. no DB or no web target in the runner) does NOT fail the build — it is "
+             "still reported and still blocks the launch verdict, but an environment gap is not a "
+             "regression. Without this flag the exit code follows the launch verdict, which is "
+             "correct for a release gate but would make ordinary CI always red.")
     args = ap.parse_args()
 
     stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
@@ -529,6 +590,15 @@ def main() -> int:
 
     print("\n" + (report_dir / "summary.txt").read_text(encoding="utf-8"))
     print(f"\nFull report: {report_dir}")
+
+    if args.ci:
+        # CI gate: fail only on an actual step failure, not on an unverified/skipped surface.
+        failed_steps = [s.name for s in steps if s.status == "fail"]
+        if failed_steps:
+            print(f"\nCI: FAIL — failing step(s): {', '.join(failed_steps)}")
+            return 1
+        print("\nCI: PASS — no failing steps (unverified surfaces reported, not fatal in CI).")
+        return 0
     return 0 if verdict["can_launch_today"] else 1
 
 

@@ -37,6 +37,7 @@ export interface ReClientDeps {
   fetchImpl?: FetchLike;
   timeoutMs?: number;
   now?: () => number; // injectable clock for deterministic signatures in tests
+  path?: string; // RE endpoint path (default RE_PATH); WP-18 planning surfaces pass their own
 }
 
 const encoder = new TextEncoder();
@@ -122,7 +123,7 @@ export async function callRecommendationEngine(
   const now = deps.now ?? Date.now;
 
   const rawBody = JSON.stringify(payload);
-  const url = cfg.gharReServiceUrl.replace(/\/$/, "") + RE_PATH;
+  const url = cfg.gharReServiceUrl.replace(/\/$/, "") + (deps.path ?? RE_PATH);
   const headers = await buildSignatureHeaders(cfg.gharReServiceSecret, rawBody, requestId, now);
 
   let networkRetried = false;

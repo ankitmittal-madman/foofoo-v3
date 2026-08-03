@@ -8,11 +8,16 @@ WHAT THIS PRODUCES
                                   (i.e. data/sig_scores_v1.csv, resolving data/source/README.md's
                                   own `../sig_scores_v1.csv` config-table entry relative to this
                                   README's own directory — data/source/ — NOT the repo root).
-  2. sig_scores_curation_template.csv — the ~58 dishes flagged as plausible national_icon/
-                                  state_icon candidates, for the Founder to review by hand. Not
-                                  merged into sig_scores_v1.csv as a final value; sig_scores_v1.csv
-                                  carries only a conservative heuristic placeholder for these rows,
-                                  flagged status=PENDING_FOUNDER_REVIEW.
+  2. sig_scores_curation_template.csv — the 63 dishes flagged as plausible national_icon/
+                                  state_icon candidates. RESOLVED (WP-21, 2026-08-03): all 63 rows
+                                  in sig_scores_v1.csv have been assigned a real band (6
+                                  national_icon, 23 state_icon, 34 confirmed regional_hero) via
+                                  AI-researched Indian food-culture knowledge, per Founder direction
+                                  that per-dish Founder review isn't feasible at this volume.
+                                  status=AI_RESEARCHED (not FOUNDER_CURATED — no human has reviewed
+                                  these individually; a spot-check is recommended, not a full
+                                  re-review). See sig_scores_curation_template.csv's own filled-in
+                                  columns for the resolved value + rationale per dish.
 
 SCHEMA (KB0.2 §S2, exact column names, do not invent a different schema)
   dish_name, sig_score, band, evidence_confidence, coverage_confidence, owner, method, version

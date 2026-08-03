@@ -29,13 +29,13 @@ python3 ops/quality/runner/report_reader.py --rerun-failed  # re-run only the fa
 | 4 | Unit — `ghar_re_core` + `ghar_re_service` | ✅ runs (pytest) |
 | 5 | Planning surfaces (`/v1/cold-start`…`/v1/recipe`) | ✅ runs |
 | 6 | API contract at the HTTP boundary (jsonschema) | ✅ runs |
-| 6 | Edge functions (`supabase/functions`) | ⛔ **blocked** — Deno not installed |
-| 7 | Database (migrations/RLS/constraints/integrity) | ⏭ **skipped** — no `DATABASE_URL` |
+| 6 | Edge functions (`supabase/functions`) | ✅ runs — needs Deno installed |
+| 7 | Database (migrations/RLS/constraints/integrity) | ✅ runs — needs `DATABASE_URL` (e.g. `supabase start` locally) |
 | 8 | Recommendation black-box behaviour (15 personas) | ✅ runs |
 | 12 | Performance (in-process latency p50/p95/p99) | ✅ runs |
 | 13 | API security + secrets scan | ✅ runs |
 | 14 | Chaos / fail-safe probes (in-process) | ✅ runs |
-| 9-11 | Headless browser UI + accessibility | ⏭ **skipped** — no `GHAR_WEB_URL` |
+| 9-11 | Headless browser UI + accessibility, one screenshot/console/network capture per screen discovered from `mobile/app`'s own route tree | ✅ runs — needs `GHAR_WEB_URL` (e.g. `expo start --web`) |
 | 16-19 | Orchestrator, reports, dashboard, one command | ✅ this module |
 
 Gated suites are recorded as **skipped/blocked with the concrete reason**, never faked. Unlock them:

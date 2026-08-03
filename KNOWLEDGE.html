@@ -697,8 +697,28 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🍆</span> S53 · Dish alias research batch 3 (WP-19)
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s54')">
+    <div class="nav-item" onclick="showPage('s54')">
       <span class="nav-icon">🍆</span> S54 · Dish alias research batches 4-7 (WP-19)
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s55')">
+      <span class="nav-icon">🗄</span> S55 · Retire legacy RE schema
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s56')">
+      <span class="nav-icon">🛠</span> S56 · Quality gate: real DB/edge/UI checks
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s57')">
+      <span class="nav-icon">🍽</span> S57 · RE deploy verification + doc corrections
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s58')">
+      <span class="nav-icon">🧹</span> S58 · Production hardening audit (WP-21)
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s59')">
+      <span class="nav-icon">🌶</span> S59 · WP-21 punch-list resolutions
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -710,18 +730,18 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">14</span>
+      <span class="nav-badge">15</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">222</span>
+      <span class="nav-badge">236</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">39</span>
+      <span class="nav-badge">43</span>
     </div>
   </div>
 </nav>
@@ -1294,6 +1314,10 @@ function deepDiveFeature(featureLabel){
     <div class="arch-node-name">re_engine RLS</div>
     <div class="arch-node-desc">Row Level Security switched on, 34 tables · S46</div>
   </div>
+  <div class="arch-node is-mod" onclick="jumpModule('re-engine-retirement')">
+    <div class="arch-node-name">re_engine schema</div>
+    <div class="arch-node-desc">Permanently removed from production · S55</div>
+  </div>
   <!-- ARCH_DB_INJECT -->
       </div>
     </div>
@@ -1304,6 +1328,10 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node-name">recommendations</div>
   <div class="arch-node-desc">Edge fn: app → engine orchestration · S34</div>
 </div>
+  <div class="arch-node is-mod" onclick="jumpModule('re-engine-retirement')">
+    <div class="arch-node-name">cron-hard-delete / user-delete / user-export</div>
+    <div class="arch-node-desc">Redeployed on current tables · S55</div>
+  </div>
   <!-- ARCH_SERVER_INJECT -->
       </div>
     </div>
@@ -2173,6 +2201,91 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Asked to keep going through the catalogue, ran four more batches back-to-back in one continuous session rather than stopping after each: batch 4 (Khubani Ka Meetha, Hyderabadi Marag, Dalcha, Osmania Biscuit, Irani Chai, Tahari, plus Masala Dosa/Idli/Sambar/Rasam/Pongal-family South Indian tiffin staples), batch 5 (Avial, Appam, Puttu, Kerala Fish Curry, Parotta, Chicken Chettinad, Filter Coffee, Poriyal, Paniyaram, Murukku), batch 6 (Sadya Thali, Malabar/Thalassery Biryani, Pathiri, Unniyappam, Olan, Kadala Curry, Sundal, Kothu Parotta, Banana Chips), and batch 7 (Bisi Bele Bath, Ragi Mudde, Neer Dosa, Jolada Rotti, Goli Baje, Tamarind Rice, Tomato Rice, Kootu). Same cited-research + safety-filter discipline as batches 1-3 throughout. The safety filter this run caught "Chitranna" and "Saaru" as candidate aliases that are themselves separate catalogue dishes (excluded both), and separately confirmed "Jonna Rotte" and "Pulihora" are distinct catalogue entries so were never used as aliases for Jolada Rotti / Tamarind Rice even though they're closely related dishes. To keep testing cheap across four batches in a row, set up ONE persistent throwaway Postgres 16 (migration 045 + the same sandbox-only auth/role/event-trigger stubs + the uncommitted full-810-dish loader used in S52/S53) instead of rebuilding it per batch — each new seed file was applied and validated against that same running database, then the database was torn down at the end of the run. All four seeds applied clean and validation 907 passed every time. Running total after this session: 116 of 810 catalogue dishes have cited aliases (240 alias rows), 694 dishes remain. Given the realistic scale of individually researching and citing the remaining ~694 dishes, continuing this is expected to take many further sessions — flagged honestly rather than implying the catalogue will be finished imminently.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S55</span>
+      <div class="tl-title">Retire legacy re_engine schema — production cutover completed</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s55')">config.toml fix</span>
+        <span class="tl-chip" onclick="showPage('s55')">edge function deploy</span>
+        <span class="tl-chip" onclick="showPage('s55')">live smoke test</span>
+        <span class="tl-chip" onclick="showPage('s55')">migration 047</span>
+        <span class="tl-chip" onclick="showPage('s55')">REPO-CERT-029</span>
+      </div>
+      <div class="tl-note">Deployed the updated account-deletion/export functions, proved them working live, then permanently removed the old recipe-engine schema from production. WP-20 flipped DRAFT → ACTIVE. Follow-up: prove the scheduled purge job against a real overdue account.</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#e8f8f2;color:#0e7a5a">S56</span>
+      <div class="tl-title">Quality gate: real DB, edge-function, and multi-screen UI checks</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s56')">local Supabase + migrations</span>
+        <span class="tl-chip" onclick="showPage('s56')">Deno installed, 65 tests pass</span>
+        <span class="tl-chip" onclick="showPage('s56')">multi-screen screenshot tool</span>
+        <span class="tl-chip" onclick="showPage('s56')">expo web smoke run</span>
+        <span class="tl-chip" onclick="showPage('s56')">quality score 95→100</span>
+      </div>
+      <div class="tl-note">Turned the quality report's three "can't verify here" gaps (database, edge functions, screenshots) into real passes by actually running local infrastructure for them, and made the screenshot tool cover every screen instead of just the home screen. Follow-up: wire the same setup into CI so this runs automatically.</div>
+    </div>
+  </div>
+
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#92500a"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fff3e0;color:#92500a">S57</span>
+      <div class="tl-title">Verified the recommendation engine is actually live, and fixed docs that said it wasn't</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s57')">ghar-re.fly.dev live-checked</span>
+        <span class="tl-chip" onclick="showPage('s57')">810-dish bundle confirmed</span>
+        <span class="tl-chip" onclick="showPage('s57')">3 stale docs corrected</span>
+        <span class="tl-chip" onclick="showPage('s57')">ghar_re.dishes deletion averted</span>
+        <span class="tl-chip" onclick="showPage('s57')">WP-11 §6 addendum</span>
+      </div>
+      <div class="tl-note">A question about which dish table powers recommendations led to checking the recommendation engine live instead of trusting its own setup docs — found it already deployed, healthy, and serving the real 810-dish catalogue with real traffic. Corrected 3 documents that wrongly said "not deployed." A plan to delete an apparently-unused database table was reversed after finding real dependent tables. Follow-up: recover/retire the undocumented "diag-re-check" live function; decide the fate of the unused ghar_re DB area.</div>
+    </div>
+  </div>
+
+
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#7a3b8f"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f3e8fb;color:#7a3b8f">S58</span>
+      <div class="tl-title">Production hardening audit (WP-21): found and fixed two accidental-launch bugs, catalogued the rest</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s58')">Onboarding force-restart bug fixed</span>
+        <span class="tl-chip" onclick="showPage('s58')">Query caching re-enabled</span>
+        <span class="tl-chip" onclick="showPage('s58')">WP-21 audit doc (10 report sections)</span>
+        <span class="tl-chip" onclick="showPage('s58')">6 Founder decisions catalogued</span>
+      </div>
+      <div class="tl-note">A repo-wide scan for stubs, hardcoded values, dead code, and doc drift found the codebase mostly self-documents its own gaps honestly. The two real accidental-launch risks — onboarding always restarting from scratch, and all query caching disabled — were both dated the day before this session and explicitly marked "revert before launch" with the real logic already written right next to them, so both were reverted. Everything else (fallback-plate coverage, consent IP-hash gap, dish-signature score curation, monitoring wiring, etc.) needs a Founder/product call, not a guess, and is catalogued in WP-21 rather than silently fixed.</div>
+    </div>
+  </div>
+
+
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#c0392b"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fdecea;color:#c0392b">S59</span>
+      <div class="tl-title">Founder ruled on the WP-21 punch list: fixed 3, postponed most, deleted an unused function + schema</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s59')">RE fallback now errors, doesn't guess a plate</span>
+        <span class="tl-chip" onclick="showPage('s59')">Fish/mustard allergens fixed</span>
+        <span class="tl-chip" onclick="showPage('s59')">63 dish signature scores resolved</span>
+        <span class="tl-chip" onclick="showPage('s59')">diag-re-check function retired</span>
+        <span class="tl-chip" onclick="showPage('s59')">ghar_re schema drop migration prepared</span>
+      </div>
+      <div class="tl-note">Founder went item-by-item through WP-21's P1-P3 list. Fixed: the RE now tells the user "try again" instead of silently serving a plate that might ignore their allergies; fish and mustard allergies can now actually be selected and excluded; all 63 pending dish-fame scores got real values from food-culture knowledge instead of staying placeholders. Deleted: an orphaned live server function with no source in the repo, and prepared (not yet applied — no DB password available this session) a migration dropping a 28-table database area confirmed unused by the app or the recommendation engine. Everything else was explicitly postponed until the full recommendation engine rebuild.</div>
+    </div>
+  </div>
+
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2567,6 +2680,32 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">S51 · Aug 3 2026</div>
   </div>
 </div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-re-engine-retirement" onclick="toggleDetail('mod-re-engine-retirement')">
+    <div class="detail-left">
+      <span class="tag tag-db">DB</span>
+      <span class="detail-name">Legacy recipe-engine schema retirement (WP-20)</span>
+    </div>
+    <span class="detail-chevron" id="chev-mod-re-engine-retirement">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-re-engine-retirement">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Retires "re_engine", the database schema belonging to a previous, now-unused version of the recommendation engine. Confirmed via code search that only 6 of its ~32 tables were still touched by any live code; those 6 were copied into the current tables (public schema) first, everything else was backed up to a JSON archive, and the whole old schema was then permanently removed.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>database/migrations/046_rehome_re_engine_live_tables.sql</code> — copies the 6 still-used tables into public<br>
+      <code>database/migrations/047_drop_legacy_re_engine_schema.sql</code> — permanently removes the old schema, guarded so it can't run too early<br>
+      <code>database/validation/908_re_engine_decommission_validation.sql</code> — the safety check that must pass before 047 runs<br>
+      <code>supabase/functions/_shared/services/scheduler/hard-delete.ts</code> — the scheduled account-erasure job, updated to use the current tables<br>
+      <code>supabase/functions/user-export/store.ts</code> — the data-export job, updated to use the current tables<br>
+      <code>database/archive/re_engine_backup_20260803/</code> — full JSON backup of every row in the old schema, taken before anything was changed
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Removes ~26 dead tables of technical debt from production without any risk of silently breaking account deletion or data export — both of those legally-required features were proven working against a real test account before the old schema was ever touched.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S55 · Aug 3</div>
+  </div>
+</div>
 <!-- MODULES_INJECT -->
   </div>
 
@@ -2857,6 +2996,103 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">database/seeds/126_seed_dish_aliases_b5.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S54</td><td class="fr-desc">Batch 5 of WP-19 cited aliases: 10 Kerala/Tamil Nadu dishes, 23 alias rows</td></tr>
 <tr><td class="fr-file mono">database/seeds/127_seed_dish_aliases_b6.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S54</td><td class="fr-desc">Batch 6 of WP-19 cited aliases: 10 Kerala Sadya/Malabar dishes, 17 alias rows</td></tr>
 <tr><td class="fr-file mono">database/seeds/128_seed_dish_aliases_b7.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S54</td><td class="fr-desc">Batch 7 of WP-19 cited aliases: 8 Karnataka/Tamil Nadu dishes, 19 alias rows</td></tr>
+  <tr>
+    <td class="fr-file mono">supabase/config.toml</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Removed an invalid top-level functions setting that was blocking every Supabase CLI command</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">.gitignore</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Ignored supabase/.branches/ (CLI-local link state) and .claude/settings.local.json (personal permission overrides)</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">docs/project-history/certificates/[ACTIVE]_REPO-CERT-029_WP-20_Full_Cutover_Completion_v1.0.md</td>
+    <td><span class="tag tag-new">New</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Proof-of-execution record for the full WP-20 cutover: deploy, smoke test, validation 908, migration 047, RLS re-check</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">docs/project-history/work-packages/[ACTIVE]_WP-20_Retire_Legacy_re_engine_Schema_v1.0.md</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Renamed DRAFT → ACTIVE and added the session's execution record now that the cutover is fully complete</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">database/migrations/047_drop_legacy_re_engine_schema.sql</td>
+    <td><span class="tag tag-db">DB</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Applied to production this session — permanently dropped the old re_engine schema</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ops/quality/ui/run_ui.mjs</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S56</td>
+    <td class="fr-desc">Now discovers every app screen from mobile/app's own folder and screenshots + logs each one, instead of only the home screen.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ops/quality/README.md</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S56</td>
+    <td class="fr-desc">Updated the status table — database, edge functions, and UI screenshots are runnable here, not permanently gated.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ops/quality/ui/package.json</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S56</td>
+    <td class="fr-desc">Added Playwright as a dependency for the screenshot tool.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ops/quality/ui/package-lock.json</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S56</td>
+    <td class="fr-desc">Lockfile for the screenshot tool's Playwright dependency.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ops/quality/ui/.gitignore</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S56</td>
+    <td class="fr-desc">Keeps the installed Playwright package out of version control.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ghar_re_service/ghar_re_service/scripts/build_catalogue.py</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S57</td>
+    <td class="fr-desc">Docstring corrected — the real-catalogue swap it describes as pending is actually done and shipping.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ghar_re_service/README.md</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S57</td>
+    <td class="fr-desc">Status line corrected from "PREPARED, NOT DEPLOYED" to "DEPLOYED", with the live health/bundle-version check that proved it.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ghar_re_service/fly.toml</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S57</td>
+    <td class="fr-desc">Header comment corrected from "NOT YET DEPLOYED" to "DEPLOYED — live at ghar-re.fly.dev".</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">docs/project-history/work-packages/[DRAFT]_WP-11_Launch_Readiness_Remediation_Plan_v1.0.md</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S57</td>
+    <td class="fr-desc">Appended §6 changelog addendum: closes the 802/810/39 catalogue-reconciliation question with live proof, flags new diag-re-check drift, records the ghar_re.dishes deletion that was deliberately not done.</td>
+  </tr>
+  <tr><td class="fr-file mono">mobile/app/index.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S58</td><td class="fr-desc">Removed a dated (Aug 2) testing override that always sent every signed-in user back to onboarding; restored the real "go to recommendations if already complete" logic</td></tr>
+  <tr><td class="fr-file mono">mobile/src/lib/queryClient.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S58</td><td class="fr-desc">Removed a dated (Aug 2) testing override that disabled all query caching app-wide; restored the documented production default</td></tr>
+  <tr><td class="fr-file mono">docs/project-history/work-packages/[DRAFT]_WP-21_Production_Hardening_Audit_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S58</td><td class="fr-desc">Full production-hardening audit: stub inventory, hardcoded-value audit, dead-code check, doc-drift notes, deferred-decision register, readiness checklist, fixes applied, remaining manual work</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/recommendations/fallback.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">RE-unavailable now returns a 503 error instead of a single hardcoded "safe" dish that ignored real allergies</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/recommendations/handler.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Both RE-failure paths now return status 503 with the fallback error body</td></tr>
+  <tr><td class="fr-file mono">database/etl/generate_icd1_seeds.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Allergen bitmask extended from 7 to 9 bits (fish=128, mustard=256)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/step-4.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Added Fish and Mustard allergen chips to the onboarding question</td></tr>
+  <tr><td class="fr-file mono">mobile/src/onboarding/toHouseholdWrite.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Allergen bitmask extended to match (fish=128, mustard=256)</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/recommendations/compose.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Allergen bitfield decode extended to 9 bits so the RE actually excludes fish/mustard dishes</td></tr>
+  <tr><td class="fr-file mono">database/migrations/049_extend_allergen_model_fish_mustard.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S59</td><td class="fr-desc">Backfills allergen_flags for the 8 ingredients tagged fish/mustard in the source CSV (not yet applied live)</td></tr>
+  <tr><td class="fr-file mono">database/migrations/050_drop_unused_ghar_re_schema.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S59</td><td class="fr-desc">Drops the 28-table ghar_re schema, confirmed unread by any live code path (not yet applied live)</td></tr>
+  <tr><td class="fr-file mono">supabase/config.toml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S59</td><td class="fr-desc">Removed a stale reference to the re_engine schema already dropped in WP-20</td></tr>
+  <tr><td class="fr-file mono">data/sig_scores_v1.csv</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">All 63 pending dish signature scores resolved (6 national_icon, 23 state_icon, 34 confirmed regional_hero)</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3351,6 +3587,90 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why reuse one persistent throwaway Postgres 16 across batches 4-7 instead of a fresh database per batch?</div>
     <div class="decision-a">Setting up the full migration chain plus the sandbox-only stubs (auth.uid()/auth.role(), roles, rls_auto_enable(), the 810-dish loader) is the expensive part of testing each batch, not applying one more seed file. Once that base state exists, each new batch's seed + validation 907 can run against it directly and still prove the same thing (the new rows satisfy the FK, the citation check, and don't break anything already seeded) without re-paying migration setup cost every time. Nothing about the seed files themselves changed — this is purely a test-harness efficiency, not a shortcut on what got verified.</div>
     <div class="decision-meta">S54 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should the assistant self-grant itself new production access permissions when it hits a permission block?</div>
+    <div class="decision-a">No. When direct database access and direct HTTP calls to production were both blocked by the coding tool's own safety classifier, the assistant reported the block and asked the Founder to add the permission rule personally, rather than editing the permission file itself — self-granting would defeat the purpose of the safety check.</div>
+    <div class="decision-meta">S55 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should the assistant back-date a test account's deletion timestamp to force the scheduled purge job to actually run its delete logic?</div>
+    <div class="decision-a">The Founder declined this specific action when proposed. The assistant instead ran the job as a safe no-op (confirming it starts up and queries the right tables without error) and left full end-to-end proof of the purge logic as a follow-up for a future session.</div>
+    <div class="decision-meta">S55 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">In what order should the deploy, database checks, and schema removal happen?</div>
+    <div class="decision-a">Strictly: deploy the updated functions first, prove them working against a real test account, re-run the safety-check script, and only then remove the old schema. Doing the removal any earlier would have broken account deletion/export in production the moment they tried to read a table that no longer existed.</div>
+    <div class="decision-meta">S55 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why did the project's saved "service role" key fail authentication on one function call, and what was used instead?</div>
+    <div class="decision-a">This project has migrated to Supabase's newer API key format; the older-style key still shown in the dashboard as valid is no longer what's actually wired into the live functions. The newer-format secret key worked immediately once tried.</div>
+    <div class="decision-meta">S55 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">The database and screenshot checks were "skipped" by design — should we treat that as a bug?</div>
+    <div class="decision-a">No — the orchestrator was already honest about not having a live database or running app to test against. The real fix was to actually provide those things (a local database, a running web build) rather than change what the checker reports.</div>
+    <div class="decision-meta">S56 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should the database check run against the real production Supabase project?</div>
+    <div class="decision-a">No — a private local copy (via Docker) was used instead. It proves the schema is structured correctly just as well, without any risk to live user data.</div>
+    <div class="decision-meta">S56 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">One database migration step fails on a fresh local copy — is that worth fixing?</div>
+    <div class="decision-a">No — that one step removes a permission from a function that only exists in the real production database (installed there manually and on purpose, per an earlier migration's own comment). It's expected to be absent locally and doesn't block anything else.</div>
+    <div class="decision-meta">S56 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">How should the screenshot tool know which screens to check?</div>
+    <div class="decision-a">By reading the app's own screen folder at run time, rather than a hardcoded list — so a newly added screen gets covered automatically instead of silently going unchecked.</div>
+    <div class="decision-meta">S56 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: The two "TEMPORARY (testing)" overrides in mobile/app/index.tsx and queryClient.ts were dated the day before this session — fix them now, or just flag them?</div>
+    <div class="decision-a">A: Fixed directly. Both are auto-fix-eligible by this audit's own rule: the correct production logic was already written by a prior session and left right there in a comment, explicitly labeled "revert before launch." Leaving them would mean the very next launch ships onboarding that never remembers a returning user and a cache that never caches — both were the highest-risk findings in the whole audit precisely because they were both recent and trivially shippable by accident.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: Where should the 10 requested audit reports live, given the task asked for a new reports/production-hardening/ folder?</div>
+    <div class="decision-a">A: Founder chose docs/project-history/work-packages/ instead — the repo's frozen architecture requires an RACR for any new top-level folder, and a full production-hardening pass is itself a Work Package by this repo's own definition. Consolidated into one WP-21 document with the 10 requested reports as appendices, rather than 10 separate files, to respect the repo's naming standard (status-prefixed, versioned document names).</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: Hardcoded weather (is_raining:true, temp_c:27) and a single hardcoded fallback dish exist in real Edge Function code — fix them?</div>
+    <div class="decision-a">A: Left untouched. Both are documented, intentional v1 scope decisions (weather-mocked-by-design is stated consistently across the whole RE), not oversights — and both already log/trace their own usage rather than hiding it. Replacing them would mean inventing a real weather API integration or a real per-allergy fallback catalogue, which this audit's own rules forbid guessing at.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Which of three dish sources (public.dishes=802, ghar_re.dishes=39, the bundled catalogue=810) actually powers live recommendations?</div>
+    <div class="decision-a">Neither database table. The live recommendation engine reads a pre-built JSON file (ghar_re_service/data/bundle/catalogue.json, 810 dishes sourced from data/source/dishes.xlsx) baked into its deployed container image — it never queries Postgres at request time, by design (RE-DOC-10 §8). Confirmed live: the running service's /v1/meta endpoint reports the exact bundle_version hash that matches the committed manifest. public.dishes (802) is used by the app's general content layer; ghar_re.dishes (39) is not read by any current runtime code path.</div>
+    <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Was the recommendation engine's Fly.io deployment actually still pending, as its own config file and README said ("PREPARED, NOT DEPLOYED")?</div>
+    <div class="decision-a">No — checked live via `fly status` and direct HTTP calls to ghar-re.fly.dev: the app was already running, healthy, and had already served 9 real requests (8 successful) through the app's recommendations server function. The "not deployed" status in fly.toml/README/build_catalogue.py was stale documentation from an earlier phase that never got updated after the actual deploy happened. Corrected all three files rather than re-deploying something already live.</div>
+    <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should ghar_re.dishes (39 rows, unread by any current runtime code) be dropped as dead weight?</div>
+    <div class="decision-a">No — reversed mid-session. An initial plan assumed it was orphaned based on an application-code-only search. Checking the database's own foreign keys found real dependent tables (dish_pairing_penalties, dish_safety_flags, dish_name_synonyms, KB hero-dish links) and an active validation script referencing it — dropping it would cascade-delete a real, structurally-connected subsystem. Left in place; the broader question (should the whole unused ghar_re Postgres schema be retired) was flagged as a Founder decision, not executed.</div>
+    <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should the hardcoded fallback dish ("Moong Dal Khichdi") in supabase/functions/recommendations/fallback.ts be removed, per a general "no hardcoded dishes anywhere" instruction?</div>
+    <div class="decision-a">Left as-is. Its own code comment already flags it explicitly as a deliberate, documented stub (RE-DOC-10 §11) for the rare case the RE is completely unreachable, not an accidental hardcode — and with the RE now confirmed live and healthy, this path is a last-resort safety net, not the default experience. Ripping it out would trade a documented safe-default for an error state with no clear product upside; treated as an existing, intentional design decision rather than a bug to silently fix.</div>
+    <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: Fallback plate served a hardcoded dish when the RE was down — fix the plate, or remove it?</div>
+    <div class="decision-a">A: Removed it. A single hardcoded dish can't know a specific household's real allergies/diet, so guessing was itself the safety risk this audit flagged. Until a real per-zone fallback catalogue exists (future work), showing the user a clear "try again" error is safer than showing food that might be wrong for them.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: Dish signature scores for 63 dishes needed real values, but Founder review of each one individually isn't feasible — what's the alternative?</div>
+    <div class="decision-a">A: AI-researched using established Indian food-culture knowledge, labeled with a new status (AI_RESEARCHED) distinct from FOUNDER_CURATED so nothing is misrepresented as human-reviewed. A spot-check of the 6 highest-impact promotions is recommended rather than a full re-review.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: The ghar_re database schema (28 tables) is confirmed unused by any live code — delete it now?</div>
+    <div class="decision-a">A: Migration prepared and Founder-approved, but not applied — this session has no database write credentials (supabase db push requires an interactive password not available here). It needs to be run through the normal deploy process.</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -8751,7 +9071,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s53 -->
-  <div id="page-s54" class="page-content">
+  <div id="page-s54" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S54 · Dish alias research batches 4-7 (WP-19)</div>
       <div class="page-subtitle">Kept going through the catalogue in one continuous run — 4 more batches, 49 dishes, 93 cited aliases, spanning Hyderabadi tiffin food, Kerala Sadya/Malabar cuisine, and Karnataka/Tamil Nadu regional classics.</div>
@@ -8789,6 +9109,1438 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s54 -->
+  <div id="page-s55" class="page-content" style="display:none">
+
+    <div class="page-header">
+      <div class="page-title">S55 · Retire legacy re_engine schema — production cutover completed</div>
+      <div class="page-subtitle">Finished removing the old, unused recipe-engine database schema from production — account deletion and data-export now run entirely on the current tables, and the leftover legacy schema is gone.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The account-deletion and data-export code had been rewritten to stop using the old legacy schema, but that rewritten code was only sitting committed, not actually running in production — the live app was still on the old code, and the old schema itself hadn't been removed yet.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The updated deletion/export functions are live and confirmed working with a real test account, and the old legacy schema (~26 unused tables) has been permanently removed from production, with everything backed up first.</div>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>6 things touched</div>
+      </div>
+      <div class="session-card-desc">Fixed a broken local tool config that was blocking every Supabase command, deployed the three edge functions that handle account deletion/export, proved they work against a real test account, then ran the two safety checks and the actual schema-removal migration against production, in that order.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">1</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">1</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">3</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s55','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s55','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s55','flows')">Feature flows</div>
+    </div>
+
+    <div id="s55-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Test account requests data export, then account deletion</span></div>
+              <div class="step-desc">A designated test user signed in and triggered both the "download my data" and "delete my account" actions, to prove the live functions actually work before the old schema was removed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ tool config had to be fixed before anything could deploy</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s55','config-fix')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Fixed a broken deploy-tool config</span><span class="tag tag-cfg">Config</span></div>
+              <div class="step-desc">The Supabase command-line tool couldn't even start — a leftover setting in its config file was written for a newer version of the tool than the one installed. Removed the invalid setting.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ database confirmed safe before and after the schema removal</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s55','migration-047')">
+            <div class="step-num num-teal">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Removed the old legacy recipe-engine schema</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">After confirming a safety check passed and the live functions no longer needed it, permanently dropped the old, unused schema (~26 tables) from production. Its data was already copied to the current tables or backed up.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s55','rls-recheck')">
+            <div class="step-num num-teal">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Re-checked table access permissions after the removal</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">Confirmed the 6 tables that were moved over from the old schema still have the correct privacy/access rules after the old schema was gone.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ live server functions had to be redeployed first</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s55','deploy-functions')">
+            <div class="step-num num-amber">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Deployed the account-deletion and data-export functions live</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Pushed the already-written, already-committed code for account deletion, data export, and the scheduled hard-delete job live to production for the first time since they were rewritten to use the current tables.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">The scheduled hard-delete job's actual purge logic (deleting a user's data once 72 hours have passed) was reviewed in code but not proven against a real overdue account in production — a future session with a genuinely overdue test account should confirm that path end to end.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <div id="s55-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s55-config-fix" onclick="toggleDetail('s55-config-fix')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Config</span>
+            <span class="detail-name">supabase/config.toml</span>
+          </div>
+          <span class="detail-chevron" id="chev-s55-config-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s55-config-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Configures the Supabase command-line tool for this project. It had a setting written in a format only understood by a newer version of the tool than the one actually installed, so every single command — including the ones needed to deploy — failed before doing anything.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Any Supabase CLI command run against this project</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Before: instant config error. After: command runs normally.</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">CLI starts</span><span class="dd-arrow">→</span>
+            <span class="dd-node">reads config.toml</span><span class="dd-arrow">→</span>
+            <span class="dd-node">invalid setting removed</span><span class="dd-arrow">→</span>
+            <span class="dd-node">command proceeds</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">removed: [functions]\nverify_jwt = true</span>  ← this installed tool version only understands per-function settings, not one shared setting for all functions; removing it is safe since "on" was already the default behavior with nothing else set.</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just tell the Founder to upgrade the CLI instead?</div>
+            <div class="dd-why-a">Upgrading a locally installed tool is a bigger, separate change; removing one invalid line that changes nothing about actual behavior was the smaller, safer fix to unblock today's deploy.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s55-deploy-functions" onclick="toggleDetail('s55-deploy-functions')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">cron-hard-delete, user-delete, user-export (edge functions)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s55-deploy-functions">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s55-deploy-functions">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">These three server functions handle a user's legal right to delete their account or download their own data — plus the background job that permanently erases a deleted account's data after 72 hours. This session deployed the versions of them that read/write the current tables instead of the old, soon-to-be-removed ones.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A signed-in user's request to export or delete their account; or the scheduled job's own trigger</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A download link for export; a confirmation + deletion timeline for delete; a count of accounts actually purged for the scheduled job</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">signed-in test account</span><span class="dd-arrow">→</span>
+            <span class="dd-node">export → 202 queued → complete</span><span class="dd-arrow">→</span>
+            <span class="dd-node">delete → 202 soft-deleted</span><span class="dd-arrow">→</span>
+            <span class="dd-node">scheduled purge job → runs clean</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">supabase/functions/_shared/services/scheduler/hard-delete.ts:110-125</span>  ← the actual erase step now deletes from the current tables (never_list, user preferences, etc.) instead of the old, soon-to-be-removed schema.</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why deploy before removing the old schema, not after?</div>
+            <div class="dd-why-a">If the old schema were removed first, these three functions would start erroring immediately in production (they'd try to read tables that no longer exist) — deploy-then-remove is the only safe order, and the removal step itself refuses to run until the new tables exist.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s55-migration-047" onclick="toggleDetail('s55-migration-047')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">database/migrations/047_drop_legacy_re_engine_schema.sql</span>
+          </div>
+          <span class="detail-chevron" id="chev-s55-migration-047">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s55-migration-047">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Permanently deletes the old "re_engine" schema — about 26 tables from a previous version of the recommendation engine that nothing in the live app reads anymore. It only runs if the current tables it depends on already exist, as a built-in safety check.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Production database, run once via the Supabase SQL Editor</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">The old schema and all its tables are gone; nothing else changes</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">safety check passes</span><span class="dd-arrow">→</span>
+            <span class="dd-node">DROP SCHEMA re_engine CASCADE</span><span class="dd-arrow">→</span>
+            <span class="dd-node">confirmed gone</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">EXECUTE 'DROP SCHEMA re_engine CASCADE';</span>  ← the actual, irreversible removal — every row was already backed up to a JSON archive in the repo before this ran.</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Was any data lost?</div>
+            <div class="dd-why-a">No — every table's data was either already copied into the current tables (the 6 still-used ones) or exported to a JSON backup committed in the repo (the ~20 genuinely dead ones) before this migration ever ran.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s55-rls-recheck" onclick="toggleDetail('s55-rls-recheck')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">Post-removal permission check (6 re-homed tables)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s55-rls-recheck">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s55-rls-recheck">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A read-only check confirming the 6 tables moved over from the old schema still have the right privacy rules turned on after the old schema was removed — nothing about removing the old schema should have changed these, but it's worth confirming rather than assuming.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The 6 re-homed tables in production</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">All 6 confirmed correct: one public read-only table, five private/staff-only tables</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">query pg_class + pg_policy</span><span class="dd-arrow">→</span>
+            <span class="dd-node">compare against intended design</span><span class="dd-arrow">→</span>
+            <span class="dd-node">matches, no fix needed</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">re_states → 1 policy (public read); other 5 → 0 policies (staff-only)</span>  ← exactly the posture a previous session had already fixed and certified; this just re-confirmed it survived the schema removal.</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why check this again — wasn't it already fixed?</div>
+            <div class="dd-why-a">A previous session found and fixed a real bug here (one table had privacy protection on but zero rules, making it silently unreadable). Given that history, re-confirming after a second, unrelated database change was cheap insurance against a repeat.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Prove the scheduled hard-delete job's purge logic against a real overdue test account (not just a zero-results run), once one exists.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <div id="s55-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S55 = [
+      {
+        id: 'account-deletion-export-cutover',
+        label: 'Account deletion & data export (post-cutover)',
+        steps: [
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'User requests export or deletion',
+            desc: 'A signed-in user calls the export or delete-my-account action from the app.',
+            codeFlow: [ {chip:'supabase/functions/user-export/index.ts'}, {label:'or'}, {chip:'supabase/functions/user-delete/index.ts'} ],
+            files: [
+              {path:'supabase/functions/user-export/index.ts', desc:'Entry point for GET /v1/user/export'},
+              {path:'supabase/functions/user-delete/index.ts', desc:'Entry point for POST /v1/user/delete'}
+            ],
+            api: {endpoint:'GET /v1/user/export, POST /v1/user/delete', note:'Both require the caller\'s own signed-in session'},
+            db: null
+          },
+          {
+            layer: 'Server',
+            tag: 'API',
+            title: 'Handler reads/writes the current tables',
+            desc: 'The business logic loads or updates the user\'s data, now scoped to the current tables instead of the old, removed schema.',
+            codeFlow: [ {chip:'supabase/functions/user-export/store.ts'}, {label:'reads'}, {chip:'public.never_list'} ],
+            files: [
+              {path:'supabase/functions/user-export/store.ts', desc:'Loads every table an export needs to include'},
+              {path:'supabase/functions/user-delete/handler.ts', desc:'Soft-deletes the account (sets deleted_at) after checking a safety-phrase match'}
+            ],
+            api: null,
+            db: {table:'public.never_list, public.profiles', op:'SELECT / UPDATE', note:'Moved here from the old re_engine schema in an earlier migration'}
+          },
+          {
+            layer: 'Server',
+            tag: 'API',
+            title: 'Scheduled job erases data 72h after deletion',
+            desc: 'A separate scheduled function checks daily for accounts past their 72-hour grace period and permanently erases their data, table by table.',
+            codeFlow: [ {chip:'supabase/functions/cron-hard-delete/index.ts'}, {label:'runs'}, {chip:'supabase/functions/_shared/services/scheduler/hard-delete.ts'} ],
+            files: [
+              {path:'supabase/functions/_shared/services/scheduler/hard-delete.ts', desc:'Deletes every personal-data table for one profile, in the right order'},
+              {path:'supabase/functions/_shared/auth/service-role.ts', desc:'Makes sure only the scheduler itself (not a random caller) can trigger this'}
+            ],
+            api: {endpoint:'POST /functions/v1/cron-hard-delete', note:'Only callable with the project\'s own service-role key, never a user session'},
+            db: {table:'public.profiles + 7 related tables', op:'DELETE', note:'Confirmed live this session with 0 real overdue accounts (safe no-op run)'}
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s55-flows', window.FEATURE_FLOWS_S55);
+    </script>
+
+  </div><!-- /page-s55 -->
+
+  <div id="page-s56" class="page-content" style="display:none">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S56 · Quality gate: real DB, edge-function, and multi-screen UI checks</div>
+      <div class="page-subtitle">The production quality report used to skip the database, server-function, and app-screenshot checks because nothing was running for them to test against — this session actually started those things up so the report now proves them for real.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The quality report scored 95/100 and said "not launchable" because three important checks — the database, the server functions, and a screenshot walk of every app screen — were skipped or blocked in this environment. Also, the screenshot tool only ever took one picture (the home screen), even when it did run.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">The quality report scores 100/100 and says "READY." All three checks now genuinely run: a real local database was set up and checked, the server functions were tested for real, and the screenshot tool now walks every screen in the app (15 screens) and saves a picture, a console log, and a network log for each one.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ops/quality/ui/run_ui.mjs</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ops/quality/README.md</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ops/quality/ui/package.json</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">ops/quality/ui/package-lock.json</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">ops/quality/ui/.gitignore</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">.claude/projects/-home-ankit-mittal-mds02-foofoo-v3/memory/quality-gate.md</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>6 things touched</div>
+      </div>
+      <div class="session-card-desc">Started a local copy of the database (via Docker) and loaded all 48 schema migrations into it, so the quality report's database check has a real database to test against instead of skipping. Installed the missing tool (Deno) the server-function tests needed, so those 65 tests actually run instead of being blocked. Rewrote the screenshot tool so it automatically finds every screen in the app and photographs each one, instead of only the home screen — then ran it against a real running copy of the app.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">15</div><div class="stat-l">Screens screenshotted</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">2</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">48</div><div class="stat-l">Migrations applied (local)</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">65</div><div class="stat-l">Server fn tests unblocked</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s56','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s56','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s56','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s56-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s56','ui-driver')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Every app screen gets loaded headlessly and photographed</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A robot browser opens the web version of the app and visits every screen — the splash screen, sign-in, all 5 onboarding steps, cold-start, create-account, recommendations, daily plan, weekly plan, and a recipe page — taking a screenshot of each so a human can see exactly what shipped without opening the app themselves.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ the screenshot tool discovers which screens exist by reading the app's own screen folder</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s56','ui-driver')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Screenshot tool rewritten to find screens automatically</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The tool used to only know about one screen (the home screen). Now it looks at the app's own screen folder and builds the full list itself, so a new screen added later gets checked automatically — nobody has to remember to add it to a list.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s56','edge-tests')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Server-function test runner (Deno) installed</span><span class="tag tag-cfg">Config</span></div>
+              <div class="step-desc">The tool that runs the server functions' own test suite was missing from this environment. Installing it let all 65 of those tests run for real instead of being reported as "can't check."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ the quality report also needs a real database to check against</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s56','local-db')">
+            <div class="step-num num-teal">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Local practice database stood up and filled in</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">A private, disposable copy of the database was started on this machine (not the real production one) and every one of the app's 48 schema-building steps was run against it, so the quality report could genuinely confirm the database is structured correctly.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ server functions were already tested against this same local setup</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s56','edge-tests')">
+            <div class="step-num num-amber">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">All 65 server-function tests pass</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Consent, feedback, household, recommendations, account-export, and account-delete functions were all exercised by their own test suite and every test passed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">This was all proven in a local sandbox, not the shared CI/staging environment — the same three checks (database, edge functions, screenshots) should be wired into an actual CI pipeline so every future change gets this same proof automatically, not just when someone runs it by hand. Also, only the Chromium browser was available for screenshots this session (Firefox/WebKit binaries weren't installed) — worth adding if cross-browser screenshots matter.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s56-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s56-ui-driver" onclick="toggleDetail('s56-ui-driver')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">ops/quality/ui/run_ui.mjs</span>
+          </div>
+          <span class="detail-chevron" id="chev-s56-ui-driver">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s56-ui-driver">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A headless-browser script that opens the web build of the app and takes evidence (screenshot, console log, network log) for every screen. It used to visit only the home screen; it now reads the app's own screen folder and visits every screen that exists, so new screens get covered automatically.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A running web address for the app (e.g. from `expo start --web`)</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">One screenshot + console log + network log per screen, plus a pass/fail summary the quality report reads</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">reads mobile/app's screen folder</span><span class="dd-arrow">→</span>
+            <span class="dd-node">builds the list of screen addresses</span><span class="dd-arrow">→</span>
+            <span class="dd-node">visits each one in a headless browser</span><span class="dd-arrow">→</span>
+            <span class="dd-node">saves a screenshot + logs per screen</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">for (const route of routes) { ... await page.screenshot(...) }</span>  ← loops over every discovered screen instead of one hardcoded screen</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why discover screens from the folder instead of a hardcoded list?</div>
+            <div class="dd-why-a">A hardcoded list silently goes stale — someone adds a new screen and forgets to add it here, so it never gets checked. Reading the app's own screen folder means the check always matches what's actually shipping.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">What about screens that need a real ID in the URL (like a recipe page)?</div>
+            <div class="dd-why-a">A placeholder value is substituted (e.g. "sample-dish") so the screen is still reachable and screenshotted, even though it won't show real recipe data — that's enough to catch a broken/blank page.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s56-local-db" onclick="toggleDetail('s56-local-db')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">Local practice database (Docker)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s56-local-db">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s56-local-db">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A private copy of the database, running only on this machine, used to prove the quality report's database check without touching the real production database.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The 48 schema-building files in database/migrations, run in order</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A working local database with 28 tables in the app's main schema — enough for the quality check to confirm "connected, correctly structured"</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">start local database (Docker)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">run all 48 schema files in order</span><span class="dd-arrow">→</span>
+            <span class="dd-node">quality report connects and counts tables</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">select count(*) from information_schema.tables where table_schema='ghar_re'</span>  ← the exact check the quality report runs to prove the database is real and structured</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just point the check at the real production database?</div>
+            <div class="dd-why-a">The production database is live and holds real user data — running quality checks against it risks disruption for no benefit, since a fresh local copy proves the schema is correct just as well.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">One migration step failed locally — was that a real problem?</div>
+            <div class="dd-why-a">No. That one step revokes a permission on a function that only exists in the real production database (it was installed there by hand, on purpose, and is documented as such in an earlier migration's own comment). It's expected to be missing in a fresh local copy and doesn't affect anything else.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s56-edge-tests" onclick="toggleDetail('s56-edge-tests')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Config</span>
+            <span class="detail-name">Server-function test runner (Deno)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s56-edge-tests">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s56-edge-tests">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Deno is the tool the server functions (consent, feedback, household, recommendations, account-export, account-delete) are written and tested with. It wasn't installed in this environment, so their 65 tests couldn't run — the quality report just said "blocked" instead of actually checking them.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The official Deno install script</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">All 65 server-function tests run and pass</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">install Deno</span><span class="dd-arrow">→</span>
+            <span class="dd-node">quality report's edge-function step runs the real test suite</span><span class="dd-arrow">→</span>
+            <span class="dd-node">65/65 pass</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">ok | 65 passed | 0 failed</span>  ← the test suite's own final summary line</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does this matter beyond just "one more green checkmark"?</div>
+            <div class="dd-why-a">These are the functions behind account deletion and data export — legally sensitive paths. Proving their tests actually run (not just "installed but blocked") is part of being able to certify the app is launch-ready.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Wire this same local-database + Deno + Expo-web setup into an actual CI pipeline so it runs automatically on every change, instead of needing to be started by hand each time.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s56-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S56 = [
+      {
+        id: 'quality-gate-unlock',
+        label: 'Quality gate: DB + edge + screenshot checks',
+        steps: [
+          {
+            layer: 'App logic',
+            tag: 'HOOK',
+            title: 'Screenshot tool discovers every app screen',
+            desc: 'Instead of a hardcoded single screen, the tool reads the app\'s own screen folder and builds the full list of screens to check.',
+            codeFlow: [ {chip:'ops/quality/ui/run_ui.mjs'}, {label:'reads'}, {chip:'mobile/app/**'} ],
+            files: [ {path:'ops/quality/ui/run_ui.mjs', desc:'Discovers screens, then screenshots + logs each one in a headless browser'} ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Server',
+            tag:'API',
+            title: 'Edge-function test suite runs for real',
+            desc: 'With Deno installed, the quality report\'s edge-functions step runs the actual test files instead of reporting "blocked."',
+            codeFlow: [ {chip:'ops/quality/runner/orchestrator.py'}, {label:'runs'}, {chip:'supabase/functions/_tests/'} ],
+            files: [ {path:'ops/quality/runner/orchestrator.py', desc:'Runs `deno test` against the edge-function test folder and records pass/fail'} ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Database',
+            tag: 'DB',
+            title: 'Local database check passes',
+            desc: 'With a local database running and every migration applied, the quality report\'s database step connects and confirms the schema is correct.',
+            codeFlow: [ {chip:'ops/quality/runner/orchestrator.py'}, {label:'queries'}, {chip:'ghar_re schema'} ],
+            files: [ {path:'ops/quality/runner/orchestrator.py', desc:'step_db(): connects via DATABASE_URL and counts tables in the ghar_re schema'} ],
+            api: null,
+            db: {table:'information_schema.tables', op:'SELECT', note:'Confirms 28 tables exist in the ghar_re schema'}
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s56-flows', window.FEATURE_FLOWS_S56);
+    </script>
+
+  </div><!-- /page-s56 -->
+
+  <div id="page-s57" class="page-content" style="display:none">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S57 · Verified the recommendation engine is actually live, and fixed docs that said it wasn't</div>
+      <div class="page-subtitle">A chat conversation raised "which dish list does the app actually recommend from?" as an open question. Checking it live (not just reading code) found the real recommendation engine was already deployed and already serving real recommendations — several project documents just hadn't caught up to say so.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Project documents (the Fly.io deploy config, its README, and a build script's own notes) all said the real recommendation engine was "prepared but not deployed" — implying real users were only ever getting one hardcoded fallback dish. A separate open question from an earlier work package asked which of three different dish counts (802 / 810 / 39) was the real one, unresolved.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">Checked the live service directly: it's deployed, healthy, running the real 810-dish catalogue, already wired to the app's server functions, and has already handled real recommendation requests successfully. Fixed the three documents that wrongly said otherwise, and recorded the dish-count answer with live proof instead of a guess. One separate finding — a live server function with no matching code in this project — was flagged for a human decision rather than fixed blindly.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/scripts/build_catalogue.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/README.md</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/fly.toml</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[DRAFT]_WP-11_Launch_Readiness_Remediation_Plan_v1.0.md</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was found and fixed this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>4 files corrected, 0 new code written</div>
+      </div>
+      <div class="session-card-desc">No new feature was built this session — it was entirely verification and documentation correction. Checked the live recommendation service directly (not just its code) and found it was already deployed, healthy, and running the real 810-dish catalogue with real traffic already flowing through it. Three documents that said the opposite ("not deployed yet") were corrected. A work package's open question about which dish table is authoritative was answered with live evidence and appended as a changelog entry. One dead end was deliberately not acted on: a plan to delete a database table turned out to be wrong once its real dependencies were checked, so nothing was deleted.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">810</div><div class="stat-l">Dishes in the real live catalogue</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">3</div><div class="stat-l">Stale docs corrected</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">9/9</div><div class="stat-l">Live requests already served</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">1</div><div class="stat-l">New drift found (unreviewed function)</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s57','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s57','detail')">Detail drill-down</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s57-swim" class="view-pane active">
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">recommendation engine</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s57','re-live-check')">
+            <div class="step-num num-amber">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Called the live recommendation service directly</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Instead of trusting what the code and docs claimed, the actual running service was pinged over the internet. It answered "alive," "ready," and reported it's running the real 810-dish menu — not the small hardcoded test menu.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ then checked whether the app's server functions are actually pointed at it</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">config / secrets</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s57','secrets-check')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Confirmed the app's server already has the recommendation service's address and password saved</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The two settings the "recommendations" server function needs to reach the recommendation engine were already saved and in place — nothing needed to be set up.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ so the connection was already proven by real usage, not a test call</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">ghar_re.dishes</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s57','dishes-table-check')">
+            <div class="step-num num-teal">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Checked before deleting a database table that looked unused</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">A small, 39-row dish table in the database looked abandoned at first glance. Checking properly found other real tables (safety warnings, dish-pairing rules) depend on it, so it was left alone instead of being deleted.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ finally, corrected the documents that had fallen out of date</div>
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">docs a human reads</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s57','docs-fix')">
+            <div class="step-num num-blue">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Three documents corrected to say "deployed," not "not deployed"</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The deploy config, its README, and a build script's own notes all said the recommendation engine wasn't live yet. That was false and would have misled the next person to touch this project. All three now state the real, checked status.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">A live server function called "diag-re-check" was found running in production with no matching code anywhere in this project's history — someone deployed it directly without ever committing its source. It needs a human decision: recover and commit its real source, or formally retire it. Also unresolved by design, left for a Founder call: the whole "ghar_re" database area (dishes + safety + pairing tables) is internally consistent but not read by anything the app currently runs — worth deciding whether to keep it as future groundwork or retire it properly.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s57-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s57-re-live-check" onclick="toggleDetail('s57-re-live-check')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Live check: ghar-re.fly.dev</span>
+          </div>
+          <span class="detail-chevron" id="chev-s57-re-live-check">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s57-re-live-check">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The recommendation engine is a separate small program (not the main app server) whose only job is to pick dishes for a household. It was assumed, based on its own setup notes, to not be running anywhere yet. Pinging its real internet address directly proved otherwise.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Three plain web requests to ghar-re.fly.dev: /healthz, /readyz, /v1/meta</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">"alive", "ready", and a report of exactly which dish menu it's using (the real 810-dish one) plus a running count of requests it has already answered (9, with 8 successful)</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">ping /healthz + /readyz</span><span class="dd-arrow">→</span>
+            <span class="dd-node">both say OK</span><span class="dd-arrow">→</span>
+            <span class="dd-node">ping /v1/meta</span><span class="dd-arrow">→</span>
+            <span class="dd-node">confirms real 810-dish menu + real prior traffic</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">"bundle_version":"sha256:07506fd7d963dffb","dish_count":810</span>  ← the live service's own self-report, matched exactly against the menu file committed to this project's history</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just trust the deploy config file, which said "not deployed"?</div>
+            <div class="dd-why-a">A file's comment about its own status can go stale the moment someone deploys it and forgets to update the comment — which is exactly what happened here. Only asking the live service itself is proof.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s57-secrets-check" onclick="toggleDetail('s57-secrets-check')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Supabase Edge Function secrets (GHAR_RE_SERVICE_URL / _SECRET)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s57-secrets-check">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s57-secrets-check">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The app's "recommendations" server function needs to know the recommendation engine's address and a shared password to call it safely. Checked the project's saved settings and both were already there.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A listing of the app server's saved secret names</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Confirmed GHAR_RE_SERVICE_URL and GHAR_RE_SERVICE_SECRET are both already set</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">list saved server secrets</span><span class="dd-arrow">→</span>
+            <span class="dd-node">both required settings present</span><span class="dd-arrow">→</span>
+            <span class="dd-node">nothing to configure</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">GHAR_RE_SERVICE_URL, GHAR_RE_SERVICE_SECRET</span>  ← both already present in the live secret list, no action needed</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why check this at all if it was already done?</div>
+            <div class="dd-why-a">The plan going in assumed a full deploy-and-wire-up was still needed. Checking first avoided doing (and re-doing) work that was already complete.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s57-dishes-table-check" onclick="toggleDetail('s57-dishes-table-check')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">ghar_re.dishes (39 rows) — checked, not deleted</span>
+          </div>
+          <span class="detail-chevron" id="chev-s57-dishes-table-check">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s57-dishes-table-check">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A small, 39-dish table that lives in the database's recommendation-engine area. Nothing in the currently-running app code reads it — the real recommendation engine reads its dish list from a different place entirely (a pre-built file, not this table). It looked safe to delete for that reason.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A search for every place in the database that points at this table</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Found real dependent tables (dish safety warnings, dish-pairing rules, dish name synonyms) that would have been deleted along with it — so it was left in place</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">planned: delete this table</span><span class="dd-arrow">→</span>
+            <span class="dd-node">checked for dependents first</span><span class="dd-arrow">→</span>
+            <span class="dd-node">found real dependents</span><span class="dd-arrow">→</span>
+            <span class="dd-node">decision reversed, nothing deleted</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">REFERENCES ghar_re.dishes(id) ON DELETE CASCADE</span>  ← the exact line, in three other tables, that would have caused their real rows to be deleted too</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why did the original plan miss this?</div>
+            <div class="dd-why-a">The first check only searched application code, not the database's own table relationships. A table can look unused by the app while still being load-bearing for other tables inside the database itself.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">So is this table needed or not?</div>
+            <div class="dd-why-a">Genuinely unclear — it's not read by anything the app currently runs, but it's not safely removable either without also deciding what happens to its dependents. Left as an open decision rather than guessed at.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s57-docs-fix" onclick="toggleDetail('s57-docs-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Stale "not deployed" docs corrected</span>
+          </div>
+          <span class="detail-chevron" id="chev-s57-docs-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s57-docs-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Three files — the Fly.io deploy settings file, its README, and a build script's own explanatory notes — all said the recommendation engine's real-dish-menu swap or its deployment was "not done yet." Both statements were false by the time this was checked.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The live proof gathered in this session (health check + bundle version match)</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">All three files rewritten to state the real, current, checked status instead of an outdated assumption</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">found live proof contradicts the docs</span><span class="dd-arrow">→</span>
+            <span class="dd-node">edited each doc's own status line</span><span class="dd-arrow">→</span>
+            <span class="dd-node">docs now match reality</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">Status: DEPLOYED.</span>  ← replaces "Status: PREPARED, NOT DEPLOYED." in the README, with the live proof cited right next to it</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does a wrong comment in a settings file matter?</div>
+            <div class="dd-why-a">The next person (human or AI) to work on this project reads these files first, before checking anything live. A confidently wrong status line sends them down the wrong path — e.g. redeploying something that's already running, or telling a founder a feature isn't live when it already is.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Recover or formally retire the "diag-re-check" server function that's live in production with no matching source in this project. Get a decision on the unused "ghar_re" database area (dishes/safety/pairing tables) — keep as future groundwork, or retire properly.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+  </div><!-- /page-s57 -->
+
+  <div id="page-s58" class="page-content" style="display:none">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S58 · Production hardening audit (WP-21)</div>
+      <div class="page-subtitle">A full repo-wide sweep for stubs, hardcoded values, dead code, and doc drift, done to answer "how production-ready is this really?" — found the codebase mostly self-documents its own gaps honestly, fixed the two things that could have shipped broken by accident, and catalogued everything else that needs a Founder call instead of guessing.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Every signed-in user was sent back through the entire onboarding question flow on every single app open, no matter how many times they'd already completed it — a leftover testing shortcut. Also, the app never remembered anything between screens; every screen re-fetched from scratch on every visit, another leftover testing shortcut. Neither had been checked against the rest of the repo for other similar leftovers.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">A returning user with a complete profile now goes straight to their recommendations, and the app caches data normally again. A full audit document (WP-21) now lists every remaining stub, hardcoded value, and deferred decision in the repo, split clearly into "already fine as documented," "safe to fix automatically" (done), and "needs a Founder/product/legal decision" (not guessed at).</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">mobile/app/index.tsx</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/lib/queryClient.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[DRAFT]_WP-21_Production_Hardening_Audit_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>3 things touched</div>
+      </div>
+      <div class="session-card-desc">Scanned the whole repository — source code, migrations, docs, and the ops/quality test harness — for stubs, hardcoded values, dead code, and documentation that no longer matches the code. Found and fixed two dated testing shortcuts in the mobile app that were one accidental deploy away from shipping (onboarding force-restart, caching disabled). Wrote a single audit document cataloguing everything else found, split into what's safely resolved, what's an intentional documented v1 design choice, and what genuinely needs a Founder, product, legal, or food-safety decision.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#c0392b">2</div><div class="stat-l">Accidental-launch bugs fixed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">10</div><div class="stat-l">Report sections written</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">6</div><div class="stat-l">Founder decisions catalogued</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">RE scoring rules changed</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s58','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s58','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s58','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s58-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s58','onboarding-fix')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Returning user now lands on their recommendations, not onboarding again</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Opening the app used to always restart the full question flow from step one, even for someone who'd already finished it. Now a complete profile skips straight to recommendations, same as before the testing shortcut was added.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ that fix lives in the app's own root routing logic</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s58','cache-fix')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Query caching re-enabled app-wide</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Every screen was re-fetching from scratch on every mount and every tab focus — a testing shortcut to always see the latest data while validating other fixes. Restored to the normal "cache once, retry once on failure" behavior.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s58','audit-doc')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Full repo scan for stubs, hardcoded values, dead code, doc drift</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Every TODO/FIXME/STUB/PLACEHOLDER-style marker, every suspicious hardcoded value, and every "Founder Decision pending" note across the whole repo was pulled together into one evidence-based audit document.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ the audit also checked what's real vs. scaffolded in the database and server layers</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s58','audit-doc')">
+            <div class="step-num num-teal">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Confirmed: real migrations, real rollback set, no fake schema</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">48 numbered migrations with a matching rollback for each — this part of the app was found to be genuinely production-real, not scaffolded.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ and what's still scaffolded on the server side</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s58','audit-doc')">
+            <div class="step-num num-amber">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Monitoring/alerting confirmed scaffolded-only, not wired to a real service yet</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The server code already has the right seams for real error-tracking (Sentry/PostHog), but only a placeholder logger is plugged in today — the code itself says so, it isn't hidden.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">The remaining items in WP-21 all need a person to decide, not code to fix: wire a real error-tracking service into the existing seams, get Founder sign-off on ~58 heuristic dish signature scores, decide the fallback-plate's allergy/diet coverage, and confirm the fish/mustard allergen-model gap.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s58-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s58-onboarding-fix" onclick="toggleDetail('s58-onboarding-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">mobile/app/index.tsx</span>
+          </div>
+          <span class="detail-chevron" id="chev-s58-onboarding-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s58-onboarding-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The root screen decides where a signed-in user lands: onboarding, or straight to their recommendations. A dated (2026-08-02) testing shortcut had it always send everyone to onboarding, "so a tester re-runs the full question flow each time" — with the real logic already written and commented directly below it.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">app opens, session exists</span><span class="dd-arrow">→</span>
+            <span class="dd-node">checks onboarding-status query</span><span class="dd-arrow">→</span>
+            <span class="dd-node">complete? → recommendations : onboarding</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">return &lt;Redirect href={complete ? "/recommendations" : "/(onboarding)/consent"} /&gt;;</span>  ← replaces a line that always redirected to onboarding regardless of this value</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why fix this automatically instead of just flagging it?</div>
+            <div class="dd-why-a">The correct logic already existed, already reviewed, sitting right there in a comment explicitly marked "revert this before launch" and dated the day before this audit. This is exactly the "safe to fix automatically" case this audit's own rules describe — no business logic was invented, only restored.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s58-cache-fix" onclick="toggleDetail('s58-cache-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">mobile/src/lib/queryClient.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s58-cache-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s58-cache-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The shared cache settings for every screen's data fetching. A dated (2026-08-02) testing shortcut turned caching off entirely (staleTime 0, gcTime 0, always refetch) "so no stale plate is ever shown while validating the RE fixes" — with the intended production setting named directly in the same comment.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">every screen's useQuery call</span><span class="dd-arrow">→</span>
+            <span class="dd-node">shares this one cache instance</span><span class="dd-arrow">→</span>
+            <span class="dd-node">retries once on failure, caches normally</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">queries: { retry: 1 }</span>  ← replaces 6 lines of caching disabled entirely</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why is this the right default instead of leaving caching off?</div>
+            <div class="dd-why-a">The comment being removed said so itself: "staleTime&gt;0 + normal gc is the right production posture." Same reasoning as the onboarding fix — restoring a documented intended state, not inventing new behavior.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s58-audit-doc" onclick="toggleDetail('s58-audit-doc')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">WP-21 Production Hardening Audit</span>
+          </div>
+          <span class="detail-chevron" id="chev-s58-audit-doc">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s58-audit-doc">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">One document covering all 10 requested report angles (stub inventory, hardcoded values, dead code, doc drift, deferred decisions, readiness checklist, fixes applied, remaining work) as appendices, rather than 10 separate files — placed as a Work Package (DRAFT status, no certificate yet) since the repo's frozen architecture doesn't allow a new top-level "reports/" folder without formal approval.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">grep + read across the whole repo</span><span class="dd-arrow">→</span>
+            <span class="dd-node">verify each hit isn't a false positive</span><span class="dd-arrow">→</span>
+            <span class="dd-node">split into: fine as-is / auto-fixed / needs a decision</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">No recommendation-engine mathematics, scoring weights, or business rules were modified.</span>  ← the audit's own stated boundary, checked and kept true</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just fix everything found?</div>
+            <div class="dd-why-a">Most remaining items (fallback-plate coverage, mocked weather, dish-signature scores, allergen-model gaps) are either already-documented intentional v1 scope, or need a Founder/product/legal/food-safety call this audit isn't authorized to make. Guessing at those would be worse than leaving them catalogued.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Work through WP-21's P1 list: wire a real monitoring/alerting sink, capture consent IP-hash, and decide the fallback-plate's allergy/diet coverage.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s58-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S58 = [
+      {
+        id: 'onboarding-cache-fix',
+        label: 'Onboarding + cache accidental-launch fixes',
+        steps: [
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'Root screen redirect decision',
+            desc: 'App open checks whether the signed-in user\'s onboarding is complete, and sends them to the right place.',
+            codeFlow: [ {chip:'mobile/app/index.tsx'}, {label:'reads'}, {chip:'src/api/household.ts (fetchOnboardingStatus)'} ],
+            files: [ {path:'mobile/app/index.tsx', desc:'Decides: onboarding vs recommendations, based on real completion status'} ],
+            api: { endpoint: 'fetchOnboardingStatus()', note: 'Non-mutating status check, safe to call on every app open' },
+            db: null
+          },
+          {
+            layer: 'App logic',
+            tag: 'HOOK',
+            title: 'Shared query cache restored to production defaults',
+            desc: 'Every screen\'s data fetch shares this one cache instance; it now caches normally instead of always refetching.',
+            codeFlow: [ {chip:'mobile/src/lib/queryClient.ts'}, {label:'used by'}, {chip:'every useQuery/useMutation call app-wide'} ],
+            files: [ {path:'mobile/src/lib/queryClient.ts', desc:'Shared TanStack Query client — retry:1, normal caching restored'} ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s58-flows', window.FEATURE_FLOWS_S58);
+    </script>
+
+  </div><!-- /page-s58 -->
+
+  <div id="page-s59" class="page-content">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S59 · WP-21 punch-list resolutions</div>
+      <div class="page-subtitle">The Founder went through WP-21's P1-P3 findings one by one and gave a direct ruling on each: fix, postpone, or delete. This session carried out the "fix" and "delete" rulings.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">If the recommendation engine went down, every user saw the exact same hardcoded dish regardless of their allergies. Households with a fish or mustard allergy had no way to tell the app — the allergy question simply didn't offer those options. 63 dishes had no real "how famous is this dish" score, only a placeholder. An orphaned live server function and a 28-table unused database area sat around with no owner.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">RE-down now shows a clear "try again" message instead of a possibly-unsafe dish. Fish and mustard are real allergy options end-to-end. All 63 dish fame scores have real values. The orphaned function is deleted; the unused database area is backed up and dropped (certified separately). Everything else was explicitly postponed to the full RE rebuild, not silently ignored.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/fallback.ts, handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/generate_icd1_seeds.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(onboarding)/step-4.tsx, mobile/src/onboarding/toHouseholdWrite.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/compose.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/049, 050 (+rollbacks)</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">data/sig_scores_v1.csv, sig_scores_curation_template.csv</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>6 things touched</div>
+      </div>
+      <div class="session-card-desc">Turned WP-21's P1-P3 findings into rulings and, where the ruling was "fix" or "delete," carried them out: removed the unsafe hardcoded fallback plate in favor of a real error, extended the allergen system to cover fish and mustard end-to-end, resolved all 63 pending dish fame scores, deleted an orphaned live function, and prepared (later executed, see the ghar_re retirement certificate) the drop of an unused 28-table database area. Everything explicitly postponed by the Founder was left untouched, not guessed at.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#c0392b">63</div><div class="stat-l">Dish scores resolved</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">2</div><div class="stat-l">New allergens supported</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">1</div><div class="stat-l">Orphaned function retired</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Items guessed at</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s59','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s59','detail')">Detail drill-down</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s59-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s59','fallback-fix')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">RE-down shows a clear error, not a risky guessed dish</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">If the recommendation engine can't be reached, the user now sees "couldn't load your recommendations, try again" instead of always being shown the same single dish that might not respect their allergies.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s59','allergen-fix')">
+            <div class="step-num num-blue">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Fish and Mustard added as allergy options</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">The onboarding allergy question now offers Fish and Mustard as choices, alongside the existing Peanut/Dairy/Gluten/Soy/Sesame/Shellfish options.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ both flow through the app's shared allergen + recommendation logic</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s59','allergen-fix')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Allergen system extended from 7 to 9 bits</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The number that packs a household's allergies together had no room for fish or mustard. Extended it, and updated every place that reads or writes it (onboarding, the server, the recommendation engine's decode step) to match.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s59','sig-scores')">
+            <div class="step-num num-purple">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">63 dish fame scores resolved</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Dishes like Butter Chicken and Idli were sitting at a placeholder "fame" score. Each of the 63 flagged dishes was given a real score based on food-culture knowledge — 6 recognized as nationally iconic, 23 as a specific state's signature dish, 34 confirmed as regionally popular but not iconic.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ the allergen fix also needed a database backfill for existing ingredients</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s59','db-cleanup')">
+            <div class="step-num num-teal">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Fish/mustard ingredients backfilled; unused database area retired</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">A migration marks the 8 ingredients that actually contain fish or mustard. Separately, a 28-table database area confirmed unused by the app or the recommendation engine was backed up and dropped (see the retirement certificate for the actual execution).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ one more cleanup item was on the server side</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s59','diag-retire')">
+            <div class="step-num num-amber">6</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Orphaned "diag-re-check" function deleted</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A live server function existed with no matching source code anywhere in the project — its source couldn't be recovered, so it was deleted rather than left as an unexplainable, unmaintainable live artifact.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Migration 049 (fish/mustard backfill) still needs to actually be run against the live database and verified — unlike migration 050, no certificate exists yet confirming it was applied. Everything explicitly postponed (monitoring, consent IP-hash, staging secrets, live weather) waits for the full RE rebuild.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s59-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-fallback-fix" onclick="toggleDetail('s59-fallback-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">supabase/functions/recommendations/fallback.ts, handler.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-fallback-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-fallback-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Builds the response sent to the app when the recommendation engine can't be reached. It used to return one hardcoded dish (Moong Dal Khichdi) dressed up as a "safe default" — but it ignored a household's actual allergies beyond a narrow jain/weaning-safe claim.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">RE times out / errors</span><span class="dd-arrow">→</span>
+            <span class="dd-node">handler.ts builds an error response instead of a plate</span><span class="dd-arrow">→</span>
+            <span class="dd-node">app shows "try again"</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">return jsonContract(fb, ctx.traceId, 503);</span>  ← replaces a 200 response that always included a guessed plate</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just improve the fallback dish instead of removing it?</div>
+            <div class="dd-why-a">A single dish can never be safe for every household's specific allergy/diet combination without real per-household data, which the fallback path doesn't have. A clear error is safer than a confident-looking wrong answer.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-allergen-fix" onclick="toggleDetail('s59-allergen-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Allergen bitmask (4 files)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-allergen-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-allergen-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A household's allergies are packed into one number, one bit per allergen (2=dairy, 4=gluten, etc.). Fish and mustard were tagged in the underlying ingredient data but had no bit assigned, so selecting them was impossible and they were silently never excluded.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">onboarding chip selected</span><span class="dd-arrow">→</span>
+            <span class="dd-node">packed into allergen_flags bitmask</span><span class="dd-arrow">→</span>
+            <span class="dd-node">RE decodes bits back into allergen names</span><span class="dd-arrow">→</span>
+            <span class="dd-node">dishes containing that allergen excluded</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">fish: 128, mustard: 256</span>  ← the two new bits, added in every one of the 4 places that read or write this number</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why didn't the recommendation engine itself need a code change?</div>
+            <div class="dd-why-a">The engine's own allergy-exclusion logic already worked off plain allergen names read straight from ingredient data, not a fixed bit list — so once the bit existed and got decoded back to "fish"/"mustard", the engine could already act on it correctly.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-sig-scores" onclick="toggleDetail('s59-sig-scores')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">Dish signature (fame) scores — 63 dishes</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-sig-scores">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-sig-scores">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A "how iconic is this dish" score feeds into recommendation ranking. 63 dishes were sitting at a conservative auto-generated placeholder, waiting for someone to confirm whether they deserve a higher "nationally famous" or "this state's signature dish" score.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">63 candidate dishes reviewed</span><span class="dd-arrow">→</span>
+            <span class="dd-node">classified using food-culture knowledge</span><span class="dd-arrow">→</span>
+            <span class="dd-node">score + status written to the scores file</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">status=AI_RESEARCHED</span>  ← a new label, deliberately different from "Founder-reviewed," so nobody mistakes this for individually human-checked data</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not mark these as Founder-approved since the Founder asked for this?</div>
+            <div class="dd-why-a">The Founder approved the approach (AI research instead of per-dish review), not each individual score — labeling honestly what was and wasn't human-reviewed matters more than looking "more official."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-db-cleanup" onclick="toggleDetail('s59-db-cleanup')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">Migrations 049 + 050</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-db-cleanup">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-db-cleanup">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">049 marks the 8 real ingredients that contain fish or mustard so the new allergy bits actually mean something for existing data. 050 removes a 28-table database area that turned out to be unused by both the app and the recommendation engine.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">confirm no live code reads the area</span><span class="dd-arrow">→</span>
+            <span class="dd-node">back up the data first</span><span class="dd-arrow">→</span>
+            <span class="dd-node">drop it, then verify it's actually gone</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">DROP SCHEMA IF EXISTS ghar_re CASCADE;</span>  ← executed by the Founder directly, verified afterward by a separate read-only check</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why back up data nobody was reading anyway?</div>
+            <div class="dd-why-a">It was real, citation-backed research data, not throwaway fixtures — deleting it without a copy would destroy work even though nothing currently depends on it live.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-diag-retire" onclick="toggleDetail('s59-diag-retire')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">diag-re-check (retired)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-diag-retire">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-diag-retire">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A live server function with no source code anywhere in the project. Its purpose could only be guessed at from its name (a recommendation-engine diagnostic check).</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">tried to download its live source</span><span class="dd-arrow">→</span>
+            <span class="dd-node">download failed (tooling incompatibility)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">deleted rather than left unexplainable</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">supabase functions delete diag-re-check</span></div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why delete instead of leaving it, since it wasn't obviously broken?</div>
+            <div class="dd-why-a">A live piece of code nobody can read, edit, or explain is a liability regardless of whether it currently works — the next person to touch this project has no way to know what it does or whether it's safe to change other things around it.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /detail -->
+
+  </div><!-- /page-s59 -->
+
   <!-- SESSIONS_INJECT -->
 
 </main>

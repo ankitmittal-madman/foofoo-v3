@@ -1,0 +1,1 @@
+[{"config_key": "ob07_yes_delta", "config_value": 0.3}, {"config_key": "ob07_nope_delta", "config_value": -0.3}, {"config_key": "never_class_trigger_count", "config_value": 3}, {"config_key": "never_class_delta", "config_value": -0.15}, {"config_key": "class_affinity_floor", "config_value": -1}, {"config_key": "class_affinity_ceiling", "config_value": 2}]

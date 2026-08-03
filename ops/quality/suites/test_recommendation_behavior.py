@@ -27,6 +27,34 @@ PERSONAS = all_personas()
 IDS = [p.key for p in PERSONAS]
 
 
+@pytest.fixture(autouse=True)
+def _raise_rate_limit_for_persona_suite(client):
+    """Temporarily raise the shared TestClient's rate-limiter cap for this module only.
+
+    100 personas x several behavioural assertions issues hundreds of /v1/recommendations calls
+    from one shared TestClient (one rate-limiter "client key") within seconds — comfortably over
+    the production default (300 req/min, see ratelimit.py), which would turn "too many test
+    requests" into spurious persona failures (429s masquerading as broken exclusion/determinism/
+    plate-count behaviour). Scoped to an autouse fixture in THIS module (not conftest.py) so
+    test_api_security.py's flood/429 tests, which deliberately exercise the real production limit
+    on the same shared client, are unaffected.
+    """
+    from ghar_re_service import main
+
+    limiter = main.state.rate_limiter
+    original = limiter.max_requests
+    limiter.max_requests = 100_000
+    try:
+        yield
+    finally:
+        limiter.max_requests = original
+        # Also drop every hit timestamp this module's burst recorded under the raised cap —
+        # restoring max_requests alone leaves the shared TestClient's client-key hit history full,
+        # which would make the very next request from any OTHER suite (e.g. test_api_security.py's
+        # own flood tests) see a window that already looks saturated and get a spurious 429.
+        limiter._hits.clear()
+
+
 def _resolve_diets(body: dict, dish_index: dict) -> list[str]:
     """Return the diet of every served hero dish, resolved via the catalogue (black-box)."""
     diets = []

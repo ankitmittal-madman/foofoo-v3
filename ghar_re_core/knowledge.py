@@ -161,7 +161,7 @@ COMFORT_HERO_MAP = [
     _ch("North",    "rain", "Aloo Paratha",  True),
     _ch("West-MH",  "rain", "Kanda Bhaji",   True),
     _ch("West-MH",  "rain", "Vada Pav",      True),
-    _ch("West-MH",  "rain", "Pithla-Bhakri", True),
+    _ch("West-MH",  "rain", "Pithla",        True),
     _ch("West-MH",  "rain", "Sol Kadhi",     True),
     _ch("West-GJ",  "rain", "Bhajiya",       False),
     _ch("West-GJ",  "rain", "Dal-Dhokli",    False),
@@ -203,21 +203,21 @@ COMFORT_HERO_MAP = [
 # them concretely ("Onion Pakora", "Bhuna Khichuri", "Rasam"). Exact resolution avoids loose
 # substring matches (e.g. "Pakora" must NOT also boost "Punjabi Kadhi Pakora").
 #
-# ⚠️ KNOWN GAP, confirmed against the real 810-dish catalogue (surfaced by a failing e2e test,
-# deliberately NOT fixed here — same discipline as pairing.py's b_protein comment): "Kanda Bhaji"
-# (COMFORT_HERO_MAP's West-MH rain entry) does not exist under that name anywhere in
-# ghar_re_service/data/bundle/catalogue.json, or under any close spelling — the comfort-hero lift
-# for that specific entry is a silent no-op in production. Separately, COMFORT_HERO_MAP's
-# "Pithla-Bhakri" (hyphen) has no entry here, so it falls back to itself literally — but the real
-# catalogue's dish is named "Pithla Bhakri" (space), so that lift is also a silent no-op. West-MH
-# rain still has two OTHER correctly-resolving heroes (Vada Pav, Sol Kadhi, both real dish names,
-# neither needs an entry here), so this zone/weather combo isn't fully dead — just two of its four
-# configured heroes are. Picking a replacement dish for "Kanda Bhaji" or fixing the
-# "Pithla-Bhakri"/"Pithla Bhakri" mismatch is a recommendation-quality decision for the
-# Founder/domain owner, not a mechanical fix — do not silently guess a substitution here.
+# ⚠️ FORMER KNOWN GAP (RE plumbing plan §0.3), resolved: "Kanda Bhaji" (COMFORT_HERO_MAP's
+# West-MH rain entry) does not exist under that name anywhere in the real 810-dish catalogue
+# (database/seeds/106_seed_dishes.sql), or under any close spelling — the comfort-hero lift for
+# that specific entry was a silent no-op in production. Remapped below to "Pakora (Mixed Veg)"
+# (106_seed_dishes.sql line 248, street_food_generic, snacks, monsoon-appropriate) rather than
+# renaming the KB-authored hero name itself (doc-of-record per KB §R3) — kanda bhaji IS onion
+# pakora, so this is a reasonable domain default, but it is a DOMAIN-OWNER-CONFIRMED substitution,
+# not a mechanical fix, and must be revisited if a dedicated onion-pakora catalogue row is ever
+# added (see Migrations note in the RE plumbing plan for the `123_seed_kanda_bhaji.sql` option).
+# Separately, COMFORT_HERO_MAP's "Pithla-Bhakri" (hyphen) entry itself has been corrected to
+# "Pithla" (COMFORT_HERO_MAP, above) to match the real catalogue's dish name exactly — that one
+# was a pure spelling bug, no domain judgement involved.
 COMFORT_HERO_TO_DISH = {
     "Pakora": "Onion Pakora",
-    "Kanda Bhaji": "Kanda Bhaji",
+    "Kanda Bhaji": "Pakora (Mixed Veg)",
     "Sarson Ka Saag": "Sarson Ka Saag",
     "Curd Rice": "Curd Rice",
     "Rasam": "Rasam", "Rasam-Rice": "Rasam",
