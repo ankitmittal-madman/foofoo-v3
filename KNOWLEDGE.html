@@ -685,8 +685,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🍆</span> S50 · Cited regional-name dish aliases (WP-19)
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s51')">
+    <div class="nav-item" onclick="showPage('s51')">
       <span class="nav-icon">🍆</span> S51 · Dish alias research batch 2 (WP-19)
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s52')">
+      <span class="nav-icon">🍆</span> S52 · Dish alias research batch 3 (WP-19)
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -702,14 +706,14 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">217</span>
+      <span class="nav-badge">218</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">37</span>
+      <span class="nav-badge">38</span>
     </div>
   </div>
 </nav>
@@ -2116,6 +2120,21 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Continued WP-19's cited regional-name alias research from S50's first 8 dishes. Worked through the next 34 catalogue dishes not yet in seed 122 (Butter Chicken, Dal Makhani, Rajma, Palak Paneer, Naan, Bhel Puri, and others), web-searching each for real regional/common names, English glosses, and spelling variants, citing a Wikipedia article or an established recipe site for every alias with a confidence score. Several dishes researched had no solid citable alias beyond what's already obvious (e.g. style-qualified catalogue variants like "Pav Bhaji (Delhi style)", "Parantha (Plain)") and were skipped rather than inventing one, per the "never fabricate an alias" rule. Checked every candidate alias string against the full 810-dish catalogue before writing it, to enforce the safety filter from batch 1 (an alias must never equal a different, distinct catalogue dish's own name) — caught and excluded "Ragda Pattice" as an Aloo Tikki alias for exactly this reason, since it is itself a separate catalogue dish. Testing surfaced a real gap: the checked-in seeds only populate ghar_re.dishes with the 39-row WP-17/18 golden sample, not the full 810-dish catalogue that lives in ghar_re_service/data/bundle/catalogue.json — so a throwaway-only loader (not committed) inserted all 810 catalogue names with the same deterministic md5-based ids the alias seeds expect, to let the FK constraint and validation 907 run against real data rather than being silently skipped. Full cycle verified: migration 045 → seeds 122 + 123 → validation 907 all four checks PASS; re-running seed 123 a second time inserted 0 new rows (idempotent) and validation still passed. The bonus classifier regeneration was NOT done this session: classify_dishes.py reads dish["synonyms"] from catalogue.json, but catalogue.json has no synonyms field populated from the DB today (only "alternate_names", untouched by this work) — regenerating dish_class_map.csv right now would pick up none of these new aliases, so it was skipped and logged as a real pipeline gap for a future WP rather than run as a no-op. Not deployed to production — no Supabase credentials in this sandbox, deploys are Founder-gated.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#64748b"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f1f5f9;color:#64748b">S52</span>
+      <div class="tl-title">Dish alias research batch 3 (WP-19): 25 more dishes, 44 cited aliases</div>
+      <div class="tl-chips">
+        <span class="tl-chip">database/seeds/124_seed_dish_aliases_b3.sql</span>
+        <span class="tl-chip">Awadhi/Hyderabadi/Mughlai focus: Nihari, Haleem, Rogan Josh, Galouti Kebab, Hyderabadi Biryanis</span>
+        <span class="tl-chip">tested on throwaway Postgres 16: migration 045 → 122+123+124 → validation 907 PASS, idempotent re-run</span>
+        <span class="tl-chip">67 of 810 dishes now researched</span>
+      </div>
+      <div class="tl-note">Continued WP-19's cited alias research, working through the next 25 catalogue dishes not yet in seeds 122/123 — mostly Awadhi (Lucknow), Hyderabadi/Deccani, and Mughlai dishes (Nihari, Rogan Josh, Haleem, Galouti Kebab, Kakori Kebab, Pathar Ka Gosht, Bagara Baingan, both Hyderabadi biryanis, Mirchi Ka Salan, Double Ka Meetha). Same process as batches 1-2: web-search each dish, cite only Wikipedia or an established recipe/food-history site, skip anything with no solid citable alias. Ran the full safety-filter check against all 810 catalogue names before writing any row — this batch specifically caught two near-misses where a source described dishes as "related" without them being the same dish under another name: Tunday Kebab (the restaurant-branded version) is a separate catalogue entry from Galouti Kebab (the generic dish), so it was excluded as an alias; Egg Paratha is likewise its own catalogue dish, distinct from Baida Roti's meat-and-egg filling, so it was excluded there too. Verified end-to-end on a fresh throwaway Postgres 16 using the same test-harness approach as S51 (stub auth.uid()/auth.role()/rls_auto_enable(), stub roles, and an uncommitted full-810-dish loader keyed to the same deterministic md5 ids): migration 045 → seeds 122+123+124 → validation 907 all four checks passed, and re-running seed 124 a second time inserted 0 new rows. Running total: 147 cited alias rows across 67 of 810 catalogue dishes. Bonus classifier regeneration again not run, for the same reason logged in S51 — catalogue.json still has no DB-synced synonyms field, so it would be a no-op. Not deployed to production.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2751,6 +2770,7 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">database/seeds/122_seed_dish_aliases.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">37 web-researched, cited aliases across 8 dishes; each row alias_type/region/language/source_url/confidence, data_source='real', idempotent ON CONFLICT DO NOTHING; drops any alias that is itself a distinct catalogue dish (Obbattu/Bobbatlu)</td></tr>
 <tr><td class="fr-file mono">database/validation/907_dish_ontology_validation.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">Fail-loud checks: WP-19 columns exist; every WP-19 'real' alias (alias_type IS NOT NULL) has source_url+confidence; alias_type valid; no orphan aliases</td></tr>
 <tr><td class="fr-file mono">database/seeds/123_seed_dish_aliases_b2.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S51</td><td class="fr-desc">Batch 2 of WP-19 cited aliases: 34 dishes, 66 alias rows (regional/common/spelling/gloss), each with source_url + confidence, idempotent ON CONFLICT DO NOTHING</td></tr>
+<tr><td class="fr-file mono">database/seeds/124_seed_dish_aliases_b3.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S52</td><td class="fr-desc">Batch 3 of WP-19 cited aliases: 25 mostly Awadhi/Hyderabadi/Mughlai dishes, 44 alias rows, each with source_url + confidence, idempotent ON CONFLICT DO NOTHING</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3215,6 +3235,11 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why wasn't dish_class_map.csv regenerated this session (the bonus step)?</div>
     <div class="decision-a">classify_dishes.py reads each dish's synonyms off dish["synonyms"] in catalogue.json, but catalogue.json only carries "alternate_names" today — there is no export step that merges ghar_re.dish_name_synonyms rows (seeds 122/123) into catalogue.json's alias fields. Regenerating the classifier map would currently pick up zero of the new aliases, so doing it now would be a no-op dressed up as progress. Flagging the missing DB→catalogue.json synonym-export pipeline as a real gap for a future WP rather than fabricating a run that doesn't change anything.</div>
     <div class="decision-meta">S51 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why skip aliases like "Tunday Kebab" for Galouti Kebab or "Egg Paratha" for Baida Roti even though sources call them related/similar?</div>
+    <div class="decision-a">"Related" or "similar" is not the same as "the same dish under another name" — the safety filter's job is to catch the latter, not the former. Tunday Kebab and Galouti Kebab are both real, separate catalogue entries (the Tunday Kababi restaurant's version vs. the generic dish), and Egg Paratha is its own catalogue dish distinct from Baida Roti's meat-and-egg filling. Every batch checks each candidate alias string against the full 810-name catalogue before writing it; a hit there means the two are being tracked as genuinely different dishes elsewhere in the system, so aliasing them would silently merge two real menu items.</div>
+    <div class="decision-meta">S52 &middot; Aug 3, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -8343,7 +8368,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s50 -->
-  <div id="page-s51" class="page-content">
+  <div id="page-s51" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S51 · Dish alias research batch 2 (WP-19)</div>
       <div class="page-subtitle">Researched real regional/common names for 34 more catalogue dishes — Butter Chicken, Rajma, Palak Paneer, Naan, Bhel Puri and 30 others — each alias cited to a Wikipedia article or an established recipe site.</div>
@@ -8379,6 +8404,42 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s51 -->
+  <div id="page-s52" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S52 · Dish alias research batch 3 (WP-19)</div>
+      <div class="page-subtitle">Researched real regional/common names for 25 more catalogue dishes — mostly Awadhi (Lucknow), Hyderabadi/Deccani, and Mughlai staples — each alias cited to a Wikipedia article or an established recipe/food-history site.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">S50 + S51 had covered 42 of 810 catalogue dishes with cited aliases, leaving the Awadhi and Hyderabadi/Deccani corners of the catalogue — Nihari, Haleem, Rogan Josh, both Hyderabadi biryanis, the Lucknowi kebab family — still showing only their single canonical name.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">25 more dishes now carry cited aliases — 44 rows across regional names, common names, spelling variants, and English glosses — bringing the running total to 67 of 810 dishes (147 alias rows). Verified end-to-end on a fresh throwaway Postgres 16 (migration 045 → seeds 122+123+124 → validation 907, all passing, idempotent on re-run). The safety filter caught two genuine near-misses this batch (Tunday Kebab vs. Galouti Kebab, Egg Paratha vs. Baida Roti) where a source called two dishes "related" but they remain distinct catalogue entries.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/seeds/124_seed_dish_aliases_b3.sql</span><span class="tag tag-db">DB</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>1 file touched</div>
+      </div>
+      <div class="session-card-body">
+        <p><strong>1. Batch 3 alias research (the headline).</strong> Worked through 25 more catalogue dishes not yet in seeds 122/123, mostly Awadhi (Lucknow) and Hyderabadi/Deccani cuisine: Nihari, Haleem, Mutton Rogan Josh, Shami Kebab, Kakori Kebab, Galouti Kebab, Pathar Ka Gosht, Bagara Baingan, Mirchi Ka Salan, Double Ka Meetha, both Hyderabadi Chicken/Mutton Biryanis, Zarda, Phirni, Rezala, and others. All 44 alias rows carry alias_type/region/language/source_url/confidence, tagged data_source='real', in the same seed shape as batches 1-2.</p>
+        <p><strong>2. Safety filter caught two genuine near-misses.</strong> Checking every candidate against the full 810-name catalogue (as in prior batches) excluded "Tunday Kebab" as an alias for Galouti Kebab and "Egg Paratha" as an alias for Baida Roti — sources describe these pairs as closely related, but each half of both pairs is its own distinct catalogue dish, so aliasing them would have silently merged two real menu items.</p>
+        <p><strong>3. Tested end-to-end again, same throwaway-harness approach as S51.</strong> A fresh Postgres 16 database, the same sandbox-only stubs for platform-provided Supabase pieces (auth.uid()/auth.role(), the anon/authenticated/service_role/supabase_admin roles, the rls_auto_enable() event-trigger stub) and the same uncommitted 810-dish loader keyed to the deterministic md5('ghar_re.dish:'||name) ids the alias seeds use. With that in place: migration 045 → seed 122 → seed 123 → seed 124 → validation 907 all four checks passed; re-running seed 124 inserted 0 new rows (idempotent) and validation still passed.</p>
+        <p><strong>4. Bonus classifier regeneration still not run, same reason as S51.</strong> catalogue.json has no synonyms field wired to the DB, so regenerating dish_class_map.csv now would still be a no-op — logged again rather than run for appearances.</p>
+        <p><strong>5. What's still pending.</strong> 67 of 810 dishes now have researched aliases (743 remain). Next batches should keep working through the catalogue with the same cited-research + safety-filter process.</p>
+      </div>
+    </div>
+  </div><!-- /page-s52 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
