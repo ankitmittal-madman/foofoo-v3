@@ -1,8 +1,8 @@
 # Repository Inventory (Phase 1)
 
-_Generated 2026-08-03T06:04:43.638640+00:00 · git `1860c9e`_
+_Generated 2026-08-03T06:21:19.347380+00:00 · git `aa841f5`_
 
-**62 components discovered.**
+**66 components discovered.**
 
 ## By kind
 
@@ -20,7 +20,7 @@ _Generated 2026-08-03T06:04:43.638640+00:00 · git `1860c9e`_
 | sql-rollback | 1 |
 | sql-seed | 1 |
 | sql-validation | 1 |
-| test-suite | 12 |
+| test-suite | 16 |
 
 
 ## Components
@@ -28,7 +28,7 @@ _Generated 2026-08-03T06:04:43.638640+00:00 · git `1860c9e`_
 | name | kind | path | detail | files |
 | --- | --- | --- | --- | --- |
 | ghar_re_core | python-package | ghar_re_core | Recommendation-engine math (frozen reference impl) | 22 |
-| ghar_re_service | python-service | ghar_re_service | FastAPI production service hosting the RE | 25 |
+| ghar_re_service | python-service | ghar_re_service | FastAPI production service hosting the RE | 26 |
 | GET /healthz | http-endpoint | ghar_re_service/ghar_re_service/main.py | FastAPI route on the RE service | 0 |
 | GET /readyz | http-endpoint | ghar_re_service/ghar_re_service/main.py | FastAPI route on the RE service | 0 |
 | GET /v1/meta | http-endpoint | ghar_re_service/ghar_re_service/main.py | FastAPI route on the RE service | 0 |
@@ -66,10 +66,10 @@ _Generated 2026-08-03T06:04:43.638640+00:00 · git `1860c9e`_
 | mobile/src/api/household.ts | mobile-api-client | mobile/src/api/household.ts | Mobile API client | 0 |
 | mobile/src/api/recommendations.ts | mobile-api-client | mobile/src/api/recommendations.ts | Mobile API client | 0 |
 | mobile/src/api/types.ts | mobile-api-client | mobile/src/api/types.ts | Mobile API client | 0 |
-| database/migrations | sql-migration | database/migrations | 44 SQL files | 44 |
-| database/rollback | sql-rollback | database/rollback | 64 SQL files | 64 |
-| database/seeds | sql-seed | database/seeds | 20 SQL files | 20 |
-| database/validation | sql-validation | database/validation | 8 SQL files | 8 |
+| database/migrations | sql-migration | database/migrations | 45 SQL files | 45 |
+| database/rollback | sql-rollback | database/rollback | 65 SQL files | 65 |
+| database/seeds | sql-seed | database/seeds | 21 SQL files | 21 |
+| database/validation | sql-validation | database/validation | 9 SQL files | 9 |
 | supabase/migrations | sql-migration | supabase/migrations | 1 SQL files | 1 |
 | contracts/ghar-re-v1.schema.json | api-contract | contracts/ghar-re-v1.schema.json | JSON Schema contract | 0 |
 | ghar_re_core/tests/test_golden_master.py | test-suite | ghar_re_core/tests/test_golden_master.py | Existing automated tests | 0 |
@@ -78,6 +78,10 @@ _Generated 2026-08-03T06:04:43.638640+00:00 · git `1860c9e`_
 | ghar_re_core/tests/test_meal_planner.py | test-suite | ghar_re_core/tests/test_meal_planner.py | Existing automated tests | 0 |
 | ghar_re_core/tests/test_class_first_cohort.py | test-suite | ghar_re_core/tests/test_class_first_cohort.py | Existing automated tests | 0 |
 | ghar_re_core/tests/test_cohort_plan.py | test-suite | ghar_re_core/tests/test_cohort_plan.py | Existing automated tests | 0 |
+| ops/quality/suites/test_contract_boundary.py | test-suite | ops/quality/suites/test_contract_boundary.py | Existing automated tests | 0 |
+| ops/quality/suites/test_recommendation_behavior.py | test-suite | ops/quality/suites/test_recommendation_behavior.py | Existing automated tests | 0 |
+| ops/quality/suites/test_api_security.py | test-suite | ops/quality/suites/test_api_security.py | Existing automated tests | 0 |
+| ops/quality/suites/test_planning_surfaces.py | test-suite | ops/quality/suites/test_planning_surfaces.py | Existing automated tests | 0 |
 | ghar_re_service/tests/test_service.py | test-suite | ghar_re_service/tests/test_service.py | Existing automated tests | 0 |
 | ghar_re_service/tests/test_bundle.py | test-suite | ghar_re_service/tests/test_bundle.py | Existing automated tests | 0 |
 | ghar_re_service/tests/test_auth.py | test-suite | ghar_re_service/tests/test_auth.py | Existing automated tests | 0 |

@@ -1,0 +1,9 @@
+{
+  "status": "skipped",
+  "reason": "GHAR_WEB_URL not set. The frontend is an Expo/React-Native app with no committed web build; provide a running web target (e.g. `expo start --web`) to enable browser tests.",
+  "phases": [
+    "9-ui",
+    "10-headless",
+    "11-accessibility"
+  ]
+}

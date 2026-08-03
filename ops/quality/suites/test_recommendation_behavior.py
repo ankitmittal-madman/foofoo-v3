@@ -19,8 +19,6 @@ contract, so each case is a request the production service actually accepts.
 
 from __future__ import annotations
 
-import json
-
 import pytest
 
 from ops.quality.personas.personas import all_personas

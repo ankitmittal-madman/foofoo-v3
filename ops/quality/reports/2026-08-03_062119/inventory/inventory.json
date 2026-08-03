@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-03T06:04:43.638640+00:00",
-  "git_head": "1860c9e",
-  "component_count": 62,
+  "generated_at": "2026-08-03T06:21:19.347380+00:00",
+  "git_head": "aa841f5",
+  "component_count": 66,
   "by_kind": {
     "python-package": 1,
     "python-service": 1,
@@ -14,7 +14,7 @@
     "sql-seed": 1,
     "sql-validation": 1,
     "api-contract": 1,
-    "test-suite": 12,
+    "test-suite": 16,
     "ci-workflow": 5
   },
   "components": [
@@ -30,7 +30,7 @@
       "kind": "python-service",
       "path": "ghar_re_service",
       "detail": "FastAPI production service hosting the RE",
-      "files": 25
+      "files": 26
     },
     {
       "name": "GET /healthz",
@@ -295,29 +295,29 @@
       "name": "database/migrations",
       "kind": "sql-migration",
       "path": "database/migrations",
-      "detail": "44 SQL files",
-      "files": 44
+      "detail": "45 SQL files",
+      "files": 45
     },
     {
       "name": "database/rollback",
       "kind": "sql-rollback",
       "path": "database/rollback",
-      "detail": "64 SQL files",
-      "files": 64
+      "detail": "65 SQL files",
+      "files": 65
     },
     {
       "name": "database/seeds",
       "kind": "sql-seed",
       "path": "database/seeds",
-      "detail": "20 SQL files",
-      "files": 20
+      "detail": "21 SQL files",
+      "files": 21
     },
     {
       "name": "database/validation",
       "kind": "sql-validation",
       "path": "database/validation",
-      "detail": "8 SQL files",
-      "files": 8
+      "detail": "9 SQL files",
+      "files": 9
     },
     {
       "name": "supabase/migrations",
@@ -372,6 +372,34 @@
       "name": "ghar_re_core/tests/test_cohort_plan.py",
       "kind": "test-suite",
       "path": "ghar_re_core/tests/test_cohort_plan.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ops/quality/suites/test_contract_boundary.py",
+      "kind": "test-suite",
+      "path": "ops/quality/suites/test_contract_boundary.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ops/quality/suites/test_recommendation_behavior.py",
+      "kind": "test-suite",
+      "path": "ops/quality/suites/test_recommendation_behavior.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ops/quality/suites/test_api_security.py",
+      "kind": "test-suite",
+      "path": "ops/quality/suites/test_api_security.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ops/quality/suites/test_planning_surfaces.py",
+      "kind": "test-suite",
+      "path": "ops/quality/suites/test_planning_surfaces.py",
       "detail": "Existing automated tests",
       "files": 0
     },

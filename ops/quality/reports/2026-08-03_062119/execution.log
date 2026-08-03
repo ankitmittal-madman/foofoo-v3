@@ -1,0 +1,16 @@
+[2026-08-03T06:21:19.311714+00:00] === Ghar Quality Suite start ===
+[2026-08-03T06:21:19.355392+00:00] inventory: pass (66 components, 17 features)
+[2026-08-03T06:21:19.409109+00:00] ruff-lint: pass (clean)
+[2026-08-03T06:21:20.833908+00:00] unit-core: pass (48 passed, 0 failed, 0 skipped)
+[2026-08-03T06:21:27.745755+00:00] unit-service: pass (68 passed, 0 failed, 0 skipped)
+[2026-08-03T06:21:29.734700+00:00] quality-contract: pass (5 passed, 0 failed, 0 skipped)
+[2026-08-03T06:21:34.673221+00:00] quality-recsys: pass (63 passed, 0 failed, 4 skipped)
+[2026-08-03T06:21:37.991234+00:00] quality-security: pass (12 passed, 0 failed, 0 skipped)
+[2026-08-03T06:21:39.912550+00:00] quality-planning: pass (12 passed, 0 failed, 0 skipped)
+[2026-08-03T06:21:40.714771+00:00] chaos: pass (fail-safe behaviour held)
+[2026-08-03T06:21:46.726424+00:00] performance: pass (recommendations p50=43.48ms p99=96.69ms (threshold 1500.0ms, in-process))
+[2026-08-03T06:21:47.043015+00:00] secrets-scan: pass (no hardcoded secret values detected)
+[2026-08-03T06:21:47.043682+00:00] database: skip (no live database configured)
+[2026-08-03T06:21:47.044664+00:00] edge-functions: blocked (5 Deno edge-function test file(s) present but not runnable)
+[2026-08-03T06:21:47.100006+00:00] ui-playwright: skip (GHAR_WEB_URL not set. The frontend is an Expo/React-Native app with no committed web build; provide a running web target (e.g. `expo start --web`) to enable browser tests.)
+[2026-08-03T06:21:47.100197+00:00] === Ghar Quality Suite end ===
