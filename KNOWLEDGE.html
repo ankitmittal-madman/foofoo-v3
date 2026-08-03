@@ -2253,16 +2253,19 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">The one place the recommendation maths live. It turns a household's raw Q1–Q15 answers into a profile, removes dishes they can't eat, scores the rest, pairs them and assembles exactly 7 ranked plates. All parameters come from config/knowledge files, never hard-coded.</div>
     <div class="dd-label">Files / tables in this module</div>
     <div class="dd-text">
-      <code>derivation.py</code> — turns onboarding answers into the household profile θ (D1–D7)<br>
-      <code>scoring.py</code> — hard filters + BASE score + the Q15 objective gain<br>
+      <code>derivation.py</code> — turns onboarding answers into the household profile θ (D1–D7), incl. lifecycle_stage + time_pressure<br>
+      <code>scoring.py</code> — hard filters + BASE score + the Q15 objective gain + the cohort/foreign terms<br>
       <code>pairing.py</code> — pairing guardrails + assembles the final 7 plates<br>
+      <code>cohort_plan.py</code> — <b>(S48)</b> the compositional cohort plan: resolves the household's persona, uses its preferred meal classes as the plan core, grounds them in the home state's regional food + migration overlay, then reshapes for lifecycle/diet<br>
+      <code>cohort_intel.py</code> — the learned "what's common" class-affinity model; since S48 it fuses the compositional plan (70%) with this model (30%)<br>
+      <code>session_log.py</code> — writes a per-user Markdown decision trace (θ → persona → plan → plates) to ops/logs/session-log<br>
       <code>pipeline.py</code> — runs the whole thing end-to-end for one household<br>
-      <code>config.py / knowledge.py / catalogue.py / fixtures.py</code> — config, knowledge-base data, and the in-memory dish catalogue<br>
+      <code>config.py / knowledge.py / catalogue.py / fixtures.py</code> — config, knowledge-base data (incl. dish→class map), and the in-memory dish catalogue<br>
     </div>
     <div class="dd-label">How it helps the app</div>
-    <div class="dd-text">It's the brain that decides what a household should eat today. Keeping it as one tested package means there's never a second, slightly-different copy of the maths to drift out of sync.</div>
+    <div class="dd-text">It's the brain that decides what a household should eat today. Since S48 that brain reasons like a nutritionist — starting from who the household is and their region — so a Maharashtra family with a toddler gets a mild, child-friendly, regionally-real plan instead of the generic national average. Keeping it as one tested package means there's never a second, slightly-different copy of the maths to drift out of sync.</div>
     <div class="dd-label">Last touched</div>
-    <div class="dd-text">S34 · Jul 28</div>
+    <div class="dd-text">S48 · Aug 3 (WP-17 compositional cohort plan + fusion; originally S34)</div>
   </div>
 </div>
 <div class="detail-item">
@@ -2281,11 +2284,14 @@ function deepDiveFeature(featureLabel){
       <code>auth.py</code> — verifies the signature on every call; the only thing protecting the engine now that it is publicly reachable<br>
       <code>ratelimit.py</code> — caps requests per source per minute, and deliberately runs <i>before</i> auth.py so a flood is turned away before any cryptographic work happens<br>
       <code>engine.py / schemas.py / lifecycle.py</code> — request→response composition, schema validation, startup<br>
+      <code>scripts/classify_dishes.py</code> — <b>(S48)</b> the offline nutritionist/chef classifier that maps all 810 dishes to their meal class (→ dish_class_map.csv)<br>
+      <code>scripts/prepare_cohort_intel.py</code> — offline: extracts the persona-DB masters, trains the class model, runs the dish classifier<br>
+      <code>scripts/export_bundle.py / build_catalogue.py</code> — build the baked config+catalogue bundle the live service loads<br>
     </div>
     <div class="dd-label">How it helps the app</div>
-    <div class="dd-text">It lets the app talk to the engine over a normal web call with a stable contract, and lets the data sources (catalogue, config) be swapped later without touching the maths. The two guards are what make it safe to expose that call over the internet at all — which S39 established it has to be, because our app's servers cannot reach a private one.</div>
+    <div class="dd-text">It lets the app talk to the engine over a normal web call with a stable contract, and lets the data sources (catalogue, config) be swapped later without touching the maths. The two guards are what make it safe to expose that call over the internet at all. Its offline scripts (S48) are where the persona-DB "science" is turned into the small files the live engine reads — so the service stays lean and never touches the source spreadsheet at runtime.</div>
     <div class="dd-label">Last touched</div>
-    <div class="dd-text">S39 · Jul 29 (rate limiter + public-ingress posture; originally S34)</div>
+    <div class="dd-text">S48 · Aug 3 (dish→class classifier + bundle rebuild; rate limiter S39; originally S34)</div>
   </div>
 </div>
 <div class="detail-item">

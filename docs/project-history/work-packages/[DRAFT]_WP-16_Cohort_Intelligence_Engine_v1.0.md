@@ -1,6 +1,6 @@
 # [DRAFT]_WP-16_Cohort_Intelligence_Engine_v1.0
 
-**Status:** DRAFT — real code shipped and tested this session (not a proposal); DRAFT until a companion certificate under docs/project-history/certificates/ documents execution per this repo's Version & Lifecycle Rules.
+**Status:** EXECUTED & CERTIFIED — real code shipped and tested; companion certificate [ACTIVE]_REPO-CERT-026_WP-16_Cohort_Intelligence_Engine_v1.0.md documents execution per this repo's Version & Lifecycle Rules. (Filename retains the [DRAFT] token because completion proof lives in the certificate, never by editing this doc in place to claim COMPLETED.) Superseded internals: the learned model is now fused behind the WP-17 compositional plan (REPO-CERT-025).
 **Version:** v1.0
 **Date:** 2026-08-02
 **Placement:** docs/project-history/work-packages/[DRAFT]_WP-16_Cohort_Intelligence_Engine_v1.0.md
