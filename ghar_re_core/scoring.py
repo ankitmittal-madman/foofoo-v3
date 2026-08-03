@@ -230,15 +230,21 @@ def m_age(dish, theta):
 def m_household(dish, theta):
     """§B6 BASE term: how well a dish fits this household's structure — e.g. a batch-friendly
     whole-meal dish scores higher for a joint/large household, and a mild/familiar dish scores
-    higher for a kid-heavy household with high variety pressure."""
-    # §B6 household structure soft-fit. single->one-pot; couple+kids->mild/familiar; joint->batch.
+    higher in proportion to the household's variety pressure (continuous, not a single cliff at
+    0.8) and how far below the household's spice ceiling the dish actually sits — so two dishes
+    in the same meal class no longer collapse to the same 0.5/0.7 fit for every household sharing
+    that class; the ranking now moves with the household's own batch/mildness posture."""
+    # §B6 household structure soft-fit. single->one-pot; couple+kids->mild/familiar (graded); joint->batch.
     bp = theta["batch_posture"]["value"]
+    vp = theta["variety_pressure"]["value"]
+    ceiling = theta["spice_ceiling"]["value"]
     fit = 0.5
     if bp and "whole_meal" in dish.dish_category:
-        fit = 0.7
-    if theta["variety_pressure"]["value"] >= 0.8 and dish.spice_level is not None and dish.spice_level <= 2:
-        fit = max(fit, 0.7)     # kid-heavy household leans mild/familiar
-    return fit
+        fit += 0.2
+    if dish.spice_level is not None and ceiling:
+        headroom = max(0.0, (ceiling - dish.spice_level) / ceiling)  # 1.0 mild, 0.0 at the ceiling
+        fit += vp * headroom * 0.3     # scales with household's own variety pressure, not a step
+    return min(1.0, fit)
 
 
 def m_weather(dish, theta, ctx):

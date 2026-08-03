@@ -11,7 +11,7 @@
       ],
       "liquid": "Gujarati Toor Dal",
       "plate_calories": 320,
-      "score": 5.280544,
+      "score": 5.114486,
       "support": "Roti"
     },
     {
@@ -24,7 +24,7 @@
       ],
       "liquid": "Moong Dal",
       "plate_calories": 320,
-      "score": 3.912927,
+      "score": 3.764066,
       "support": "Roti"
     },
     {
@@ -37,7 +37,7 @@
       ],
       "liquid": "Gujarati Kadhi",
       "plate_calories": 340,
-      "score": 3.473947,
+      "score": 3.343867,
       "support": "Rice"
     },
     {
@@ -50,7 +50,7 @@
       ],
       "liquid": "Cholar Dal",
       "plate_calories": 470,
-      "score": 3.314314,
+      "score": 3.158866,
       "support": "Roti"
     },
     {
@@ -62,7 +62,7 @@
       ],
       "liquid": null,
       "plate_calories": 300,
-      "score": 3.074756,
+      "score": 2.995041,
       "support": null
     },
     {
@@ -74,7 +74,7 @@
       ],
       "liquid": null,
       "plate_calories": 380,
-      "score": 2.160966,
+      "score": 2.07808,
       "support": null
     },
     {
@@ -86,7 +86,7 @@
       ],
       "liquid": null,
       "plate_calories": 280,
-      "score": 2.086537,
+      "score": 2.012207,
       "support": null
     }
   ]

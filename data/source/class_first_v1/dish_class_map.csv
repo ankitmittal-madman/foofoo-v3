@@ -1484,3 +1484,18 @@ Zarda,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric,0.72
 Zarda,DN_LIGHT_DAL_RICE,Dinner,chef_rubric_secondary,0.72
 Zarda,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric_secondary,0.72
 Zunka Bhakri,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,curated_exact,1.0
+Khichdi,LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric_secondary,0.65
+Khichdi,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric_secondary,0.6
+Phulka,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.65
+Phulka,DN_CHILD_FRIENDLY_DINNER,Dinner,chef_rubric_secondary,0.6
+Rumali Roti,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.6
+Tandoori Roti,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.6
+Moong Dal Khichdi,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.7
+Moong Dal Khichdi,DN_CHILD_FRIENDLY_DINNER,Dinner,chef_rubric_secondary,0.65
+Lauki Khichdi,LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric,0.7
+Lauki Khichdi,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.65
+Lauki Khichdi,DN_CHILD_FRIENDLY_DINNER,Dinner,chef_rubric_secondary,0.6
+Roti,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.6
+Roti,DN_LIGHT_ROTI_SABZI,Dinner,chef_rubric_secondary,0.6
+Roti,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.6
+Roti,DN_CHILD_FRIENDLY_DINNER,Dinner,chef_rubric_secondary,0.55

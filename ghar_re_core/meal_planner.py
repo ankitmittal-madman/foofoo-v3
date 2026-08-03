@@ -170,37 +170,93 @@ def dishes_for_class(household, slot, class_code, catalogue=None, n=8, weekday="
                              class_code=class_code), kind="reconciled_class_dishes")
 
 
+_RECENT_WINDOW = 2   # days a class is held back from re-topping the same slot, once it has led
+
+
 def weekly_class_plan(household, top_classes=3, catalogue=None):
     """Surface 3 — the weekly class plan: for each day × main slot, the top-`top_classes` meal
     CLASSES (from the compositional cohort plan) for the user to select and finalize. Selecting a
     class then drives dishes_for_class (surface 4) for that day/slot. Also reports, per class, how
     many catalogue dishes back it — so the UI can avoid finalizing a class with no dishes (the
-    thin-DN_-class coverage issue surfaced for test_17)."""
+    thin-DN_-class coverage issue surfaced for test_17).
+
+    The whole week is computed in this one pass, so two cross-day rules can be enforced in-process
+    with no persisted history: (1) a class that led a slot on a recent day is held back from leading
+    it again for `_RECENT_WINDOW` days (falls back to it only if the slot's pool is that thin), so
+    the same top-1 class/dish doesn't repeat day after day; (2) each weekend day (Sat/Sun) is checked
+    for at least one gravy-rich/special lunch-or-dinner class — if the household's own plan doesn't
+    already lead with one, the best diet-compatible, dish-backed special class is promoted to the
+    front of that slot's list, so a holiday doesn't default to a routine weekday plate."""
     cat = catalogue or Catalogue()
     theta, _ = _theta_obj(household)
     backing = _class_dish_counts(cat)
+    meta = CP._class_meta()
     days = []
+    recent_leaders = {slot: [] for slot in MAIN_SLOTS}   # slot -> class codes that led on recent days
     for day in WEEK:
         slots = {}
+        full_plans = {}
         for slot in MAIN_SLOTS:
             ctx = make_context(slot=slot, weekday=day)
             plan = CP.class_plan(theta, ctx)
+            full_plans[slot] = plan
             ranked = sorted(plan.items(), key=lambda x: -x[1])
-            top = []
+            held_back = set(recent_leaders[slot])
+            top, deferred = [], []
             for code, weight in ranked:
                 if backing.get(code, 0) == 0:      # never offer a class with no dishes to reconcile to
                     continue
-                top.append({
+                item = {
                     "class_code": code,
                     "class_name": _class_names().get(code, code),
                     "plan_weight": round(weight, 4),
                     "dish_count": backing.get(code, 0),
-                })
+                }
+                if code in held_back:
+                    deferred.append(item)          # led recently — only used if the pool runs dry
+                    continue
+                top.append(item)
                 if len(top) >= top_classes:
                     break
+            for item in deferred:                  # pool too thin to fill without repeating — allow it
+                if len(top) >= top_classes:
+                    break
+                top.append(item)
             slots[slot] = top
+            recent_leaders[slot] = ([top[0]["class_code"]] if top else []) + recent_leaders[slot]
+            recent_leaders[slot] = recent_leaders[slot][:_RECENT_WINDOW]
+        if day in ("Saturday", "Sunday"):
+            _ensure_weekend_special(slots, full_plans, backing, meta, top_classes)
         days.append({"weekday": day, "slots": slots})
     return {"household": household.get("label"), "kind": "weekly_class_plan", "days": days}
+
+
+def _ensure_weekend_special(slots, full_plans, backing, meta, top_classes):
+    """If neither lunch nor dinner already leads with a gravy-rich/special class for this weekend
+    day, promote the best diet-compatible, dish-backed special class (from the household's OWN
+    full class_plan, so diet/Jain/allergen gating is never bypassed) to the front of whichever main
+    slot it belongs to. No-op if the household's plan contains no eligible special class at all
+    (e.g. every special class was diet-gated out) — never fabricates a class outside the plan."""
+    already = any(item["class_code"] in CP._WEEKEND_SPECIAL_CLASSES
+                  for slot in ("lunch", "dinner") for item in slots.get(slot, []))
+    if already:
+        return
+    candidates = []
+    for slot in ("lunch", "dinner"):
+        for code, weight in full_plans.get(slot, {}).items():
+            if code in CP._WEEKEND_SPECIAL_CLASSES and backing.get(code, 0) > 0:
+                candidates.append((weight, slot, code))
+    if not candidates:
+        return
+    weight, slot, code = max(candidates, key=lambda x: x[0])
+    promoted = {
+        "class_code": code,
+        "class_name": _class_names().get(code, code),
+        "plan_weight": round(weight, 4),
+        "dish_count": backing.get(code, 0),
+    }
+    slots[slot] = [promoted] + [i for i in slots.get(slot, []) if i["class_code"] != code]
+    slots[slot] = slots[slot][:top_classes]
 
 
 _DISH_COUNTS = None
