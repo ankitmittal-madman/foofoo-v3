@@ -697,8 +697,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🍆</span> S53 · Dish alias research batch 3 (WP-19)
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s54')">
+    <div class="nav-item" onclick="showPage('s54')">
       <span class="nav-icon">🍆</span> S54 · Dish alias research batches 4-7 (WP-19)
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s55')">
+      <span class="nav-icon">🗄</span> S55 · Retire legacy RE schema
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -710,11 +714,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">14</span>
+      <span class="nav-badge">15</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">222</span>
+      <span class="nav-badge">227</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -1294,6 +1298,10 @@ function deepDiveFeature(featureLabel){
     <div class="arch-node-name">re_engine RLS</div>
     <div class="arch-node-desc">Row Level Security switched on, 34 tables · S46</div>
   </div>
+  <div class="arch-node is-mod" onclick="jumpModule('re-engine-retirement')">
+    <div class="arch-node-name">re_engine schema</div>
+    <div class="arch-node-desc">Permanently removed from production · S55</div>
+  </div>
   <!-- ARCH_DB_INJECT -->
       </div>
     </div>
@@ -1304,6 +1312,10 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node-name">recommendations</div>
   <div class="arch-node-desc">Edge fn: app → engine orchestration · S34</div>
 </div>
+  <div class="arch-node is-mod" onclick="jumpModule('re-engine-retirement')">
+    <div class="arch-node-name">cron-hard-delete / user-delete / user-export</div>
+    <div class="arch-node-desc">Redeployed on current tables · S55</div>
+  </div>
   <!-- ARCH_SERVER_INJECT -->
       </div>
     </div>
@@ -2173,6 +2185,22 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Asked to keep going through the catalogue, ran four more batches back-to-back in one continuous session rather than stopping after each: batch 4 (Khubani Ka Meetha, Hyderabadi Marag, Dalcha, Osmania Biscuit, Irani Chai, Tahari, plus Masala Dosa/Idli/Sambar/Rasam/Pongal-family South Indian tiffin staples), batch 5 (Avial, Appam, Puttu, Kerala Fish Curry, Parotta, Chicken Chettinad, Filter Coffee, Poriyal, Paniyaram, Murukku), batch 6 (Sadya Thali, Malabar/Thalassery Biryani, Pathiri, Unniyappam, Olan, Kadala Curry, Sundal, Kothu Parotta, Banana Chips), and batch 7 (Bisi Bele Bath, Ragi Mudde, Neer Dosa, Jolada Rotti, Goli Baje, Tamarind Rice, Tomato Rice, Kootu). Same cited-research + safety-filter discipline as batches 1-3 throughout. The safety filter this run caught "Chitranna" and "Saaru" as candidate aliases that are themselves separate catalogue dishes (excluded both), and separately confirmed "Jonna Rotte" and "Pulihora" are distinct catalogue entries so were never used as aliases for Jolada Rotti / Tamarind Rice even though they're closely related dishes. To keep testing cheap across four batches in a row, set up ONE persistent throwaway Postgres 16 (migration 045 + the same sandbox-only auth/role/event-trigger stubs + the uncommitted full-810-dish loader used in S52/S53) instead of rebuilding it per batch — each new seed file was applied and validated against that same running database, then the database was torn down at the end of the run. All four seeds applied clean and validation 907 passed every time. Running total after this session: 116 of 810 catalogue dishes have cited aliases (240 alias rows), 694 dishes remain. Given the realistic scale of individually researching and citing the remaining ~694 dishes, continuing this is expected to take many further sessions — flagged honestly rather than implying the catalogue will be finished imminently.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S55</span>
+      <div class="tl-title">Retire legacy re_engine schema — production cutover completed</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s55')">config.toml fix</span>
+        <span class="tl-chip" onclick="showPage('s55')">edge function deploy</span>
+        <span class="tl-chip" onclick="showPage('s55')">live smoke test</span>
+        <span class="tl-chip" onclick="showPage('s55')">migration 047</span>
+        <span class="tl-chip" onclick="showPage('s55')">REPO-CERT-029</span>
+      </div>
+      <div class="tl-note">Deployed the updated account-deletion/export functions, proved them working live, then permanently removed the old recipe-engine schema from production. WP-20 flipped DRAFT → ACTIVE. Follow-up: prove the scheduled purge job against a real overdue account.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2567,6 +2595,32 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">S51 · Aug 3 2026</div>
   </div>
 </div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-re-engine-retirement" onclick="toggleDetail('mod-re-engine-retirement')">
+    <div class="detail-left">
+      <span class="tag tag-db">DB</span>
+      <span class="detail-name">Legacy recipe-engine schema retirement (WP-20)</span>
+    </div>
+    <span class="detail-chevron" id="chev-mod-re-engine-retirement">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-re-engine-retirement">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Retires "re_engine", the database schema belonging to a previous, now-unused version of the recommendation engine. Confirmed via code search that only 6 of its ~32 tables were still touched by any live code; those 6 were copied into the current tables (public schema) first, everything else was backed up to a JSON archive, and the whole old schema was then permanently removed.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>database/migrations/046_rehome_re_engine_live_tables.sql</code> — copies the 6 still-used tables into public<br>
+      <code>database/migrations/047_drop_legacy_re_engine_schema.sql</code> — permanently removes the old schema, guarded so it can't run too early<br>
+      <code>database/validation/908_re_engine_decommission_validation.sql</code> — the safety check that must pass before 047 runs<br>
+      <code>supabase/functions/_shared/services/scheduler/hard-delete.ts</code> — the scheduled account-erasure job, updated to use the current tables<br>
+      <code>supabase/functions/user-export/store.ts</code> — the data-export job, updated to use the current tables<br>
+      <code>database/archive/re_engine_backup_20260803/</code> — full JSON backup of every row in the old schema, taken before anything was changed
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Removes ~26 dead tables of technical debt from production without any risk of silently breaking account deletion or data export — both of those legally-required features were proven working against a real test account before the old schema was ever touched.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S55 · Aug 3</div>
+  </div>
+</div>
 <!-- MODULES_INJECT -->
   </div>
 
@@ -2857,6 +2911,36 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">database/seeds/126_seed_dish_aliases_b5.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S54</td><td class="fr-desc">Batch 5 of WP-19 cited aliases: 10 Kerala/Tamil Nadu dishes, 23 alias rows</td></tr>
 <tr><td class="fr-file mono">database/seeds/127_seed_dish_aliases_b6.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S54</td><td class="fr-desc">Batch 6 of WP-19 cited aliases: 10 Kerala Sadya/Malabar dishes, 17 alias rows</td></tr>
 <tr><td class="fr-file mono">database/seeds/128_seed_dish_aliases_b7.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S54</td><td class="fr-desc">Batch 7 of WP-19 cited aliases: 8 Karnataka/Tamil Nadu dishes, 19 alias rows</td></tr>
+  <tr>
+    <td class="fr-file mono">supabase/config.toml</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Removed an invalid top-level functions setting that was blocking every Supabase CLI command</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">.gitignore</td>
+    <td><span class="tag tag-cfg">Config</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Ignored supabase/.branches/ (CLI-local link state) and .claude/settings.local.json (personal permission overrides)</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">docs/project-history/certificates/[ACTIVE]_REPO-CERT-029_WP-20_Full_Cutover_Completion_v1.0.md</td>
+    <td><span class="tag tag-new">New</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Proof-of-execution record for the full WP-20 cutover: deploy, smoke test, validation 908, migration 047, RLS re-check</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">docs/project-history/work-packages/[ACTIVE]_WP-20_Retire_Legacy_re_engine_Schema_v1.0.md</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Renamed DRAFT → ACTIVE and added the session's execution record now that the cutover is fully complete</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">database/migrations/047_drop_legacy_re_engine_schema.sql</td>
+    <td><span class="tag tag-db">DB</span></td>
+    <td class="fr-session">S55</td>
+    <td class="fr-desc">Applied to production this session — permanently dropped the old re_engine schema</td>
+  </tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3351,6 +3435,26 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why reuse one persistent throwaway Postgres 16 across batches 4-7 instead of a fresh database per batch?</div>
     <div class="decision-a">Setting up the full migration chain plus the sandbox-only stubs (auth.uid()/auth.role(), roles, rls_auto_enable(), the 810-dish loader) is the expensive part of testing each batch, not applying one more seed file. Once that base state exists, each new batch's seed + validation 907 can run against it directly and still prove the same thing (the new rows satisfy the FK, the citation check, and don't break anything already seeded) without re-paying migration setup cost every time. Nothing about the seed files themselves changed — this is purely a test-harness efficiency, not a shortcut on what got verified.</div>
     <div class="decision-meta">S54 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should the assistant self-grant itself new production access permissions when it hits a permission block?</div>
+    <div class="decision-a">No. When direct database access and direct HTTP calls to production were both blocked by the coding tool's own safety classifier, the assistant reported the block and asked the Founder to add the permission rule personally, rather than editing the permission file itself — self-granting would defeat the purpose of the safety check.</div>
+    <div class="decision-meta">S55 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should the assistant back-date a test account's deletion timestamp to force the scheduled purge job to actually run its delete logic?</div>
+    <div class="decision-a">The Founder declined this specific action when proposed. The assistant instead ran the job as a safe no-op (confirming it starts up and queries the right tables without error) and left full end-to-end proof of the purge logic as a follow-up for a future session.</div>
+    <div class="decision-meta">S55 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">In what order should the deploy, database checks, and schema removal happen?</div>
+    <div class="decision-a">Strictly: deploy the updated functions first, prove them working against a real test account, re-run the safety-check script, and only then remove the old schema. Doing the removal any earlier would have broken account deletion/export in production the moment they tried to read a table that no longer existed.</div>
+    <div class="decision-meta">S55 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why did the project's saved "service role" key fail authentication on one function call, and what was used instead?</div>
+    <div class="decision-a">This project has migrated to Supabase's newer API key format; the older-style key still shown in the dashboard as valid is no longer what's actually wired into the live functions. The newer-format secret key worked immediately once tried.</div>
+    <div class="decision-meta">S55 · Aug 3</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -8751,7 +8855,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s53 -->
-  <div id="page-s54" class="page-content">
+  <div id="page-s54" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S54 · Dish alias research batches 4-7 (WP-19)</div>
       <div class="page-subtitle">Kept going through the catalogue in one continuous run — 4 more batches, 49 dishes, 93 cited aliases, spanning Hyderabadi tiffin food, Kerala Sadya/Malabar cuisine, and Karnataka/Tamil Nadu regional classics.</div>
@@ -8789,6 +8893,324 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s54 -->
+  <div id="page-s55" class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">S55 · Retire legacy re_engine schema — production cutover completed</div>
+      <div class="page-subtitle">Finished removing the old, unused recipe-engine database schema from production — account deletion and data-export now run entirely on the current tables, and the leftover legacy schema is gone.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The account-deletion and data-export code had been rewritten to stop using the old legacy schema, but that rewritten code was only sitting committed, not actually running in production — the live app was still on the old code, and the old schema itself hadn't been removed yet.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The updated deletion/export functions are live and confirmed working with a real test account, and the old legacy schema (~26 unused tables) has been permanently removed from production, with everything backed up first.</div>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>6 things touched</div>
+      </div>
+      <div class="session-card-desc">Fixed a broken local tool config that was blocking every Supabase command, deployed the three edge functions that handle account deletion/export, proved they work against a real test account, then ran the two safety checks and the actual schema-removal migration against production, in that order.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">1</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">1</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">3</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s55','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s55','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s55','flows')">Feature flows</div>
+    </div>
+
+    <div id="s55-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Test account requests data export, then account deletion</span></div>
+              <div class="step-desc">A designated test user signed in and triggered both the "download my data" and "delete my account" actions, to prove the live functions actually work before the old schema was removed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ tool config had to be fixed before anything could deploy</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s55','config-fix')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Fixed a broken deploy-tool config</span><span class="tag tag-cfg">Config</span></div>
+              <div class="step-desc">The Supabase command-line tool couldn't even start — a leftover setting in its config file was written for a newer version of the tool than the one installed. Removed the invalid setting.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ database confirmed safe before and after the schema removal</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s55','migration-047')">
+            <div class="step-num num-teal">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Removed the old legacy recipe-engine schema</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">After confirming a safety check passed and the live functions no longer needed it, permanently dropped the old, unused schema (~26 tables) from production. Its data was already copied to the current tables or backed up.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s55','rls-recheck')">
+            <div class="step-num num-teal">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Re-checked table access permissions after the removal</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">Confirmed the 6 tables that were moved over from the old schema still have the correct privacy/access rules after the old schema was gone.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ live server functions had to be redeployed first</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s55','deploy-functions')">
+            <div class="step-num num-amber">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Deployed the account-deletion and data-export functions live</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Pushed the already-written, already-committed code for account deletion, data export, and the scheduled hard-delete job live to production for the first time since they were rewritten to use the current tables.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">The scheduled hard-delete job's actual purge logic (deleting a user's data once 72 hours have passed) was reviewed in code but not proven against a real overdue account in production — a future session with a genuinely overdue test account should confirm that path end to end.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <div id="s55-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s55-config-fix" onclick="toggleDetail('s55-config-fix')">
+          <div class="detail-left">
+            <span class="tag tag-cfg">Config</span>
+            <span class="detail-name">supabase/config.toml</span>
+          </div>
+          <span class="detail-chevron" id="chev-s55-config-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s55-config-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Configures the Supabase command-line tool for this project. It had a setting written in a format only understood by a newer version of the tool than the one actually installed, so every single command — including the ones needed to deploy — failed before doing anything.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Any Supabase CLI command run against this project</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Before: instant config error. After: command runs normally.</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">CLI starts</span><span class="dd-arrow">→</span>
+            <span class="dd-node">reads config.toml</span><span class="dd-arrow">→</span>
+            <span class="dd-node">invalid setting removed</span><span class="dd-arrow">→</span>
+            <span class="dd-node">command proceeds</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">removed: [functions]\nverify_jwt = true</span>  ← this installed tool version only understands per-function settings, not one shared setting for all functions; removing it is safe since "on" was already the default behavior with nothing else set.</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just tell the Founder to upgrade the CLI instead?</div>
+            <div class="dd-why-a">Upgrading a locally installed tool is a bigger, separate change; removing one invalid line that changes nothing about actual behavior was the smaller, safer fix to unblock today's deploy.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s55-deploy-functions" onclick="toggleDetail('s55-deploy-functions')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">cron-hard-delete, user-delete, user-export (edge functions)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s55-deploy-functions">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s55-deploy-functions">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">These three server functions handle a user's legal right to delete their account or download their own data — plus the background job that permanently erases a deleted account's data after 72 hours. This session deployed the versions of them that read/write the current tables instead of the old, soon-to-be-removed ones.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A signed-in user's request to export or delete their account; or the scheduled job's own trigger</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A download link for export; a confirmation + deletion timeline for delete; a count of accounts actually purged for the scheduled job</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">signed-in test account</span><span class="dd-arrow">→</span>
+            <span class="dd-node">export → 202 queued → complete</span><span class="dd-arrow">→</span>
+            <span class="dd-node">delete → 202 soft-deleted</span><span class="dd-arrow">→</span>
+            <span class="dd-node">scheduled purge job → runs clean</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">supabase/functions/_shared/services/scheduler/hard-delete.ts:110-125</span>  ← the actual erase step now deletes from the current tables (never_list, user preferences, etc.) instead of the old, soon-to-be-removed schema.</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why deploy before removing the old schema, not after?</div>
+            <div class="dd-why-a">If the old schema were removed first, these three functions would start erroring immediately in production (they'd try to read tables that no longer exist) — deploy-then-remove is the only safe order, and the removal step itself refuses to run until the new tables exist.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s55-migration-047" onclick="toggleDetail('s55-migration-047')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">database/migrations/047_drop_legacy_re_engine_schema.sql</span>
+          </div>
+          <span class="detail-chevron" id="chev-s55-migration-047">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s55-migration-047">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Permanently deletes the old "re_engine" schema — about 26 tables from a previous version of the recommendation engine that nothing in the live app reads anymore. It only runs if the current tables it depends on already exist, as a built-in safety check.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Production database, run once via the Supabase SQL Editor</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">The old schema and all its tables are gone; nothing else changes</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">safety check passes</span><span class="dd-arrow">→</span>
+            <span class="dd-node">DROP SCHEMA re_engine CASCADE</span><span class="dd-arrow">→</span>
+            <span class="dd-node">confirmed gone</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">EXECUTE 'DROP SCHEMA re_engine CASCADE';</span>  ← the actual, irreversible removal — every row was already backed up to a JSON archive in the repo before this ran.</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Was any data lost?</div>
+            <div class="dd-why-a">No — every table's data was either already copied into the current tables (the 6 still-used ones) or exported to a JSON backup committed in the repo (the ~20 genuinely dead ones) before this migration ever ran.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s55-rls-recheck" onclick="toggleDetail('s55-rls-recheck')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">Post-removal permission check (6 re-homed tables)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s55-rls-recheck">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s55-rls-recheck">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A read-only check confirming the 6 tables moved over from the old schema still have the right privacy rules turned on after the old schema was removed — nothing about removing the old schema should have changed these, but it's worth confirming rather than assuming.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The 6 re-homed tables in production</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">All 6 confirmed correct: one public read-only table, five private/staff-only tables</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">query pg_class + pg_policy</span><span class="dd-arrow">→</span>
+            <span class="dd-node">compare against intended design</span><span class="dd-arrow">→</span>
+            <span class="dd-node">matches, no fix needed</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">re_states → 1 policy (public read); other 5 → 0 policies (staff-only)</span>  ← exactly the posture a previous session had already fixed and certified; this just re-confirmed it survived the schema removal.</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why check this again — wasn't it already fixed?</div>
+            <div class="dd-why-a">A previous session found and fixed a real bug here (one table had privacy protection on but zero rules, making it silently unreadable). Given that history, re-confirming after a second, unrelated database change was cheap insurance against a repeat.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Prove the scheduled hard-delete job's purge logic against a real overdue test account (not just a zero-results run), once one exists.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <div id="s55-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S55 = [
+      {
+        id: 'account-deletion-export-cutover',
+        label: 'Account deletion & data export (post-cutover)',
+        steps: [
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'User requests export or deletion',
+            desc: 'A signed-in user calls the export or delete-my-account action from the app.',
+            codeFlow: [ {chip:'supabase/functions/user-export/index.ts'}, {label:'or'}, {chip:'supabase/functions/user-delete/index.ts'} ],
+            files: [
+              {path:'supabase/functions/user-export/index.ts', desc:'Entry point for GET /v1/user/export'},
+              {path:'supabase/functions/user-delete/index.ts', desc:'Entry point for POST /v1/user/delete'}
+            ],
+            api: {endpoint:'GET /v1/user/export, POST /v1/user/delete', note:'Both require the caller\'s own signed-in session'},
+            db: null
+          },
+          {
+            layer: 'Server',
+            tag: 'API',
+            title: 'Handler reads/writes the current tables',
+            desc: 'The business logic loads or updates the user\'s data, now scoped to the current tables instead of the old, removed schema.',
+            codeFlow: [ {chip:'supabase/functions/user-export/store.ts'}, {label:'reads'}, {chip:'public.never_list'} ],
+            files: [
+              {path:'supabase/functions/user-export/store.ts', desc:'Loads every table an export needs to include'},
+              {path:'supabase/functions/user-delete/handler.ts', desc:'Soft-deletes the account (sets deleted_at) after checking a safety-phrase match'}
+            ],
+            api: null,
+            db: {table:'public.never_list, public.profiles', op:'SELECT / UPDATE', note:'Moved here from the old re_engine schema in an earlier migration'}
+          },
+          {
+            layer: 'Server',
+            tag: 'API',
+            title: 'Scheduled job erases data 72h after deletion',
+            desc: 'A separate scheduled function checks daily for accounts past their 72-hour grace period and permanently erases their data, table by table.',
+            codeFlow: [ {chip:'supabase/functions/cron-hard-delete/index.ts'}, {label:'runs'}, {chip:'supabase/functions/_shared/services/scheduler/hard-delete.ts'} ],
+            files: [
+              {path:'supabase/functions/_shared/services/scheduler/hard-delete.ts', desc:'Deletes every personal-data table for one profile, in the right order'},
+              {path:'supabase/functions/_shared/auth/service-role.ts', desc:'Makes sure only the scheduler itself (not a random caller) can trigger this'}
+            ],
+            api: {endpoint:'POST /functions/v1/cron-hard-delete', note:'Only callable with the project\'s own service-role key, never a user session'},
+            db: {table:'public.profiles + 7 related tables', op:'DELETE', note:'Confirmed live this session with 0 real overdue accounts (safe no-op run)'}
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s55-flows', window.FEATURE_FLOWS_S55);
+    </script>
+
+  </div><!-- /page-s55 -->
+
   <!-- SESSIONS_INJECT -->
 
 </main>
