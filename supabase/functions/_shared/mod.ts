@@ -69,7 +69,7 @@ export type { TelemetrySink } from "./telemetry/telemetry.ts";
 export { Container, createContainer } from "./di/container.ts";
 
 // constants + utils
-export { PUBLIC_SCHEMA, RE_ENGINE_SCHEMA, ROLES } from "./constants/schemas.ts";
+export { PUBLIC_SCHEMA, ROLES } from "./constants/schemas.ts";
 export { newTraceId } from "./utils/id.ts";
 export { invariant } from "./utils/assert.ts";
 export { DB_TIMEOUT_MS, withTimeout } from "./utils/timeout.ts";

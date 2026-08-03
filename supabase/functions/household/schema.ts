@@ -65,7 +65,7 @@ const HOUSEHOLD_ANSWERS_SCHEMAS = {
  */
 const PROFILE_SCHEMAS = {
   primary_cook_name: z.string().min(1),
-  home_state: z.string().min(1), // FK to re_engine.re_states — validated by the DB, not duplicated
+  home_state: z.string().min(1), // FK to public.re_states (WP-20) — validated by the DB, not duplicated
   current_city: z.string().min(1),
   diet_type: z.enum(["veg", "non_veg", "egg", "vegan", "jain"]),
   cook_capability: z.enum(["beginner", "intermediate", "advanced"]),

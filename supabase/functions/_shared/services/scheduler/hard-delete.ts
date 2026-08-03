@@ -19,7 +19,7 @@
  * unit-tested with fakes; a purge job has no equivalent need to swap implementations).
  */
 import type { SupabaseClient } from "../../db/client.ts";
-import { PUBLIC_SCHEMA, RE_ENGINE_SCHEMA } from "../../constants/schemas.ts";
+import { PUBLIC_SCHEMA } from "../../constants/schemas.ts";
 import type { Logger } from "../../logging/logger.ts";
 
 const HARD_DELETE_WINDOW_MS = 72 * 60 * 60 * 1000;
@@ -107,15 +107,17 @@ export class HardDeleteScheduler {
       if (error) throw error;
     }
 
-    const reEngineTables = [
+    // WP-20: these were re_engine.* (the legacy TS-RE's per-user state) until migration 046 re-homed
+    // them into public ahead of the re_engine schema drop (047) — same tables, same data, new schema.
+    const reStateTables = [
       "never_list",
       "not_today_suppression",
       "user_re_state",
       "user_taste_vectors",
       "re_dish_bandit_state",
     ] as const;
-    for (const table of reEngineTables) {
-      const { error } = await this.db.schema(RE_ENGINE_SCHEMA).from(table).delete().eq(
+    for (const table of reStateTables) {
+      const { error } = await this.db.schema(PUBLIC_SCHEMA).from(table).delete().eq(
         "profile_id",
         profileId,
       );

@@ -178,7 +178,8 @@ interface MemberRow {
   conditions: string[] | null;
 }
 
-// profiles.home_state is a 2-letter code ("MP") — it REFERENCES re_engine.re_states(state_code).
+// profiles.home_state is a 2-letter code ("MP") — it REFERENCES public.re_states(state_code)
+// (WP-20: re-homed from re_engine.re_states, migration 046, ahead of that schema's retirement).
 // The RE keys every regional/cohort structure on the FULL NAME ("Madhya Pradesh"), so the code must
 // be mapped before the request is sent, or region resolution + the whole cohort layer silently
 // no-op and the household gets incoherent cross-regional plates (confirmed root cause, test_10).

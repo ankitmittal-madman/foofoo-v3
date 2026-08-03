@@ -1,0 +1,26 @@
+-- Rollback: 047_drop_legacy_re_engine_schema.sql
+-- A DROP SCHEMA CASCADE cannot be undone by a single inverse SQL statement — the schema's DDL and
+-- ~32k rows of data must both be restored. This is NOT auto-executable; follow the steps below.
+--
+-- 1. Recreate the schema + every table's structure by re-running the ORIGINAL migrations that
+--    created them (still present in this repo, never deleted — only the prod schema was dropped):
+--      database/migrations/002_reference_tier0.sql          (re_states, re_main_cohorts, ...)
+--      database/migrations/004_reference_tier2.sql          (re_class_dish_options, ...)
+--      database/migrations/007_re_identity_interaction_history.sql
+--                                                            (never_list, user_re_state, ...)
+--      ...and every other migration that DDL's a re_engine.* table (grep migrations/ for
+--      "CREATE TABLE re_engine\." to get the full list in original order).
+--
+-- 2. Restore every table's DATA from the WP-20 backup (JSON, one file per table, taken 2026-08-03
+--    before this schema was dropped — every row, populated or not):
+--      database/archive/re_engine_backup_20260803/<table>.json
+--    Load each with a small script (jsonb_populate_recordset or an INSERT ... SELECT * FROM
+--    jsonb_to_recordset($1::jsonb) AS x(...)) — do NOT hand-write 32k rows of literal INSERTs here.
+--
+-- 3. If 046 was also rolled back first, profiles.home_state's FK already points back to
+--    re_engine.re_states — nothing further to repoint. If 046 is still applied (the public copies
+--    exist), decide whether to keep them or drop them once re_engine is restored (having both is
+--    redundant but not broken).
+--
+-- See docs/project-history/work-packages/ for the WP-20 work package, which has the full restore
+-- runbook if this rollback is ever actually needed.

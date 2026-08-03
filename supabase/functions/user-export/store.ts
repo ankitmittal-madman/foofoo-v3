@@ -7,7 +7,7 @@
  * no direct `profile_id` column — it is scoped via its owning `week_plans` row instead.
  */
 import type { SupabaseClient } from "../_shared/db/client.ts";
-import { PUBLIC_SCHEMA, RE_ENGINE_SCHEMA } from "../_shared/constants/schemas.ts";
+import { PUBLIC_SCHEMA } from "../_shared/constants/schemas.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
@@ -60,7 +60,8 @@ export async function loadUserExportBundle(
       "userExport.week_plans",
     ),
     withTimeout(
-      db.schema(RE_ENGINE_SCHEMA).from("never_list").select("*").eq("profile_id", profileId),
+      // WP-20: never_list moved re_engine -> public (migration 046) ahead of the re_engine schema drop.
+      db.schema(PUBLIC_SCHEMA).from("never_list").select("*").eq("profile_id", profileId),
       "userExport.never_list",
     ),
     withTimeout(
