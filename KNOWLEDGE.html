@@ -681,8 +681,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🧩</span> S49 · Multi-membership dish→class fix + WP-18 planning surfaces
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s50')">
+    <div class="nav-item" onclick="showPage('s50')">
       <span class="nav-icon">🍆</span> S50 · Cited regional-name dish aliases (WP-19)
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s51')">
+      <span class="nav-icon">🍆</span> S51 · Dish alias research batch 2 (WP-19)
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -698,14 +702,14 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">216</span>
+      <span class="nav-badge">217</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">35</span>
+      <span class="nav-badge">37</span>
     </div>
   </div>
 </nav>
@@ -2097,6 +2101,21 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Founder reported the recommendation engine "not working as expected" and asked to read every visuals-folder doc and enhance the live RE so cold-start feels like the plan available in Indian_Meal_Cohort_Persona_DB_v3 — implementing the excel's SCIENCE, not copying its precomputed cells, per five directives (right cohort from onboarding, right sub-cohort built as science not copied, link region/migration/add-on/non-veg, build the computation, use ML where it helps). Read RE-Visual-01→05 in full: confirmed the live engine is the Python ghar_re_core/ghar_re_service (RE-Visual-01/02/03 describe the deleted legacy TypeScript engine), and that WP-15 (shipped earlier the same day) had already filled the master formula's w_cohort·S_cohort seam with a BINARY 1.0/0.0 check using only 3 of the persona DB's 22 sheets. Founder chose: build directly now, train a model on the excel to generalize, cold-start-strong decaying with data. Built WP-16 as a new subsystem: (1) an offline prepare_cohort_intel.py that extracts 6 reference sheets (migration overlay, state profile, non-veg logic, persona master, subcohort routing, main-cohort hierarchy) and TRAINS a factorized log-linear (Naive-Bayes-style) class-affinity model from the excel's 20,664-row Weekly_Class_Plan_v3 (2,952 cohorts × 7 days), joined to each cohort's feature vector — 1.49M weighted label examples → a 498 KB JSON artifact scored at runtime in pure Python (no numpy/sklearn in the Fly bundle). The model learns class propensities per feature and GENERALIZES by feature product to household combinations the excel never enumerated — the honest reading of "as intelligent as the excel, derived not copied," trained only on real authored data (FD-11 respected). (2) A new ghar_re_core/cohort_intel.py: recomputes the cohort feature vector live from θ every request (no stored persona ID — the retired fixed-persona architecture stays retired), computes a migration-blended graded class affinity in [0,1], and exposes soft sub-cohort membership for explainability. The City_Migration_Overlay_v3 science is now live: an MP household in Mumbai blends home-state signature classes + Mumbai lifestyle (Pitla-Bhakri, street chaat) + national-modern (salad bowl) by the overlay's own weights — the exact MP-in-Mumbai example the Founder cited. (3) Rewired scoring.s_cohort from binary to the graded affinity; score() now uses a cold-start-strong, decaying weight (CONFIG.w_cohort_effective(n): 0.60 at n=0 → 0.15 floor, half-life 25 interactions) — but feedback_events has 0 production rows, so every live household sits at full cold-start strength today (the decay mechanism exists, the data to move along it does not yet — same honest constraint as WP-14/WP-15). Added local_state + city_tier to θ; retired WP-15's now-dead binary cohort-match code from knowledge.py (kept only the curated dish→class lookup). Verified on the REAL 810-dish catalogue: a Tamil Nadu couple's cold-start breakfast slate reorders to lead with Rava Upma (affinity 1.0) and Idli (0.55) — the persona-DB's actual TN breakfast plan — where the rule-only baseline led with dosas. Tests: new test_cohort_intel.py (features contract, graded/slot-specific/bounded, model-reproduces-a-real-cohort fidelity, generalization, migration-overlay shift, membership) + rewritten test_class_first_cohort.py for the graded/cold-start path; golden master regenerated intentionally (2 of 4 fixtures unchanged, 2 shifted scores only — same served plates, since the 39-dish fixture has few high-affinity matches in the tested slot); bundle rebuilt (810 dishes, model + 6 CSVs baked in). Full verification: 34/34 ghar_re_core + 62/62 ghar_re_service tests pass. Documented in [DRAFT]_WP-16_Cohort_Intelligence_Engine_v1.0.md (design, the ~16% dish→class coverage limit carried forward from WP-15, w_cohort=0.60 disclosed as a reasoned-not-calibrated default, and a Future/Deferred register incl. add-on member plates and coverage-raising), and updated RE-Visual-05's WP-15 steps to reflect the graded+migration reality. Coverage caveat unchanged: only 129/810 dishes carry a curated class, so WP-16 makes the matched dishes far smarter but does not widen the map (WP16-F1). Disclosure: this KNOWLEDGE.html entry is a timeline-row addition, not a full swim-lane/detail page per the skill's complete template — noted honestly given this session's time budget.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#64748b"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f1f5f9;color:#64748b">S51</span>
+      <div class="tl-title">Dish alias research batch 2 (WP-19): 34 more dishes, 66 cited aliases</div>
+      <div class="tl-chips">
+        <span class="tl-chip">database/seeds/123_seed_dish_aliases_b2.sql</span>
+        <span class="tl-chip">Wikipedia + established recipe-site citations only</span>
+        <span class="tl-chip">tested on throwaway Postgres 16: migration 045 → 122 → 123 → validation 907 PASS, idempotent re-run</span>
+        <span class="tl-chip">classify_dishes.py regeneration deferred — export pipeline gap found</span>
+      </div>
+      <div class="tl-note">Continued WP-19's cited regional-name alias research from S50's first 8 dishes. Worked through the next 34 catalogue dishes not yet in seed 122 (Butter Chicken, Dal Makhani, Rajma, Palak Paneer, Naan, Bhel Puri, and others), web-searching each for real regional/common names, English glosses, and spelling variants, citing a Wikipedia article or an established recipe site for every alias with a confidence score. Several dishes researched had no solid citable alias beyond what's already obvious (e.g. style-qualified catalogue variants like "Pav Bhaji (Delhi style)", "Parantha (Plain)") and were skipped rather than inventing one, per the "never fabricate an alias" rule. Checked every candidate alias string against the full 810-dish catalogue before writing it, to enforce the safety filter from batch 1 (an alias must never equal a different, distinct catalogue dish's own name) — caught and excluded "Ragda Pattice" as an Aloo Tikki alias for exactly this reason, since it is itself a separate catalogue dish. Testing surfaced a real gap: the checked-in seeds only populate ghar_re.dishes with the 39-row WP-17/18 golden sample, not the full 810-dish catalogue that lives in ghar_re_service/data/bundle/catalogue.json — so a throwaway-only loader (not committed) inserted all 810 catalogue names with the same deterministic md5-based ids the alias seeds expect, to let the FK constraint and validation 907 run against real data rather than being silently skipped. Full cycle verified: migration 045 → seeds 122 + 123 → validation 907 all four checks PASS; re-running seed 123 a second time inserted 0 new rows (idempotent) and validation still passed. The bonus classifier regeneration was NOT done this session: classify_dishes.py reads dish["synonyms"] from catalogue.json, but catalogue.json has no synonyms field populated from the DB today (only "alternate_names", untouched by this work) — regenerating dish_class_map.csv right now would pick up none of these new aliases, so it was skipped and logged as a real pipeline gap for a future WP rather than run as a no-op. Not deployed to production — no Supabase credentials in this sandbox, deploys are Founder-gated.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2731,6 +2750,7 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">database/rollback/045_dish_name_synonyms_ontology_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">Drops the added columns/constraint/index; pre-existing synonym rows unaffected</td></tr>
 <tr><td class="fr-file mono">database/seeds/122_seed_dish_aliases.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">37 web-researched, cited aliases across 8 dishes; each row alias_type/region/language/source_url/confidence, data_source='real', idempotent ON CONFLICT DO NOTHING; drops any alias that is itself a distinct catalogue dish (Obbattu/Bobbatlu)</td></tr>
 <tr><td class="fr-file mono">database/validation/907_dish_ontology_validation.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">Fail-loud checks: WP-19 columns exist; every WP-19 'real' alias (alias_type IS NOT NULL) has source_url+confidence; alias_type valid; no orphan aliases</td></tr>
+<tr><td class="fr-file mono">database/seeds/123_seed_dish_aliases_b2.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S51</td><td class="fr-desc">Batch 2 of WP-19 cited aliases: 34 dishes, 66 alias rows (regional/common/spelling/gloss), each with source_url + confidence, idempotent ON CONFLICT DO NOTHING</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3185,6 +3205,16 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why filter out aliases that are themselves catalogue dishes?</div>
     <div class="decision-a">Adding 'Gutti Vankaya' or 'Obbattu' as a synonym of another dish would conflate two distinct real catalogue entries into one. The seed drops any candidate alias that already exists as its own DISTINCT dish (Obbattu/Bobbatlu) so the ontology maps names to the same dish, never merges two genuinely different dishes.</div>
     <div class="decision-meta">S50 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">How was the local test DB populated when ghar_re.dishes only has a 39-row golden sample, not the real 810?</div>
+    <div class="decision-a">Discovered mid-testing: ghar_re.dishes in this repo's checked-in seeds only holds the WP-17/18 golden sample (39 dishes), while the 810-dish catalogue that seeds 122/123 alias lives in ghar_re_service/data/bundle/catalogue.json, not yet loaded into the DB via any committed seed script. To exercise the FK constraint honestly, a throwaway-only loader inserted all 810 catalogue names into ghar_re.dishes with the same deterministic md5('ghar_re.dish:'||name) id scheme the alias seeds use, so the real FK and validation 907 could run for real rather than being skipped. That loader was NOT committed — it's sandbox-only scaffolding to validate the seed shape; production's actual full ghar_re.dishes load is a separate, undocumented gap this session surfaces rather than papers over.</div>
+    <div class="decision-meta">S51 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why wasn't dish_class_map.csv regenerated this session (the bonus step)?</div>
+    <div class="decision-a">classify_dishes.py reads each dish's synonyms off dish["synonyms"] in catalogue.json, but catalogue.json only carries "alternate_names" today — there is no export step that merges ghar_re.dish_name_synonyms rows (seeds 122/123) into catalogue.json's alias fields. Regenerating the classifier map would currently pick up zero of the new aliases, so doing it now would be a no-op dressed up as progress. Flagging the missing DB→catalogue.json synonym-export pipeline as a real gap for a future WP rather than fabricating a run that doesn't change anything.</div>
+    <div class="decision-meta">S51 &middot; Aug 3, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -8275,7 +8305,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s49 -->
-  <div id="page-s50" class="page-content">
+  <div id="page-s50" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S50 · Cited regional-name dish aliases (WP-19)</div>
       <div class="page-subtitle">Started giving every dish its real regional names — so a Madhya Pradesh user living in Mumbai sees "Bharwa Baingan", not the unfamiliar Marathi name "Bharli Vangi" for the same dish.</div>
@@ -8313,6 +8343,42 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s50 -->
+  <div id="page-s51" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S51 · Dish alias research batch 2 (WP-19)</div>
+      <div class="page-subtitle">Researched real regional/common names for 34 more catalogue dishes — Butter Chicken, Rajma, Palak Paneer, Naan, Bhel Puri and 30 others — each alias cited to a Wikipedia article or an established recipe site.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">S50 built the sourced alias ontology and seeded the first 8 of 810 catalogue dishes. The remaining 802 dishes still had no researched aliases, so the vast majority of the catalogue still only showed its single canonical (often regionally-marked) name.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">34 more dishes now carry cited aliases — 66 rows total across regional names, common names, spelling variants, and English glosses — bringing the running total to 42 of 810 dishes researched. Verified end-to-end on a throwaway Postgres 16 (migration 045 → seeds 122 + 123 → validation 907, all passing, idempotent on re-run). A real gap in the data pipeline was also surfaced and logged rather than papered over: ghar_re.dishes only has the 39-row golden sample checked in, not the full 810-dish catalogue, and catalogue.json (which classify_dishes.py reads) has no synonyms field wired to the DB yet — so the bonus classifier regeneration was deliberately skipped this session rather than run as a no-op.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/seeds/123_seed_dish_aliases_b2.sql</span><span class="tag tag-db">DB</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>1 file touched</div>
+      </div>
+      <div class="session-card-body">
+        <p><strong>1. Batch 2 alias research (the headline).</strong> Worked through the next 34 catalogue dishes not yet in seed 122 (mostly North Indian/Punjabi restaurant and street-food staples: Butter Chicken, Dal Makhani, Sarson Ka Saag, Tandoori Chicken, Rajma, Palak Paneer, Naan, Bhatura, Dahi Bhalla, Aloo Tikki, Bhel Puri, Chaat Papdi, Kachori and more). Every one of the 66 alias rows carries alias_type, region, language, source_url, and a confidence score, tagged data_source='real', in the exact same seed shape as batch 1. Dishes with no solid, citable distinct alias — mostly style-qualified catalogue variants like "Pav Bhaji (Delhi style)" and "Parantha (Plain)" — were skipped rather than inventing something, per the "never fabricate an alias" rule.</p>
+        <p><strong>2. Safety filter re-applied.</strong> Every candidate alias string was checked against the full 810-name catalogue before being written, continuing batch 1's rule that an alias must never equal a different, distinct catalogue dish's own name. This caught "Ragda Pattice" as a would-be alias for Aloo Tikki — it's a real, separate catalogue dish — and it was dropped.</p>
+        <p><strong>3. Tested end-to-end on a throwaway Postgres 16, with an honest gap surfaced along the way.</strong> Applying the full migration set required standing in for platform-provided Supabase pieces not present in this sandbox (auth.users, auth.uid(), the anon/authenticated/service_role roles, the rls_auto_enable() event-trigger stub) — none of that is part of the shipped migrations, it's test-harness scaffolding only. More materially: the checked-in seeds only populate ghar_re.dishes with the 39-dish WP-17/18 golden sample, not the real 810-dish catalogue (which lives in ghar_re_service/data/bundle/catalogue.json, not the DB). A throwaway-only loader inserted all 810 catalogue names into ghar_re.dishes using the same deterministic md5('ghar_re.dish:'||name) id scheme the alias seeds rely on, so the FK constraint and validation 907 could be exercised against real data instead of silently passing on an empty set. That loader was not committed. With it in place: migration 045 → seed 122 → seed 123 → validation 907 all four checks passed; re-running seed 123 inserted 0 new rows (idempotent) and validation still passed.</p>
+        <p><strong>4. Bonus classifier regeneration deliberately skipped, not silently dropped.</strong> classify_dishes.py reads each dish's aliases from catalogue.json's dish["synonyms"] field — but catalogue.json only carries "alternate_names" today, and nothing exports the DB's dish_name_synonyms rows into it. Regenerating dish_class_map.csv right now would produce byte-identical output to before, since none of S50/S51's new aliases are reachable from catalogue.json. Logged as a real, undocumented pipeline gap (DB→catalogue.json synonym export) for a future WP, rather than running the regeneration anyway and reporting a false "improved" result.</p>
+        <p><strong>5. What's still pending.</strong> 42 of 810 dishes now have researched aliases (768 remain). Continued batches should keep following the same cited-research + safety-filter process; whenever the classifier-feeding pipeline gap above is closed, dish_class_map.csv should be regenerated to pick up all of S50+S51's aliases at once.</p>
+      </div>
+    </div>
+  </div><!-- /page-s51 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
