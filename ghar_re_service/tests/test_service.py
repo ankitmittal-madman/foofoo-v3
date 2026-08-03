@@ -123,7 +123,10 @@ def test_recommendations_include_decision_trace(client):
     trace = body["decision_trace"]
     funnel = trace["funnel"]
     assert funnel[0]["stage"] == "catalogue_total"
-    assert funnel[-1]["stage"] == "after_fasting_filter"
+    # WP-8G Option A added a final after_exclude_dish_ids_filter stage to the funnel (a no-op
+    # stage here since this request sends no exclude_dish_ids), so the funnel's last stage moved
+    # from after_fasting_filter to it.
+    assert funnel[-1]["stage"] == "after_exclude_dish_ids_filter"
     counts = [s["count"] for s in funnel]
     assert counts == sorted(counts, reverse=True)
     assert len(trace["winners"]) == len(body["plates"])

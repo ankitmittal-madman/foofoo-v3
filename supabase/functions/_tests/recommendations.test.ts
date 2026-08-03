@@ -21,6 +21,7 @@ import { makeRecommendationsHandler, type RecommendationDeps } from "../recommen
 import { callRecommendationEngine, type FetchLike } from "../recommendations/re-client.ts";
 import {
   allergenTokens,
+  buildRequest,
   composeHouseholdRaw,
   type HouseholdRaw,
   memberRole,
@@ -198,6 +199,62 @@ Deno.test("POST /v1/recommendations merges interaction_count into the outgoing R
     // this is what makes household_context a true historical record of what a request actually
     // used, not a separately-derived approximation of it.
     assertEquals(recordedContext, sentContext);
+  });
+});
+
+// ── buildRequest: WP-8G exclude_dish_ids field (pure-logic unit tests, no DB) ────────────────────
+Deno.test("buildRequest includes exclude_dish_ids when a non-empty list is supplied", () => {
+  const payload = buildRequest(TEST_HOUSEHOLD, undefined, "req-1", 0, ["md5:Onion Pakora"]);
+  assertEquals(payload.exclude_dish_ids, ["md5:Onion Pakora"]);
+});
+
+Deno.test("buildRequest omits exclude_dish_ids when undefined or empty (additive/optional field)", () => {
+  const noArg = buildRequest(TEST_HOUSEHOLD, undefined, "req-1");
+  assertEquals("exclude_dish_ids" in noArg, false);
+  const emptyArg = buildRequest(TEST_HOUSEHOLD, undefined, "req-1", 0, []);
+  assertEquals("exclude_dish_ids" in emptyArg, false);
+});
+
+// ── 1c. WP-8G exclude_dish_ids wiring ──────────────────────────────────────────────────────────
+Deno.test("POST /v1/recommendations sends exclude_dish_ids built from recent recommendation_events", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    let sentPayload: Record<string, unknown> | undefined;
+    const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      countInteractionsFn: () => Promise.resolve(0),
+      buildExcludeDishIdsFn: () => Promise.resolve(["md5:Onion Pakora", "md5:Chole"]),
+      callRe: (payload, requestId) => {
+        sentPayload = payload;
+        return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
+      },
+    };
+    const res = await pipeline(deps)(post());
+    assertEquals(res.status, 200);
+    assertEquals(sentPayload?.exclude_dish_ids, ["md5:Onion Pakora", "md5:Chole"]);
+  });
+});
+
+Deno.test("POST /v1/recommendations omits exclude_dish_ids entirely when the household has no served history", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    let sentPayload: Record<string, unknown> | undefined;
+    const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      countInteractionsFn: () => Promise.resolve(0),
+      buildExcludeDishIdsFn: () => Promise.resolve([]),
+      callRe: (payload, requestId) => {
+        sentPayload = payload;
+        return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
+      },
+    };
+    const res = await pipeline(deps)(post());
+    assertEquals(res.status, 200);
+    assertEquals("exclude_dish_ids" in (sentPayload ?? {}), false);
   });
 });
 

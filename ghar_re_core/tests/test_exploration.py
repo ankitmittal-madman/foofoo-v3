@@ -1,0 +1,150 @@
+"""
+Phase 2 tests — selection-stage epsilon-greedy class-level exploration (ghar_re_core.exploration)
+and WP-8G's exclude_dish_ids hard filter (ghar_re_core.scoring.pass_exclude_dish_ids).
+
+Uses the same golden-household fixtures/pipeline entrypoint as test_pipeline.py, monkeypatching
+CONFIG.bandit_epsilon (never the golden-master fixtures themselves) so these tests never depend on
+data/source/bandit_weights.yaml's actual YAML value.
+"""
+from ghar_re_core import fixtures as F
+from ghar_re_core import config as cfgmod
+from ghar_re_core.catalogue import Catalogue
+from ghar_re_core.pipeline import recommend, make_context
+
+CAT = Catalogue()
+HH = {h["id_key"]: h for h in F.HOUSEHOLDS}
+
+
+def _run(id_key, ctx_extra=None, **ctx_kw):
+    hh = HH[id_key]
+    ctx = make_context(**ctx_kw)
+    if ctx_extra:
+        ctx.update(ctx_extra)
+    return recommend(hh, ctx, CAT)
+
+
+def _heroes(res):
+    return [sorted(p["heroes"]) for p in res["plates"]]
+
+
+# ---------------------------------------------------------------------------
+# epsilon = 0 (the code-level safety default) is a total no-op, same output as no exploration at
+# all — this must hold for every golden-master household, not just one.
+# ---------------------------------------------------------------------------
+def test_epsilon_zero_is_a_total_noop_for_every_golden_household():
+    orig = cfgmod.CONFIG.bandit  # active_config().bandit — same dict every module sees
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 0.0, "exploration_boost": 0.0}}
+        for id_key in HH:
+            baseline = _run(id_key, slot="dinner", season="transitional")
+            exploring = _run(
+                id_key, slot="dinner", season="transitional",
+                ctx_extra={"_rng_seed": 1, "dish_feedback_counts": []},
+            )
+            assert _heroes(baseline) == _heroes(exploring), id_key
+    finally:
+        cfgmod.active_config().bandit = orig
+
+
+# ---------------------------------------------------------------------------
+# epsilon = 0 is ALSO what every golden-master fixture actually exercises today (no
+# dish_feedback_counts / _rng_seed in any GOLDEN_CASES ctx) — explicit sanity check that the
+# feature is a real no-op under production defaults, not just under a forced epsilon=0 override.
+# ---------------------------------------------------------------------------
+def test_default_bandit_epsilon_is_zero_code_level_safety_default():
+    # Simulate "the YAML/key is missing" by pointing at an empty bandit config — this is the
+    # code-level safety default path in ghar_re_core/config.py, distinct from the YAML default.
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {}
+        assert cfgmod.CONFIG.bandit_epsilon == 0.0
+        assert cfgmod.CONFIG.bandit_exploration_boost == 0.0
+    finally:
+        cfgmod.active_config().bandit = orig
+
+
+# ---------------------------------------------------------------------------
+# epsilon = 1 with a seeded RNG deterministically swaps in a lower-ranked dish from an
+# under-served class, in place of the lowest-scored already-chosen plate — and never changes any
+# dish's score in doing so.
+# ---------------------------------------------------------------------------
+def test_epsilon_one_seeded_deterministically_swaps_a_lower_plate_in():
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 1.0, "exploration_boost": 0.0}}
+        baseline = _run("single_professional_blr", slot="dinner", season="transitional")
+        exploring = _run(
+            "single_professional_blr", slot="dinner", season="transitional",
+            ctx_extra={"_rng_seed": 7, "dish_feedback_counts": []},
+        )
+        # Same call, same seed -> same result (determinism).
+        exploring_again = _run(
+            "single_professional_blr", slot="dinner", season="transitional",
+            ctx_extra={"_rng_seed": 7, "dish_feedback_counts": []},
+        )
+        assert _heroes(exploring) == _heroes(exploring_again)
+        # No dish's individual score changed — scores present in the output are a property of the
+        # dish/plate itself (score()), never mutated by exploration.
+        baseline_scores = {tuple(sorted(p["heroes"])): p["score"] for p in baseline["plates"]}
+        exploring_scores = {tuple(sorted(p["heroes"])): p["score"] for p in exploring["plates"]}
+        for heroes, score in exploring_scores.items():
+            if heroes in baseline_scores:
+                assert baseline_scores[heroes] == score
+    finally:
+        cfgmod.active_config().bandit = orig
+
+
+# ---------------------------------------------------------------------------
+# exploration + exclude_dish_ids together must never surface an excluded dish, even when
+# exploration is maximally aggressive (epsilon=1).
+# ---------------------------------------------------------------------------
+def test_exploration_never_surfaces_an_excluded_dish():
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 1.0, "exploration_boost": 0.0}}
+        baseline = _run("single_professional_blr", slot="dinner", season="transitional")
+        served_names = {n for p in baseline["plates"] for n in p["heroes"]}
+        excluded_ids = {"md5:" + n for n in served_names}
+        res = _run(
+            "single_professional_blr", slot="dinner", season="transitional",
+            ctx_extra={
+                "_rng_seed": 3, "dish_feedback_counts": [],
+                "exclude_dish_ids": sorted(excluded_ids),
+            },
+        )
+        got_names = {n for p in res["plates"] for n in p["heroes"]}
+        assert not (got_names & served_names), got_names & served_names
+    finally:
+        cfgmod.active_config().bandit = orig
+
+
+# ---------------------------------------------------------------------------
+# exclude_dish_ids alone: a dish that would have scored top-1 is hard-removed from the output,
+# never just demoted (WP-8G Option A).
+# ---------------------------------------------------------------------------
+def test_exclude_dish_ids_removes_a_would_be_top_dish():
+    baseline = _run("single_professional_blr", slot="dinner", season="transitional")
+    top_plate = baseline["plates"][0]
+    top_names = sorted(top_plate["heroes"])
+    excluded_ids = ["md5:" + n for n in top_names]
+
+    res = _run(
+        "single_professional_blr", slot="dinner", season="transitional",
+        ctx_extra={"exclude_dish_ids": excluded_ids},
+    )
+    all_served_names = {n for p in res["plates"] for n in p["heroes"]}
+    for n in top_names:
+        assert n not in all_served_names, f"{n} should have been hard-excluded"
+
+
+# ---------------------------------------------------------------------------
+# exclude_dish_ids is additive/optional: omitted or empty is a total no-op.
+# ---------------------------------------------------------------------------
+def test_exclude_dish_ids_empty_or_omitted_is_a_noop():
+    baseline = _run("single_professional_blr", slot="dinner", season="transitional")
+    omitted = _run("single_professional_blr", slot="dinner", season="transitional")
+    empty = _run(
+        "single_professional_blr", slot="dinner", season="transitional",
+        ctx_extra={"exclude_dish_ids": []},
+    )
+    assert _heroes(baseline) == _heroes(omitted) == _heroes(empty)

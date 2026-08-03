@@ -22,6 +22,7 @@ import type { Handler } from "../_shared/middleware/types.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 
 import {
+  buildExcludeDishIds,
   buildRequest,
   countInteractions,
   type HouseholdRaw,
@@ -52,6 +53,8 @@ export interface RecommendationDeps {
   recordContext?: typeof recordHouseholdContext;
   /** §0.2 — injectable so tests never need a live feedback_events table. */
   countInteractionsFn?: typeof countInteractions;
+  /** WP-8G Option A — injectable so tests never need a live recommendation_events table. */
+  buildExcludeDishIdsFn?: typeof buildExcludeDishIds;
 }
 
 function plateCount(body: Record<string, unknown>): number {
@@ -68,6 +71,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
   const recordEvent = deps.recordEvent ?? recordRecommendationEvent;
   const recordContext = deps.recordContext ?? recordHouseholdContext;
   const countInteractionsFn = deps.countInteractionsFn ?? countInteractions;
+  const buildExcludeDishIdsFn = deps.buildExcludeDishIdsFn ?? buildExcludeDishIds;
 
   return async (req, ctx) => {
     if (req.method !== "POST") {
@@ -124,7 +128,11 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     // populated ctx['interaction_count']. Computed BEFORE buildRequest so it is merged into
     // `context` prior to validateRequest below, exactly like every other context field.
     const interactionCount = await countInteractionsFn(ctx, hid);
-    const payload = buildRequest(household, contextOverride, requestId, interactionCount);
+    // WP-8G Option A: the household's own last-served dish ids, so a refresh doesn't keep
+    // resurfacing the exact same plates. Best-effort (buildExcludeDishIdsFn never throws — see
+    // compose.ts) — a lookup failure degrades to no exclusions, never blocks the request.
+    const excludeDishIds = await buildExcludeDishIdsFn(ctx, hid);
+    const payload = buildRequest(household, contextOverride, requestId, interactionCount, excludeDishIds);
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext

@@ -1,0 +1,19 @@
+config_version: 1.0
+generated_from: Phase 2 (Recommendation Engine build) — epsilon-greedy class-level exploration.
+# Selection-stage exploration (ghar_re_core/exploration.py), NOT a ScoringModule and NOT part of
+# the master scoring formula — it only decides, AFTER ranking, whether one lower-ranked-but-
+# eligible dish from an under-served meal CLASS should swap in for one of the greedy top picks.
+# It never changes any dish's score.
+#
+# epsilon: probability [0,1] that a given selection swap-check explores an under-served class
+# instead of taking the greedy top pick. 0.15 here is the YAML/product default (15% of the time,
+# nudge variety toward classes this household's `dish_feedback_counts` show are under-served).
+# CODE-LEVEL SAFETY DEFAULT IS 0.0 (see ghar_re_core/config.py bandit_epsilon()) — if this file or
+# this key is ever missing, exploration is a hard no-op rather than silently guessing a rate.
+exploration:
+  epsilon: 0.15
+  # exploration_boost: a small additive nudge [0,1] used only to break ties among several
+  # eligible-but-under-served-class candidates when picking WHICH dish to swap in (prefers the
+  # one with the least `served` history in dish_feedback_counts) — never applied to any dish's
+  # actual score, purely a selection-stage tie-break weight.
+  exploration_boost: 0.05

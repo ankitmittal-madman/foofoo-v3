@@ -55,6 +55,7 @@ class Config:
         self.filters = _load("filters.yaml")
         self.derivation = _load("derivation_params.yaml")
         self.cohort = _load("cohort_weights.yaml")
+        self.bandit = _load("bandit_weights.yaml")
         self.versions = dict(spine="Spine v1.0", kb="KB v0.2",
                              config="Config v%s" % self.base["config_version"])
         self._community_priors = None
@@ -195,6 +196,23 @@ class Config:
         half = fd.get("halflife", 25)
         n = max(0, interaction_count or 0)
         return floor + (coldstart - floor) * (2.0 ** (-n / half))
+
+    # --- selection-stage epsilon-greedy exploration (bandit_weights.yaml <- Phase 2) ---
+    @property
+    def bandit_epsilon(self):
+        """Probability [0,1] that ghar_re_core.exploration's epsilon-greedy selection swap
+        explores an under-served meal class instead of taking the greedy top pick. The YAML
+        default (bandit_weights.yaml) is 0.15; the CODE-LEVEL SAFETY DEFAULT — used whenever the
+        file or the `exploration.epsilon` key is missing — is 0.0 (a hard no-op), never a
+        guessed non-zero rate (Task 3 rule)."""
+        return (self.bandit or {}).get("exploration", {}).get("epsilon", 0.0)
+
+    @property
+    def bandit_exploration_boost(self):
+        """Small additive tie-break weight [0,1] ghar_re_core.exploration uses ONLY to choose
+        which under-served-class candidate to swap in when several are eligible (never applied
+        to any dish's actual score). Code-level safety default 0.0 if missing."""
+        return (self.bandit or {}).get("exploration", {}).get("exploration_boost", 0.0)
 
     # --- community priors (community_priors.csv <- KB §C1) ---
     # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a

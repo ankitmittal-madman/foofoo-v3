@@ -37,13 +37,19 @@ def build_household_dict(hh: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
-def build_context(ctx: dict[str, Any]) -> dict[str, Any]:
+def build_context(ctx: dict[str, Any], exclude_dish_ids: list[str] | None = None) -> dict[str, Any]:
     """Map the contract context to a core context dict.
 
     Weather is mocked/injected in v1 — there is no live weather API.
+
+    `exclude_dish_ids` (WP-8G Option A) is a REQUEST-level field, not part of the contract's
+    HouseholdContext object, so it's threaded in as a separate argument here rather than read off
+    `ctx` — but it still lands in the core ctx dict, since that's what
+    ghar_re_core.scoring.pass_exclude_dish_ids/eligible() read. Additive/optional: an
+    omitted/empty list is a no-op, matching every existing caller/fixture that predates this field.
     """
     weather = ctx.get("weather") or {}
-    return core_pipeline.make_context(
+    core_ctx = core_pipeline.make_context(
         slot=ctx.get("slot", "dinner"),
         season=ctx.get("season", "transitional"),
         weekday=ctx.get("weekday", "Monday"),
@@ -53,6 +59,8 @@ def build_context(ctx: dict[str, Any]) -> dict[str, Any]:
         active_modes=ctx.get("active_modes") or [],
         calorie_target=ctx.get("calorie_target"),
     )
+    core_ctx["exclude_dish_ids"] = exclude_dish_ids or []
+    return core_ctx
 
 
 def _principal_hero(plate):
@@ -140,7 +148,7 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
     """
     request_id = request.get("request_id") or str(uuid.uuid4())
     hh = build_household_dict(request["household"])
-    ctx = build_context(request["context"])
+    ctx = build_context(request["context"], request.get("exclude_dish_ids"))
     objective = hh.get("q15_objective") or config.default_objective
     want_trace = bool(request.get("include_decision_trace"))
 

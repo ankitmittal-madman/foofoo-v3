@@ -398,6 +398,7 @@ export function buildRequest(
   contextOverride: Record<string, unknown> | undefined,
   requestId: string,
   interactionCount?: number,
+  excludeDishIds?: string[],
 ): Record<string, unknown> {
   const context: Record<string, unknown> = { ...DEFAULT_CONTEXT, ...(contextOverride ?? {}) };
   if (typeof interactionCount === "number") {
@@ -409,7 +410,19 @@ export function buildRequest(
   // plates, not just the plates themselves. The RE only builds this payload when asked
   // (ghar_re_core/decision_log.py), so requesting it is a small, bounded cost, not free — but
   // WP-12 chose completeness (every event traced) over trimming it to on-demand.
-  return { request_id: requestId, household, context, include_decision_trace: true };
+  const payload: Record<string, unknown> = {
+    request_id: requestId,
+    household,
+    context,
+    include_decision_trace: true,
+  };
+  // WP-8G Option A — additive/optional request-level field (contracts/ghar-re-v1.schema.json);
+  // only set it when there's something to exclude, so a household with no history sends exactly
+  // the same payload shape it always has.
+  if (excludeDishIds && excludeDishIds.length > 0) {
+    payload.exclude_dish_ids = excludeDishIds;
+  }
+  return payload;
 }
 
 /**
@@ -466,6 +479,66 @@ export async function recordHouseholdContext(
  * row fetch. Returns 0 (never throws) on a lookup failure, matching that formula's own graceful
  * degrade-to-zero-history behaviour rather than blocking the request over a secondary read.
  */
+/**
+ * WP-8G Option A ("Recommendation Variety on Refresh") — build the RE request's
+ * `exclude_dish_ids[]` from this household's own last N recommendation_events rows, so a repeated
+ * refresh with the same (household, context) doesn't keep resurfacing the exact same dishes.
+ *
+ * Reads `hero_dish_ids` off each stored plate — the RE's OWN catalogue ids (ghar_re_core
+ * `Dish.id`, e.g. "md5:<name>"), already persisted verbatim in `recommendation_events.plates`
+ * (RE-DOC-11 §6: plates[] is passed through and stored as-is) — so this needs no separate
+ * `public.dishes` name→id resolution (unlike served.ts's shown_not_tapped path, which resolves
+ * hero_dish_NAMES because feedback_events keys off `public.dishes.id`, a different id space).
+ *
+ * Best-effort like `countInteractions`/`loadLatestContext`: a lookup failure degrades to an empty
+ * exclusion list (same as a brand-new household with no history) rather than blocking or erroring
+ * the recommendation request over a variety nice-to-have.
+ * @param ctx - request context (used for the DB client + a lookup-failure warn log)
+ * @param profileId - the household whose recent recommendation_events to read
+ * @param lastN - how many most-recent recommendation_events rows to pull dish ids from (default 2,
+ *   per the WP-8G contract summary — "the last N=2 recommendation_events.plates dish names")
+ * @returns deduplicated hero_dish_ids across those rows' plates; empty if none exist or on error
+ */
+export async function buildExcludeDishIds(
+  ctx: RequestContext,
+  profileId: string,
+  lastN = 2,
+): Promise<string[]> {
+  try {
+    const db = createServiceRoleClient(ctx.config);
+    const { data, error } = await withTimeout(
+      db.from("recommendation_events")
+        .select("plates")
+        .eq("profile_id", profileId)
+        .eq("re_served", true)
+        .order("created_at", { ascending: false })
+        .limit(lastN),
+      "recommendations.compose.buildExcludeDishIds",
+    );
+    if (error) throw error;
+    const rows = (data ?? []) as Array<{ plates: unknown }>;
+    const ids = new Set<string>();
+    for (const row of rows) {
+      const plates = row.plates;
+      if (!Array.isArray(plates)) continue;
+      for (const p of plates) {
+        if (p && typeof p === "object" && Array.isArray((p as Record<string, unknown>).hero_dish_ids)) {
+          for (const id of (p as Record<string, unknown>).hero_dish_ids as unknown[]) {
+            if (typeof id === "string" && id.length > 0) ids.add(id);
+          }
+        }
+      }
+    }
+    return Array.from(ids);
+  } catch (e) {
+    ctx.logger.warn("exclude_dish_ids.lookup_failed", {
+      profile_id: profileId,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+    return [];
+  }
+}
+
 export async function countInteractions(
   ctx: RequestContext,
   profileId: string,

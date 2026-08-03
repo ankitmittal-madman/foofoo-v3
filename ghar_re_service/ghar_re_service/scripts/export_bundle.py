@@ -63,6 +63,7 @@ CONFIG_FILES = (
     "filters.yaml",
     "derivation_params.yaml",
     "cohort_weights.yaml",
+    "bandit_weights.yaml",
     "community_priors.csv",
     # Ingredient MASTER attributes (category / allergen flags / Jain compatibility) — read by
     # ghar_re_core.catalogue at import time for allergen + Jain derivation. This is ingredient

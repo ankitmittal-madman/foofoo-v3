@@ -9,6 +9,7 @@ discovery-dial cap), default carb attach (§S4.4 + KB §R2a).
 from ghar_re_core.config import CONFIG
 from ghar_re_core import scoring as S
 from ghar_re_core import decision_log
+from ghar_re_core import exploration
 
 
 RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich"}
@@ -228,6 +229,13 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None, with
         chosen.append(p)
         used_heroes |= p["heroes"]
 
+    # Phase 2 selection-stage epsilon-greedy class-level exploration (ghar_re_core.exploration) —
+    # runs AFTER the greedy no-duplicate-guard ranking/selection above, on its already-chosen
+    # output. NOT a ScoringModule (no dish score is ever touched); a total no-op whenever
+    # CONFIG.bandit_epsilon is 0 (its code-level safety default, and the value implied for every
+    # golden-master fixture, which sets no dish_feedback_counts/_rng_seed).
+    chosen, exploration_trace = exploration.epsilon_greedy_select(chosen, plates, ctx)
+
     # attach support (§S4.4) to non-standalone plates
     for p in chosen:
         p["support"] = default_carb(p, theta)
@@ -243,6 +251,10 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None, with
 
     if with_trace:
         trace = decision_log.build_decision_trace(household_label, ctx, objective, plates, chosen, funnel)
+        # Additive-only: exploration_trace is empty ([]) whenever exploration didn't fire (the
+        # golden-master/every-live-household case), so this never changes existing trace shape
+        # for a no-op call — it only ever ADDS a key, never removes/renames one.
+        trace["exploration_trace"] = exploration_trace
         return chosen, trace
     return chosen
 

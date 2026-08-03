@@ -78,6 +78,19 @@ def pass_weaning(dish, theta, ctx):
     return True
 
 
+def pass_exclude_dish_ids(dish, theta, ctx):
+    """WP-8G hard filter (Option A — server-side exclusion): rejects a dish whose id appears in
+    the request's `exclude_dish_ids` (additive/optional — omitted or empty is a no-op, matching
+    every existing caller/fixture that predates this field). Always a hard pool-stage exclusion,
+    never a scoring penalty, so an excluded dish can never surface even at score rank 1 — see
+    docs/project-history/work-packages/[DRAFT]_WP-8G_Recommendation_Variety_on_Refresh_v1.0.md
+    §1 Option A."""
+    excl = ctx.get("exclude_dish_ids")
+    if not excl:
+        return True
+    return dish.id not in set(excl)
+
+
 def pass_mode_fasting(dish, theta, ctx):
     """A5 hard filter, only active when 'fasting' is in the context's active_modes: restricts to
     farali (fasting-permitted) dishes. A no-op filter (everything passes) outside fasting mode."""
@@ -115,6 +128,7 @@ def eligibility_funnel(catalogue, theta, ctx, shared_hero=True):
     if shared_hero:
         stages.append(("after_weaning_filter", pass_weaning))
     stages.append(("after_fasting_filter", pass_mode_fasting))
+    stages.append(("after_exclude_dish_ids_filter", pass_exclude_dish_ids))
     for stage_name, check in stages:
         survivors = [d for d in survivors if check(d, theta, ctx)]
         funnel.append({"stage": stage_name, "count": len(survivors)})
@@ -133,6 +147,8 @@ def eligible(dish, theta, ctx, shared_hero=True):
     if shared_hero and not pass_weaning(dish, theta, ctx):
         return False
     if not pass_mode_fasting(dish, theta, ctx):
+        return False
+    if not pass_exclude_dish_ids(dish, theta, ctx):
         return False
     return True
 

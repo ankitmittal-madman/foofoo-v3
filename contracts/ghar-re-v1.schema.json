@@ -104,7 +104,8 @@
         "request_id": { "type": "string", "description": "UUID; if omitted the service generates one and echoes it back." },
         "household": { "$ref": "#/$defs/HouseholdRaw" },
         "context": { "$ref": "#/$defs/HouseholdContext" },
-        "include_decision_trace": { "type": "boolean", "description": "Optional, defaults to false. When true, the response includes decision_trace: the funnel of how many catalogue dishes survived each hard filter (diet/jain/allergen/weaning/fasting), the served plates ranked, and the top near-miss alternatives with why each lost." }
+        "include_decision_trace": { "type": "boolean", "description": "Optional, defaults to false. When true, the response includes decision_trace: the funnel of how many catalogue dishes survived each hard filter (diet/jain/allergen/weaning/fasting), the served plates ranked, and the top near-miss alternatives with why each lost." },
+        "exclude_dish_ids": { "type": "array", "items": { "type": "string" }, "description": "WP-8G Option A ('Recommendation Variety on Refresh'). Optional, additive; empty/omitted is a no-op. Dish ids the RE must hard-filter out of the candidate pool BEFORE scoring/selection (never a scoring penalty) — typically the household's own last-served dish ids, so a refresh doesn't repeat them." }
       },
       "required": ["household", "context"]
     },
