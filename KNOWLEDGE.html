@@ -705,8 +705,16 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🗄</span> S55 · Retire legacy RE schema
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s56')">
+    <div class="nav-item" onclick="showPage('s56')">
       <span class="nav-icon">🛠</span> S56 · Quality gate: real DB/edge/UI checks
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('s57')">
+      <span class="nav-icon">🍽</span> S57 · RE deploy verification + doc corrections
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s58')">
+      <span class="nav-icon">🧹</span> S58 · Production hardening audit (WP-21)
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -722,7 +730,7 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">232</span>
+      <span class="nav-badge">236</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -2222,6 +2230,40 @@ function deepDiveFeature(featureLabel){
     </div>
   </div>
 
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#92500a"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fff3e0;color:#92500a">S57</span>
+      <div class="tl-title">Verified the recommendation engine is actually live, and fixed docs that said it wasn't</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s57')">ghar-re.fly.dev live-checked</span>
+        <span class="tl-chip" onclick="showPage('s57')">810-dish bundle confirmed</span>
+        <span class="tl-chip" onclick="showPage('s57')">3 stale docs corrected</span>
+        <span class="tl-chip" onclick="showPage('s57')">ghar_re.dishes deletion averted</span>
+        <span class="tl-chip" onclick="showPage('s57')">WP-11 §6 addendum</span>
+      </div>
+      <div class="tl-note">A question about which dish table powers recommendations led to checking the recommendation engine live instead of trusting its own setup docs — found it already deployed, healthy, and serving the real 810-dish catalogue with real traffic. Corrected 3 documents that wrongly said "not deployed." A plan to delete an apparently-unused database table was reversed after finding real dependent tables. Follow-up: recover/retire the undocumented "diag-re-check" live function; decide the fate of the unused ghar_re DB area.</div>
+    </div>
+  </div>
+
+
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#7a3b8f"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f3e8fb;color:#7a3b8f">S58</span>
+      <div class="tl-title">Production hardening audit (WP-21): found and fixed two accidental-launch bugs, catalogued the rest</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s58')">Onboarding force-restart bug fixed</span>
+        <span class="tl-chip" onclick="showPage('s58')">Query caching re-enabled</span>
+        <span class="tl-chip" onclick="showPage('s58')">WP-21 audit doc (10 report sections)</span>
+        <span class="tl-chip" onclick="showPage('s58')">6 Founder decisions catalogued</span>
+      </div>
+      <div class="tl-note">A repo-wide scan for stubs, hardcoded values, dead code, and doc drift found the codebase mostly self-documents its own gaps honestly. The two real accidental-launch risks — onboarding always restarting from scratch, and all query caching disabled — were both dated the day before this session and explicitly marked "revert before launch" with the real logic already written right next to them, so both were reverted. Everything else (fallback-plate coverage, consent IP-hash gap, dish-signature score curation, monitoring wiring, etc.) needs a Founder/product call, not a guess, and is catalogued in WP-21 rather than silently fixed.</div>
+    </div>
+  </div>
+
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2992,6 +3034,33 @@ function deepDiveFeature(featureLabel){
     <td class="fr-session">S56</td>
     <td class="fr-desc">Keeps the installed Playwright package out of version control.</td>
   </tr>
+  <tr>
+    <td class="fr-file mono">ghar_re_service/ghar_re_service/scripts/build_catalogue.py</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S57</td>
+    <td class="fr-desc">Docstring corrected — the real-catalogue swap it describes as pending is actually done and shipping.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ghar_re_service/README.md</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S57</td>
+    <td class="fr-desc">Status line corrected from "PREPARED, NOT DEPLOYED" to "DEPLOYED", with the live health/bundle-version check that proved it.</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">ghar_re_service/fly.toml</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S57</td>
+    <td class="fr-desc">Header comment corrected from "NOT YET DEPLOYED" to "DEPLOYED — live at ghar-re.fly.dev".</td>
+  </tr>
+  <tr>
+    <td class="fr-file mono">docs/project-history/work-packages/[DRAFT]_WP-11_Launch_Readiness_Remediation_Plan_v1.0.md</td>
+    <td><span class="tag tag-mod">Modified</span></td>
+    <td class="fr-session">S57</td>
+    <td class="fr-desc">Appended §6 changelog addendum: closes the 802/810/39 catalogue-reconciliation question with live proof, flags new diag-re-check drift, records the ghar_re.dishes deletion that was deliberately not done.</td>
+  </tr>
+  <tr><td class="fr-file mono">mobile/app/index.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S58</td><td class="fr-desc">Removed a dated (Aug 2) testing override that always sent every signed-in user back to onboarding; restored the real "go to recommendations if already complete" logic</td></tr>
+  <tr><td class="fr-file mono">mobile/src/lib/queryClient.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S58</td><td class="fr-desc">Removed a dated (Aug 2) testing override that disabled all query caching app-wide; restored the documented production default</td></tr>
+  <tr><td class="fr-file mono">docs/project-history/work-packages/[DRAFT]_WP-21_Production_Hardening_Audit_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S58</td><td class="fr-desc">Full production-hardening audit: stub inventory, hardcoded-value audit, dead-code check, doc-drift notes, deferred-decision register, readiness checklist, fixes applied, remaining manual work</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3526,6 +3595,38 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">How should the screenshot tool know which screens to check?</div>
     <div class="decision-a">By reading the app's own screen folder at run time, rather than a hardcoded list — so a newly added screen gets covered automatically instead of silently going unchecked.</div>
     <div class="decision-meta">S56 · Aug 3</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: The two "TEMPORARY (testing)" overrides in mobile/app/index.tsx and queryClient.ts were dated the day before this session — fix them now, or just flag them?</div>
+    <div class="decision-a">A: Fixed directly. Both are auto-fix-eligible by this audit's own rule: the correct production logic was already written by a prior session and left right there in a comment, explicitly labeled "revert before launch." Leaving them would mean the very next launch ships onboarding that never remembers a returning user and a cache that never caches — both were the highest-risk findings in the whole audit precisely because they were both recent and trivially shippable by accident.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: Where should the 10 requested audit reports live, given the task asked for a new reports/production-hardening/ folder?</div>
+    <div class="decision-a">A: Founder chose docs/project-history/work-packages/ instead — the repo's frozen architecture requires an RACR for any new top-level folder, and a full production-hardening pass is itself a Work Package by this repo's own definition. Consolidated into one WP-21 document with the 10 requested reports as appendices, rather than 10 separate files, to respect the repo's naming standard (status-prefixed, versioned document names).</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: Hardcoded weather (is_raining:true, temp_c:27) and a single hardcoded fallback dish exist in real Edge Function code — fix them?</div>
+    <div class="decision-a">A: Left untouched. Both are documented, intentional v1 scope decisions (weather-mocked-by-design is stated consistently across the whole RE), not oversights — and both already log/trace their own usage rather than hiding it. Replacing them would mean inventing a real weather API integration or a real per-allergy fallback catalogue, which this audit's own rules forbid guessing at.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Which of three dish sources (public.dishes=802, ghar_re.dishes=39, the bundled catalogue=810) actually powers live recommendations?</div>
+    <div class="decision-a">Neither database table. The live recommendation engine reads a pre-built JSON file (ghar_re_service/data/bundle/catalogue.json, 810 dishes sourced from data/source/dishes.xlsx) baked into its deployed container image — it never queries Postgres at request time, by design (RE-DOC-10 §8). Confirmed live: the running service's /v1/meta endpoint reports the exact bundle_version hash that matches the committed manifest. public.dishes (802) is used by the app's general content layer; ghar_re.dishes (39) is not read by any current runtime code path.</div>
+    <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Was the recommendation engine's Fly.io deployment actually still pending, as its own config file and README said ("PREPARED, NOT DEPLOYED")?</div>
+    <div class="decision-a">No — checked live via `fly status` and direct HTTP calls to ghar-re.fly.dev: the app was already running, healthy, and had already served 9 real requests (8 successful) through the app's recommendations server function. The "not deployed" status in fly.toml/README/build_catalogue.py was stale documentation from an earlier phase that never got updated after the actual deploy happened. Corrected all three files rather than re-deploying something already live.</div>
+    <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should ghar_re.dishes (39 rows, unread by any current runtime code) be dropped as dead weight?</div>
+    <div class="decision-a">No — reversed mid-session. An initial plan assumed it was orphaned based on an application-code-only search. Checking the database's own foreign keys found real dependent tables (dish_pairing_penalties, dish_safety_flags, dish_name_synonyms, KB hero-dish links) and an active validation script referencing it — dropping it would cascade-delete a real, structurally-connected subsystem. Left in place; the broader question (should the whole unused ghar_re Postgres schema be retired) was flagged as a Founder decision, not executed.</div>
+    <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should the hardcoded fallback dish ("Moong Dal Khichdi") in supabase/functions/recommendations/fallback.ts be removed, per a general "no hardcoded dishes anywhere" instruction?</div>
+    <div class="decision-a">Left as-is. Its own code comment already flags it explicitly as a deliberate, documented stub (RE-DOC-10 §11) for the rare case the RE is completely unreachable, not an accidental hardcode — and with the RE now confirmed live and healthy, this path is a last-resort safety net, not the default experience. Ripping it out would trade a documented safe-default for an error state with no clear product upside; treated as an existing, intentional design decision rather than a bug to silently fix.</div>
+    <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -9282,7 +9383,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s55 -->
 
-  <div id="page-s56" class="page-content">
+  <div id="page-s56" class="page-content" style="display:none">
 
     <!-- ── Session header ── -->
     <div class="page-header">
@@ -9580,6 +9681,539 @@ function deepDiveFeature(featureLabel){
     </script>
 
   </div><!-- /page-s56 -->
+
+  <div id="page-s57" class="page-content" style="display:none">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S57 · Verified the recommendation engine is actually live, and fixed docs that said it wasn't</div>
+      <div class="page-subtitle">A chat conversation raised "which dish list does the app actually recommend from?" as an open question. Checking it live (not just reading code) found the real recommendation engine was already deployed and already serving real recommendations — several project documents just hadn't caught up to say so.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Project documents (the Fly.io deploy config, its README, and a build script's own notes) all said the real recommendation engine was "prepared but not deployed" — implying real users were only ever getting one hardcoded fallback dish. A separate open question from an earlier work package asked which of three different dish counts (802 / 810 / 39) was the real one, unresolved.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">Checked the live service directly: it's deployed, healthy, running the real 810-dish catalogue, already wired to the app's server functions, and has already handled real recommendation requests successfully. Fixed the three documents that wrongly said otherwise, and recorded the dish-count answer with live proof instead of a guess. One separate finding — a live server function with no matching code in this project — was flagged for a human decision rather than fixed blindly.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/scripts/build_catalogue.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/README.md</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/fly.toml</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[DRAFT]_WP-11_Launch_Readiness_Remediation_Plan_v1.0.md</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was found and fixed this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>4 files corrected, 0 new code written</div>
+      </div>
+      <div class="session-card-desc">No new feature was built this session — it was entirely verification and documentation correction. Checked the live recommendation service directly (not just its code) and found it was already deployed, healthy, and running the real 810-dish catalogue with real traffic already flowing through it. Three documents that said the opposite ("not deployed yet") were corrected. A work package's open question about which dish table is authoritative was answered with live evidence and appended as a changelog entry. One dead end was deliberately not acted on: a plan to delete a database table turned out to be wrong once its real dependencies were checked, so nothing was deleted.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">810</div><div class="stat-l">Dishes in the real live catalogue</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">3</div><div class="stat-l">Stale docs corrected</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">9/9</div><div class="stat-l">Live requests already served</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">1</div><div class="stat-l">New drift found (unreviewed function)</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s57','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s57','detail')">Detail drill-down</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s57-swim" class="view-pane active">
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">recommendation engine</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s57','re-live-check')">
+            <div class="step-num num-amber">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Called the live recommendation service directly</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Instead of trusting what the code and docs claimed, the actual running service was pinged over the internet. It answered "alive," "ready," and reported it's running the real 810-dish menu — not the small hardcoded test menu.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ then checked whether the app's server functions are actually pointed at it</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">config / secrets</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s57','secrets-check')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Confirmed the app's server already has the recommendation service's address and password saved</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The two settings the "recommendations" server function needs to reach the recommendation engine were already saved and in place — nothing needed to be set up.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ so the connection was already proven by real usage, not a test call</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">ghar_re.dishes</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s57','dishes-table-check')">
+            <div class="step-num num-teal">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Checked before deleting a database table that looked unused</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">A small, 39-row dish table in the database looked abandoned at first glance. Checking properly found other real tables (safety warnings, dish-pairing rules) depend on it, so it was left alone instead of being deleted.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ finally, corrected the documents that had fallen out of date</div>
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">docs a human reads</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s57','docs-fix')">
+            <div class="step-num num-blue">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Three documents corrected to say "deployed," not "not deployed"</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The deploy config, its README, and a build script's own notes all said the recommendation engine wasn't live yet. That was false and would have misled the next person to touch this project. All three now state the real, checked status.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">A live server function called "diag-re-check" was found running in production with no matching code anywhere in this project's history — someone deployed it directly without ever committing its source. It needs a human decision: recover and commit its real source, or formally retire it. Also unresolved by design, left for a Founder call: the whole "ghar_re" database area (dishes + safety + pairing tables) is internally consistent but not read by anything the app currently runs — worth deciding whether to keep it as future groundwork or retire it properly.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s57-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s57-re-live-check" onclick="toggleDetail('s57-re-live-check')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Live check: ghar-re.fly.dev</span>
+          </div>
+          <span class="detail-chevron" id="chev-s57-re-live-check">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s57-re-live-check">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The recommendation engine is a separate small program (not the main app server) whose only job is to pick dishes for a household. It was assumed, based on its own setup notes, to not be running anywhere yet. Pinging its real internet address directly proved otherwise.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Three plain web requests to ghar-re.fly.dev: /healthz, /readyz, /v1/meta</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">"alive", "ready", and a report of exactly which dish menu it's using (the real 810-dish one) plus a running count of requests it has already answered (9, with 8 successful)</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">ping /healthz + /readyz</span><span class="dd-arrow">→</span>
+            <span class="dd-node">both say OK</span><span class="dd-arrow">→</span>
+            <span class="dd-node">ping /v1/meta</span><span class="dd-arrow">→</span>
+            <span class="dd-node">confirms real 810-dish menu + real prior traffic</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">"bundle_version":"sha256:07506fd7d963dffb","dish_count":810</span>  ← the live service's own self-report, matched exactly against the menu file committed to this project's history</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just trust the deploy config file, which said "not deployed"?</div>
+            <div class="dd-why-a">A file's comment about its own status can go stale the moment someone deploys it and forgets to update the comment — which is exactly what happened here. Only asking the live service itself is proof.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s57-secrets-check" onclick="toggleDetail('s57-secrets-check')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Supabase Edge Function secrets (GHAR_RE_SERVICE_URL / _SECRET)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s57-secrets-check">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s57-secrets-check">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The app's "recommendations" server function needs to know the recommendation engine's address and a shared password to call it safely. Checked the project's saved settings and both were already there.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A listing of the app server's saved secret names</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Confirmed GHAR_RE_SERVICE_URL and GHAR_RE_SERVICE_SECRET are both already set</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">list saved server secrets</span><span class="dd-arrow">→</span>
+            <span class="dd-node">both required settings present</span><span class="dd-arrow">→</span>
+            <span class="dd-node">nothing to configure</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">GHAR_RE_SERVICE_URL, GHAR_RE_SERVICE_SECRET</span>  ← both already present in the live secret list, no action needed</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why check this at all if it was already done?</div>
+            <div class="dd-why-a">The plan going in assumed a full deploy-and-wire-up was still needed. Checking first avoided doing (and re-doing) work that was already complete.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s57-dishes-table-check" onclick="toggleDetail('s57-dishes-table-check')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">ghar_re.dishes (39 rows) — checked, not deleted</span>
+          </div>
+          <span class="detail-chevron" id="chev-s57-dishes-table-check">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s57-dishes-table-check">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A small, 39-dish table that lives in the database's recommendation-engine area. Nothing in the currently-running app code reads it — the real recommendation engine reads its dish list from a different place entirely (a pre-built file, not this table). It looked safe to delete for that reason.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A search for every place in the database that points at this table</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Found real dependent tables (dish safety warnings, dish-pairing rules, dish name synonyms) that would have been deleted along with it — so it was left in place</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">planned: delete this table</span><span class="dd-arrow">→</span>
+            <span class="dd-node">checked for dependents first</span><span class="dd-arrow">→</span>
+            <span class="dd-node">found real dependents</span><span class="dd-arrow">→</span>
+            <span class="dd-node">decision reversed, nothing deleted</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">REFERENCES ghar_re.dishes(id) ON DELETE CASCADE</span>  ← the exact line, in three other tables, that would have caused their real rows to be deleted too</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why did the original plan miss this?</div>
+            <div class="dd-why-a">The first check only searched application code, not the database's own table relationships. A table can look unused by the app while still being load-bearing for other tables inside the database itself.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">So is this table needed or not?</div>
+            <div class="dd-why-a">Genuinely unclear — it's not read by anything the app currently runs, but it's not safely removable either without also deciding what happens to its dependents. Left as an open decision rather than guessed at.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s57-docs-fix" onclick="toggleDetail('s57-docs-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Stale "not deployed" docs corrected</span>
+          </div>
+          <span class="detail-chevron" id="chev-s57-docs-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s57-docs-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Three files — the Fly.io deploy settings file, its README, and a build script's own explanatory notes — all said the recommendation engine's real-dish-menu swap or its deployment was "not done yet." Both statements were false by the time this was checked.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The live proof gathered in this session (health check + bundle version match)</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">All three files rewritten to state the real, current, checked status instead of an outdated assumption</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">found live proof contradicts the docs</span><span class="dd-arrow">→</span>
+            <span class="dd-node">edited each doc's own status line</span><span class="dd-arrow">→</span>
+            <span class="dd-node">docs now match reality</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">Status: DEPLOYED.</span>  ← replaces "Status: PREPARED, NOT DEPLOYED." in the README, with the live proof cited right next to it</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does a wrong comment in a settings file matter?</div>
+            <div class="dd-why-a">The next person (human or AI) to work on this project reads these files first, before checking anything live. A confidently wrong status line sends them down the wrong path — e.g. redeploying something that's already running, or telling a founder a feature isn't live when it already is.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Recover or formally retire the "diag-re-check" server function that's live in production with no matching source in this project. Get a decision on the unused "ghar_re" database area (dishes/safety/pairing tables) — keep as future groundwork, or retire properly.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+  </div><!-- /page-s57 -->
+
+  <div id="page-s58" class="page-content">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S58 · Production hardening audit (WP-21)</div>
+      <div class="page-subtitle">A full repo-wide sweep for stubs, hardcoded values, dead code, and doc drift, done to answer "how production-ready is this really?" — found the codebase mostly self-documents its own gaps honestly, fixed the two things that could have shipped broken by accident, and catalogued everything else that needs a Founder call instead of guessing.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Every signed-in user was sent back through the entire onboarding question flow on every single app open, no matter how many times they'd already completed it — a leftover testing shortcut. Also, the app never remembered anything between screens; every screen re-fetched from scratch on every visit, another leftover testing shortcut. Neither had been checked against the rest of the repo for other similar leftovers.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">A returning user with a complete profile now goes straight to their recommendations, and the app caches data normally again. A full audit document (WP-21) now lists every remaining stub, hardcoded value, and deferred decision in the repo, split clearly into "already fine as documented," "safe to fix automatically" (done), and "needs a Founder/product/legal decision" (not guessed at).</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">mobile/app/index.tsx</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/lib/queryClient.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">docs/project-history/work-packages/[DRAFT]_WP-21_Production_Hardening_Audit_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>3 things touched</div>
+      </div>
+      <div class="session-card-desc">Scanned the whole repository — source code, migrations, docs, and the ops/quality test harness — for stubs, hardcoded values, dead code, and documentation that no longer matches the code. Found and fixed two dated testing shortcuts in the mobile app that were one accidental deploy away from shipping (onboarding force-restart, caching disabled). Wrote a single audit document cataloguing everything else found, split into what's safely resolved, what's an intentional documented v1 design choice, and what genuinely needs a Founder, product, legal, or food-safety decision.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#c0392b">2</div><div class="stat-l">Accidental-launch bugs fixed</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">10</div><div class="stat-l">Report sections written</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">6</div><div class="stat-l">Founder decisions catalogued</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">RE scoring rules changed</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s58','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s58','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s58','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s58-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s58','onboarding-fix')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Returning user now lands on their recommendations, not onboarding again</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Opening the app used to always restart the full question flow from step one, even for someone who'd already finished it. Now a complete profile skips straight to recommendations, same as before the testing shortcut was added.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ that fix lives in the app's own root routing logic</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s58','cache-fix')">
+            <div class="step-num num-purple">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Query caching re-enabled app-wide</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Every screen was re-fetching from scratch on every mount and every tab focus — a testing shortcut to always see the latest data while validating other fixes. Restored to the normal "cache once, retry once on failure" behavior.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s58','audit-doc')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Full repo scan for stubs, hardcoded values, dead code, doc drift</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Every TODO/FIXME/STUB/PLACEHOLDER-style marker, every suspicious hardcoded value, and every "Founder Decision pending" note across the whole repo was pulled together into one evidence-based audit document.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ the audit also checked what's real vs. scaffolded in the database and server layers</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s58','audit-doc')">
+            <div class="step-num num-teal">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Confirmed: real migrations, real rollback set, no fake schema</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">48 numbered migrations with a matching rollback for each — this part of the app was found to be genuinely production-real, not scaffolded.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ and what's still scaffolded on the server side</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s58','audit-doc')">
+            <div class="step-num num-amber">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Monitoring/alerting confirmed scaffolded-only, not wired to a real service yet</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The server code already has the right seams for real error-tracking (Sentry/PostHog), but only a placeholder logger is plugged in today — the code itself says so, it isn't hidden.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">The remaining items in WP-21 all need a person to decide, not code to fix: wire a real error-tracking service into the existing seams, get Founder sign-off on ~58 heuristic dish signature scores, decide the fallback-plate's allergy/diet coverage, and confirm the fish/mustard allergen-model gap.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s58-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s58-onboarding-fix" onclick="toggleDetail('s58-onboarding-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">mobile/app/index.tsx</span>
+          </div>
+          <span class="detail-chevron" id="chev-s58-onboarding-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s58-onboarding-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The root screen decides where a signed-in user lands: onboarding, or straight to their recommendations. A dated (2026-08-02) testing shortcut had it always send everyone to onboarding, "so a tester re-runs the full question flow each time" — with the real logic already written and commented directly below it.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">app opens, session exists</span><span class="dd-arrow">→</span>
+            <span class="dd-node">checks onboarding-status query</span><span class="dd-arrow">→</span>
+            <span class="dd-node">complete? → recommendations : onboarding</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">return &lt;Redirect href={complete ? "/recommendations" : "/(onboarding)/consent"} /&gt;;</span>  ← replaces a line that always redirected to onboarding regardless of this value</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why fix this automatically instead of just flagging it?</div>
+            <div class="dd-why-a">The correct logic already existed, already reviewed, sitting right there in a comment explicitly marked "revert this before launch" and dated the day before this audit. This is exactly the "safe to fix automatically" case this audit's own rules describe — no business logic was invented, only restored.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s58-cache-fix" onclick="toggleDetail('s58-cache-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">mobile/src/lib/queryClient.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s58-cache-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s58-cache-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The shared cache settings for every screen's data fetching. A dated (2026-08-02) testing shortcut turned caching off entirely (staleTime 0, gcTime 0, always refetch) "so no stale plate is ever shown while validating the RE fixes" — with the intended production setting named directly in the same comment.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">every screen's useQuery call</span><span class="dd-arrow">→</span>
+            <span class="dd-node">shares this one cache instance</span><span class="dd-arrow">→</span>
+            <span class="dd-node">retries once on failure, caches normally</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">queries: { retry: 1 }</span>  ← replaces 6 lines of caching disabled entirely</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why is this the right default instead of leaving caching off?</div>
+            <div class="dd-why-a">The comment being removed said so itself: "staleTime&gt;0 + normal gc is the right production posture." Same reasoning as the onboarding fix — restoring a documented intended state, not inventing new behavior.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s58-audit-doc" onclick="toggleDetail('s58-audit-doc')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">WP-21 Production Hardening Audit</span>
+          </div>
+          <span class="detail-chevron" id="chev-s58-audit-doc">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s58-audit-doc">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">One document covering all 10 requested report angles (stub inventory, hardcoded values, dead code, doc drift, deferred decisions, readiness checklist, fixes applied, remaining work) as appendices, rather than 10 separate files — placed as a Work Package (DRAFT status, no certificate yet) since the repo's frozen architecture doesn't allow a new top-level "reports/" folder without formal approval.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">grep + read across the whole repo</span><span class="dd-arrow">→</span>
+            <span class="dd-node">verify each hit isn't a false positive</span><span class="dd-arrow">→</span>
+            <span class="dd-node">split into: fine as-is / auto-fixed / needs a decision</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">No recommendation-engine mathematics, scoring weights, or business rules were modified.</span>  ← the audit's own stated boundary, checked and kept true</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just fix everything found?</div>
+            <div class="dd-why-a">Most remaining items (fallback-plate coverage, mocked weather, dish-signature scores, allergen-model gaps) are either already-documented intentional v1 scope, or need a Founder/product/legal/food-safety call this audit isn't authorized to make. Guessing at those would be worse than leaving them catalogued.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Work through WP-21's P1 list: wire a real monitoring/alerting sink, capture consent IP-hash, and decide the fallback-plate's allergy/diet coverage.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s58-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S58 = [
+      {
+        id: 'onboarding-cache-fix',
+        label: 'Onboarding + cache accidental-launch fixes',
+        steps: [
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'Root screen redirect decision',
+            desc: 'App open checks whether the signed-in user\'s onboarding is complete, and sends them to the right place.',
+            codeFlow: [ {chip:'mobile/app/index.tsx'}, {label:'reads'}, {chip:'src/api/household.ts (fetchOnboardingStatus)'} ],
+            files: [ {path:'mobile/app/index.tsx', desc:'Decides: onboarding vs recommendations, based on real completion status'} ],
+            api: { endpoint: 'fetchOnboardingStatus()', note: 'Non-mutating status check, safe to call on every app open' },
+            db: null
+          },
+          {
+            layer: 'App logic',
+            tag: 'HOOK',
+            title: 'Shared query cache restored to production defaults',
+            desc: 'Every screen\'s data fetch shares this one cache instance; it now caches normally instead of always refetching.',
+            codeFlow: [ {chip:'mobile/src/lib/queryClient.ts'}, {label:'used by'}, {chip:'every useQuery/useMutation call app-wide'} ],
+            files: [ {path:'mobile/src/lib/queryClient.ts', desc:'Shared TanStack Query client — retry:1, normal caching restored'} ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s58-flows', window.FEATURE_FLOWS_S58);
+    </script>
+
+  </div><!-- /page-s58 -->
 
   <!-- SESSIONS_INJECT -->
 
