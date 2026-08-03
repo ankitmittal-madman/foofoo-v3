@@ -110,17 +110,28 @@ def _nonveg_mode(theta):
     return "default"
 
 
+def _time_pressure_band(theta):
+    """Band θ's numeric time_pressure (WP-16.2) to the persona-DB's high/medium/low. Falls back to
+    the coarse time_route mapping only if the numeric field is absent (older θ)."""
+    tp = theta.get("time_pressure", {}).get("value")
+    if tp is None:
+        return _TIME_ROUTE_TO_PRESSURE.get(theta["time_route"]["value"], "medium")
+    return "high" if tp >= 0.6 else "medium" if tp >= 0.35 else "low"
+
+
 def theta_features(theta, state=None):
-    """The six model features for this household. `state` overrides the state_ut/region_archetype
-    pair (used to compute the 'local-city lifestyle' side of the migration blend against the
-    current-residence state instead of the home state)."""
+    """The model features for this household. `state` overrides the state_ut/region_archetype pair
+    (used for the 'local-city lifestyle' side of the migration blend). WP-16.2 added lifecycle_stage
+    (sub-cohort granularity) and a numeric-banded time_pressure — must stay in sync with
+    prepare_cohort_intel.FEATURES."""
     st = state or theta["home_state"]["value"]
     return {
         "state_ut": st,
         "region_archetype": _state_archetype().get(st, "UNKNOWN"),
         "city_tier_code": theta["city_tier"]["value"],
         "main_cohort_id": _HOUSEHOLD_TO_MC.get(theta["household_type"]["value"], "MC1"),
-        "time_pressure": _TIME_ROUTE_TO_PRESSURE.get(theta["time_route"]["value"], "medium"),
+        "lifecycle_stage": theta.get("lifecycle_stage", {}).get("value", "none"),
+        "time_pressure": _time_pressure_band(theta),
         "nonveg_mode": _nonveg_mode(theta),
     }
 
@@ -238,17 +249,24 @@ def _class_affinity_uncached(theta, ctx):
     else:
         w_home, w_local, w_nat, overlay_classes = 1.0, 0.0, 0.0, []
 
+    is_migrant = local != home
     aff_home = _softmax_scaled(_raw_affinity(part, theta_features(theta)))
-    if w_local > 0 and local != home:
+    if w_local > 0 and is_migrant:
         aff_local = _softmax_scaled(_raw_affinity(part, theta_features(theta, state=local)))
     else:
         aff_local, w_home, w_local = {}, w_home + w_local, 0.0  # fold local weight into home
 
     vocab = part["classes"]
     blended = {c: w_home * aff_home.get(c, 0.0) + w_local * aff_local.get(c, 0.0) for c in vocab}
-    for c in overlay_classes:
-        if c in blended:
-            blended[c] += w_nat            # national-modern push toward the overlay's modern classes
+    # The City_Migration_Overlay's local-cuisine + national-modern class injection is for MIGRANTS
+    # (the "MP-in-Mumbai" case). For a home-state resident it double-counts modern classes the
+    # per-slot model already captures and crowds out the household's own traditional plan
+    # (S14_T1_P10's weekday lunch has NO salad-bowl/delivery — those are migrant overlay artefacts).
+    # So only apply the overlay bump for a genuine migrant.
+    if is_migrant:
+        for c in overlay_classes:
+            if c in blended:
+                blended[c] += w_nat        # national-modern push toward the overlay's modern classes
     top = max(blended.values()) if blended else 0.0
     if top <= 0:
         return dict.fromkeys(vocab, 0.0)

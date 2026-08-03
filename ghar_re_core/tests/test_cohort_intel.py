@@ -33,8 +33,8 @@ def _hh(home_state, city, household_type="single", diet="veg", cooks="self",
 # The exact feature set the model was trained on (prepare_cohort_intel.FEATURES). Mirrored here as
 # a contract check: theta_features() must produce exactly these, all non-empty, or the model can't
 # be scored live. Kept in sync with the model artifact's own meta.features below.
-_EXPECTED_FEATURES = {"state_ut", "region_archetype", "city_tier_code",
-                      "main_cohort_id", "time_pressure", "nonveg_mode"}
+_EXPECTED_FEATURES = {"state_ut", "region_archetype", "city_tier_code", "main_cohort_id",
+                      "lifecycle_stage", "time_pressure", "nonveg_mode"}
 
 
 def test_theta_features_complete_and_recomputable():
@@ -44,6 +44,23 @@ def test_theta_features_complete_and_recomputable():
     assert all(feats[f] for f in _EXPECTED_FEATURES)
     # the model artifact must declare the same feature list it was trained on
     assert set(CI._model()["meta"]["features"]) == _EXPECTED_FEATURES
+
+
+def test_lifecycle_stage_and_time_pressure_derived():
+    """WP-16.2: sub-cohort granularity + real time-pressure. A dual-income couple with a toddler
+    who self-cooks is HIGH time-pressure and lifecycle_stage=toddler (not the generic family
+    average) — the signals that let the model isolate the persona-DB family_with_toddler cohort."""
+    # _hh has no members; inject a toddler + dual income to mirror test_14
+    hh = _hh("MH", "Pune", household_type="couple_kids")
+    hh["q2_working_professionals"] = 2
+    hh["q11_conditions"] = ["toddler"]
+    hh["q12_member_ages"] = [{"role": "toddler", "age": 3}]
+    hh["q14_eat_out_per_week"] = 0
+    th = derive_theta(hh)
+    assert th["lifecycle_stage"]["value"] == "toddler"
+    f = CI.theta_features(th)
+    assert f["lifecycle_stage"] == "toddler"
+    assert f["time_pressure"] == "high"       # numeric-banded, not the coarse who_cooks→medium
 
 
 def test_class_affinity_graded_slot_specific_and_bounded():

@@ -128,6 +128,12 @@ def derive_theta(hh):
     d2 = cfg.D("D2_time_route")
     ec = d2["effort_ceiling"]
     who = hh["q13_who_cooks"]
+    # General household time-pressure (0-1), computed for EVERY cook arrangement (not just 'self'):
+    # more earners and dependents raise it, eating out lowers it. Stored in θ (WP-16.2) so the cohort
+    # layer bands it to high/medium/low — the previous coarse who_cooks→route→band path lost this
+    # (a dual-income family-with-toddler that self-cooks is genuinely HIGH pressure, but mapped to
+    # 'medium', diverging from the persona-DB toddler cohort which is 'high'; see cohort_intel).
+    time_pressure = max(0.0, min(1.0, 0.5 * earners_n + 0.3 * (1 if dependents else 0) - 0.2 * eatout_n))
     if who == "hired_cook":
         effort_ceiling = ec["hired_cook"]
         time_route, reason = "DELEGATE", "hired cook present"
@@ -139,12 +145,12 @@ def derive_theta(hh):
         time_route, reason = "SIMPLIFY", "family member cooks"
     else:  # self
         effort_ceiling = ec["self_weekday"]  # weekday default; weekend raises at context time
-        time_pressure = max(0.0, min(1.0, 0.5 * earners_n + 0.3 * 1 - 0.2 * eatout_n))
         if time_pressure > 0.5 and income_band == "high":
             time_route, reason = "OUTSOURCE", "dual-income / high time-pressure"
         else:
             time_route, reason = "SIMPLIFY", "low income / cook in-house"
     theta["time_route"] = dict(field(time_route, "D2", "derived", "dynamic"), reason=reason)
+    theta["time_pressure"] = field(round(time_pressure, 3), "D2", "derived", "dynamic")
     theta["effort_ceiling"] = field(effort_ceiling, "D2", "derived", "dynamic")
 
     # ---------------- D3 — adventurousness (needs D1, D4) ----------------
@@ -183,6 +189,30 @@ def derive_theta(hh):
     heaviness_ceiling = d5["heaviness_ceiling_senior"] if has_senior else 3
     variety_pressure = d5["variety_pressure"][hh["q1_household_type"]]
     batch_posture = 1 if hh["q1_household_type"] in ("joint", "couple_kids_parents") else 0
+    # lifecycle_stage (WP-16.2): the dependent-driven sub-cohort signal (infant/toddler/school_child/
+    # teen/elder/pregnancy/none), derived from member ages + roles + Q11 conditions. This is the
+    # granularity WP-16 v1 dropped by keying only on main_cohort — it lets the cohort model isolate a
+    # family-with-TODDLER (persona-DB SC3A) from the family average, restoring the child-appropriate
+    # class plan (see cohort_intel.theta_features / persona-DB Subcohort_Routing).
+    conds = {c.lower() for c in hh.get("q11_conditions", [])}
+    role_set = {r.lower() for r in roles}
+
+    def _lifecycle_stage():
+        if any(a["age"] < 1 for a in ages) or {"infant"} & conds:
+            return "infant"
+        if any(a["age"] <= 3 for a in ages) or {"toddler", "weaning"} & (conds | role_set):
+            return "toddler"
+        if {"pregnancy", "pregnant", "preconception", "lactating"} & conds:
+            return "pregnancy"
+        if any(a["age"] >= 65 for a in ages) or {"senior"} & role_set or {"elderly", "recovery", "elder"} & conds:
+            return "elder"
+        if any(13 <= a["age"] <= 19 for a in ages) or {"teen"} & conds:
+            return "teen"
+        if any(4 <= a["age"] <= 12 for a in ages) or {"school_child", "school", "picky child", "child"} & conds:
+            return "school_child"
+        return "none"
+
+    theta["lifecycle_stage"] = field(_lifecycle_stage(), "D5", "derived", "stable")
     theta["household_type"] = field(hh["q1_household_type"], "explicit", "explicit", "stable")
     theta["weaning_present"] = field(has_weaning, "D5", "derived", "stable")
     theta["spice_ceiling"] = field(spice_ceiling, "D5", "derived", "stable")

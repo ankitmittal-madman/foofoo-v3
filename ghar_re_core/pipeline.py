@@ -13,7 +13,7 @@ from ghar_re_core.derivation import derive_theta
 from ghar_re_core import pairing
 
 
-def recommend(household, ctx, catalogue=None, with_trace=False):
+def recommend(household, ctx, catalogue=None, with_trace=False, session_log_dir=None):
     """Run the full pipeline for one (household, context). Returns dict with theta + 7 plates.
 
     `with_trace=True` additionally includes `decision_trace` in the result — the funnel
@@ -39,6 +39,11 @@ def recommend(household, ctx, catalogue=None, with_trace=False):
     )
     if with_trace:
         result["decision_trace"] = decision_trace
+    if session_log_dir:
+        # Write a per-user Markdown trace (ops/logs/session-log/<label>.md). Dev/ops aid — the Fly
+        # service is stateless and never writes to the repo at runtime; call this from a local run.
+        from ghar_re_core.session_log import write_session_log
+        result["session_log_path"] = write_session_log(household, ctx, cat, session_log_dir)
     return result
 
 

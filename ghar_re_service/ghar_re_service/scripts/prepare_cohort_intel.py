@@ -64,9 +64,31 @@ FEATURES = [
     "region_archetype",
     "city_tier_code",
     "main_cohort_id",
+    "lifecycle_stage",  # WP-16.2: sub-cohort granularity (toddler/school_child/teen/elder/...)
     "time_pressure",
     "nonveg_mode",
 ]
+
+
+def lifecycle_stage(health):
+    """Map the persona-DB lifecycle_health free-text to the same coarse lifecycle_stage vocabulary
+    ghar_re_core.derivation derives from a household's members — so the model's lifecycle_stage
+    feature is trainable from the excel AND reproducible live from theta. Order matters: elder/
+    pregnancy/infant/toddler are checked before the broader school/teen buckets."""
+    h = (health or "").lower()
+    if "infant" in h or "baby" in h or "0-6m" in h or "6-18m" in h:
+        return "infant"
+    if "toddler" in h:
+        return "toddler"
+    if "pregnan" in h or "preconception" in h or "lactat" in h:
+        return "pregnancy"
+    if "elder" in h or "recovery" in h or "senior" in h:
+        return "elder"
+    if "teen" in h:
+        return "teen"
+    if "school" in h or "picky child" in h or "child" in h:
+        return "school_child"
+    return "none"
 
 
 def _rows(ws):
@@ -192,6 +214,7 @@ def build_cohort_features(wb):
             "region_archetype": state_region.get(r["state_ut"], "UNKNOWN"),
             "city_tier_code": r["city_tier_code"],
             "main_cohort_id": r["main_cohort_id"],
+            "lifecycle_stage": lifecycle_stage(r.get("lifecycle_health")),
             "time_pressure": (r["time_pressure"] or "medium"),
             "nonveg_mode": (r["nonveg_mode"] or "default"),
         }

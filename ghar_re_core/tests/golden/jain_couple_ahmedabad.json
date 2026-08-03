@@ -43,18 +43,6 @@
     {
       "dry": null,
       "form": "standalone",
-      "hero_dish": "Moong Dal Khichdi",
-      "heroes": [
-        "Moong Dal Khichdi"
-      ],
-      "liquid": null,
-      "plate_calories": 280,
-      "score": 1.889057,
-      "support": null
-    },
-    {
-      "dry": null,
-      "form": "standalone",
       "hero_dish": "Lauki Khichdi",
       "heroes": [
         "Lauki Khichdi"
@@ -62,6 +50,18 @@
       "liquid": null,
       "plate_calories": 260,
       "score": 1.884255,
+      "support": null
+    },
+    {
+      "dry": null,
+      "form": "standalone",
+      "hero_dish": "Moong Dal Khichdi",
+      "heroes": [
+        "Moong Dal Khichdi"
+      ],
+      "liquid": null,
+      "plate_calories": 280,
+      "score": 1.882157,
       "support": null
     },
     {
