@@ -10,7 +10,10 @@ _dish() for the canonical shape). Nothing downstream (Catalogue, Dish, the scori
 derivation modules, CatalogueProvider/ConfigProvider) changes because of this module.
 
 THIS MODULE ONLY BUILDS THE LIST OF DISH DICTS (+ a gap report). Wiring it into export_bundle.py
-is a separate step (Phase G Task 1 proper), deliberately not done here.
+was Phase G Task 1 proper — DONE (see export_bundle.py's CATALOGUE_SOURCE and
+ghar_re_service/data/bundle/manifest.json, dish_count=810, catalogue_source cites this module).
+This module's own docstring above ("Phase G Task 2") predates that wiring landing; kept accurate
+retroactively rather than left to imply the swap is still pending.
 
 SOURCE FILES READ (under data/source/ unless noted, resolved the same way export_bundle.py does)
   dishes.xlsx                  sheet "dishes_810" — the 810 authored dishes. NOTE: row 1 of the
@@ -29,13 +32,17 @@ FIELDS DERIVED, NOT SOURCED (documented per-field below — never fabricated, al
                         'egg' if any is egg, else 'veg'. (dishes.xlsx has no diet column.)
   jain_compatible    -> 'Y' only if diet == 'veg' AND every resolved ingredient is jain-compatible
                         per ingredients_v5.csv; else 'N'. (No column in dishes.xlsx.)
-  farali_compatible  -> always False. Neither dishes.xlsx nor ingredients_v5.csv/tags_v4.csv carries
-                        a farali/vrat flag. This is a genuine data gap (see GAP: farali below), not
-                        a "no dish is farali" claim — left False rather than guessed per dish.
-  hero_role          -> BEST-EFFORT heuristic from dish_category (+ a first-ingredient diet signal
-                        for the curry/single-vs-liquid split), reverse-engineered from the
-                        dish_category -> hero_role correlation observed across all 39 golden-sample
-                        dishes (see _hero_role() for the exact rules and its known blind spot).
+  farali_compatible  -> 'Y' only if diet == 'veg' AND every resolved ingredient is farali-compatible
+                        per ingredients_v5.csv's `is_farali_compatible` column (added for this fix —
+                        see FARALI COMPATIBILITY below), mirroring how jain_compatible is derived.
+                        Any unresolved ingredient token makes the dish False (can't verify -> not
+                        claimed compatible), the same conservative stance jain_compatible already
+                        takes.
+  hero_role          -> BEST-EFFORT heuristic from dish_category (+ a has-protein-centre signal —
+                        ANY resolved ingredient in a main-protein category OR a paneer/khoya name,
+                        not just the first ingredient — for the curry/single-vs-liquid split),
+                        reverse-engineered from the dish_category -> hero_role correlation observed
+                        across all 39 golden-sample dishes (see _hero_role() for the exact rules).
   sig_band/sig_score -> read from ../sig_scores_v1.csv (i.e. data/sig_scores_v1.csv — one level
                         above source_dir, exactly where data/source/README.md's own config table
                         entry `../sig_scores_v1.csv` resolves), keyed on dish_name. That file was
@@ -64,20 +71,36 @@ explicit instruction not to silently drop the ingredient or the dish.
 
 is_main (protein-centric vs seasoning) is NOT present anywhere in the source data either — the
 golden sample hand-curated this distinction. Approximated here as:
-is_main = ingredient category in MAIN_INGREDIENT_CATEGORIES and not flagged is_common='Y' in
-ingredients_v5.csv. This under-classifies dairy-based proteins (e.g. paneer) as non-main because
-'dairy' also covers butter/cream/milk, which are legitimately non-main — ingredients_v5.csv gives
-no way to tell them apart. Flagged as an approximation, not fact.
+is_main = ingredient category in MAIN_INGREDIENT_CATEGORIES, OR the ingredient is paneer/khoya (the
+two protein-centric dairy items ingredients_v5.csv's plain 'dairy' category otherwise lumps in with
+butter/cream/milk) — and not flagged is_common='Y'. The paneer/khoya override closes the previously
+documented blind spot (a paneer curry no longer silently loses its protein classification just
+because 'dairy' isn't in MAIN_INGREDIENT_CATEGORIES); milk/cream/butter/ghee/cheese still correctly
+score as non-main. Still an approximation, not fact — flagged as such.
 
-ALLERGEN HIDDEN-DERIVATIVE GAP (explicitly out of scope to fix, per task)
-ingredients_v5.csv only carries direct is_allergen/allergen_type per ingredient. There is no table
-anywhere capturing hidden derivatives (hing/asafoetida commonly contains wheat flour as a carrier;
-some spice blends contain gluten). ghar_re_core.catalogue.dish_allergens() is explicit-ingredient-
-only by its own docstring ("hidden-derivative layer is out of scope") and this module does not
-change that. build_report()'s `hidden_allergen_risk` list instead separately flags every dish
-containing a known-risk ingredient by name/alias (hing/asafoetida, plus anything already flagged
-wheat-adjacent in allergen_type) so this stays a visible, named, open P0 gap rather than one that
-disappears into a catalogue that LOOKS allergen-safe.
+ALLERGEN HIDDEN-DERIVATIVE GAP (now covers the one known instance; see catalogue.dish_allergens())
+ingredients_v5.csv only carries direct is_allergen/allergen_type per ingredient — asafoetida's own
+row is correctly blank (pure hing has no gluten), so nothing in that CSV can flag its commercial
+wheat-flour-carrier risk. ghar_re_core.catalogue.py now carries a small authored
+HIDDEN_DERIVATIVE_ALLERGENS table (currently just {"asafoetida": "gluten"} — the one instance this
+catalogue's 810 dishes actually surfaced, via the 20-dish hidden_allergen_risk report below) that
+dish_allergens() unions into its result, so a gluten-allergic household's A3 hard filter now
+actually excludes those dishes instead of only reporting them. Any OTHER hidden-derivative pairing
+discovered later should be added to that same table, not silently left as a report-only footnote.
+build_report()'s `hidden_allergen_risk` list still separately flags every dish containing a
+known-risk ingredient by name/alias, so the underlying data gap (no ingredient-level "commercial
+form may contain X" column) stays visible even though this one instance is now actively enforced.
+
+FARALI COMPATIBILITY (previously always False — now derived, heuristic, and clearly imperfect)
+ingredients_v5.csv gained an `is_farali_compatible` column (conservative allow-list: whole spices,
+fruit/dry-fruit/dairy/coconut/seed/oil categories, and named fasting staples default Y; meat/
+seafood/egg/lentil_legume/most grain_flour/vegetable default N) plus 4 previously-absent fasting
+staples (kuttu_atta, singhara_atta, rajgira_flour, sendha_namak) that had ZERO rows before this fix
+— meaning no dish naming them could resolve at all, let alone be marked fasting-compatible. This is
+a best-effort religious-observance heuristic, not an authoritative ruling: regional/community vrat
+rules vary (e.g. some traditions permit black salt or certain rice forms this table denies), so it
+is intentionally conservative — ambiguous ingredients are marked N (not verified) rather than a
+guessed Y, exactly as jain_compatible already does for onion/garlic-adjacent cases.
 """
 
 from __future__ import annotations
@@ -158,6 +181,7 @@ def load_ingredients(source_dir: str) -> dict[str, dict]:
                 "allergen_type": row["allergen_type"] or None,
                 "is_jain_compatible": row["is_jain_compatible"] == "Y",
                 "is_common": row["is_common"] == "Y",
+                "is_farali_compatible": row.get("is_farali_compatible") == "Y",
             }
     return out
 
@@ -237,14 +261,14 @@ def resolve_ingredient(
     return token, False
 
 
-def _hero_role(cats: set[str], name: str, first_ingredient_diet: str | None) -> str:
+def _hero_role(cats: set[str], name: str, has_protein_centre: bool) -> str:
     """BEST-EFFORT heuristic. Derived from the dish_category -> hero_role correlation across every
     dish in ghar_re_core/fixtures.py (all 39 golden-sample dishes were cross-tabulated by hand to
-    build these rules). Known blind spot: single-protein VEGETARIAN curries (e.g. paneer-based)
-    can be under-classified as 'liquid' instead of 'single', since ingredients_v5.csv's diet_type
-    doesn't distinguish a protein-centric veg curry from a generic vegetable curry the way a human
-    curator did for the golden sample. Not silently treated as certainly correct — flag for
-    spot-review, don't trust blindly for paneer/tofu/soya dishes categorized 'curry'."""
+    build these rules). `has_protein_centre` (see _has_protein_centre()) checks EVERY resolved
+    ingredient, not just the first, and treats paneer/khoya as protein-centric alongside meat/
+    seafood/egg/lentil_legume — closing the previously documented blind spot where a paneer curry
+    with paneer listed second/third (not the dish's first ingredient token) was silently
+    under-classified as 'liquid' instead of 'single'."""
     STAPLE_ONLY = {"paratha_roti", "bread", "rice"}
     if cats and cats <= STAPLE_ONLY:
         return "support"
@@ -260,7 +284,7 @@ def _hero_role(cats: set[str], name: str, first_ingredient_diet: str | None) -> 
     if "curry" in cats:
         if "dal_lentil" in cats:
             return "liquid"
-        return "single" if first_ingredient_diet == "non_veg" else "liquid"
+        return "single" if has_protein_centre else "liquid"
     if "dal_lentil" in cats:
         return "liquid"
     if "dry_sabzi" in cats:
@@ -296,6 +320,44 @@ def _jain_compatible(
     return "Y"
 
 
+# Ingredients whose OWN category is generic (paneer/khoya both sit under ingredients_v5.csv's plain
+# 'dairy' category, alongside butter/cream/milk) but that are, in practice, the protein centre of a
+# dish exactly like a meat/lentil main would be. Named override, not a category, since the CSV has
+# no way to distinguish them from non-main dairy — see module docstring's is_main section.
+_PROTEIN_CENTRIC_DAIRY_NAMES = {"paneer", "khoya"}
+
+
+def _has_protein_centre(resolved_ingredients: list[tuple[str, bool]], ing_map: dict[str, dict]) -> bool:
+    """Whether ANY resolved ingredient in this dish is a main-protein-category item (meat/seafood/
+    egg/lentil_legume — the last covers tofu already) or a protein-centric dairy name (paneer/khoya)
+    — used by _hero_role's curry branch instead of only checking the FIRST ingredient's diet_type,
+    which silently misclassified a paneer curry as 'liquid' whenever paneer wasn't listed first."""
+    for name, ok in resolved_ingredients:
+        if not ok:
+            continue
+        if name in _PROTEIN_CENTRIC_DAIRY_NAMES:
+            return True
+        info = ing_map.get(name)
+        if info and info["category"] in ("meat", "seafood", "egg", "lentil_legume"):
+            return True
+    return False
+
+
+def _farali_compatible(
+    diet: str, resolved_ingredients: list[tuple[str, bool]], ing_map: dict[str, dict]
+) -> str:
+    """See module docstring's FARALI COMPATIBILITY section: 'Y' only if diet == 'veg' AND every
+    resolved ingredient is fasting-compatible per ingredients_v5.csv's is_farali_compatible column.
+    An unresolved token (can't verify) or diet != veg makes the whole dish 'N', the same
+    conservative stance _jain_compatible already takes — never guess a Y."""
+    if diet != "veg":
+        return "N"
+    for name, ok in resolved_ingredients:
+        if not ok or name not in ing_map or not ing_map[name]["is_farali_compatible"]:
+            return "N"
+    return "Y"
+
+
 def transform_dish_row(
     row: dict,
     ing_map: dict[str, dict],
@@ -326,24 +388,28 @@ def transform_dish_row(
 
     diet = _diet(resolved, ing_map)
     jain = _jain_compatible(diet, resolved, ing_map)
+    farali = _farali_compatible(diet, resolved, ing_map)
 
     main_categories = MAIN_INGREDIENT_CATEGORIES
     ingredients = [
         (
             resolved_name,
-            ing_map.get(resolved_name, {}).get("category") in main_categories
+            (
+                ing_map.get(resolved_name, {}).get("category") in main_categories
+                or resolved_name in _PROTEIN_CENTRIC_DAIRY_NAMES
+            )
             and not ing_map.get(resolved_name, {}).get("is_common", False),
         )
         for resolved_name, _ok in resolved
     ]
-    first_ingredient_diet = ing_map.get(resolved[0][0], {}).get("diet_type") if resolved else None
+    has_protein_centre = _has_protein_centre(resolved, ing_map)
 
     cuisine = row["Cuisines"]
     if cuisine not in cuisine_map:
         report.unresolved_cuisines.append((name, cuisine))
 
     cats = set(_split(row["Dish Category"]))
-    hero_role = _hero_role(cats, name, first_ingredient_diet)
+    hero_role = _hero_role(cats, name, has_protein_centre)
 
     sig_band = sig_scores_map.get(_normalize_name(name))
     if sig_band:
@@ -386,7 +452,9 @@ def transform_dish_row(
         "weather_affinity": _split(row["Weather Affinity"]),
         "jain_compatible": jain,
         "scope_tier": row["tier_1"],
-        "farali_compatible": False,  # GAP: no farali/vrat signal anywhere in data/source/
+        # bool, not "Y"/"N" — ghar_re_core.catalogue.Dish/scoring.pass_mode_fasting reads this as a
+        # Python bool (mirrors fixtures.py's golden-sample shape); see FARALI COMPATIBILITY above.
+        "farali_compatible": farali == "Y",
         "alternate_names": alt_names,
         "synonyms": synonyms,
         "ingredients": ingredients,

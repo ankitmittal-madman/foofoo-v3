@@ -139,11 +139,28 @@ def ingredient_info(name):
     return _ING.get(name, {})
 
 
+# Known hidden-derivative allergen carriers: an ingredient whose OWN is_allergen/allergen_type
+# columns in ingredients_v5.csv are correctly blank (pure asafoetida has no gluten) but whose
+# COMMERCIAL form commonly carries a hidden allergen as a filler/anti-caking carrier (hing is
+# typically cut with wheat flour). Authored here, not in ingredients_v5.csv, because it's a fact
+# about the commercial product's typical composition, not an intrinsic property of the ingredient
+# itself. Add further entries here if another hidden-derivative pairing is confirmed — this table,
+# not a report-only footnote, is what dish_allergens() (the actual A3 safety filter) reads.
+HIDDEN_DERIVATIVE_ALLERGENS = {
+    "asafoetida": "gluten",
+}
+
+
 def dish_allergens(dish):
-    """Explicit-ingredient allergen set (A3 BASIC pass; hidden-derivative layer is out of scope)."""
+    """Explicit-ingredient allergen set (A3 BASIC pass), plus the known hidden-derivative carriers
+    in HIDDEN_DERIVATIVE_ALLERGENS above. Still not a full hidden-derivative layer (only the
+    confirmed asafoetida/gluten pairing is authored so far) but no longer purely explicit-only."""
     out = set()
     for ing in dish.ingredient_names:
         info = ingredient_info(ing)
         if info.get("is_allergen") and info.get("allergen_type"):
             out.add(info["allergen_type"])
+        hidden = HIDDEN_DERIVATIVE_ALLERGENS.get(ing)
+        if hidden:
+            out.add(hidden)
     return out
