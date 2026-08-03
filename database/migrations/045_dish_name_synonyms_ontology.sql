@@ -23,10 +23,14 @@ ALTER TABLE ghar_re.dish_name_synonyms
   ADD COLUMN source_url  text,   -- citation for a web-researched alias (required when data_source='real')
   ADD COLUMN confidence  real CHECK (confidence BETWEEN 0 AND 1);
 
--- A 'real' (web-researched) alias must carry its citation; derived/stub rows need not.
+-- A 'real' (web-researched) alias must carry its citation; derived/stub rows need not. Added
+-- NOT VALID: the rule is enforced on every INSERT/UPDATE from here on (so all WP-19 cited rows must
+-- carry a source), but pre-existing legacy rows are not retroactively validated — a legacy 'real'
+-- row lacking a source_url must not make this schema migration fail on first apply. Backfill legacy
+-- sources separately, then `VALIDATE CONSTRAINT` in a later migration if/when full validation is wanted.
 ALTER TABLE ghar_re.dish_name_synonyms
   ADD CONSTRAINT dish_name_synonyms_real_needs_source
-    CHECK (data_source <> 'real' OR source_url IS NOT NULL);
+    CHECK (data_source <> 'real' OR source_url IS NOT NULL) NOT VALID;
 
 COMMENT ON COLUMN ghar_re.dish_name_synonyms.alias_type IS
   'WP-19: kind of alias — regional_name/common_name/transliteration/english_gloss/spelling_variant';

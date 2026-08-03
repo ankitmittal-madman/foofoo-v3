@@ -17,14 +17,16 @@ BEGIN
   END IF;
 END $$;
 
--- 2. Evidence integrity: every web-researched ('real') alias carries a citation and a confidence.
+-- 2. Evidence integrity: every WP-19 web-researched alias carries a citation and a confidence.
+--    Scoped to WP-19-shaped rows (alias_type IS NOT NULL) — legacy pre-WP-19 'real' rows that carry
+--    no alias_type are out of scope here (the NOT VALID constraint likewise doesn't retro-police them).
 DO $$
 DECLARE n int;
 BEGIN
   SELECT count(*) INTO n FROM ghar_re.dish_name_synonyms
-  WHERE data_source='real' AND (source_url IS NULL OR confidence IS NULL);
+  WHERE data_source='real' AND alias_type IS NOT NULL AND (source_url IS NULL OR confidence IS NULL);
   IF n > 0 THEN
-    RAISE EXCEPTION '% real aliases missing source_url or confidence (WP-19 requires cited evidence)', n;
+    RAISE EXCEPTION '% WP-19 aliases missing source_url or confidence (cited evidence required)', n;
   END IF;
 END $$;
 
