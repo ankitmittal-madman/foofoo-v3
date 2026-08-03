@@ -13,8 +13,10 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
+from ghar_re_core import meal_planner as planner
 from ghar_re_core import pipeline as core_pipeline
 from ghar_re_core import scoring as S
+from ghar_re_service import media
 from ghar_re_service.modules import compose_base
 from ghar_re_service.version import API_VERSION, ENGINE_VERSION
 
@@ -64,6 +66,71 @@ def _principal_hero(plate):
         return dry, [dry, liquid]
     h = plate["hero"]
     return h, [h]
+
+
+# =====================================================================================
+# WP-18 planning surfaces (onboarding → plan → dish). Translation-only, exactly like run():
+# map the request → call ghar_re_core.meal_planner (the ONE place the ranking/reconciliation lives)
+# → attach media (Cloudinary image URLs; recipe on the detail surface). No math here.
+# =====================================================================================
+def _with_images(views: list[dict]) -> list[dict]:
+    """Attach a Cloudinary image URL to each dish view (in place)."""
+    for v in views:
+        media.attach_image(v)
+    return views
+
+
+def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
+    """Surface 1: post-onboarding top-15 preference primer (diverse top dishes)."""
+    hh = build_household_dict(request["household"])
+    n = int(request.get("count", 15))
+    res = planner.cold_start_top15(hh, catalogue, n=n, weekday=request.get("weekday", "Monday"))
+    _with_images(res["dishes"])
+    return res
+
+
+def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
+    """Surface 2 (and 4 when class_code is set): a slot's 4–5 dish options."""
+    hh = build_household_dict(request["household"])
+    res = planner.slot_options(
+        hh,
+        request.get("slot", "dinner"),
+        catalogue,
+        n=int(request.get("count", 5)),
+        weekday=request.get("weekday", "Monday"),
+        class_code=request.get("class_code"),
+    )
+    _with_images(res["options"])
+    return res
+
+
+def plan_weekly(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
+    """Surface 3: the weekly class plan (7 days × slots, top-3 dish-backed classes each)."""
+    hh = build_household_dict(request["household"])
+    return planner.weekly_class_plan(
+        hh, top_classes=int(request.get("top_classes", 3)), catalogue=catalogue
+    )
+
+
+def plan_class_dishes(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
+    """Surface 4: RECONCILIATION — only dishes of a finalized class for that day/slot."""
+    hh = build_household_dict(request["household"])
+    res = planner.dishes_for_class(
+        hh,
+        request["slot"],
+        request["class_code"],
+        catalogue,
+        n=int(request.get("count", 8)),
+        weekday=request.get("weekday", "Monday"),
+    )
+    _with_images(res["options"])
+    return res
+
+
+def recipe_detail(request: dict[str, Any]) -> dict[str, Any]:
+    """Surface 5: full recipe + image for one dish (the meal-detail screen)."""
+    name = request["dish_name"]
+    return {"dish_name": name, "image_url": media.image_url(name), "recipe": media.recipe_for(name)}
 
 
 def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:

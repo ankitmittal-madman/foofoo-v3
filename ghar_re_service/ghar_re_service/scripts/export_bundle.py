@@ -68,6 +68,10 @@ CONFIG_FILES = (
     # ghar_re_core.catalogue at import time for allergen + Jain derivation. This is ingredient
     # reference data, NOT the dish catalogue; the real 810-dish swap remains a separate task.
     "ingredients_v5.csv",
+    # WP-18 offline-generated recipe store (dish_name -> structured recipe). Read by
+    # ghar_re_service.media for the recipe-detail surface. Rides with the config bundle for a
+    # single resolvable path (config.SRC); it is a cached data artifact, not engine math config.
+    "recipes_v1.json",
 )
 
 # class_first_v1/ subdirectory files. WP-15 shipped the first three (curated class taxonomy).

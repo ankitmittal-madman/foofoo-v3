@@ -363,15 +363,34 @@ def _diet_ok(dish_diet, cls):
     return meat or dt in ("mixed", "nonveg")
 
 
+# Multi-membership (WP-17.1): a dish belongs to ONE primary class (argmax — its best fit, used by
+# dish_to_class_code for S_cohort scoring and plan labelling) AND to any SECONDARY class it also
+# fits well. The behavioural DN_ dinner classes (child-friendly, family-comfort, light-dal-rice)
+# overlap heavily with the LD_ lunch/dinner classes — the SAME dal-rice dish is legitimately a lunch
+# LD_DAL_RICE_COMFORT and a light dinner DN_LIGHT_DAL_RICE. A strict argmax partition let LD_ win
+# and starved every DN_ class (24 classes, incl. 9 dinner, held 0 dishes), so the class-first plan
+# could never reconcile a child/family dinner and fell back to regional LD_ plates. Secondary
+# membership fills those class pools from the catalogue we already have, without moving any primary.
+_SEC_RATIO = 0.6  # a secondary class must score >= 60% of the dish's best class ...
+# ... and clear this absolute floor (~conf 0.52) — a genuine fit, not a weak echo. The floor trades
+# a little recall for precision: it drops the weak generic-token tail (a foreign dish echoing
+# 'rice'/'soup' into an Indian class) while keeping the real overlaps. The runtime ranking layer
+# (WP-16.1 foreign-cuisine demote) is the second line of defence for anything that still slips.
+_SEC_MIN = 2.9
+_SEC_MAX = 4  # cap secondaries per dish so a generic dish can't flood many class pools.
+
+
 def classify(dish, classes, idf, exact):
-    """Return (meal_class_code, slot_group, method, confidence) for one dish dict."""
+    """Return a LIST of (meal_class_code, slot_group, method, confidence) rows for one dish: the
+    primary (curated_exact or chef_rubric — always first) followed by any chef_rubric_secondary
+    memberships (see multi-membership note above)."""
     dtoks = _toks(dish["name"], *dish.get("synonyms", []), *dish.get("alternate_names", []))
     main_ing = _toks(*[i[0] for i in dish.get("ingredients", []) if i[1]])
     # curated exact: the dish IS an exemplar of a class -> authored truth, reproduce it.
     key = " ".join(sorted(dtoks))
     if key in exact:
         code = exact[key]
-        return code, classes[code]["slot_group"], "curated_exact", 1.0
+        return [(code, classes[code]["slot_group"], "curated_exact", 1.0)]
 
     groups = set()
     for slot in dish.get("meal_type", []):
@@ -396,7 +415,7 @@ def classify(dish, classes, idf, exact):
         else set()
     )
 
-    best, best_score = None, 0.0
+    scored = []  # (score, cls) for every slot-and-diet-compatible class scoring > 0
     for cls in classes.values():
         if cls["slot_group"] not in groups:
             continue
@@ -427,14 +446,28 @@ def classify(dish, classes, idf, exact):
                 score -= 5.0
             else:
                 score += 0.5
-        if score > best_score:
-            best, best_score = cls, score
+        if score > 0:
+            scored.append((score, cls))
 
-    if best is None:
-        return None, None, "unmapped", 0.0
-    # confidence: squash the rubric score into [0,1] (a score of ~6 -> ~0.75; tune gentle).
-    conf = round(1.0 - math.exp(-best_score / 4.0), 3) if best_score > 0 else 0.0
-    return best["code"], best["slot_group"], "chef_rubric", conf
+    if not scored:
+        return [(None, None, "unmapped", 0.0)]
+    scored.sort(key=lambda x: -x[0])
+    best_score, best = scored[0]
+
+    def _conf(s):
+        # confidence: squash the rubric score into [0,1] (a score of ~6 -> ~0.75; tune gentle).
+        return round(1.0 - math.exp(-s / 4.0), 3) if s > 0 else 0.0
+
+    rows = [(best["code"], best["slot_group"], "chef_rubric", _conf(best_score))]
+    # secondary memberships: other classes this dish also genuinely fits (see the note above).
+    floor = max(_SEC_MIN, best_score * _SEC_RATIO)
+    for s, cls in scored[1:]:
+        if s < floor:
+            break  # scored is descending — nothing below the floor remains
+        rows.append((cls["code"], cls["slot_group"], "chef_rubric_secondary", _conf(s)))
+        if len(rows) - 1 >= _SEC_MAX:
+            break
+    return rows
 
 
 def _gate_supported(dish, cls, dtoks):
@@ -467,9 +500,11 @@ def build_map():
         dishes = json.load(f)
     rows = []
     for d in dishes:
-        code, sg, method, conf = classify(d, classes, idf, exact)
-        rows.append((d["name"], code or "", sg or "", method, conf))
-    rows.sort()
+        for code, sg, method, conf in classify(d, classes, idf, exact):
+            rows.append((d["name"], code or "", sg or "", method, conf))
+    # Sort by dish name, but keep each dish's PRIMARY row (curated_exact/chef_rubric) before its
+    # secondaries so dish_to_class_code (first-row-wins) still returns the primary class unchanged.
+    rows.sort(key=lambda r: (r[0], 0 if r[3] in ("curated_exact", "chef_rubric") else 1, r[1]))
     return rows
 
 
@@ -479,14 +514,17 @@ def main():
         w = csv.writer(f)
         w.writerow(["dish_name", "meal_class_code", "slot_group", "method", "confidence"])
         w.writerows(rows)
-    total = len(rows)
-    mapped = sum(1 for r in rows if r[1])
+    total = len(rows)  # membership rows (a dish now contributes one primary + any secondary rows)
+    dishes = len({r[0] for r in rows})
+    primary = sum(1 for r in rows if r[3] in ("curated_exact", "chef_rubric") and r[1])
     curated = sum(1 for r in rows if r[3] == "curated_exact")
     chef = sum(1 for r in rows if r[3] == "chef_rubric")
-    lowconf = sum(1 for r in rows if r[3] == "chef_rubric" and r[4] < 0.4)
+    secondary = sum(1 for r in rows if r[3] == "chef_rubric_secondary")
+    classes_covered = len({r[1] for r in rows if r[1]})
     print(
-        f"  wrote dish_class_map.csv: {mapped}/{total} mapped "
-        f"({curated} curated_exact, {chef} chef_rubric, {lowconf} chef low-confidence <0.4)"
+        f"  wrote dish_class_map.csv: {total} membership rows over {dishes} dishes "
+        f"({primary} primary = {curated} curated_exact + {chef} chef_rubric, "
+        f"{secondary} chef_rubric_secondary); {classes_covered} distinct classes covered"
     )
 
 

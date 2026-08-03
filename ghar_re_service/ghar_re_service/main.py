@@ -40,7 +40,17 @@ app = FastAPI(title="Ghar RE", version=ENGINE_VERSION, lifespan=lifespan)
 # /healthz and /readyz stay open on purpose — the deploy platform's probes call them before any
 # secret is necessarily wired, and gating liveness on auth is how a rollout deadlocks itself.
 # /v1/meta also stays open per RE-DOC-10 §4 ("no auth data"); it exposes versions + counters only.
-SIGNED_PATHS = frozenset({"/v1/recommendations"})
+SIGNED_PATHS = frozenset(
+    {
+        "/v1/recommendations",
+        # WP-18 planning surfaces — all compute calls, so all signed + rate-limited.
+        "/v1/cold-start",
+        "/v1/meal-plan",
+        "/v1/weekly-plan",
+        "/v1/class-dishes",
+        "/v1/recipe",
+    }
+)
 
 
 @app.middleware("http")
@@ -107,7 +117,17 @@ async def verify_signature(request: Request, call_next):
 # /healthz and /readyz are deliberately EXEMPT. Fly's proxy probes them on a fixed interval, and a
 # limiter that shed a health check would make the platform believe the machine is unhealthy and
 # restart it — a rate limit that causes the very outage it exists to prevent.
-RATE_LIMITED_PATHS = frozenset({"/v1/recommendations", "/v1/meta"})
+RATE_LIMITED_PATHS = frozenset(
+    {
+        "/v1/recommendations",
+        "/v1/meta",
+        "/v1/cold-start",
+        "/v1/meal-plan",
+        "/v1/weekly-plan",
+        "/v1/class-dishes",
+        "/v1/recipe",
+    }
+)
 
 
 # REGISTERED SECOND, RUNS FIRST. Starlette builds its middleware stack so that the most recently
@@ -310,3 +330,86 @@ def recommendations(
         latency_ms=elapsed_ms(),
     )
     return response
+
+
+# =====================================================================================
+# WP-18 planning surfaces. Translation-only routes (parse → engine planner fn → serialize), each
+# signed + rate-limited like /v1/recommendations. The math/reconciliation lives in
+# ghar_re_core.meal_planner; media (Cloudinary/recipe) is attached in engine.py.
+# =====================================================================================
+def _planning_call(name, fn, payload, request, needs_household=True):
+    """Shared translation wrapper: 503 if not ready, 422 if the required inputs are missing, 500 on
+    an engine error, 200 with the planner result otherwise. `fn(payload, catalogue, config)` for the
+    household surfaces; a plain `fn(payload)` for the recipe lookup (needs_household=False)."""
+    request_id = (
+        payload.get("request_id")
+        or request.headers.get(auth.REQUEST_ID_HEADER)
+        or str(uuid.uuid4())
+    )
+    if not state.ready:
+        state.counters.record("error")
+        return JSONResponse(
+            status_code=503, content={"error": "service_not_ready", "request_id": request_id}
+        )
+    if needs_household and not isinstance(payload.get("household"), dict):
+        state.counters.record("error")
+        return JSONResponse(
+            status_code=422,
+            content={
+                "error": "invalid_request",
+                "detail": "household required",
+                "request_id": request_id,
+            },
+        )
+    try:
+        result = fn(payload, state.catalogue, state.config) if needs_household else fn(payload)
+    except KeyError as e:
+        state.counters.record("error")
+        return JSONResponse(
+            status_code=422,
+            content={
+                "error": "invalid_request",
+                "detail": f"missing {e}",
+                "request_id": request_id,
+            },
+        )
+    except Exception as e:
+        state.counters.record("error")
+        log_event(f"{name}.error", request_id=request_id, outcome="error", error=str(e))
+        return JSONResponse(
+            status_code=500, content={"error": "internal_error", "request_id": request_id}
+        )
+    state.counters.record("success")
+    log_event(f"{name}.ok", request_id=request_id, outcome="success")
+    result["request_id"] = request_id
+    return result
+
+
+@app.post("/v1/cold-start")
+def cold_start(request: Request, payload: dict = Body(...)):  # noqa: B008
+    """WP-18 surface 1: top-15 diverse dishes for the post-onboarding preference primer."""
+    return _planning_call("cold_start", engine.plan_cold_start, payload, request)
+
+
+@app.post("/v1/meal-plan")
+def meal_plan(request: Request, payload: dict = Body(...)):  # noqa: B008
+    """WP-18 surface 2: a slot's 4–5 dish options (pass class_code to reconcile to one class)."""
+    return _planning_call("meal_plan", engine.plan_slot, payload, request)
+
+
+@app.post("/v1/weekly-plan")
+def weekly_plan(request: Request, payload: dict = Body(...)):  # noqa: B008
+    """WP-18 surface 3: the weekly class plan (7 days × slots, top-3 dish-backed classes each)."""
+    return _planning_call("weekly_plan", engine.plan_weekly, payload, request)
+
+
+@app.post("/v1/class-dishes")
+def class_dishes(request: Request, payload: dict = Body(...)):  # noqa: B008
+    """WP-18 surface 4: RECONCILIATION — only dishes of a finalized class for that day/slot."""
+    return _planning_call("class_dishes", engine.plan_class_dishes, payload, request)
+
+
+@app.post("/v1/recipe")
+def recipe(request: Request, payload: dict = Body(...)):  # noqa: B008
+    """WP-18 surface 5: full recipe + image for one dish (the meal-detail screen)."""
+    return _planning_call("recipe", engine.recipe_detail, payload, request, needs_household=False)

@@ -8,68 +8,130 @@ Aamras (Maharashtrian),LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,chef_rubric,0.
 Aamti (Kokum),LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.313
 Achari Gosht,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
 Achari Paneer,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.91
+Achari Paneer,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.91
 Affogato,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Akki Rotti,BF_STUFFED_FLATBREAD,Breakfast,chef_rubric,0.313
 Aktori,BF_STUFFED_FLATBREAD,Breakfast,chef_rubric,0.313
 Akuri,BF_EGG_FAST,Breakfast,curated_exact,1.0
 Aloo Bonda,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric,0.838
+Aloo Bonda,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric_secondary,0.716
+Aloo Bonda,SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.805
 Aloo Chaat,SN_STREET_CHAAT,Snack,chef_rubric,0.91
 Aloo Chhole,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.716
+Aloo Chhole,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric_secondary,0.716
+Aloo Chhole,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.593
+Aloo Chhole,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric_secondary,0.716
+Aloo Chhole,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,chef_rubric_secondary,0.641
 Aloo Dum (Bengali),LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.9
+Aloo Dum (Bengali),LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.855
 Aloo Gobhi,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.716
+Aloo Gobhi,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.587
+Aloo Gobhi,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric_secondary,0.716
+Aloo Gobhi,LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.716
+Aloo Gobhi,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric_secondary,0.587
 Aloo Paratha,BF_STUFFED_FLATBREAD,Breakfast,chef_rubric,0.834
+Aloo Paratha,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric_secondary,0.716
+Aloo Paratha,BF_REGIONAL_PUNJAB_HARYANA,Breakfast,chef_rubric_secondary,0.834
 Aloo Pitika,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.67
+Aloo Pitika,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.52
+Aloo Pitika,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric_secondary,0.52
+Aloo Pitika,LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.67
+Aloo Pitika,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric_secondary,0.52
 Aloo Posto,LD_ROOT_TUBER_SABZI,Lunch/Dinner,curated_exact,1.0
 Aloo Puri,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.716
+Aloo Puri,BF_FRIED_FESTIVE,Breakfast,chef_rubric_secondary,0.675
+Aloo Puri,BF_STUFFED_FLATBREAD,Breakfast,chef_rubric_secondary,0.67
 Aloo Sabzi (Delhi style),LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.884
+Aloo Sabzi (Delhi style),BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric_secondary,0.797
+Aloo Sabzi (Delhi style),LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.797
+Aloo Sabzi (Delhi style),LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric_secondary,0.797
+Aloo Sabzi (Delhi style),LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.8
 Aloo Tikki,SN_STREET_CHAAT,Snack,chef_rubric,0.908
 Ambot Tik,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.883
+Ambot Tik,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.751
+Ambot Tik,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.751
+Ambot Tik,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.751
 American Chop Suey,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.72
+American Chop Suey,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.593
 Amritsari Fish Fry,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric,0.922
+Amritsari Fish Fry,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.922
+Amritsari Fish Fry,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric_secondary,0.828
+Amritsari Fish Fry,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.922
+Amritsari Fish Fry,SN_NONVEG_SNACK,Snack,chef_rubric_secondary,0.872
 Amti,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.313
 Andhra Chicken Curry,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.974
 Andhra Prawn Fry,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric,0.971
+Andhra Prawn Fry,SN_NONVEG_SNACK,Snack,chef_rubric_secondary,0.908
 Angakar Roti,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.74
+Angakar Roti,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric_secondary,0.622
 Anishi Curry,LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric,0.667
+Anishi Curry,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.667
+Anishi Curry,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric_secondary,0.667
+Anishi Curry,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric_secondary,0.667
+Anishi Curry,LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric_secondary,0.573
 Appam,BF_FERMENTED_CREPE_PAN,Breakfast,curated_exact,1.0
 Appam with Stew,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric,0.83
+Appam with Stew,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric_secondary,0.821
+Appam with Stew,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.682
+Appam with Stew,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.682
 Arancini,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Ariselu,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Athirasam,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Avial,LD_COCONUT_VEG_STEW,Lunch/Dinner,curated_exact,1.0
 Avial (Kerala),LD_COCONUT_VEG_STEW,Lunch/Dinner,curated_exact,1.0
 Axone Chutney,LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric,0.792
+Axone Chutney,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric_secondary,0.64
 Baati Chokha,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.838
+Baati Chokha,LD_BIHAR_LITTI_SATTU,Lunch/Dinner,chef_rubric_secondary,0.821
 Baba Ganoush,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.313
 Babru,BF_STUFFED_FLATBREAD,Breakfast,chef_rubric,0.408
 Baby Corn Manchurian,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.608
 Bagara Baingan,LD_SEMI_GRAVY_VEG,Lunch/Dinner,curated_exact,1.0
 Bagara Khana,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric,0.811
+Bagara Khana,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric_secondary,0.698
 Bai,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.675
+Bai,DN_LIGHT_ROTI_SABZI,Dinner,chef_rubric_secondary,0.675
+Bai,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric_secondary,0.675
 Baida Roti,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.674
+Baida Roti,BF_DIABETIC_LOW_GI,Breakfast,chef_rubric_secondary,0.582
+Baida Roti,BF_REGIONAL_PUNJAB_HARYANA,Breakfast,chef_rubric_secondary,0.622
+Baida Roti,SN_LEFTOVER_ROLL,Snack,chef_rubric_secondary,0.526
 Baingan Bharta,LD_SEMI_GRAVY_VEG,Lunch/Dinner,curated_exact,1.0
 Bajra Khichdi,BF_MILLET_TRADITIONAL,Breakfast,curated_exact,1.0
 Bajra Roti,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.966
+Bajra Roti,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric_secondary,0.874
 Bajra Roti (Rajasthani),LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.966
+Bajra Roti (Rajasthani),LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric_secondary,0.874
 Bal Mithai,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Balushahi,SN_STREET_CHAAT,Snack,chef_rubric,0.313
 Banana Chips,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.904
 Banarasi Chaat,SN_STREET_CHAAT,Snack,chef_rubric,0.726
+Banarasi Chaat,SN_FRUIT_CHAAT,Snack,chef_rubric_secondary,0.726
+Banarasi Chaat,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric_secondary,0.602
 Banarasi Thandai,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.408
 Banh Mi (Pork),LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.795
 Banh Xeo,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric,0.55
 Barfi (Kaju),SN_STREET_CHAAT,Snack,chef_rubric,0.408
 Basundi,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric,0.408
 Batata Vada,SN_STREET_CHAAT,Snack,chef_rubric,0.787
+Batata Vada,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric_secondary,0.787
+Batata Vada,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric_secondary,0.787
 Bean Burrito,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.765
 Bebinca,LD_PREGNANCY_BALANCED,Lunch/Dinner,chef_rubric,0.118
 Bedmi Puri,BF_FRIED_FESTIVE,Breakfast,chef_rubric,0.924
 Beef Fry (Kerala),LD_COMMUNITY_RED_MEAT,Lunch/Dinner,chef_rubric,0.882
+Beef Fry (Kerala),LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.733
+Beef Fry (Kerala),LD_KERALA_MEAT_STEW_ROAST,Lunch/Dinner,chef_rubric_secondary,0.821
+Beef Fry (Kerala),LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.733
 Begun Bhaja,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric,0.943
 Bellam Garelu,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Berma,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.711
+Berma,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.711
+Berma,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.711
+Berma,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.711
 Berry Pulao,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric,0.885
 Besan Gatte,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.838
+Besan Gatte,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric_secondary,0.808
 Bhakarwadi,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Bhakri,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric,0.969
 Bharli Vangi,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,curated_exact,1.0
@@ -77,98 +139,232 @@ Bhatt Ki Churkani,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.765
 Bhatura,BF_STUFFED_FLATBREAD,Breakfast,chef_rubric,0.408
 Bhel Puri,SN_STREET_CHAAT,Snack,curated_exact,1.0
 Bhindi Masala,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.777
+Bhindi Masala,DN_LIGHT_ROTI_SABZI,Dinner,chef_rubric_secondary,0.675
+Bhindi Masala,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.675
+Bhindi Masala,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.689
+Bhindi Masala,LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.689
 Bhopali Biryani,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric,0.926
+Bhopali Biryani,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.893
 Bhopali Gosht Korma,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
+Bhopali Gosht Korma,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric_secondary,0.783
 Bhopali Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Bhopali Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Bhopali Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Bhutta (Roasted Corn),SN_STREET_CHAAT,Snack,chef_rubric,0.528
 Bhutte Ka Kees,SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric,0.539
+Bhutte Ka Kees,SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.528
 Bhutte Ka Kees (Indori),SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric,0.539
+Bhutte Ka Kees (Indori),SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.528
 Bibimbap (Chicken),LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.408
 Bibimbap (Veg),LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric,0.55
 Bihari Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Bihari Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Bihari Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Biryani (Mughlai Chicken),LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,curated_exact,1.0
 Biryani Rice (Plain),LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric,0.83
 Bisi Bele Bath,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric,0.979
 Bisi Bele Bath Mix Veg,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric,0.979
 Bobbatlu,LD_FESTIVE_THALI,Lunch/Dinner,chef_rubric,0.921
 Boiled Egg,BF_EGG_FAST,Breakfast,chef_rubric,0.956
+Boiled Egg,SN_EGG_SNACK,Snack,chef_rubric_secondary,0.956
 Boiled Egg Chaat,SN_EGG_SNACK,Snack,chef_rubric,0.974
 Bombay Sandwich,SN_BAKERY_CAFE,Snack,chef_rubric,0.719
+Bombay Sandwich,BF_BREAD_MODERN_FAST,Breakfast,chef_rubric_secondary,0.591
+Bombay Sandwich,BF_KID_TIFFIN,Breakfast,chef_rubric_secondary,0.639
+Bombay Sandwich,BF_OUTSIDE_CAFE_BRUNCH,Breakfast,chef_rubric_secondary,0.591
+Bombay Sandwich,SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric_secondary,0.639
 Bora Saul Rice,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.63
+Bora Saul Rice,LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric_secondary,0.63
+Bora Saul Rice,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.63
+Bora Saul Rice,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric_secondary,0.63
+Bora Saul Rice,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric_secondary,0.63
 Bore Baasi,BF_KID_TIFFIN,Breakfast,chef_rubric,0.118
 Borugu Undalu,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Boti Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Boti Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Boti Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Bread Omelette,BF_EGG_FAST,Breakfast,curated_exact,1.0
 Bread Pakora,SN_FRIED_PAKORA_SAMOSA,Snack,curated_exact,1.0
 Broccoli Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Broccoli Soup,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.631
+Broccoli Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Broccoli Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Broccoli Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
 Bruschetta,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Bulgogi,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.774
 Bun Cha,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.795
 Burmese Samosa Soup,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.765
+Burmese Samosa Soup,SN_MOMO_NOODLES_SNACK,Snack,chef_rubric_secondary,0.64
 Burmese Tea Leaf Salad,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.719
+Burmese Tea Leaf Salad,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.64
+Burmese Tea Leaf Salad,SN_LATE_NIGHT_LIGHT,Snack,chef_rubric_secondary,0.64
+Burmese Tea Leaf Salad,SN_OFFICE_PANTRY,Snack,chef_rubric_secondary,0.64
+Burmese Tea Leaf Salad,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric_secondary,0.64
 Burnt Garlic Fried Rice,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.862
+Burnt Garlic Fried Rice,LD_LEFTOVER_REUSE,Lunch/Dinner,chef_rubric_secondary,0.799
+Burnt Garlic Fried Rice,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.704
 Butter Chicken,LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric,0.932
+Butter Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.846
 Butter Naan,LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric,0.892
+Butter Naan,DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.892
+Butter Naan,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.771
 Cacio e Pepe,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.593
 Caesar Salad,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.719
+Caesar Salad,DN_GRILLED_TIKKA_BOWL,Dinner,chef_rubric_secondary,0.591
+Caesar Salad,LD_HIGH_PROTEIN_VEG_PLATE,Lunch/Dinner,chef_rubric_secondary,0.591
+Caesar Salad,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.591
+Caesar Salad,LD_PREGNANCY_BALANCED,Lunch/Dinner,chef_rubric_secondary,0.639
 Cannoli,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Caprese Salad,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.719
+Caprese Salad,LD_HIGH_PROTEIN_VEG_PLATE,Lunch/Dinner,chef_rubric_secondary,0.591
+Caprese Salad,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.591
+Caprese Salad,LD_PREGNANCY_BALANCED,Lunch/Dinner,chef_rubric_secondary,0.639
+Caprese Salad,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric_secondary,0.591
 Chaas,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric,0.313
 Chaat Papdi,SN_STREET_CHAAT,Snack,curated_exact,1.0
 Chai,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.812
+Chai,SN_CURD_CHAAS_LASSI,Snack,chef_rubric_secondary,0.689
 Chainsoo,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.408
 Chakka Pradhaman,LD_JAIN_NO_ROOT_MAIN,Lunch/Dinner,chef_rubric,0.603
 Chakki Ki Shaak,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.765
+Chakki Ki Shaak,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric_secondary,0.74
 Chakli,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric,0.812
 Cham Cham,SN_STREET_CHAAT,Snack,chef_rubric,0.313
 Chamthong,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.43
 Chana Chaat,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric,0.823
+Chana Chaat,SN_FRUIT_CHAAT,Snack,chef_rubric_secondary,0.726
+Chana Chaat,SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.726
 Chana Ghugni,BF_REGIONAL_BIHAR_EAST,Breakfast,curated_exact,1.0
 Chanar Dalna,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric,0.838
 Chapli Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Chapli Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Chapli Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Chepala Pulusu,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.948
 Chettinad Egg Curry,LD_EGG_CURRY_BHURJI,Lunch/Dinner,chef_rubric,0.934
+Chettinad Egg Curry,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.934
 Chettinad Fish Curry,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.933
+Chettinad Fish Curry,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.903
+Chettinad Fish Curry,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.83
+Chettinad Fish Curry,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric_secondary,0.84
+Chettinad Fish Curry,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.903
 Chettinad Mutton,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.886
 Chha Gosht,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.713
 Chhanar Jilipi,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Chhena Poda,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Chholar Dal with Luchi,BF_FRIED_FESTIVE,Breakfast,chef_rubric,0.727
+Chholar Dal with Luchi,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric_secondary,0.654
+Chholar Dal with Luchi,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric_secondary,0.654
+Chholar Dal with Luchi,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.654
+Chholar Dal with Luchi,LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric_secondary,0.654
 Chhurpi Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Chhurpi Soup,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.631
+Chhurpi Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Chhurpi Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Chhurpi Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
 Chicken 65,LD_CHICKEN_DRY_FRY,Lunch/Dinner,curated_exact,1.0
 Chicken Burger,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.776
+Chicken Burger,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.776
+Chicken Burger,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.776
+Chicken Burger,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.63
+Chicken Burger,SN_NONVEG_SNACK,Snack,chef_rubric_secondary,0.63
 Chicken Burrito,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.776
+Chicken Burrito,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.776
+Chicken Burrito,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.776
+Chicken Burrito,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.63
 Chicken Cafreal,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Chicken Cafreal,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Cafreal,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Cafreal,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric_secondary,0.682
 Chicken Changezi,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.846
+Chicken Changezi,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.776
+Chicken Changezi,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.776
 Chicken Chettinad,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,curated_exact,1.0
 Chicken Curry,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.925
+Chicken Curry,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Curry,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Curry,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric_secondary,0.821
+Chicken Curry,LD_KERALA_MEAT_STEW_ROAST,Lunch/Dinner,chef_rubric_secondary,0.821
 Chicken Enchilada,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Chicken Enchilada,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Enchilada,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Enchilada,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.682
 Chicken Fried Rice,LD_INDO_CHINESE_MEAL,Lunch/Dinner,curated_exact,1.0
 Chicken Ghee Roast,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric,0.937
+Chicken Ghee Roast,LD_KERALA_MEAT_STEW_ROAST,Lunch/Dinner,chef_rubric_secondary,0.85
+Chicken Ghee Roast,LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric_secondary,0.853
 Chicken Karaage,SN_NONVEG_SNACK,Snack,chef_rubric,0.682
+Chicken Karaage,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.682
+Chicken Karaage,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric_secondary,0.537
+Chicken Karaage,SN_MOMO_NOODLES_SNACK,Snack,chef_rubric_secondary,0.537
 Chicken Korma,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.954
+Chicken Korma,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric_secondary,0.891
 Chicken Korma (Mughlai),LD_CHICKEN_HOME_CURRY,Lunch/Dinner,curated_exact,1.0
 Chicken Lollipop,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Chicken Lollipop,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Lollipop,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Lollipop,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.682
+Chicken Lollipop,SN_NONVEG_SNACK,Snack,chef_rubric_secondary,0.682
 Chicken Malai Tikka,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric,0.923
+Chicken Malai Tikka,DN_GRILLED_TIKKA_BOWL,Dinner,chef_rubric_secondary,0.873
+Chicken Malai Tikka,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.816
+Chicken Malai Tikka,LD_TANDOORI_GRILL_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.873
+Chicken Malai Tikka,SN_NONVEG_SNACK,Snack,chef_rubric_secondary,0.873
 Chicken Manchurian,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.913
+Chicken Manchurian,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Manchurian,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Manchurian,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.807
 Chicken Nuggets,SN_NONVEG_SNACK,Snack,chef_rubric,0.682
+Chicken Nuggets,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.682
+Chicken Nuggets,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric_secondary,0.537
+Chicken Nuggets,SN_MOMO_NOODLES_SNACK,Snack,chef_rubric_secondary,0.537
 Chicken Parmesan,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.776
+Chicken Parmesan,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.776
+Chicken Parmesan,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.776
+Chicken Parmesan,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.63
 Chicken Roll (Kolkata),SN_NONVEG_SNACK,Snack,curated_exact,1.0
 Chicken Satay,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Chicken Satay,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Satay,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Satay,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.682
+Chicken Satay,LD_TANDOORI_GRILL_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.682
 Chicken Schezwan Noodles,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.979
 Chicken Shawarma Plate,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Chicken Shawarma Plate,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Shawarma Plate,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
 Chicken Soup,LD_NONVEG_LIGHT_SOUP_STEW,Lunch/Dinner,curated_exact,1.0
 Chicken Steak,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Chicken Steak,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Steak,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Steak,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.682
 Chicken Stew (Awadhi),LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.945
+Chicken Stew (Awadhi),LD_KERALA_MEAT_STEW_ROAST,Lunch/Dinner,chef_rubric_secondary,0.867
+Chicken Stew (Awadhi),LD_NONVEG_LIGHT_SOUP_STEW,Lunch/Dinner,chef_rubric_secondary,0.829
+Chicken Stew (Awadhi),LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.829
 Chicken Sukka (Chettinad),LD_CHICKEN_DRY_FRY,Lunch/Dinner,curated_exact,1.0
 Chicken Tacos,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Chicken Tacos,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Tacos,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Tacos,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.682
 Chicken Tikka,LD_CHICKEN_DRY_FRY,Lunch/Dinner,curated_exact,1.0
 Chicken Wrap,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Chicken Wrap,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Wrap,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chicken Wrap,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.682
+Chicken Wrap,SN_NONVEG_SNACK,Snack,chef_rubric_secondary,0.682
 Chicken Xacuti,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric,0.931
+Chicken Xacuti,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.846
 Chikki (Peanut),SN_MILLET_HEALTH_SNACK,Snack,chef_rubric,0.698
+Chikki (Peanut),SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.528
 Chila (CG),BF_STEAMED_FERMENTED_LIGHT,Breakfast,chef_rubric,0.313
 Chilli Chicken,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.913
+Chilli Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Chilli Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Chilli Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.807
 Chilli Fish,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.882
+Chilli Fish,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric_secondary,0.828
+Chilli Fish,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.828
+Chilli Fish,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.838
+Chilli Fish,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.882
 Chilli Garlic Noodles,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.964
 Chilli Paneer,LD_INDO_CHINESE_MEAL,Lunch/Dinner,curated_exact,1.0
 Chingri Bhaja,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.812
@@ -176,18 +372,32 @@ Chingri Cutlet,SN_NONVEG_SNACK,Snack,chef_rubric,0.93
 Chingri Malai Curry,LD_BENGALI_FISH_MEAL,Lunch/Dinner,curated_exact,1.0
 Chitranna,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric,0.528
 Cholar Dal,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.654
+Cholar Dal,DN_LIGHT_DAL_RICE,Dinner,chef_rubric_secondary,0.654
+Cholar Dal,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric_secondary,0.654
+Cholar Dal,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.654
+Cholar Dal,LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric_secondary,0.654
 Chole,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,chef_rubric,0.971
 Chole Tikki,SN_STREET_CHAAT,Snack,chef_rubric,0.926
 Chur Chur Naan,LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric,0.72
+Chur Chur Naan,DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.72
 Churma,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.812
 Churros,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Ciabatta,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.408
 Coconut Chutney,BF_RICE_LEFTOVER_BREAKFAST,Breakfast,chef_rubric,0.656
+Coconut Chutney,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric_secondary,0.64
+Coconut Chutney,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.656
+Coconut Chutney,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.656
+Coconut Chutney,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric_secondary,0.656
 Coleslaw,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.43
 Com Tam,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.795
 Corn Chaat,SN_STREET_CHAAT,Snack,chef_rubric,0.812
+Corn Chaat,SN_FRUIT_CHAAT,Snack,chef_rubric_secondary,0.726
 Corn Chowder,LD_HIMALAYAN_THUKPA_MOMO,Lunch/Dinner,chef_rubric,0.313
 Cream of Tomato Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Cream of Tomato Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Cream of Tomato Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Cream of Tomato Soup,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.656
+Cream of Tomato Soup,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric_secondary,0.656
 Crispy Corn,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.608
 Curd Rice,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric,0.998
 Daab Chingri,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.889
@@ -201,33 +411,60 @@ Dal Makhani,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric,0.964
 Dal Pakwan,BF_DIABETIC_LOW_GI,Breakfast,chef_rubric,0.556
 Dal Pitha,LD_BIHAR_LITTI_SATTU,Lunch/Dinner,curated_exact,1.0
 Dal Tadka,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.878
+Dal Tadka,DN_LOW_CARB_DINNER,Dinner,chef_rubric_secondary,0.736
+Dal Tadka,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric_secondary,0.736
+Dal Tadka,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.736
 Dalcha,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.774
+Dalcha,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric_secondary,0.627
 Dalma,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.808
+Dalma,LD_ODIA_DALMA_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.808
 Dappalam,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.477
 Daulat Ki Chaat,SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric,0.649
+Daulat Ki Chaat,BF_SPROUTS_FRUIT_CURD,Breakfast,chef_rubric_secondary,0.602
+Daulat Ki Chaat,SN_FRUIT_CHAAT,Snack,chef_rubric_secondary,0.602
+Daulat Ki Chaat,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric_secondary,0.602
+Daulat Ki Chaat,SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.602
 Dham Thali,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric,0.734
+Dham Thali,LD_FESTIVE_THALI,Lunch/Dinner,chef_rubric_secondary,0.734
+Dham Thali,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric_secondary,0.734
+Dham Thali,LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric_secondary,0.614
 Dhokar Dalna,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,curated_exact,1.0
 Dhokla,BF_STEAMED_FERMENTED_LIGHT,Breakfast,chef_rubric,0.963
+Dhokla,SN_STEAMED_SNACK,Snack,chef_rubric_secondary,0.907
 Dim Sum (Veg),SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.608
 Dodol,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Dohneiiong,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.837
 Doi Maach,LD_BENGALI_FISH_MEAL,Lunch/Dinner,curated_exact,1.0
 Dosa (Street Style),BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.88
 Double Ka Meetha,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.727
+Double Ka Meetha,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.727
 Dragon Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.776
+Dragon Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.776
+Dragon Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.776
+Dragon Chicken,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.63
 Dragon Prawns,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric,0.765
 Dubki Kadhi,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric,0.875
 Dubuk,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.408
 Duck Curry (Assamese),LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.613
+Duck Curry (Assamese),LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.613
+Duck Curry (Assamese),LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric_secondary,0.613
+Duck Curry (Assamese),LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric_secondary,0.613
 Dudhi Halwa,LD_GOURD_PUMPKIN_LIGHT,Lunch/Dinner,chef_rubric,0.904
 Dum Aloo,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.9
+Dum Aloo,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.855
 Dum Aloo (Kashmiri),LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.9
+Dum Aloo (Kashmiri),LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.855
 Dum Ka Murgh,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.713
+Dum Ka Murgh,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.583
+Dum Ka Murgh,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.583
+Dum Ka Murgh,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.698
 Edamame,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Egg Bhurji,BF_EGG_FAST,Breakfast,chef_rubric,0.943
+Egg Bhurji,SN_EGG_SNACK,Snack,chef_rubric_secondary,0.943
 Egg Bhurji Pav,SN_EGG_SNACK,Snack,curated_exact,1.0
 Egg Chilli,SN_EGG_SNACK,Snack,chef_rubric,0.883
 Egg Curry,LD_EGG_CURRY_BHURJI,Lunch/Dinner,chef_rubric,0.98
+Egg Curry,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.98
 Egg Drop Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric,0.952
 Egg Fried Rice,LD_EGG_RICE_MEAL,Lunch/Dinner,curated_exact,1.0
 Egg Paratha,BF_EGG_FAST,Breakfast,chef_rubric,0.915
@@ -235,7 +472,12 @@ Egg Podimas,BF_EGG_FAST,Breakfast,chef_rubric,0.864
 Egg Roll,SN_EGG_SNACK,Snack,chef_rubric,0.951
 Ema Datshi,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.408
 Enduri Pitha,SN_STEAMED_SNACK,Snack,chef_rubric,0.704
+Enduri Pitha,SN_NORTHEAST_SNACK,Snack,chef_rubric_secondary,0.704
 Erissery,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.675
+Erissery,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.593
+Erissery,LD_GOURD_PUMPKIN_LIGHT,Lunch/Dinner,chef_rubric_secondary,0.527
+Erissery,LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric_secondary,0.527
+Erissery,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.527
 Eromba,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.313
 Fafda Jalebi,BF_JAIN_BREAKFAST,Breakfast,chef_rubric,0.792
 Falafel,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.408
@@ -243,6 +485,10 @@ Falooda,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.408
 Fara,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Fattoush,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.528
 Feni Spiked Cashew Curry,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.667
+Feni Spiked Cashew Curry,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.667
+Feni Spiked Cashew Curry,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric_secondary,0.667
+Feni Spiked Cashew Curry,LD_PREGNANCY_BALANCED,Lunch/Dinner,chef_rubric_secondary,0.573
+Feni Spiked Cashew Curry,LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric_secondary,0.573
 Fettuccine Alfredo,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.528
 Filter Coffee,BF_SKIP_MINIMAL,Breakfast,chef_rubric,0.727
 Fish Chop,SN_NONVEG_SNACK,Snack,chef_rubric,0.716
@@ -250,21 +496,37 @@ Fish Fry (Street Style),SN_NONVEG_SNACK,Snack,chef_rubric,0.872
 Fish Molee,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.968
 Fish Recheado,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,curated_exact,1.0
 Fish and Chips,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.882
+Fish and Chips,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric_secondary,0.828
+Fish and Chips,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.828
+Fish and Chips,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.882
 Focaccia,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.408
 French Fries,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 French Omelette,BF_EGG_FAST,Breakfast,chef_rubric,0.777
 French Onion Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.752
+French Onion Soup,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.682
+French Onion Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.682
+French Onion Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.682
+French Onion Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.682
 Fried Bombil,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric,0.964
+Fried Bombil,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.869
+Fried Bombil,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.869
 Fried Momos,SN_NONVEG_SNACK,Snack,chef_rubric,0.753
+Fried Momos,SN_MOMO_NOODLES_SNACK,Snack,chef_rubric_secondary,0.64
+Fried Momos,SN_NORTHEAST_SNACK,Snack,chef_rubric_secondary,0.64
 Frittata,LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric,0.55
 Fruit Chaat,SN_FRUIT_CHAAT,Snack,curated_exact,1.0
 Gajar Ka Halwa,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.727
 Galho,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.509
 Galouti Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Galouti Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Galouti Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Garadu Chaat,SN_STREET_CHAAT,Snack,chef_rubric,0.838
+Garadu Chaat,SN_FRUIT_CHAAT,Snack,chef_rubric_secondary,0.765
 Garden Salad,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.911
 Garlic Bread,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,curated_exact,1.0
 Garlic Naan,LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric,0.72
+Garlic Naan,DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.72
+Garlic Naan,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.704
 Gathiya,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Gatte Ki Sabzi,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,curated_exact,1.0
 Gavvalu,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
@@ -274,19 +536,32 @@ Ghevar,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Ghugni,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,curated_exact,1.0
 Gnocchi in Tomato Sauce,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.889
 Goan Egg Curry,LD_EGG_CURRY_BHURJI,Lunch/Dinner,chef_rubric,0.934
+Goan Egg Curry,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.934
 Goan Fish Curry,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.985
+Goan Fish Curry,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric_secondary,0.964
 Goan Prawn Curry,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,curated_exact,1.0
 Goan Sausage Pulao,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric,0.89
+Goan Sausage Pulao,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric_secondary,0.795
 Gobhi Paratha,BF_STUFFED_FLATBREAD,Breakfast,chef_rubric,0.888
 Goli Baje,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric,0.838
 Gongura Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.867
+Gongura Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Gongura Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
 Gongura Mutton,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.886
 Gongura Pachadi,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.925
 Goshtaba,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
 Greek Salad,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.807
+Greek Salad,LD_PREGNANCY_BALANCED,Lunch/Dinner,chef_rubric_secondary,0.639
 Green Curry (Veg),LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.866
+Green Curry (Veg),LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.724
 Grilled Chicken,LD_TANDOORI_GRILL_NONVEG,Lunch/Dinner,chef_rubric,0.85
+Grilled Chicken,DN_GRILLED_TIKKA_BOWL,Dinner,chef_rubric_secondary,0.85
+Grilled Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Grilled Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Grilled Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.807
 Grilled Sandwich,BF_OUTSIDE_CAFE_BRUNCH,Breakfast,chef_rubric,0.932
+Grilled Sandwich,BF_KID_TIFFIN,Breakfast,chef_rubric_secondary,0.815
+Grilled Sandwich,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.856
 Guacamole,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric,0.313
 Gujarati Dal,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric,0.869
 Gujarati Kadhi,LD_KADHI_CURD_CURRY,Lunch/Dinner,curated_exact,1.0
@@ -294,6 +569,10 @@ Gujhiya,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Gujiya,SN_STREET_CHAAT,Snack,chef_rubric,0.408
 Gulab Jamun,SN_SWEET_REGIONAL,Snack,chef_rubric,0.949
 Gundruk Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Gundruk Soup,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.631
+Gundruk Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Gundruk Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Gundruk Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
 Gushtaba,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
 Gutti Vankaya,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.408
 Gyeran Mari,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.43
@@ -301,21 +580,40 @@ Gyoza,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.608
 Haak (Kashmiri Greens),LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.313
 Hakka Noodles,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.96
 Haleem,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric,0.882
+Haleem,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.819
 Handvo,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.408
 Hara Bhara Kebab,SN_STREET_CHAAT,Snack,chef_rubric,0.528
 Honey Chilli Potato,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.608
 Hot and Sour Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Hot and Sour Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Hot and Sour Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Hot and Sour Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
+Hot and Sour Soup,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric_secondary,0.675
 Hummus,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.313
 Hyderabadi Biryani (Veg),LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric,0.972
+Hyderabadi Biryani (Veg),LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.902
 Hyderabadi Chicken Biryani,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric,0.98
+Hyderabadi Chicken Biryani,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric_secondary,0.957
 Hyderabadi Egg Biryani,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric,0.979
+Hyderabadi Egg Biryani,LD_EGG_CURRY_BHURJI,Lunch/Dinner,chef_rubric_secondary,0.949
+Hyderabadi Egg Biryani,LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric_secondary,0.967
 Hyderabadi Haleem,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric,0.882
+Hyderabadi Haleem,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.819
 Hyderabadi Keema Samosa,SN_NONVEG_SNACK,Snack,chef_rubric,0.627
 Hyderabadi Kheer,LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric,0.72
+Hyderabadi Kheer,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.72
 Hyderabadi Khichdi,LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric,0.814
+Hyderabadi Khichdi,DN_KHICHDI_SOUP,Dinner,chef_rubric_secondary,0.814
+Hyderabadi Khichdi,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric_secondary,0.693
+Hyderabadi Khichdi,LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric_secondary,0.72
+Hyderabadi Khichdi,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.72
 Hyderabadi Marag,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.737
+Hyderabadi Marag,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric_secondary,0.566
+Hyderabadi Marag,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.675
 Hyderabadi Mirchi Bajji,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.838
 Hyderabadi Mutton Biryani,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric,0.968
+Hyderabadi Mutton Biryani,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.897
+Hyderabadi Mutton Biryani,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.932
 Idiyappam,BF_STEAMED_FERMENTED_LIGHT,Breakfast,chef_rubric,0.812
 Idli,BF_STEAMED_FERMENTED_LIGHT,Breakfast,chef_rubric,0.883
 Ilish Bhaja,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.889
@@ -324,45 +622,72 @@ Indori Namkeen,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.812
 Indori Poha,BF_POHA_CHIVDA_LIGHT,Breakfast,curated_exact,1.0
 Insalata Mista,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.43
 Irachi Stew,LD_KERALA_MEAT_STEW_ROAST,Lunch/Dinner,chef_rubric,0.893
+Irachi Stew,DN_NONVEG_HOME_DINNER,Dinner,chef_rubric_secondary,0.773
+Irachi Stew,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.844
 Irani Chai,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.812
 Italian Meatballs,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.774
 Jadoh,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.859
 Jalebi,SN_STREET_CHAAT,Snack,chef_rubric,0.408
 Japanese Fried Rice,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.862
+Japanese Fried Rice,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.799
+Japanese Fried Rice,LD_LEFTOVER_REUSE,Lunch/Dinner,chef_rubric_secondary,0.799
 Japchae,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.528
 Jasha Maroo,LD_HIMALAYAN_THUKPA_MOMO,Lunch/Dinner,chef_rubric,0.408
 Jeera Rice,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric,0.87
 Jhalmuri,SN_STREET_CHAAT,Snack,chef_rubric,0.313
 Jhangora Kheer,LD_HIMALAYAN_THUKPA_MOMO,Lunch/Dinner,chef_rubric,0.408
 Jolada Rotti,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric,0.878
+Jolada Rotti,DN_MILLET_LIGHT_DINNER,Dinner,chef_rubric_secondary,0.823
 Jonna Rotte,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric,0.878
+Jonna Rotte,DN_MILLET_LIGHT_DINNER,Dinner,chef_rubric_secondary,0.823
 Kachhi Haldi Ki Sabzi,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.908
 Kachori (Dal),SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.792
+Kachori (Dal),BF_CHILLA_PROTEIN,Breakfast,chef_rubric_secondary,0.731
+Kachori (Dal),BF_FRIED_FESTIVE,Breakfast,chef_rubric_secondary,0.74
+Kachori (Dal),BF_JAIN_BREAKFAST,Breakfast,chef_rubric_secondary,0.763
 Kadai Paneer,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric,0.973
+Kadai Paneer,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.949
 Kadala Curry,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric,0.937
 Kadhai Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.867
+Kadhai Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Kadhai Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
 Kadhai Paneer,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.949
+Kadhai Paneer,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.91
 Kadhi Badi (Bihari),LD_BIHAR_LITTI_SATTU,Lunch/Dinner,chef_rubric,0.922
+Kadhi Badi (Bihari),LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric_secondary,0.892
 Kadhi Pakora,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric,0.989
 Kafuli,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.527
+Kafuli,LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric_secondary,0.527
 Kahwa,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.812
 Kakori Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Kakori Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Kakori Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Kangshoi,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.675
+Kangshoi,DN_LIGHT_ROTI_SABZI,Dinner,chef_rubric_secondary,0.675
+Kangshoi,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric_secondary,0.675
 Kashmiri Pulao,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric,0.885
+Kashmiri Pulao,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.765
 Kathi Kebab Wrap,SN_NONVEG_SNACK,Snack,chef_rubric,0.821
+Kathi Kebab Wrap,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.74
 Kathi Roll,SN_NONVEG_SNACK,Snack,chef_rubric,0.752
 Katsu Curry,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.613
+Katsu Curry,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.613
 Kavuni Arisi,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Keema Matar,LD_HOME_STYLE_KEEMA,Lunch/Dinner,chef_rubric,0.972
 Keema Samosa,SN_NONVEG_SNACK,Snack,chef_rubric,0.627
 Keerai Masiyal,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.313
 Ker Sangri,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,curated_exact,1.0
 Kerala Chicken Curry,LD_KERALA_MEAT_STEW_ROAST,Lunch/Dinner,chef_rubric,0.963
+Kerala Chicken Curry,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.925
 Kerala Egg Roast,BF_EGG_FAST,Breakfast,chef_rubric,0.883
+Kerala Egg Roast,LD_EGG_CURRY_BHURJI,Lunch/Dinner,chef_rubric_secondary,0.883
+Kerala Egg Roast,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.883
 Kerala Fish Curry,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.994
 Kerala Parotta,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.408
 Kerala Prawn Curry,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric,0.99
 Kesari Bath,SN_SWEET_REGIONAL,Snack,chef_rubric,0.838
+Kesari Bath,BF_STEAMED_FERMENTED_LIGHT,Breakfast,chef_rubric_secondary,0.74
+Kesari Bath,BF_UPMA_DALIA_SEVAI,Breakfast,chef_rubric_secondary,0.74
 Kewa Datshi,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.408
 Khaja (Odia),SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Khakhra,SN_OFFICE_PANTRY,Snack,curated_exact,1.0
@@ -376,48 +701,80 @@ Khopra Patties,SN_STREET_CHAAT,Snack,chef_rubric,0.593
 Khow Suey,LD_HIMALAYAN_THUKPA_MOMO,Lunch/Dinner,chef_rubric,0.408
 Khubani Ka Meetha,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.765
 Kimchi Fried Rice,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.862
+Kimchi Fried Rice,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.799
+Kimchi Fried Rice,LD_LEFTOVER_REUSE,Lunch/Dinner,chef_rubric_secondary,0.799
 Kinema Curry,LD_SOY_TOFU_PROTEIN,Lunch/Dinner,chef_rubric,0.873
 Koat Pitha,SN_NORTHEAST_SNACK,Snack,chef_rubric,0.797
+Koat Pitha,SN_STEAMED_SNACK,Snack,chef_rubric_secondary,0.704
 Kofta Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Kofta Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Kofta Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Koki,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.408
 Koki (Sindhi),BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.408
 Kolambi Bhaat,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.678
+Kolambi Bhaat,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric_secondary,0.55
 Kolhapuri Misal,BF_REGIONAL_BIHAR_EAST,Breakfast,chef_rubric,0.408
 Kolkata Biryani,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric,0.926
+Kolkata Biryani,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.904
+Kolkata Biryani,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.893
 Kolkata Chicken Roll,SN_NONVEG_SNACK,Snack,chef_rubric,0.867
 Kolkata Fish Fry,SN_NONVEG_SNACK,Snack,chef_rubric,0.872
 Kombdi Vade (Malvani),LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.313
 Koottu Curry,LD_JAIN_NO_ROOT_MAIN,Lunch/Dinner,chef_rubric,0.854
+Koottu Curry,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.771
 Kootu,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric,0.808
+Kootu,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.808
+Kootu,LD_MIXED_VEG_DRY,Lunch/Dinner,chef_rubric_secondary,0.72
 Korean Corn Cheese,SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric,0.933
 Korean Fried Chicken,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.881
+Korean Fried Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Korean Fried Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Korean Fried Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Korean Fried Chicken,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.827
 Kori Rotti,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.765
 Kosha Mangsho,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.945
 Kosha Murgi,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.821
+Kosha Murgi,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.821
 Kothimbir Vadi,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Kothu Parotta,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric,0.593
 Kozhi Varuval,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Kozhi Varuval,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Kozhi Varuval,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
 Kulcha,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric,0.947
 Kulfi (Malai),SN_STREET_CHAAT,Snack,chef_rubric,0.408
 Kulfi (Paan),SN_STREET_CHAAT,Snack,chef_rubric,0.408
 Kulfi Falooda,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Kumura Khar,LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric,0.622
 Kung Pao Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Kung Pao Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Kung Pao Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Kung Pao Chicken,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.682
 Kurkure Bhindi,SN_STREET_CHAAT,Snack,chef_rubric,0.528
 Kuzhambu (Vathal),LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric,0.838
 Laal Maas,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,curated_exact,1.0
 Labra,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,curated_exact,1.0
 Laccha Paratha,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.702
+Laccha Paratha,DN_CHILD_FRIENDLY_DINNER,Dinner,chef_rubric_secondary,0.618
+Laccha Paratha,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.618
+Laccha Paratha,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.618
+Laccha Paratha,LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric_secondary,0.618
 Lagan Nu Custard,LD_EGG_CURRY_BHURJI,Lunch/Dinner,chef_rubric,0.408
 Lamb Chops,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.583
 Lassi (Salted),SN_CURD_CHAAS_LASSI,Snack,chef_rubric,0.937
 Lassi (Sweet),SN_CURD_CHAAS_LASSI,Snack,chef_rubric,0.821
+Lassi (Sweet),BF_REGIONAL_PUNJAB_HARYANA,Breakfast,chef_rubric_secondary,0.698
 Lemon Rice,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric,0.911
+Lemon Rice,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric_secondary,0.87
+Lemon Rice,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric_secondary,0.87
 Lilva Kachori,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.792
 Litti Chokha,BF_REGIONAL_BIHAR_EAST,Breakfast,curated_exact,1.0
 Luchi,BF_FRIED_FESTIVE,Breakfast,chef_rubric,0.727
 Lucknowi Biryani,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric,0.949
+Lucknowi Biryani,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.913
+Lucknowi Biryani,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.893
 Lucknowi Kebab Paratha,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Lucknowi Kebab Paratha,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Lucknowi Kebab Paratha,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Lukhmi,SN_NONVEG_SNACK,Snack,chef_rubric,0.566
 Lukter,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.774
 Lyodur Tschaman,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.408
@@ -429,34 +786,68 @@ Machha Jhola,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric,0.987
 Machher Jhol,LD_FISH_CURRY_RICE,Lunch/Dinner,curated_exact,1.0
 Madra (Chana),LD_HIMALAYAN_THUKPA_MOMO,Lunch/Dinner,chef_rubric,0.838
 Mag Ni Dal,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.598
+Mag Ni Dal,DN_LIGHT_DAL_RICE,Dinner,chef_rubric_secondary,0.598
+Mag Ni Dal,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.598
+Mag Ni Dal,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric_secondary,0.598
+Mag Ni Dal,LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric_secondary,0.598
 Maggi Noodles,SN_MOMO_NOODLES_SNACK,Snack,chef_rubric,0.939
 Makhaniya Lassi,SN_CURD_CHAAS_LASSI,Snack,chef_rubric,0.821
 Makki Ki Roti,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric,0.971
+Makki Ki Roti,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric_secondary,0.894
 Malabar Biryani,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric,0.968
+Malabar Biryani,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric_secondary,0.883
 Malai Kofta,LD_PANEER_RICH_GRAVY,Lunch/Dinner,curated_exact,1.0
 Malpua,SN_STREET_CHAAT,Snack,chef_rubric,0.313
 Malvani Mutton Curry,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.936
+Malvani Mutton Curry,LD_KERALA_MEAT_STEW_ROAST,Lunch/Dinner,chef_rubric_secondary,0.846
 Mamsam Pulusu,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
 Manchow Soup (Veg),DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Manchow Soup (Veg),LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Manchow Soup (Veg),LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Manchow Soup (Veg),LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
+Manchow Soup (Veg),LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric_secondary,0.675
 Manchurian (Veg),LD_INDO_CHINESE_MEAL,Lunch/Dinner,curated_exact,1.0
 Manga Curry,LD_JAIN_NO_ROOT_MAIN,Lunch/Dinner,chef_rubric,0.74
+Manga Curry,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.734
+Manga Curry,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric_secondary,0.613
+Manga Curry,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric_secondary,0.613
 Mangalore Buns,BF_FRIED_FESTIVE,Breakfast,curated_exact,1.0
 Mangalorean Fish Gassi,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.882
+Mangalorean Fish Gassi,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.828
+Mangalorean Fish Gassi,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.828
+Mangalorean Fish Gassi,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.828
 Mango Sticky Rice,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric,0.853
 Mapo Tofu,LD_SOY_TOFU_PROTEIN,Lunch/Dinner,chef_rubric,0.857
 Margherita Pizza,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.821
+Margherita Pizza,DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.74
 Marinara Breadsticks,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Masala Bhaat,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,chef_rubric,0.779
+Masala Bhaat,DN_LIGHT_DAL_RICE,Dinner,chef_rubric_secondary,0.779
+Masala Bhaat,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric_secondary,0.678
+Masala Bhaat,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric_secondary,0.779
+Masala Bhaat,LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.611
 Masala Bhaat (Maharashtrian),LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,chef_rubric,0.779
+Masala Bhaat (Maharashtrian),DN_LIGHT_DAL_RICE,Dinner,chef_rubric_secondary,0.779
+Masala Bhaat (Maharashtrian),LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric_secondary,0.678
+Masala Bhaat (Maharashtrian),LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric_secondary,0.779
+Masala Bhaat (Maharashtrian),LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.611
 Masala Dosa,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.968
 Masala Omelette,BF_EGG_FAST,Breakfast,curated_exact,1.0
 Masala Papad,SN_ROASTED_CHANA_NUTS,Snack,chef_rubric,0.548
+Masala Papad,SN_CURD_CHAAS_LASSI,Snack,chef_rubric_secondary,0.548
+Masala Papad,SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.528
 Mashed Potatoes,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.408
 Masor Tenga,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.946
 Massaman Curry,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.613
+Massaman Curry,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric_secondary,0.613
+Massaman Curry,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric_secondary,0.613
+Massaman Curry,LD_KERALA_MEAT_STEW_ROAST,Lunch/Dinner,chef_rubric_secondary,0.613
+Massaman Curry,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.613
 Matar Chaat,SN_STREET_CHAAT,Snack,chef_rubric,0.812
+Matar Chaat,SN_FRUIT_CHAAT,Snack,chef_rubric_secondary,0.726
 Matar Ki Tikki,SN_STREET_CHAAT,Snack,chef_rubric,0.808
 Matar Paneer,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.968
+Matar Paneer,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.968
 Matki Usal,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,curated_exact,1.0
 Mawa Bati,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.313
 Mawa Kachori,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.698
@@ -464,94 +855,185 @@ Medu Vada,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric,0.942
 Meen Kulambu,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.968
 Meen Mappas,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.953
 Meen Pollichathu,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.932
+Meen Pollichathu,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.829
+Meen Pollichathu,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.829
 Meen Varuthathu,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.932
+Meen Varuthathu,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.829
+Meen Varuthathu,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.829
 Methi Bajra Puri,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.907
 Methi Matar Malai,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric,0.956
+Methi Matar Malai,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.854
 Methi Na Gota,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Mexican Rice,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.57
+Mexican Rice,DN_LIGHT_DAL_RICE,Dinner,chef_rubric_secondary,0.57
+Mexican Rice,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.57
+Mexican Rice,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric_secondary,0.57
+Mexican Rice,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric_secondary,0.57
 Minestrone Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.752
+Minestrone Soup,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.682
+Minestrone Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.682
+Minestrone Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.682
+Minestrone Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.682
 Mirchi Ka Salan,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.765
 Mirchi Vada,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.942
 Misal Pav,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,curated_exact,1.0
 Mishti Doi,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric,0.313
 Miso Soup,LD_SOY_TOFU_PROTEIN,Lunch/Dinner,chef_rubric,0.737
+Miso Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric_secondary,0.712
+Miso Soup,DN_LOW_CARB_DINNER,Dinner,chef_rubric_secondary,0.736
+Miso Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Miso Soup,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.736
 Missi Roti,BF_REGIONAL_PUNJAB_HARYANA,Breakfast,curated_exact,1.0
 Mix Veg,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.871
+Mix Veg,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.86
+Mix Veg,LD_MIXED_VEG_DRY,Lunch/Dinner,chef_rubric_secondary,0.797
+Mix Veg,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.797
+Mix Veg,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric_secondary,0.86
 Mochar Ghonto,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric,0.812
 Mochi,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Modak,SN_SWEET_REGIONAL,Snack,chef_rubric,0.838
+Modak,SN_STEAMED_SNACK,Snack,chef_rubric_secondary,0.765
 Modur Pulao,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric,0.885
 Mohan Thaal,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Mohanthal,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Mohinga,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.751
+Mohinga,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.751
+Mohinga,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.751
+Mohinga,LD_NONVEG_LIGHT_SOUP_STEW,Lunch/Dinner,chef_rubric_secondary,0.638
+Mohinga,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.751
 Momos (Chicken),SN_NORTHEAST_SNACK,Snack,curated_exact,1.0
 Momos (Steamed Veg),SN_MOMO_NOODLES_SNACK,Snack,chef_rubric,0.944
+Momos (Steamed Veg),SN_STEAMED_SNACK,Snack,chef_rubric_secondary,0.873
 Mooli Paratha,BF_STUFFED_FLATBREAD,Breakfast,curated_exact,1.0
 Mor Kuzhambu,LD_KADHI_CURD_CURRY,Lunch/Dinner,curated_exact,1.0
 Mughlai Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.846
+Mughlai Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.776
+Mughlai Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.776
 Mughlai Paratha,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.737
+Mughlai Paratha,BF_FIELD_WORK_HEAVY,Breakfast,chef_rubric_secondary,0.567
+Mughlai Paratha,BF_OUTSIDE_CAFE_BRUNCH,Breakfast,chef_rubric_secondary,0.567
+Mughlai Paratha,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.556
+Mughlai Paratha,LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric_secondary,0.556
 Mui Borok,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.829
+Mui Borok,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.751
+Mui Borok,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.751
+Mui Borok,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.751
 Murgh Musallam,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.583
+Murgh Musallam,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.583
+Murgh Musallam,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.583
 Muri Ghonto,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.883
+Muri Ghonto,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric_secondary,0.751
+Muri Ghonto,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.751
+Muri Ghonto,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.829
 Murukku,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric,0.812
 Mushroom Chilli,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.608
 Mushroom Ghee Roast,LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric,0.765
+Mushroom Ghee Roast,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.69
+Mushroom Ghee Roast,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric_secondary,0.593
+Mushroom Ghee Roast,LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric_secondary,0.727
 Mushroom Soup,LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric,0.727
+Mushroom Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric_secondary,0.712
+Mushroom Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Mushroom Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Mushroom Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
 Muthiya,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Muthiya (CG),SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Mutta Curry,LD_EGG_CURRY_BHURJI,Lunch/Dinner,chef_rubric,0.934
+Mutta Curry,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.934
 Mutton Biryani (Lucknowi),LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,curated_exact,1.0
 Mutton Chaap,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.834
 Mutton Korma,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric,0.906
+Mutton Korma,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.886
 Mutton Nihari,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric,0.891
+Mutton Nihari,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.886
 Mutton Rogan Josh,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.991
 Mutton Roll,SN_NONVEG_SNACK,Snack,chef_rubric,0.901
 Mysore Masala Dosa,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.953
 Mysore Pak,SN_SWEET_REGIONAL,Snack,curated_exact,1.0
 Naan,LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric,0.72
+Naan,DN_GRILLED_TIKKA_BOWL,Dinner,chef_rubric_secondary,0.704
+Naan,DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.72
 Nachos with Salsa,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Nadru Yakhni,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.408
 Naga Fish Curry,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.933
+Naga Fish Curry,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.903
+Naga Fish Curry,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric_secondary,0.84
+Naga Fish Curry,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric_secondary,0.881
+Naga Fish Curry,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.903
 Naga Pork Curry,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,curated_exact,1.0
 Nahari Kulcha,BF_OUTSIDE_CAFE_BRUNCH,Breakfast,chef_rubric,0.72
+Nahari Kulcha,BF_FIELD_WORK_HEAVY,Breakfast,chef_rubric_secondary,0.72
 Nakham Bitchi,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.711
+Nakham Bitchi,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric_secondary,0.711
+Nakham Bitchi,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.711
+Nakham Bitchi,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.711
 Narikol Laru,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Narkel Naru,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Natu Kodi Pulusu,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.821
 Natukodi Fry,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.733
+Natukodi Fry,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.611
+Natukodi Fry,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.611
+Natukodi Fry,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.611
+Natukodi Fry,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.733
 Neer Dosa,BF_FERMENTED_CREPE_PAN,Breakfast,curated_exact,1.0
 Nihari,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,curated_exact,1.0
 Noodle Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Noodle Soup,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.631
+Noodle Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Noodle Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Noodle Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
 Noon Chai,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.812
 Obbattu,LD_FESTIVE_THALI,Lunch/Dinner,chef_rubric,0.921
 Okonomiyaki,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.663
 Olan,LD_COCONUT_VEG_STEW,Lunch/Dinner,curated_exact,1.0
 Omelette Pav,SN_EGG_SNACK,Snack,chef_rubric,0.924
+Omelette Pav,BF_EGG_FAST,Breakfast,chef_rubric_secondary,0.808
 Onigiri,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.313
 Onion Dosa,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.88
 Onion Rings,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.777
 Osmania Biscuit,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.698
+Osmania Biscuit,SN_OFFICE_PANTRY,Snack,chef_rubric_secondary,0.698
 Ou Tenga Fish Curry,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric,0.979
 Pachi Pulusu,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric,0.698
 Pad See Ew,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.593
 Pad Thai (Veg),LD_SOY_TOFU_PROTEIN,Lunch/Dinner,chef_rubric,0.774
+Pad Thai (Veg),LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.593
 Pakhala Bhaat,LD_ODIA_DALMA_PAKHALA,Lunch/Dinner,chef_rubric,0.777
+Pakhala Bhaat,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric_secondary,0.626
+Pakhala Bhaat,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric_secondary,0.743
+Pakhala Bhaat,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,chef_rubric_secondary,0.626
 Paknam,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.829
+Paknam,LD_FISH_CURRY_RICE,Lunch/Dinner,chef_rubric_secondary,0.751
+Paknam,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric_secondary,0.751
+Paknam,LD_ODIA_FISH_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.829
 Pakodi Ki Kadhi,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric,0.892
+Pakodi Ki Kadhi,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric_secondary,0.838
 Pakora (Mixed Veg),SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.777
+Pakora (Mixed Veg),SN_LEFTOVER_ROLL,Snack,chef_rubric_secondary,0.626
 Palada Payasam,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric,0.408
 Palak Paneer,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.962
+Palak Paneer,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.91
 Pancakes,BF_KID_TIFFIN,Breakfast,chef_rubric,0.24
 Pandhra Rassa,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.844
 Paneer 65,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric,0.545
 Paneer Bhurji,LD_PANEER_HOME_DRY,Lunch/Dinner,curated_exact,1.0
 Paneer Butter Masala,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric,0.994
+Paneer Butter Masala,LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric_secondary,0.97
 Paneer Chilli Dry,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.663
+Paneer Chilli Dry,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric_secondary,0.545
+Paneer Chilli Dry,SN_ROASTED_CHANA_NUTS,Snack,chef_rubric_secondary,0.657
 Paneer Chilli Gravy,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric,0.961
+Paneer Chilli Gravy,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.915
+Paneer Chilli Gravy,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.926
 Paneer Do Pyaza,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.949
+Paneer Do Pyaza,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.91
 Paneer Manchurian,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.915
+Paneer Manchurian,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.892
+Paneer Manchurian,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.81
 Paneer Paratha,BF_STUFFED_FLATBREAD,Breakfast,curated_exact,1.0
 Paneer Steak,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.892
+Paneer Steak,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.81
+Paneer Steak,LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric_secondary,0.762
 Paneer Tikka,DN_GRILLED_TIKKA_BOWL,Dinner,curated_exact,1.0
 Paneer Tikka Roll,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.957
 Pani Puri,SN_STREET_CHAAT,Snack,chef_rubric,0.958
@@ -561,10 +1043,14 @@ Paniyaram,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric,0.812
 Pantua,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Panzanella,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.313
 Pao (Goan Bread),BF_OUTSIDE_CAFE_BRUNCH,Breakfast,chef_rubric,0.602
+Pao (Goan Bread),DN_LEFTOVER_THALI,Dinner,chef_rubric_secondary,0.602
+Pao (Goan Bread),DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.602
+Pao (Goan Bread),LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.602
 Papad Ki Sabzi,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,curated_exact,1.0
 Papdi Chaat,SN_STREET_CHAAT,Snack,curated_exact,1.0
 Parantha (Plain),BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.408
 Parippu Curry,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,chef_rubric,0.613
+Parippu Curry,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric_secondary,0.613
 Parotta (Kerala/Tamil),LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.408
 Parsi Dhansak,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.737
 Paruppu Rasam,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,curated_exact,1.0
@@ -572,15 +1058,25 @@ Pasanda,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.886
 Pasta Alfredo,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.988
 Pasta Arrabiata,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.868
 Pasta Carbonara,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.868
+Pasta Carbonara,DN_CHILD_FRIENDLY_DINNER,Dinner,chef_rubric_secondary,0.753
+Pasta Carbonara,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.753
 Pasta Pomodoro,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.847
+Pasta Pomodoro,DN_CHILD_FRIENDLY_DINNER,Dinner,chef_rubric_secondary,0.713
+Pasta Pomodoro,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.713
 Pasta Salad,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.777
+Pasta Salad,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.713
+Pasta Salad,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric_secondary,0.719
+Pasta Salad,LD_PREGNANCY_BALANCED,Lunch/Dinner,chef_rubric_secondary,0.639
 Patande,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Pathar Ka Gosht,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.737
+Pathar Ka Gosht,LD_MUSLIM_BIRYANI_KORMA,Lunch/Dinner,chef_rubric_secondary,0.566
 Pathiri,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.313
 Pathiri (Malabar),LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.313
 Patra,SN_STEAMED_SNACK,Snack,chef_rubric,0.812
 Patra Ni Machhi,LD_FISH_FRY_MEAL,Lunch/Dinner,chef_rubric,0.55
 Pav Bhaji,DN_LEFTOVER_THALI,Dinner,chef_rubric,0.912
+Pav Bhaji,DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.872
+Pav Bhaji,SN_LEFTOVER_ROLL,Snack,chef_rubric_secondary,0.872
 Pav Bhaji (Delhi style),DN_WEEKEND_INDULGENCE,Dinner,curated_exact,1.0
 Payasam (Ada),LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric,0.408
 Payasam (Semiya),LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric,0.408
@@ -590,42 +1086,64 @@ Peda,SN_STREET_CHAAT,Snack,chef_rubric,0.408
 Pepper Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric,0.937
 Pepper Chicken (Tamil),LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric,0.937
 Pesarattu,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.792
+Pesarattu,BF_CHILLA_PROTEIN,Breakfast,chef_rubric_secondary,0.698
 Pesarattu MLC,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.821
+Pesarattu MLC,BF_CHILLA_PROTEIN,Breakfast,chef_rubric_secondary,0.74
 Pesarattu Upma,BF_UPMA_DALIA_SEVAI,Breakfast,chef_rubric,0.843
+Pesarattu Upma,BF_CHILLA_PROTEIN,Breakfast,chef_rubric_secondary,0.74
+Pesarattu Upma,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric_secondary,0.821
+Pesarattu Upma,BF_MILLET_TRADITIONAL,Breakfast,chef_rubric_secondary,0.742
 Phaanu,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.408
 Phagshapa,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.762
+Phagshapa,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric_secondary,0.608
 Phaksha Paa,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.762
+Phaksha Paa,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric_secondary,0.608
 Phirni,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric,0.24
 Pho (Chicken),LD_NONVEG_LIGHT_SOUP_STEW,Lunch/Dinner,chef_rubric,0.393
 Phulka,LD_LEFTOVER_REUSE,Lunch/Dinner,chef_rubric,0.821
+Phulka,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.733
 Pika Pila,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.313
 Pindi Chole,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,chef_rubric,0.935
 Pita Bread,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.626
 Pitha (Patishapta),BF_REGIONAL_BIHAR_EAST,Breakfast,chef_rubric,0.704
+Pitha (Patishapta),SN_NORTHEAST_SNACK,Snack,chef_rubric_secondary,0.704
+Pitha (Patishapta),SN_STEAMED_SNACK,Snack,chef_rubric_secondary,0.704
 Pithla,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,chef_rubric,0.812
 Pithla Bhakri,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,chef_rubric,0.942
 Plain Dosa,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.918
 Poee Bread,BF_BREAD_MODERN_FAST,Breakfast,chef_rubric,0.626
+Poee Bread,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.626
 Poha,BF_POHA_CHIVDA_LIGHT,Breakfast,chef_rubric,0.986
 Poha Jalebi (Indori),BF_POHA_CHIVDA_LIGHT,Breakfast,chef_rubric,0.897
 Pongal (Sweet),LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric,0.74
+Pongal (Sweet),LD_FESTIVE_THALI,Lunch/Dinner,chef_rubric_secondary,0.74
 Pongal (Ven),BF_DIABETIC_LOW_GI,Breakfast,chef_rubric,0.24
 Pootharekulu,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Poriyal,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.859
+Poriyal,LD_GOURD_PUMPKIN_LIGHT,Lunch/Dinner,chef_rubric_secondary,0.753
+Poriyal,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric_secondary,0.753
+Poriyal,LD_MIXED_VEG_DRY,Lunch/Dinner,chef_rubric_secondary,0.753
+Poriyal,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric_secondary,0.753
 Pork with Bamboo Shoot,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.988
 Posto Bora,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Potato Wedges,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.408
 Prawn Balchao,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,curated_exact,1.0
 Prawn Hakka Noodles,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.96
+Prawn Hakka Noodles,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric_secondary,0.936
 Prawn Malaikari,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric,0.936
 Prawn Sukka,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric,0.936
 Pulihora,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,curated_exact,1.0
 Pundi Curry,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric,0.667
+Pundi Curry,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric_secondary,0.667
+Pundi Curry,LD_ODIA_DALMA_PAKHALA,Lunch/Dinner,chef_rubric_secondary,0.667
+Pundi Curry,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric_secondary,0.593
+Pundi Curry,LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric_secondary,0.573
 Punugulu,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Puran Poli,LD_FESTIVE_THALI,Lunch/Dinner,chef_rubric,0.921
 Puri,BF_FRIED_FESTIVE,Breakfast,chef_rubric,0.902
 Puttu,BF_STUFFED_FLATBREAD,Breakfast,chef_rubric,0.313
 Pyaaz Ki Kachori,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.792
+Pyaaz Ki Kachori,BF_FRIED_FESTIVE,Breakfast,chef_rubric_secondary,0.74
 Qubani Ka Meetha,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.765
 Quesadilla (Veg),SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric,0.603
 Quiche (Vegetable),LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric,0.55
@@ -634,22 +1152,28 @@ Rabri Jalebi,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Ragda Pattice,SN_STREET_CHAAT,Snack,curated_exact,1.0
 Ragi Mudde,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric,0.977
 Raj Kachori,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.74
+Raj Kachori,SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.593
 Raja Mirchi Chutney,LD_RAJASTHANI_DAL_BAATI,Lunch/Dinner,chef_rubric,0.64
 Rajasthani Pyaaz Kachori,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.821
+Rajasthani Pyaaz Kachori,BF_FRIED_FESTIVE,Breakfast,chef_rubric_secondary,0.698
 Rajbhog,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Rajma,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,chef_rubric,0.939
+Rajma,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric_secondary,0.816
 Ram Ladoo,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Ramen (Chicken),LD_NONVEG_LIGHT_SOUP_STEW,Lunch/Dinner,chef_rubric,0.478
 Ras Malai,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric,0.74
 Rasabali,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Rasam,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric,0.913
+Rasam,DN_KHICHDI_SOUP,Dinner,chef_rubric_secondary,0.792
 Rasam Vada,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric,0.925
 Rasgulla,SN_SWEET_REGIONAL,Snack,chef_rubric,0.812
 Rava Dosa,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.88
+Rava Dosa,BF_STEAMED_FERMENTED_LIGHT,Breakfast,chef_rubric_secondary,0.792
 Rava Idli,BF_STEAMED_FERMENTED_LIGHT,Breakfast,curated_exact,1.0
 Rava Upma,BF_UPMA_DALIA_SEVAI,Breakfast,curated_exact,1.0
 Ravioli (Spinach Ricotta),LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.593
 Red Curry (Chicken),LD_COMMUNITY_RED_MEAT,Lunch/Dinner,chef_rubric,0.854
+Red Curry (Chicken),LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.74
 Revdi,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Rezala,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.844
 Rishta,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
@@ -658,15 +1182,22 @@ Ros Omelette,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,curated_exact,1.0
 Rotla,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric,0.808
 Royyala Iguru,LD_PRAWN_CRAB_COASTAL,Lunch/Dinner,chef_rubric,0.971
 Rumali Roti,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.622
+Rumali Roti,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric_secondary,0.622
+Rumali Roti,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.622
+Rumali Roti,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric_secondary,0.622
 Saagu,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.509
 Saaru,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric,0.313
 Sabudana Khichdi,BF_FASTING_PHALAHARI,Breakfast,chef_rubric,0.865
+Sabudana Khichdi,SN_FASTING_SNACK,Snack,chef_rubric_secondary,0.739
 Sabudana Vada,SN_FASTING_SNACK,Snack,curated_exact,1.0
 Sabudana Vada (Maharashtrian),SN_FASTING_SNACK,Snack,curated_exact,1.0
 Sadya Thali,LD_FESTIVE_THALI,Lunch/Dinner,chef_rubric,0.98
 Safed Maas,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.951
 Saga Bhaja,LD_ODIA_DALMA_PAKHALA,Lunch/Dinner,curated_exact,1.0
 Sai Bhaji,DN_LEFTOVER_THALI,Dinner,chef_rubric,0.678
+Sai Bhaji,DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.678
+Sai Bhaji,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric_secondary,0.527
+Sai Bhaji,LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric_secondary,0.527
 Sakinalu,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Sakinalu (Telangana),SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Salli Boti,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
@@ -676,29 +1207,46 @@ Sandesh,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Sannas,BF_STEAMED_FERMENTED_LIGHT,Breakfast,curated_exact,1.0
 Santula,LD_ODIA_DALMA_PAKHALA,Lunch/Dinner,curated_exact,1.0
 Sarson Ka Saag,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.985
+Sarson Ka Saag,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric_secondary,0.932
 Sarva Pindi,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Sattu Paratha,BF_STUFFED_FLATBREAD,Breakfast,curated_exact,1.0
 Sawhchiar,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric,0.408
 Schezwan Noodles,SN_MOMO_NOODLES_SNACK,Snack,curated_exact,1.0
 Scrambled Eggs on Toast,BF_EGG_FAST,Breakfast,chef_rubric,0.792
+Scrambled Eggs on Toast,BF_BREAD_MODERN_FAST,Breakfast,chef_rubric_secondary,0.626
+Scrambled Eggs on Toast,BF_FIELD_WORK_HEAVY,Breakfast,chef_rubric_secondary,0.698
+Scrambled Eggs on Toast,BF_SKIP_MINIMAL,Breakfast,chef_rubric_secondary,0.626
 Seekh Kebab,LD_TANDOORI_GRILL_NONVEG,Lunch/Dinner,chef_rubric,0.956
+Seekh Kebab,SN_NONVEG_SNACK,Snack,chef_rubric_secondary,0.887
 Sel Roti,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.674
+Sel Roti,BF_DIABETIC_LOW_GI,Breakfast,chef_rubric_secondary,0.582
+Sel Roti,SN_LEFTOVER_ROLL,Snack,chef_rubric_secondary,0.526
 Serradura,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric,0.24
 Set Dosa,BF_FERMENTED_CREPE_PAN,Breakfast,curated_exact,1.0
 Sev Biryanji,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.704
+Sev Biryanji,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric_secondary,0.704
 Sev Puri,SN_STREET_CHAAT,Snack,curated_exact,1.0
 Sev Tamatar,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric,0.98
+Sev Tamatar,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric_secondary,0.935
 Sev Usal,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.704
+Sev Usal,SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.704
 Shahi Paneer,LD_PANEER_RICH_GRAVY,Lunch/Dinner,curated_exact,1.0
 Shahi Shikanji,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.313
 Shahi Tukda,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric,0.812
 Shakarkandi Chaat,SN_STREET_CHAAT,Snack,chef_rubric,0.726
+Shakarkandi Chaat,SN_FRUIT_CHAAT,Snack,chef_rubric_secondary,0.726
+Shakarkandi Chaat,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric_secondary,0.602
+Shakarkandi Chaat,SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric_secondary,0.649
 Shami Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Shami Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Shami Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Shan Noodles,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.777
 Shawarma (Chicken),SN_NONVEG_SNACK,Snack,chef_rubric,0.408
 Sheermal,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric,0.408
 Sheermal with Nihari,BF_OUTSIDE_CAFE_BRUNCH,Breakfast,chef_rubric,0.139
 Shikampur Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Shikampur Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Shikampur Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Shikanji (Indori),SN_STREET_CHAAT,Snack,chef_rubric,0.812
 Shorshe Ilish,LD_BENGALI_FISH_MEAL,Lunch/Dinner,chef_rubric,0.889
 Shrikhand,SN_SWEET_REGIONAL,Snack,curated_exact,1.0
@@ -709,103 +1257,230 @@ Sindhi Kadhi,LD_KADHI_CURD_CURRY,Lunch/Dinner,curated_exact,1.0
 Singju,SN_NORTHEAST_SNACK,Snack,curated_exact,1.0
 Singodi,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Smoked Chicken (Naga),LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Smoked Chicken (Naga),LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Smoked Chicken (Naga),LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Smoked Chicken (Naga),LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,chef_rubric_secondary,0.719
 Smoked Pork with Bamboo Shoot,LD_NORTHEAST_SMOKED_PORK_MEAT,Lunch/Dinner,curated_exact,1.0
 Sohan Halwa,SN_STREET_CHAAT,Snack,chef_rubric,0.313
 Sol Kadhi,LD_KADHI_CURD_CURRY,Lunch/Dinner,chef_rubric,0.818
 Solkadhi,SN_CURD_CHAAS_LASSI,Snack,curated_exact,1.0
 Som Tam,SN_FRUIT_CHAAT,Snack,chef_rubric,0.792
+Som Tam,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric_secondary,0.719
 Sondesh (Nolen Gur),SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Sorpotel,LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric,0.926
 Spaghetti Bolognese,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.774
+Spaghetti Bolognese,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.593
 Spring Roll,SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric,0.631
+Spring Roll,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric_secondary,0.608
+Spring Roll,SN_LEFTOVER_ROLL,Snack,chef_rubric_secondary,0.582
 Steamed Bao (Veg),SN_STEAMED_SNACK,Snack,chef_rubric,0.808
+Steamed Bao (Veg),SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric_secondary,0.663
 Steamed Rice,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.839
+Steamed Rice,DN_LIGHT_DAL_RICE,Dinner,chef_rubric_secondary,0.839
+Steamed Rice,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric_secondary,0.743
+Steamed Rice,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,chef_rubric_secondary,0.766
+Steamed Rice,LD_NORTHEAST_VEG_STEAMED,Lunch/Dinner,chef_rubric_secondary,0.797
 Stuffed Capsicum,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.808
+Stuffed Capsicum,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.808
+Stuffed Capsicum,LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.808
 Stuffed Grape Leaves,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Stuffed Naan (Paneer),LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric,0.72
+Stuffed Naan (Paneer),DN_WEEKEND_INDULGENCE,Dinner,chef_rubric_secondary,0.72
 Sundal,SN_SOUTH_TIFFIN_SNACK,Snack,curated_exact,1.0
 Surti Locho,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Sushi (Veg Roll),LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.43
 Sweet Corn Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Sweet Corn Soup,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.631
+Sweet Corn Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Sweet Corn Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Sweet Corn Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
 Sweet and Sour Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Sweet and Sour Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Sweet and Sour Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Sweet and Sour Chicken,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.682
 Szechuan Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Szechuan Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Szechuan Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Szechuan Chicken,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.682
 Szechuan Fried Rice,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.862
+Szechuan Fried Rice,LD_EGG_RICE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.799
+Szechuan Fried Rice,LD_LEFTOVER_REUSE,Lunch/Dinner,chef_rubric_secondary,0.799
 Taar Gosht,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
 Tabak Maaz,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.583
 Tabbouleh,LD_MODERN_SALAD_BOWL,Lunch/Dinner,chef_rubric,0.528
 Tahari,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.313
 Tahiri,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric,0.838
+Tahiri,DN_ONE_POT_DINNER,Dinner,chef_rubric_secondary,0.704
+Tahiri,LD_ONE_POT_PRESSURE,Lunch/Dinner,chef_rubric_secondary,0.704
+Tahiri,LD_VEG_BIRYANI_SPECIAL,Lunch/Dinner,chef_rubric_secondary,0.704
 Tamarind Rice,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric,0.992
 Tamatar Chaat,SN_STREET_CHAAT,Snack,chef_rubric,0.726
+Tamatar Chaat,SN_FRUIT_CHAAT,Snack,chef_rubric_secondary,0.726
+Tamatar Chaat,SN_HEALTHY_PROTEIN_SNACK,Snack,chef_rubric_secondary,0.602
 Tambda Rassa,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.819
 Tandoori Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric,0.934
+Tandoori Chicken,DN_GRILLED_TIKKA_BOWL,Dinner,chef_rubric_secondary,0.891
+Tandoori Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Tandoori Chicken,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.841
+Tandoori Chicken,LD_TANDOORI_GRILL_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.891
 Tandoori Momos,SN_NONVEG_SNACK,Snack,chef_rubric,0.787
+Tandoori Momos,SN_MOMO_NOODLES_SNACK,Snack,chef_rubric_secondary,0.69
+Tandoori Momos,SN_NORTHEAST_SNACK,Snack,chef_rubric_secondary,0.69
 Tandoori Paneer Tikka,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric,0.97
+Tandoori Paneer Tikka,DN_GRILLED_TIKKA_BOWL,Dinner,chef_rubric_secondary,0.957
 Tandoori Roti,DN_GRILLED_TIKKA_BOWL,Dinner,chef_rubric,0.656
+Tandoori Roti,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.622
+Tandoori Roti,LD_MILLET_ROTI_THALI,Lunch/Dinner,chef_rubric_secondary,0.622
+Tandoori Roti,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.622
+Tandoori Roti,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric_secondary,0.622
 Tawa Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Tawa Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Tawa Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
 Tchok Wangan,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.774
 Telebhaja Platter,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Tempura (Veg),SN_CURD_CHAAS_LASSI,Snack,chef_rubric,0.389
 Teriyaki Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Teriyaki Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Teriyaki Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Teriyaki Chicken,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.682
 Thai Basil Chicken,LD_CHICKEN_HOME_CURRY,Lunch/Dinner,chef_rubric,0.807
+Thai Basil Chicken,LD_CHICKEN_BIRYANI_PULAO,Lunch/Dinner,chef_rubric_secondary,0.807
+Thai Basil Chicken,LD_CHICKEN_DRY_FRY,Lunch/Dinner,chef_rubric_secondary,0.807
+Thai Basil Chicken,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric_secondary,0.682
 Thai Fish Cakes,SN_NONVEG_SNACK,Snack,chef_rubric,0.716
 Thai Fried Rice (Chicken),LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.862
+Thai Fried Rice (Chicken),LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.799
 Thali Meals (South Indian),LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric,0.894
 Thalipeeth,BF_MILLET_TRADITIONAL,Breakfast,curated_exact,1.0
 Thalipeeth (Multi-grain),BF_MILLET_TRADITIONAL,Breakfast,curated_exact,1.0
 Thandai,SN_TEA_BISCUIT_RUSK,Snack,chef_rubric,0.408
 Thayir Vadai,SN_STREET_CHAAT,Snack,chef_rubric,0.897
 Theeyal,LD_COCONUT_VEG_STEW,Lunch/Dinner,chef_rubric,0.593
+Theeyal,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric_secondary,0.55
 Thekua,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Thepla,BF_PLAIN_FLATBREAD_SUBZI,Breakfast,chef_rubric,0.909
 Thoran (Cabbage),LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.777
+Thoran (Cabbage),DN_LIGHT_ROTI_SABZI,Dinner,chef_rubric_secondary,0.675
+Thoran (Cabbage),LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.675
 Thukpa (Arunachali),LD_HIMALAYAN_THUKPA_MOMO,Lunch/Dinner,chef_rubric,0.821
 Til Pitha,SN_NORTHEAST_SNACK,Snack,chef_rubric,0.797
+Til Pitha,BF_REGIONAL_BIHAR_EAST,Breakfast,chef_rubric_secondary,0.704
+Til Pitha,SN_STEAMED_SNACK,Snack,chef_rubric_secondary,0.704
 Tiramisu,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric,0.408
 Tisrya Masala,LD_PANEER_RICH_GRAVY,Lunch/Dinner,chef_rubric,0.733
+Tisrya Masala,LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric_secondary,0.611
+Tisrya Masala,LD_OUTSIDE_DELIVERY_INDIAN,Lunch/Dinner,chef_rubric_secondary,0.611
+Tisrya Masala,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,chef_rubric_secondary,0.611
+Tisrya Masala,LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.611
 Toast Sandwich,SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric,0.865
+Toast Sandwich,BF_BREAD_MODERN_FAST,Breakfast,chef_rubric_secondary,0.847
+Toast Sandwich,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.719
 Tofu Pho,LD_SOY_TOFU_PROTEIN,Lunch/Dinner,chef_rubric,0.834
 Tok Dal,LD_JAIN_NO_ROOT_MAIN,Lunch/Dinner,chef_rubric,0.73
+Tok Dal,LD_BENGALI_VEG_DAL_BHAAT,Lunch/Dinner,chef_rubric_secondary,0.598
+Tok Dal,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric_secondary,0.598
+Tok Dal,LD_DAL_ROTI_SABZI,Lunch/Dinner,chef_rubric_secondary,0.598
+Tok Dal,LD_LIGHT_KHICHDI,Lunch/Dinner,chef_rubric_secondary,0.598
 Tom Kha Gai,LD_NONVEG_LIGHT_SOUP_STEW,Lunch/Dinner,chef_rubric,0.478
 Tom Yum Soup (Prawn),LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric,0.631
+Tom Yum Soup (Prawn),DN_LOW_CARB_DINNER,Dinner,chef_rubric_secondary,0.582
+Tom Yum Soup (Prawn),LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.582
 Tomato Rice,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric,0.911
+Tomato Rice,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.852
+Tomato Rice,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric_secondary,0.87
+Tomato Rice,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric_secondary,0.852
 Tomato Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Tomato Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Tomato Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Tomato Soup,LD_RICE_PULAO_VEG,Lunch/Dinner,chef_rubric_secondary,0.656
+Tomato Soup,LD_SOUTH_TAMARIND_LEMON_RICE,Lunch/Dinner,chef_rubric_secondary,0.656
 Tortellini Soup,LD_NONVEG_LIGHT_SOUP_STEW,Lunch/Dinner,chef_rubric,0.782
+Tortellini Soup,DN_LOW_CARB_DINNER,Dinner,chef_rubric_secondary,0.64
+Tortellini Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.682
+Tortellini Soup,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.64
+Tortellini Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.682
 Tteokbokki,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.663
 Tudkiya Bhath,LD_DAL_RICE_COMFORT,Lunch/Dinner,chef_rubric,0.408
 Tunday Kebab,SN_NONVEG_SNACK,Snack,chef_rubric,0.887
+Tunday Kebab,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric_secondary,0.774
+Tunday Kebab,LD_SUNDAY_OUTSIDE_NONVEG,Lunch/Dinner,chef_rubric_secondary,0.836
 Tungrymbai,LD_SEMI_GRAVY_VEG,Lunch/Dinner,chef_rubric,0.408
 Uddina Vada (Udupi),SN_STREET_CHAAT,Snack,chef_rubric,0.787
+Uddina Vada (Udupi),BF_FIELD_WORK_HEAVY,Breakfast,chef_rubric_secondary,0.64
+Uddina Vada (Udupi),SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric_secondary,0.787
+Uddina Vada (Udupi),SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric_secondary,0.787
 Udon Noodles,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.868
 Uggani,BF_LACTATION_MOTHER,Breakfast,chef_rubric,0.118
 Ukdiche Modak,SN_SWEET_REGIONAL,Snack,chef_rubric,0.838
 Undhiyu,LD_GUJARATI_THALI,Lunch/Dinner,chef_rubric,0.792
+Undhiyu,LD_MIXED_VEG_DRY,Lunch/Dinner,chef_rubric_secondary,0.698
+Undhiyu,LD_ROOT_TUBER_SABZI,Lunch/Dinner,chef_rubric_secondary,0.626
 Unniyappam,SN_SWEET_REGIONAL,Snack,chef_rubric,0.313
 Upma,BF_UPMA_DALIA_SEVAI,Breakfast,chef_rubric,0.818
 Usal,LD_RAJMA_CHOLE_LEGUME,Lunch/Dinner,curated_exact,1.0
 Uttapam,BF_FERMENTED_CREPE_PAN,Breakfast,chef_rubric,0.821
+Uttapam,BF_KID_TIFFIN,Breakfast,chef_rubric_secondary,0.77
 Vada Pav,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric,0.915
+Vada Pav,SN_SOUTH_TIFFIN_SNACK,Snack,chef_rubric_secondary,0.787
+Vada Pav,SN_STREET_CHAAT,Snack,chef_rubric_secondary,0.787
 Vangi Bath,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric,0.868
+Vangi Bath,DN_CURD_RICE_LIGHT,Dinner,chef_rubric_secondary,0.808
+Vangi Bath,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,chef_rubric_secondary,0.765
+Vangi Bath,LD_WEEKEND_SPECIAL_REGIONAL,Lunch/Dinner,chef_rubric_secondary,0.72
 Vazhakka Bajji,SN_NAMKEEN_CHIVDA,Snack,chef_rubric,0.313
 Veg Burger,DN_LIGHT_ROTI_SABZI,Dinner,chef_rubric,0.748
+Veg Burger,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric_secondary,0.61
+Veg Burger,LD_PASTA_PIZZA_MODERN,Lunch/Dinner,chef_rubric_secondary,0.696
+Veg Burger,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.696
+Veg Burger,SN_STEAMED_SNACK,Snack,chef_rubric_secondary,0.696
 Veg Club Sandwich,BF_BREAD_MODERN_FAST,Breakfast,chef_rubric,0.904
+Veg Club Sandwich,BF_KID_TIFFIN,Breakfast,chef_rubric_secondary,0.841
+Veg Club Sandwich,BF_OUTSIDE_CAFE_BRUNCH,Breakfast,chef_rubric_secondary,0.79
+Veg Club Sandwich,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.876
 Veg Crispy,SN_STEAMED_SNACK,Snack,chef_rubric,0.647
+Veg Crispy,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.647
 Veg Cutlet,SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric,0.864
+Veg Cutlet,SN_LEFTOVER_ROLL,Snack,chef_rubric_secondary,0.704
 Veg Fried Rice,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.981
 Veg Manchow Soup,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric,0.785
+Veg Manchow Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric_secondary,0.712
+Veg Manchow Soup,DN_LIGHT_ROTI_SABZI,Dinner,chef_rubric_secondary,0.707
+Veg Manchow Soup,LD_HIMALAYAN_THUKPA_MOMO,Lunch/Dinner,chef_rubric_secondary,0.647
+Veg Manchow Soup,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric_secondary,0.675
 Veg Manchurian Dry,SN_STEAMED_SNACK,Snack,chef_rubric,0.647
+Veg Manchurian Dry,SN_BAKERY_CAFE,Snack,chef_rubric_secondary,0.647
+Veg Manchurian Dry,SN_FRIED_PAKORA_SAMOSA,Snack,chef_rubric_secondary,0.608
+Veg Manchurian Dry,SN_ROASTED_CHANA_NUTS,Snack,chef_rubric_secondary,0.602
 Vegetable Stir Fry,LD_LEAFY_GREENS_SAAG,Lunch/Dinner,chef_rubric,0.888
+Vegetable Stir Fry,DN_LOW_CARB_DINNER,Dinner,chef_rubric_secondary,0.837
+Vegetable Stir Fry,LD_LOW_CARB_PROTEIN_PLATE,Lunch/Dinner,chef_rubric_secondary,0.837
+Vegetable Stir Fry,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric_secondary,0.82
+Vegetable Stir Fry,LD_SOY_TOFU_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.837
 Vendakkai Poriyal,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.92
 Vengaya Sambar,LD_SOUTH_SAMBAR_RASAM,Lunch/Dinner,chef_rubric,0.928
 Vietnamese Coffee,BF_SKIP_MINIMAL,Breakfast,chef_rubric,0.727
 Vietnamese Spring Roll (Fresh),LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric,0.631
+Vietnamese Spring Roll (Fresh),LD_LEFTOVER_REUSE,Lunch/Dinner,chef_rubric_secondary,0.582
+Vietnamese Spring Roll (Fresh),SN_KIDS_TIFFIN_SNACK,Snack,chef_rubric_secondary,0.631
+Vietnamese Spring Roll (Fresh),SN_LEFTOVER_ROLL,Snack,chef_rubric_secondary,0.582
 Vindaloo (Pork),LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric,0.919
+Vindaloo (Pork),LD_COMMUNITY_RED_MEAT,Lunch/Dinner,chef_rubric_secondary,0.828
 Waffles,SN_SWEET_REGIONAL,Snack,chef_rubric,0.408
 Wahan Mosdeng,LD_SIMPLE_GREEN_VEG_SABZI,Lunch/Dinner,chef_rubric,0.313
 Warqi Paratha,LD_CHILD_MILD_PLATE,Lunch/Dinner,chef_rubric,0.618
+Warqi Paratha,DN_CHILD_FRIENDLY_DINNER,Dinner,chef_rubric_secondary,0.618
+Warqi Paratha,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.618
+Warqi Paratha,LD_PANEER_HOME_DRY,Lunch/Dinner,chef_rubric_secondary,0.567
+Warqi Paratha,LD_TEEN_HIGH_CALORIE,Lunch/Dinner,chef_rubric_secondary,0.618
 Wonton Soup,DN_KHICHDI_SOUP,Dinner,chef_rubric,0.712
+Wonton Soup,DN_EARLY_ELDERLY_DINNER,Dinner,chef_rubric_secondary,0.631
+Wonton Soup,LD_ELDERLY_SOFT_DIGESTIVE,Lunch/Dinner,chef_rubric_secondary,0.631
+Wonton Soup,LD_LACTATION_POSTPARTUM,Lunch/Dinner,chef_rubric_secondary,0.631
+Wonton Soup,LD_RECOVERY_SOFT_PROTEIN,Lunch/Dinner,chef_rubric_secondary,0.631
 Xacuti (Chicken),LD_GOAN_XACUTI_CURRY,Lunch/Dinner,chef_rubric,0.871
 Yakhni,LD_MUTTON_SUNDAY_CURRY,Lunch/Dinner,chef_rubric,0.953
 Yakitori,LD_INDO_CHINESE_MEAL,Lunch/Dinner,chef_rubric,0.313
 Zarda,LD_SOUTH_CURD_RICE,Lunch/Dinner,chef_rubric,0.72
+Zarda,DN_LIGHT_DAL_RICE,Dinner,chef_rubric_secondary,0.72
+Zarda,LD_PUNJABI_RICH_VEG,Lunch/Dinner,chef_rubric_secondary,0.72
 Zunka Bhakri,LD_MAHARASHTRIAN_PITLA_BHAKRI,Lunch/Dinner,curated_exact,1.0

@@ -433,6 +433,7 @@ import os as _os
 
 _DISH_TO_CLASS = None
 _DISH_OVERRIDES = None
+_DISH_TO_CLASSES = None  # dish -> full set of classes (multi-membership; WP-17.1)
 
 
 def _load_class_first_csv(name):
@@ -471,3 +472,28 @@ def dish_to_class_code(dish_name):
             pass  # map is optional; exact curated map still works without it
     key = dish_name.strip().lower()
     return _DISH_TO_CLASS.get(key) or _DISH_OVERRIDES.get(key)
+
+
+def dish_to_class_codes(dish_name):
+    """dish_name -> the FULL set of meal_class_codes the dish belongs to (WP-17.1 multi-membership).
+    A dish is NOT one-to-one with a class: the same dal-rice is a lunch LD_DAL_RICE_COMFORT AND a
+    light dinner DN_LIGHT_DAL_RICE. dish_to_class_code (above) still returns the single PRIMARY class
+    (for S_cohort scoring + plan labelling); this returns every class — the primary plus every
+    chef_rubric_secondary row in dish_class_map.csv, unioned with the curated exact map. Used to build
+    a CLASS's dish pool (meal_planner.dishes_for_class / _class_dish_counts): without it the
+    behavioural DN_ dinner classes held 0–1 dishes and the plan fell back to regional LD_ plates.
+    Returns a possibly-empty frozenset (never None)."""
+    global _DISH_TO_CLASS, _DISH_OVERRIDES, _DISH_TO_CLASSES
+    if _DISH_TO_CLASSES is None:
+        dish_to_class_code(dish_name)  # ensure the two static sources are parsed into the globals
+        _DISH_TO_CLASSES = {}
+        for k, c in (_DISH_TO_CLASS or {}).items():
+            _DISH_TO_CLASSES.setdefault(k, set()).add(c)
+        try:
+            for r in _load_class_first_csv("dish_class_map.csv"):
+                if r["meal_class_code"]:
+                    _DISH_TO_CLASSES.setdefault(r["dish_name"].strip().lower(), set()).add(
+                        r["meal_class_code"])
+        except FileNotFoundError:
+            pass
+    return frozenset(_DISH_TO_CLASSES.get(dish_name.strip().lower(), ()))

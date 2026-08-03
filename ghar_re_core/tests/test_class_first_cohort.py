@@ -138,7 +138,9 @@ def test_real_catalogue_coverage_is_full_and_honest():
               "NONVEG", "TANDOORI", "SMOKED", "MEAT_STEW", "XACUTI")
         with open(src, newline="") as f:
             for r in _csv.DictReader(f):
-                if r["method"] != "chef_rubric":
+                # WP-17.1: both derived paths (primary chef_rubric + chef_rubric_secondary
+                # multi-membership) go through the same diet gate, so both must be diet-safe.
+                if r["method"] not in ("chef_rubric", "chef_rubric_secondary"):
                     continue
                 if by_diet.get(r["dish_name"]) == "veg":
                     code = r["meal_class_code"]
