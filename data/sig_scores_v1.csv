@@ -1,30 +1,30 @@
 dish_name,sig_score,band,evidence_confidence,coverage_confidence,owner,method,version,status
-Butter Chicken,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Dal Makhani,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Sarson Ka Saag,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Butter Chicken,1.0,national_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Dal Makhani,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Sarson Ka Saag,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Makki Ki Roti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Tandoori Chicken,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Tandoori Chicken,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Paneer Tikka,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Amritsari Fish Fry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Chole,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Rajma,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Chole,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Rajma,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Palak Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Aloo Gobhi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Aloo Gobhi,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Paneer Butter Masala,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Shahi Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Chicken Tikka,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Seekh Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Kadhi Pakora,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Aloo Paratha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Gobhi Paratha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Paneer Paratha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Aloo Paratha,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Gobhi Paratha,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Paneer Paratha,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Naan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Garlic Naan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Kulcha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Lassi (Sweet),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Lassi (Salted),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Matar Paneer,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Dal Tadka,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Dal Tadka,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Bhindi Masala,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Baingan Bharta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Dum Aloo,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -35,15 +35,15 @@ Keema Matar,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - 
 Phulka,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Tawa Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Bhatura,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Bedmi Puri,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Aloo Sabzi (Delhi style),0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Dahi Bhalla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Bedmi Puri,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Aloo Sabzi (Delhi style),0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Dahi Bhalla,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Aloo Tikki,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Pav Bhaji (Delhi style),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Parantha (Plain),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Mooli Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Chur Chur Naan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Chaat Papdi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Chaat Papdi,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Kachori (Dal),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Bhel Puri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Sev Puri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -53,16 +53,16 @@ Mughlai Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1
 Rabri Jalebi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Kulfi Falooda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Rumali Roti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Nihari,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Nihari,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Mutton Korma,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Biryani (Mughlai Chicken),0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Biryani (Mughlai Chicken),0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Shami Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Mughlai Chicken,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Pasanda,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Mutton Rogan Josh,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Galouti Kebab,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Galouti Kebab,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Kakori Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Lucknowi Biryani,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Lucknowi Biryani,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Tunday Kebab,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Chicken Stew (Awadhi),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Nahari Kulcha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -73,10 +73,10 @@ Haleem,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see g
 Rezala,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Baida Roti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Warqi Paratha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Hyderabadi Chicken Biryani,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Hyderabadi Mutton Biryani,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Mirchi Ka Salan,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Double Ka Meetha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Hyderabadi Chicken Biryani,1.0,national_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Hyderabadi Mutton Biryani,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Mirchi Ka Salan,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Double Ka Meetha,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Bagara Baingan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Pathar Ka Gosht,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Lukhmi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -87,21 +87,21 @@ Osmania Biscuit,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1
 Dum Ka Murgh,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Bagara Khana,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Hyderabadi Egg Biryani,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Irani Chai,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Irani Chai,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Tahari,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Qubani Ka Meetha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Achari Gosht,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Masala Dosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Plain Dosa,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Idli,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Sambar,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Idli,1.0,national_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Sambar,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Rasam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Coconut Chutney,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Medu Vada,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Uttapam,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Medu Vada,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Uttapam,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Pongal (Ven),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Pongal (Sweet),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Curd Rice,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Curd Rice,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Lemon Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Tamarind Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Tomato Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -119,19 +119,19 @@ Paniyaram,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - se
 Murukku,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Kothu Parotta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Parotta (Kerala/Tamil),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Filter Coffee,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Filter Coffee,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Sundal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Kerala Fish Curry,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Appam with Stew,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Puttu,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Kerala Fish Curry,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Appam with Stew,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Puttu,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Kadala Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Fish Molee,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Kerala Prawn Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Avial (Kerala),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Olan,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Parippu Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Banana Chips,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Sadya Thali,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Banana Chips,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Sadya Thali,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Kerala Parotta,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Beef Fry (Kerala),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Payasam (Ada),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -141,30 +141,30 @@ Pathiri,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see ge
 Unniyappam,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Erissery,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Mutta Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Bisi Bele Bath,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Ragi Mudde,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Bisi Bele Bath,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Ragi Mudde,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Neer Dosa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Jolada Rotti,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Chitranna,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Set Dosa,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Goli Baje,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Akki Rotti,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Akki Rotti,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Mangalorean Fish Gassi,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Kori Rotti,0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Mysore Pak,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Mysore Pak,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Obbattu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Vangi Bath,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Kesari Bath,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Saaru,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Machher Jhol,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Shorshe Ilish,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Machher Jhol,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Shorshe Ilish,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Aloo Posto,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Luchi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Cholar Dal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Kosha Mangsho,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Mishti Doi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Kosha Mangsho,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Mishti Doi,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Sandesh,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Rasgulla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Rasgulla,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Begun Bhaja,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Chingri Malai Curry,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Doi Maach,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -176,15 +176,15 @@ Mochar Ghonto,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) 
 Aam Doi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Steamed Rice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Muri Ghonto,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Vada Pav,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Misal Pav,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Puran Poli,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Vada Pav,1.0,national_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Misal Pav,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Puran Poli,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Thalipeeth,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Sabudana Khichdi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Poha,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Poha,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Usal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Bhakri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Pav Bhaji,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Pav Bhaji,1.0,national_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Batata Vada,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Bharli Vangi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Sol Kadhi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -196,11 +196,11 @@ Modak,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see ge
 Shrikhand,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Ukdiche Modak,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Kothimbir Vadi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Dhokla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Thepla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Undhiyu,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Khandvi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Fafda Jalebi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Dhokla,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Thepla,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Undhiyu,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Khandvi,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Fafda Jalebi,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Dal Dhokli,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Gujarati Kadhi,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Sev Tamatar,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -215,10 +215,10 @@ Rotla,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see ge
 Methi Na Gota,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Khichu,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Muthiya,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Goan Fish Curry,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Vindaloo (Pork),0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Xacuti (Chicken),0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Bebinca,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Goan Fish Curry,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Vindaloo (Pork),0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Xacuti (Chicken),0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Bebinca,0.9,state_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Sorpotel,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Ros Omelette,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Fish Recheado,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -232,7 +232,7 @@ Kathi Roll,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - s
 Pakora (Mixed Veg),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Pani Puri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Bread Pakora,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Chole Tikki,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Chole Tikki,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Ragda Pattice,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Momos (Steamed Veg),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Momos (Chicken),0.60,very_common,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -336,7 +336,7 @@ Jhalmuri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see
 Payesh,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Telebhaja Platter,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Aamti (Kokum),0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Pithla,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Pithla,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Matki Usal,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Aamras,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Chakli,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
@@ -372,9 +372,9 @@ Veg Manchow Soup,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v
 Chicken Lollipop,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Chilli Fish,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Chicken 65,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
-Tahiri,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Khichdi,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
-Puri,0.75,regional_hero,Low,High,Auto-derived,"catalogue heuristic (v1) - conservative placeholder, see sig_scores_curation_template.csv for the founder-review candidate",KB0.2,PENDING_FOUNDER_REVIEW
+Tahiri,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Khichdi,1.0,national_icon,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
+Puri,0.75,regional_hero,Medium,High,"AI-researched (Claude Sonnet 5, WP-21)","AI-assigned via established Indian food-culture knowledge (not live-cited web sources) per Founder direction that per-dish Founder review isn't feasible at this volume; recommend a spot-check, not a full re-review",KB0.2,AI_RESEARCHED
 Aloo Puri,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Baati Chokha,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT
 Goan Sausage Pulao,0.75,regional_hero,Low,High,Auto-derived,catalogue heuristic (v1) - see generate_sig_scores_v1.py header for rule,KB0.2,AUTO_DRAFT

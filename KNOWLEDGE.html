@@ -713,8 +713,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🍽</span> S57 · RE deploy verification + doc corrections
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s58')">
+    <div class="nav-item" onclick="showPage('s58')">
       <span class="nav-icon">🧹</span> S58 · Production hardening audit (WP-21)
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s59')">
+      <span class="nav-icon">🌶</span> S59 · WP-21 punch-list resolutions
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -2264,6 +2268,24 @@ function deepDiveFeature(featureLabel){
     </div>
   </div>
 
+
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#c0392b"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fdecea;color:#c0392b">S59</span>
+      <div class="tl-title">Founder ruled on the WP-21 punch list: fixed 3, postponed most, deleted an unused function + schema</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s59')">RE fallback now errors, doesn't guess a plate</span>
+        <span class="tl-chip" onclick="showPage('s59')">Fish/mustard allergens fixed</span>
+        <span class="tl-chip" onclick="showPage('s59')">63 dish signature scores resolved</span>
+        <span class="tl-chip" onclick="showPage('s59')">diag-re-check function retired</span>
+        <span class="tl-chip" onclick="showPage('s59')">ghar_re schema drop migration prepared</span>
+      </div>
+      <div class="tl-note">Founder went item-by-item through WP-21's P1-P3 list. Fixed: the RE now tells the user "try again" instead of silently serving a plate that might ignore their allergies; fish and mustard allergies can now actually be selected and excluded; all 63 pending dish-fame scores got real values from food-culture knowledge instead of staying placeholders. Deleted: an orphaned live server function with no source in the repo, and prepared (not yet applied — no DB password available this session) a migration dropping a 28-table database area confirmed unused by the app or the recommendation engine. Everything else was explicitly postponed until the full recommendation engine rebuild.</div>
+    </div>
+  </div>
+
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -3061,6 +3083,16 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">mobile/app/index.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S58</td><td class="fr-desc">Removed a dated (Aug 2) testing override that always sent every signed-in user back to onboarding; restored the real "go to recommendations if already complete" logic</td></tr>
   <tr><td class="fr-file mono">mobile/src/lib/queryClient.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S58</td><td class="fr-desc">Removed a dated (Aug 2) testing override that disabled all query caching app-wide; restored the documented production default</td></tr>
   <tr><td class="fr-file mono">docs/project-history/work-packages/[DRAFT]_WP-21_Production_Hardening_Audit_v1.0.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S58</td><td class="fr-desc">Full production-hardening audit: stub inventory, hardcoded-value audit, dead-code check, doc-drift notes, deferred-decision register, readiness checklist, fixes applied, remaining manual work</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/recommendations/fallback.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">RE-unavailable now returns a 503 error instead of a single hardcoded "safe" dish that ignored real allergies</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/recommendations/handler.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Both RE-failure paths now return status 503 with the fallback error body</td></tr>
+  <tr><td class="fr-file mono">database/etl/generate_icd1_seeds.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Allergen bitmask extended from 7 to 9 bits (fish=128, mustard=256)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(onboarding)/step-4.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Added Fish and Mustard allergen chips to the onboarding question</td></tr>
+  <tr><td class="fr-file mono">mobile/src/onboarding/toHouseholdWrite.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Allergen bitmask extended to match (fish=128, mustard=256)</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/recommendations/compose.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">Allergen bitfield decode extended to 9 bits so the RE actually excludes fish/mustard dishes</td></tr>
+  <tr><td class="fr-file mono">database/migrations/049_extend_allergen_model_fish_mustard.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S59</td><td class="fr-desc">Backfills allergen_flags for the 8 ingredients tagged fish/mustard in the source CSV (not yet applied live)</td></tr>
+  <tr><td class="fr-file mono">database/migrations/050_drop_unused_ghar_re_schema.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S59</td><td class="fr-desc">Drops the 28-table ghar_re schema, confirmed unread by any live code path (not yet applied live)</td></tr>
+  <tr><td class="fr-file mono">supabase/config.toml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S59</td><td class="fr-desc">Removed a stale reference to the re_engine schema already dropped in WP-20</td></tr>
+  <tr><td class="fr-file mono">data/sig_scores_v1.csv</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">All 63 pending dish signature scores resolved (6 national_icon, 23 state_icon, 34 confirmed regional_hero)</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3627,6 +3659,18 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Should the hardcoded fallback dish ("Moong Dal Khichdi") in supabase/functions/recommendations/fallback.ts be removed, per a general "no hardcoded dishes anywhere" instruction?</div>
     <div class="decision-a">Left as-is. Its own code comment already flags it explicitly as a deliberate, documented stub (RE-DOC-10 §11) for the rare case the RE is completely unreachable, not an accidental hardcode — and with the RE now confirmed live and healthy, this path is a last-resort safety net, not the default experience. Ripping it out would trade a documented safe-default for an error state with no clear product upside; treated as an existing, intentional design decision rather than a bug to silently fix.</div>
     <div class="decision-meta">S57 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: Fallback plate served a hardcoded dish when the RE was down — fix the plate, or remove it?</div>
+    <div class="decision-a">A: Removed it. A single hardcoded dish can't know a specific household's real allergies/diet, so guessing was itself the safety risk this audit flagged. Until a real per-zone fallback catalogue exists (future work), showing the user a clear "try again" error is safer than showing food that might be wrong for them.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: Dish signature scores for 63 dishes needed real values, but Founder review of each one individually isn't feasible — what's the alternative?</div>
+    <div class="decision-a">A: AI-researched using established Indian food-culture knowledge, labeled with a new status (AI_RESEARCHED) distinct from FOUNDER_CURATED so nothing is misrepresented as human-reviewed. A spot-check of the 6 highest-impact promotions is recommended rather than a full re-review.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Q: The ghar_re database schema (28 tables) is confirmed unused by any live code — delete it now?</div>
+    <div class="decision-a">A: Migration prepared and Founder-approved, but not applied — this session has no database write credentials (supabase db push requires an interactive password not available here). It needs to be run through the normal deploy process.</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -9956,7 +10000,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s57 -->
 
-  <div id="page-s58" class="page-content">
+  <div id="page-s58" class="page-content" style="display:none">
 
     <!-- ── Session header ── -->
     <div class="page-header">
