@@ -669,12 +669,16 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🗄</span> S46 · Live DB reconciled, Fly.io RE verified
       <span class="nav-badge">Aug 1</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s47')">
+    <div class="nav-item" onclick="showPage('s47')">
       <span class="nav-icon">🛠</span> S47 · Two P0 launch blockers fixed
       <span class="nav-badge">Aug 1</span>
     </div>
     <div class="nav-item" onclick="showPage('s48')">
       <span class="nav-icon">🧩</span> S48 · Compositional cohort plan (WP-17)
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s49')">
+      <span class="nav-icon">🧩</span> S49 · Multi-membership dish→class fix + WP-18 planning surfaces
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -690,7 +694,7 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">198</span>
+      <span class="nav-badge">212</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -2705,6 +2709,20 @@ function deepDiveFeature(featureLabel){
     <td class="fr-session">S47</td>
     <td class="fr-desc">Now requires the service credential; deployed live for the first time</td>
   </tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/scripts/classify_dishes.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S49</td><td class="fr-desc">Offline dish→class classifier now also emits secondary memberships (top-k above a floor, capped 4/dish, diet+slot gated)</td></tr>
+<tr><td class="fr-file mono">ghar_re_core/knowledge.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S49</td><td class="fr-desc">Added dish_to_class_codes() returning a dish's FULL class set; primary dish_to_class_code() unchanged</td></tr>
+<tr><td class="fr-file mono">ghar_re_core/meal_planner.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">WP-18 onboarding→plan→dish surfaces; class dish-pool + counts now use membership; reconciled dishes labelled by their reconciled class</td></tr>
+<tr><td class="fr-file mono">data/source/class_first_v1/dish_class_map.csv</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S49</td><td class="fr-desc">Regenerated 810→1485 membership rows (708 secondary); empty classes 24→6</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/data/bundle/config/class_first_v1/dish_class_map.csv</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S49</td><td class="fr-desc">Baked bundle copy of the regenerated dish→class membership map</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/data/bundle/manifest.json</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S49</td><td class="fr-desc">Bundle manifest hashes updated for the new map + recipes_v1.json</td></tr>
+<tr><td class="fr-file mono">ghar_re_core/tests/test_class_first_cohort.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S49</td><td class="fr-desc">Diet-safety test now also covers the chef_rubric_secondary membership rows</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/main.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S49</td><td class="fr-desc">WP-18: five translation-only planning routes (cold-start, meal-plan, weekly-plan, class-dishes, recipe)</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/engine.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S49</td><td class="fr-desc">WP-18: composes the planner surfaces and attaches image/recipe media into responses</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/media.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">Deterministic env-configurable Cloudinary image URLs + the baked offline recipe store</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/ghar_re_service/scripts/generate_recipes.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">Offline recipe builder → recipes_v1.json; composes a structured draft recipe per dish from its real attributes, quantities "to taste" (FD-11)</td></tr>
+<tr><td class="fr-file mono">data/source/recipes_v1.json / ghar_re_service/data/bundle/config/recipes_v1.json</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">Baked per-dish draft recipes consumed by the recipe endpoint</td></tr>
+<tr><td class="fr-file mono">ghar_re_service/tests/test_planning.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">End-to-end tests for all five WP-18 planning endpoints</td></tr>
+<tr><td class="fr-file mono">ghar_re_core/tests/test_meal_planner.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S49</td><td class="fr-desc">Core tests for planner reconciliation, diversity, and Jain diet safety</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3119,6 +3137,26 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why redeploy the functions instead of just committing the code fix?</div>
     <div class="decision-a">Supabase Edge Functions each bundle their own copy of the shared code at deploy time &mdash; a repo commit alone doesn't change what's actually running live. All 5 affected functions were redeployed with the fix in the same session.</div>
     <div class="decision-meta">S47 &middot; Aug 1, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why let a dish belong to multiple classes instead of fixing the single-class scorer?</div>
+    <div class="decision-a">The behavioural dinner (DN_) classes overlap heavily with the regional lunch/dinner (LD_) classes — the same dish legitimately serves both a lunch and a light dinner. A strict one-dish-one-class partition can't express that and was what structurally starved the DN_ classes. Multi-membership is the correct model, not a workaround; the Founder confirmed "a dish can be part of multiple classes, one-to-one is not mandatory."</div>
+    <div class="decision-meta">S49 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why keep a single PRIMARY class as well, rather than a flat set of classes?</div>
+    <div class="decision-a">The cohort scoring (S_cohort) and the plan labelling still need one representative class per dish. Only the class dish-POOL eligibility expands to the full membership set; scoring stays untouched. That keeps the blast radius small — the fix adds reach without changing how any dish is scored or how a plan is labelled.</div>
+    <div class="decision-meta">S49 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why are 6 classes still empty after the fix?</div>
+    <div class="decision-a">They're legitimately empty and should stay that way. One (DN_FAMILY_COMFORT_MEAL) is a combo-template — compound plates, not single dishes — and the rest are gated or thin-catalogue classes (fasting, infant, northeast, oats). Force-filling them would pollute the plan with dishes that don't really belong, and the engine already skips any zero-dish class.</div>
+    <div class="decision-meta">S49 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why put a confidence floor and a cap on secondary memberships?</div>
+    <div class="decision-a">To trade a little recall for precision. Without a floor and a per-dish cap (4), a generic dish that just echoes common words like "rice" or "soup" would flood many class pools. The WP-16.1 foreign-cuisine demote at ranking time is the second line of defence, but keeping the map itself clean is cheaper and clearer.</div>
+    <div class="decision-meta">S49 &middot; Aug 3, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -7943,7 +7981,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s46 -->
 
-  <div id="page-s47" class="page-content">
+  <div id="page-s47" class="page-content" style="display:none">
 
     <div class="page-header">
       <div class="page-title">S47 &middot; Two of the fresh audit's P0 launch blockers fixed and deployed live</div>
@@ -8164,6 +8202,51 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s48 -->
+  <div id="page-s49" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S49 · Multi-membership dish→class fix (WP-17.1) + WP-18 planning surfaces</div>
+      <div class="page-subtitle">Fixed the meal engine so it can actually fill child-friendly and family-dinner plans — a dish can now belong to several meal classes instead of just one, so behavioural dinner classes that used to be empty now have real dishes to show.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The engine plans across 131 behavioural meal classes, but every dish was pinned to exactly ONE class. That left 24 of those classes with zero dishes — including 9 dinner classes like "child-friendly dinner" — so when a household's plan picked one of them, the engine had nothing to show and fell back to generic regional lunch/dinner plates. A veg couple with school-age kids (MP origin, living in Mumbai) hit exactly this in the test_17 log.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">A dish now belongs to a primary class PLUS any secondary classes it also genuinely fits (the same dal-rice is both a lunch comfort plate and a light dinner). The dish→class map grew from 810 to 1485 membership rows, empty classes dropped from 24 to 6 (the remaining 6 are legitimately empty), and "child-friendly dinner" went from 1 dish to 5. On top of that, the backend gained the full onboarding→plan→recipe REST surfaces (WP-18) so the app can request cold-start picks, a weekly class plan, a class's dishes, and a full recipe with an image.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_service/scripts/classify_dishes.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/knowledge.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/meal_planner.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">data/source/class_first_v1/dish_class_map.csv (+ bundle copy)</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/test_class_first_cohort.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/main.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/engine.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/media.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/scripts/generate_recipes.py → recipes_v1.json</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/data/bundle/manifest.json</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">tests: test_meal_planner.py, test_planning.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/.../[DRAFT] WP-18 Onboarding→Plan→Recipe Flow</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>12 things touched</div>
+      </div>
+      <div class="session-card-body">
+        <p><strong>1. Multi-membership dish→class fix (WP-17.1 — the headline).</strong> The recommendation engine plans in 131 behavioural meal classes, but each catalogue dish was mapped to exactly one class — a strict partition. That structurally starved the behavioural dinner (DN_) classes: 24 of 131 classes (including 9 dinner classes such as child-friendly dinner) had zero dishes, so a plan that picked one of them had nothing to reconcile to and fell back to regional lunch/dinner plates. Now the offline classifier emits secondary memberships too, so a dish carries one <strong>primary</strong> class plus any <strong>secondary</strong> classes it also genuinely fits (top matches above a confidence floor, capped at 4 per dish, diet- and slot-gated). Result: the dish→class map went from 810 to <strong>1485</strong> membership rows (708 secondary), empty classes fell from <strong>24 to 6</strong>, and child-friendly dinner went from 1 dish to 5. All 116 tests pass.</p>
+        <p><strong>2. Why only 6 classes stay empty.</strong> The remaining 6 are legitimately empty and are meant to be — one is a combo-template class (compound plates, not single dishes) and the rest are gated/thin-catalogue classes (fasting, infant, northeast, oats). Force-filling them would pollute the plan, and the engine already skips any zero-dish class.</p>
+        <p><strong>3. WP-18 backend planning surfaces (the user's concurrent work in the same commit).</strong> A new translation-only planning layer (meal_planner.py) and five signed RE endpoints now expose the full onboarding→plan→recipe flow: cold-start (15 diverse top dishes to seed likes), a slot's eligible options, a 7-day class plan (top dish-backed classes per slot), class-dishes reconciliation (only dishes whose class-set contains the chosen class — the multi-membership fix is what makes this return real dishes), and a full recipe with a Cloudinary image. Dish images are built deterministically from the dish name and are env-configurable; recipes are baked offline from each dish's real ingredients and times, quantities kept "to taste" with no gram amounts invented.</p>
+      </div>
+    </div>
+  </div><!-- /page-s49 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
