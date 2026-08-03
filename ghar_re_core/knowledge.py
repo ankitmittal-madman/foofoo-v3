@@ -449,12 +449,14 @@ def _load_class_first_csv(name):
 
 def dish_to_class_code(dish_name):
     """dish_name -> meal_class_code. Two static, checked-in sources, in precedence order:
-      1. the curated Class_Dish_Options_v3 map (case-insensitive EXACT match), then
-      2. dish_class_overrides.csv — WP16-F1's PRECISION-SAFE extension: real-catalogue dishes matched
-         offline to a class ONLY when every curated candidate agreed unanimously (see
-         prepare_cohort_intel.generate_overrides). Ambiguous names were left out, not guessed.
-    Still NO fuzzy matching at RUNTIME — both are static lookups, so a coverage gap stays an honest
-    0.0 rather than a live guess. Returns None if the dish is in neither source."""
+      1. the curated Class_Dish_Options_v3 map (case-insensitive EXACT match — authored truth), then
+      2. dish_class_map.csv — WP-17's full-coverage nutritionist/chef classification: EVERY
+         catalogue dish assigned its best meal class offline (classify_dishes.py), each row tagged
+         method (curated_exact / chef_rubric) + confidence. This lifted coverage from 202/810 to
+         810/810 — the coverage that was the ceiling on the whole class-first cohort plan.
+    Still NO fuzzy matching at RUNTIME — both are static lookups over a reviewed, checked-in file, so
+    the classification is a deterministic offline artifact, never a live guess. Returns None only if
+    the dish is in neither source (e.g. a brand-new dish added after the last classify run)."""
     global _DISH_TO_CLASS, _DISH_OVERRIDES
     if _DISH_TO_CLASS is None:
         _DISH_TO_CLASS = {}
@@ -462,9 +464,10 @@ def dish_to_class_code(dish_name):
             _DISH_TO_CLASS.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
         _DISH_OVERRIDES = {}
         try:
-            for r in _load_class_first_csv("dish_class_overrides.csv"):
-                _DISH_OVERRIDES.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
+            for r in _load_class_first_csv("dish_class_map.csv"):
+                if r["meal_class_code"]:
+                    _DISH_OVERRIDES.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
         except FileNotFoundError:
-            pass  # overrides are optional; exact map still works without them
+            pass  # map is optional; exact curated map still works without it
     key = dish_name.strip().lower()
     return _DISH_TO_CLASS.get(key) or _DISH_OVERRIDES.get(key)

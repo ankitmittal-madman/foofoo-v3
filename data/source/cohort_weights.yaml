@@ -11,6 +11,15 @@ generated_from: Core Spine FROZEN master formula (w_cohort . S_cohort term) + WP
 # NOTE: feedback_events currently has 0 production rows, so n=0 for every live household today and
 # w_eff = coldstart for everyone until real signals accrue — the decay mechanism exists, the data
 # to move along it does not yet (same honest constraint WP-14/WP-15 flagged).
+# COMPOSITIONAL vs LEARNED blend (WP-17). class_affinity fuses the compositional persona/state/
+# migration plan (ghar_re_core.cohort_plan.class_plan — the persona-specific, regionally-grounded
+# structure) with the WP-16 learned frequency model (smoothing/generalization). Compositional
+# dominant: it is what makes a slate feel like the persona-DB plan for THIS household rather than the
+# cross-cohort average the frequency model plateaus at.
+class_plan:
+  compositional_weight: 0.70
+  learned_weight: 0.30
+
 cohort:
   w_cohort: 0.15              # legacy WP-15 base weight (retained; = the decay floor below)
   w_cohort_coldstart: 0.60    # strong at n=0 so cold-start feels like the persona-DB plan

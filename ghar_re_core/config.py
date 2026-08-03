@@ -160,6 +160,14 @@ class Config:
         scoring uses w_cohort_effective() below, which is cold-start-strong and decays with data."""
         return self.cohort["cohort"]["w_cohort"]
 
+    @property
+    def class_plan_weights(self):
+        """WP-17 (compositional_weight, learned_weight) for cohort_intel.class_affinity's fusion of
+        the compositional persona/state plan with the learned frequency model. Compositional-dominant
+        defaults if the class_plan block is absent (feature degrades to learned-only, never crashes)."""
+        cp = self.cohort.get("class_plan") or {}
+        return cp.get("compositional_weight", 0.7), cp.get("learned_weight", 0.3)
+
     def w_cohort_effective(self, interaction_count=0):
         """WP-16 cold-start-strong, decaying w_cohort weight for the master formula's
         `w_cohort·S_cohort` term. At interaction_count=0 (a brand-new household — the state of

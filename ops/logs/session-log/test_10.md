@@ -1,5 +1,5 @@
 # Session log — test_10
-_generated 2026-08-03T02:47:04.047989+00:00 · slot=dinner weekday=Saturday · engine Spine v1.0_
+_generated 2026-08-03T03:25:19.902904+00:00 · slot=dinner weekday=Wednesday · engine Spine v1.0_
 
 ## 1. Onboarding inputs (raw)
 - `q1_household_type` = couple_kids
@@ -7,9 +7,9 @@ _generated 2026-08-03T02:47:04.047989+00:00 · slot=dinner weekday=Saturday · e
 - `q4_current_city` = Mumbai
 - `q5_diet` = veg
 - `q13_who_cooks` = self
-- `q14_eat_out_per_week` = 0
+- `q14_eat_out_per_week` = 1
 - `q15_objective` = awesome_taste
-- `q11_conditions` = []
+- `q11_conditions` = ['toddler']
 
 ## 2. θ — derived household profile
 - **home_state** = Madhya Pradesh
@@ -19,9 +19,9 @@ _generated 2026-08-03T02:47:04.047989+00:00 · slot=dinner weekday=Saturday · e
 - **local_state** = Maharashtra
 - **blend** = 0.73
 - **diet** = veg
-- **spice_ceiling** = 4
-- **lifecycle_stage** = none
-- **time_pressure** = 0.5
+- **spice_ceiling** = 1
+- **lifecycle_stage** = toddler
+- **time_pressure** = 0.75
 - **time_route** = SIMPLIFY
 - **objective** = awesome_taste
 
@@ -31,57 +31,77 @@ state_ut          = Madhya Pradesh
 region_archetype  = CENTRAL_MIXED
 city_tier_code    = T1
 main_cohort_id    = MC3
-lifecycle_stage   = none
-time_pressure     = medium
+lifecycle_stage   = toddler
+time_pressure     = high
 nonveg_mode       = veg_default
 ```
 
-## 4. Sub-cohort membership (nearest persona anchors — explainability)
-- P36 · recovery_senior_light · match 0.667
-- P26 · budget_family · match 0.667
-- P21 · fasting_ritual · match 0.667
-- P19 · vegetarian_protein · match 0.667
+## 4. Resolved persona + sub-cohort membership
+**Compositional persona resolution (WP-17 — the plan core):**
+- **P10** · family_with_toddler · match 1.0
+- **P11** · family_with_school_kids · match 0.429
+- **P17** · weight_loss_calorie_conscious · match 0.429
+
+_nearest anchors (learned-model explainability):_
+- P39 · desk_job_sedentary · match 0.667
+- P17 · weight_loss_calorie_conscious · match 0.667
+- P11 · family_with_school_kids · match 0.667
 
 ## 5. Migration / region blend
 - destination_group = **MUMBAI_PUNE** · migrant = True
 - weights → home 0.55 / city 0.3 / national 0.15  _(overlay applied — migrant)_
 
-## 6. Class affinity — learned model (dinner/weekend)
-- 1.00  `LD_WEEKEND_SPECIAL_REGIONAL`
-- 0.68  `LD_FESTIVE_THALI`
-- 0.19  `DN_LIGHT_ROTI_SABZI`
-- 0.19  `LD_MAHARASHTRIAN_PITLA_BHAKRI`
+## 6. Class plan — compositional + learned (dinner/weekday)
+**Compositional plan (WP-17: persona core ∩ state pool + migration, spine-filtered):**
+- 1.00  `DN_CHILD_FRIENDLY_DINNER`
+- 1.00  `DN_LIGHT_DAL_RICE`
+- 0.70  `LD_CHILD_MILD_PLATE`
+- 0.60  `DN_LIGHT_ROTI_SABZI`
+- 0.60  `BF_POHA_CHIVDA_LIGHT`
+- 0.55  `LD_LIGHT_KHICHDI`
+- 0.46  `LD_DAL_ROTI_SABZI`
+- 0.44  `LD_MAHARASHTRIAN_PITLA_BHAKRI`
+
+**Fused affinity (compositional×0.7 + learned×0.3, what scoring uses):**
+- 1.00  `DN_LIGHT_DAL_RICE`
+- 0.86  `DN_LIGHT_ROTI_SABZI`
+- 0.83  `DN_CHILD_FRIENDLY_DINNER`
+- 0.58  `LD_CHILD_MILD_PLATE`
+- 0.50  `BF_POHA_CHIVDA_LIGHT`
+- 0.46  `LD_LIGHT_KHICHDI`
+- 0.42  `LD_MAHARASHTRIAN_PITLA_BHAKRI`
+- 0.38  `LD_DAL_ROTI_SABZI`
 
 - cohort weight w_cohort(n=0) = **0.60** · foreign_demote(n=0) = **0.80**
 
 ## 7. Eligibility funnel
 ```
-catalogue_total         : 810
-after_diet_filter       : 539
-after_jain_filter       : 539
-after_allergen_filter   : 539
-after_fasting_filter    : 539
+catalogue_total         : 39
+after_diet_filter       : 36
+after_jain_filter       : 36
+after_allergen_filter   : 36
+after_fasting_filter    : 36
 ```
 
 ## 8. Final plates (Assemble-7)
-1. **[5.22]** Bharli Vangi + Amti  (+ Roti)
-2. **[4.51]** Aloo Gobhi + Dal Makhani  (+ Roti)
-3. **[4.40]** Begun Bhaja + Dalma  (+ Roti)
-4. **[4.33]** Aloo Posto + Cholar Dal  (+ Roti)
-5. **[4.32]** Sannas + Pithla  (+ Roti)
-6. **[4.32]** Stuffed Capsicum + Dal Tadka  (+ Roti)
-7. **[4.30]** Thoran (Cabbage) + Vengaya Sambar  (+ Rice)
+1. **[4.92]** Undhiyu + Gujarati Toor Dal  (+ Roti)
+2. **[4.56]** Kanda Bhaji + Gujarati Kadhi  (+ Rice)
+3. **[3.91]** Lauki Sabzi + Sarson Ka Saag  (+ Roti)
+4. **[3.87]** Medu Vada + Rasam  (+ Rice)
+5. **[3.81]** Onion Pakora + Chole  (+ Poori)
+6. **[3.67]** Cabbage Sabzi + Moong Dal  (+ Roti)
+7. **[3.57]** Dhokla + Pithla  (+ Roti)
 
 ## 9. Per-dish scoring (dishes in the served plates)
 | dish | zone | m_palette | sig | BASE | GAIN | s_cohort | s_foreign | score |
 |---|---|---|---|---|---|---|---|---|
-| Bharli Vangi | West | 0.27 | 0.75 | 1.81 | 1.13 | 0.19 | 0 | 2.17 |
-| Amti | West | 0.27 | 0.75 | 1.81 | 1.02 | 0.00 | 0 | 1.85 |
-| Aloo Gobhi | North | 0.00 | 0.75 | 1.54 | 1.06 | 0.00 | 0 | 1.63 |
-| Dal Makhani | North | 0.00 | 0.75 | 1.54 | 1.19 | 0.00 | 0 | 1.84 |
-| Begun Bhaja | East | 0.00 | 0.75 | 1.54 | 1.16 | 0.00 | 0 | 1.79 |
-| Dalma | East | 0.00 | 0.60 | 1.50 | 1.06 | 0.00 | 0 | 1.59 |
-| Aloo Posto | East | 0.00 | 0.75 | 1.54 | 1.02 | 0.00 | 0 | 1.58 |
-| Cholar Dal | East | 0.00 | 0.75 | 1.54 | 1.14 | 0.00 | 0 | 1.76 |
-| Sannas | West | 0.11 | 0.75 | 1.65 | 1.09 | 0.00 | 0 | 1.80 |
-| Pithla | West | 0.27 | 0.75 | 1.81 | 1.02 | 0.19 | 0 | 1.96 |
+| Gujarati Toor Dal | West | 0.11 | 0.40 | 1.55 | 1.05 | 0.00 | 0 | 1.63 |
+| Undhiyu | West | 0.11 | 0.90 | 1.59 | 1.18 | 0.00 | 0 | 1.88 |
+| Kanda Bhaji | West | 0.27 | 0.60 | 1.66 | 1.21 | 0.00 | 0 | 2.02 |
+| Gujarati Kadhi | West | 0.11 | 0.40 | 1.55 | 1.05 | 0.00 | 0 | 1.63 |
+| Lauki Sabzi | North | 0.00 | 0.40 | 1.44 | 1.01 | 0.34 | 0 | 1.65 |
+| Sarson Ka Saag | North | 0.00 | 0.90 | 1.48 | 1.17 | 0.00 | 0 | 1.74 |
+| Rasam | South | 0.00 | 0.60 | 1.39 | 1.01 | 0.00 | 0 | 1.40 |
+| Medu Vada | South | 0.00 | 0.60 | 1.39 | 1.21 | 0.00 | 0 | 1.69 |
+| Onion Pakora | North | 0.00 | 0.60 | 1.39 | 1.22 | 0.00 | 0 | 1.70 |
+| Chole | North | 0.00 | 0.60 | 1.22 | 1.11 | 0.00 | 0 | 1.35 |

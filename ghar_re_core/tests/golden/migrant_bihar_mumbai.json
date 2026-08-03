@@ -24,7 +24,7 @@
       ],
       "liquid": "Macher Jhol",
       "plate_calories": 490,
-      "score": 4.999325,
+      "score": 5.219825,
       "support": "Rice"
     },
     {
@@ -37,7 +37,7 @@
       ],
       "liquid": "Moong Dal",
       "plate_calories": 300,
-      "score": 4.760372,
+      "score": 4.827782,
       "support": "Rice"
     },
     {
@@ -50,7 +50,7 @@
       ],
       "liquid": "Dal Tadka",
       "plate_calories": 330,
-      "score": 4.190325,
+      "score": 4.515531,
       "support": "Rice"
     },
     {
@@ -63,8 +63,21 @@
       ],
       "liquid": "Pithla",
       "plate_calories": 360,
-      "score": 3.856908,
+      "score": 4.034748,
       "support": "Rice"
+    },
+    {
+      "dry": "Aloo Gobi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Aloo Gobi",
+        "Chole"
+      ],
+      "liquid": "Chole",
+      "plate_calories": 550,
+      "score": 3.960301,
+      "support": "Poori"
     },
     {
       "dry": "Egg Bhurji",
@@ -78,19 +91,6 @@
       "plate_calories": 520,
       "score": 3.737751,
       "support": "Rice"
-    },
-    {
-      "dry": "Aloo Gobi",
-      "form": "pair",
-      "hero_dish": null,
-      "heroes": [
-        "Aloo Gobi",
-        "Chole"
-      ],
-      "liquid": "Chole",
-      "plate_calories": 550,
-      "score": 3.694651,
-      "support": "Poori"
     }
   ]
 }

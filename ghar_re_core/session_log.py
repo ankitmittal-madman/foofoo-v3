@@ -64,8 +64,13 @@ def render(household, ctx, catalogue=None):
         L.append(f"{k:18s}= {v}")
     L.append("```\n")
 
-    L.append("## 4. Sub-cohort membership (nearest persona anchors — explainability)")
-    for m in CI.cohort_membership(th, k=4):
+    L.append("## 4. Resolved persona + sub-cohort membership")
+    from ghar_re_core import cohort_plan as CP
+    L.append("**Compositional persona resolution (WP-17 — the plan core):**")
+    for p, frac in CP.resolve_persona(th, k=3):
+        L.append(f"- **{p['persona_id']}** · {p.get('sub_cohort_label')} · match {frac}")
+    L.append("\n_nearest anchors (learned-model explainability):_")
+    for m in CI.cohort_membership(th, k=3):
         L.append(f"- {m['persona_id']} · {m['label']} · match {m['match']}")
     L.append("")
 
@@ -80,8 +85,15 @@ def render(household, ctx, catalogue=None):
                     else "  _(overlay NOT applied — home-state resident)_"))
     L.append("")
 
-    L.append(f"## 6. Class affinity — learned model ({ctx.get('slot')}/"
-             f"{'weekend' if ctx.get('weekday') in ('Saturday', 'Sunday') else 'weekday'})")
+    daytype = "weekend" if ctx.get("weekday") in ("Saturday", "Sunday") else "weekday"
+    L.append(f"## 6. Class plan — compositional + learned ({ctx.get('slot')}/{daytype})")
+    comp = CP.class_plan(th, ctx)
+    L.append("**Compositional plan (WP-17: persona core ∩ state pool + migration, spine-filtered):**")
+    for c, v in sorted(comp.items(), key=lambda x: -x[1])[:8]:
+        if v > 0.02:
+            L.append(f"- {v:.2f}  `{c}`")
+    w_comp, w_learn = CONFIG.class_plan_weights
+    L.append(f"\n**Fused affinity (compositional×{w_comp} + learned×{w_learn}, what scoring uses):**")
     aff = CI.class_affinity(th, ctx)
     for c, v in sorted(aff.items(), key=lambda x: -x[1])[:8]:
         if v > 0.02:

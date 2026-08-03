@@ -268,9 +268,22 @@ def _class_affinity_uncached(theta, ctx):
             if c in blended:
                 blended[c] += w_nat        # national-modern push toward the overlay's modern classes
     top = max(blended.values()) if blended else 0.0
-    if top <= 0:
-        return dict.fromkeys(vocab, 0.0)
-    return {c: round(blended[c] / top, 4) for c in vocab}
+    learned = dict.fromkeys(vocab, 0.0) if top <= 0 else {c: blended[c] / top for c in vocab}
+
+    # WP-17: blend the COMPOSITIONAL persona/state/migration plan (primary) with this learned
+    # frequency model (secondary smoothing). The compositional plan carries the persona-specific,
+    # regionally-grounded structure a frequency model washes out; the learned model keeps the plan
+    # graded and generalizing over the classes the composition doesn't name. Weights from config.
+    from ghar_re_core import cohort_plan
+    from ghar_re_core.config import CONFIG
+    comp = cohort_plan.class_plan(theta, ctx)
+    w_comp, w_learn = CONFIG.class_plan_weights
+    keys = set(learned) | set(comp)
+    fused = {c: w_comp * comp.get(c, 0.0) + w_learn * learned.get(c, 0.0) for c in keys}
+    ftop = max(fused.values()) if fused else 0.0
+    if ftop <= 0:
+        return {c: round(learned.get(c, 0.0), 4) for c in vocab}
+    return {c: round(v / ftop, 4) for c, v in fused.items()}
 
 
 def cohort_membership(theta, k=3):

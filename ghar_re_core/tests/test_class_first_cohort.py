@@ -21,6 +21,7 @@ HH = {h["id_key"]: h for h in F.HOUSEHOLDS}
 _BUNDLE_CATALOGUE = os.path.join(
     os.path.dirname(__file__), "..", "..", "ghar_re_service", "data", "bundle", "catalogue.json"
 )
+_SRC = os.path.join(os.path.dirname(__file__), "..", "..", "data", "source", "class_first_v1")
 _SLOTS = ("breakfast", "lunch", "dinner", "snacks")
 
 
@@ -113,15 +114,33 @@ def test_foreign_dishes_demoted_at_coldstart_and_decays():
     assert round(S.score(indian, theta, ctx, obj), 6) == round(base_gain + cohort_term, 6)  # no demote term
 
 
-def test_real_catalogue_coverage_is_honest_not_padded():
-    """Documents the actual, measured coverage rate against the real 810-dish catalogue: ~16%.
-    Floor-check, not a target: fails loudly if coverage silently regresses to 0 (e.g. a broken
-    path), and must never be "fixed" by loosening the exact-match rule in dish_to_class_code."""
+def test_real_catalogue_coverage_is_full_and_honest():
+    """WP-17: EVERY catalogue dish now resolves to a meal class (dish_class_map.csv, the nutritionist/
+    chef classifier) — coverage is no longer the ceiling on the class-first plan. Coverage went
+    129 (exact) -> 202 (WP16-F1 precision-safe) -> 810/810 (WP-17 full). Honesty is preserved not by
+    a low recall but by the per-row method + confidence tag: curated_exact reproduces authored truth,
+    chef_rubric is a transparent, diet-gated, attribute-derived classification. This asserts the map
+    is (a) full and (b) diet-safe: no veg catalogue dish is ever assigned an egg/nonveg-marked class
+    via the DERIVED path (a curated_exact authored row may, and is honoured as authored truth)."""
     if not os.path.isfile(_BUNDLE_CATALOGUE):
         return  # bundle not built in this environment; core-only tests still cover the mechanism
     dishes = json.load(open(_BUNDLE_CATALOGUE))
     cat = Catalogue(dishes)
     matched = sum(1 for d in cat if K.dish_to_class_code(d.name))
-    # WP16-F1 raised this from 129 (exact only) to 202 (exact + precision-safe unanimous overrides).
-    # Band, not a target: fails loudly on a silent regression to 0, without flaking on catalogue edits.
-    assert 175 <= matched <= 245
+    assert matched >= 780  # ~full coverage; a small tail may lack a class if the catalogue grows
+
+    # diet safety of the DERIVED rows: a veg dish's chef_rubric class must not be egg/nonveg-marked.
+    import csv as _csv
+    src = os.path.join(_SRC, "dish_class_map.csv")
+    if os.path.isfile(src):
+        by_diet = {d.name: d.diet for d in cat}
+        NV = ("CHICKEN", "FISH", "MUTTON", "PRAWN", "CRAB", "KEEMA", "PORK", "SEAFOOD",
+              "NONVEG", "TANDOORI", "SMOKED", "MEAT_STEW", "XACUTI")
+        with open(src, newline="") as f:
+            for r in _csv.DictReader(f):
+                if r["method"] != "chef_rubric":
+                    continue
+                if by_diet.get(r["dish_name"]) == "veg":
+                    code = r["meal_class_code"]
+                    assert "EGG" not in code and not any(m in code for m in NV), \
+                        f"veg dish {r['dish_name']} chef-mapped to non-veg class {code}"

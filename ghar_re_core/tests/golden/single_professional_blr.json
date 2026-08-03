@@ -11,7 +11,7 @@
       ],
       "liquid": "Rasam",
       "plate_calories": 390,
-      "score": 5.077433,
+      "score": 5.366183,
       "support": "Rice"
     },
     {
@@ -25,6 +25,19 @@
       "liquid": "Gujarati Toor Dal",
       "plate_calories": 560,
       "score": 4.537284,
+      "support": "Rice"
+    },
+    {
+      "dry": "Idli",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Idli",
+        "Sambar"
+      ],
+      "liquid": "Sambar",
+      "plate_calories": 340,
+      "score": 4.154892,
       "support": "Rice"
     },
     {
@@ -54,16 +67,16 @@
       "support": "Rice"
     },
     {
-      "dry": "Idli",
+      "dry": "Lauki Sabzi",
       "form": "pair",
       "hero_dish": null,
       "heroes": [
-        "Idli",
-        "Sambar"
+        "Lauki Sabzi",
+        "Sarson Ka Saag"
       ],
-      "liquid": "Sambar",
-      "plate_calories": 340,
-      "score": 3.946992,
+      "liquid": "Sarson Ka Saag",
+      "plate_calories": 390,
+      "score": 3.93807,
       "support": "Rice"
     },
     {
@@ -72,24 +85,11 @@
       "hero_dish": null,
       "heroes": [
         "Egg Bhurji",
-        "Sarson Ka Saag"
-      ],
-      "liquid": "Sarson Ka Saag",
-      "plate_calories": 520,
-      "score": 3.719572,
-      "support": "Rice"
-    },
-    {
-      "dry": "Aloo Gobi",
-      "form": "pair",
-      "hero_dish": null,
-      "heroes": [
-        "Aloo Gobi",
         "Punjabi Kadhi Pakora"
       ],
       "liquid": "Punjabi Kadhi Pakora",
-      "plate_calories": 540,
-      "score": 3.601432,
+      "plate_calories": 570,
+      "score": 3.606036,
       "support": "Rice"
     }
   ]

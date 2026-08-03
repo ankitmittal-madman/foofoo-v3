@@ -673,6 +673,10 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🛠</span> S47 · Two P0 launch blockers fixed
       <span class="nav-badge">Aug 1</span>
     </div>
+    <div class="nav-item" onclick="showPage('s48')">
+      <span class="nav-icon">🧩</span> S48 · Compositional cohort plan (WP-17)
+      <span class="nav-badge">Aug 3</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -8110,6 +8114,50 @@ function deepDiveFeature(featureLabel){
     </div><!-- /detail -->
 
   </div><!-- /page-s47 -->
+
+  <div id="page-s48" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">S48 · Compositional cohort plan + full dish→class coverage (WP-17)</div>
+      <div class="page-subtitle">The recommendation engine now works out a family's meal plan the way a nutritionist would — starting from who they are (e.g. "a Maharashtra family with a toddler"), grounding it in their region's real food, and then keeping it mild and child-friendly — instead of just averaging what's popular everywhere.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The engine leaned on a "what's most common" model that washed out what makes a household's plan its own, so a Maharashtra toddler family's suggestions looked like the generic national average. And only 1 in 4 dishes was even linked to a meal type, so most dishes were invisible to the plan.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The engine identifies the household's persona, builds their plan from that persona's preferred meal types, grounds it in their home state's real dishes (Pitla-Bhakri, Coconut-Stew for Maharashtra), and softens it for toddlers/elders. Every one of the 810 dishes is now correctly categorised, so the whole catalogue can participate.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_core/cohort_plan.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/scripts/classify_dishes.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">data/source/class_first_v1/dish_class_map.csv</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/test_cohort_plan.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/cohort_intel.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/knowledge.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/config.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/session_log.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">data/source/cohort_weights.yaml</span><span class="tag tag-config">Config</span></span>
+        <span class="fc-file"><span class="fc-path">docs/.../WP-17 + REPO-CERT-025</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>10 things touched</div>
+      </div>
+      <div class="session-card-body">
+        <p><strong>1. Nutritionist/chef dish classifier (#5).</strong> A new offline step reads each meal class's authored example dishes and profile (slot, diet, heaviness, region) and scores every one of the 810 catalogue dishes against every compatible class — anchored on the dish's hero ingredient (a "Fish Curry" is classed by the fish, never as a chicken dish). Coverage went from 202/810 to <strong>810/810</strong>, each row tagged as authored-truth or derived, with a confidence score.</p>
+        <p><strong>2. Compositional cohort plan (WP-17 core).</strong> A new layer resolves the household's persona live (e.g. P10 "family with toddler"), takes that persona's preferred meal classes as the plan core, grounds them in the home state's regional dishes, adds a migration overlay for people living away from home, then reshapes for lifecycle (mild/child-friendly for toddlers, lighter for elders) and diet. The old "most popular" model is now a secondary smoother (70% new plan / 30% old model).</p>
+        <p><strong>3. Proof it works.</strong> A Maharashtra/Pune family with a toddler now self-arrives at the exact target persona and a plan led by child-mild and traditional-Maharashtrian classes — the S14_T1_P10 shape the founder wanted, derived from the masters, not copied. 43 core + 62 service tests pass; per-user decision logs regenerated.</p>
+      </div>
+    </div>
+  </div><!-- /page-s48 -->
   <!-- SESSIONS_INJECT -->
 
 </main>

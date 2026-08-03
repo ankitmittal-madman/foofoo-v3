@@ -81,7 +81,7 @@ CLASS_FIRST_FILES = (
     "cohort_matrix.csv",
     # WP-16 additions:
     "cohort_class_model.json",  # trained factorized class-affinity model (the "intelligence")
-    "dish_class_overrides.csv",  # WP16-F1 precision-safe dish->class coverage extension (129->202)
+    "dish_class_map.csv",  # WP-17 nutritionist/chef dish->class map — full 810/810 coverage
     "migration_overlay.csv",  # City_Migration_Overlay_v3 (home/local/national blend)
     "state_profile.csv",  # state -> region_archetype (a model feature) + class pools
     "nonveg_logic.csv",  # per-state nonveg/egg cadence (reference)
