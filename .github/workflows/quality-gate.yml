@@ -1,0 +1,84 @@
+name: quality-gate
+
+# Ghar Production Quality Gate — runs the ops/quality/ program (inventory, static analysis, unit,
+# API contract, recommendation black-box behaviour across 15 personas, API/security, chaos,
+# performance) on every push/PR that touches the engine, the quality module, or the contract.
+#
+# Relationship to the other workflows:
+#   * re-ci.yml       — runs the ORIGINAL ghar_re_core/ghar_re_service unit suites + lint/mypy/bundle.
+#   * backend-ci.yml  — runs the Deno edge-function tests under supabase/.
+#   * quality-gate.yml (this) — runs the cross-cutting ops/quality orchestrator: the persona /
+#     recsys / contract-boundary / security / planning suites plus perf + chaos, and uploads the
+#     timestamped evidence report as a build artifact.
+#
+# CI mode (`--ci`): the build FAILS only on a real test/step failure. Surfaces that cannot run on
+# a GitHub runner today — the live database (needs the Supabase auth.* bootstrap) and the mobile
+# UI (needs a running Expo web build) — are reported as SKIPPED and do NOT fail the build; they
+# still block the launch verdict inside the report, which stays honest. Deno IS installed here so
+# the edge-function step runs for real rather than being blocked.
+on:
+  push:
+    paths:
+      - "ops/quality/**"
+      - "ghar_re_core/**"
+      - "ghar_re_service/**"
+      - "contracts/**"
+      - ".github/workflows/quality-gate.yml"
+  pull_request:
+    paths:
+      - "ops/quality/**"
+      - "ghar_re_core/**"
+      - "ghar_re_service/**"
+      - "contracts/**"
+      - ".github/workflows/quality-gate.yml"
+  workflow_dispatch: {}   # allow manual runs from the Actions tab
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Deno unlocks the orchestrator's edge-function step (step_edge) so it runs the real
+      # supabase/functions Deno tests instead of recording them as BLOCKED.
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install packages (ghar_re_core + ghar_re_service, editable, with test extras)
+        run: |
+          pip install -e ".[test,lint]"
+          pip install -e "ghar_re_service[test]"
+          pip install jsonschema
+
+      - name: Run the production quality gate (CI mode)
+        env:
+          # Both package roots on the path: repo root (ghar_re_core) + nested service package root.
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/ghar_re_service
+          GHAR_PERF_ITERS: "60"   # keep the perf benchmark quick on a shared runner
+        run: |
+          python3 ops/quality/runner/orchestrator.py --ci --report-root ops/quality/reports
+
+      - name: Show the report summary in the job log
+        if: always()
+        run: |
+          latest="$(cat ops/quality/reports/latest.txt 2>/dev/null || true)"
+          if [ -n "$latest" ] && [ -f "$latest/summary.txt" ]; then
+            echo "----- summary.txt -----"
+            cat "$latest/summary.txt"
+          else
+            echo "No report summary found."
+          fi
+
+      - name: Upload the evidence report
+        if: always()   # keep the report even when the gate fails, for triage
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghar-quality-report
+          path: ops/quality/reports/
+          retention-days: 30
+          if-no-files-found: warn
