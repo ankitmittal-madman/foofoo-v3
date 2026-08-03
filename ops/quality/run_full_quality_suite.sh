@@ -29,8 +29,10 @@ echo "Ghar Quality Suite — repo ${REPO_ROOT}"
 echo "git HEAD: $(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 echo
 
-python3 "${SCRIPT_DIR}/runner/orchestrator.py" "$@"
-rc=$?
+# Capture the orchestrator's exit code without letting `set -e` abort the script first, so the
+# triage step below always runs even when the gate fails.
+rc=0
+python3 "${SCRIPT_DIR}/runner/orchestrator.py" "$@" || rc=$?
 
 echo
 echo "Triage (latest report):"

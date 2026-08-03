@@ -260,8 +260,13 @@ def step_edge(report_dir: Path) -> StepResult:
     cat = report_dir / "edge"
     cat.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
-    proc = subprocess.run(["deno", "test", "-A", str(fn_root)], cwd=REPO_ROOT,
-                          capture_output=True, text=True)
+    # Must run with cwd=supabase/ (not REPO_ROOT) and a path relative to it: the import map
+    # (@std/assert, zod, ajv, @supabase/supabase-js) lives in supabase/deno.json and Deno only
+    # picks up that config by walking up from the CURRENT WORKING DIRECTORY — an absolute path
+    # passed from a different cwd resolves those imports as missing (TS2307) even though the
+    # exact same test files pass under backend-ci.yml, which runs from this same working-directory.
+    proc = subprocess.run(["deno", "test", "--allow-env", "functions/_tests/"],
+                          cwd=fn_root.parent, capture_output=True, text=True)
     (cat / "deno.log").write_text(proc.stdout + proc.stderr, encoding="utf-8")
     ok = proc.returncode == 0
     return StepResult("edge-functions", "6", "pass" if ok else "fail", "P0",
@@ -503,6 +508,13 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Ghar production quality orchestrator")
     ap.add_argument("--quick", action="store_true", help="skip the perf benchmark")
     ap.add_argument("--report-root", default=str(QUALITY_DIR / "reports"))
+    ap.add_argument(
+        "--ci", action="store_true",
+        help="CI mode: exit non-zero ONLY on a real test/step FAILURE. A skipped/blocked P0 "
+             "surface (e.g. no DB or no web target in the runner) does NOT fail the build — it is "
+             "still reported and still blocks the launch verdict, but an environment gap is not a "
+             "regression. Without this flag the exit code follows the launch verdict, which is "
+             "correct for a release gate but would make ordinary CI always red.")
     args = ap.parse_args()
 
     stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
@@ -529,6 +541,15 @@ def main() -> int:
 
     print("\n" + (report_dir / "summary.txt").read_text(encoding="utf-8"))
     print(f"\nFull report: {report_dir}")
+
+    if args.ci:
+        # CI gate: fail only on an actual step failure, not on an unverified/skipped surface.
+        failed_steps = [s.name for s in steps if s.status == "fail"]
+        if failed_steps:
+            print(f"\nCI: FAIL — failing step(s): {', '.join(failed_steps)}")
+            return 1
+        print("\nCI: PASS — no failing steps (unverified surfaces reported, not fatal in CI).")
+        return 0
     return 0 if verdict["can_launch_today"] else 1
 
 
