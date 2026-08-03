@@ -10259,6 +10259,288 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s58 -->
 
+  <div id="page-s59" class="page-content">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S59 · WP-21 punch-list resolutions</div>
+      <div class="page-subtitle">The Founder went through WP-21's P1-P3 findings one by one and gave a direct ruling on each: fix, postpone, or delete. This session carried out the "fix" and "delete" rulings.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">If the recommendation engine went down, every user saw the exact same hardcoded dish regardless of their allergies. Households with a fish or mustard allergy had no way to tell the app — the allergy question simply didn't offer those options. 63 dishes had no real "how famous is this dish" score, only a placeholder. An orphaned live server function and a 28-table unused database area sat around with no owner.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">RE-down now shows a clear "try again" message instead of a possibly-unsafe dish. Fish and mustard are real allergy options end-to-end. All 63 dish fame scores have real values. The orphaned function is deleted; the unused database area is backed up and dropped (certified separately). Everything else was explicitly postponed to the full RE rebuild, not silently ignored.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/fallback.ts, handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/generate_icd1_seeds.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(onboarding)/step-4.tsx, mobile/src/onboarding/toHouseholdWrite.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/compose.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/049, 050 (+rollbacks)</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">data/sig_scores_v1.csv, sig_scores_curation_template.csv</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>6 things touched</div>
+      </div>
+      <div class="session-card-desc">Turned WP-21's P1-P3 findings into rulings and, where the ruling was "fix" or "delete," carried them out: removed the unsafe hardcoded fallback plate in favor of a real error, extended the allergen system to cover fish and mustard end-to-end, resolved all 63 pending dish fame scores, deleted an orphaned live function, and prepared (later executed, see the ghar_re retirement certificate) the drop of an unused 28-table database area. Everything explicitly postponed by the Founder was left untouched, not guessed at.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#c0392b">63</div><div class="stat-l">Dish scores resolved</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">2</div><div class="stat-l">New allergens supported</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">1</div><div class="stat-l">Orphaned function retired</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">Items guessed at</div></div>
+      </div>
+    </div>
+
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s59','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s59','detail')">Detail drill-down</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s59-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s59','fallback-fix')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">RE-down shows a clear error, not a risky guessed dish</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">If the recommendation engine can't be reached, the user now sees "couldn't load your recommendations, try again" instead of always being shown the same single dish that might not respect their allergies.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s59','allergen-fix')">
+            <div class="step-num num-blue">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Fish and Mustard added as allergy options</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">The onboarding allergy question now offers Fish and Mustard as choices, alongside the existing Peanut/Dairy/Gluten/Soy/Sesame/Shellfish options.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ both flow through the app's shared allergen + recommendation logic</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s59','allergen-fix')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Allergen system extended from 7 to 9 bits</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">The number that packs a household's allergies together had no room for fish or mustard. Extended it, and updated every place that reads or writes it (onboarding, the server, the recommendation engine's decode step) to match.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s59','sig-scores')">
+            <div class="step-num num-purple">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">63 dish fame scores resolved</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Dishes like Butter Chicken and Idli were sitting at a placeholder "fame" score. Each of the 63 flagged dishes was given a real score based on food-culture knowledge — 6 recognized as nationally iconic, 23 as a specific state's signature dish, 34 confirmed as regionally popular but not iconic.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ the allergen fix also needed a database backfill for existing ingredients</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s59','db-cleanup')">
+            <div class="step-num num-teal">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Fish/mustard ingredients backfilled; unused database area retired</span><span class="tag tag-db">DB</span></div>
+              <div class="step-desc">A migration marks the 8 ingredients that actually contain fish or mustard. Separately, a 28-table database area confirmed unused by the app or the recommendation engine was backed up and dropped (see the retirement certificate for the actual execution).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ one more cleanup item was on the server side</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s59','diag-retire')">
+            <div class="step-num num-amber">6</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Orphaned "diag-re-check" function deleted</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A live server function existed with no matching source code anywhere in the project — its source couldn't be recovered, so it was deleted rather than left as an unexplainable, unmaintainable live artifact.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Migration 049 (fish/mustard backfill) still needs to actually be run against the live database and verified — unlike migration 050, no certificate exists yet confirming it was applied. Everything explicitly postponed (monitoring, consent IP-hash, staging secrets, live weather) waits for the full RE rebuild.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s59-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-fallback-fix" onclick="toggleDetail('s59-fallback-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">supabase/functions/recommendations/fallback.ts, handler.ts</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-fallback-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-fallback-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Builds the response sent to the app when the recommendation engine can't be reached. It used to return one hardcoded dish (Moong Dal Khichdi) dressed up as a "safe default" — but it ignored a household's actual allergies beyond a narrow jain/weaning-safe claim.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">RE times out / errors</span><span class="dd-arrow">→</span>
+            <span class="dd-node">handler.ts builds an error response instead of a plate</span><span class="dd-arrow">→</span>
+            <span class="dd-node">app shows "try again"</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">return jsonContract(fb, ctx.traceId, 503);</span>  ← replaces a 200 response that always included a guessed plate</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just improve the fallback dish instead of removing it?</div>
+            <div class="dd-why-a">A single dish can never be safe for every household's specific allergy/diet combination without real per-household data, which the fallback path doesn't have. A clear error is safer than a confident-looking wrong answer.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-allergen-fix" onclick="toggleDetail('s59-allergen-fix')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">Allergen bitmask (4 files)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-allergen-fix">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-allergen-fix">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A household's allergies are packed into one number, one bit per allergen (2=dairy, 4=gluten, etc.). Fish and mustard were tagged in the underlying ingredient data but had no bit assigned, so selecting them was impossible and they were silently never excluded.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">onboarding chip selected</span><span class="dd-arrow">→</span>
+            <span class="dd-node">packed into allergen_flags bitmask</span><span class="dd-arrow">→</span>
+            <span class="dd-node">RE decodes bits back into allergen names</span><span class="dd-arrow">→</span>
+            <span class="dd-node">dishes containing that allergen excluded</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">fish: 128, mustard: 256</span>  ← the two new bits, added in every one of the 4 places that read or write this number</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why didn't the recommendation engine itself need a code change?</div>
+            <div class="dd-why-a">The engine's own allergy-exclusion logic already worked off plain allergen names read straight from ingredient data, not a fixed bit list — so once the bit existed and got decoded back to "fish"/"mustard", the engine could already act on it correctly.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-sig-scores" onclick="toggleDetail('s59-sig-scores')">
+          <div class="detail-left">
+            <span class="tag tag-new">New</span>
+            <span class="detail-name">Dish signature (fame) scores — 63 dishes</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-sig-scores">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-sig-scores">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A "how iconic is this dish" score feeds into recommendation ranking. 63 dishes were sitting at a conservative auto-generated placeholder, waiting for someone to confirm whether they deserve a higher "nationally famous" or "this state's signature dish" score.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">63 candidate dishes reviewed</span><span class="dd-arrow">→</span>
+            <span class="dd-node">classified using food-culture knowledge</span><span class="dd-arrow">→</span>
+            <span class="dd-node">score + status written to the scores file</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">status=AI_RESEARCHED</span>  ← a new label, deliberately different from "Founder-reviewed," so nobody mistakes this for individually human-checked data</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not mark these as Founder-approved since the Founder asked for this?</div>
+            <div class="dd-why-a">The Founder approved the approach (AI research instead of per-dish review), not each individual score — labeling honestly what was and wasn't human-reviewed matters more than looking "more official."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-db-cleanup" onclick="toggleDetail('s59-db-cleanup')">
+          <div class="detail-left">
+            <span class="tag tag-db">DB</span>
+            <span class="detail-name">Migrations 049 + 050</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-db-cleanup">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-db-cleanup">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">049 marks the 8 real ingredients that contain fish or mustard so the new allergy bits actually mean something for existing data. 050 removes a 28-table database area that turned out to be unused by both the app and the recommendation engine.</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">confirm no live code reads the area</span><span class="dd-arrow">→</span>
+            <span class="dd-node">back up the data first</span><span class="dd-arrow">→</span>
+            <span class="dd-node">drop it, then verify it's actually gone</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">DROP SCHEMA IF EXISTS ghar_re CASCADE;</span>  ← executed by the Founder directly, verified afterward by a separate read-only check</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why back up data nobody was reading anyway?</div>
+            <div class="dd-why-a">It was real, citation-backed research data, not throwaway fixtures — deleting it without a copy would destroy work even though nothing currently depends on it live.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s59-diag-retire" onclick="toggleDetail('s59-diag-retire')">
+          <div class="detail-left">
+            <span class="tag tag-mod">Modified</span>
+            <span class="detail-name">diag-re-check (retired)</span>
+          </div>
+          <span class="detail-chevron" id="chev-s59-diag-retire">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s59-diag-retire">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A live server function with no source code anywhere in the project. Its purpose could only be guessed at from its name (a recommendation-engine diagnostic check).</div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">tried to download its live source</span><span class="dd-arrow">→</span>
+            <span class="dd-node">download failed (tooling incompatibility)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">deleted rather than left unexplainable</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">supabase functions delete diag-re-check</span></div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why delete instead of leaving it, since it wasn't obviously broken?</div>
+            <div class="dd-why-a">A live piece of code nobody can read, edit, or explain is a liability regardless of whether it currently works — the next person to touch this project has no way to know what it does or whether it's safe to change other things around it.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /detail -->
+
+  </div><!-- /page-s59 -->
+
   <!-- SESSIONS_INJECT -->
 
 </main>
