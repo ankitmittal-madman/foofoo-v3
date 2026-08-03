@@ -26,7 +26,10 @@ import json
 import os
 import re
 
-_CLOUD = os.environ.get("CLOUDINARY_CLOUD_NAME") or None
+# The Cloudinary CLOUD NAME is public (it appears in every delivery URL) — safe to ship as the
+# default; env still overrides. The API key/secret are for UPLOAD/signing only and are deliberately
+# NOT referenced here: this feature only DELIVERS images, which needs no credentials.
+_CLOUD = os.environ.get("CLOUDINARY_CLOUD_NAME") or "dzlqsobol"
 _FOLDER = os.environ.get("CLOUDINARY_DISH_FOLDER", "foofoo/dishes").strip("/")
 _TRANSFORM = os.environ.get("CLOUDINARY_DISH_TRANSFORM", "w_800,h_600,c_fill,q_auto,f_auto")
 _EXT = os.environ.get("CLOUDINARY_DISH_EXT", "jpg")
