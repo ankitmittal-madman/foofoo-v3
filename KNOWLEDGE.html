@@ -3725,6 +3725,11 @@ function deepDiveFeature(featureLabel){
     <div class="decision-a">public.dishes has 802 rows; the service's catalogue.json bundle (where WP-19's dish list originally came from) has 810 — a pre-existing gap unrelated to this migration. Two dish names ("Dal Baati Churma", "Sadya Thali") don't have an exact-match row in the 802, so their 4 alias rows resolve to zero rows via the SELECT id FROM public.dishes WHERE name = '...' pattern and are silently, harmlessly skipped — the same environment-robust guard behavior WP-19 has used since seed 122's original WHERE EXISTS fix. Not a bug in this migration; a symptom of the 802-vs-810 catalogue gap, which is now visible for a future WP to close.</div>
     <div class="decision-meta">S60 &middot; Aug 3, 2026</div>
   </div>
+  <div class="decision-item">
+    <div class="decision-q">Founder asked to push WP-19 (migration 051 + alias seeds 135-144) from local sandbox to the real DB — was public.dishes actually empty in production?</div>
+    <div class="decision-a">No — a first check via list_tables reported 0 rows for public.dishes, but that reflects Supabase's cached table-stats metadata, not a live count. A direct SELECT count(*) showed 802 rows in public.dishes and 66 in public.cuisines already present. Corrected the report to the Founder before proceeding, then applied migration 051 + seed 135 (352 rows, 348 landed — same 4-row Dal Baati Churma/Sadya Thali gap as local testing) + seeds 136-144 (batches 14-22) directly against the live Supabase project (cmkswalqpmmqojwdmqbv) via apply_migration/execute_sql. Post-deploy: 430 alias rows across 237 dishes, validation 909's 5 checks all pass clean on the real table, get_advisors shows no new findings tied to dish_name_synonyms.</div>
+    <div class="decision-meta">S60 &middot; Aug 3, 2026</div>
+  </div>
   <!-- DECISIONS_INJECT -->
   </div>
 
