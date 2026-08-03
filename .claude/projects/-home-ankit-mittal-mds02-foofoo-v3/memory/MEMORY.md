@@ -1,0 +1,1 @@
+- [Quality Gate](quality-gate.md) — one-command production quality gate in ops/quality/
