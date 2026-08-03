@@ -717,8 +717,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🧹</span> S58 · Production hardening audit (WP-21)
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s59')">
+    <div class="nav-item" onclick="showPage('s59')">
       <span class="nav-icon">🌶</span> S59 · WP-21 punch-list resolutions
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s60')">
+      <span class="nav-icon">🍆</span> S60 · Batches 8-13 + WP-19 retargeted to public.dishes
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -734,14 +738,14 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">236</span>
+      <span class="nav-badge">246</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">43</span>
+      <span class="nav-badge">45</span>
     </div>
   </div>
 </nav>
@@ -2286,6 +2290,21 @@ function deepDiveFeature(featureLabel){
     </div>
   </div>
 
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#b91c1c"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#fef2f2;color:#b91c1c">S60</span>
+      <div class="tl-title">Dish alias batches 8-13 (99 more dishes, 181 alias rows), then WP-19 retargeted after WP-21 dropped ghar_re</div>
+      <div class="tl-chips">
+        <span class="tl-chip">seeds 129-134: Karnataka, Bengal, Maharashtra, Gujarat, Goa, Rajasthan, Kashmir, Andhra</span>
+        <span class="tl-chip">discovered: WP-21 dropped the entire ghar_re schema in production (REPO-CERT-030)</span>
+        <span class="tl-chip">migration 051 + validation 909: alias ontology recreated on public.dish_name_synonyms</span>
+        <span class="tl-chip">seed 135: all 352 prior alias rows migrated verbatim, 348 loaded against the real 802-dish public.dishes</span>
+      </div>
+      <div class="tl-note">Continued the cited-research + safety-filter process through six more batches (8-13): Karnataka classics (Mysore Pak, Vangi Bath, Akki Rotti…) and Bengali cuisine (Machher Jhol, Shorshe Ilish, Rasgulla…), then more Bengali (Chingri Malai Curry, Shukto, Patishapta…), Maharashtra/Gujarat (Vada Pav, Misal Pav, Modak, Shrikhand, Khandvi…), Goan cuisine (Vindaloo, Xacuti, Bebinca, Sorpotel…), and finally Rajasthani/Kashmiri/Andhra (Dal Baati Churma, Laal Maas, Yakhni, Kahwa, Gongura Chicken…) — 99 dishes, 181 alias rows, bringing the running total to 181 of 810 dishes / 352 alias rows. Mid-merge (pushing batch 13 to main), discovered a concurrent WP-20/WP-21 session had dropped the entire ghar_re Postgres schema from production (migration 050, certified in REPO-CERT-030 with a verified 0-row pg_namespace check) — the exact schema all 13 WP-19 batches had been writing into. WP-21's own audit had independently found no live code path ever read ghar_re.* to begin with (the real RE reads public.dishes / a JSON bundle). Stopped immediately rather than continuing onto a dead target, surfaced the finding, and asked the Founder how to proceed. Founder chose: redirect to public.dishes. Built migration 051 (public.dish_name_synonyms, FK'd to the real live public.dishes, same evidence-integrity constraint and RLS read-policy pattern as public.dishes itself) and validation 909 (same checks as the retired 907, plus a new structural check that no alias collides with a different dish's own canonical name). Wrote seed 135 by mechanically parsing all 13 old seed files and re-emitting every one of the 352 alias rows against public.dish_name_synonyms — same synonym, citation, and confidence, only the dish_id resolution changed (by name, against the real table, instead of the retired deterministic md5 scheme) — no alias content was re-researched or altered. Tested end-to-end on Postgres 16 against the REAL public.dishes seed (106, 802 rows, not a stub loader this time): migration 051 → seeds 105+106 → seed 135 → validation 909 all pass, idempotent re-run. 348 of 352 aliases loaded; the remaining 4 (for "Dal Baati Churma" and "Sadya Thali") harmlessly no-op because those 2 names aren't present in the 802-row public.dishes (a pre-existing 802-vs-810 gap against catalogue.json, surfaced but not fixed here). Pushed to main.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -3093,6 +3112,16 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">database/migrations/050_drop_unused_ghar_re_schema.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S59</td><td class="fr-desc">Drops the 28-table ghar_re schema, confirmed unread by any live code path (not yet applied live)</td></tr>
   <tr><td class="fr-file mono">supabase/config.toml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S59</td><td class="fr-desc">Removed a stale reference to the re_engine schema already dropped in WP-20</td></tr>
   <tr><td class="fr-file mono">data/sig_scores_v1.csv</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S59</td><td class="fr-desc">All 63 pending dish signature scores resolved (6 national_icon, 23 state_icon, 34 confirmed regional_hero)</td></tr>
+<tr><td class="fr-file mono">database/seeds/129_seed_dish_aliases_b8.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 8 WP-19 cited aliases: 15 Karnataka classics + Bengali cuisine dishes, 26 alias rows, guarded WHERE EXISTS inserts</td></tr>
+<tr><td class="fr-file mono">database/seeds/130_seed_dish_aliases_b9.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 9 WP-19 cited aliases: 5 Bengali/Tulu Nadu dishes, 10 alias rows</td></tr>
+<tr><td class="fr-file mono">database/seeds/131_seed_dish_aliases_b10.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 10 WP-19 cited aliases: 13 Maharashtra/Gujarat/Bengali dishes, 23 alias rows</td></tr>
+<tr><td class="fr-file mono">database/seeds/132_seed_dish_aliases_b11.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 11 WP-19 cited aliases: 13 Maharashtra/Gujarat dishes, 20 alias rows</td></tr>
+<tr><td class="fr-file mono">database/seeds/133_seed_dish_aliases_b12.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 12 WP-19 cited aliases: 10 Goan cuisine + Gujarat remainder dishes, 15 alias rows</td></tr>
+<tr><td class="fr-file mono">database/seeds/134_seed_dish_aliases_b13.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 13 WP-19 cited aliases: 11 Rajasthani/Kashmiri/Andhra dishes, 18 alias rows</td></tr>
+<tr><td class="fr-file mono">database/migrations/051_public_dish_name_synonyms.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Recreates the WP-19 alias ontology as public.dish_name_synonyms (FK'd to the real public.dishes) after WP-21 dropped the ghar_re schema this ontology previously lived in</td></tr>
+<tr><td class="fr-file mono">database/rollback/051_public_dish_name_synonyms_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Drops public.dish_name_synonyms; public.dishes itself untouched</td></tr>
+<tr><td class="fr-file mono">database/validation/909_public_dish_ontology_validation.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Fail-loud checks over public.dish_name_synonyms: columns exist, cited evidence present, alias_type valid, no orphan aliases, no alias collides with a different dish's own name</td></tr>
+<tr><td class="fr-file mono">database/seeds/135_seed_public_dish_aliases_migrated.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Migrates all 352 previously-researched WP-19 alias rows (seeds 122-134) onto public.dish_name_synonyms, resolving dish_id by name against public.dishes instead of the retired md5 scheme; no alias content changed</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3671,6 +3700,21 @@ function deepDiveFeature(featureLabel){
   <div class="decision-item">
     <div class="decision-q">Q: The ghar_re database schema (28 tables) is confirmed unused by any live code — delete it now?</div>
     <div class="decision-a">A: Migration prepared and Founder-approved, but not applied — this session has no database write credentials (supabase db push requires an interactive password not available here). It needs to be run through the normal deploy process.</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">WP-21 dropped the ghar_re schema mid-session — why not just keep researching aliases into a dead schema?</div>
+    <div class="decision-a">A concurrent WP-20/WP-21 cutover dropped the entire ghar_re schema in production (migration 050, REPO-CERT-030 — verified 0 rows in pg_namespace) and independently confirmed no live code path ever read ghar_re.* to begin with. Continuing to add more cited-alias batches onto a schema that's both physically gone and was never wired to production would have been building on nothing. Stopped, surfaced the finding, and asked the Founder how to proceed rather than silently continuing or silently abandoning 13 batches of real research.</div>
+    <div class="decision-meta">S60 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why migrate the existing 352 alias rows instead of re-researching them against public.dishes from scratch?</div>
+    <div class="decision-a">The alias content itself (synonym, region, language, source_url, confidence) was never wrong — only its target table was. Every row was independently web-researched and cited in an earlier batch; re-deriving the same facts a second time would waste real research effort and risk introducing new errors for no benefit. A mechanical migration (parse the 13 old seed files, re-resolve dish_id by name against public.dishes instead of the retired md5 scheme) preserves 100% of the citation work while fixing the only thing that was actually broken.</div>
+    <div class="decision-meta">S60 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why did only 348 of 352 migrated aliases actually load into public.dish_name_synonyms?</div>
+    <div class="decision-a">public.dishes has 802 rows; the service's catalogue.json bundle (where WP-19's dish list originally came from) has 810 — a pre-existing gap unrelated to this migration. Two dish names ("Dal Baati Churma", "Sadya Thali") don't have an exact-match row in the 802, so their 4 alias rows resolve to zero rows via the SELECT id FROM public.dishes WHERE name = '...' pattern and are silently, harmlessly skipped — the same environment-robust guard behavior WP-19 has used since seed 122's original WHERE EXISTS fix. Not a bug in this migration; a symptom of the 802-vs-810 catalogue gap, which is now visible for a future WP to close.</div>
+    <div class="decision-meta">S60 &middot; Aug 3, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -10259,7 +10303,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s58 -->
 
-  <div id="page-s59" class="page-content">
+  <div id="page-s59" class="page-content" style="display:none">
 
     <!-- ── Session header ── -->
     <div class="page-header">
@@ -10540,6 +10584,47 @@ function deepDiveFeature(featureLabel){
     </div><!-- /detail -->
 
   </div><!-- /page-s59 -->
+
+  <div id="page-s60" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S60 · Dish alias batches 8-13, then WP-19 retargeted to public.dishes</div>
+      <div class="page-subtitle">Researched 99 more dishes across Karnataka, Bengal, Maharashtra, Gujarat, Goa, Rajasthan, Kashmir and Andhra — then discovered a concurrent session had dropped WP-19's entire target schema, and retargeted all 352 researched aliases onto the real live public.dishes table.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">116 of 810 catalogue dishes had cited aliases in ghar_re.dish_name_synonyms. Mid-session, a concurrent WP-20/WP-21 cutover dropped the entire ghar_re schema from production (migration 050) — the exact table all of WP-19's research had been writing into — and its own audit confirmed no live code path had ever read that schema anyway.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">181 of 810 dishes now have cited aliases (352 rows) after six more research batches, and — critically — the entire alias ontology now lives on public.dish_name_synonyms, a new table FK'd to the real, live public.dishes (802 rows). All 352 previously-researched alias rows were migrated verbatim (same citations, same confidence scores) rather than re-researched, and the whole chain was re-tested end-to-end against the actual public.dishes seed data, not a stub loader.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/seeds/129-134_seed_dish_aliases_b8-b13.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/051_public_dish_name_synonyms.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/rollback/051_public_dish_name_synonyms_rollback.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/validation/909_public_dish_ontology_validation.sql</span><span class="tag tag-db">DB</span></span>
+        <span class="fc-file"><span class="fc-path">database/seeds/135_seed_public_dish_aliases_migrated.sql</span><span class="tag tag-db">DB</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>10 files touched</div>
+      </div>
+      <div class="session-card-body">
+        <p><strong>1. Six more cited-alias batches (8-13), 99 dishes / 181 rows.</strong> Batch 8: Karnataka classics (Mysore Pak, Vangi Bath, Kesari Bath, Akki Rotti, Mangalorean Fish Gassi) plus Bengali cuisine (Machher Jhol, Shorshe Ilish, Aloo Posto, Luchi, Cholar Dal, Kosha Mangsho, Mishti Doi, Sandesh, Rasgulla, Begun Bhaja). Batch 9: more Bengal + Tulu Nadu (Chingri Malai Curry, Doi Maach, Shukto, Patishapta, Kori Rotti). Batch 10: Maharashtra/Gujarat (Vada Pav, Misal Pav, Thalipeeth, Bhakri, Sol Kadhi, Modak, Shrikhand, Khandvi, Thepla, Fafda Jalebi, Kombdi Vade, Ghugni). Batch 11: more Maharashtra/Gujarat (Sabudana Khichdi, Batata Vada, Amti, Dal Dhokli, Handvo, Patra, Basundi, Gathiya, Mohanthal, Khakhra, Methi Na Gota, Rotla). Batch 12: Goan cuisine (Vindaloo, Xacuti, Bebinca, Sorpotel, Fish Recheado, Prawn Balchao, Pao/Poi, Goan Fish Curry, Khichu, Muthiya). Batch 13: Rajasthani/Kashmiri/Andhra (Dal Baati Churma, Laal Maas, Gatte Ki Sabzi, Ker Sangri, Kashmiri Dum Aloo, Yakhni, Kahwa, Noon Chai, Gushtaba, Haak, Gongura Chicken, Gutti Vankaya). Same cited-research + safety-filter discipline throughout — several near-conflicts caught and excluded (e.g. "Solkadhi" vs "Sol Kadhi", "Goshtaba" vs "Gushtaba", "Zarda" already a separate catalogue dish).</p>
+        <p><strong>2. Mid-push discovery: WP-19's entire target schema had been dropped.</strong> While merging batch 13 to main, found that a concurrent session had executed WP-21 (migration 050, certified in REPO-CERT-030): <code>DROP SCHEMA ghar_re CASCADE</code> against production, verified afterward with a direct <code>psql</code> query showing 0 rows in <code>pg_namespace</code> for that schema name. WP-21's own audit had independently confirmed no live code path ever read <code>ghar_re.*</code> to begin with — the real running recommendation engine reads from <code>public.dishes</code> and a build-time JSON bundle instead. That meant all 13 WP-19 batches (352 alias rows) had been researching real, correctly-cited data into a table that was both physically gone and never actually wired to production. Stopped adding more batches immediately rather than continuing onto a dead target or silently discarding 13 batches of real research, and asked the Founder how to proceed.</p>
+        <p><strong>3. Retargeted onto public.dishes — content preserved, only the target fixed.</strong> Founder's direction: redirect to public.dishes. Built migration 051 (<code>public.dish_name_synonyms</code>, FK'd <code>ON DELETE CASCADE</code> to the real live <code>public.dishes</code>, the same "real aliases need a source_url" check constraint and public-read RLS policy pattern <code>public.dishes</code> itself already uses) and its rollback. Built validation 909 as a direct adaptation of the retired validation 907 (columns exist, every 'real' alias has source_url+confidence, alias_type is a valid kind, no orphan dish_id) plus one new structural check: no alias string may equal a *different* dish's own canonical name in <code>public.dishes</code> — the safety filter WP-19 has applied by hand since batch 1, now also enforced by the database itself. Then wrote a Python script that mechanically parsed all 13 old seed files (122-134) and re-emitted every one of the 352 alias rows against the new table — identical synonym, alias_type, region, language, source_url, and confidence for every row; the only thing that changed is how <code>dish_id</code> is resolved (<code>SELECT id FROM public.dishes WHERE name = '...'</code> instead of the retired deterministic <code>md5('ghar_re.dish:'||name)</code> scheme). No alias was re-researched, re-worded, or re-scored.</p>
+        <p><strong>4. Tested against the REAL public.dishes this time, not a stub loader.</strong> Every prior WP-19 batch's local test used an uncommitted stub loader to simulate the full 810-dish catalogue in ghar_re.dishes, because the real DB only ever had a 39-dish golden sample there. This time, testing needed no such workaround: public.dishes already has its own real seed (106_seed_dishes.sql, 802 rows, deployed to production per earlier work packages), so the test ran migration 051 → seeds 105 (cuisines) + 106 (dishes) → seed 135 (aliases) → validation 909 against genuinely real data. All four validation checks passed; re-running seed 135 a second time inserted 0 new rows (idempotent). 348 of the 352 migrated rows actually loaded — the remaining 4 (for "Dal Baati Churma" and "Sadya Thali") resolved to zero matching rows because those 2 exact names aren't present in the 802-row public.dishes, a pre-existing gap against the 810-dish catalogue.json the service bundle uses, surfaced here but not this session's to fix.</p>
+        <p><strong>5. What's still pending.</strong> 181 of 810 dishes have cited aliases (352 rows); 629 remain — a realistic multi-session undertaking, as flagged in prior sessions. The 802-vs-810 public.dishes/catalogue.json naming gap is now a known, surfaced issue for a future WP. The classify_dishes.py → catalogue.json synonym-export gap (logged since S51) is unaffected by this session's retarget and remains open.</p>
+      </div>
+    </div>
+  </div><!-- /page-s60 -->
 
   <!-- SESSIONS_INJECT -->
 
