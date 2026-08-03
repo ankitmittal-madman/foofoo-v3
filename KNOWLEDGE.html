@@ -721,8 +721,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🌶</span> S59 · WP-21 punch-list resolutions
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s60')">
+    <div class="nav-item" onclick="showPage('s60')">
       <span class="nav-icon">🍆</span> S60 · Batches 8-13 + WP-19 retargeted to public.dishes
+      <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s61')">
+      <span class="nav-icon">🧠</span> S61 · RE Phase 3: s_pref stub + training pipeline
       <span class="nav-badge">Aug 3</span>
     </div>
     <!-- NAV_INJECT -->
@@ -734,11 +738,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">15</span>
+      <span class="nav-badge">16</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">256</span>
+      <span class="nav-badge">273</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -2305,6 +2309,21 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Continued the cited-research + safety-filter process through six more batches (8-13): Karnataka classics (Mysore Pak, Vangi Bath, Akki Rotti…) and Bengali cuisine (Machher Jhol, Shorshe Ilish, Rasgulla…), then more Bengali (Chingri Malai Curry, Shukto, Patishapta…), Maharashtra/Gujarat (Vada Pav, Misal Pav, Modak, Shrikhand, Khandvi…), Goan cuisine (Vindaloo, Xacuti, Bebinca, Sorpotel…), and finally Rajasthani/Kashmiri/Andhra (Dal Baati Churma, Laal Maas, Yakhni, Kahwa, Gongura Chicken…) — 99 dishes, 181 alias rows, bringing the running total to 181 of 810 dishes / 352 alias rows. Mid-merge (pushing batch 13 to main), discovered a concurrent WP-20/WP-21 session had dropped the entire ghar_re Postgres schema from production (migration 050, certified in REPO-CERT-030 with a verified 0-row pg_namespace check) — the exact schema all 13 WP-19 batches had been writing into. WP-21's own audit had independently found no live code path ever read ghar_re.* to begin with (the real RE reads public.dishes / a JSON bundle). Stopped immediately rather than continuing onto a dead target, surfaced the finding, and asked the Founder how to proceed. Founder chose: redirect to public.dishes. Built migration 051 (public.dish_name_synonyms, FK'd to the real live public.dishes, same evidence-integrity constraint and RLS read-policy pattern as public.dishes itself) and validation 909 (same checks as the retired 907, plus a new structural check that no alias collides with a different dish's own canonical name). Wrote seed 135 by mechanically parsing all 13 old seed files and re-emitting every one of the 352 alias rows against public.dish_name_synonyms — same synonym, citation, and confidence, only the dish_id resolution changed (by name, against the real table, instead of the retired deterministic md5 scheme) — no alias content was re-researched or altered. Tested end-to-end on Postgres 16 against the REAL public.dishes seed (106, 802 rows, not a stub loader this time): migration 051 → seeds 105+106 → seed 135 → validation 909 all pass, idempotent re-run. 348 of 352 aliases loaded; the remaining 4 (for "Dal Baati Churma" and "Sadya Thali") harmlessly no-op because those 2 names aren't present in the 802-row public.dishes (a pre-existing 802-vs-810 gap against catalogue.json, surfaced but not fixed here). Pushed to main.</div>
     </div>
   </div>
+  <div class="timeline-row">
+    <div class="tl-date">Aug 3, 2026</div>
+    <div class="tl-spine"><div class="tl-dot" style="background:#6d28d9"></div></div>
+    <div class="tl-content">
+      <span class="tl-badge" style="background:#f5f3ff;color:#6d28d9">S61</span>
+      <div class="tl-title">RE Phase 3 (final phase): s_pref ScoringModule stub, ModelArtifactProvider, training pipeline — unfit by design</div>
+      <div class="tl-chips">
+        <span class="tl-chip" onclick="showPage('s61')">s_pref registered as phase="pref", contributes exactly 0.0</span>
+        <span class="tl-chip" onclick="showPage('s61')">ModelArtifactProvider seam mirrors the Config injection pattern</span>
+        <span class="tl-chip" onclick="showPage('s61')">training/ pipeline built, fixture-tested, never run on real data</span>
+        <span class="tl-chip" onclick="showPage('s61')">golden-master byte-identical, zero diff, no --update</span>
+      </div>
+      <div class="tl-note">Closed the last of the plan's 4 phases. `s_pref` is now a real, registry-wired ScoringModule (`ghar_re_core/preference.py`, phase="pref") — but two independent checks (its own enabled/artifact logic, and its weight defaulting to 0.0) keep it a strict no-op today, since no trained artifact and no real feedback data exist yet. Proved `base()`/`score()`'s existing behaviour never changed: golden-master ran before and after, byte-identical, zero diff. Built `ghar_re_core/model_provider.py` (NullModelArtifactProvider is the only provider ever actually constructed; FileModelArtifactProvider is the seam for later) and `ghar_re_core/training/` (dataset loading + labeling with an FD-11 no-fabricated-labels guard, a runnable `train_pref_model.py` CLI, holdout eval) — added `scikit-learn`/`joblib` as a new optional extra. Also caught and fixed a missed `pref_model.yaml` in `ghar_re_service`'s baked config bundle (full `ghar_re_service/tests/` suite failed until `export_bundle.py`'s allow-list and the bundle itself were updated). Final tally: golden-master 1 passed, `ghar_re_core/tests/` 83 passed, `ghar_re_service/tests/` 68 passed.</div>
+    </div>
+  </div>
   <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2725,6 +2744,34 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">S55 · Aug 3</div>
   </div>
 </div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-s-pref-stub" onclick="toggleDetail('mod-s-pref-stub')">
+    <div class="detail-left">
+      <span class="tag tag-new">New</span>
+      <span class="detail-name">RE Phase 3 — s_pref preference-model stub + training pipeline</span>
+    </div>
+    <span class="detail-chevron" id="chev-mod-s-pref-stub">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-s-pref-stub">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Closes the last gap of the 4-phase Recommendation Engine build: a real, registry-wired "learned preference" scoring term (S_pref) that today contributes exactly 0.0 to every recommendation, plus the offline pipeline that will one day train a real model for it — deliberately not run against real data yet, since there isn't any (0 production feedback_events rows).</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>ghar_re_core/preference.py</code> — s_pref(dish, theta, ctx): returns 0.0 unless a real artifact is loaded AND the config flag is on (never true today).<br>
+      <code>ghar_re_core/model_provider.py</code> — the artifact-loading seam (NullModelArtifactProvider today; FileModelArtifactProvider for later).<br>
+      <code>ghar_re_core/features.py</code> — extract_features(): the one feature vector shared by inference and training.<br>
+      <code>ghar_re_core/training/dataset.py</code> — loads/labels an offline feedback export, refuses to proceed on insufficient or non-real data.<br>
+      <code>ghar_re_core/training/train_pref_model.py</code> — the runnable (but never-yet-run-for-real) training CLI.<br>
+      <code>ghar_re_core/training/evaluate.py</code> — holdout eval report for human review.<br>
+      <code>data/source/pref_model.yaml</code> / <code>ghar_re_service/data/bundle/config/pref_model.yaml</code> — the enabled/artifact-path/weight switches, all defaulting off.<br>
+      <code>ghar_re_core/modules_default.py</code>, <code>ghar_re_core/scoring.py</code> — the registry registration and score() wiring.
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">The master scoring formula's "+w_pref·S_pref" term now genuinely exists in code rather than only as a comment — so a future session can activate real learned preferences by flipping a config flag and pointing at a trained file (a deploy, not a code change), without touching scoring.py again. Until then, every household's recommendations are provably unaffected: golden-master ran before and after this work and stayed byte-identical.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S61 · Aug 3 2026</div>
+  </div>
+</div>
 <!-- MODULES_INJECT -->
   </div>
 
@@ -3131,6 +3178,24 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">database/seeds/142_seed_public_dish_aliases_b20.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 20 WP-19 cited aliases: 3 dishes, 3 alias rows — Chettinad, Andhra, Bengali cuisine</td></tr>
 <tr><td class="fr-file mono">database/seeds/143_seed_public_dish_aliases_b21.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 21 WP-19 cited aliases: 3 dishes, 3 alias rows — Mughlai, Himachali cuisine</td></tr>
 <tr><td class="fr-file mono">database/seeds/144_seed_public_dish_aliases_b22.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 22 WP-19 cited aliases: 4 dishes, 5 alias rows — Pashtun, Gujarati, Levantine cuisine</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/preference.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">s_pref(dish, theta, ctx) — the UNFIT master-formula S_pref term; returns exactly 0.0 unless a real trained artifact is loaded AND pref_model.yaml.enabled is true (neither is true anywhere today)</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/model_provider.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">ModelArtifactProvider seam (mirrors config.py's ConfigProvider pattern) — NullModelArtifactProvider (default, only one used) and FileModelArtifactProvider (built for later, not yet wired to a real artifact)</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/features.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">extract_features(dish, theta, ctx) — the one feature vector shared by s_pref inference and the training pipeline, so the two can never drift onto different feature definitions</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/training/__init__.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">Package marker + placement rationale (nested under ghar_re_core per CLAUDE.md's Placement Rule, no new top-level folder)</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/training/dataset.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">Loads an offline feedback-export JSONL, filters to data_source=="real", excludes ambiguous shown_not_tapped/edit/swap rows, labels accept/like=1 and dislike=0, and refuses (raises, writes nothing) on zero rows or a single label class</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/training/train_pref_model.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">Runnable CLI: vectorizes features, fits sklearn LogisticRegression, writes a joblib artifact + eval report; never invoked against real production feedback_events in this plan (0 rows exist)</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/training/evaluate.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">Holdout accuracy/AUC + per-feature coefficient dump for human review, never auto-applied</td></tr>
+  <tr><td class="fr-file mono">data/source/pref_model.yaml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S61</td><td class="fr-desc">enabled: false, model_artifact_path: null, w_pref: 0.0 — the belt-and-suspenders switches that keep s_pref a no-op</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/modules_default.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S61</td><td class="fr-desc">Registered s_pref as phase="pref" (weight_fn reads CONFIG.w_pref, confidence pinned 1.0) — the only Phase-1 file touched this session, exactly as the plan scoped</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/scoring.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S61</td><td class="fr-desc">score() now adds a separate, explicit combine(..., phase="pref") call for the +w_pref·S_pref term — never folded into the existing phase="base"/"cohort" calls</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/config.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S61</td><td class="fr-desc">Loads pref_model.yaml; adds pref_model_enabled / pref_model_artifact_path / w_pref properties, each with a code-level safety default if the file/key is missing</td></tr>
+  <tr><td class="fr-file mono">ghar_re_service/ghar_re_service/scripts/export_bundle.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S61</td><td class="fr-desc">Added pref_model.yaml to CONFIG_FILES so the baked service bundle stays complete — caught by ghar_re_service/tests/ failing with FileNotFoundError before this fix</td></tr>
+  <tr><td class="fr-file mono">ghar_re_service/data/bundle/config/pref_model.yaml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S61</td><td class="fr-desc">Regenerated bundle copy of pref_model.yaml (via export_bundle.py re-run)</td></tr>
+  <tr><td class="fr-file mono">ghar_re_service/data/bundle/manifest.json</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S61</td><td class="fr-desc">Regenerated bundle manifest/version hash after adding pref_model.yaml to the config allow-list</td></tr>
+  <tr><td class="fr-file mono">pyproject.toml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S61</td><td class="fr-desc">New "training" optional-dependency extra (scikit-learn, joblib) — nothing in the live scoring path needs them, only ghar_re_core/training/ does</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/tests/test_preference.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">Proves s_pref's neutral value, phase="pref" isolation from base()/score()'s default combine() calls, and ModelArtifactProvider's None-handling</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/tests/test_training_pipeline.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">Fixture-only: dataset labeling rules, the insufficient-data/non-real-data refusal guard, and one end-to-end pipeline run producing a loadable artifact</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/tests/test_scoring_registry.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S61</td><td class="fr-desc">Updated the Phase-1 "phase=pref is empty" assertion to "phase=pref contains exactly s_pref" — an intentional, expected update, not a scoring-math change</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3729,6 +3794,31 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Founder asked to push WP-19 (migration 051 + alias seeds 135-144) from local sandbox to the real DB — was public.dishes actually empty in production?</div>
     <div class="decision-a">No — a first check via list_tables reported 0 rows for public.dishes, but that reflects Supabase's cached table-stats metadata, not a live count. A direct SELECT count(*) showed 802 rows in public.dishes and 66 in public.cuisines already present. Corrected the report to the Founder before proceeding, then applied migration 051 + seed 135 (352 rows, 348 landed — same 4-row Dal Baati Churma/Sadya Thali gap as local testing) + seeds 136-144 (batches 14-22) directly against the live Supabase project (cmkswalqpmmqojwdmqbv) via apply_migration/execute_sql. Post-deploy: 430 alias rows across 237 dishes, validation 909's 5 checks all pass clean on the real table, get_advisors shows no new findings tied to dish_name_synonyms.</div>
     <div class="decision-meta">S60 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should s_pref actually compute a real learned score in Phase 3, since the master formula's docstring has referenced w_pref·S_pref since Phase 1?</div>
+    <div class="decision-a">No — the plan is explicit that this phase ships an UNFIT stub, not an active model. No trained artifact exists (none has ever been built anywhere in this repo) and no real feedback_events data exists to train one honestly (0 production rows). s_pref returns exactly 0.0, checked two independent ways (its own enabled/artifact logic, and its registry weight defaulting to 0.0 regardless), so the slot exists in code without pretending anything was learned. Activating it later is meant to be a config change (point pref_model.yaml at a real file + flip enabled:true), never a silent code change.</div>
+    <div class="decision-meta">S61 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Registering a brand-new phase="pref" module in the shared ScoringRegistry is the highest golden-master risk in this phase — how was leakage into base()/score()'s existing default behaviour actually ruled out, not just assumed?</div>
+    <div class="decision-a">base() and score()'s cohort term each call DEFAULT_REGISTRY.combine() with an explicit phase="base"/"cohort" filter, never phase=None ("all phases") — so registering "pref" cannot reach either call by construction. score() adds its own separate, explicit combine(..., phase="pref") call for the +w_pref·S_pref term, which is unconditionally 0.0 today. This was verified by actual test, not inspection alone: golden-master ran before and after this session's changes and stayed byte-identical, zero diff, no --update — plus new unit tests (test_preference.py) assert phase="pref" contributions never appear in the phase="base"/"cohort" filtered views.</div>
+    <div class="decision-meta">S61 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Where should the training pipeline code live, given CLAUDE.md's Placement Rule forbids a new top-level folder without an approved RACR?</div>
+    <div class="decision-a">ghar_re_core/training/ — nested under the existing ghar_re_core package, exactly matching the plan's own suggested placement. This is not a new top-level folder (no RACR needed): it's a subpackage of the single existing "recommendation mathematics" package, alongside its existing tests/ subpackage.</div>
+    <div class="decision-meta">S61 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">The plan leaves no numeric minimum-data-density threshold for training (deliberately, per WP-14) — does that mean the pipeline has no guard against bad data at all?</div>
+    <div class="decision-a">No — a guard still exists, just not a product-density number. ghar_re_core/training/dataset.py's guard_sufficient_data() refuses to fit (raises, writes nothing) if there are zero real labeled rows, or if every labeled row shares the same class (logistic regression is structurally undefined with a single class — that's a correctness requirement, not a business judgement call). Separately, only data_source=="real" rows are ever used (ai_generated/stub rows are excluded categorically), and shown_not_tapped/edit/swap rows are excluded from labeling entirely rather than defaulted to a rejection label, per FD-11's no-fabricated-labels rule.</div>
+    <div class="decision-meta">S61 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why does ghar_re_service's baked config bundle need updating for a ghar_re_core-only change?</div>
+    <div class="decision-a">ghar_re_core/config.py's Config.__init__ loads every runtime YAML config file unconditionally, including the new pref_model.yaml — and the production service reads its config from a pre-baked bundle directory (RE-DOC-10 §8), not from data/source/ directly. Missing this caused the full ghar_re_service/tests/ suite to fail with FileNotFoundError; fixed by adding pref_model.yaml to export_bundle.py's CONFIG_FILES allow-list and re-running the exporter, which also regenerated manifest.json's version hash.</div>
+    <div class="decision-meta">S61 &middot; Aug 3, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -10599,7 +10689,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s59 -->
 
-  <div id="page-s60" class="page-content">
+  <div id="page-s60" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S60 · Dish alias batches 8-13, then WP-19 retargeted to public.dishes</div>
       <div class="page-subtitle">Researched 99 more dishes across Karnataka, Bengal, Maharashtra, Gujarat, Goa, Rajasthan, Kashmir and Andhra — then discovered a concurrent session had dropped WP-19's entire target schema, and retargeted all 352 researched aliases onto the real live public.dishes table.</div>
@@ -10639,6 +10729,61 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s60 -->
+
+  <div id="page-s61" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S61 · Recommendation Engine Phase 3 (final phase) — s_pref stub, ModelArtifactProvider, training pipeline</div>
+      <div class="page-subtitle">Closed the last gap in the 4-phase RE build: the master scoring formula's `+ w_pref·S_pref` term now exists as a real, registry-wired ScoringModule instead of only a docstring comment — but it is deliberately UNFIT, contributing exactly 0.0 to every live score, since no real training data or trained model exists yet. Also built (but never ran against real data) the offline training pipeline that will one day produce that model.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Phases 0-2 (feedback plumbing, ScoringModule registry, epsilon-greedy exploration) were done. No `S_pref` term existed anywhere in code — only in a comment inside score()'s docstring. There was no seam for injecting a trained preference model, and no code at all for turning real feedback_events into a trained artifact.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">`s_pref` is a registered ScoringModule (phase="pref") that every request's score() call now genuinely includes — but it returns exactly 0.0 (checked two independent ways: the module's own enabled/artifact checks, AND its weight defaulting to 0.0) so nothing about any household's recommendations changed. Golden-master stayed byte-identical, zero diff, no --update. A `ModelArtifactProvider` seam (mirroring the existing Config injection pattern) and a fixture-tested offline training pipeline now exist for a future session to actually use once real feedback data exists — neither was run against real production data, since there is none yet.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_core/preference.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/model_provider.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/features.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/training/dataset.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/training/train_pref_model.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/training/evaluate.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">data/source/pref_model.yaml</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/modules_default.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/scoring.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/config.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/scripts/export_bundle.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/data/bundle/config/pref_model.yaml</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/data/bundle/manifest.json</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">pyproject.toml</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/test_preference.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/test_training_pipeline.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/test_scoring_registry.py</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 3, 2026<br>17 files touched</div>
+      </div>
+      <div class="session-card-body">
+        <p><strong>1. s_pref — a real ScoringModule that is deliberately unfit.</strong> <code>ghar_re_core/preference.py</code>'s <code>s_pref(dish, theta, ctx)</code> returns exactly 0.0 whenever `pref_model.yaml`'s `enabled` flag is off (the state today) OR no trained artifact is loaded (also true today, unconditionally) — either check alone is sufficient. It is registered into <code>modules_default.DEFAULT_REGISTRY</code> as `phase="pref"`, with its weight (`CONFIG.w_pref`) *also* defaulting to 0.0 as a second, independent safety net. Nothing is fit, nothing is fabricated — the slot in the master formula simply exists in code now instead of only in a docstring comment.</p>
+        <p><strong>2. Proved phase="pref" can never leak into existing scoring.</strong> The single biggest risk this phase carried: registering a new module in the shared registry could silently change every household's score. <code>base()</code> and the cohort term in <code>score()</code> each call `DEFAULT_REGISTRY.combine(...)` with an EXPLICIT phase filter ("base"/"cohort"), never "all phases" — so `s_pref` never reaches them. `score()` now also adds its own separate, explicit `combine(..., phase="pref")` call for the `+ w_pref·S_pref` term, which is unconditionally 0.0 today. Golden-master (`pytest ghar_re_core/tests/test_golden_master.py`) ran before and after this work: byte-identical, zero diff, no `--update` used — proving score-neutrality by actual test, not by inspection alone.</p>
+        <p><strong>3. ModelArtifactProvider — the seam for a future trained model.</strong> <code>ghar_re_core/model_provider.py</code> mirrors the existing `Config`/`CONFIG` injection pattern exactly: `active_model()`/`set_active_model()`/a `PREF_MODEL` proxy. `NullModelArtifactProvider` (no artifact, ever) is the only provider actually constructed anywhere in this repo right now. `FileModelArtifactProvider(path)` is built (loads a joblib file, returns `None` gracefully if the path doesn't exist) but nothing calls it with a real path — activating it later is meant to be a config change (point `pref_model.yaml.model_artifact_path` at a real file + flip `enabled: true`), not a code change.</p>
+        <p><strong>4. Feature extraction — one function, shared by inference and training.</strong> <code>ghar_re_core/features.py</code>'s `extract_features(dish, theta, ctx)` concatenates household/context fields (diet, region, slot, season, weekday, interaction_count, plus `household_type` as an honest proxy for "household size" since no literal member-count field exists in theta) with every OTHER registered module's raw score value — deliberately skipping `phase="pref"` itself to avoid s_pref recursively calling its own feature extractor once a real model exists.</p>
+        <p><strong>5. Training pipeline — built, fixture-tested, never run on real data.</strong> New `ghar_re_core/training/` package (nested under the existing `ghar_re_core` package, not a new top-level folder — no RACR needed, matches the plan's own suggested placement exactly). `dataset.py` loads an offline feedback-export JSONL (never queries Postgres directly — that boundary stays with Edge Functions), filters to `data_source == "real"` only, excludes ambiguous `shown_not_tapped`/`edit`/`swap` rows from labeling (never labelled 0, per the no-fabricated-labels rule), and labels `accept`/`like` as 1 and `dislike` as 0. A guard (`guard_sufficient_data`) refuses to fit — raising, writing nothing — if there are zero real labeled rows or only one label class present (a single-class fit would silently produce a meaningless constant model). `train_pref_model.py` is a runnable CLI (`python -m ghar_re_core.training.train_pref_model --feedback-export <jsonl> --out <artifact>`) that vectorizes features, fits a small `sklearn.LogisticRegression`, and writes a joblib artifact + a holdout AUC/accuracy/coefficient eval report. `scikit-learn`/`joblib` were added as a new `training` optional-dependency extra in `pyproject.toml` — nothing in the live scoring path needs them, only running this pipeline does. This script has NEVER been run against real production feedback_events (0 rows exist today) — only against small, clearly-synthetic fixture rows in tests, proving the pipeline mechanics work without pretending any model is trained.</p>
+        <p><strong>6. Bundle regeneration.</strong> `ghar_re_service`'s baked config bundle loads every file `Config.__init__` loads, including the new `pref_model.yaml` — missed this once (caught by running the full `ghar_re_service/tests/` suite, which failed with `FileNotFoundError`), added `pref_model.yaml` to `export_bundle.py`'s `CONFIG_FILES` allow-list, and re-ran the exporter to regenerate `ghar_re_service/data/bundle/config/pref_model.yaml` + `manifest.json`.</p>
+        <p><strong>7. Verification.</strong> `pytest ghar_re_core/tests/test_golden_master.py -v` — 1 passed, byte-identical, zero diff, no `--update`. `pytest ghar_re_core/tests/` — 83 passed. `pytest ghar_re_service/tests/` — 68 passed. One existing Phase-1 test (`test_registry_module_names_match_expected_set`) had its assertion updated from "phase=pref is empty" to "phase=pref contains exactly s_pref" — an intentional, expected update to reflect Phase 3 legitimately registering the module, not a scoring-math change.</p>
+      </div>
+    </div>
+  </div><!-- /page-s61 -->
 
   <!-- SESSIONS_INJECT -->
 

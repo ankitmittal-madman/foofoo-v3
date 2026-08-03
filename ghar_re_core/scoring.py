@@ -421,7 +421,7 @@ def s_foreign(dish):
 
 def score(dish, theta, ctx, objective):
     """score = BASE × GAIN_Q15 + w_cohort(n)·S_cohort − foreign_demote(n)·S_foreign
-    (+ w_pref·S_pref[=0 v1] − PENALTY[assemble]).
+    + w_pref·S_pref (− PENALTY[assemble]).
 
     Both cohort weight and foreign demote are WP-16 cold-start-strong, decaying with
     ctx['interaction_count'] (0 for a new household — every live household today).
@@ -430,10 +430,18 @@ def score(dish, theta, ctx, objective):
     modules (Phase 1 ScoringModule registry refactor): s_foreign's module models its effective
     weight as NEGATIVE (see modules_default.py), so combine()'s plain weighted sum already nets
     out to the same subtraction — no special-casing needed here. s_cohort/s_foreign's own bodies
-    are unchanged."""
+    are unchanged.
+
+    The `+ w_pref·S_pref` term (Phase 3) is computed via DEFAULT_REGISTRY's phase="pref" — an
+    EXPLICIT, separate combine() call, never folded into the phase="cohort" or phase="base" calls
+    above, so this is the only place phase="pref" is allowed to affect a live score. In every
+    deployment today s_pref itself returns 0.0 (ghar_re_core/preference.py — no artifact loaded)
+    AND its weight (CONFIG.w_pref, pref_model.yaml) also defaults to 0.0, so `pref_val` is
+    unconditionally 0.0 and this call is a byte-for-byte no-op (golden-master proves it)."""
     from ghar_re_core.modules_default import DEFAULT_REGISTRY
     cohort_val, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="cohort")
-    return base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val
+    pref_val, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="pref")
+    return base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val + pref_val
 
 
 # ---------------------------------------------------------------------------

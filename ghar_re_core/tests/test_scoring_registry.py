@@ -93,14 +93,22 @@ def test_cohort_phase_matches_old_score_formula():
 
 def test_registry_module_names_match_expected_set():
     """Light assertion (per the plan §1.3) that the registry's module list is exactly the 8 BASE
-    + 2 cohort terms Phase 1 wraps — catches an accidental extra/missing registration without
-    needing decision_trace itself to carry the module list (decision_trace's own shape is
-    unaffected by Phase 1 — see scoring.py/decision_log.py, unchanged in this refactor)."""
+    + 2 cohort terms Phase 1 wraps, plus (as of Phase 3) exactly one phase="pref" stub — catches
+    an accidental extra/missing registration without needing decision_trace itself to carry the
+    module list (decision_trace's own shape is unaffected by Phase 1 — see scoring.py/
+    decision_log.py, unchanged in this refactor).
+
+    Phase 3 update: `phase="pref"` is no longer expected to be empty — ghar_re_core/preference.py's
+    `s_pref` stub is now a real registered ScoringModule (see modules_default.py), it is just
+    numerically a no-op (value=0.0, weight defaults to 0.0) until a real trained artifact exists.
+    See test_preference.py for the assertions that `phase="pref"` never leaks into base()/score()'s
+    default combine() calls."""
     base_names = {m.name for m in DEFAULT_REGISTRY.modules(phase="base")}
     cohort_names = {m.name for m in DEFAULT_REGISTRY.modules(phase="cohort")}
+    pref_names = {m.name for m in DEFAULT_REGISTRY.modules(phase="pref")}
     assert base_names == {
         "m_palette", "m_slot", "m_season", "sig", "m_age", "m_household", "m_weather",
         "prior_boost",
     }
     assert cohort_names == {"s_cohort", "s_foreign"}
-    assert DEFAULT_REGISTRY.modules(phase="pref") == []
+    assert pref_names == {"s_pref"}

@@ -1,0 +1,25 @@
+config_version: 1.0
+generated_from: Phase 3 (Recommendation Engine build) — s_pref ScoringModule stub, unfit.
+# s_pref (ghar_re_core/preference.py) is a REAL registry-wired ScoringModule (phase="pref") but
+# is numerically a no-op until a real artifact, trained on real feedback_events, exists and this
+# flag is deliberately flipped by a human. FD-11 (no synthetic/fabricated labels): nothing here
+# is fit, nothing is shipped — the slot in the master formula (`+ w_pref·S_pref`) simply EXISTS
+# in code now instead of only in the score() docstring.
+#
+# enabled: master switch. False = s_pref always returns value=0.0, confidence=1.0 (see
+# preference.py). CODE-LEVEL SAFETY DEFAULT (config.py pref_model_enabled) is also False if this
+# key or this file is ever missing — never silently guessed on.
+enabled: false
+
+# model_artifact_path: where ModelArtifactProvider looks for a trained joblib artifact
+# (ghar_re_core/model_provider.py FileModelArtifactProvider). null = no artifact configured;
+# NullModelArtifactProvider (the default active provider) is used, so s_pref is 0.0 regardless
+# of `enabled`. Activating s_pref later is meant to be exactly this: point this at a real trained
+# file + flip `enabled: true` — "a deploy, not a code change" (RE-DOC-11 §8).
+model_artifact_path: null
+
+# w_pref: the master formula's `w_pref·S_pref` weight. Belt-and-suspenders default 0.0
+# regardless of `enabled` above (mirrors foreign_demote_effective's "absent block -> 0.0"
+# pattern in config.py) — even if `enabled` is mistakenly flipped on without a real weight
+# decision, the term still contributes exactly 0.0 to score() until a human sets this too.
+w_pref: 0.0

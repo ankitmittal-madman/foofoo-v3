@@ -56,6 +56,7 @@ class Config:
         self.derivation = _load("derivation_params.yaml")
         self.cohort = _load("cohort_weights.yaml")
         self.bandit = _load("bandit_weights.yaml")
+        self.pref = _load("pref_model.yaml")
         self.versions = dict(spine="Spine v1.0", kb="KB v0.2",
                              config="Config v%s" % self.base["config_version"])
         self._community_priors = None
@@ -213,6 +214,29 @@ class Config:
         which under-served-class candidate to swap in when several are eligible (never applied
         to any dish's actual score). Code-level safety default 0.0 if missing."""
         return (self.bandit or {}).get("exploration", {}).get("exploration_boost", 0.0)
+
+    # --- s_pref ScoringModule stub (pref_model.yaml <- Phase 3, not fit, not shipped) ---
+    @property
+    def pref_model_enabled(self):
+        """Master switch for ghar_re_core.preference.s_pref. CODE-LEVEL SAFETY DEFAULT is False
+        if pref_model.yaml or this key is ever missing — s_pref must never silently turn itself
+        on (Task 3 rule)."""
+        return bool((self.pref or {}).get("enabled", False))
+
+    @property
+    def pref_model_artifact_path(self):
+        """Path to the trained s_pref artifact, or None if no artifact is configured yet (the
+        real-world state today — see ghar_re_core/model_provider.py). Code-level safety default
+        None if pref_model.yaml or this key is missing."""
+        return (self.pref or {}).get("model_artifact_path")
+
+    @property
+    def w_pref(self):
+        """The master formula's `w_pref·S_pref` weight (score()'s `+ w_pref·S_pref` term).
+        Belt-and-suspenders code-level safety default 0.0 if pref_model.yaml or this key is
+        missing — mirrors foreign_demote_effective's "absent block -> 0.0" pattern, so a mistaken
+        `enabled: true` without an explicit weight decision still contributes exactly 0.0."""
+        return (self.pref or {}).get("w_pref", 0.0)
 
     # --- community priors (community_priors.csv <- KB §C1) ---
     # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a

@@ -64,6 +64,10 @@ CONFIG_FILES = (
     "derivation_params.yaml",
     "cohort_weights.yaml",
     "bandit_weights.yaml",
+    # Phase 3 s_pref stub config (ghar_re_core/preference.py, ghar_re_core/model_provider.py) —
+    # `config.py`'s Config.__init__ loads this unconditionally alongside every other runtime
+    # config file, so it must ship in the bundle exactly like bandit_weights.yaml above.
+    "pref_model.yaml",
     "community_priors.csv",
     # Ingredient MASTER attributes (category / allergen flags / Jain compatibility) — read by
     # ghar_re_core.catalogue at import time for allergen + Jain derivation. This is ingredient

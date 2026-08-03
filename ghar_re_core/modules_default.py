@@ -19,8 +19,16 @@ Phases:
              ScoringRegistry.combine()'s plain weighted sum needs no special-cased subtraction —
              `score()` still ends up computing base*gain + w*s_cohort - wf*s_foreign exactly as
              before, just via `+ (-wf)*s_foreign` inside combine() instead of an inline `-`.
-  "pref"   — reserved for Phase 3's s_pref; intentionally NOT registered here.
+  "pref"   — Phase 3's s_pref stub. Registered below, but numerically a no-op (value=0.0) until
+             a real trained artifact exists and pref_model.yaml.enabled is flipped on — see
+             ghar_re_core/preference.py. Registering it here does NOT change base()/score()'s
+             default behaviour: base() and score() (scoring.py) each call
+             DEFAULT_REGISTRY.combine(..., phase="base"/"cohort") with an EXPLICIT phase filter,
+             never combine(..., phase=None), so "pref" never leaks into either call. score()
+             separately combines phase="pref" for its own dedicated `+ w_pref·S_pref` term
+             (weight defaults to 0.0 regardless — see config.py CONFIG.w_pref).
 """
+from ghar_re_core import preference as P
 from ghar_re_core import scoring as S
 from ghar_re_core.config import CONFIG
 from ghar_re_core.modules import BoundModule, ScoringRegistry
@@ -82,4 +90,13 @@ DEFAULT_REGISTRY.register(BoundModule(
     weight_fn=lambda ctx: -CONFIG.foreign_demote_effective(ctx.get("interaction_count", 0)),
 ))
 
-# phase="pref" (Phase 3's s_pref) intentionally NOT registered here — out of Phase 1 scope.
+# ---- phase="pref" — Phase 3's s_pref stub (not fit, not shipped) ----
+# weight_fn reads CONFIG.w_pref (pref_model.yaml, default 0.0) rather than a static weight_key —
+# belt-and-suspenders alongside s_pref's own internal enabled/artifact checks (preference.py):
+# even a mistaken `enabled: true` flip without an explicit weight decision still contributes 0.0.
+DEFAULT_REGISTRY.register(BoundModule(
+    "s_pref", lambda dish, theta, ctx: P.s_pref(dish, theta, ctx),
+    phase="pref",
+    weight_fn=lambda ctx: CONFIG.w_pref,
+    confidence_fn=lambda dish, theta, ctx: 1.0,
+))
