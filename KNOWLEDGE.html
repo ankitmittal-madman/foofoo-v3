@@ -738,7 +738,7 @@ function deepDiveFeature(featureLabel){
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">246</span>
+      <span class="nav-badge">250</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -3122,6 +3122,9 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">database/rollback/051_public_dish_name_synonyms_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Drops public.dish_name_synonyms; public.dishes itself untouched</td></tr>
 <tr><td class="fr-file mono">database/validation/909_public_dish_ontology_validation.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Fail-loud checks over public.dish_name_synonyms: columns exist, cited evidence present, alias_type valid, no orphan aliases, no alias collides with a different dish's own name</td></tr>
 <tr><td class="fr-file mono">database/seeds/135_seed_public_dish_aliases_migrated.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Migrates all 352 previously-researched WP-19 alias rows (seeds 122-134) onto public.dish_name_synonyms, resolving dish_id by name against public.dishes instead of the retired md5 scheme; no alias content changed</td></tr>
+<tr><td class="fr-file mono">database/seeds/136_seed_public_dish_aliases_b14.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 14 WP-19 cited aliases: 22 dishes, 37 alias rows — North Indian street food, Goan, Gujarati, Maharashtrian, Hyderabadi cuisine</td></tr>
+<tr><td class="fr-file mono">database/seeds/137_seed_public_dish_aliases_b15.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 15 WP-19 cited aliases: 7 dishes, 10 alias rows — Lucknowi, Mughlai, Kerala cuisine</td></tr>
+<tr><td class="fr-file mono">database/seeds/138_seed_public_dish_aliases_b16.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S60</td><td class="fr-desc">Batch 16 WP-19 cited aliases: 8 dishes, 10 alias rows — regional sweets, breads, global fusion dishes</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
