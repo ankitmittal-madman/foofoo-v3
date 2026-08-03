@@ -142,10 +142,12 @@ MAIN_INGREDIENT_CATEGORIES = {
     "leafy_green",
 }
 
-# Known-risk ingredient names/aliases for the hidden-allergen-derivative gap report. hing is the
-# textbook example (often cut with wheat flour); anything already allergen_type='wheat'-adjacent
-# by name is added as a second, narrower check inside build_report().
-HIDDEN_ALLERGEN_RISK_NAMES = {"hing", "asafoetida"}
+# Known-risk ingredient names/aliases for the hidden-allergen-derivative gap report. Kept in sync
+# with ghar_re_core.catalogue.HIDDEN_DERIVATIVE_ALLERGENS (the table that actually ENFORCES these at
+# scoring time) so the report and the real filter never drift apart — see that table's own comments
+# for the researched basis of each entry (hing's wheat-flour carrier, soy sauce's traditional wheat
+# brewing, sambar powder/chaat masala's hing content).
+HIDDEN_ALLERGEN_RISK_NAMES = {"hing", "asafoetida", "soy_sauce", "sambar_powder", "chaat_masala"}
 
 
 @dataclass
@@ -327,7 +329,9 @@ def _jain_compatible(
 _PROTEIN_CENTRIC_DAIRY_NAMES = {"paneer", "khoya"}
 
 
-def _has_protein_centre(resolved_ingredients: list[tuple[str, bool]], ing_map: dict[str, dict]) -> bool:
+def _has_protein_centre(
+    resolved_ingredients: list[tuple[str, bool]], ing_map: dict[str, dict]
+) -> bool:
     """Whether ANY resolved ingredient in this dish is a main-protein-category item (meat/seafood/
     egg/lentil_legume — the last covers tofu already) or a protein-centric dairy name (paneer/khoya)
     — used by _hero_role's curry branch instead of only checking the FIRST ingredient's diet_type,
