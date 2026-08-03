@@ -72,6 +72,8 @@ CONFIG_FILES = (
     # ghar_re_service.media for the recipe-detail surface. Rides with the config bundle for a
     # single resolvable path (config.SRC); it is a cached data artifact, not engine math config.
     "recipes_v1.json",
+    # WP-18 dish -> Cloudinary public_id map (scripts/build_image_map.py). Read by media.image_url.
+    "dish_images_v1.json",
 )
 
 # class_first_v1/ subdirectory files. WP-15 shipped the first three (curated class taxonomy).

@@ -1,0 +1,140 @@
+"""
+Phase 8 — Recommendation engine BLACK-BOX behaviour testing.
+
+Rule (from the program brief): treat the RE as a black box. Do NOT verify formulas or score
+values. Verify observable behaviour only:
+
+  * correct HTTP outcome per persona (200 vs a clean 422 — never a 500),
+  * hard EXCLUSIONS honoured (a veg/jain household is never served a non_veg dish; an allergen
+    household is never served a dish containing that allergen),
+  * plate COUNT / shape contract,
+  * DIVERSITY (served plates are distinct),
+  * ORDERING (plates are returned in non-increasing plate_score),
+  * PERSISTENCE / determinism (the same request twice yields the same heroes),
+  * FALLBACK (a legitimately constrained household degrades via warnings[], not a 500).
+
+Every persona comes from ops/quality/personas/personas.py, itself grounded in the real request
+contract, so each case is a request the production service actually accepts.
+"""
+
+from __future__ import annotations
+
+import json
+
+import pytest
+
+from ops.quality.personas.personas import all_personas
+
+PERSONAS = all_personas()
+IDS = [p.key for p in PERSONAS]
+
+
+def _resolve_diets(body: dict, dish_index: dict) -> list[str]:
+    """Return the diet of every served hero dish, resolved via the catalogue (black-box)."""
+    diets = []
+    for plate in body.get("plates", []):
+        for did in plate.get("hero_dish_ids", []):
+            dish = dish_index.get(did)
+            if dish is not None:
+                diets.append(getattr(dish, "diet", None))
+    return diets
+
+
+def _resolve_ingredients(body: dict, dish_index: dict) -> set[str]:
+    """Return the union of ingredient tokens across every served hero dish (lowercased)."""
+    toks: set[str] = set()
+    for plate in body.get("plates", []):
+        for did in plate.get("hero_dish_ids", []):
+            dish = dish_index.get(did)
+            if dish is None:
+                continue
+            for name in getattr(dish, "ingredient_names", []) or []:
+                toks.add(str(name).lower())
+    return toks
+
+
+@pytest.mark.parametrize("persona", PERSONAS, ids=IDS)
+def test_persona_http_outcome(persona, signed_post):
+    """Each persona yields its expected HTTP status — and NEVER a 500 (a 500 is always a defect)."""
+    r = signed_post("/v1/recommendations", {"household": persona.household,
+                                             "context": persona.context})
+    assert r.status_code != 500, f"{persona.key}: server error 500 — {r.text}"
+    assert r.status_code == persona.expect_status, (
+        f"{persona.key}: expected {persona.expect_status}, got {r.status_code}: {r.text}")
+
+
+@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+    p.key for p in PERSONAS if p.expect_status == 200])
+def test_persona_diet_exclusion(persona, signed_post, dish_index):
+    """A household's forbidden diet (e.g. non_veg for a veg/jain household) is never served."""
+    if not persona.forbid_diet:
+        pytest.skip("no diet exclusion asserted for this persona")
+    r = signed_post("/v1/recommendations", {"household": persona.household,
+                                             "context": persona.context})
+    assert r.status_code == 200, r.text
+    diets = _resolve_diets(r.json(), dish_index)
+    violations = [d for d in diets if d in persona.forbid_diet]
+    assert not violations, f"{persona.key}: served forbidden diet(s) {set(violations)}"
+
+
+@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.forbid_ingredients], ids=[
+    p.key for p in PERSONAS if p.forbid_ingredients])
+def test_persona_allergen_exclusion(persona, signed_post, dish_index):
+    """An allergen household is never served a dish containing the forbidden ingredient token."""
+    r = signed_post("/v1/recommendations", {"household": persona.household,
+                                             "context": persona.context})
+    assert r.status_code == 200, r.text
+    served = _resolve_ingredients(r.json(), dish_index)
+    hit = [tok for tok in persona.forbid_ingredients if tok.lower() in served]
+    assert not hit, f"{persona.key}: served forbidden allergen ingredient(s) {hit}"
+
+
+@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200
+                                     and p.expect_plates == 7], ids=[
+    p.key for p in PERSONAS if p.expect_status == 200 and p.expect_plates == 7])
+def test_persona_plate_count(persona, signed_post):
+    """Personas expected to reach a full plan return exactly the contracted 7 plates."""
+    r = signed_post("/v1/recommendations", {"household": persona.household,
+                                             "context": persona.context})
+    assert r.status_code == 200, r.text
+    assert len(r.json()["plates"]) == 7
+
+
+@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+    p.key for p in PERSONAS if p.expect_status == 200])
+def test_persona_diversity_and_ordering(persona, signed_post):
+    """Served plates are DISTINCT (no duplicate plan) and ordered by non-increasing plate_score."""
+    r = signed_post("/v1/recommendations", {"household": persona.household,
+                                             "context": persona.context})
+    assert r.status_code == 200, r.text
+    plates = r.json()["plates"]
+    plate_ids = [p["plate_id"] for p in plates]
+    assert len(plate_ids) == len(set(plate_ids)), f"{persona.key}: duplicate plate_id in plan"
+    scores = [p["plate_score"] for p in plates]
+    assert scores == sorted(scores, reverse=True), (
+        f"{persona.key}: plates not ordered by non-increasing plate_score: {scores}")
+
+
+@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+    p.key for p in PERSONAS if p.expect_status == 200])
+def test_persona_determinism(persona, signed_post):
+    """The same request twice yields identical hero dishes (persistence/repeatability)."""
+    body = {"household": persona.household, "context": persona.context}
+    r1 = signed_post("/v1/recommendations", body)
+    r2 = signed_post("/v1/recommendations", body)
+    assert r1.status_code == 200 and r2.status_code == 200
+    heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+    heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+    assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+
+
+@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_warnings is not None], ids=[
+    p.key for p in PERSONAS if p.expect_warnings is not None])
+def test_persona_fallback_warnings(persona, signed_post):
+    """A constrained household degrades via warnings[], never via a 500 (fallback behaviour)."""
+    r = signed_post("/v1/recommendations", {"household": persona.household,
+                                             "context": persona.context})
+    assert r.status_code == 200, r.text
+    has_warn = bool(r.json()["warnings"])
+    assert has_warn == persona.expect_warnings, (
+        f"{persona.key}: warnings present={has_warn}, expected={persona.expect_warnings}")
