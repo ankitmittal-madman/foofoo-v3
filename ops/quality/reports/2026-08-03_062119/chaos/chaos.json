@@ -1,0 +1,14 @@
+{
+  "checks": [
+    {
+      "check": "not_ready_returns_503_or_401",
+      "ok": true,
+      "status": 401
+    },
+    {
+      "check": "unsigned_rejected_401",
+      "ok": true,
+      "status": 401
+    }
+  ]
+}

@@ -22,3 +22,9 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+
+# ops/quality — ignore future timestamped quality-report runs and the latest pointer,
+# but the module itself and any explicitly-added sample report stay tracked.
+ops/quality/reports/*/
+!ops/quality/reports/2026-08-03_062119/
+ops/quality/reports/latest.txt

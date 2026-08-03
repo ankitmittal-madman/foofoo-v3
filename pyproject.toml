@@ -44,6 +44,11 @@ select = ["E", "W", "F", "I", "B", "UP", "C4", "SIM"]
 # tests, deliberately "wrong" values that exist precisely to be rejected.
 "*/tests/*" = ["E501"]
 
+# ops/quality — the production quality-gate module. Its persona fixtures and feature-matrix rows
+# are intentionally dense one-line data records (the same justification as test files above), so
+# E501 line-length is exempted here while every REAL-defect rule (F/B/etc.) stays on.
+"ops/quality/*" = ["E501"]
+
 # ghar_re_core is the FROZEN reference implementation of the recommendation mathematics, locked by
 # the golden-master test (ghar_re_core/tests/test_golden_master.py). The rules disabled below are
 # purely cosmetic — line length, dict() vs {}, import order, syntax modernisation, `l` as the

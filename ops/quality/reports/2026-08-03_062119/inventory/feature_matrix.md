@@ -1,6 +1,6 @@
 # Feature Matrix (Phase 2)
 
-_Generated 2026-08-03T06:04:43.638640+00:00 · git `1860c9e`_
+_Generated 2026-08-03T06:21:19.347380+00:00 · git `aa841f5`_
 
 | feature | description | owner | dependencies | status | testability | priority | risk | missing | evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

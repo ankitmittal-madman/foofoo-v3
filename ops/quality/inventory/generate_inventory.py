@@ -21,8 +21,8 @@ import json
 import os
 import re
 import subprocess
-from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -190,7 +190,7 @@ def build_feature_matrix(comps: list[Component]) -> list[Feature]:
 
     endpoints = [c.name for c in kinds.get("http-endpoint", [])]
     edge = [c.name for c in kinds.get("edge-function", [])]
-    screens = [c for c in kinds.get("mobile-screen", [])]
+    screens = list(kinds.get("mobile-screen", []))
 
     feats: list[Feature] = []
 
@@ -288,7 +288,7 @@ def generate(out_dir: Path | None = None) -> dict:
 
     comps = discover_components()
     feats = build_feature_matrix(comps)
-    generated_at = datetime.now(timezone.utc).isoformat()
+    generated_at = datetime.now(UTC).isoformat()
     head = _git_head()
 
     by_kind: dict[str, int] = {}
@@ -302,7 +302,7 @@ def generate(out_dir: Path | None = None) -> dict:
     }
     (out_dir / "inventory.json").write_text(json.dumps(inv, indent=2), encoding="utf-8")
 
-    inv_md = [f"# Repository Inventory (Phase 1)\n",
+    inv_md = ["# Repository Inventory (Phase 1)\n",
               f"_Generated {generated_at} · git `{head}`_\n",
               f"**{len(comps)} components discovered.**\n", "## By kind\n"]
     inv_md.append(_md_table(
@@ -314,7 +314,7 @@ def generate(out_dir: Path | None = None) -> dict:
     fm = {"generated_at": generated_at, "git_head": head,
           "features": [asdict(f) for f in feats]}
     (out_dir / "feature_matrix.json").write_text(json.dumps(fm, indent=2), encoding="utf-8")
-    fm_md = [f"# Feature Matrix (Phase 2)\n", f"_Generated {generated_at} · git `{head}`_\n",
+    fm_md = ["# Feature Matrix (Phase 2)\n", f"_Generated {generated_at} · git `{head}`_\n",
              _md_table([asdict(f) for f in feats],
                        ["feature", "description", "owner", "dependencies", "status",
                         "testability", "priority", "risk", "missing", "evidence"])]

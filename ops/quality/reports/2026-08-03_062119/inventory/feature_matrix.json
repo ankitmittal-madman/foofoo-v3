@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-03T06:04:43.638640+00:00",
-  "git_head": "1860c9e",
+  "generated_at": "2026-08-03T06:21:19.347380+00:00",
+  "git_head": "aa841f5",
   "features": [
     {
       "feature": "Recommendation engine (RE core math)",

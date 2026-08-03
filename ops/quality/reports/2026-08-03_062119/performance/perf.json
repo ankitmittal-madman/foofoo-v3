@@ -1,0 +1,28 @@
+{
+  "disclaimer": "in-process TestClient micro-benchmark; not a network/load test",
+  "iterations": 120,
+  "endpoints": {
+    "/v1/meta": {
+      "count": 120,
+      "errors": 0,
+      "p50_ms": 2.41,
+      "p95_ms": 4.07,
+      "p99_ms": 5.33,
+      "max_ms": 5.84,
+      "mean_ms": 2.66
+    },
+    "/v1/recommendations": {
+      "count": 120,
+      "errors": 0,
+      "p50_ms": 43.48,
+      "p95_ms": 68.11,
+      "p99_ms": 96.69,
+      "max_ms": 97.46,
+      "mean_ms": 46.34
+    }
+  },
+  "cold_start_ms": 70.06,
+  "warn_threshold_p99_ms": 1500.0,
+  "within_threshold": true,
+  "status": "pass"
+}

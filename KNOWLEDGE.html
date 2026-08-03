@@ -681,11 +681,15 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🧩</span> S49 · Multi-membership dish→class fix + WP-18 planning surfaces
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s50')">
+    <div class="nav-item" onclick="showPage('s50')">
       <span class="nav-icon">🍆</span> S50 · Cited regional-name dish aliases (WP-19)
       <span class="nav-badge">Aug 3</span>
     </div>
-    <!-- NAV_INJECT -->
+    <div class="nav-item active" onclick="showPage('s51')">
+  <span class="nav-icon">✅</span> S51 · Production Quality Gate
+  <span class="nav-badge">Aug 3</span>
+</div>
+<!-- NAV_INJECT -->
   </div>
 
   <hr class="sidebar-divider">
@@ -2097,7 +2101,22 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Founder reported the recommendation engine "not working as expected" and asked to read every visuals-folder doc and enhance the live RE so cold-start feels like the plan available in Indian_Meal_Cohort_Persona_DB_v3 — implementing the excel's SCIENCE, not copying its precomputed cells, per five directives (right cohort from onboarding, right sub-cohort built as science not copied, link region/migration/add-on/non-veg, build the computation, use ML where it helps). Read RE-Visual-01→05 in full: confirmed the live engine is the Python ghar_re_core/ghar_re_service (RE-Visual-01/02/03 describe the deleted legacy TypeScript engine), and that WP-15 (shipped earlier the same day) had already filled the master formula's w_cohort·S_cohort seam with a BINARY 1.0/0.0 check using only 3 of the persona DB's 22 sheets. Founder chose: build directly now, train a model on the excel to generalize, cold-start-strong decaying with data. Built WP-16 as a new subsystem: (1) an offline prepare_cohort_intel.py that extracts 6 reference sheets (migration overlay, state profile, non-veg logic, persona master, subcohort routing, main-cohort hierarchy) and TRAINS a factorized log-linear (Naive-Bayes-style) class-affinity model from the excel's 20,664-row Weekly_Class_Plan_v3 (2,952 cohorts × 7 days), joined to each cohort's feature vector — 1.49M weighted label examples → a 498 KB JSON artifact scored at runtime in pure Python (no numpy/sklearn in the Fly bundle). The model learns class propensities per feature and GENERALIZES by feature product to household combinations the excel never enumerated — the honest reading of "as intelligent as the excel, derived not copied," trained only on real authored data (FD-11 respected). (2) A new ghar_re_core/cohort_intel.py: recomputes the cohort feature vector live from θ every request (no stored persona ID — the retired fixed-persona architecture stays retired), computes a migration-blended graded class affinity in [0,1], and exposes soft sub-cohort membership for explainability. The City_Migration_Overlay_v3 science is now live: an MP household in Mumbai blends home-state signature classes + Mumbai lifestyle (Pitla-Bhakri, street chaat) + national-modern (salad bowl) by the overlay's own weights — the exact MP-in-Mumbai example the Founder cited. (3) Rewired scoring.s_cohort from binary to the graded affinity; score() now uses a cold-start-strong, decaying weight (CONFIG.w_cohort_effective(n): 0.60 at n=0 → 0.15 floor, half-life 25 interactions) — but feedback_events has 0 production rows, so every live household sits at full cold-start strength today (the decay mechanism exists, the data to move along it does not yet — same honest constraint as WP-14/WP-15). Added local_state + city_tier to θ; retired WP-15's now-dead binary cohort-match code from knowledge.py (kept only the curated dish→class lookup). Verified on the REAL 810-dish catalogue: a Tamil Nadu couple's cold-start breakfast slate reorders to lead with Rava Upma (affinity 1.0) and Idli (0.55) — the persona-DB's actual TN breakfast plan — where the rule-only baseline led with dosas. Tests: new test_cohort_intel.py (features contract, graded/slot-specific/bounded, model-reproduces-a-real-cohort fidelity, generalization, migration-overlay shift, membership) + rewritten test_class_first_cohort.py for the graded/cold-start path; golden master regenerated intentionally (2 of 4 fixtures unchanged, 2 shifted scores only — same served plates, since the 39-dish fixture has few high-affinity matches in the tested slot); bundle rebuilt (810 dishes, model + 6 CSVs baked in). Full verification: 34/34 ghar_re_core + 62/62 ghar_re_service tests pass. Documented in [DRAFT]_WP-16_Cohort_Intelligence_Engine_v1.0.md (design, the ~16% dish→class coverage limit carried forward from WP-15, w_cohort=0.60 disclosed as a reasoned-not-calibrated default, and a Future/Deferred register incl. add-on member plates and coverage-raising), and updated RE-Visual-05's WP-15 steps to reflect the graded+migration reality. Coverage caveat unchanged: only 129/810 dishes carry a curated class, so WP-16 makes the matched dishes far smarter but does not widen the map (WP16-F1). Disclosure: this KNOWLEDGE.html entry is a timeline-row addition, not a full swim-lane/detail page per the skill's complete template — noted honestly given this session's time budget.</div>
     </div>
   </div>
-  <!-- TIMELINE_INJECT -->
+  <div class="timeline-row">
+  <div class="tl-date">2026-08-03</div>
+  <div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div>
+  <div class="tl-content">
+    <span class="tl-badge" style="background:#eff4ff;color:#1a56db">S51</span>
+    <div class="tl-title">Production Quality Gate (ops/quality)</div>
+    <div class="tl-chips">
+      <span class="tl-chip" onclick="showPage('s51')">quality suite</span>
+      <span class="tl-chip" onclick="showPage('s51')">15 personas</span>
+      <span class="tl-chip" onclick="showPage('s51')">208 tests</span>
+      <span class="tl-chip" onclick="showPage('s51')">launch verdict</span>
+    </div>
+    <div class="tl-note">One-command quality gate now runs 208 real tests (100% pass) and prints an honest launch verdict. Pending: DB + edge-function + mobile-UI certification in CI/staging.</div>
+  </div>
+</div>
+<!-- TIMELINE_INJECT -->
   </div>
 
   <!-- ── Modules ── -->
@@ -2463,7 +2482,35 @@ function deepDiveFeature(featureLabel){
     </div>
   </div>
 
-  <!-- MODULES_INJECT -->
+  <div class="detail-item">
+  <div class="detail-row" id="row-mod-quality-gate" onclick="toggleDetail('mod-quality-gate')">
+    <div class="detail-left">
+      <span class="tag tag-new">New</span>
+      <span class="detail-name">Production Quality Gate (ops/quality)</span>
+    </div>
+    <span class="detail-chevron" id="chev-mod-quality-gate">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-quality-gate">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">A self-contained, executable quality gate for the whole repository. One command runs every applicable check — repository inventory, static analysis, unit tests, API contract, recommendation behaviour across 15 personas, security, chaos/fail-safe, and performance — then writes a timestamped evidence report and prints whether the app can launch today.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>run_full_quality_suite.sh</code> — one command that runs the whole program end to end.<br>
+      <code>runner/orchestrator.py</code> — runs each check, saves evidence, computes the score and launch verdict.<br>
+      <code>runner/report_reader.py</code> — reads a report, ranks failures worst-first, re-runs only what failed.<br>
+      <code>runner/perf_benchmark.py</code> — measures how fast the recommendation service responds.<br>
+      <code>personas/personas.py</code> — 15 realistic households the tests run against.<br>
+      <code>suites/*.py</code> — the actual checks (contract, recommendation behaviour, security, planning).<br>
+      <code>ui/run_ui.mjs</code> — headless-browser + accessibility checks (runs only against a live web build).<br>
+      <code>inventory/generate_inventory.py</code> — auto-lists every part of the codebase and its test status.
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Before this, "is it working?" relied on running scattered test folders by hand and trusting the answer. Now anyone — including a non-engineer — runs one command and gets a single honest report: what passed, what could not be checked here, and whether it is safe to launch. It refuses to give a green light while critical surfaces (database, edge functions, mobile UI) are unverified.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S51 · Aug 3 2026</div>
+  </div>
+</div>
+<!-- MODULES_INJECT -->
   </div>
 
   <!-- ── Files register ── -->
@@ -2731,7 +2778,23 @@ function deepDiveFeature(featureLabel){
 <tr><td class="fr-file mono">database/rollback/045_dish_name_synonyms_ontology_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">Drops the added columns/constraint/index; pre-existing synonym rows unaffected</td></tr>
 <tr><td class="fr-file mono">database/seeds/122_seed_dish_aliases.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">37 web-researched, cited aliases across 8 dishes; each row alias_type/region/language/source_url/confidence, data_source='real', idempotent ON CONFLICT DO NOTHING; drops any alias that is itself a distinct catalogue dish (Obbattu/Bobbatlu)</td></tr>
 <tr><td class="fr-file mono">database/validation/907_dish_ontology_validation.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S50</td><td class="fr-desc">Fail-loud checks: WP-19 columns exist; every WP-19 'real' alias (alias_type IS NOT NULL) has source_url+confidence; alias_type valid; no orphan aliases</td></tr>
-  <!-- FILES_INJECT -->
+  <tr><td class="fr-file mono">ops/quality/run_full_quality_suite.sh</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">Single command that runs the whole quality program and prints the launch verdict.</td></tr>
+<tr><td class="fr-file mono">ops/quality/runner/orchestrator.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">Runs every check, collects evidence into a timestamped report, computes score + verdict.</td></tr>
+<tr><td class="fr-file mono">ops/quality/runner/report_reader.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">Reads a report, ranks failures by severity, and can re-run only the failing suites.</td></tr>
+<tr><td class="fr-file mono">ops/quality/runner/perf_benchmark.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">In-process latency benchmark (p50/p95/p99) of the recommendation endpoints.</td></tr>
+<tr><td class="fr-file mono">ops/quality/inventory/generate_inventory.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S51</td><td class="fr-desc">Auto-discovers every component + builds the feature matrix (lint cleanup this session).</td></tr>
+<tr><td class="fr-file mono">ops/quality/personas/personas.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">15 test personas (7 real households + 8 edge/malformed) with behavioural expectations.</td></tr>
+<tr><td class="fr-file mono">ops/quality/suites/conftest.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">Shared test fixtures: signed HTTP client, dish resolver, contract schema loader.</td></tr>
+<tr><td class="fr-file mono">ops/quality/suites/test_contract_boundary.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">Validates live API responses against the published JSON-Schema contract.</td></tr>
+<tr><td class="fr-file mono">ops/quality/suites/test_recommendation_behavior.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S51</td><td class="fr-desc">Black-box persona tests: diet/allergen exclusions, diversity, ordering, determinism.</td></tr>
+<tr><td class="fr-file mono">ops/quality/suites/test_api_security.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">Auth, tamper, stale, rate-limit, malformed/large payload security tests.</td></tr>
+<tr><td class="fr-file mono">ops/quality/suites/test_planning_surfaces.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">Tests the 5 WP-18 planning endpoints (cold-start/meal/weekly/class/recipe).</td></tr>
+<tr><td class="fr-file mono">ops/quality/ui/run_ui.mjs</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">Playwright driver for headless UI + a11y; skips honestly when no web target.</td></tr>
+<tr><td class="fr-file mono">ops/quality/README.md</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S51</td><td class="fr-desc">How to run the quality gate and what is verified vs gated in this environment.</td></tr>
+<tr><td class="fr-file mono">pyproject.toml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S51</td><td class="fr-desc">Added ops/quality E501 lint exemption (data-dense fixtures), matching the tests convention.</td></tr>
+<tr><td class="fr-file mono">.gitignore</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S51</td><td class="fr-desc">Ignore future timestamped quality-report runs; keep the module + one sample report.</td></tr>
+
+<!-- FILES_INJECT -->
       </tbody>
     </table>
   </div>
@@ -3186,7 +3249,27 @@ function deepDiveFeature(featureLabel){
     <div class="decision-a">Adding 'Gutti Vankaya' or 'Obbattu' as a synonym of another dish would conflate two distinct real catalogue entries into one. The seed drops any candidate alias that already exists as its own DISTINCT dish (Obbattu/Bobbatlu) so the ontology maps names to the same dish, never merges two genuinely different dishes.</div>
     <div class="decision-meta">S50 &middot; Aug 3, 2026</div>
   </div>
-  <!-- DECISIONS_INJECT -->
+  <div class="decision-item">
+  <div class="decision-q">Where should the testing module live, given the frozen top-level architecture?</div>
+  <div class="decision-a">Under ops/quality/ — the Founder chose this over a new top-level tree, so the frozen-architecture rule in CLAUDE.md holds and no RACR was needed.</div>
+  <div class="decision-meta">S51 · Aug 3</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Should the recommendation engine's scoring maths be tested directly?</div>
+  <div class="decision-a">No — per the brief it is tested as a black box: observable behaviour only (veg/jain never served non-veg, allergens excluded, 7 plates, deterministic, ordered), never a score formula.</div>
+  <div class="decision-meta">S51 · Aug 3</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">Can the app "launch today" when all runnable tests pass?</div>
+  <div class="decision-a">No. Database, edge functions, and mobile UI cannot be exercised in this environment, so the verdict is "NOT CERTIFIABLE HERE" — an unverified P0 surface blocks certification even with zero failing tests. Honesty over a green light.</div>
+  <div class="decision-meta">S51 · Aug 3</div>
+</div>
+<div class="decision-item">
+  <div class="decision-q">A batch of persona tests failed on first run — product bug or test bug?</div>
+  <div class="decision-a">Test bug: the derived personas used the wrong request shape (veg_days/member_ages/objective). Root-caused against the live contract and fixed the fixtures; the golden-household personas had passed all along, confirming the engine was correct.</div>
+  <div class="decision-meta">S51 · Aug 3</div>
+</div>
+<!-- DECISIONS_INJECT -->
   </div>
 
   <!-- ── Session 1 ── -->
@@ -8275,7 +8358,7 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s49 -->
-  <div id="page-s50" class="page-content">
+  <div id="page-s50" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S50 · Cited regional-name dish aliases (WP-19)</div>
       <div class="page-subtitle">Started giving every dish its real regional names — so a Madhya Pradesh user living in Mumbai sees "Bharwa Baingan", not the unfamiliar Marathi name "Bharli Vangi" for the same dish.</div>
@@ -8313,7 +8396,207 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s50 -->
-  <!-- SESSIONS_INJECT -->
+  <div id="page-s51" class="page-content">
+  <div class="page-header">
+    <div class="page-title">S51 · Production Quality Gate</div>
+    <div class="page-subtitle">Built a one-command quality gate that runs 208 real tests, saves the evidence, and honestly says whether the app can launch.</div>
+  </div>
+  <div class="impact-bar">
+    <div class="impact-col impact-before">
+      <div class="impact-label">⛔ Before this session</div>
+      <div class="impact-text">Checking whether the app worked meant running scattered test folders by hand and trusting the result; there was no single view of overall quality or launch-readiness.</div>
+    </div>
+    <div class="impact-arrow">→</div>
+    <div class="impact-col impact-after">
+      <div class="impact-label">✅ After this session</div>
+      <div class="impact-text">One command runs every check across the whole system and produces a single report — pass/fail, a quality score, and a plain-English launch verdict that refuses to green-light unverified critical surfaces.</div>
+    </div>
+  </div>
+  <div class="files-changed">
+    <div class="files-changed-label">📁 Files changed this session</div>
+    <div class="files-changed-list">
+      <span class="fc-file"><span class="fc-path">ops/quality/run_full_quality_suite.sh</span><span class="tag tag-new">New</span></span>
+      <span class="fc-file"><span class="fc-path">ops/quality/runner/orchestrator.py</span><span class="tag tag-new">New</span></span>
+      <span class="fc-file"><span class="fc-path">ops/quality/suites/*.py</span><span class="tag tag-new">New</span></span>
+      <span class="fc-file"><span class="fc-path">ops/quality/personas/personas.py</span><span class="tag tag-new">New</span></span>
+      <span class="fc-file"><span class="fc-path">ops/quality/ui/run_ui.mjs</span><span class="tag tag-new">New</span></span>
+      <span class="fc-file"><span class="fc-path">pyproject.toml</span><span class="tag tag-cfg">Config</span></span>
+    </div>
+  </div>
+  <div class="session-card">
+    <div class="session-card-header">
+      <div class="session-card-title">What was built this session</div>
+      <div class="session-card-meta">Aug 3 2026<br>15 things touched</div>
+    </div>
+    <div class="session-card-desc">A production-quality testing framework under ops/quality. It discovers every part of the codebase, runs unit + contract + security + recommendation-behaviour + performance + chaos checks, and drives 15 realistic households through the live recommendation service. It writes a timestamped evidence folder (summary in text, markdown and HTML) and computes a launch verdict. Suites that cannot run here (database, edge functions, mobile UI) are recorded as skipped/blocked with the exact reason — never faked.</div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+      <div class="stat"><div class="stat-n" style="color:#5145b8">13</div><div class="stat-l">Code files</div></div>
+      <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB changes</div></div>
+      <div class="stat"><div class="stat-n" style="color:#92500a">208</div><div class="stat-l">Tests run</div></div>
+    </div>
+  </div>
+  <div class="view-tabs">
+    <div class="view-tab active" onclick="switchView('s51','swim')">Swim lane flow</div>
+    <div class="view-tab" onclick="switchView('s51','detail')">Detail drill-down</div>
+    <div class="view-tab" onclick="switchView('s51','flows')">Feature flows</div>
+  </div>
+  <div id="s51-swim" class="view-pane active">
+    <div class="swim-lane lane-blue">
+      <div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Phone</div><div class="swim-label-sub">operator sees</div></div></div>
+      <div class="swim-body">
+        <div class="swim-step">
+          <div class="step-num num-blue">1</div>
+          <div class="step-content"><div class="step-title-row"><span class="step-title">Run one command</span><span class="tag tag-new">New</span></div>
+          <div class="step-desc">Anyone runs a single command and waits for a report — no knowledge of the test layout needed.</div></div>
+        </div>
+        <div class="swim-step">
+          <div class="step-num num-blue">7</div>
+          <div class="step-content"><div class="step-title-row"><span class="step-title">Read the verdict</span></div>
+          <div class="step-desc">A plain-English summary prints: quality score, pass rate, and whether the app can launch today.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="swim-arrow">↕ the command hands off to the orchestrator</div>
+    <div class="swim-lane" style="margin-bottom:10px">
+      <div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">App logic</div><div class="swim-label-sub">orchestrator</div></div></div>
+      <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+        <div class="swim-step" onclick="jumpDetail('s51','orchestrator')">
+          <div class="step-num num-purple">2</div>
+          <div class="step-content"><div class="step-title-row"><span class="step-title">Discover the codebase</span><span class="tag tag-new">New</span></div>
+          <div class="step-desc">Lists every service, endpoint, screen, migration and test, and builds a feature matrix.</div></div>
+        </div>
+        <div class="swim-step" onclick="jumpDetail('s51','personas')">
+          <div class="step-num num-purple">3</div>
+          <div class="step-content"><div class="step-title-row"><span class="step-title">Load 15 personas</span><span class="tag tag-new">New</span></div>
+          <div class="step-desc">Real and edge-case households (Jain, allergic, diabetic senior, infant, malformed) to test against.</div></div>
+        </div>
+        <div class="swim-step" onclick="jumpDetail('s51','recsys')">
+          <div class="step-num num-purple">4</div>
+          <div class="step-content"><div class="step-title-row"><span class="step-title">Run every check</span><span class="tag tag-new">New</span></div>
+          <div class="step-desc">Unit, contract, security, recommendation-behaviour, performance and chaos checks all run in sequence.</div></div>
+        </div>
+        <div class="swim-step" onclick="jumpDetail('s51','report')">
+          <div class="step-num num-purple">6</div>
+          <div class="step-content"><div class="step-title-row"><span class="step-title">Score + verdict</span><span class="tag tag-new">New</span></div>
+          <div class="step-desc">Aggregates results into a score and a launch verdict; unverified critical surfaces block a green light.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="swim-arrow">↕ checks call the live recommendation service</div>
+    <div class="swim-lane lane-amber">
+      <div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Server</div><div class="swim-label-sub">RE service</div></div></div>
+      <div class="swim-body">
+        <div class="swim-step">
+          <div class="step-num num-amber">5</div>
+          <div class="step-content"><div class="step-title-row"><span class="step-title">Answer the requests</span></div>
+          <div class="step-desc">The FastAPI recommendation service serves signed requests for all 15 households; responses are checked for exclusions, diversity, ordering and contract shape.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="next-box">
+      <div class="next-label">Next session</div>
+      <div class="next-text">Wire the gate into CI with a live Postgres and Deno so the database and edge-function checks actually run, and point it at a running mobile web build to unlock the UI + accessibility checks. Only then can the launch verdict move past "not certifiable here".</div>
+    </div>
+  </div>
+  <div id="s51-detail" class="view-pane">
+    <div class="detail-item">
+      <div class="detail-row" id="row-s51-orchestrator" onclick="toggleDetail('s51-orchestrator')">
+        <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">runner/orchestrator.py</span></div>
+        <span class="detail-chevron" id="chev-s51-orchestrator">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-s51-orchestrator">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">The conductor. It runs each check in order, saves the raw evidence for each into a dated report folder, then adds up the results into a single score and a launch verdict. It is deliberately honest: a check it cannot run here is recorded as "skipped" or "blocked" with the reason, never counted as a pass.</div>
+        <div class="dd-label">Input → Output</div>
+        <div class="dd-io"><div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The repository, plus optional settings for a database URL or web address.</div></div><div class="dd-io-arrow">→</div><div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A timestamped report folder (summary.txt/md/html + JSON) and a pass/fail exit code.</div></div></div>
+        <div class="dd-label">Flow through it</div>
+        <div class="dd-flow"><span class="dd-node">inventory</span><span class="dd-arrow">→</span><span class="dd-node">run each suite</span><span class="dd-arrow">→</span><span class="dd-node">collect evidence</span><span class="dd-arrow">→</span><span class="dd-node">score + verdict</span></div>
+        <div class="dd-label">Key line of code</div>
+        <div class="dd-code"><span class="dd-hl">can_launch = not hard_blockers and not unverified</span>  ← the app is only "launchable" if nothing failed AND no critical surface is unverified.</div>
+        <div class="dd-why"><div class="dd-why-q">Why block launch on unverified surfaces, not just failures?</div><div class="dd-why-a">For a system meant to serve millions, "we never checked the delete/export path or the database" is a launch risk, not a pass. Saying "not certifiable here" is the honest answer.</div></div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-s51-personas" onclick="toggleDetail('s51-personas')">
+        <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">personas/personas.py</span></div>
+        <span class="detail-chevron" id="chev-s51-personas">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-s51-personas">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">Defines 15 test households: the 7 shipped sample households plus 8 tricky ones — a strict Jain, a peanut-allergic person, a fasting household, a diabetic senior, a family with an infant, and deliberately broken inputs. Each carries what the app must do for it (e.g. "never serve non-veg", "must return a clean error").</div>
+        <div class="dd-label">Input → Output</div>
+        <div class="dd-io"><div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The real recommendation request contract.</div></div><div class="dd-io-arrow">→</div><div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A list of personas the behaviour tests iterate over.</div></div></div>
+        <div class="dd-label">Flow through it</div>
+        <div class="dd-flow"><span class="dd-node">golden households</span><span class="dd-arrow">+</span><span class="dd-node">edge/malformed</span><span class="dd-arrow">→</span><span class="dd-node">expectations</span></div>
+        <div class="dd-label">Key line of code</div>
+        <div class="dd-code"><span class="dd-hl">forbid_diet=("non_veg",)</span>  ← a vegetarian/Jain household must never be served a non-veg dish.</div>
+        <div class="dd-why"><div class="dd-why-q">Why include deliberately broken households?</div><div class="dd-why-a">To prove bad input produces a clean error (422), never a server crash (500) — the difference between a graceful app and one that falls over in front of a user.</div></div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-s51-recsys" onclick="toggleDetail('s51-recsys')">
+        <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">suites/test_recommendation_behavior.py</span></div>
+        <span class="detail-chevron" id="chev-s51-recsys">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-s51-recsys">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">Sends each persona to the live recommendation service and checks the answer as a black box: no non-veg for veg households, no allergens, exactly 7 distinct plates in ranked order, and the same request twice gives the same answer. It never inspects the scoring maths.</div>
+        <div class="dd-label">Input → Output</div>
+        <div class="dd-io"><div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A persona household + context.</div></div><div class="dd-io-arrow">→</div><div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Pass/fail on each behavioural rule.</div></div></div>
+        <div class="dd-label">Flow through it</div>
+        <div class="dd-flow"><span class="dd-node">sign request</span><span class="dd-arrow">→</span><span class="dd-node">POST /v1/recommendations</span><span class="dd-arrow">→</span><span class="dd-node">resolve dishes</span><span class="dd-arrow">→</span><span class="dd-node">assert rules</span></div>
+        <div class="dd-label">Key line of code</div>
+        <div class="dd-code"><span class="dd-hl">assert not violations, f"{persona.key}: served forbidden diet(s)"</span>  ← fails loudly if a forbidden dish reaches the plate.</div>
+        <div class="dd-why"><div class="dd-why-q">Why black-box and not test the formula?</div><div class="dd-why-a">The brief requires it, and it is the right call: behaviour is what users experience. A formula can change; "a Jain is never served non-veg" must never change.</div></div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-s51-report" onclick="toggleDetail('s51-report')">
+        <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">runner/report_reader.py</span></div>
+        <span class="detail-chevron" id="chev-s51-report">▾</span>
+      </div>
+      <div class="detail-drawer" id="draw-s51-report">
+        <div class="dd-label">What this does</div>
+        <div class="dd-text">Reads the latest report and lists every failure worst-first, so a human knows exactly what to fix. It can also re-run only the checks that failed, so a fix is re-validated in seconds instead of re-running everything.</div>
+        <div class="dd-label">Input → Output</div>
+        <div class="dd-io"><div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A report folder's results file.</div></div><div class="dd-io-arrow">→</div><div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A ranked triage list; optionally a re-run of only the failing suites.</div></div></div>
+        <div class="dd-label">Flow through it</div>
+        <div class="dd-flow"><span class="dd-node">load results</span><span class="dd-arrow">→</span><span class="dd-node">rank by severity</span><span class="dd-arrow">→</span><span class="dd-node">rerun failed (optional)</span></div>
+        <div class="dd-label">Key line of code</div>
+        <div class="dd-code"><span class="dd-hl">ranked.sort(key=lambda t: t[0])</span>  ← puts the most severe (P0) failures at the top of the triage list.</div>
+        <div class="dd-why"><div class="dd-why-q">Why not auto-edit the code to fix failures?</div><div class="dd-why-a">A quality tool that silently rewrites the code it is testing can't be trusted. It surfaces exactly what to fix and re-verifies after a human/agent fixes it.</div></div>
+      </div>
+    </div>
+    <div class="next-box"><div class="next-label">Next session</div><div class="next-text">Run the gate in CI with a live database and Deno, and against a running mobile web build, to certify the surfaces that are only "skipped/blocked" today.</div></div>
+  </div>
+  <div id="s51-flows" class="view-pane"></div>
+  <script>
+  window.FEATURE_FLOWS_S51 = [
+    {
+      id: 'quality-gate-run',
+      label: 'Run the quality gate',
+      steps: [
+        { layer:'Phone', tag:'UI', title:'Operator runs one command', desc:'A person runs the single entry-point script and waits for the report.',
+          codeFlow:[{chip:'ops/quality/run_full_quality_suite.sh'},{label:'calls'},{chip:'ops/quality/runner/orchestrator.py'}],
+          files:[{path:'ops/quality/run_full_quality_suite.sh', desc:'Sets the import paths and launches the orchestrator, then the triage reader.'}] },
+        { layer:'App logic', tag:'HOOK', title:'Orchestrator runs every check', desc:'Runs inventory, static analysis, unit, contract, recommendation, security, chaos and performance checks in order, saving evidence for each.',
+          codeFlow:[{chip:'ops/quality/runner/orchestrator.py'},{label:'runs'},{chip:'ops/quality/suites/test_recommendation_behavior.py'},{label:'+ perf'},{chip:'ops/quality/runner/perf_benchmark.py'}],
+          files:[{path:'ops/quality/runner/orchestrator.py', desc:'Runs each step, collects results, computes score + verdict.'},{path:'ops/quality/runner/perf_benchmark.py', desc:'Measures recommendation latency p50/p95/p99.'}] },
+        { layer:'Server', tag:'API', title:'Recommendation service answers', desc:'The behaviour and contract checks send signed requests to the live FastAPI service for all 15 households.',
+          codeFlow:[{chip:'ops/quality/suites/test_recommendation_behavior.py'},{label:'POST'},{chip:'ghar_re_service/ghar_re_service/main.py'}],
+          files:[{path:'ops/quality/suites/test_recommendation_behavior.py', desc:'Black-box persona checks against the live service.'}],
+          api:{endpoint:'POST /v1/recommendations', note:'HMAC-signed; checked for exclusions, diversity, ordering, contract shape.'} },
+        { layer:'App logic', tag:'HOOK', title:'Report + verdict written', desc:'Results become a timestamped evidence folder and a plain-English launch verdict; the triage reader lists any failures worst-first.',
+          codeFlow:[{chip:'ops/quality/runner/orchestrator.py'},{label:'then'},{chip:'ops/quality/runner/report_reader.py'}],
+          files:[{path:'ops/quality/runner/report_reader.py', desc:'Reads the report, ranks failures, can re-run only what failed.'}] }
+      ]
+    }
+  ];
+  renderFeatureFlows('s51-flows', window.FEATURE_FLOWS_S51);
+  </script>
+</div>
+<!-- SESSIONS_INJECT -->
 
 </main>
 
