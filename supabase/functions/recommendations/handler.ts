@@ -21,7 +21,13 @@ import { UserJourney } from "../_shared/logging/userJourney.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 
-import { buildRequest, type HouseholdRaw, loadHouseholdRaw } from "./compose.ts";
+import {
+  buildRequest,
+  countInteractions,
+  type HouseholdRaw,
+  loadHouseholdRaw,
+  recordHouseholdContext,
+} from "./compose.ts";
 import { validateRequest, validateResponse } from "./contract.ts";
 import { callRecommendationEngine, type ReResult } from "./re-client.ts";
 import { buildFallbackResponse } from "./fallback.ts";
@@ -42,6 +48,10 @@ export interface RecommendationDeps {
     logger: RequestContext["logger"],
   ) => Promise<ReResult>;
   recordEvent?: typeof recordRecommendationEvent;
+  /** §0.2 — injectable so tests never need a live household_context table. */
+  recordContext?: typeof recordHouseholdContext;
+  /** §0.2 — injectable so tests never need a live feedback_events table. */
+  countInteractionsFn?: typeof countInteractions;
 }
 
 function plateCount(body: Record<string, unknown>): number {
@@ -56,6 +66,8 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     ((payload, requestId, cfg, logger) =>
       callRecommendationEngine(payload, requestId, cfg, logger));
   const recordEvent = deps.recordEvent ?? recordRecommendationEvent;
+  const recordContext = deps.recordContext ?? recordHouseholdContext;
+  const countInteractionsFn = deps.countInteractionsFn ?? countInteractions;
 
   return async (req, ctx) => {
     if (req.method !== "POST") {
@@ -106,7 +118,28 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     const contextOverride = (body.context && typeof body.context === "object")
       ? body.context as Record<string, unknown>
       : undefined;
-    const payload = buildRequest(household, contextOverride, requestId);
+
+    // §0.2: interaction_count closes the gap where w_cohort_effective/foreign_demote_effective
+    // (ghar_re_core/config.py) were dead code paths — always n=0 — because no real caller ever
+    // populated ctx['interaction_count']. Computed BEFORE buildRequest so it is merged into
+    // `context` prior to validateRequest below, exactly like every other context field.
+    const interactionCount = await countInteractionsFn(ctx, hid);
+    const payload = buildRequest(household, contextOverride, requestId, interactionCount);
+
+    // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
+    // household_context, so the household's NEXT call finds real history via loadLatestContext
+    // instead of always falling through to DEFAULT_CONTEXT. Best-effort telemetry, same
+    // "don't let a secondary write fail an otherwise-successful request" pattern as
+    // recordRecommendationEvent below — recordHouseholdContext itself never throws, but this is
+    // wrapped defensively anyway so a future change to that contract can't regress the request.
+    try {
+      await recordContext(ctx, hid, payload.context as Record<string, unknown>);
+    } catch (e) {
+      log.warn("household_context.record_call_failed", {
+        household_id: hid,
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    }
 
     // Validate the OUTGOING payload against the shared contract BEFORE calling the RE (RE-DOC-10 §15).
     const reqCheck = validateRequest(payload);

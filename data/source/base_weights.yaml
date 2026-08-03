@@ -16,3 +16,20 @@ base_weights:
   W_EFFORT:  0.40   # D2 effort module (context-dependent)
 confidence:
   all_conf_k: 1.0   # v1 pins every module confidence to 1.0; v2 calibrates [SP-F3]
+
+# Ghar RE — ScoringModule registry seam (Phase 1, RE-DOC-11 §8).
+# Optional: which base_weights-driven BASE modules are active, in what order. Defaults to "all
+# modules enabled, current order" so nothing changes unless this is explicitly edited — a future
+# module can be disabled via config alone (a deploy, not a code change), matching Phase 3's
+# s_pref disable-flag pattern. NOT YET READ by ghar_re_core.modules_default (Phase 1 only adds the
+# config seam; wiring modules_default to actually honor this list is a future step).
+module_registry:
+  enabled_modules:
+    - m_palette
+    - m_slot
+    - m_season
+    - sig
+    - m_age
+    - m_household
+    - m_weather
+    - prior_boost

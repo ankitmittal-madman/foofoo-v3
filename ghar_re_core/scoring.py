@@ -294,18 +294,17 @@ def prior_boost(dish, theta, ctx):
 
 
 def base(dish, theta, ctx):
-    """BASE = Σ_k W_k·conf_k·m_k + PRIOR[zone][slot]  (§S2 PART B). conf_k pinned 1.0 (v1)."""
-    cfg = CONFIG
-    conf = cfg.all_conf_k
-    val = (cfg.W("W_PALETTE") * conf * m_palette(dish, theta)
-           + cfg.W("W_SLOT") * conf * m_slot(dish, ctx)
-           + cfg.W("W_SEASON") * conf * m_season(dish, ctx)
-           + cfg.W("W_SIG") * conf * sig(dish)
-           + cfg.W("W_AGE") * conf * m_age(dish, theta)
-           + cfg.W("W_HOUSE") * conf * m_household(dish, theta)
-           + cfg.W("W_WEATHER") * conf * m_weather(dish, theta, ctx)   # signed
-           + prior_boost(dish, theta, ctx))
-    return val
+    """BASE = Σ_k W_k·conf_k·m_k + PRIOR[zone][slot]  (§S2 PART B). conf_k pinned 1.0 (v1).
+
+    Delegates to ghar_re_core.modules_default.DEFAULT_REGISTRY's phase="base" modules (Phase 1
+    ScoringModule registry refactor) — the 7 W_k-weighted terms + prior_boost, combined as a
+    weighted sum. Each underlying m_palette/m_slot/.../prior_boost function body is UNCHANGED;
+    only how they're invoked/composed moved into the registry, so this is score-neutral by
+    construction. Imported lazily (not at module top) to avoid a circular import: modules_default
+    imports scoring's own functions to build its BoundModule wrappers."""
+    from ghar_re_core.modules_default import DEFAULT_REGISTRY
+    total, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="base")
+    return total
 
 
 # =====================================================================================
@@ -409,13 +408,16 @@ def score(dish, theta, ctx, objective):
     (+ w_pref·S_pref[=0 v1] − PENALTY[assemble]).
 
     Both cohort weight and foreign demote are WP-16 cold-start-strong, decaying with
-    ctx['interaction_count'] (0 for a new household — every live household today)."""
-    n = ctx.get("interaction_count", 0)
-    w = CONFIG.w_cohort_effective(n)
-    wf = CONFIG.foreign_demote_effective(n)
-    return (base(dish, theta, ctx) * gain_q15(dish, objective)
-            + w * s_cohort(dish, theta, ctx)
-            - wf * s_foreign(dish))
+    ctx['interaction_count'] (0 for a new household — every live household today).
+
+    The `w·S_cohort − wf·S_foreign` term is computed via DEFAULT_REGISTRY's phase="cohort"
+    modules (Phase 1 ScoringModule registry refactor): s_foreign's module models its effective
+    weight as NEGATIVE (see modules_default.py), so combine()'s plain weighted sum already nets
+    out to the same subtraction — no special-casing needed here. s_cohort/s_foreign's own bodies
+    are unchanged."""
+    from ghar_re_core.modules_default import DEFAULT_REGISTRY
+    cohort_val, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="cohort")
+    return base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val
 
 
 # ---------------------------------------------------------------------------

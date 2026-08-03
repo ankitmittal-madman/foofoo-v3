@@ -152,6 +152,8 @@ Deno.test("POST /v1/recommendations success passes RE plates[]/contributions[] t
     const deps: RecommendationDeps = {
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      countInteractionsFn: () => Promise.resolve(0),
       callRe: (_payload, requestId) => {
         called++;
         return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
@@ -169,6 +171,36 @@ Deno.test("POST /v1/recommendations success passes RE plates[]/contributions[] t
   });
 });
 
+// ── 1b. §0.2 interaction_count wiring ────────────────────────────────────────────────────────────
+Deno.test("POST /v1/recommendations merges interaction_count into the outgoing RE payload's context", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    let sentPayload: Record<string, unknown> | undefined;
+    let recordedContext: Record<string, unknown> | undefined;
+    const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
+      recordContext: (_ctx, _profileId, context) => {
+        recordedContext = context;
+        return Promise.resolve();
+      },
+      countInteractionsFn: () => Promise.resolve(7),
+      callRe: (payload, requestId) => {
+        sentPayload = payload;
+        return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
+      },
+    };
+    const res = await pipeline(deps)(post());
+    assertEquals(res.status, 200);
+    const sentContext = sentPayload?.context as Record<string, unknown>;
+    assertEquals(sentContext.interaction_count, 7);
+    // §0.2: recordHouseholdContext is called with the SAME resolved context buildRequest sent —
+    // this is what makes household_context a true historical record of what a request actually
+    // used, not a separately-derived approximation of it.
+    assertEquals(recordedContext, sentContext);
+  });
+});
+
 // ── 2. timeout → fallback (no retry) ─────────────────────────────────────────────────────────────
 Deno.test("POST /v1/recommendations timeout returns a retryable error, not a guessed plate", async () => {
   await withEnv(REQUIRED_ENV, async () => {
@@ -177,6 +209,8 @@ Deno.test("POST /v1/recommendations timeout returns a retryable error, not a gue
     const deps: RecommendationDeps = {
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      countInteractionsFn: () => Promise.resolve(0),
       callRe: () => {
         called++;
         return Promise.resolve({
@@ -264,6 +298,8 @@ Deno.test("malformed composed payload is rejected before the RE is called (400, 
       loadHousehold: () =>
         Promise.resolve({ household: invalidHousehold, householdId: "stub", stubbed: true }),
       recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      countInteractionsFn: () => Promise.resolve(0),
       callRe: () => {
         called++;
         return Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse("x") });
@@ -293,6 +329,8 @@ Deno.test("household_id owned by another user is rejected before loadHousehold/c
         eventCalled++;
         return Promise.resolve();
       },
+      recordContext: () => Promise.resolve(),
+      countInteractionsFn: () => Promise.resolve(0),
       callRe: (_payload, requestId) => {
         reCalled++;
         return Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) });
@@ -319,6 +357,8 @@ Deno.test("household_id equal to the caller's own id is allowed through", async 
     const deps: RecommendationDeps = {
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      countInteractionsFn: () => Promise.resolve(0),
       callRe: (_payload, requestId) =>
         Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) }),
     };
@@ -333,6 +373,8 @@ Deno.test("omitting household_id defaults to the caller's own id and is allowed 
     const deps: RecommendationDeps = {
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      countInteractionsFn: () => Promise.resolve(0),
       callRe: (_payload, requestId) =>
         Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) }),
     };

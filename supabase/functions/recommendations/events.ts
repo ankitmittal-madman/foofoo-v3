@@ -12,6 +12,7 @@
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
+import { buildShownNotTappedRows, flattenServedDishes, resolveDishIdsByName } from "./served.ts";
 
 export type RecommendationOutcome =
   | "success"
@@ -70,9 +71,10 @@ export async function recordRecommendationEvent(
   // complete record for that case.
   if (ev.stubbed) return;
 
+  let insertedId: string | null = null;
   try {
     const db = createServiceRoleClient(ctx.config);
-    const { error } = await withTimeout(
+    const { data, error } = await withTimeout(
       db.from("recommendation_events").insert({
         profile_id: ev.householdId,
         request_id: ev.requestId,
@@ -87,10 +89,11 @@ export async function recordRecommendationEvent(
         config_version: ev.configVersion ?? null,
         decision_trace: ev.decisionTrace ?? null,
         data_source: "real",
-      }),
+      }).select("id").single(),
       "recommendations.events.record",
     );
     if (error) throw error;
+    insertedId = (data as { id: string } | null)?.id ?? null;
   } catch (e) {
     ctx.logger.warn("recommendation_event.persist_failed", {
       request_id: ev.requestId,
@@ -98,5 +101,39 @@ export async function recordRecommendationEvent(
       outcome: ev.outcome,
       detail: e instanceof Error ? e.message : String(e),
     });
+    return;
+  }
+
+  // §0.1: emit one `shown_not_tapped` feedback_events row per served hero dish, synchronously
+  // with the recommendation_events write above — this is the Edge-Function-side "served"
+  // denominator Phase 2's bandit later reads (module doc, served.ts). A later real
+  // accept/like/dislike/edit/swap row sharing this recommendation_event_id+dish_id supersedes it
+  // at READ time; nothing here needs to delete/update it. Best-effort, same as the write above:
+  // never turns an otherwise-successful recommendation into an error for the user.
+  if (ev.outcome === "success" && insertedId && Array.isArray(ev.plates) && ev.plates.length > 0) {
+    try {
+      const db = createServiceRoleClient(ctx.config);
+      const served = flattenServedDishes(ev.plates);
+      if (served.length > 0) {
+        const dishIds = await resolveDishIdsByName(ctx, db, served.map((s) => s.dishName));
+        const rows = buildShownNotTappedRows(ev.householdId, insertedId, served, dishIds);
+        const { error: feError } = await withTimeout(
+          db.from("feedback_events").insert(rows),
+          "recommendations.events.record_shown_not_tapped",
+        );
+        if (feError) throw feError;
+        ctx.logger.info("shown_not_tapped.recorded", {
+          request_id: ev.requestId,
+          household_id: ev.householdId,
+          row_count: rows.length,
+        });
+      }
+    } catch (e) {
+      ctx.logger.warn("shown_not_tapped.persist_failed", {
+        request_id: ev.requestId,
+        household_id: ev.householdId,
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    }
   }
 }

@@ -199,12 +199,24 @@ def test_weather_north_surfaces_pakora():
     assert "Onion Pakora" in served
 
 
-def test_weather_west_mh_surfaces_kanda_bhaji():
+def test_weather_west_mh_surfaces_pithla():
+    # RE plumbing plan §0.3: COMFORT_HERO_MAP's West-MH rain row used to read "Pithla-Bhakri"
+    # (hyphenated) — a pure spelling bug against the real catalogue's "Pithla" (no "Bhakri" at
+    # all) — so the comfort-hero lift silently never fired against the REAL catalogue. This
+    # ghar_re_core golden-sample fixture set happens to also contain a dish literally named
+    # "Kanda Bhaji" (coincidental to this small 39-dish sample, not present in the real seeded
+    # catalogue — see ghar_re_core/tests/test_comfort_hero.py), which is why this test previously
+    # asserted "Kanda Bhaji" won here: COMFORT_HERO_TO_DISH's old identity mapping
+    # ("Kanda Bhaji" -> "Kanda Bhaji") happened to resolve in THIS fixture world even though it
+    # was a no-op against the real one. Once "Kanda Bhaji" was correctly remapped to the real
+    # catalogue's "Pakora (Mixed Veg)" (absent from this small fixture set) and the
+    # "Pithla-Bhakri" bug was fixed to "Pithla" (present in both), "Pithla" is now the hero that
+    # actually resolves and wins here — which is the CORRECT behaviour post-fix, not a regression.
     theta, ranked, res = _rain_ranked("couple_mumbai_mh")
     assert theta["region"]["value"] == "West"
-    assert ranked[0] == "Kanda Bhaji", f"West-MH rain top should be Kanda Bhaji, got {ranked[0]}"
+    assert ranked[0] == "Pithla", f"West-MH rain top should be Pithla, got {ranked[0]}"
     served = {h for p in res["plates"] for h in p["heroes"]}
-    assert "Kanda Bhaji" in served
+    assert "Pithla" in served
 
 
 def test_weather_is_zone_specific_not_generic():
