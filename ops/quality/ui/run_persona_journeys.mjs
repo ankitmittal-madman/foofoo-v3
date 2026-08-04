@@ -529,10 +529,13 @@ async function runPersona(browser, persona) {
         await page.getByTestId("home-breakfast-why-0").click();
         await recordStep("home-why-this-opened");
         const feedbackActions = [
-          ["like", 0], ["dislike", 1], ["not-today", 2], ["never", 3],
+          ["breakfast", "like", 0],
+          ["breakfast", "dislike", 1],
+          ["lunch", "not-today", 0],
+          ["dinner", "never", 0],
         ];
-        for (const [event, index] of feedbackActions) {
-          const control = page.getByTestId(`home-breakfast-${event}-${index}`);
+        for (const [slot, event, index] of feedbackActions) {
+          const control = page.getByTestId(`home-${slot}-${event}-${index}`);
           if (!(await control.count())) throw new Error(`missing home ${event} control`);
           await clickWithApi(page, control, "feedback");
           await recordStep(`home-feedback-${event}`);
