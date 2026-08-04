@@ -12061,6 +12061,825 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s63 -->
 
+  <div id="page-s64" class="page-content">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S64 · Closed the feedback loop, made DPDP rights reachable, real error alerting</div>
+      <div class="page-subtitle">Fixed a bug where household activity was never actually being recorded, gave users a way to react to and understand their meal recommendations, put the already-built "export my data / delete my account" tools somewhere a user can actually find them, and made sure a real error in production now reaches an alert instead of just a log file.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">A like/dislike tap on the Home tab had nothing to attach to, so it silently did nothing. Editing your diet or allergens after onboarding looked like it saved but actually changed nothing in the database. The app had no history view, no profile-edit screen, and no way to reach the already-built data export/account deletion tools at all. Production errors only ever showed up in a log nobody was watching.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">Liking or disliking a meal on the Home tab now records against that recommendation, with a "Why this?" toggle showing the match reason. A new History tab shows your past recommendations. A new Profile-edit screen actually saves diet/allergen changes. A new Settings tab lets you request a data export or delete your account. Every planning call now correctly records which household made it. A production error now reaches a configurable webhook alert, not just a log line.</div>
+      </div>
+    </div>
+
+    <!-- ── Files changed this session ── -->
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">supabase/functions/plan/handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/recommendations/events.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/household/handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/household/store.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/household/schema.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/telemetry/telemetry.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/middleware/error-boundary.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/config/env.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/config/config.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/di/container.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_shared/mod.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_tests/foundation.test.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/_tests/household.test.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/recommendations.tsx</span><span class="tag tag-mod">Deleted</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/api/recommendations.ts</span><span class="tag tag-mod">Deleted</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(tabs)/today.tsx</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/api/plan.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/history.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/profile-edit.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/api/account.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(tabs)/settings.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(tabs)/_layout.tsx</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/onboarding/toHouseholdWrite.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/package.json</span><span class="tag tag-cfg">Config</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/jest.config.js</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/jest.setup.js</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/onboarding/__tests__/toHouseholdWrite.test.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/api/__tests__/errorMessages.test.ts</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/active/OPEN_ITEMS.md</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">docs/active/LAUNCH_BLOCKERS.md</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">docs/active/CURRENT_STATUS.md</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <!-- ── Summary card ── -->
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 4, 2026<br>32 things touched</div>
+      </div>
+      <div class="session-card-desc">Closed out most of the P0/P1 launch-blocker backlog: wired the missing household_context write, widened which surfaces log a feedback-resolvable event, fixed a real profile-update bug, and built four new mobile screens (feedback UI on Home, History, Profile-edit, Settings with DPDP export/delete). Added a real webhook alerting sink for production errors and stood up mobile unit testing from scratch. Deployed household and plan to production; left the confirmed-dead recommendations function alone.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">5</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">17</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">2</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+
+    <!-- ── View tabs ── -->
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s64','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s64','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s64','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s64-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s64','today-dishcard')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Taps like or dislike on a meal on the Home tab</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Every dish card on today's meal screen now has a thumbs up/down that actually records the reaction.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','today-dishcard')">
+            <div class="step-num num-blue">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Taps "Why this?" to see the match reason</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A small toggle reveals the match score and which cuisine/class this dish was picked for.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','history-screen')">
+            <div class="step-num num-blue">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Opens History to see past recommendations</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">A new tab lists every past recommendation, newest first, with a plain-English outcome label.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','profile-edit-screen')">
+            <div class="step-num num-blue">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Opens Profile edit to change diet or allergens</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">A new screen, pre-filled with your current answers, actually saves changes this time.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','settings-dpdp')">
+            <div class="step-num num-blue">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Opens Settings to request a data export or delete their account</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">The already-built data-rights tools finally have a screen a user can find and use.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ taps trigger calls into the app's own API layer</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s64','plan-ts-client')">
+            <div class="step-num num-purple">6</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">App calls the server for the caller's own history or profile</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Two new functions in the shared API layer ask the server for the caller's past recommendations or current profile.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','account-ts')">
+            <div class="step-num num-purple">7</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">App calls the server to start a data export or delete an account</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">A deletion only actually fires once the user types an exact confirmation phrase.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','tohouseholdwrite')">
+            <div class="step-num num-purple">8</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Allergen selections reuse the same logic as onboarding</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Profile-edit shares its allergen bit-mapping with the original onboarding flow instead of reimplementing it.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','mobile-test-infra')">
+            <div class="step-num num-purple">9</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">New automated tests check this logic without a real server</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">The mobile app has its first-ever unit test suite, run locally with no live backend needed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ successful calls write rows the app reads back later</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s64','plan-household-context')">
+            <div class="step-num num-teal">10</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Every planning call now records which household made it</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A table that should have been filling up with every meal request was stuck at zero rows — now it isn't.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','plan-feedback-surfaces')">
+            <div class="step-num num-teal">11</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">A like/dislike on today's meals now has something to attach to</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">More kinds of recommendations get logged, so a feedback tap on the Home tab actually finds a matching record.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','household-profile-update')">
+            <div class="step-num num-teal">12</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Editing your profile now actually updates your saved answers</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A repeat submission used to be silently ignored after the first one — now it updates in place.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ the server resolves each request against those tables</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s64','plan-history-profile-surfaces')">
+            <div class="step-num num-amber">13</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">The plan function looks up your history or current profile on request</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Two new read-only surfaces answer the History and Profile-edit screens without touching the recommendation engine at all.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','household-allergen-cap')">
+            <div class="step-num num-amber">14</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">The household function no longer rejects legitimate allergen combinations</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">An outdated limit was silently rejecting two of the newer allergen options.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s64','telemetry-webhook')">
+            <div class="step-num num-amber">15</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Every server error now reaches a real alert channel</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">A crash in any function now tries to notify a configured webhook, not just write to a log nobody's watching.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">P1-1 (leaked-password protection) is still open — deferred this session per direct Founder instruction, not attempted. P1-5 (mobile test coverage) is partial: add React Native component-render tests, starting with Settings' delete-confirmation gating. P2/P3 backlog items are untouched. No real TELEMETRY_WEBHOOK_URL has been configured yet — alerting still falls back to log-only in production until one is provided. The recommendations edge function's bundler issue is still unresolved (low priority — confirmed dead).</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s64-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-today-dishcard" onclick="toggleDetail('s64-today-dishcard')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">mobile/app/(tabs)/today.tsx — DishCard</span></div>
+          <span class="detail-chevron" id="chev-s64-today-dishcard">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-today-dishcard">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Each meal shown on the Home tab is now its own card with a like/dislike button and a "Why this?" toggle. Tapping like or dislike posts feedback tied to the specific recommendation that produced this dish; tapping "Why this?" reveals the match score and cuisine/class reasoning already present on the dish data.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A tap on 👍/👎 or "Why this?", plus the dish's request_id from the plan the screen already loaded</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A POST to /v1/feedback recorded against that request_id, or an expanded explanation panel</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">User taps like/dislike</span><span class="dd-arrow">→</span>
+            <span class="dd-node">postFeedback()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">POST /v1/feedback</span><span class="dd-arrow">→</span>
+            <span class="dd-node">resolves against recommendation_events</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">return postFeedback({ request_id: requestId, event_type: eventType, dish_name: dish.name });</span>  ← the whole feedback tap in one call, using the request_id the plan/handler.ts fix (P0-4) now guarantees exists for this surface</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why did feedback taps on Home not work before this session?</div>
+            <div class="dd-why-a">meal_plan and class_dishes — the surfaces the Home tab actually calls — weren't in the server's FEEDBACK_ELIGIBLE_SURFACES set, so no recommendation_events row ever existed for feedback to resolve against. The tap itself wasn't broken; there was simply nothing on the server side for it to attach to.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-history-screen" onclick="toggleDetail('s64-history-screen')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/app/history.tsx</span></div>
+          <span class="detail-chevron" id="chev-s64-history-screen">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-history-screen">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">A new screen listing the caller's own past recommendations, most recent first, with a plain-English label for each outcome (Served, Timed out, Failed, Unavailable) instead of raw status codes.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The signed-in user opening the History tab</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A scrollable, human-readable list of that household's recommendation_events rows</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">History tab mounts</span><span class="dd-arrow">→</span>
+            <span class="dd-node">fetchHistory()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">plan surface:"history"</span><span class="dd-arrow">→</span>
+            <span class="dd-node">fetchRecentRecommendationEvents()</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">const OUTCOME_LABEL: Record&lt;string, string&gt; = { success: "Served", partial: "Served (partial)", ... }</span>  ← translates internal outcome codes into words a non-technical user recognizes</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why route this through the plan function instead of querying the database directly from the app?</div>
+            <div class="dd-why-a">Every other surface already goes through plan/handler.ts for auth and household-ownership checks (requireOwnership) — reusing that path means History gets the same security guarantee for free instead of the app needing its own direct-to-database read path.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-profile-edit-screen" onclick="toggleDetail('s64-profile-edit-screen')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/app/profile-edit.tsx</span></div>
+          <span class="detail-chevron" id="chev-s64-profile-edit-screen">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-profile-edit-screen">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Lets a user change their diet type and allergen selections after onboarding. Pre-fills from their current saved profile, then saves through the same write path onboarding itself uses.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Chip selections for diet type and allergens</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">An updated profiles row, this time actually saved (see the P1-4 database fix below)</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">fetchProfile() pre-fills the form</span><span class="dd-arrow">→</span>
+            <span class="dd-node">user edits chips</span><span class="dd-arrow">→</span>
+            <span class="dd-node">postHousehold()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">buildProfilePatch/updateProfileFields</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">import { allergenFlags } from "@/onboarding/toHouseholdWrite";</span>  ← reuses onboarding's own allergen bit-mapping instead of re-deriving it, so the two flows can never quietly drift apart</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why was this worth building this session specifically?</div>
+            <div class="dd-why-a">Without the paired store.ts fix, this screen would have looked fully functional while silently discarding every edit — building the screen surfaced the bug, and fixing the bug is what makes the screen honest.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-settings-dpdp" onclick="toggleDetail('s64-settings-dpdp')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/app/(tabs)/settings.tsx</span></div>
+          <span class="detail-chevron" id="chev-s64-settings-dpdp">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-settings-dpdp">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The first reachable UI for the DPDP data-subject-rights endpoints — requesting an export of your data, or deleting your account. Also links out to Profile-edit and History. Both backend endpoints already existed and were already authorized; neither had anywhere in the app to be triggered from before this screen.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A tap on "Export my data," or the exact phrase "DELETE MY ACCOUNT" typed to confirm deletion</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">An export job kicked off and polled, or the account actually deleted</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">Settings tab</span><span class="dd-arrow">→</span>
+            <span class="dd-node">requestExport()/deleteAccount()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">GET /v1/user/export or POST /v1/user/delete</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">export const REQUIRED_CONFIRMATION_PHRASE = "DELETE MY ACCOUNT";</span>  ← account deletion only fires if the typed text matches exactly, a deliberate friction point against accidental deletion</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why was this treated as a compliance gap rather than just a missing feature?</div>
+            <div class="dd-why-a">India's DPDP Act requires these rights be user-initiated. An endpoint that exists and is authorized but has no UI a user can reach isn't a satisfied right — it's an unreachable one, which is a real audit finding, not a nice-to-have.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-account-ts" onclick="toggleDetail('s64-account-ts')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/src/api/account.ts</span></div>
+          <span class="detail-chevron" id="chev-s64-account-ts">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-account-ts">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The API client layer backing the Settings screen: requestExport(), pollExport() and deleteAccount(), each a thin call to an already-existing Edge Function.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A user id, and for deletion, the typed confirmation phrase</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">An export job id to poll, or a deletion confirmation</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">Settings screen calls</span><span class="dd-arrow">→</span>
+            <span class="dd-node">account.ts</span><span class="dd-arrow">→</span>
+            <span class="dd-node">existing export/delete Edge Functions</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">function deleteAccount(userId: string, confirmationPhrase: string): Promise&lt;DeleteAccountResponse&gt;</span>  ← the confirmation phrase is required at the API layer too, not just enforced by the screen's UI</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why require the confirmation phrase in the client function's own signature?</div>
+            <div class="dd-why-a">So the safeguard travels with the function itself — any future screen that calls deleteAccount() has to supply a confirmation phrase by construction, rather than relying on every future caller to remember to add its own UI gate.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-plan-ts-client" onclick="toggleDetail('s64-plan-ts-client')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">mobile/src/api/plan.ts</span></div>
+          <span class="detail-chevron" id="chev-s64-plan-ts-client">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-plan-ts-client">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Two new functions, fetchHistory() and fetchProfile(), added to the shared client that already talked to the plan edge function for calibration/cold-start/weekly-plan — same pattern, two new read-only surfaces.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">An optional limit (history) or nothing (profile)</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A typed list of recommendation history rows, or the caller's current profile</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">History/Profile screen</span><span class="dd-arrow">→</span>
+            <span class="dd-node">fetchHistory()/fetchProfile()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">POST /v1/plan {surface}</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">export function fetchHistory(limit?: number): Promise&lt;RecommendationHistoryRow[]&gt;</span>  ← same request shape as every other plan surface, just no engine call underneath it</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why add these as new "surface" values on the existing plan function instead of new standalone endpoints?</div>
+            <div class="dd-why-a">Every planning surface already gets auth, household resolution and structured error handling for free from plan/handler.ts's shared orchestration — a new endpoint would have had to reimplement all of that from scratch for two read-only queries.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-tohouseholdwrite" onclick="toggleDetail('s64-tohouseholdwrite')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">mobile/src/onboarding/toHouseholdWrite.ts</span></div>
+          <span class="detail-chevron" id="chev-s64-tohouseholdwrite">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-tohouseholdwrite">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">ALLERGEN_BITS and allergenFlags() — previously private to this file — are now exported, so Profile-edit can reuse the exact same allergen-to-bitmask mapping onboarding uses, and so both are now unit-testable.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A list of selected allergen strings</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A single integer bitmask (0–511, the 9-bit model)</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">Profile-edit chip selections</span><span class="dd-arrow">→</span>
+            <span class="dd-node">allergenFlags()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">bitmask sent to postHousehold()</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">export function allergenFlags(allergens: string[]): number</span>  ← the only place this mapping is defined now, shared by onboarding and profile-edit</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why export instead of duplicating the mapping in profile-edit.tsx?</div>
+            <div class="dd-why-a">Two copies of a bit-mapping are one refactor away from silently disagreeing — sharing the single source means a future allergen addition only has to change one file, and one set of tests covers both call sites.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-mobile-test-infra" onclick="toggleDetail('s64-mobile-test-infra')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/jest.config.js, jest.setup.js, __tests__/</span></div>
+          <span class="detail-chevron" id="chev-s64-mobile-test-infra">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-mobile-test-infra">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Stands up unit testing for the mobile app for the first time: 9 tests total, 5 on allergenFlags()/ALLERGEN_BITS and 4 on describeApiError(), run via `npx jest`.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">`npx jest` from the mobile/ directory</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">9 passing tests, no live backend or device required</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">jest.config.js extends jest-expo's preset</span><span class="dd-arrow">→</span>
+            <span class="dd-node">jest.setup.js mocks AsyncStorage</span><span class="dd-arrow">→</span>
+            <span class="dd-node">tests run against real exported logic</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">setupFiles: [...(preset.setupFiles || []), "&lt;rootDir&gt;/jest.setup.js"]</span>  ← extends the preset's own setup rather than replacing it, which would silently drop react-native's required test setup</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Is this complete test coverage for the mobile app now?</div>
+            <div class="dd-why-a">No — partial (P1-5). Only pure-logic unit tests exist; there are no React Native component-render tests, so screen-level behavior like Settings' delete-confirmation gating is still unverified by any automated test.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-plan-household-context" onclick="toggleDetail('s64-plan-household-context')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">household_context (via plan/handler.ts, P0-1)</span></div>
+          <span class="detail-chevron" id="chev-s64-plan-household-context">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-plan-household-context">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Every planning surface with a resolved household now calls the existing recordHouseholdContext helper after a successful engine response — the helper always existed and worked, it was simply never called from the one function real traffic actually uses.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A resolved household id, slot and weekday from a successful plan call</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A household_context row, best-effort (never blocks the response if it fails)</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">plan handler gets a successful RE response</span><span class="dd-arrow">→</span>
+            <span class="dd-node">recordHouseholdContext(ctx, householdId, {slot, weekday})</span><span class="dd-arrow">→</span>
+            <span class="dd-node">household_context row written</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">if (resolvedHouseholdId) { await recordHouseholdContext(ctx, resolvedHouseholdId, { slot: body.slot, weekday: body.weekday }); }</span>  ← best-effort, guarded so it can never turn a successful plan response into a failure</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why had household_context stayed at exactly 0 rows despite 126+ served recommendations?</div>
+            <div class="dd-why-a">recommendations/handler.ts (which has zero live callers) was the only place that ever called recordHouseholdContext. plan/handler.ts — the function real traffic actually goes through — simply never called it. The writer worked fine; it was just never invoked from the path that matters.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-plan-feedback-surfaces" onclick="toggleDetail('s64-plan-feedback-surfaces')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">recommendation_events (via plan/handler.ts, P0-4)</span></div>
+          <span class="detail-chevron" id="chev-s64-plan-feedback-surfaces">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-plan-feedback-surfaces">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">FEEDBACK_ELIGIBLE_SURFACES widened from cold_start/calibration-only to also include meal_plan and class_dishes — the surfaces the actively-routed Home tab actually calls — so a like/dislike tap there has a recommendation_events row to resolve against.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A successful meal_plan or class_dishes response with a resolved household</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A recommendation_events row keyed by request_id</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">plan handler serves meal_plan/class_dishes</span><span class="dd-arrow">→</span>
+            <span class="dd-node">FEEDBACK_ELIGIBLE_SURFACES.has(surface)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">recordRecommendationEvent()</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">const FEEDBACK_ELIGIBLE_SURFACES = new Set(["cold_start", "calibration", "meal_plan", "class_dishes"]);</span>  ← weekly_plan/recipe stay deliberately excluded — one returns classes not scored dishes, the other isn't a recommendation at all</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not just make every surface feedback-eligible?</div>
+            <div class="dd-why-a">weekly_plan returns classes, not individual scored dishes — there's nothing coherent for a like/dislike to attach to. recipe isn't a recommendation at all. Being explicit about which surfaces qualify avoids creating meaningless feedback rows.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-household-profile-update" onclick="toggleDetail('s64-household-profile-update')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">profiles (via household/store.ts, P1-4)</span></div>
+          <span class="detail-chevron" id="chev-s64-household-profile-update">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-household-profile-update">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">+buildProfilePatch()/updateProfileFields(): a repeat call to POST /v1/household with changed answers now updates the existing profiles row's fields, instead of silently doing nothing once the row already existed.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A screens[] array from a repeat household write call, on a household that already has a profile</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">An UPDATE on the profiles row's changed fields only</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">household handler sees profile already exists</span><span class="dd-arrow">→</span>
+            <span class="dd-node">buildProfilePatch(screens)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">updateProfileFields(ctx, profileId, patch)</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">export async function updateProfileFields(ctx, profileId, patch)</span>  ← the function that literally didn't exist before this session — every call after the first profile insert was previously a silent no-op</div>
+          <div class="dd-why">
+            <div class="dd-why-q">How was this bug found?</div>
+            <div class="dd-why-a">Building profile-edit.tsx required a real update path to test against — reading store.ts to wire the new screen surfaced that no such path existed at all.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-plan-history-profile-surfaces" onclick="toggleDetail('s64-plan-history-profile-surfaces')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">plan edge function — history/profile surfaces (P1-3, P1-4)</span></div>
+          <span class="detail-chevron" id="chev-s64-plan-history-profile-surfaces">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-plan-history-profile-surfaces">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Two new pure-read surfaces on POST /v1/plan: "history" calls the new fetchRecentRecommendationEvents(), "profile" calls the existing loadHouseholdRaw() — neither calls the recommendation engine at all.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">{surface: "history", limit?} or {surface: "profile"}</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A list of the caller's own recommendation_events rows, or their current composed household profile</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">authenticate + requireOwnership</span><span class="dd-arrow">→</span>
+            <span class="dd-node">surface routing</span><span class="dd-arrow">→</span>
+            <span class="dd-node">fetchRecentRecommendationEvents() or loadHouseholdRaw()</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">const events = await fetchRecentRecommendationEvents(ctx, householdIdForHistory, limit);</span>  ← read-only and fail-open, same auth/ownership guard as every scoring surface</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why give these read-only surfaces the same auth path as engine-calling surfaces?</div>
+            <div class="dd-why-a">requireOwnership already guarantees a caller only ever sees their own household's data — reusing it for reads costs nothing and rules out an entire class of "wrong household's history leaked" bugs by construction.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-household-allergen-cap" onclick="toggleDetail('s64-household-allergen-cap')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">household/schema.ts — allergen_flags cap</span></div>
+          <span class="detail-chevron" id="chev-s64-household-allergen-cap">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-household-allergen-cap">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The profile envelope's allergen_flags validation cap, corrected from max(127) (the old frozen 7-bit allergen model) to max(511) (the live 9-bit model, per the WP-21 fish/mustard extension).</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">An allergen_flags integer that includes the fish or mustard bit</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Accepted (previously rejected with a validation error)</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">Profile-edit sends allergenFlags()</span><span class="dd-arrow">→</span>
+            <span class="dd-node">zod schema validates</span><span class="dd-arrow">→</span>
+            <span class="dd-node">max(511) now accepts the full 9-bit range</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">allergen_flags: z.number().int().min(0).max(511),</span>  ← was max(127); note the separate per-member envelope's own cap is still max(127), not touched this session</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why wasn't the per-member allergen cap fixed too, if it has the same bug?</div>
+            <div class="dd-why-a">Flagged but left out of scope this session — the profile-edit screen only writes the top-level profile envelope, so fixing that cap was what the new screen actually needed. The member-envelope cap is a known follow-up, not silently missed.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s64-telemetry-webhook" onclick="toggleDetail('s64-telemetry-webhook')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">_shared/telemetry/telemetry.ts + error-boundary.ts (P1-7)</span></div>
+          <span class="detail-chevron" id="chev-s64-telemetry-webhook">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s64-telemetry-webhook">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">+webhookSink()/resolveTelemetrySink(), wired into error-boundary.ts — the one place every Edge Function's uncaught error already passes through — so a real alerting channel is reachable across every function, not just plan/household.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Any uncaught 500-level error in any Edge Function</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A POST to the configured TELEMETRY_WEBHOOK_URL, always also still logged</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow">
+            <span class="dd-node">error-boundary catches an error</span><span class="dd-arrow">→</span>
+            <span class="dd-node">resolveTelemetrySink(logger, webhookUrl)</span><span class="dd-arrow">→</span>
+            <span class="dd-node">webhookSink POSTs, or falls back to log-only</span>
+          </div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">resolveTelemetrySink(ctx.logger, ctx.config.telemetryWebhookUrl).captureError(e, {...})</span>  ← picks webhookSink only when a URL is configured; never throws, so a failed webhook POST can never itself cause a 500</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Is a real alert actually firing in production right now?</div>
+            <div class="dd-why-a">No — no real TELEMETRY_WEBHOOK_URL was provided this session, so production currently still falls back to log-only, same as before. The plumbing is real and tested; wiring in an actual Slack/PagerDuty/etc. URL later is a one-line env var change, not a code change.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Pick up P1-1 (leaked-password protection), add component-render tests for the mobile app (starting with Settings' delete gate), and consider whether the recommendations edge function's bundler issue is worth fixing or the function should be formally retired.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s64-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S64 = [
+      {
+        id: 'feedback-explanation',
+        label: 'Recommendation feedback + explanation',
+        steps: [
+          {
+            layer: 'Phone', tag: 'UI',
+            title: 'DishCard renders like/dislike + "Why this?"',
+            desc: 'Each meal on the Home tab is its own card with feedback buttons and a collapsible explanation.',
+            codeFlow: [ {chip:'mobile/app/(tabs)/today.tsx'}, {label:'renders'}, {chip:'DishCard (same file)'} ],
+            files: [ {path:'mobile/app/(tabs)/today.tsx', desc:'Home tab screen + its in-file DishCard component'} ],
+            api: null, db: null
+          },
+          {
+            layer: 'App logic', tag: 'HOOK',
+            title: 'Like/dislike posts feedback',
+            desc: 'A tap calls the shared feedback API with the request_id this dish came from.',
+            codeFlow: [ {chip:'mobile/app/(tabs)/today.tsx'}, {label:'calls'}, {chip:'mobile/src/api/feedback.ts'} ],
+            files: [ {path:'mobile/src/api/feedback.ts', desc:'postFeedback() — the shared feedback API call'} ],
+            api: {endpoint:'POST /v1/feedback', note:'resolves against the recommendation_events row for this request_id'},
+            db: null
+          },
+          {
+            layer: 'Server', tag: 'API',
+            title: 'plan handler wrote the resolvable event',
+            desc: 'For this feedback tap to find anything, plan/handler.ts had to already have logged a recommendation_events row for meal_plan/class_dishes — which it now does (P0-4).',
+            codeFlow: [ {chip:'supabase/functions/plan/handler.ts'}, {label:'FEEDBACK_ELIGIBLE_SURFACES.has(surface)'}, {label:'calls'}, {chip:'recordRecommendationEvent()'} ],
+            files: [ {path:'supabase/functions/plan/handler.ts', desc:'Widened this session to cover meal_plan/class_dishes, not just cold_start/calibration'} ],
+            api: null,
+            db: {table:'recommendation_events', op:'INSERT', note:'created at serve time so a later feedback tap has a row to resolve against'}
+          }
+        ]
+      },
+      {
+        id: 'history-view',
+        label: 'History view',
+        steps: [
+          {
+            layer: 'Phone', tag: 'UI',
+            title: 'History tab loads',
+            desc: 'Shows the caller\'s own past recommendations, most recent first.',
+            codeFlow: [ {chip:'mobile/app/history.tsx'}, {label:'calls'}, {chip:'mobile/src/api/plan.ts'} ],
+            files: [ {path:'mobile/app/history.tsx', desc:'The screen: outcome labels + list rendering'} ],
+            api: null, db: null
+          },
+          {
+            layer: 'App logic', tag: 'API',
+            title: 'fetchHistory() requests the list',
+            desc: 'Calls the plan endpoint with surface:"history".',
+            codeFlow: [ {chip:'mobile/src/api/plan.ts'}, {label:'POST'}, {chip:'/v1/plan'} ],
+            files: [ {path:'mobile/src/api/plan.ts', desc:'fetchHistory() — new this session'} ],
+            api: {endpoint:'POST /v1/plan {surface:"history"}', note:'no recommendation engine call — pure read'},
+            db: null
+          },
+          {
+            layer: 'Server', tag: 'API',
+            title: 'plan handler routes to the history surface',
+            desc: 'Authenticates, resolves the household, then calls the events reader.',
+            codeFlow: [ {chip:'supabase/functions/plan/handler.ts'}, {label:'calls'}, {chip:'supabase/functions/recommendations/events.ts'} ],
+            files: [
+              {path:'supabase/functions/plan/handler.ts', desc:'Routes surface:"history" to fetchRecentRecommendationEvents()'},
+              {path:'supabase/functions/recommendations/events.ts', desc:'fetchRecentRecommendationEvents() — new this session, read-only, fail-open'}
+            ],
+            api: null,
+            db: {table:'recommendation_events', op:'SELECT', note:'the caller\'s own rows only, most recent first, limited'}
+          }
+        ]
+      },
+      {
+        id: 'profile-edit',
+        label: 'Profile edit',
+        steps: [
+          {
+            layer: 'Phone', tag: 'UI',
+            title: 'Profile-edit screen pre-fills from the current profile',
+            desc: 'Loads the user\'s current diet/allergen answers into editable chips.',
+            codeFlow: [ {chip:'mobile/app/profile-edit.tsx'}, {label:'calls'}, {chip:'mobile/src/api/plan.ts'} ],
+            files: [ {path:'mobile/app/profile-edit.tsx', desc:'The screen, using the shared ChipGroup component'} ],
+            api: {endpoint:'POST /v1/plan {surface:"profile"}', note:'reads the current composed profile'},
+            db: null
+          },
+          {
+            layer: 'App logic', tag: 'HOOK',
+            title: 'Save calls postHousehold() with the new answers',
+            desc: 'Reuses allergenFlags() from onboarding\'s own mapping module.',
+            codeFlow: [ {chip:'mobile/app/profile-edit.tsx'}, {label:'calls'}, {chip:'mobile/src/api/household.ts'}, {label:'uses'}, {chip:'mobile/src/onboarding/toHouseholdWrite.ts'} ],
+            files: [
+              {path:'mobile/src/api/household.ts', desc:'postHousehold() — the existing household write call'},
+              {path:'mobile/src/onboarding/toHouseholdWrite.ts', desc:'allergenFlags()/ALLERGEN_BITS — now exported for reuse here'}
+            ],
+            api: {endpoint:'POST /v1/household', note:'a repeat call on an existing household'},
+            db: null
+          },
+          {
+            layer: 'Server', tag: 'API',
+            title: 'household handler updates the existing profile',
+            desc: 'The fixed P1-4 path: a repeat call now patches the profiles row instead of doing nothing.',
+            codeFlow: [ {chip:'supabase/functions/household/handler.ts'}, {label:'calls'}, {chip:'supabase/functions/household/store.ts'} ],
+            files: [ {path:'supabase/functions/household/store.ts', desc:'buildProfilePatch()/updateProfileFields() — new this session'} ],
+            api: null,
+            db: {table:'profiles', op:'UPDATE', note:'only the changed fields, on an already-existing row'}
+          }
+        ]
+      },
+      {
+        id: 'dpdp-export-delete',
+        label: 'DPDP export/delete',
+        steps: [
+          {
+            layer: 'Phone', tag: 'UI',
+            title: 'Settings screen offers export or delete',
+            desc: 'The first reachable UI entry point for either right.',
+            codeFlow: [ {chip:'mobile/app/(tabs)/settings.tsx'}, {label:'calls'}, {chip:'mobile/src/api/account.ts'} ],
+            files: [ {path:'mobile/app/(tabs)/settings.tsx', desc:'The screen, including the exact-phrase delete confirmation input'} ],
+            api: null, db: null
+          },
+          {
+            layer: 'App logic', tag: 'API',
+            title: 'account.ts calls the export/delete endpoints',
+            desc: 'requestExport()/pollExport() for export; deleteAccount() only proceeds with the exact confirmation phrase.',
+            codeFlow: [ {chip:'mobile/src/api/account.ts'}, {label:'POST/GET'}, {chip:'existing DPDP Edge Functions'} ],
+            files: [ {path:'mobile/src/api/account.ts', desc:'requestExport(), pollExport(), deleteAccount() — new this session'} ],
+            api: {endpoint:'GET /v1/user/export, POST /v1/user/delete', note:'both already implemented and authorized before this session — only the UI was missing'},
+            db: null
+          }
+        ]
+      },
+      {
+        id: 'mobile-test-infra-flow',
+        label: 'Mobile test infra',
+        steps: [
+          {
+            layer: 'App logic', tag: 'SDK',
+            title: 'jest.config.js extends the jest-expo preset',
+            desc: 'Appends jest.setup.js to the preset\'s own setupFiles rather than replacing them, avoiding a common trap where react-native\'s required setup silently disappears.',
+            codeFlow: [ {chip:'mobile/jest.config.js'}, {label:'spreads'}, {chip:'jest-expo/jest-preset'}, {label:'appends'}, {chip:'mobile/jest.setup.js'} ],
+            files: [
+              {path:'mobile/jest.config.js', desc:'Test config — extends, does not replace, the preset'},
+              {path:'mobile/jest.setup.js', desc:'Mocks @react-native-async-storage/async-storage'}
+            ],
+            api: null, db: null
+          },
+          {
+            layer: 'App logic', tag: 'HOOK',
+            title: 'Tests run against real exported logic',
+            desc: '9 tests total, verified passing via npx jest.',
+            codeFlow: [ {chip:'mobile/src/onboarding/__tests__/toHouseholdWrite.test.ts'}, {label:'+'}, {chip:'mobile/src/api/__tests__/errorMessages.test.ts'} ],
+            files: [
+              {path:'mobile/src/onboarding/__tests__/toHouseholdWrite.test.ts', desc:'5 tests on allergenFlags()/ALLERGEN_BITS'},
+              {path:'mobile/src/api/__tests__/errorMessages.test.ts', desc:'4 tests on describeApiError(), mocking supabaseClient'}
+            ],
+            api: null, db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s64-flows', window.FEATURE_FLOWS_S64);
+    </script>
+
+  </div><!-- /page-s64 -->
+
   <!-- SESSIONS_INJECT -->
 
 </main>
