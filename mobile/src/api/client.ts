@@ -101,3 +101,59 @@ export async function apiPost<TResponse>(path: string, body: unknown): Promise<T
 
   return json as TResponse;
 }
+
+/**
+ * GET helper, same auth/timeout/error-shape conventions as apiPost above (P0-2, 2026-08 — added
+ * for GET /v1/user/export, the first GET endpoint the mobile client needs to call). Not a
+ * refactor of apiPost: kept as a separate sibling function so apiPost's existing behavior/call
+ * sites are untouched.
+ */
+export async function apiGet<TResponse>(path: string): Promise<TResponse> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) {
+    throw new ApiError("No active session — sign in before calling the API", 401);
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}${path}`, {
+      method: "GET",
+      headers: { authorization: `Bearer ${token}` },
+      signal: controller.signal,
+    });
+  } catch (e) {
+    if (isAbortError(e)) {
+      logger.warn("api.timeout", { path, timeout_ms: REQUEST_TIMEOUT_MS });
+      throw new ApiError(
+        "Request timed out — check your connection and try again.",
+        0,
+        undefined,
+        CLIENT_ERROR_CODES.TIMEOUT,
+      );
+    }
+    logger.warn("api.network_error", { path, detail: e instanceof Error ? e.message : String(e) });
+    throw new ApiError(
+      "Network error — check your connection and try again.",
+      0,
+      undefined,
+      CLIENT_ERROR_CODES.NETWORK_ERROR,
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+
+  const traceId = res.headers.get("x-trace-id") ?? undefined;
+  const json = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    const message = typeof json?.error?.message === "string" ? json.error.message : res.statusText;
+    const code = typeof json?.error?.code === "string" ? json.error.code : undefined;
+    throw new ApiError(message, res.status, traceId, code);
+  }
+
+  return json as TResponse;
+}
