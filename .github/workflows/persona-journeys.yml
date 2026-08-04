@@ -14,11 +14,9 @@ name: persona-journeys
 # honesty rule as the local driver: without a reachable backend it records a truthful
 # SKIPPED/FAILED result rather than fabricating evidence, it does not fail the build silently.
 #
-# The web target is a fresh Vercel preview deployment of mobile/'s Expo web export, built and
-# deployed by this workflow itself from the checked-out commit (via `vercel build` + `vercel
-# deploy --prebuilt`) rather than a locally-booted Expo dev server — the Vercel project
-# (foofoo-v3) already owns its own EXPO_PUBLIC_* env vars, so this workflow does not need to
-# write mobile/.env itself.
+# The web target is the existing public Vercel production test domain. The workflow deploys the
+# checked-out commit there before each run rather than relying on a locally booted Expo server or
+# a Vercel preview URL protected by Vercel Authentication.
 #
 # Auth: no pre-provisioned test account needed — each persona signs up its own fresh random-email
 # account via the app's real sign-up flow (see run_persona_journeys.mjs's own header comment).
@@ -82,17 +80,17 @@ jobs:
           # not Vercel's login page.
           vercel deploy --prod --token="$VERCEL_TOKEN"
           url="https://foofoo-v3.vercel.app"
-          echo "Deployed preview: $url"
+          echo "Deployed production test build: $url"
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "Waiting for the deployment to become reachable..."
           for i in $(seq 1 30); do
             if curl -sf "$url" > /dev/null; then
-              echo "Preview is up."
+              echo "Production test build is up."
               exit 0
             fi
             sleep 5
           done
-          echo "Preview never came up within 2.5 minutes."
+          echo "Production test build never came up within 2.5 minutes."
           exit 1
 
       - name: Run the persona UI journey driver

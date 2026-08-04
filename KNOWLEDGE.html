@@ -737,11 +737,11 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🧩</span> S63 · Dish-pick calibration grid
       <span class="nav-badge">Aug 4</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s64')">
+    <div class="nav-item" onclick="showPage('s64')">
       <span class="nav-icon">🔔</span> S64 · Feedback loop, DPDP UI, telemetry alerting
       <span class="nav-badge">Aug 4</span>
     </div>
-    <div class="nav-item" onclick="showPage('s65')"><span class="nav-icon">🧩</span> S65 · Closed-loop recommendations <span class="nav-badge">04 Aug</span></div>
+    <div class="nav-item active" onclick="showPage('s65')"><span class="nav-icon">🧩</span> S65 · Closed-loop recommendations <span class="nav-badge">04 Aug</span></div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -751,11 +751,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">24</span>
+      <span class="nav-badge">25</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">348</span>
+      <span class="nav-badge">351</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -2462,7 +2462,7 @@ function deepDiveFeature(featureLabel){
     <div class="tl-note">Fixed a real data-loss bug (household_context never wrote, profile edits never saved), gave users a way to act on and understand recommendations, and made the already-built DPDP export/delete endpoints reachable from the app for the first time. household and plan functions redeployed to production; recommendations function left as-is (confirmed dead, unrelated bundler issue). P1-1 (leaked-password protection) explicitly deferred per Founder instruction; P1-5 (mobile test coverage) partial — pure logic only, no component-render tests yet.</div>
   </div>
 </div>
-<div class="timeline-row"><div class="tl-date">04 Aug 2026</div><div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div><div class="tl-content"><span class="tl-badge" style="background:#eff4ff;color:#1a56db">S65</span><div class="tl-title">Closed the P0 recommendation loop locally</div><div class="tl-chips"><span class="tl-chip" onclick="showPage('s65')">Personalization</span><span class="tl-chip" onclick="showPage('s65')">Plans</span><span class="tl-chip" onclick="showPage('s65')">Analytics</span></div><div class="tl-note">Feedback now changes future ranking; promotion and provider configuration remain.</div></div></div>
+<div class="timeline-row"><div class="tl-date">04 Aug 2026</div><div class="tl-spine"><div class="tl-dot" style="background:#1a56db"></div></div><div class="tl-content"><span class="tl-badge" style="background:#eff4ff;color:#1a56db">S65</span><div class="tl-title">Closed and deployed the P0 recommendation loop</div><div class="tl-chips"><span class="tl-chip" onclick="showPage('s65')">Personalization</span><span class="tl-chip" onclick="showPage('s65')">Plans</span><span class="tl-chip" onclick="showPage('s65')">Analytics</span><span class="tl-chip" onclick="showPage('s65')">Notifications</span></div><div class="tl-note">The migration, active plan and feedback functions, Python service, OneSignal secrets, and notification schedule are live on the existing production project; native-device push receipt remains to be verified with an iOS or Android build.</div></div></div>
 <!-- TIMELINE_INJECT -->
   </div>
 
@@ -3078,6 +3078,21 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">S64 · Aug 4</div>
   </div>
 </div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-onesignal-mobile" onclick="toggleDetail('mod-onesignal-mobile')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">Mobile OneSignal integration</span></div>
+    <span class="detail-chevron" id="chev-mod-onesignal-mobile">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-onesignal-mobile">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Starts OneSignal only on iOS and Android after a user has given permission, and associates the device with the signed-in Supabase user. Browsers receive a safe adapter that does not load unsupported native code.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text"><code>mobile/src/notifications/oneSignal.ts</code> — initializes the native SDK, stores consent, requests OS permission, and sets the external user identity.<br><code>mobile/src/notifications/oneSignal.web.ts</code> — preserves the same app-facing functions on web without trying to register a native push device.</div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Real mobile devices can receive targeted reminders without breaking the browser build used by Vercel journey tests.</div>
+    <div class="dd-label">Last touched</div><div class="dd-text">S65 · 04 Aug</div>
+  </div>
+</div>
 <!-- MODULES_INJECT -->
   </div>
 
@@ -3549,6 +3564,9 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">docs/active/LAUNCH_BLOCKERS.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Same status updates reflected in the launch-blocker view</td></tr>
   <tr><td class="fr-file mono">docs/active/CURRENT_STATUS.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Same status updates reflected in the current-status view</td></tr>
   <tr><td class="fr-file mono">KNOWLEDGE.html</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">This session's own knowledge-book update (session block, modules, arch map, files register, decisions)</td></tr>
+  <tr><td class="fr-file mono">mobile/src/notifications/oneSignal.web.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S65</td><td class="fr-desc">Prevents the native OneSignal module from loading in browsers while keeping consent stored on the server.</td></tr>
+  <tr><td class="fr-file mono">.github/workflows/persona-journeys.yml</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S65</td><td class="fr-desc">Builds the Expo web app with the public OneSignal app ID and runs journeys on the existing Vercel production site.</td></tr>
+  <tr><td class="fr-file mono">KNOWLEDGE.html</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S65</td><td class="fr-desc">Records the verified production deployment and the remaining native-device notification check.</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -12067,7 +12085,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s63 -->
 
-  <div id="page-s64" class="page-content">
+  <div id="page-s64" class="page-content" style="display:none">
 
     <!-- ── Session header ── -->
     <div class="page-header">
@@ -12886,13 +12904,13 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s64 -->
 
-  <div id="page-s65" class="page-content" style="display:none">
+  <div id="page-s65" class="page-content">
     <div class="page-header"><div class="page-title">S65 · Closed-loop recommendations</div><div class="page-subtitle">Meal feedback now changes future suggestions, and household plans have persistent controls and measurable outcomes.</div></div>
     <div class="impact-bar"><div class="impact-col impact-before"><div class="impact-label">⛔ Before this session</div><div class="impact-text">Likes and dislikes were stored but ignored; plans were local to one device; Never, Not Today, Lock, add-to-date, experiments and morning delivery were absent.</div></div><div class="impact-arrow">→</div><div class="impact-col impact-after"><div class="impact-label">✅ After this session</div><div class="impact-text">Feedback re-ranks or suppresses dishes, plans persist on the server, eight options and lifecycle add-ons are shown, and consented metrics and notification jobs are available.</div></div></div>
-    <div class="files-changed"><div class="files-changed-label">📁 Main areas changed</div><div class="files-changed-list"><span class="fc-file"><span class="fc-path">database/migrations/053_close_p0_recommendation_loop.sql</span><span class="tag tag-db">DB</span></span><span class="fc-file"><span class="fc-path">supabase/functions/feedback/events.ts</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">supabase/functions/plan/handler.ts</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">ghar_re_core/meal_planner.py</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">mobile/app/(tabs)/today.tsx</span><span class="tag tag-mod">Modified</span></span></div></div>
-    <div class="session-card"><div class="session-card-header"><div class="session-card-title">What was built this session</div><div class="session-card-meta">4 August 2026<br>P0 recommendation loop</div></div><div class="session-card-desc">Added online affinities, hard suppressions, idempotent feedback, persisted plan states and locks, an explicit date picker, lifecycle add-ons, first-party experiments/KPIs, and a consent-gated OneSignal worker. Changes are locally verified and not yet deployed.</div></div>
+    <div class="files-changed"><div class="files-changed-label">📁 Main areas changed</div><div class="files-changed-list"><span class="fc-file"><span class="fc-path">database/migrations/053_close_p0_recommendation_loop.sql</span><span class="tag tag-db">DB</span></span><span class="fc-file"><span class="fc-path">supabase/functions/feedback/events.ts</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">supabase/functions/plan/handler.ts</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">ghar_re_core/meal_planner.py</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">mobile/app/(tabs)/today.tsx</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">mobile/src/notifications/oneSignal.web.ts</span><span class="tag tag-new">New</span></span><span class="fc-file"><span class="fc-path">.github/workflows/persona-journeys.yml</span><span class="tag tag-cfg">Config</span></span></div></div>
+    <div class="session-card"><div class="session-card-header"><div class="session-card-title">What was built this session</div><div class="session-card-meta">4 August 2026<br>P0 recommendation loop</div></div><div class="session-card-desc">Added online affinities, hard suppressions, idempotent feedback, persisted plan states and locks, an explicit date picker, lifecycle add-ons, first-party experiments/KPIs, and a consent-gated OneSignal worker. The migration and active services are deployed to the existing production project; web builds now use a safe no-op notification adapter while native apps retain the OneSignal SDK.</div></div>
     <div class="view-tabs"><div class="view-tab active" onclick="switchView('s65','swim')">Swim lane flow</div><div class="view-tab" onclick="switchView('s65','detail')">Detail drill-down</div><div class="view-tab" onclick="switchView('s65','flows')">Feature flows</div></div>
-    <div id="s65-swim" class="view-pane active"><div class="swim-lane lane-blue"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Phone</div><div class="swim-label-sub">user sees</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-blue">1</div><div class="step-content"><div class="step-title-row"><span class="step-title">Control the meal plan</span><span class="tag tag-mod">Modified</span></div><div class="step-desc">The household sees eight choices and can like, dislike, suppress, lock, or add a dish to another date.</div></div></div></div></div><div class="swim-arrow">↕ authenticated plan and feedback calls</div><div class="swim-lane lane-teal"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Database</div><div class="swim-label-sub">Supabase</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-teal">2</div><div class="step-content"><div class="step-title-row"><span class="step-title">Persist intent and outcomes</span><span class="tag tag-db">DB</span></div><div class="step-desc">Plans, affinities, suppressions, experiment exposures, KPIs, devices, and notification jobs are durable and user-owned.</div></div></div></div></div><div class="swim-arrow">↕ online features feed the next request</div><div class="swim-lane lane-amber"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Server</div><div class="swim-label-sub">edge and RE</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-amber">3</div><div class="step-content"><div class="step-title-row"><span class="step-title">Re-rank the next slate</span><span class="tag tag-new">New</span></div><div class="step-desc">The active planner loads feedback state, applies bounded preference changes and hard exclusions, and preserves cold-start decay features.</div></div></div></div></div><div class="next-box"><div class="next-label">Next session</div><div class="next-text">Apply migration 053, deploy the service/functions/mobile build, configure OneSignal and the cron invocation, then run live smoke tests.</div></div></div>
+    <div id="s65-swim" class="view-pane active"><div class="swim-lane lane-blue"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Phone</div><div class="swim-label-sub">user sees</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-blue">1</div><div class="step-content"><div class="step-title-row"><span class="step-title">Control the meal plan</span><span class="tag tag-mod">Modified</span></div><div class="step-desc">The household sees eight choices and can like, dislike, suppress, lock, or add a dish to another date.</div></div></div></div></div><div class="swim-arrow">↕ authenticated plan and feedback calls</div><div class="swim-lane lane-teal"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Database</div><div class="swim-label-sub">Supabase</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-teal">2</div><div class="step-content"><div class="step-title-row"><span class="step-title">Persist intent and outcomes</span><span class="tag tag-db">DB</span></div><div class="step-desc">Plans, affinities, suppressions, experiment exposures, KPIs, devices, and notification jobs are durable and user-owned.</div></div></div></div></div><div class="swim-arrow">↕ online features feed the next request</div><div class="swim-lane lane-amber"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Server</div><div class="swim-label-sub">edge and RE</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-amber">3</div><div class="step-content"><div class="step-title-row"><span class="step-title">Re-rank the next slate</span><span class="tag tag-new">New</span></div><div class="step-desc">The active planner loads feedback state, applies bounded preference changes and hard exclusions, and preserves cold-start decay features.</div></div></div></div></div><div class="next-box"><div class="next-label">Next session</div><div class="next-text">Install a native iOS or Android build on a real device, grant notification permission, and verify that OneSignal receives the device identity and delivers a real morning notification.</div></div></div>
     <div id="s65-detail" class="view-pane"><div class="next-box"><div class="next-label">Verification</div><div class="next-text">693 Python tests and 79 Deno tests pass. The mobile app was upgraded to Expo SDK 53, wired to OneSignal with consent gating and external identity, and passes TypeScript, 9 Jest tests, Expo Doctor 18/18, Android bundle export, and Vercel web export. Migration 053, plan, feedback and the notification worker are live on cmkswalqpmmqojwdmqbv; the worker schedule is active and a service-role smoke call returned 200.</div></div></div>
     <div id="s65-flows" class="view-pane"></div><script>window.FEATURE_FLOWS_S65=[];renderFeatureFlows('s65-flows',window.FEATURE_FLOWS_S65);</script>
   </div>

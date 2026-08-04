@@ -1,23 +1,19 @@
-const CONSENT_KEY = "foofoo.push-notification-consent";
-
 /**
- * Push notifications are currently native-only. Keeping a web-specific module prevents Metro
- * from loading react-native-onesignal in browsers, where its native TurboModule is unavailable.
+ * initializeOneSignal — web adapter for the native-only OneSignal integration.
+ * @returns false because FooFoo currently registers push subscriptions only on iOS and Android.
  */
 export async function initializeOneSignal(): Promise<boolean> {
   return false;
 }
 
-/** Web has no OneSignal native user identity to update. */
+/**
+ * identifyOneSignalUser — no-op on web because no native push subscription exists to identify.
+ * @param _userId - authenticated Supabase user ID, intentionally unused on web.
+ */
 export function identifyOneSignalUser(_userId: string | null): void {}
 
 /**
- * Remember the user's choice on web without attempting to open a native permission prompt.
+ * configureNotificationConsent — no-op on web; the consent record is still written to Supabase.
+ * @param _granted - user's recorded push preference, intentionally unused on web.
  */
-export async function configureNotificationConsent(granted: boolean): Promise<void> {
-  try {
-    globalThis.localStorage?.setItem(CONSENT_KEY, granted ? "granted" : "denied");
-  } catch {
-    // Storage can be unavailable in privacy-restricted browser contexts.
-  }
-}
+export async function configureNotificationConsent(_granted: boolean): Promise<void> {}
