@@ -9,14 +9,18 @@ name: persona-journeys
 # onboarding completes. Renders one HTML report per persona + an index grouped by outcome
 # (200/422/warned), uploaded as a build artifact.
 #
-# This is NOT part of quality-gate.yml: it needs a live web target (Expo web) and a pre-provisioned
-# signed-in test account, both of which are unavailable/undesirable on every push. It is deliberately
-# a separate, opt-in workflow — same honesty rule as the local driver: without the required secrets
-# it records a truthful SKIPPED result rather than fabricating evidence, it does not fail the build.
+# This is NOT part of quality-gate.yml: it needs a live web target (Expo web), which is
+# unavailable/undesirable on every push. It is deliberately a separate, opt-in workflow — same
+# honesty rule as the local driver: without a reachable backend it records a truthful
+# SKIPPED/FAILED result rather than fabricating evidence, it does not fail the build silently.
+#
+# Auth: no pre-provisioned test account needed — each persona signs up its own fresh random-email
+# account via the app's real sign-up flow (see run_persona_journeys.mjs's own header comment).
+# This requires the target Supabase project's Auth settings to auto-confirm new signups (no email
+# confirmation step); otherwise every persona will fail identically at signup with a "check your
+# email to confirm" notice, which the driver reports as the failure reason rather than hanging.
 #
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
-#   GHAR_SIGNIN_EMAIL / GHAR_SIGNIN_PASSWORD   — a pre-provisioned test account (onboarding is only
-#                                                 reachable while signed in)
 #   EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY / EXPO_PUBLIC_API_BASE_URL
 #                                               — same values mobile/.env.example documents, for the
 #                                                 web build this workflow boots to actually reach the
@@ -89,8 +93,6 @@ jobs:
         env:
           GHAR_WEB_URL: "http://localhost:8081"
           GHAR_UI_OUT: "${{ github.workspace }}/ops/quality/reports/persona-journeys"
-          GHAR_SIGNIN_EMAIL: ${{ secrets.GHAR_SIGNIN_EMAIL }}
-          GHAR_SIGNIN_PASSWORD: ${{ secrets.GHAR_SIGNIN_PASSWORD }}
           GHAR_PERSONAS_LIMIT: ${{ github.event.inputs.persona_limit }}
         run: node ops/quality/ui/run_persona_journeys.mjs
 

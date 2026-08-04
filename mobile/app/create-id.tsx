@@ -58,6 +58,7 @@ export default function CreateId() {
 
           <Text style={[styles.label, { color: t.colors.textSecondary, fontFamily: t.fonts.bodyMedium }]}>YOUR NAME</Text>
           <TextInput
+            testID="create-id-name"
             value={name}
             onChangeText={setName}
             placeholder="e.g. Pratikshit"
@@ -77,6 +78,7 @@ export default function CreateId() {
 
           <View style={styles.actions}>
             <Pressable
+              testID="create-id-continue"
               disabled={!canContinue}
               onPress={() => mutation.mutate()}
               style={[styles.button, { backgroundColor: canContinue ? t.colors.selected : t.colors.disabled }]}

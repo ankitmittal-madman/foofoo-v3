@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet, Image } from "react-native";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { fetchClassDishes, fetchSlotOptions } from "@/api/plan";
+import { postFeedback } from "@/api/feedback";
 import { describeApiError } from "@/api/errorMessages";
 import { loadWeeklyPlan, type FinalizedWeek, type SlotName } from "@/lib/weeklyPlanStore";
 import type { PlanDish } from "@/api/plan";
+import type { FeedbackEventType } from "@/api/types";
 
 const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -87,24 +89,77 @@ function SlotSection({
           contentContainerStyle={styles.cardRow}
         >
           {(query.data?.options ?? []).map((d: PlanDish) => (
-            <Pressable
-              key={d.name}
-              style={styles.dishCard}
-              onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: d.name } })}
-            >
-              {d.image_url ? (
-                <Image source={{ uri: d.image_url }} style={styles.thumb} />
-              ) : (
-                <View style={[styles.thumb, styles.thumbPlaceholder]} />
-              )}
-              <View style={styles.dishBody}>
-                <Text style={styles.dishName}>{d.name}</Text>
-                <Text style={styles.dishMeta}>{d.meal_class_name ?? d.cuisine}</Text>
-              </View>
-            </Pressable>
+            <DishCard key={d.name} dish={d} requestId={query.data?.request_id} />
           ))}
         </ScrollView>
       )}
+    </View>
+  );
+}
+
+/**
+ * One dish card on the Home tab (P0-4/P1-2, 2026-08): like/dislike feedback + a minimal "why
+ * this?" explanation. Feedback resolves against the recommendation_events row plan/handler.ts now
+ * writes for meal_plan/class_dishes (previously only cold_start/calibration wrote one, so a tap
+ * here had nothing to record against). The explanation is deliberately minimal — this surface's
+ * PlanDish only carries a single numeric `score`, not the BASE/Q15/weather contribution breakdown
+ * ghar_re_core.scoring.explain_dish() can produce; showing the real score plus the two tags that
+ * drove the class match (meal_class_name/cuisine) is honest given what this endpoint returns,
+ * rather than fabricating a richer breakdown the API doesn't supply.
+ */
+function DishCard({ dish, requestId }: { dish: PlanDish; requestId?: string }) {
+  const [sent, setSent] = useState<FeedbackEventType | null>(null);
+  const [showWhy, setShowWhy] = useState(false);
+  const feedback = useMutation({
+    mutationFn: (eventType: FeedbackEventType) => {
+      if (!requestId) return Promise.reject(new Error("no request_id on this response"));
+      return postFeedback({ request_id: requestId, event_type: eventType, dish_name: dish.name });
+    },
+    onSuccess: (_data, eventType) => setSent(eventType),
+  });
+
+  return (
+    <View style={styles.dishCard}>
+      <Pressable
+        onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: dish.name } })}
+      >
+        {dish.image_url ? (
+          <Image source={{ uri: dish.image_url }} style={styles.thumb} />
+        ) : (
+          <View style={[styles.thumb, styles.thumbPlaceholder]} />
+        )}
+        <View style={styles.dishBody}>
+          <Text style={styles.dishName}>{dish.name}</Text>
+          <Text style={styles.dishMeta}>{dish.meal_class_name ?? dish.cuisine}</Text>
+        </View>
+      </Pressable>
+      <Pressable onPress={() => setShowWhy((v) => !v)}>
+        <Text style={styles.whyLink}>{showWhy ? "Hide why" : "Why this?"}</Text>
+      </Pressable>
+      {showWhy ? (
+        <Text style={styles.whyText}>
+          Match score {dish.score.toFixed(2)} — {dish.cuisine} cuisine
+          {dish.meal_class_name ? `, ${dish.meal_class_name} class` : ""}.
+        </Text>
+      ) : null}
+      <View style={styles.feedbackRow}>
+        <Pressable
+          disabled={feedback.isPending || !requestId}
+          onPress={() => feedback.mutate("like")}
+          style={[styles.feedbackButton, sent === "like" && styles.feedbackButtonActive]}
+        >
+          <Text style={styles.feedbackButtonText}>{sent === "like" ? "Liked" : "Like"}</Text>
+        </Pressable>
+        <Pressable
+          disabled={feedback.isPending || !requestId}
+          onPress={() => feedback.mutate("dislike")}
+          style={[styles.feedbackButton, sent === "dislike" && styles.feedbackButtonActive]}
+        >
+          <Text style={styles.feedbackButtonText}>
+            {sent === "dislike" ? "Not for me ✓" : "Not for me"}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -133,4 +188,17 @@ const styles = StyleSheet.create({
   dishName: { fontSize: 15, fontWeight: "600" },
   dishMeta: { color: "#6B6B6B", fontSize: 12 },
   error: { color: "#C0392B" },
+  whyLink: { fontSize: 11, color: "#4A6FA5", marginTop: 6 },
+  whyText: { fontSize: 11, color: "#6B6B6B", marginTop: 4 },
+  feedbackRow: { flexDirection: "row", gap: 8, marginTop: 8 },
+  feedbackButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+    borderRadius: 6,
+    paddingVertical: 6,
+    alignItems: "center",
+  },
+  feedbackButtonActive: { borderColor: "#4A6FA5", backgroundColor: "#EEF3FA" },
+  feedbackButtonText: { fontSize: 12, fontWeight: "600" },
 });

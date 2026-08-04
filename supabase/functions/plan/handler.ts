@@ -22,7 +22,7 @@ import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 
-import { loadHouseholdRaw } from "../recommendations/compose.ts";
+import { loadHouseholdRaw, recordHouseholdContext } from "../recommendations/compose.ts";
 import { recordRecommendationEvent } from "../recommendations/events.ts";
 import { callRecommendationEngine } from "../recommendations/re-client.ts";
 
@@ -103,18 +103,43 @@ export function makePlanHandler(): Handler {
 
     if (result.ok) {
       log.info("plan.re_call_done", { latency_ms: latencyMs });
-      // cold_start / calibration only: write a recommendation_events row so POST /v1/feedback
-      // (which resolves request_id -> recommendation_events, see feedback/events.ts) has something
-      // to resolve against — previously cold-start "likes" could never be recorded at all, since
-      // these surfaces never wrote a row here. Best-effort (recordRecommendationEvent never
-      // throws/never blocks the response, same as recommendations/handler.ts's own call site);
-      // skipped for a stubbed (no-profile-yet) household, same guard recordRecommendationEvent
-      // already applies itself.
-      if ((surface === "cold_start" || surface === "calibration") && resolvedHouseholdId) {
+      // P0-1 fix (2026-08): every planning surface with a resolved household writes the same
+      // household_context row recommendations/handler.ts already writes, via the shared
+      // recordHouseholdContext helper. This surface (plan) is the one real traffic actually uses
+      // (recommendations/handler.ts has zero live callers) -- household_context had a working
+      // writer that was simply never called from here, which is the direct cause of
+      // household_context staying at 0 rows despite 126+ served recommendation events. Best-effort
+      // (recordHouseholdContext never throws -- see its own try/catch), so this can never turn a
+      // successful plan response into a failure. Only slot/weekday are known on this surface (no
+      // weather/season resolution happens here, unlike recommendations/compose.ts's buildRequest) --
+      // recordHouseholdContext already null-coalesces every other field.
+      if (resolvedHouseholdId) {
+        await recordHouseholdContext(ctx, resolvedHouseholdId, {
+          slot: body.slot,
+          weekday: body.weekday,
+        });
+      }
+      // cold_start / calibration / meal_plan / class_dishes: write a recommendation_events row so
+      // POST /v1/feedback (which resolves request_id -> recommendation_events, see
+      // feedback/events.ts) has something to resolve against. Widened 2026-08 (P0-4) from
+      // cold_start/calibration-only to also cover meal_plan/class_dishes -- those are the surfaces
+      // the actively-routed Home tab (today.tsx) actually calls, so a like/dislike tap there had
+      // nothing to resolve against before this change. weekly_plan/recipe are deliberately excluded:
+      // weekly_plan returns classes, not scored dishes, and recipe isn't a recommendation at all.
+      // Best-effort (recordRecommendationEvent never throws/never blocks the response, same as
+      // recommendations/handler.ts's own call site); skipped for a stubbed (no-profile-yet)
+      // household, same guard recordRecommendationEvent already applies itself.
+      const FEEDBACK_ELIGIBLE_SURFACES = new Set([
+        "cold_start",
+        "calibration",
+        "meal_plan",
+        "class_dishes",
+      ]);
+      if (FEEDBACK_ELIGIBLE_SURFACES.has(surface) && resolvedHouseholdId) {
         const body = result.body as Record<string, unknown>;
         const dishes = surface === "calibration"
           ? Object.values((body.slots as Record<string, unknown[]>) ?? {}).flat()
-          : body.dishes;
+          : (body.dishes ?? body.options);
         const dishCount = Array.isArray(dishes) ? dishes.length : 0;
         await recordRecommendationEvent(ctx, {
           requestId,

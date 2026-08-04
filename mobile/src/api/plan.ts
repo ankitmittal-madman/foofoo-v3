@@ -46,6 +46,10 @@ export interface SlotOptionsResponse {
   class_code: string | null;
   count: number;
   options: PlanDish[];
+  /** Stamped by plan/handler.ts on every response (P0-4, 2026-08) so a like/dislike tap on the
+   * Home tab (today.tsx) can resolve to the recommendation_events row the handler now writes for
+   * meal_plan/class_dishes surfaces too — same pattern as ColdStartResponse.request_id. */
+  request_id?: string;
 }
 
 export interface WeeklyClass {

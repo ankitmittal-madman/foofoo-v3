@@ -27,10 +27,17 @@
  *     node ops/quality/ui/run_persona_journeys.mjs
  *
  *   GHAR_PERSONAS_LIMIT=5   (optional — run only the first N personas, for a fast smoke pass)
- *   GHAR_SIGNIN_EMAIL / GHAR_SIGNIN_PASSWORD  (a pre-provisioned test account the driver signs
- *     into before each persona's run — onboarding is only reachable while signed in, per
- *     (onboarding)/_layout.tsx's guard. Without these, the driver cannot get past sign-in and
- *     records that as the failure reason for every persona rather than fabricating a pass.)
+ *
+ * Auth: no pre-provisioned account is needed or used. Each persona signs up its OWN fresh
+ * random-email account via the app's real sign-up flow ((auth)/sign-in?mode=signup ->
+ * create-id -> onboarding), since onboarding is only reachable while signed in
+ * ((onboarding)/_layout.tsx's guard). This also fixes a correctness gap a shared account would
+ * have had: reusing one login across personas would leak persona N's onboarding_completed state
+ * onto persona N+1's run. If the target Supabase project requires email confirmation before a
+ * session is issued, sign-up will succeed but never yield a session — the driver detects this
+ * (the app's own "check your email to confirm" notice) and reports it as the persona's failure
+ * reason rather than fabricating a pass; auto-confirm must be enabled in that project for this
+ * driver to work end-to-end.
  */
 
 import fs from "node:fs";
@@ -124,53 +131,60 @@ function slug(key) {
   return String(key).replace(/[^a-zA-Z0-9_-]/g, "-");
 }
 
+/** randomTestCredentials — a fresh, never-reused email+password for one persona's own account. */
+function randomTestCredentials(personaKey) {
+  const suffix = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return {
+    email: `ghar-persona-${slug(personaKey)}-${suffix}@example.com`,
+    password: `Qa1-${suffix}-Ghar`,
+  };
+}
+
 /**
- * bestEffortLogin — signs into the app via the sign-in screen using a pre-provisioned test
- * account, IF one is configured. Onboarding is unreachable while signed out
- * ((onboarding)/_layout.tsx's <Redirect> guard), so without credentials every persona's journey
- * fails identically and honestly at this step rather than the driver fabricating a pass.
+ * signUpAndAuthenticate — creates a fresh random-email account via the app's real sign-up flow
+ * and drives it through to a signed-in session, IF one is configured. Onboarding is unreachable
+ * while signed out ((onboarding)/_layout.tsx's <Redirect> guard), so a failure here fails
+ * identically and honestly rather than the driver fabricating a pass.
  */
-async function bestEffortLogin(page) {
-  const email = process.env.GHAR_SIGNIN_EMAIL;
-  const password = process.env.GHAR_SIGNIN_PASSWORD;
-  if (!email || !password) {
-    throw new Error(
-      "GHAR_SIGNIN_EMAIL/GHAR_SIGNIN_PASSWORD not set — cannot authenticate. Onboarding is " +
-      "gated on a signed-in session (see (onboarding)/_layout.tsx); this driver will not fabricate one.",
-    );
-  }
-  await page.goto(new URL("/(auth)/sign-in", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
-  // testID-based selectors are the driver's contract with the app; the sign-in screen predates
-  // WP-22 and is out of this work package's scope to retrofit, so this falls back to common
-  // input roles/placeholders rather than a testID this screen may not have.
+async function signUpAndAuthenticate(page, personaKey) {
+  const { email, password } = randomTestCredentials(personaKey);
+  // mode=signup is (auth)/sign-in.tsx's own query param for opening straight into its signup
+  // toggle state — no extra click needed to switch off the default sign-in tab.
+  await page.goto(new URL("/(auth)/sign-in?mode=signup", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
   const emailInput = page.locator('[data-testid="signin-email"], input[type="email"], input[placeholder*="mail" i]').first();
   const passwordInput = page.locator('[data-testid="signin-password"], input[type="password"]').first();
   await emailInput.fill(email, { timeout: 10000 });
   await passwordInput.fill(password, { timeout: 10000 });
-  const submit = page.locator('[data-testid="signin-submit"], button:has-text("Sign in"), button:has-text("Log in")').first();
+  const submit = page.locator('[data-testid="signin-submit"], button:has-text("Create Account"), button:has-text("Sign up")').first();
   await submit.click({ timeout: 10000 });
+
   try {
-    // handleSubmit awaits signInWithPassword() THEN fetchOnboardingStatus() before navigating
-    // (see (auth)/sign-in.tsx) — two sequential network round trips, so this needs real headroom
-    // beyond a single request's latency.
+    // signUp() -> either an immediate session (auto-confirm on) which routes to /create-id, or
+    // (email confirmation required) a "check your email" notice with mode switched back to
+    // signin and the URL unchanged — either way this resolves once the URL actually moves.
     await waitForPath(page, (u) => !u.pathname.includes("sign-in"), 30000);
   } catch (e) {
-    // Diagnostic capture, not a fix: without this, every timeout here looks identical (a bare
-    // "timed out") regardless of WHY — wrong credentials (errorMsg visible, URL never moves),
-    // a network-egress problem in this environment (same symptom), or something else entirely.
-    // Surfacing the on-screen error text + a screenshot path turns the next run's failure into
-    // actual evidence instead of another blind timeout.
-    const errorText = await page
-      .locator("text=/invalid|error|incorrect|not confirmed/i")
-      .first()
-      .textContent({ timeout: 1000 })
-      .catch(() => null);
-    const shotPath = path.join(outDir, "login-failure.png");
+    // Diagnostic capture, not a fix: distinguishes "confirmation required" (a real environment
+    // limitation this driver cannot work around) from "already registered" (a random-email
+    // collision, extremely unlikely but not impossible) from anything else, instead of every
+    // failure here looking like an identical blind timeout.
+    const noticeText = await page.locator("text=/check your email|confirm/i").first().textContent({ timeout: 1000 }).catch(() => null);
+    const errorText = await page.locator("text=/invalid|error|already registered|exists/i").first().textContent({ timeout: 1000 }).catch(() => null);
+    const shotPath = path.join(outDir, `signup-failure-${slug(personaKey)}.png`);
     await page.screenshot({ path: shotPath }).catch(() => {});
     throw new Error(
-      `${e.message} | on-screen error text: ${errorText ?? "(none found)"} | screenshot: ${shotPath}`,
+      `${e.message} | notice: ${noticeText ?? "(none found)"} | error: ${errorText ?? "(none found)"} | screenshot: ${shotPath}`,
     );
   }
+
+  // A brand-new signup always lands on /create-id first (display name capture) before consent —
+  // fill it in and continue, same real UI path a human signup would take.
+  if (new URL(page.url()).pathname.includes("create-id")) {
+    await page.getByTestId("create-id-name").fill(`QA ${personaKey}`, { timeout: 10000 }).catch(() => {});
+    await page.getByTestId("create-id-continue").click({ timeout: 10000 }).catch(() => {});
+    await waitForPath(page, (u) => u.pathname.includes("consent"), 20000).catch(() => {});
+  }
+  return { email, password };
 }
 
 /**
@@ -234,8 +248,8 @@ async function runPersona(browser, persona) {
   const shot = (label) => screenshot(page, steps, label, personaDir);
 
   try {
-    await bestEffortLogin(page);
-    steps.push({ label: "signed-in", screenshot: await shot("signed-in") });
+    await signUpAndAuthenticate(page, persona.key);
+    steps.push({ label: "signed-up", screenshot: await shot("signed-up") });
 
     // Consent — gate on personalization=true so the flow can proceed into step-1.
     await page.goto(new URL("/(onboarding)/consent", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
