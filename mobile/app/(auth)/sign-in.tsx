@@ -119,6 +119,7 @@ export default function SignIn() {
 
           <Text style={[styles.label, { color: t.colors.textSecondary, fontFamily: t.fonts.bodyMedium }]}>EMAIL</Text>
           <TextInput
+            testID="signin-email"
             value={email}
             onChangeText={setEmail}
             placeholder="you@example.com"
@@ -132,6 +133,7 @@ export default function SignIn() {
 
           <Text style={[styles.label, { color: t.colors.textSecondary, fontFamily: t.fonts.bodyMedium }]}>PASSWORD</Text>
           <TextInput
+            testID="signin-password"
             value={password}
             onChangeText={setPassword}
             placeholder="At least 6 characters"
@@ -146,6 +148,7 @@ export default function SignIn() {
           {notice ? <Text style={[styles.msg, { color: t.colors.success, fontFamily: t.fonts.bodyMedium }]}>{notice}</Text> : null}
 
           <Pressable
+            testID="signin-submit"
             disabled={!canSubmit}
             onPress={handleSubmit}
             style={[styles.button, { backgroundColor: canSubmit ? t.colors.selected : t.colors.disabled }]}

@@ -123,6 +123,13 @@ class Config:
         cuisine-coherence hard gate rejects the pair (pairing.allowed())."""
         return self.pairing["hard_gates"]["theta_region"]
 
+    @property
+    def theta_base(self):
+        """The same-base exclusion threshold (Core Spine FROZEN §S4 line 641, default 0.6):
+        pairing.same_base(d,l) rejects a pair when cosine(base-ingredient vectors) exceeds this,
+        i.e. the dry and liquid dish are too similar in their defining/main ingredients."""
+        return self.pairing["hard_gates"]["theta_base"]
+
     def soft(self, key):
         """Look up one named soft pairing term (e.g. 'b_balance', 'b_protein', 'p_sametaste')
         from pairing_rules.yaml — the small bonuses/penalties compat() adds up."""

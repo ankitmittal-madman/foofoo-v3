@@ -10,6 +10,7 @@ from ghar_re_core.config import CONFIG
 from ghar_re_core import scoring as S
 from ghar_re_core import decision_log
 from ghar_re_core import exploration
+from ghar_re_core import similarity as SIM
 
 
 RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich"}
@@ -26,28 +27,23 @@ def both_rich(d, l):
     return bool(set(d.richness) & RICH_TAGS) and bool(set(l.richness) & RICH_TAGS)
 
 
-DALS = {"toor_dal", "moong_dal", "chana_dal", "urad_dal", "masoor_dal", "black_lentil", "kidney_beans", "chickpeas"}
-COCONUT = {"coconut_fresh", "coconut_milk", "coconut_desiccated", "dried_coconut", "coconut_cream"}
+def same_base(d, l, idf):
+    """True if the dry dish `d` and liquid dish `l` share the same underlying base — the pairing
+    hard gate that stops two too-similar-tasting dishes being served together (KB §N1 row 2).
 
+    Core Spine FROZEN §S4 line 555 defines this exactly: "derived from the §1 ING block on base
+    ingredients... Use cosine(base-ingredient vectors) > theta_base" (theta_base=0.6, line 641).
+    `idf` is the catalogue-wide IDF-weighted vector built by `similarity.build_idf()` — required,
+    not optional, since the cosine gate is meaningless without a real corpus behind it; callers
+    build it once per catalogue via `build_plates()` below, not per pair.
 
-def same_base(d, l):
-    """True if the dry dish `d` and liquid dish `l` share the same underlying base (both
-    coconut-dominant, both built on the same primary dal/pulse, or both tomato-onion gravies) —
-    the pairing hard gate that stops two too-similar-tasting dishes being served together
-    (KB §N1 row 2)."""
-    # G2 (KB §N1 row 2): not two tomato-onion / two coconut / same primary dal.
-    # Proxy for the §1 ING base-cosine gate, using MAIN ingredients.
-    dm, lm = set(d.main_ingredients), set(l.main_ingredients)
-    # two coconut-dominant
-    if (dm & COCONUT) and (lm & COCONUT):
-        return True
-    # same primary dal/pulse in both
-    if (dm & DALS) and (dm & DALS) == (lm & DALS) and (lm & DALS):
-        return True
-    # both tomato-onion gravies (both carry tomato AND onion as mains)
-    if {"tomato", "onion"} <= dm and {"tomato", "onion"} <= lm:
-        return True
-    return False
+    This REPLACES the previous set-intersection proxy (coconut/dal/tomato-onion special-casing)
+    that stood in for this gate — the proxy is gone, not layered underneath; the real formula
+    governs the gate entirely now, per Founder direction (2026-08 RE compliance review)."""
+    # G2 (KB §N1 row 2): base-ingredient cosine gate, exactly per Core Spine FROZEN §S4 line 555.
+    va = {ing: idf[ing] for ing in set(d.main_ingredients) if ing in idf}
+    vb = {ing: idf[ing] for ing in set(l.main_ingredients) if ing in idf}
+    return SIM.cosine(va, vb) > CONFIG.theta_base
 
 
 def cuisine_dist(d, l):
@@ -66,15 +62,16 @@ def cuisine_dist(d, l):
     return ch["else"]
 
 
-def allowed(d, l):
+def allowed(d, l, idf):
     """Whether a dry dish `d` and liquid dish `l` may be formed into a pair at all. Checks every
     configured hard gate (not-both-rich, not-same-base, cuisine-coherence) — the pair is only
-    ever built if ALL of them pass; any single violation rejects the pair outright."""
+    ever built if ALL of them pass; any single violation rejects the pair outright. `idf` is the
+    catalogue-wide IDF vector required by the same_base() cosine gate (see same_base's docstring)."""
     # HARD gates — pair not formed if any violated (pairing_rules.yaml hard_gates).
     hg = CONFIG.pairing["hard_gates"]
     if hg.get("not_both_rich") and both_rich(d, l):
         return False
-    if hg.get("not_same_base") and same_base(d, l):
+    if hg.get("not_same_base") and same_base(d, l, idf):
         return False
     if hg.get("cuisine_coherence") and cuisine_dist(d, l) > CONFIG.theta_region:
         return False
