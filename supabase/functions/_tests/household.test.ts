@@ -99,6 +99,7 @@ function fakeStore() {
     checkProfileExists: 0,
     upsertProfileRow: 0,
     upsertMembers: 0,
+    updateProfile: 0,
   };
 
   const deps: HouseholdDeps = {
@@ -141,6 +142,11 @@ function fakeStore() {
       calls.upsertMembers++;
       members.push(...memberList);
       return Promise.resolve(memberList.length);
+    },
+    updateProfile: (_ctx, _id, patch) => {
+      calls.updateProfile++;
+      if (profile) Object.assign(profile, patch);
+      return Promise.resolve();
     },
   };
 
@@ -299,6 +305,40 @@ Deno.test("a repeat call after the profile already exists does not re-create it"
     assertEquals(json.profile_created, false); // already existed BEFORE this call
     assertEquals(json.profile_exists, true);
     assertEquals(calls.upsertProfileRow, 1); // still exactly one, never two
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 4b. Profile UPDATE path (P1-4, 2026-08) — an existing profile's diet_type/allergen_flags can
+// actually change on a later call, not silently no-op (the gap this fix closes).
+// ---------------------------------------------------------------------------
+Deno.test("a profile field can be updated after the profile already exists", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const { deps, calls, getProfile } = fakeStore();
+    const app = pipeline(deps);
+
+    await app(post({ screens: COMPLETE_ANSWERS }));
+    assertEquals((getProfile() as Record<string, unknown>).diet_type, "veg");
+    assertEquals(calls.updateProfile, 0); // create path only touched upsertProfileRow so far
+
+    const res = await app(post({ screens: [screen("diet_type", "vegan")] }));
+    assertEquals(res.status, 200);
+    assertEquals(calls.updateProfile, 1);
+    assertEquals(calls.upsertProfileRow, 1); // create path never re-ran
+    assertEquals((getProfile() as Record<string, unknown>).diet_type, "vegan");
+  });
+});
+
+Deno.test("a household_answers-only call does not touch updateProfile", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const { deps, calls } = fakeStore();
+    const app = pipeline(deps);
+
+    await app(post({ screens: COMPLETE_ANSWERS }));
+    await app(post({ screens: [screen("q15_objective", "healthy_living")] }));
+    assertEquals(calls.updateProfile, 0);
   });
 });
 

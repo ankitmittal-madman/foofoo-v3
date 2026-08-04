@@ -137,3 +137,51 @@ export async function recordRecommendationEvent(
     }
   }
 }
+
+/** One row of a household's own recommendation history, as returned by the plan "history" surface
+ * (P1-3, 2026-08). Deliberately narrow projection — no `plates` jsonb blob (that's per-request
+ * audit detail, not what a "past plans" UI needs) and no other household's rows are ever
+ * reachable, since the query is always scoped to the caller's own resolved household_id. */
+export interface RecommendationHistoryRow {
+  id: string;
+  request_id: string;
+  created_at: string;
+  slot: string | null;
+  outcome: string;
+  plate_count: number;
+}
+
+/**
+ * Read-only: the caller's own most recent recommendation_events rows, newest first. Used by the
+ * plan Edge Function's "history" surface (P1-3) — the first read path this table has ever had;
+ * previously recommendation_events accumulated real rows with no way for a user to see their own
+ * history (docs/active/OPEN_ITEMS.md P1-3). Never throws: an empty array on any DB error, same
+ * fail-open posture the write-side functions in this file already use, since a history screen
+ * should degrade to "no history yet" rather than a hard error.
+ */
+export async function fetchRecentRecommendationEvents(
+  ctx: RequestContext,
+  householdId: string,
+  limit = 20,
+): Promise<RecommendationHistoryRow[]> {
+  try {
+    const db = createServiceRoleClient(ctx.config);
+    const { data, error } = await withTimeout(
+      db
+        .from("recommendation_events")
+        .select("id, request_id, created_at, slot, outcome, plate_count")
+        .eq("profile_id", householdId)
+        .order("created_at", { ascending: false })
+        .limit(limit),
+      "recommendations.events.fetchRecentRecommendationEvents",
+    );
+    if (error) throw error;
+    return (data ?? []) as RecommendationHistoryRow[];
+  } catch (e) {
+    ctx.logger.warn("recommendation_history.fetch_failed", {
+      household_id: householdId,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+    return [];
+  }
+}

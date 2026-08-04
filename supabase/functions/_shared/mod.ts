@@ -62,7 +62,12 @@ export { ConsentService } from "./services/consent-service.ts";
 export type { ConsentResponse } from "./services/consent-service.ts";
 
 // telemetry
-export { loggerSink, withTiming } from "./telemetry/telemetry.ts";
+export {
+  loggerSink,
+  resolveTelemetrySink,
+  webhookSink,
+  withTiming,
+} from "./telemetry/telemetry.ts";
 export type { TelemetrySink } from "./telemetry/telemetry.ts";
 
 // di

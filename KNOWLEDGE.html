@@ -733,8 +733,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🍱</span> S62 · Home tab (today's meals) + Week Plan tab
       <span class="nav-badge">Aug 4</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s63')">
+    <div class="nav-item" onclick="showPage('s63')">
       <span class="nav-icon">🧩</span> S63 · Dish-pick calibration grid
+      <span class="nav-badge">Aug 4</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s64')">
+      <span class="nav-icon">🔔</span> S64 · Feedback loop, DPDP UI, telemetry alerting
       <span class="nav-badge">Aug 4</span>
     </div>
     <!-- NAV_INJECT -->
@@ -746,18 +750,18 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">21</span>
+      <span class="nav-badge">24</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">316</span>
+      <span class="nav-badge">348</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">45</span>
+      <span class="nav-badge">51</span>
     </div>
   </div>
 </nav>
@@ -1286,6 +1290,22 @@ function deepDiveFeature(featureLabel){
           <div class="arch-node-name">mobile/app/cold-start.tsx</div>
           <div class="arch-node-desc">Rewritten: 3-slot × 5-dish calibration grid · S63</div>
         </div>
+        <div class="arch-node is-mod" onclick="jumpModule('mobile-app')">
+          <div class="arch-node-name">mobile/app/(tabs)/today.tsx</div>
+          <div class="arch-node-desc">DishCard: like/dislike feedback + "Why this?" explainer · S64</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+          <div class="arch-node-name">mobile/app/history.tsx</div>
+          <div class="arch-node-desc">Reverse-chronological recommendation history · S64</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+          <div class="arch-node-name">mobile/app/profile-edit.tsx</div>
+          <div class="arch-node-desc">Diet/allergen editor · S64</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+          <div class="arch-node-name">mobile/app/(tabs)/settings.tsx</div>
+          <div class="arch-node-desc">DPDP export/delete + links to profile/history · S64</div>
+        </div>
         <!-- ARCH_PHONE_INJECT -->
       </div>
     </div>
@@ -1327,6 +1347,22 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node is-mod" onclick="jumpModule('mobile-app')">
     <div class="arch-node-name">mobile/src/api/plan.ts</div>
     <div class="arch-node-desc">+fetchCalibrationGrid(), cell_role plumbing · S63</div>
+  </div>
+  <div class="arch-node is-mod" onclick="jumpModule('mobile-app')">
+    <div class="arch-node-name">mobile/src/api/plan.ts</div>
+    <div class="arch-node-desc">+fetchHistory(), +fetchProfile() · S64</div>
+  </div>
+  <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+    <div class="arch-node-name">mobile/src/api/account.ts</div>
+    <div class="arch-node-desc">DPDP export/delete calls · S64</div>
+  </div>
+  <div class="arch-node is-mod" onclick="jumpModule('mobile-app')">
+    <div class="arch-node-name">mobile/src/onboarding/toHouseholdWrite.ts</div>
+    <div class="arch-node-desc">Exported ALLERGEN_BITS/allergenFlags for reuse + tests · S64</div>
+  </div>
+  <div class="arch-node is-new" onclick="jumpModule('mobile-test-infra')">
+    <div class="arch-node-name">mobile/jest.config.js, jest.setup.js</div>
+    <div class="arch-node-desc">Test infra stood up from scratch · S64</div>
   </div>
   <!-- ARCH_APPLOGIC_INJECT -->
       </div>
@@ -1379,6 +1415,18 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node is-mod" onclick="jumpModule('plan-edge')">
     <div class="arch-node-name">plan (edge fn)</div>
     <div class="arch-node-desc">supabase/functions/plan · +calibration surface · S63</div>
+  </div>
+  <div class="arch-node is-mod" onclick="jumpModule('plan-edge')">
+    <div class="arch-node-name">plan (edge fn)</div>
+    <div class="arch-node-desc">household_context write fix (P0-1), feedback-surface widening (P0-4), +history/+profile · S64</div>
+  </div>
+  <div class="arch-node is-mod" onclick="jumpModule('household-edge')">
+    <div class="arch-node-name">household (edge fn)</div>
+    <div class="arch-node-desc">supabase/functions/household · profile-update fix (P1-4), allergen_flags cap fix · S64</div>
+  </div>
+  <div class="arch-node is-new" onclick="jumpModule('telemetry-webhook')">
+    <div class="arch-node-name">_shared/telemetry, error-boundary.ts</div>
+    <div class="arch-node-desc">Real webhook alerting sink for every 500-level error (P1-7) · S64</div>
   </div>
   <!-- ARCH_SERVER_INJECT -->
       </div>
@@ -2395,6 +2443,24 @@ function deepDiveFeature(featureLabel){
     <div class="tl-note">Replaced the flat post-onboarding like-list with a smarter grid that mixes 3 good-fit dishes with 2 deliberately weak-but-safe ones per meal slot, so an early wrong-guess "like" corrects the taste profile sooner. RE core math (scoring/derivation/pairing/etc.) was deliberately left untouched — new additive-only calibration.py calls existing public functions, same charter as meal_planner.py. Next: visually verify the grid in a simulator; the OTHER concurrent session's pairing.py fix and onboarding-step guards are tracked separately, not part of this session.</div>
   </div>
 </div>
+<div class="timeline-row">
+  <div class="tl-date">Aug 4, 2026</div>
+  <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+  <div class="tl-content">
+    <span class="tl-badge" style="background:#e8f8f2;color:#0e7a5a">S64</span>
+    <div class="tl-title">Feedback loop closed, DPDP rights made reachable, first mobile test suite</div>
+    <div class="tl-chips">
+      <span class="tl-chip" onclick="showPage('s64')">household_context fix (P0-1)</span>
+      <span class="tl-chip" onclick="showPage('s64')">Like/dislike + Why this?</span>
+      <span class="tl-chip" onclick="showPage('s64')">History screen</span>
+      <span class="tl-chip" onclick="showPage('s64')">Profile edit</span>
+      <span class="tl-chip" onclick="showPage('s64')">Settings + DPDP export/delete</span>
+      <span class="tl-chip" onclick="showPage('s64')">Telemetry webhook alerting</span>
+      <span class="tl-chip" onclick="showPage('s64')">Mobile test infra</span>
+    </div>
+    <div class="tl-note">Fixed a real data-loss bug (household_context never wrote, profile edits never saved), gave users a way to act on and understand recommendations, and made the already-built DPDP export/delete endpoints reachable from the app for the first time. household and plan functions redeployed to production; recommendations function left as-is (confirmed dead, unrelated bundler issue). P1-1 (leaked-password protection) explicitly deferred per Founder instruction; P1-5 (mobile test coverage) partial — pure logic only, no component-render tests yet.</div>
+  </div>
+</div>
 <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2613,12 +2679,12 @@ function deepDiveFeature(featureLabel){
       <code>handler.ts</code> — the orchestration flow<br>
       <code>re-client.ts</code> — HMAC-signed call + timeout/retry<br>
       <code>contract.ts</code> — validates payloads against the shared JSON-Schema<br>
-      <code>compose.ts / fallback.ts / events.ts</code> — build the request (stubbed household), fallback plate, outcome logging<br>
+      <code>compose.ts / fallback.ts / events.ts</code> — build the request (stubbed household), fallback plate, outcome logging; <b>(S64)</b> events.ts +<code>fetchRecentRecommendationEvents(ctx, householdId, limit)</code> — a read-only, fail-open query of the caller's own recommendation_events rows, added so plan/handler.ts's new "history" surface (P1-3) has something to call<br>
     </div>
     <div class="dd-label">How it helps the app</div>
-    <div class="dd-text">It's the secure front door to the engine: the app makes one authenticated call and always gets a usable answer, even when the engine is slow or down.</div>
+    <div class="dd-text">It's the secure front door to the engine: the app makes one authenticated call and always gets a usable answer, even when the engine is slow or down. Note: this function itself (recommendations/handler.ts) was NOT redeployed in S64 — its bundler fails on a pre-existing, unrelated static-file packaging issue, and it's confirmed zero-live-traffic (P0-3, mobile's own recommendations.tsx/recommendations.ts were deleted this session), so fixing that deploy wasn't worth doing now. compose.ts/events.ts are shared code, imported directly by plan/handler.ts, so S64's fixes reach production via the plan function's redeploy regardless.</div>
     <div class="dd-label">Last touched</div>
-    <div class="dd-text">S34 · Jul 28</div>
+    <div class="dd-text">S64 · Aug 4 (added fetchRecentRecommendationEvents; recommendations/handler.ts itself last deployed S34)</div>
   </div>
 </div>
 <div class="detail-item">
@@ -2644,7 +2710,7 @@ function deepDiveFeature(featureLabel){
   <div class="detail-item">
     <div class="detail-row" id="row-mod-mobile-app" onclick="toggleDetail('mod-mobile-app')">
       <div class="detail-left">
-        <span class="tag tag-new">New</span>
+        <span class="tag tag-mod">Modified</span>
         <span class="detail-name">Mobile app (Expo client)</span>
       </div>
       <span class="detail-chevron" id="chev-mod-mobile-app">▾</span>
@@ -2660,19 +2726,25 @@ function deepDiveFeature(featureLabel){
         <code>mobile/app/(auth)/sign-in.tsx</code> — combined sign-in/sign-up toggle screen<br>
         <code>mobile/app/create-id.tsx</code> — captures the display name after sign-up; also submits it as the required primary_cook_name<br>
         <code>mobile/app/(onboarding)/step-1.tsx .. step-5.tsx</code> — the real 5-screen onboarding (household, location, diet, health, last details incl. required cooking skill)<br>
-        <code>mobile/app/recommendations.tsx</code> — plain list of the AI's meal picks<br>
+        <code>mobile/app/recommendations.tsx</code> — <b>(S64) DELETED</b>: confirmed zero live traffic against production logs (P0-3), so this dead flat like-list screen was retired rather than ported forward<br>
         <code>mobile/src/auth/supabaseClient.ts, SessionContext.tsx</code> — login/session handling, shared app-wide<br>
-        <code>mobile/src/api/client.ts, household.ts, recommendations.ts, types.ts</code> — the one shared layer that talks to the backend<br>
-        <code>mobile/src/api/plan.ts</code> — <b>(S63)</b> +<code>fetchCalibrationGrid()</code> (POST /plan surface:"calibration") + <code>CalibrationResponse</code> type + a plumbing-only <code>cell_role</code> field on PlanDish, never rendered<br>
+        <code>mobile/src/api/client.ts, household.ts, types.ts</code> — the one shared layer that talks to the backend; <code>recommendations.ts</code> <b>(S64) DELETED</b> alongside its screen, same zero-traffic decision<br>
+        <code>mobile/src/api/plan.ts</code> — <b>(S63)</b> +<code>fetchCalibrationGrid()</code> (POST /plan surface:"calibration") + <code>CalibrationResponse</code> type + a plumbing-only <code>cell_role</code> field on PlanDish, never rendered; <b>(S64)</b> +<code>fetchHistory()</code> (surface:"history", P1-3) and +<code>fetchProfile()</code> (surface:"profile", P1-4) plus their response types, backing the new History and Profile-edit screens below<br>
         <code>mobile/app/cold-start.tsx</code> — <b>(S63)</b> rewritten: was a flat scrolling 15-dish like-list, now a 3-column (breakfast/lunch/dinner) × 5-row calibration grid of DishCards; same place in the nav chain (reached from onboarding step-5, continues to /weekly-plan)<br>
+        <code>mobile/app/(tabs)/today.tsx</code> — <b>(S64)</b> rewritten with a new in-file <code>DishCard</code> component: like/dislike buttons that POST to <code>/v1/feedback</code> against the <code>request_id</code> plan/handler.ts now writes for meal_plan/class_dishes (P0-4 — before this, a like tap on the actively-routed Home tab had nothing in <code>recommendation_events</code> to resolve against), plus a "Why this?" toggle that reveals the match score + cuisine/class explanation already present on the dish payload (P1-2)<br>
+        <code>mobile/app/history.tsx</code> — <b>(S64 new)</b>: reverse-chronological list of the caller's own <code>recommendation_events</code> rows via <code>fetchHistory()</code>, human labels for each outcome (Served / Timed out / Failed / Unavailable) (P1-3)<br>
+        <code>mobile/app/profile-edit.tsx</code> — <b>(S64 new)</b>: diet/allergen editor pre-filled from <code>fetchProfile()</code>, saves via the existing <code>postHousehold()</code> write path, reuses <code>allergenFlags()</code> (now exported, see toHouseholdWrite.ts below) and the shared <code>ChipGroup</code> onboarding component (P1-4)<br>
+        <code>mobile/src/api/account.ts</code> — <b>(S64 new)</b>: <code>requestExport()</code>/<code>pollExport()</code> (GET /v1/user/export) and <code>deleteAccount()</code> (POST /v1/user/delete) — the DPDP data-subject-rights calls, gated by an exact-phrase confirmation (<code>REQUIRED_CONFIRMATION_PHRASE = "DELETE MY ACCOUNT"</code>) (P0-2)<br>
+        <code>mobile/app/(tabs)/settings.tsx</code> — <b>(S64 new)</b>: the first reachable UI for the already-implemented, already-authorized export/delete Edge Functions — before this screen they had no UI entry point at all, which is a real DPDP compliance gap, not just a UX one; links to profile-edit and history too<br>
+        <code>mobile/app/(tabs)/_layout.tsx</code> — <b>(S64)</b> +Settings tab alongside Home/Week Plan<br>
         <code>mobile/src/theme/index.tsx</code> — the Ghar visual system (terracotta/cream, Fraunces/Mukta) actually used by every real screen<br>
         <code>mobile/src/theme/theme.ts, hooks/, components/ThemedText.tsx, ThemedView.tsx</code> — the earlier, plainer light/dark tokens (kept for parity, not currently used by any screen)<br>
-        <code>mobile/src/onboarding/</code> — the shared answer store, chip/header components, state list, and the answers→backend mapping layer (toHouseholdWrite.ts)<br>
+        <code>mobile/src/onboarding/</code> — the shared answer store, chip/header components, state list, and the answers→backend mapping layer (toHouseholdWrite.ts — <b>(S64)</b> now exports <code>ALLERGEN_BITS</code>/<code>allergenFlags</code> so they're unit-testable and reusable from profile-edit.tsx)<br>
       </div>
       <div class="dd-label">How it helps the app</div>
-      <div class="dd-text">Before this, FooFoo's recommendation engine and onboarding write path existed but nobody could actually use them — there was no app. This is what makes the backend reachable by a real person for the first time, and now with a real, considered visual identity rather than placeholder styling.</div>
+      <div class="dd-text">Before this, FooFoo's recommendation engine and onboarding write path existed but nobody could actually use them — there was no app. This is what makes the backend reachable by a real person for the first time, and now with a real, considered visual identity rather than placeholder styling. As of S64 it's also the first version where a user can act on a recommendation (like/dislike with a visible reason), see their own history, correct their own diet/allergen profile, and exercise their DPDP export/delete rights — not just view AI output passively.</div>
       <div class="dd-label">Last touched</div>
-      <div class="dd-text">S43 · Jul 30</div>
+      <div class="dd-text">S64 · Aug 4</div>
     </div>
   </div>
   <div class="detail-item">
@@ -2932,13 +3004,76 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">The WP-18 planning edge function — a single handler that routes every onboarding→plan→recipe surface (cold_start, calibration, meal, weekly, class, recipe) to the matching signed ghar_re_service endpoint via one SURFACES lookup table, and writes a recommendation_events row for surfaces whose "like" taps need to resolve later through POST /v1/feedback.</div>
     <div class="dd-label">Files / tables in this module</div>
     <div class="dd-text">
-      <code>handler.ts</code> — the SURFACES map (path + needsHousehold per surface); <b>(S63)</b> added a <code>calibration</code> entry (<code>{ path: "/v1/calibration", needsHousehold: true }</code>) and extended the existing cold-start-only recommendation_events write block to also cover <code>surface === "calibration"</code>, flattening <code>result.body.slots</code> into one array so a calibration "like" tap can resolve via request_id exactly like cold-start likes already do<br>
+      <code>handler.ts</code> — the SURFACES map (path + needsHousehold per surface); <b>(S63)</b> added a <code>calibration</code> entry (<code>{ path: "/v1/calibration", needsHousehold: true }</code>) and extended the existing cold-start-only recommendation_events write block to also cover <code>surface === "calibration"</code>, flattening <code>result.body.slots</code> into one array so a calibration "like" tap can resolve via request_id exactly like cold-start likes already do; <b>(S64)</b> P0-1 fix — every surface with a resolved household now calls the existing (previously unwired) <code>recordHouseholdContext</code> helper after a successful RE call, which is the direct fix for household_context staying at 0 rows despite 126+ served recommendation events; P0-4 — widened <code>FEEDBACK_ELIGIBLE_SURFACES</code> from cold_start/calibration-only to also include meal_plan and class_dishes, since those are what the actively-routed Home tab actually calls; added two new pure-read surfaces needing no RE call at all — <code>history</code> (P1-3, calls the new <code>fetchRecentRecommendationEvents</code>) and <code>profile</code> (P1-4, calls the existing <code>loadHouseholdRaw</code>)<br>
       <code>index.ts</code> — entrypoint, unchanged this session<br>
     </div>
     <div class="dd-label">How it helps the app</div>
-    <div class="dd-text">One shared orchestration path means every new planning surface (calibration included) gets signed calls, household resolution, and feedback-event logging for free instead of each surface reimplementing that plumbing.</div>
+    <div class="dd-text">One shared orchestration path means every new planning surface (calibration, history, profile) gets signed calls, household resolution, and feedback-event logging for free instead of each surface reimplementing that plumbing. As of S64 this is also the one place that reliably writes household_context on every real planning call, and the one place a like/dislike tap on the live Home tab has something to resolve against.</div>
     <div class="dd-label">Last touched</div>
-    <div class="dd-text">S63 · Aug 4 (added calibration surface; originally WP-18, S49-era)</div>
+    <div class="dd-text">S64 · Aug 4 (P0-1 household_context wiring, P0-4 feedback-surface widening, history/profile surfaces; originally WP-18, S49-era)</div>
+  </div>
+</div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-household-edge" onclick="toggleDetail('mod-household-edge')">
+    <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">household edge function (supabase/functions/household)</span></div>
+    <span class="detail-chevron" id="chev-mod-household-edge">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-household-edge">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">POST /v1/household — the onboarding write path. A thin handler that parses the incoming answers, authorizes the caller, then sequences four steps against the live schema: logs every screen to onboarding_sessions, incrementally upserts household_answers, inserts the profiles row once all five required fields are known (exactly once), and writes household_members rows once a profile exists.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>handler.ts</code> — the 4-step orchestration sequence, unit-testable via injectable deps (same pattern as recommendations/handler.ts)<br>
+      <code>store.ts</code> — <b>(S64)</b> +<code>buildProfilePatch(screens)</code> and +<code>updateProfileFields(ctx, profileId, patch)</code>: fixes a real bug (P1-4) where a repeat call to this endpoint with changed answers never actually updated the existing profiles row's fields — it only ever inserted once and silently ignored everything after. Now a repeat call diffs the incoming screens against a patch and updates in place<br>
+      <code>schema.ts</code> — request validation (zod); <b>(S64)</b> the top-level profile envelope's <code>allergen_flags</code> cap corrected from <code>max(127)</code> (the old frozen 7-bit model) to <code>max(511)</code> (the live 9-bit model per the WP-21 fish/mustard extension) — the old cap was silently rejecting valid allergen combinations that used either of the two newest bits. Note: the separate per-member envelope's own allergen_flags cap (used for household_members rows) still reads max(127) — not touched this session, flagged but out of scope<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">This is the only write path for a household's own answers, so a bug here silently caps what a user's profile can ever say about itself. Before S64, editing your diet/allergens after onboarding (the new profile-edit.tsx screen, P1-4) would have looked like it saved successfully while actually changing nothing in the database — this fix is what makes that new screen honest.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S64 · Aug 4</div>
+  </div>
+</div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-telemetry-webhook" onclick="toggleDetail('mod-telemetry-webhook')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">Telemetry webhook alerting (supabase/functions/_shared/telemetry, middleware, config)</span></div>
+    <span class="detail-chevron" id="chev-mod-telemetry-webhook">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-telemetry-webhook">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Adds a real alerting sink to the existing observability seam (WP-8B) so a 500-level error in any Edge Function reaches somewhere a human would actually see it, instead of only ever reaching the structured log. Configured, not hardcoded — if no webhook URL is set, it behaves exactly as before (log-only).</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>_shared/telemetry/telemetry.ts</code> — +<code>webhookSink(url, fallback)</code>: POSTs a JSON error payload to the configured URL, never throws (a failed webhook POST still falls through to the log sink, so alerting can never itself cause a 500); +<code>resolveTelemetrySink(logger, webhookUrl)</code>: picks webhookSink when a URL is configured, otherwise the pre-existing loggerSink<br>
+      <code>_shared/middleware/error-boundary.ts</code> — wired <code>resolveTelemetrySink(ctx.logger, ctx.config.telemetryWebhookUrl).captureError(...)</code> into the one place every Edge Function's uncaught error already passes through, so this reaches all functions for free, not just plan/household<br>
+      <code>_shared/config/env.ts, config.ts</code> — new optional <code>TELEMETRY_WEBHOOK_URL</code> env var (marked secret, not required) resolved into <code>config.telemetryWebhookUrl</code><br>
+      <code>_shared/di/container.ts, mod.ts</code> — re-export/wiring surface touched so the new sink resolution is reachable from the container's existing <code>telemetry</code> seam<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Before this, a production error only ever became visible if someone happened to be reading logs. No real webhook URL was provided this session, so in production today it still falls back to log-only — but the plumbing is now real and wiring in a Slack/PagerDuty/etc. webhook later is a one-line env var, not a code change.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S64 · Aug 4</div>
+  </div>
+</div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-mobile-test-infra" onclick="toggleDetail('mod-mobile-test-infra')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">Mobile test infrastructure (mobile/jest.config.js, jest.setup.js, __tests__/)</span></div>
+    <span class="detail-chevron" id="chev-mod-mobile-test-infra">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-mobile-test-infra">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Stood up unit testing for the mobile app from scratch — it had none before S64. Uses jest-expo's own preset rather than replacing it wholesale, because a naive setupFiles override drops react-native's own required test setup and everything fails in confusing ways.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>mobile/package.json</code> — jest + jest-expo dev dependencies, a <code>test</code> script<br>
+      <code>mobile/jest.config.js</code> — spreads <code>jest-expo/jest-preset</code> and appends (not replaces) its <code>setupFiles</code> with jest.setup.js<br>
+      <code>mobile/jest.setup.js</code> — mocks <code>@react-native-async-storage/async-storage</code><br>
+      <code>mobile/src/onboarding/__tests__/toHouseholdWrite.test.ts</code> — 5 tests on the newly-exported <code>allergenFlags()</code>/<code>ALLERGEN_BITS</code>: zero-allergen case, bitwise-OR combination, "others" correctly ignored (collect-only, no bit), full 9-bit coverage including the fish/mustard extension, and idempotent double-selection<br>
+      <code>mobile/src/api/__tests__/errorMessages.test.ts</code> — 4 tests on <code>describeApiError()</code>, mocking <code>../../auth/supabaseClient</code> so the test doesn't need real Supabase env vars<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Business-critical mapping logic (which allergen maps to which bit, which error code shows which user-facing message) used to be verified only by hand. This is partial coverage, not complete — pure-logic only, no component-render tests yet, e.g. the new Settings screen's confirmation-phrase gating (P0-2) isn't tested. Be aware this is P1-5 partially done, not finished.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S64 · Aug 4</div>
   </div>
 </div>
 <!-- MODULES_INJECT -->
@@ -3380,6 +3515,38 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">supabase/functions/plan/handler.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S63</td><td class="fr-desc">+calibration entry in SURFACES map; recommendation_events write block now also covers surface==="calibration"</td></tr>
   <tr><td class="fr-file mono">mobile/src/api/plan.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S63</td><td class="fr-desc">+cell_role field on PlanDish (plumbing only), +CalibrationResponse type, +fetchCalibrationGrid()</td></tr>
   <tr><td class="fr-file mono">mobile/app/cold-start.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S63</td><td class="fr-desc">Rewritten: flat 15-dish like-list → 3×5 calibration grid of DishCards with heart-toggle + best-effort feedback post, same nav position</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/plan/handler.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">P0-1 household_context write, P0-4 feedback-surface widening, +history/+profile surfaces</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/recommendations/events.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">+fetchRecentRecommendationEvents() for the plan function's new history surface</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/household/handler.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Wired the new profile-update patch path into the onboarding write handler</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/household/store.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">P1-4 fix: +buildProfilePatch/updateProfileFields — repeat calls now update an existing profile</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/household/schema.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Fixed stale allergen_flags cap: max(127) → max(511) for the live 9-bit model</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/_shared/telemetry/telemetry.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">P1-7: +webhookSink/resolveTelemetrySink, real alerting sink</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/_shared/middleware/error-boundary.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Wired the webhook sink into every function's shared error path</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/_shared/config/env.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">+optional TELEMETRY_WEBHOOK_URL env var</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/_shared/config/config.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Resolves telemetryWebhookUrl from env</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/_shared/di/container.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Wiring for the webhook telemetry sink resolution</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/_shared/mod.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Re-export surface for the new telemetry sink helpers</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/_tests/foundation.test.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">+3 tests covering webhookSink/resolveTelemetrySink</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/_tests/household.test.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">+2 tests covering the repeat-call profile-update fix</td></tr>
+  <tr><td class="fr-file mono">mobile/app/recommendations.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Deleted — confirmed zero live traffic (P0-3), dead surface retired</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/recommendations.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Deleted alongside its screen (P0-3)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(tabs)/today.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">New DishCard: like/dislike feedback + "Why this?" explanation (P0-4, P1-2)</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/plan.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">+fetchHistory(), +fetchProfile() and their response types</td></tr>
+  <tr><td class="fr-file mono">mobile/app/history.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S64</td><td class="fr-desc">Reverse-chronological recommendation history screen (P1-3)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/profile-edit.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S64</td><td class="fr-desc">Diet/allergen editor screen, saves via postHousehold (P1-4)</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/account.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S64</td><td class="fr-desc">DPDP export/delete API calls, exact-phrase delete confirmation (P0-2)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(tabs)/settings.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S64</td><td class="fr-desc">First reachable UI for export/delete + links to profile-edit/history</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(tabs)/_layout.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">+Settings tab</td></tr>
+  <tr><td class="fr-file mono">mobile/src/onboarding/toHouseholdWrite.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Exported ALLERGEN_BITS/allergenFlags so they're unit-testable</td></tr>
+  <tr><td class="fr-file mono">mobile/package.json</td><td><span class="tag tag-cfg">Config</span></td><td class="fr-session">S64</td><td class="fr-desc">+jest/jest-expo dev deps, test script</td></tr>
+  <tr><td class="fr-file mono">mobile/jest.config.js</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S64</td><td class="fr-desc">Extends (not replaces) jest-expo preset's setupFiles</td></tr>
+  <tr><td class="fr-file mono">mobile/jest.setup.js</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S64</td><td class="fr-desc">Mocks @react-native-async-storage/async-storage</td></tr>
+  <tr><td class="fr-file mono">mobile/src/onboarding/__tests__/toHouseholdWrite.test.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S64</td><td class="fr-desc">5 tests on allergenFlags()/ALLERGEN_BITS</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/__tests__/errorMessages.test.ts</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S64</td><td class="fr-desc">4 tests on describeApiError()</td></tr>
+  <tr><td class="fr-file mono">docs/active/OPEN_ITEMS.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Marked P0-1..P0-4, P1-2/3/4/7 done, P1-5 partial, P1-1 deferred</td></tr>
+  <tr><td class="fr-file mono">docs/active/LAUNCH_BLOCKERS.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Same status updates reflected in the launch-blocker view</td></tr>
+  <tr><td class="fr-file mono">docs/active/CURRENT_STATUS.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">Same status updates reflected in the current-status view</td></tr>
+  <tr><td class="fr-file mono">KNOWLEDGE.html</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S64</td><td class="fr-desc">This session's own knowledge-book update (session block, modules, arch map, files register, decisions)</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -4073,6 +4240,36 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why did the pairing.py/golden-fixture changes and onboarding step-1..4/OnboardingChips.tsx changes visible in the working tree get left out of this session's documentation?</div>
     <div class="decision-a">Those are uncommitted, in-progress edits from a concurrent developer/session in the same working tree (a Founder-ratified protein-category pairing widening, and separate onboarding-step guard work) — not part of what this session built. Confirmed via git diff that the one pre-existing test_golden_master.py failure traces to that other session's in-progress pairing.py change, not to anything in calibration.py.</div>
     <div class="decision-meta">S63 · Aug 4</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">The dead recommendations.tsx/recommendations.ts pair had zero live traffic — retire it or port its logic into today.tsx?</div>
+    <div class="decision-a">Retired (deleted), not ported. Production logs were checked first and confirmed zero live callers (P0-3) — the actively-routed surface is the Home tab (today.tsx), which already gets its own new like/dislike + explanation UI this session. Porting dead code forward would have doubled the maintenance surface for a screen nobody uses.</div>
+    <div class="decision-meta">S64 · Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Where should the new webhook alerting sink be wired in — through the DI Container, or through error-boundary.ts directly?</div>
+    <div class="decision-a">error-boundary.ts, because it's the one place every Edge Function's uncaught error already passes through today — wiring there means all functions get real alerting for free in this session, without also having to touch every function's own container wiring. The DI Container's existing `telemetry` seam still exists and resolveTelemetrySink is reachable through it, but error-boundary.ts is the call site that actually fires on every 500.</div>
+    <div class="decision-meta">S64 · Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Setting up jest for the mobile app for the first time — should jest.config.js replace jest-expo's own preset setupFiles, or extend it?</div>
+    <div class="decision-a">Extend: `setupFiles: [...(preset.setupFiles || []), "<rootDir>/jest.setup.js"]`. A naive override that replaces setupFiles wholesale silently drops react-native's own required test setup, which produces confusing unrelated-looking failures rather than an obvious config error — worth calling out explicitly since it's an easy trap to fall into on a fresh test-infra setup.</div>
+    <div class="decision-meta">S64 · Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">The recommendations edge function's bundler fails on a static-file packaging issue — fix it and redeploy this session, or leave it?</div>
+    <div class="decision-a">Left as-is. The issue is pre-existing and unrelated to this session's changes, and the function is confirmed zero-live-traffic (its only caller, the mobile recommendations.tsx screen, was deleted this session per the P0-3 decision above). Not worth spending session time fixing a bundler issue on code nothing calls; compose.ts/events.ts (the shared code this session actually changed) reach production anyway via the plan function's redeploy.</div>
+    <div class="decision-meta">S64 · Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Should P1-1 (leaked-password-protection) be picked up this session since it's still open?</div>
+    <div class="decision-a">No — explicitly deferred per direct Founder instruction. Not attempted, not partially started; docs/active/OPEN_ITEMS.md, LAUNCH_BLOCKERS.md and CURRENT_STATUS.md all record it as deferred rather than done or in-progress, so the next session picks it up cleanly.</div>
+    <div class="decision-meta">S64 · Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">P1-5 (mobile test coverage) — is it safe to call this "done"?</div>
+    <div class="decision-a">No, marked partial. 9 tests exist and pass (5 on allergenFlags()/ALLERGEN_BITS, 4 on describeApiError()), and `npx tsc --noEmit` is clean, but this is pure-logic coverage only — there are no React Native component-render tests, so e.g. the new Settings screen's exact-phrase delete-confirmation gating is unverified by any test. Recorded honestly as partial rather than oversold as complete.</div>
+    <div class="decision-meta">S64 · Aug 4, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -11429,7 +11626,7 @@ function deepDiveFeature(featureLabel){
 
   </div><!-- /page-s62 -->
 
-  <div id="page-s63" class="page-content">
+  <div id="page-s63" class="page-content" style="display:none">
 
     <!-- ── Session header ── -->
     <div class="page-header">

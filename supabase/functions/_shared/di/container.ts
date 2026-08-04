@@ -7,7 +7,7 @@
  * singletons except the process-level config (cached in config.ts).
  */
 import { createServiceRoleClient, type SupabaseClient } from "../db/client.ts";
-import { loggerSink, type TelemetrySink } from "../telemetry/telemetry.ts";
+import { resolveTelemetrySink, type TelemetrySink } from "../telemetry/telemetry.ts";
 import { ConsentRepository } from "../repositories/consent-repository.ts";
 import { ConsentService } from "../services/consent-service.ts";
 import type { RequestContext } from "../types/context.ts";
@@ -32,7 +32,9 @@ export class Container {
   }
 
   get telemetry(): TelemetrySink {
-    if (this._telemetry === null) this._telemetry = loggerSink(this.ctx.logger);
+    if (this._telemetry === null) {
+      this._telemetry = resolveTelemetrySink(this.ctx.logger, this.ctx.config.telemetryWebhookUrl);
+    }
     return this._telemetry;
   }
 

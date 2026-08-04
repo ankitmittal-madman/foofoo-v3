@@ -43,6 +43,45 @@ export function missingRequiredProfileFields(accumulated: Record<string, unknown
   return PROFILE_REQUIRED_FIELDS.filter((f) => accumulated[f] === undefined);
 }
 
+/**
+ * Reduce this call's non-skipped, profiles-targeted screens into the partial column set to
+ * UPDATE (P1-4, 2026-08). Mirrors buildHouseholdAnswersPatch's shape exactly, targeting
+ * "profiles" instead of "household_answers" -- added because handler.ts previously had NO path
+ * that ever updated an EXISTING profile's diet_type/allergen_flags/etc.: upsertProfileIfAbsent's
+ * ON CONFLICT DO NOTHING makes profile creation correctly idempotent, but that also means it
+ * silently no-ops for every field on a repeat call, including an intentional edit. This patch is
+ * for updateProfileFields below, an explicit UPDATE, never used for the create path.
+ */
+export function buildProfilePatch(screens: ScreenAnswer[]): Record<string, unknown> {
+  const patch: Record<string, unknown> = {};
+  for (const s of screens) {
+    if (s.target === "profiles" && !s.skipped) {
+      patch[s.questionKey] = s.answerValue;
+    }
+  }
+  return patch;
+}
+
+/**
+ * UPDATE (not upsert) one or more public.profiles columns for an EXISTING profile (P1-4). Only
+ * called by handler.ts when `exists` is already true and `fields` is non-empty -- never used to
+ * create a row (upsertProfileIfAbsent above remains the only creation path), so there is no
+ * FK/required-field concern here, just a plain column update scoped to the caller's own id.
+ */
+export async function updateProfileFields(
+  ctx: RequestContext,
+  profileId: string,
+  fields: Record<string, unknown>,
+): Promise<void> {
+  if (Object.keys(fields).length === 0) return;
+  const db = createServiceRoleClient(ctx.config);
+  const { error } = await withTimeout(
+    db.from("profiles").update(fields).eq("id", profileId),
+    "household.updateProfileFields",
+  );
+  if (error) throw error;
+}
+
 // ---------------------------------------------------------------------------
 // Writes
 // ---------------------------------------------------------------------------

@@ -216,12 +216,12 @@ async function extractBearerToken(page) {
  * Silently skips a value with no matching testID (e.g. this mapper produced a token Screen 4/5
  * doesn't render a chip for) rather than failing the whole persona over one optional field.
  */
-async function fillChipGroup(page, prefix, values, artifacts) {
+async function fillChipGroup(page, prefix, values, steps, shot) {
   for (const v of values) {
     const el = page.getByTestId(`${prefix}-${v}`);
     if (await el.count()) {
       await el.first().click();
-      artifacts.push(await screenshot(page, artifacts, `${prefix}-${v}`));
+      steps.push({ label: `${prefix}-${v}`, screenshot: await shot(`${prefix}-${v}`) });
     }
   }
 }
@@ -281,10 +281,9 @@ async function runPersona(browser, persona) {
     await waitForPath(page, (u) => u.pathname.endsWith("/step-2"), 15000).catch(() => {});
     if (answers.homeState) {
       await page.getByTestId("onboarding-step2-state-field").click({ timeout: 10000 });
+      await page.getByTestId("onboarding-step2-state-search").fill(answers.homeState, { timeout: 10000 });
       const stateOption = page.getByTestId(`onboarding-step2-state-option-${answers.homeState}`);
-      if (await stateOption.count()) {
-        await stateOption.first().click();
-      }
+      await stateOption.first().click({ timeout: 10000 });
       steps.push({ label: "step2-state", screenshot: await shot("step2-state") });
     }
     if (answers.currentCity) {
@@ -300,15 +299,15 @@ async function runPersona(browser, persona) {
       await page.getByTestId(`onboarding-step3-diet-${answers.diet}`).click({ timeout: 10000 });
       steps.push({ label: "step3-diet", screenshot: await shot("step3-diet") });
     }
-    await fillChipGroup(page, "onboarding-step3-meat", answers.meatPreferences, steps);
-    await fillChipGroup(page, "onboarding-step3-vegday", answers.vegDays, steps);
+    await fillChipGroup(page, "onboarding-step3-meat", answers.meatPreferences, steps, shot);
+    await fillChipGroup(page, "onboarding-step3-vegday", answers.vegDays, steps, shot);
     await page.getByTestId("onboarding-step3-continue").click({ timeout: 10000 });
     steps.push({ label: "step3-continue", screenshot: await shot("step3-continue") });
 
     // ---- Step 4 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-4"), 15000).catch(() => {});
-    await fillChipGroup(page, "onboarding-step4-allergen", answers.allergens, steps);
-    await fillChipGroup(page, "onboarding-step4-condition", answers.medicalConditions, steps);
+    await fillChipGroup(page, "onboarding-step4-allergen", answers.allergens, steps, shot);
+    await fillChipGroup(page, "onboarding-step4-condition", answers.medicalConditions, steps, shot);
     if (answers.allergensOther) {
       await page.getByTestId("onboarding-step4-allergen-other-input").fill(answers.allergensOther).catch(() => {});
     }

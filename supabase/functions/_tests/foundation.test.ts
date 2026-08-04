@@ -17,7 +17,9 @@ import {
   ERROR_CATALOGUE,
   loadConfig,
   resetConfigCacheForTests,
+  resolveTelemetrySink,
   validate,
+  webhookSink,
   z,
 } from "../_shared/mod.ts";
 import type { Handler, Middleware } from "../_shared/mod.ts";
@@ -120,6 +122,73 @@ Deno.test("DI container builds a service-role client lazily", () => {
     assertExists(container.db);
     assertExists(container.telemetry);
   });
+});
+
+// ---------------------------------------------------------------------------
+// P1-7 (2026-08): real alerting sink -- webhookSink actually POSTs, resolveTelemetrySink picks
+// the right sink based on config, and a webhook failure never suppresses the underlying log.
+// ---------------------------------------------------------------------------
+Deno.test("webhookSink POSTs a JSON payload to the configured URL and still logs via fallback", async () => {
+  const logged: unknown[] = [];
+  const fallback = {
+    captureError: (error: unknown, fields?: Record<string, unknown>) => {
+      logged.push({ error, fields });
+    },
+    recordMetric: () => {},
+  };
+
+  let capturedBody: string | undefined;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = ((_url: string, init?: RequestInit) => {
+    capturedBody = init?.body as string;
+    return Promise.resolve(new Response("ok", { status: 200 }));
+  }) as typeof fetch;
+
+  try {
+    const sink = webhookSink("https://example.test/hook", fallback);
+    sink.captureError(new Error("boom"), { path: "/v1/plan" });
+    // captureError is fire-and-forget for the network call; the fallback call itself is synchronous.
+    assertEquals(logged.length, 1);
+    // give the fire-and-forget fetch a tick to run before asserting on it.
+    await new Promise((r) => setTimeout(r, 10));
+    assertExists(capturedBody);
+    const payload = JSON.parse(capturedBody!);
+    assertEquals(payload.type, "error");
+    assertEquals(payload.message, "boom");
+    assertEquals(payload.path, "/v1/plan");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+Deno.test("webhookSink never throws or suppresses the fallback log when the webhook itself fails", async () => {
+  const logged: unknown[] = [];
+  const fallback = {
+    captureError: (error: unknown) => {
+      logged.push(error);
+    },
+    recordMetric: () => {},
+  };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (() => Promise.reject(new Error("network down"))) as typeof fetch;
+
+  try {
+    const sink = webhookSink("https://example.test/hook", fallback);
+    // Must not throw even though the underlying fetch rejects.
+    sink.captureError(new Error("boom"));
+    assertEquals(logged.length, 1);
+    await new Promise((r) => setTimeout(r, 10));
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+Deno.test("resolveTelemetrySink falls back to log-only when no webhook URL is configured", () => {
+  const logged: unknown[] = [];
+  const logger = { error: () => logged.push("error"), warn: () => {}, info: () => {} } as never;
+  const sink = resolveTelemetrySink(logger, null);
+  sink.captureError(new Error("x"));
+  assertEquals(logged.length, 1);
 });
 
 Deno.test("validate() throws VALIDATION_FAILED on bad input", () => {

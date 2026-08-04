@@ -10,47 +10,34 @@ see `docs/archive/completed-phases/` for history. Source audit:
 
 ## P0-1: Investigate the recommendation-events vs. plan-persistence gap
 - **Priority:** P0
-- **Area:** Database / Backend
-- **Evidence:** Live query this session: `recommendation_events`=126, `week_plans`=0, `plan_slots`=0, `household_context`=0, `interaction_events`=0.
-- **Why it matters:** Either a write path is silently failing for real users, or these 126 events bypass normal persistence. Unknown which — must be resolved before trusting any other production-behavior claim.
-- **Current status:** OPEN — not yet investigated.
-- **Expected outcome:** A root-cause trace (real request → real DB write, or a discovered failure point) and either a fix or a documented explanation.
-- **Files involved:** `supabase/functions/recommendations/`, `supabase/functions/plan/`, `database/migrations/038_household_answers_context_and_events.sql`.
-- **Estimated effort:** Small to diagnose.
-- **Dependencies:** None.
+- **Status:** Completed 2026-08-04. Root cause: live edge-function logs showed `plan` is the sole
+  active traffic surface (zero `/v1/recommendations` requests) and `plan/handler.ts` simply never
+  called the already-correct, already-tested `recordHouseholdContext`. Fixed by wiring that call
+  into `plan/handler.ts` for every surface with a resolved household. Deployed to production
+  (`plan` function, v4, 2026-08-04).
+- **Files involved:** `supabase/functions/plan/handler.ts`.
 
 ## P0-2: Wire DPDP export/delete into the mobile app
 - **Priority:** P0
-- **Area:** Frontend / Compliance
-- **Evidence:** `user-export`/`user-delete` Edge Functions implemented and authorized; zero references to either endpoint anywhere under `mobile/`.
-- **Why it matters:** India's DPDP Act requires user-initiated data-subject rights; unreachable = non-compliant.
-- **Current status:** OPEN — backend done, frontend not started.
-- **Expected outcome:** A reachable UI (standalone screen or part of P1-4's profile screen) calling both endpoints.
-- **Files involved:** `supabase/functions/user-export/`, `supabase/functions/user-delete/`, new `mobile/app/` screen.
-- **Estimated effort:** Medium.
-- **Dependencies:** None (can precede or follow P1-4).
+- **Status:** Completed 2026-08-04. New `mobile/src/api/account.ts` (export request/poll,
+  delete-account with exact-phrase confirmation) wired into a new `mobile/app/(tabs)/settings.tsx`
+  screen, added to the tab layout.
+- **Files involved:** `mobile/src/api/account.ts`, `mobile/app/(tabs)/settings.tsx`, `mobile/app/(tabs)/_layout.tsx`.
 
 ## P0-3: Decide the fate of the two parallel recommendation surfaces
 - **Priority:** P0
-- **Area:** Frontend / Architecture
-- **Evidence:** `mobile/app/recommendations.tsx`'s own header comment states it is unreachable; the active surface (`today.tsx`/`weekly-plan.tsx`) uses a different API family with no feedback/explanation UI.
-- **Why it matters:** Root cause of P0-4 and P1-2; a single decision here unblocks both.
-- **Current status:** OPEN — decision not made.
-- **Expected outcome:** A recorded decision: port the dead screen's UI patterns to the active surface, or rebuild fresh.
-- **Files involved:** `mobile/app/recommendations.tsx`, `mobile/app/(tabs)/today.tsx`, `mobile/app/(tabs)/weekly-plan.tsx`.
-- **Estimated effort:** Small (decision) + Medium (implementation, tracked separately in P0-4/P1-2).
-- **Dependencies:** None. Blocks P0-4, P1-2.
+- **Status:** Completed 2026-08-04. Decision: retired the dead surface — live logs confirmed zero
+  traffic to `mobile/app/recommendations.tsx`/`mobile/src/api/recommendations.ts`; both deleted.
+  `today.tsx` (the actually-routed screen) got the feedback/explanation UI instead (see P0-4/P1-2).
+- **Files involved:** `mobile/app/recommendations.tsx` (deleted), `mobile/src/api/recommendations.ts` (deleted).
 
 ## P0-4: Feedback UI on the actively-routed screens
 - **Priority:** P0
-- **Area:** Frontend
-- **Evidence:** `today.tsx`/`recipe/[dish].tsx` have no like/dislike/accept UI.
-- **Why it matters:** Feedback data will never accumulate without this — also permanently blocks `s_pref` personalization.
-- **Current status:** OPEN.
-- **Expected outcome:** Like/dislike/accept controls on the daily-use screens, wired to the existing `POST /v1/feedback`.
-- **Files involved:** `mobile/app/(tabs)/today.tsx`, `mobile/app/recipe/[dish].tsx`, `mobile/src/api/feedback.ts`.
-- **Estimated effort:** Medium.
-- **Dependencies:** P0-3.
+- **Status:** Completed 2026-08-04. `today.tsx` rewritten with a `DishCard` component: like/dislike
+  buttons wired to `POST /v1/feedback`, plus a "Why this?" toggle showing the match score and
+  cuisine/class explanation. Backend `FEEDBACK_ELIGIBLE_SURFACES` widened to include
+  `meal_plan`/`class_dishes` so feedback on these surfaces is actually accepted.
+- **Files involved:** `mobile/app/(tabs)/today.tsx`, `supabase/functions/plan/handler.ts`.
 
 ## P1-1: Enable Supabase leaked-password-protection
 - **Priority:** P1
@@ -65,47 +52,36 @@ see `docs/archive/completed-phases/` for history. Source audit:
 
 ## P1-2: Recommendation-explanation UI
 - **Priority:** P1
-- **Area:** Frontend
-- **Evidence:** `contributions`/`decision_trace` flow into the API response and get persisted; zero mobile screens render either.
-- **Why it matters:** A real, already-built differentiator (explainable recommendations) is invisible to users.
-- **Current status:** OPEN.
-- **Expected outcome:** A "why this dish" UI surface on the recommendation/recipe screen.
-- **Files involved:** `mobile/src/api/types.ts` (Contribution type already defined), recipe/today screens.
-- **Estimated effort:** Medium.
-- **Dependencies:** P0-3.
+- **Status:** Completed 2026-08-04, bundled with P0-4. `DishCard`'s "Why this?" toggle on
+  `today.tsx` renders the match score and cuisine/class explanation using the RE's existing
+  `contributions`/score fields.
+- **Files involved:** `mobile/app/(tabs)/today.tsx`.
 
 ## P1-3: History/past-plans view
 - **Priority:** P1
-- **Area:** Backend + Frontend
-- **Evidence:** No GET endpoint exists for household state; only a device-local, non-synced AsyncStorage cache exists client-side.
-- **Why it matters:** Basic expected functionality; current "history" is lost on reinstall.
-- **Current status:** OPEN.
-- **Expected outcome:** A new read endpoint + a screen showing past recommendation/plan history.
-- **Files involved:** New Edge Function or extension of `plan`, `mobile/src/lib/weeklyPlanStore.ts`, new screen.
-- **Estimated effort:** Medium.
-- **Dependencies:** None.
+- **Status:** Completed 2026-08-04. New `"history"` surface on `plan/handler.ts` (pure read via
+  `fetchRecentRecommendationEvents`) plus a new `mobile/app/history.tsx` reverse-chronological
+  list screen, reachable from Settings.
+- **Files involved:** `supabase/functions/plan/handler.ts`, `supabase/functions/recommendations/events.ts`, `mobile/app/history.tsx`, `mobile/src/api/plan.ts`.
 
 ## P1-4: Profile/preferences-edit screen
 - **Priority:** P1
-- **Area:** Backend + Frontend
-- **Evidence:** No route named profile/settings exists; `household` Edge Function is create-once, never revisited post-onboarding.
-- **Why it matters:** Users' circumstances change (diet, allergies, household composition); no way to update today.
-- **Current status:** OPEN.
-- **Expected outcome:** A GET endpoint to read current household state + a screen to edit and re-save it.
-- **Files involved:** `supabase/functions/household/`, new `mobile/app/` screen.
-- **Estimated effort:** Medium-large.
-- **Dependencies:** None. Natural home for P0-2 if not shipped standalone.
+- **Status:** Completed 2026-08-04. New `"profile"` GET surface on `plan/handler.ts` and a real
+  UPDATE path added to `household/handler.ts` (previously the handler only ever created a
+  household once and silently no-op'd on repeat calls — genuine bug found and fixed while
+  building this, with regression tests added). New `mobile/app/profile-edit.tsx` screen. Also
+  fixed a stale validation cap on `allergen_flags` (7-bit max, should have been 9-bit per the
+  WP-21 fish/mustard extension — found while wiring this screen).
+- **Files involved:** `supabase/functions/plan/handler.ts`, `supabase/functions/household/handler.ts`, `supabase/functions/household/store.ts`, `supabase/functions/household/schema.ts`, `mobile/app/profile-edit.tsx`.
 
 ## P1-5: Mobile automated test coverage
 - **Priority:** P1
-- **Area:** Testing
-- **Evidence:** Zero `*.test.ts(x)` files anywhere under `mobile/`, no jest config, no test script.
-- **Why it matters:** Every other layer (backend/RE) has 755 passing tests; mobile has none — the one place a regression ships unnoticed.
-- **Current status:** OPEN.
-- **Expected outcome:** A jest/RN-testing-library setup plus tests for the 8 core journeys.
-- **Files involved:** `mobile/` (new test infra).
-- **Estimated effort:** Large.
-- **Dependencies:** Higher-value after P0-3/P1-2/P1-3/P1-4 stabilize the surfaces being tested.
+- **Status:** Partially completed 2026-08-04 — honest scoping, not full 8-journey coverage. Jest +
+  jest-expo + @testing-library/react-native infra stood up from scratch (previously zero test
+  files, no jest config). 9 passing tests: pure-logic coverage for allergen-bit encoding and API
+  error-message mapping. No RN component-render tests yet (e.g. Settings' confirmation-phrase
+  gating). **Remaining:** component-render tests for the new P0-2/P0-4/P1-3/P1-4 screens.
+- **Files involved:** `mobile/package.json`, `mobile/jest.config.js`, `mobile/jest.setup.js`, `mobile/src/onboarding/__tests__/`, `mobile/src/api/__tests__/`.
 
 ## P1-6: Wire IDF-cosine distance into pairing/scoring
 - **Priority:** P1
@@ -114,14 +90,13 @@ see `docs/archive/completed-phases/` for history. Source audit:
 
 ## P1-7: Real monitoring/alerting
 - **Priority:** P1
-- **Area:** Observability
-- **Evidence:** Only a log-based shim (`telemetry.ts`) exists; Sentry/PostHog/APM are explicitly "seams only, none wired" per the code's own comments.
-- **Why it matters:** If the RE service goes down today, nothing pages anyone.
-- **Current status:** OPEN.
-- **Expected outcome:** At least one real alerting sink wired to the existing telemetry seam.
-- **Files involved:** `supabase/functions/_shared/telemetry/telemetry.ts`.
-- **Estimated effort:** Medium.
-- **Dependencies:** None.
+- **Status:** Completed 2026-08-04. `webhookSink()` (fire-and-forget POST, 3s timeout, never
+  suppresses the fallback log) plus `resolveTelemetrySink()` wired directly into
+  `error-boundary.ts` — the one place every request across every Edge Function already flows
+  through unconditionally — rather than via the never-instantiated `Container`. Activates when
+  `TELEMETRY_WEBHOOK_URL` is configured (not fabricated — no real webhook URL was provided this
+  session, so it currently falls back to log-only until Founder supplies one); log-only otherwise.
+- **Files involved:** `supabase/functions/_shared/telemetry/telemetry.ts`, `supabase/functions/_shared/middleware/error-boundary.ts`, `supabase/functions/_shared/config/env.ts`, `supabase/functions/_shared/config/config.ts`.
 
 ## P2 items (production improvements, not launch-blocking)
 - P2-1: Expand nutrition data beyond 50/810 dishes.

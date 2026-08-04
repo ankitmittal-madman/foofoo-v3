@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, Pressable, TextInput, ActivityIndicator, Linking, Alert } from "react-native";
 import { useMutation } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useSession } from "@/auth/SessionContext";
 import { requestExport, pollExport, deleteAccount, REQUIRED_CONFIRMATION_PHRASE } from "@/api/account";
 import { describeApiError } from "@/api/errorMessages";
@@ -20,6 +21,20 @@ export default function Settings() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Settings</Text>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Preferences</Text>
+        <Pressable style={styles.linkButton} onPress={() => router.push("/profile-edit")} testID="settings-profile-edit-link">
+          <Text style={styles.linkButtonText}>Edit diet & allergies →</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Recommendation history</Text>
+        <Pressable style={styles.linkButton} onPress={() => router.push("/history")} testID="settings-history-link">
+          <Text style={styles.linkButtonText}>View past recommendations →</Text>
+        </Pressable>
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Your data</Text>
@@ -153,4 +168,6 @@ const styles = StyleSheet.create({
   dangerButton: { backgroundColor: "#C0392B" },
   buttonLabel: { color: "#fff", fontWeight: "600" },
   error: { color: "#C0392B", fontSize: 12 },
+  linkButton: { paddingVertical: 4 },
+  linkButtonText: { color: "#4A6FA5", fontWeight: "600" },
 });

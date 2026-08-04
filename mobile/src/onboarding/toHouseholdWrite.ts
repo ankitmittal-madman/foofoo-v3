@@ -47,7 +47,7 @@ const OBJECTIVE_MAP: Record<string, string> = {
 
 // compose.ts's ALLERGEN_BITS (extended to 9 bits, WP-21 — fish/mustard were a real safety gap) —
 // 'others' has no bit; it is collect-only, carried through allergensOther/q10_allergy_other instead.
-const ALLERGEN_BITS: Record<string, number> = {
+export const ALLERGEN_BITS: Record<string, number> = {
   peanuts: 1, // the live catalogue's plural spelling maps to the engine's 'nuts' bit
   dairy: 2,
   gluten: 4,
@@ -66,7 +66,7 @@ const ALLERGEN_BITS: Record<string, number> = {
  * @param allergens - the allergen chip values the user selected on Screen 4 (e.g. ["dairy", "soy"]).
  * @returns the combined bitmask to send as profiles.allergen_flags.
  */
-function allergenFlags(allergens: string[]): number {
+export function allergenFlags(allergens: string[]): number {
   return allergens.reduce((bits, a) => bits | (ALLERGEN_BITS[a] ?? 0), 0);
 }
 

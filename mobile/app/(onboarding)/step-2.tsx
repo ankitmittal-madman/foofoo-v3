@@ -119,6 +119,7 @@ export default function OnboardingStep2() {
               </Pressable>
             </View>
             <TextInput
+              testID="onboarding-step2-state-search"
               value={query}
               onChangeText={setQuery}
               placeholder="Search state…"

@@ -21,6 +21,8 @@ export interface AppConfig {
   readonly gharReServiceUrl: string;
   /** Shared HMAC secret for the service-to-service call (RE-DOC-10 §9). */
   readonly gharReServiceSecret: string;
+  /** Optional real alerting sink URL (P1-7). Null when unset -- telemetry falls back to log-only. */
+  readonly telemetryWebhookUrl: string | null;
 }
 
 /** Dev-only defaults for the Ghar RE service. NEVER used in staging/production (guarded below). */
@@ -84,6 +86,7 @@ export function loadConfig(): AppConfig {
     isProduction,
     gharReServiceUrl: gharReServiceUrl ?? GHAR_RE_DEV_URL,
     gharReServiceSecret: gharReServiceSecret ?? GHAR_RE_DEV_SECRET,
+    telemetryWebhookUrl: read(ENV_VARS.TELEMETRY_WEBHOOK_URL),
   });
 }
 

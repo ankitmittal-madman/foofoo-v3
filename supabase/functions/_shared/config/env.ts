@@ -29,6 +29,14 @@ export const ENV_VARS = {
   // MUST be set in staging/production (enforced in config.ts).
   GHAR_RE_SERVICE_URL: { key: "GHAR_RE_SERVICE_URL", required: false, secret: false },
   GHAR_RE_SERVICE_SECRET: { key: "GHAR_RE_SERVICE_SECRET", required: false, secret: true },
+  // P1-7 (2026-08): optional real alerting sink. When set, the error-boundary middleware POSTs a
+  // JSON payload here for every 500-level request failure across every Edge Function (see
+  // telemetry.ts's webhookSink / middleware/error-boundary.ts). Deliberately generic (a plain
+  // webhook URL, e.g. a Slack incoming-webhook or a custom collector), not a specific vendor SDK
+  // (Sentry/PostHog) -- this repo has no real credentials for either, and inventing a fake
+  // integration would be worse than a real, generic one an operator can point anywhere. Optional:
+  // if unset, telemetry falls back to the pre-existing log-only sink, unchanged.
+  TELEMETRY_WEBHOOK_URL: { key: "TELEMETRY_WEBHOOK_URL", required: false, secret: true },
 } as const satisfies Record<string, EnvVarSpec>;
 
 export type EnvVarName = keyof typeof ENV_VARS;

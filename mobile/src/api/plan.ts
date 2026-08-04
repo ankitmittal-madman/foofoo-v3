@@ -135,3 +135,41 @@ export function fetchClassDishes(
 export function fetchRecipe(dishName: string): Promise<RecipeResponse> {
   return apiPost<RecipeResponse>("/plan", { surface: "recipe", dish_name: dishName });
 }
+
+/** One past recommendation event (P1-3, 2026-08) — a row of the household's own history. */
+export interface RecommendationHistoryRow {
+  id: string;
+  request_id: string;
+  created_at: string;
+  slot: string | null;
+  outcome: string;
+  plate_count: number;
+}
+
+export interface HistoryResponse {
+  kind: string;
+  events: RecommendationHistoryRow[];
+}
+
+/** Surface 6 (P1-3) — the caller's own recent recommendation history. No RE call; a pure DB read. */
+export function fetchHistory(count = 20): Promise<HistoryResponse> {
+  return apiPost<HistoryResponse>("/plan", { surface: "history", count });
+}
+
+/** The current composed household (P1-4, 2026-08) — same shape the RE itself scores against. */
+export interface HouseholdRawView {
+  q5_diet: string;
+  q9_allergies: string[];
+  q1_household_type?: string;
+}
+
+export interface ProfileResponse {
+  kind: string;
+  household: HouseholdRawView;
+  stubbed: boolean;
+}
+
+/** Surface 7 (P1-4) — read the caller's own current diet/allergen/household answers. No RE call. */
+export function fetchProfile(): Promise<ProfileResponse> {
+  return apiPost<ProfileResponse>("/plan", { surface: "profile" });
+}

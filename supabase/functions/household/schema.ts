@@ -70,7 +70,11 @@ const PROFILE_SCHEMAS = {
   diet_type: z.enum(["veg", "non_veg", "egg", "vegan", "jain"]),
   cook_capability: z.enum(["beginner", "intermediate", "advanced"]),
   religious_pref: z.enum(["all", "hindu_veg", "jain", "halal", "no_beef", "no_pork"]),
-  allergen_flags: z.number().int().min(0).max(127), // 7-bit model, DOC-P3-02 §Allergen
+  // 9-bit model (WP-21 extended fish/mustard, migration 049) -- was still capped at 127 (the
+  // old 7-bit model) here even though compose.ts's allergenTokens() decode already reads all 9
+  // bits; found and fixed 2026-08 while wiring the P1-4 profile-edit screen, since sending a
+  // fish/mustard-inclusive bitmask would have been rejected by this stale validation cap.
+  allergen_flags: z.number().int().min(0).max(511),
   migration_duration_band: z.enum(["native", "lt_1yr", "1_3yr", "3_7yr", "7plus_yr", "skipped"]),
   city_overlay_weight: z.number().min(0).max(1),
   push_notification_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, "expected HH:MM[:SS]"),

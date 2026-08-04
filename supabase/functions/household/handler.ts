@@ -27,9 +27,11 @@ import { parseHouseholdWriteRequest } from "./schema.ts";
 import {
   accumulatedProfileFields,
   buildHouseholdAnswersPatch,
+  buildProfilePatch,
   insertOnboardingSessionRows,
   missingRequiredProfileFields,
   profileExists,
+  updateProfileFields,
   upsertHouseholdAnswers,
   upsertHouseholdMembers,
   upsertProfileIfAbsent,
@@ -45,6 +47,9 @@ export interface HouseholdDeps {
   /** Atomic create (MEDIUM audit fix — replaces the old check-then-act createProfileRow). */
   upsertProfileRow?: typeof upsertProfileIfAbsent;
   upsertMembers?: typeof upsertHouseholdMembers;
+  /** P1-4 (2026-08): the update path for an EXISTING profile's diet_type/allergen_flags/etc. —
+   * distinct from upsertProfileRow above, which only ever creates. */
+  updateProfile?: typeof updateProfileFields;
 }
 
 /** Build the POST /v1/household handler. */
@@ -55,6 +60,7 @@ export function makeHouseholdHandler(deps: HouseholdDeps = {}): Handler {
   const checkProfileExists = deps.checkProfileExists ?? profileExists;
   const upsertProfileRow = deps.upsertProfileRow ?? upsertProfileIfAbsent;
   const upsertMembers = deps.upsertMembers ?? upsertHouseholdMembers;
+  const updateProfile = deps.updateProfile ?? updateProfileFields;
 
   return async (req, ctx: RequestContext) => {
     if (req.method !== "POST") {
@@ -135,6 +141,20 @@ export function makeHouseholdHandler(deps: HouseholdDeps = {}): Handler {
         } else {
           log.info("household.profile_already_existed", { household_id: householdId });
         }
+      }
+    } else {
+      // 3b. UPDATE path (P1-4, 2026-08): the block above only ever CREATES a profile once
+      // (upsertProfileIfAbsent's ON CONFLICT DO NOTHING is a correct no-op for a repeat call with
+      // the SAME answers, but that also meant an INTENTIONAL edit — e.g. the profile-edit screen
+      // resubmitting a new diet_type/allergen_flags for an EXISTING profile — was silently
+      // dropped, since this branch never ran for `exists === true`. Only runs when the request
+      // actually carries profile-targeted fields (buildProfilePatch empty-guards itself), so a
+      // household_answers-only or members-only call still touches nothing here, unchanged from
+      // before this fix.
+      const profilePatch = buildProfilePatch(parsed.screens);
+      if (Object.keys(profilePatch).length > 0) {
+        await updateProfile(ctx, householdId, profilePatch);
+        log.info("household.profile_updated", { fields: Object.keys(profilePatch) });
       }
     }
 

@@ -9,6 +9,8 @@
  *   weekly_plan   -> RE /v1/weekly-plan    (7 days × slots, top-3 classes each)
  *   class_dishes  -> RE /v1/class-dishes   (reconciliation: dishes of a finalized class)
  *   recipe        -> RE /v1/recipe         (recipe + image for one dish; no household needed)
+ *   history       -> (no RE call, P1-3)    (the caller's own recent recommendation_events rows)
+ *   profile       -> (no RE call, P1-4)    (the caller's own current diet/allergen/household answers)
  *
  * Flow: authenticate (middleware) → requireOwnership → loadHouseholdRaw (compose from live tables,
  * reused from recommendations/compose.ts) → signed call to the RE surface (re-client, path per
@@ -23,7 +25,10 @@ import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 
 import { loadHouseholdRaw, recordHouseholdContext } from "../recommendations/compose.ts";
-import { recordRecommendationEvent } from "../recommendations/events.ts";
+import {
+  fetchRecentRecommendationEvents,
+  recordRecommendationEvent,
+} from "../recommendations/events.ts";
 import { callRecommendationEngine } from "../recommendations/re-client.ts";
 
 const SERVICE_NAME = "plan";
@@ -57,10 +62,45 @@ export function makePlanHandler(): Handler {
     }
 
     const surface = typeof body.surface === "string" ? body.surface : "";
+
+    // "history" (P1-3, 2026-08) is a pure read -- no RE call, no household composition, just the
+    // caller's own recommendation_events rows. Handled as a special case rather than added to
+    // SURFACES below, since every entry there implies "call the RE"; history never does.
+    if (surface === "history") {
+      const householdIdForHistory =
+        (typeof body.household_id === "string" ? body.household_id : null) ??
+          claims.userId ?? null;
+      requireOwnership(claims, householdIdForHistory);
+      if (!householdIdForHistory) {
+        throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "no household_id" });
+      }
+      const limit = typeof body.count === "number" && body.count > 0
+        ? Math.min(body.count, 50)
+        : 20;
+      const events = await fetchRecentRecommendationEvents(ctx, householdIdForHistory, limit);
+      return jsonContract({ kind: "history", events }, ctx.traceId, 200);
+    }
+
+    // "profile" (P1-4, 2026-08) is also a pure read: the same composed household object
+    // loadHouseholdRaw already builds for scoring, returned to the caller so a settings/edit
+    // screen has something to show. Read-only -- editing still goes through the existing
+    // POST /v1/household (this repo's one household-write path); this surface just closes the
+    // "there was no way to see current answers before editing them" gap.
+    if (surface === "profile") {
+      const householdIdForProfile =
+        (typeof body.household_id === "string" ? body.household_id : null) ??
+          claims.userId ?? null;
+      requireOwnership(claims, householdIdForProfile);
+      const { household, stubbed } = await loadHouseholdRaw(ctx, householdIdForProfile);
+      return jsonContract({ kind: "profile", household, stubbed }, ctx.traceId, 200);
+    }
+
     const spec = SURFACES[surface];
     if (!spec) {
       throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
-        detail: `unknown surface '${surface}' (expected: ${Object.keys(SURFACES).join(", ")})`,
+        detail: `unknown surface '${surface}' (expected: history, ${
+          Object.keys(SURFACES).join(", ")
+        })`,
       });
     }
 
