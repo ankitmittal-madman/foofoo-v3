@@ -91,6 +91,27 @@ function loadPersonas() {
   return limit ? all.slice(0, limit) : all;
 }
 
+/**
+ * waitForPath — Node-side poll of page.url() against a predicate, instead of Playwright's
+ * page.waitForURL(). expo-router's web navigation uses history.pushState (client-side routing),
+ * which never fires the browser 'load' event waitForURL's default waitUntil:'load' waits for —
+ * so waitForURL can hang the FULL timeout even after the URL has already changed. Polling
+ * page.url() directly is lifecycle-agnostic and works identically for full navigations and SPA
+ * route changes. On timeout, throws with the LAST OBSERVED URL so a failure is diagnosable
+ * (e.g. "still on /sign-in" -> login itself never completed, vs "on /consent" -> a later step's
+ * own selector is what's actually wrong).
+ */
+async function waitForPath(page, predicate, timeoutMs) {
+  const start = Date.now();
+  let lastUrl = page.url();
+  while (Date.now() - start < timeoutMs) {
+    lastUrl = page.url();
+    if (predicate(new URL(lastUrl))) return;
+    await page.waitForTimeout(250);
+  }
+  throw new Error(`waitForPath timed out after ${timeoutMs}ms (last url: ${lastUrl})`);
+}
+
 let personas;
 try {
   personas = loadPersonas();
@@ -128,7 +149,28 @@ async function bestEffortLogin(page) {
   await passwordInput.fill(password, { timeout: 10000 });
   const submit = page.locator('[data-testid="signin-submit"], button:has-text("Sign in"), button:has-text("Log in")').first();
   await submit.click({ timeout: 10000 });
-  await page.waitForURL((u) => !u.pathname.includes("sign-in"), { timeout: 20000 });
+  try {
+    // handleSubmit awaits signInWithPassword() THEN fetchOnboardingStatus() before navigating
+    // (see (auth)/sign-in.tsx) — two sequential network round trips, so this needs real headroom
+    // beyond a single request's latency.
+    await waitForPath(page, (u) => !u.pathname.includes("sign-in"), 30000);
+  } catch (e) {
+    // Diagnostic capture, not a fix: without this, every timeout here looks identical (a bare
+    // "timed out") regardless of WHY — wrong credentials (errorMsg visible, URL never moves),
+    // a network-egress problem in this environment (same symptom), or something else entirely.
+    // Surfacing the on-screen error text + a screenshot path turns the next run's failure into
+    // actual evidence instead of another blind timeout.
+    const errorText = await page
+      .locator("text=/invalid|error|incorrect|not confirmed/i")
+      .first()
+      .textContent({ timeout: 1000 })
+      .catch(() => null);
+    const shotPath = path.join(outDir, "login-failure.png");
+    await page.screenshot({ path: shotPath }).catch(() => {});
+    throw new Error(
+      `${e.message} | on-screen error text: ${errorText ?? "(none found)"} | screenshot: ${shotPath}`,
+    );
+  }
 }
 
 /**
@@ -206,7 +248,7 @@ async function runPersona(browser, persona) {
     const split = isSplitAge(answers.householdType);
 
     // ---- Step 1 ----
-    await page.waitForURL((u) => u.pathname.endsWith("/step-1"), { timeout: 15000 }).catch(() => {});
+    await waitForPath(page, (u) => u.pathname.endsWith("/step-1"), 15000).catch(() => {});
     if (answers.householdType) {
       await page.getByTestId(`onboarding-step1-household-${answers.householdType}`).click({ timeout: 10000 });
       steps.push({ label: "step1-household", screenshot: await shot("step1-household") });
@@ -222,7 +264,7 @@ async function runPersona(browser, persona) {
     steps.push({ label: "step1-continue", screenshot: await shot("step1-continue") });
 
     // ---- Step 2 ----
-    await page.waitForURL((u) => u.pathname.endsWith("/step-2"), { timeout: 15000 }).catch(() => {});
+    await waitForPath(page, (u) => u.pathname.endsWith("/step-2"), 15000).catch(() => {});
     if (answers.homeState) {
       await page.getByTestId("onboarding-step2-state-field").click({ timeout: 10000 });
       const stateOption = page.getByTestId(`onboarding-step2-state-option-${answers.homeState}`);
@@ -239,7 +281,7 @@ async function runPersona(browser, persona) {
     steps.push({ label: "step2-continue", screenshot: await shot("step2-continue") });
 
     // ---- Step 3 ----
-    await page.waitForURL((u) => u.pathname.endsWith("/step-3"), { timeout: 15000 }).catch(() => {});
+    await waitForPath(page, (u) => u.pathname.endsWith("/step-3"), 15000).catch(() => {});
     if (answers.diet) {
       await page.getByTestId(`onboarding-step3-diet-${answers.diet}`).click({ timeout: 10000 });
       steps.push({ label: "step3-diet", screenshot: await shot("step3-diet") });
@@ -250,7 +292,7 @@ async function runPersona(browser, persona) {
     steps.push({ label: "step3-continue", screenshot: await shot("step3-continue") });
 
     // ---- Step 4 ----
-    await page.waitForURL((u) => u.pathname.endsWith("/step-4"), { timeout: 15000 }).catch(() => {});
+    await waitForPath(page, (u) => u.pathname.endsWith("/step-4"), 15000).catch(() => {});
     await fillChipGroup(page, "onboarding-step4-allergen", answers.allergens, steps);
     await fillChipGroup(page, "onboarding-step4-condition", answers.medicalConditions, steps);
     if (answers.allergensOther) {
@@ -263,7 +305,7 @@ async function runPersona(browser, persona) {
     steps.push({ label: "step4-continue", screenshot: await shot("step4-continue") });
 
     // ---- Step 5 ----
-    await page.waitForURL((u) => u.pathname.endsWith("/step-5"), { timeout: 15000 }).catch(() => {});
+    await waitForPath(page, (u) => u.pathname.endsWith("/step-5"), 15000).catch(() => {});
     if (split) {
       if (answers.ageEldest) await page.getByTestId(`onboarding-step5-age-eldest-${answers.ageEldest}`).click().catch(() => {});
       if (answers.ageYoungest) await page.getByTestId(`onboarding-step5-age-youngest-${answers.ageYoungest}`).click().catch(() => {});
@@ -281,7 +323,7 @@ async function runPersona(browser, persona) {
     steps.push({ label: "step5-finish", screenshot: await shot("step5-finish") });
 
     // ---- Land on post-onboarding screen (cold-start) ----
-    await page.waitForURL((u) => u.pathname.includes("cold-start") || u.pathname.includes("recommendations"), { timeout: 20000 }).catch(() => {});
+    await waitForPath(page, (u) => u.pathname.includes("cold-start") || u.pathname.includes("recommendations"), 20000).catch(() => {});
     steps.push({ label: "post-onboarding-landing", screenshot: await shot("post-onboarding-landing") });
 
     // ---- Capture the actual /v1/recommendations result the app's own session would get ----
