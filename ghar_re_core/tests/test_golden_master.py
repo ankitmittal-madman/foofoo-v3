@@ -18,6 +18,7 @@ import argparse
 import json
 import os
 
+from ghar_re_core import config as cfgmod
 from ghar_re_core import fixtures as F
 from ghar_re_core.catalogue import Catalogue
 from ghar_re_core.pipeline import recommend, make_context
@@ -62,9 +63,22 @@ def _canonicalize(res):
 
 
 def _compute(id_key, ctx_kw):
-    ctx = make_context(**ctx_kw)
-    res = recommend(HH[id_key], ctx, CAT)
-    return _canonicalize(res)
+    # Pin epsilon-greedy exploration (Phase 2, ghar_re_core.exploration) OFF for this lock.
+    # Golden-master exists to lock scoring/pairing MATH (see module docstring) — exploration is a
+    # selection-stage, intentionally-probabilistic swap that runs on top of already-scored,
+    # already-ranked output, and these fixtures set no _rng_seed. Running it under the real
+    # bandit_weights.yaml epsilon (0.15) would make this lock flaky by design, not by bug: with no
+    # dish_feedback_counts (every golden household here), every meal class is equally "0 served",
+    # so a genuinely under-served-history household is exactly the case Phase 2's exploration
+    # exists to handle — appropriately, not a scoring regression this test should ever catch.
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 0.0, "exploration_boost": 0.0}}
+        ctx = make_context(**ctx_kw)
+        res = recommend(HH[id_key], ctx, CAT)
+        return _canonicalize(res)
+    finally:
+        cfgmod.active_config().bandit = orig
 
 
 def _golden_path(id_key):

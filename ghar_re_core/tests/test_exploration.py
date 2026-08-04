@@ -95,6 +95,42 @@ def test_epsilon_one_seeded_deterministically_swaps_a_lower_plate_in():
 
 
 # ---------------------------------------------------------------------------
+# Regression (found by exercising the pipeline with real cold-start households): a household with
+# a completely EMPTY dish_feedback_counts must not be permanently inert to exploration just
+# because every class is equally "0 served". The bug: the under-served comparison required
+# candidate_served < target_served even when there is zero signal anywhere, so "0 >= 0" always
+# held and no swap was ever possible for any brand-new household, regardless of epsilon.
+#
+# Exercised directly against ghar_re_core.exploration.epsilon_greedy_select with two minimal
+# synthetic standalone plates in different, non-overlapping meal classes (rather than through the
+# full pipeline/golden fixtures, whose small catalogue + hero-overlap dedup can legitimately leave
+# zero eligible candidates for a given household/seed — a separate, real constraint that
+# shouldn't make this specific regression test flaky).
+# ---------------------------------------------------------------------------
+def test_cold_start_zero_history_is_not_permanently_inert_to_exploration():
+    from ghar_re_core import exploration as EXP
+    cat = {d.name: d for d in CAT}
+    target = cat["Onion Pakora"]        # class SN_FRIED_PAKORA_SAMOSA
+    candidate = cat["Sarson Ka Saag"]   # class LD_LEAFY_GREENS_SAAG — different, no hero overlap
+
+    chosen = [{"form": "standalone", "hero": target, "heroes": {target.name}, "score": 1.0}]
+    candidate_plates = chosen + [
+        {"form": "standalone", "hero": candidate, "heroes": {candidate.name}, "score": 0.5},
+    ]
+
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 1.0, "exploration_boost": 0.0}}
+        new_chosen, trace = EXP.epsilon_greedy_select(
+            chosen, candidate_plates, {"_rng_seed": 1, "dish_feedback_counts": []},
+        )
+        assert trace, "expected a swap for a cold-start household with zero feedback history"
+        assert [p["hero"].name for p in new_chosen] == [candidate.name]
+    finally:
+        cfgmod.active_config().bandit = orig
+
+
+# ---------------------------------------------------------------------------
 # exploration + exclude_dish_ids together must never surface an excluded dish, even when
 # exploration is maximally aggressive (epsilon=1).
 # ---------------------------------------------------------------------------
@@ -120,31 +156,45 @@ def test_exploration_never_surfaces_an_excluded_dish():
 
 # ---------------------------------------------------------------------------
 # exclude_dish_ids alone: a dish that would have scored top-1 is hard-removed from the output,
-# never just demoted (WP-8G Option A).
+# never just demoted (WP-8G Option A). Pins epsilon=0 so this exercises exclude_dish_ids in
+# isolation from exploration's own (real, intentional) randomness on a no-history household under
+# the production YAML epsilon — that's a separate concern, covered by the epsilon-specific tests
+# above.
 # ---------------------------------------------------------------------------
 def test_exclude_dish_ids_removes_a_would_be_top_dish():
-    baseline = _run("single_professional_blr", slot="dinner", season="transitional")
-    top_plate = baseline["plates"][0]
-    top_names = sorted(top_plate["heroes"])
-    excluded_ids = ["md5:" + n for n in top_names]
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 0.0, "exploration_boost": 0.0}}
+        baseline = _run("single_professional_blr", slot="dinner", season="transitional")
+        top_plate = baseline["plates"][0]
+        top_names = sorted(top_plate["heroes"])
+        excluded_ids = ["md5:" + n for n in top_names]
 
-    res = _run(
-        "single_professional_blr", slot="dinner", season="transitional",
-        ctx_extra={"exclude_dish_ids": excluded_ids},
-    )
-    all_served_names = {n for p in res["plates"] for n in p["heroes"]}
-    for n in top_names:
-        assert n not in all_served_names, f"{n} should have been hard-excluded"
+        res = _run(
+            "single_professional_blr", slot="dinner", season="transitional",
+            ctx_extra={"exclude_dish_ids": excluded_ids},
+        )
+        all_served_names = {n for p in res["plates"] for n in p["heroes"]}
+        for n in top_names:
+            assert n not in all_served_names, f"{n} should have been hard-excluded"
+    finally:
+        cfgmod.active_config().bandit = orig
 
 
 # ---------------------------------------------------------------------------
-# exclude_dish_ids is additive/optional: omitted or empty is a total no-op.
+# exclude_dish_ids is additive/optional: omitted or empty is a total no-op. Pins epsilon=0 for the
+# same reason as the test above — isolating exclude_dish_ids from exploration's own randomness.
 # ---------------------------------------------------------------------------
 def test_exclude_dish_ids_empty_or_omitted_is_a_noop():
-    baseline = _run("single_professional_blr", slot="dinner", season="transitional")
-    omitted = _run("single_professional_blr", slot="dinner", season="transitional")
-    empty = _run(
-        "single_professional_blr", slot="dinner", season="transitional",
-        ctx_extra={"exclude_dish_ids": []},
-    )
-    assert _heroes(baseline) == _heroes(omitted) == _heroes(empty)
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 0.0, "exploration_boost": 0.0}}
+        baseline = _run("single_professional_blr", slot="dinner", season="transitional")
+        omitted = _run("single_professional_blr", slot="dinner", season="transitional")
+        empty = _run(
+            "single_professional_blr", slot="dinner", season="transitional",
+            ctx_extra={"exclude_dish_ids": []},
+        )
+        assert _heroes(baseline) == _heroes(omitted) == _heroes(empty)
+    finally:
+        cfgmod.active_config().bandit = orig

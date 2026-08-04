@@ -104,6 +104,12 @@ def epsilon_greedy_select(chosen, candidate_plates, ctx):
         remaining_heroes |= p["heroes"]
     target_class = _plate_class(swap_target)
     target_served = served_counts.get(target_class, 0)
+    # With zero feedback history at all (true cold-start), every class is equally and maximally
+    # under-served — there is no signal to rank classes against each other, so require only
+    # "not worse" (>) rather than "strictly more under-served" (>=), letting the score-based
+    # tie-break below pick among them. Once real history exists for at least one class, keep the
+    # stricter "genuinely more under-served" (>=) comparison unchanged.
+    has_history = sum(served_counts.values()) > 0
 
     chosen_ids = {id(p) for p in chosen}
     best, best_key = None, None
@@ -116,8 +122,11 @@ def epsilon_greedy_select(chosen, candidate_plates, ctx):
         if cls is None or cls == target_class:
             continue                                   # only swap in a genuinely different class
         served = served_counts.get(cls, 0)
-        if served >= target_served:
-            continue                                   # not actually MORE under-served
+        if has_history:
+            if served >= target_served:
+                continue                               # not actually MORE under-served
+        elif served > target_served:
+            continue                                   # worse than target — no signal to prefer it
         # tie-break among equally under-served candidates: prefer the least-served class, then
         # (CONFIG.bandit_exploration_boost-nudged) higher plate score — never alters the score
         # itself, only which equally-under-served candidate wins the tie-break.

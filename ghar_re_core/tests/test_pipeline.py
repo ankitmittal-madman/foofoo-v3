@@ -3,6 +3,7 @@ End-to-end tests: run the golden households through the full Ghar RE v1.0 pipeli
 the behaviours the Core Spine / D1-D7 / Final_RE / KB require (Task 4).
 """
 
+from ghar_re_core import config as cfgmod
 from ghar_re_core import fixtures as F
 from ghar_re_core import knowledge as K
 from ghar_re_core import scoring as S
@@ -356,12 +357,20 @@ def test_decision_trace_winners_match_served_plates():
 
 def test_decision_trace_never_changes_which_plates_are_served():
     # LOGGING-ONLY invariant (decision_log module docstring): asking for the trace must never
-    # change the actual recommendation output.
-    for k, hh in HH.items():
-        ctx1 = make_context(slot="dinner", season="transitional")
-        ctx2 = make_context(slot="dinner", season="transitional")
-        plain = recommend(hh, ctx1, CAT)
-        traced = recommend(hh, ctx2, CAT, with_trace=True)
-        plain_ids = [p["dry"].name if p["form"] == "pair" else p["hero"].name for p in plain["plates"]]
-        traced_ids = [p["dry"].name if p["form"] == "pair" else p["hero"].name for p in traced["plates"]]
-        assert plain_ids == traced_ids, f"{k}: with_trace changed which plates were served"
+    # change the actual recommendation output. Pin Phase 2 exploration's epsilon to 0 for this
+    # comparison: two independent, unseeded recommend() calls run under the real (nonzero)
+    # bandit_weights.yaml epsilon can each roll their own independent explore/exploit decision,
+    # which would make this comparison flaky for a reason that has nothing to do with with_trace.
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 0.0, "exploration_boost": 0.0}}
+        for k, hh in HH.items():
+            ctx1 = make_context(slot="dinner", season="transitional")
+            ctx2 = make_context(slot="dinner", season="transitional")
+            plain = recommend(hh, ctx1, CAT)
+            traced = recommend(hh, ctx2, CAT, with_trace=True)
+            plain_ids = [p["dry"].name if p["form"] == "pair" else p["hero"].name for p in plain["plates"]]
+            traced_ids = [p["dry"].name if p["form"] == "pair" else p["hero"].name for p in traced["plates"]]
+            assert plain_ids == traced_ids, f"{k}: with_trace changed which plates were served"
+    finally:
+        cfgmod.active_config().bandit = orig
