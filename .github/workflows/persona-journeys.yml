@@ -72,8 +72,10 @@ jobs:
           fi
           npm install -g vercel@latest
           vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
-          vercel build --token="$VERCEL_TOKEN"
-          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
+          # Build remotely on Vercel. Local `vercel build` depends on runner shell discovery and
+          # currently fails before Expo starts (`spawn sh ENOENT`), while the same source exports
+          # successfully through Expo and Vercel's hosted build environment.
+          url=$(vercel deploy --token="$VERCEL_TOKEN")
           echo "Deployed preview: $url"
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "Waiting for the deployment to become reachable..."
