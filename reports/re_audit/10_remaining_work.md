@@ -78,12 +78,16 @@ before adding new features), **P1** (closes a real functional gap in the shipped
 
 ## P2 — spec-acknowledged v2/v3 work (deferred by the canonical docs themselves, not urgent)
 
-9. **Real 810-dish catalogue cutover into the live scoring engine** (RE-DOC-10 §2 Phase G;
-   Core Spine SP-F10). This is the single largest deferred item: the live RE runs on a 39-dish golden
-   sample (report 02, 03), and the real catalogue's knowledge-layer population (full PRIOR
-   region×slot×season table, full-catalogue signature scores, full-catalogue `dish_macro` nutrition,
-   full-catalogue comfort-hero mapping) is explicitly named by the spine as the dedicated "Step 5"
-   pass, not yet done.
+9. **RESOLVED for the cutover itself (2026-08-04) — see report 07 §6.** The 810-dish catalogue
+   cutover is code-complete: `ghar_re_service`'s `resolve_providers()` already loads the committed
+   810-dish bundle whenever it runs, not the 39-dish golden sample. **Still genuinely open, and
+   larger than this item's original framing suggested**: the knowledge-layer population that would
+   make that catalogue *good*, not just *present* — full PRIOR region×slot×season table (~10-15%
+   populated), full-catalogue signature scores (only 63/810 curated, AI-researched), full-catalogue
+   `dish_macro` nutrition (0/810), and comfort-hero mapping (expanded this session from 10 to 19
+   resolved hero names via exact-match wiring — see `ghar_re_core/knowledge.py`
+   `COMFORT_HERO_TO_DISH` — still far short of the 810-dish catalogue). Also still open: nothing is
+   deployed to Fly.io (report 11), so this code-complete cutover has not yet served a real user.
 10. **Activate `s_pref` personal-history learning** once real feedback density clears the FD-11 gate
     (`min_real_events: 10000`, `min_households: 500`, report 09 §3). The pipeline is built and
     honestly gated — this is a matter of waiting for real usage volume, not further engineering, but

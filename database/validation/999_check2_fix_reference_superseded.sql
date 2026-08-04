@@ -1,11 +1,15 @@
+-- Renamed 2026-08-04 from WP-3D_Check2_Fix_Reference.sql to 999_check2_fix_reference_superseded.sql
+-- to conform to the NNN_description.sql validation-band naming standard (WP-5AA) — authorized as
+-- part of a Founder-directed backlog closeout session (2026-08-04); 999 chosen deliberately outside
+-- the sequential 900-909 real-check band since this file is a historical reference, never executed
+-- standalone, not a runnable validation check.
+--
 -- SUPERSEDED (2026-08-04): Check 2's underlying bug (search-path-sensitive conrelid::regclass::text
 -- comparison) was independently fixed a different way, under WP-6E3, in the live file
 -- (900_structural_validation.sql's Check 2 now uses conrelid = ANY(ARRAY[...]::regclass[]) — verify
 -- there directly rather than trusting this note). The join-based rewrite proposed below was never
 -- applied and is now moot. Kept only as a historical record of the originally-proposed approach;
--- do not apply it. Non-conforming filename (no NNN_ prefix) also flagged in
--- reports/re_audit/07_database_audit.md §5 — a rename needs Founder authorization per the repo's
--- naming standard (WP-5AA), not done here.
+-- do not apply it.
 --
 -- Reference only — this was the proposed fix for Check 2 in 900_structural_validation.sql,
 -- provided for founder review before Claude Code applies it as part of WP-3D.

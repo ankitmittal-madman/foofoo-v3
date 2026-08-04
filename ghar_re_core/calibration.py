@@ -22,7 +22,6 @@ import random
 from ghar_re_core import knowledge as K
 from ghar_re_core import scoring as S
 from ghar_re_core.catalogue import Catalogue
-from ghar_re_core.derivation import derive_theta
 from ghar_re_core.meal_planner import MAIN_SLOTS, _class_names, _theta_obj
 from ghar_re_core.pipeline import make_context
 

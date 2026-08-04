@@ -122,9 +122,26 @@ recommendations path (compose.ts/handler.ts), not just declared in schema.
 
 ## 5. Non-conforming file names in database/validation
 
-`database/validation/WP-3D_Check2_Fix_Reference.sql` does not match the `9NN_description.sql`
-validation naming band and has no status prefix — flag per CLAUDE.md Naming Standard (WP-5AA);
-not renamed here per the "Bulk-renaming existing files requires explicit Founder authorization" rule.
+**RESOLVED (2026-08-04).** `database/validation/WP-3D_Check2_Fix_Reference.sql` renamed to
+`999_check2_fix_reference_superseded.sql` (Founder-authorized as part of this session's backlog
+closeout) to conform to the `NNN_description.sql` band; its content was already confirmed moot
+(the Check 2 bug it targeted was independently fixed under WP-6E3).
+
+## 6. Real 810-dish catalogue cutover — correction to reports 03/05/09/12's "not cut over" claim
+
+Reports 03/05/09/12 (and the earlier version of this report) describe the live RE as running on
+the 39-dish `ghar_re_core.fixtures` golden sample, with the real 810-dish catalogue cutover
+(RE-DOC-10 Phase G) still pending. **Verified directly this session: the cutover is code-complete.**
+`ghar_re_service/providers.py`'s `resolve_providers()` selects `BundleCatalogueProvider` whenever
+`ghar_re_service/data/bundle/manifest.json` exists (it does, committed, `dish_count: 810`), and
+`lifecycle.py`'s `startup()` calls `resolve_providers()` unconditionally — so any *running* instance
+of `ghar_re_service` loads the real 810-dish catalogue, not the golden sample. The golden sample
+remains in use only for `ghar_re_core`'s own test suite (`test_pipeline.py`, `test_golden_master.py`),
+which construct their own `Catalogue(F.DISHES)` directly, bypassing `resolve_providers()` by design
+(that's what makes them a stable regression lock). **What is genuinely still true**: report 11's
+separate "Deployment: 0%" finding stands — nothing is deployed to Fly.io, so this code-complete
+cutover has not yet served a single real user. "Cutover done in code" and "deployed to production"
+are two different facts; only the first is resolved here.
 
 ## Critical Self-Review
 

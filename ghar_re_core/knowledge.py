@@ -226,6 +226,23 @@ COMFORT_HERO_TO_DISH = {
     "Undhiyu": "Undhiyu",
     "Pithla": "Pithla",
     "Ven Pongal": "Ven Pongal",
+    # Added 2026-08-04 (reports/re_audit/05 §6, "10 named dishes" coverage gap): exact-name matches
+    # confirmed present in the real 810-dish catalogue (ghar_re_service/data/bundle/catalogue.json)
+    # that were simply never wired — same category of mechanical fix as the Pithla-Bhakri spelling
+    # correction above (verbatim name match, no domain substitution judgment involved). Entries with
+    # no exact or safely-close catalogue match (Kadhi-Pakora, Bhajiya, Dal-Dhokli, Bajji/Bonda,
+    # Parippu Vada, Pazham Pori, Telebhaja, Thukpa, Momos, Sattu, Aam Panna, Neer Mor, Panta Bhat,
+    # Gajar Halwa, Bajra Bhakri, Pithe) are deliberately left unmapped rather than guessed — same
+    # domain-substitution caution as the Kanda Bhaji case above.
+    "Samosa": "Samosa",
+    "Aloo Paratha": "Aloo Paratha",
+    "Vada Pav": "Vada Pav",
+    "Sol Kadhi": "Sol Kadhi",
+    "Methi Na Gota": "Methi Na Gota",
+    "Poha": "Poha",
+    "Chaas": "Chaas",
+    "Aamras": "Aamras",
+    "Nihari": "Nihari",
 }
 
 # Map an engine palette-zone (North/South/East/West/...) + weather tag to the KB §R3 zone key.

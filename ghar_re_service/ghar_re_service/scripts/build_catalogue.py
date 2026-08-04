@@ -433,9 +433,9 @@ def transform_dish_row(
         "cuisine": cuisine,
         # cuisines_v4.csv's 65-cuisine state_origin, resolved here (was loaded into cuisine_map but
         # never written into this dict — ghar_re_core.catalogue.Dish previously also unconditionally
-        # overwrote any state_origin with its own 10-cuisine-only fixtures lookup regardless, so this
-        # key was silently discarded twice; both are now fixed together). None if the cuisine failed
-        # to resolve (already flagged above via report.unresolved_cuisines).
+        # overwrote any state_origin with its own 10-cuisine-only fixtures lookup regardless, so
+        # this key was silently discarded twice; both are now fixed together). None if the cuisine
+        # failed to resolve (already flagged above via report.unresolved_cuisines).
         "state_origin": cuisine_map.get(cuisine, {}).get("state_origin") or None,
         "diet": diet,
         "hero_role": hero_role,

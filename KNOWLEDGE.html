@@ -729,8 +729,12 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🧠</span> S61 · RE Phase 3: s_pref stub + training pipeline
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s62')">
+    <div class="nav-item" onclick="showPage('s62')">
       <span class="nav-icon">🍱</span> S62 · Home tab (today's meals) + Week Plan tab
+      <span class="nav-badge">Aug 4</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s63')">
+      <span class="nav-icon">🧩</span> S63 · Dish-pick calibration grid
       <span class="nav-badge">Aug 4</span>
     </div>
     <!-- NAV_INJECT -->
@@ -742,11 +746,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">19</span>
+      <span class="nav-badge">21</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">287</span>
+      <span class="nav-badge">316</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -1278,6 +1282,10 @@ function deepDiveFeature(featureLabel){
           <div class="arch-node-name">mobile/app/(tabs)/weekly-plan.tsx</div>
           <div class="arch-node-desc">Week Plan — 7-day class picker, moved into tabs · S62</div>
         </div>
+        <div class="arch-node is-mod" onclick="jumpModule('mobile-app')">
+          <div class="arch-node-name">mobile/app/cold-start.tsx</div>
+          <div class="arch-node-desc">Rewritten: 3-slot × 5-dish calibration grid · S63</div>
+        </div>
         <!-- ARCH_PHONE_INJECT -->
       </div>
     </div>
@@ -1311,6 +1319,14 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node is-new" onclick="jumpModule('claude-skills-library')">
     <div class="arch-node-name">.claude/skills/</div>
     <div class="arch-node-desc">Org skill library (20 skills) + CLAUDE.md policy · S45</div>
+  </div>
+  <div class="arch-node is-new" onclick="jumpModule('calibration-core')">
+    <div class="arch-node-name">ghar_re_core/calibration.py</div>
+    <div class="arch-node-desc">3-slot × 5-dish taste-calibration grid · S63</div>
+  </div>
+  <div class="arch-node is-mod" onclick="jumpModule('mobile-app')">
+    <div class="arch-node-name">mobile/src/api/plan.ts</div>
+    <div class="arch-node-desc">+fetchCalibrationGrid(), cell_role plumbing · S63</div>
   </div>
   <!-- ARCH_APPLOGIC_INJECT -->
       </div>
@@ -1355,6 +1371,14 @@ function deepDiveFeature(featureLabel){
   <div class="arch-node is-mod" onclick="jumpModule('re-engine-retirement')">
     <div class="arch-node-name">cron-hard-delete / user-delete / user-export</div>
     <div class="arch-node-desc">Redeployed on current tables · S55</div>
+  </div>
+  <div class="arch-node is-mod" onclick="jumpModule('ghar-re-service')">
+    <div class="arch-node-name">ghar_re_service (engine.py, main.py)</div>
+    <div class="arch-node-desc">+POST /v1/calibration route · S63</div>
+  </div>
+  <div class="arch-node is-mod" onclick="jumpModule('plan-edge')">
+    <div class="arch-node-name">plan (edge fn)</div>
+    <div class="arch-node-desc">supabase/functions/plan · +calibration surface · S63</div>
   </div>
   <!-- ARCH_SERVER_INJECT -->
       </div>
@@ -2356,6 +2380,21 @@ function deepDiveFeature(featureLabel){
     <div class="tl-note">Split the combined daily-plan screen into persistent Home + Week Plan tabs and made dish options scroll horizontally; still pending: visual verification in a simulator, and a decision on orphaned recommendations.tsx.</div>
   </div>
 </div>
+<div class="timeline-row">
+  <div class="tl-date">Aug 4</div>
+  <div class="tl-spine"><div class="tl-dot" style="background:#5145b8"></div></div>
+  <div class="tl-content">
+    <span class="tl-badge" style="background:#f0effe;color:#5145b8">S63</span>
+    <div class="tl-title">Dish-pick calibration grid (3 slots × 5 dishes, expected-positive + planted-negative)</div>
+    <div class="tl-chips">
+      <span class="tl-chip" onclick="showPage('s63')">calibration.py</span>
+      <span class="tl-chip" onclick="showPage('s63')">/v1/calibration</span>
+      <span class="tl-chip" onclick="showPage('s63')">plan edge fn</span>
+      <span class="tl-chip" onclick="showPage('s63')">cold-start.tsx rewrite</span>
+    </div>
+    <div class="tl-note">Replaced the flat post-onboarding like-list with a smarter grid that mixes 3 good-fit dishes with 2 deliberately weak-but-safe ones per meal slot, so an early wrong-guess "like" corrects the taste profile sooner. RE core math (scoring/derivation/pairing/etc.) was deliberately left untouched — new additive-only calibration.py calls existing public functions, same charter as meal_planner.py. Next: visually verify the grid in a simulator; the OTHER concurrent session's pairing.py fix and onboarding-step guards are tracked separately, not part of this session.</div>
+  </div>
+</div>
 <!-- TIMELINE_INJECT -->
   </div>
 
@@ -2545,20 +2584,20 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">A thin FastAPI web service that hosts the engine. It loads the catalogue and config at startup through swappable providers, exposes POST /v1/recommendations plus /healthz and /readyz, and validates every request/response against the shared contract. It contains no maths of its own. Since S39 it is designed to face the public internet, so two guards sit in front of every call: a rate limiter, then a signature check.</div>
     <div class="dd-label">Files / tables in this module</div>
     <div class="dd-text">
-      <code>main.py</code> — the FastAPI routes (translation only), plus the two guards in front of them<br>
+      <code>main.py</code> — the FastAPI routes (translation only), plus the two guards in front of them; <b>(S63)</b> +POST /v1/calibration, wired into SIGNED_PATHS and the rate-limited path set the same way every other planning route is<br>
       <code>providers.py</code> — Catalogue/Config/auth/rate-limit provider interfaces + one adapter each<br>
       <code>modules.py</code> — wraps each score factor so the response can explain itself<br>
       <code>auth.py</code> — verifies the signature on every call; the only thing protecting the engine now that it is publicly reachable<br>
       <code>ratelimit.py</code> — caps requests per source per minute, and deliberately runs <i>before</i> auth.py so a flood is turned away before any cryptographic work happens<br>
-      <code>engine.py / schemas.py / lifecycle.py</code> — request→response composition, schema validation, startup<br>
+      <code>engine.py / schemas.py / lifecycle.py</code> — request→response composition, schema validation, startup; <b>(S63)</b> engine.py gained <code>plan_calibration()</code>, a translation wrapper calling <code>ghar_re_core.calibration.calibration_grid</code> and attaching Cloudinary image URLs to every cell, same pattern as every other WP-18 surface<br>
       <code>scripts/classify_dishes.py</code> — <b>(S48)</b> the offline nutritionist/chef classifier that maps all 810 dishes to their meal class (→ dish_class_map.csv)<br>
       <code>scripts/prepare_cohort_intel.py</code> — offline: extracts the persona-DB masters, trains the class model, runs the dish classifier<br>
       <code>scripts/export_bundle.py / build_catalogue.py</code> — build the baked config+catalogue bundle the live service loads<br>
     </div>
     <div class="dd-label">How it helps the app</div>
-    <div class="dd-text">It lets the app talk to the engine over a normal web call with a stable contract, and lets the data sources (catalogue, config) be swapped later without touching the maths. The two guards are what make it safe to expose that call over the internet at all. Its offline scripts (S48) are where the persona-DB "science" is turned into the small files the live engine reads — so the service stays lean and never touches the source spreadsheet at runtime.</div>
+    <div class="dd-text">It lets the app talk to the engine over a normal web call with a stable contract, and lets the data sources (catalogue, config) be swapped later without touching the maths. The two guards are what make it safe to expose that call over the internet at all. Its offline scripts (S48) are where the persona-DB "science" is turned into the small files the live engine reads — so the service stays lean and never touches the source spreadsheet at runtime. Since S63, the same translation-only pattern now also serves the calibration grid — no new maths inside the service itself, it just calls out to ghar_re_core.calibration and shapes the reply.</div>
     <div class="dd-label">Last touched</div>
-    <div class="dd-text">S48 · Aug 3 (dish→class classifier + bundle rebuild; rate limiter S39; originally S34)</div>
+    <div class="dd-text">S63 · Aug 4 (added /v1/calibration route + plan_calibration() wrapper; dish→class classifier + bundle rebuild S48; rate limiter S39; originally S34)</div>
   </div>
 </div>
 <div class="detail-item">
@@ -2624,6 +2663,8 @@ function deepDiveFeature(featureLabel){
         <code>mobile/app/recommendations.tsx</code> — plain list of the AI's meal picks<br>
         <code>mobile/src/auth/supabaseClient.ts, SessionContext.tsx</code> — login/session handling, shared app-wide<br>
         <code>mobile/src/api/client.ts, household.ts, recommendations.ts, types.ts</code> — the one shared layer that talks to the backend<br>
+        <code>mobile/src/api/plan.ts</code> — <b>(S63)</b> +<code>fetchCalibrationGrid()</code> (POST /plan surface:"calibration") + <code>CalibrationResponse</code> type + a plumbing-only <code>cell_role</code> field on PlanDish, never rendered<br>
+        <code>mobile/app/cold-start.tsx</code> — <b>(S63)</b> rewritten: was a flat scrolling 15-dish like-list, now a 3-column (breakfast/lunch/dinner) × 5-row calibration grid of DishCards; same place in the nav chain (reached from onboarding step-5, continues to /weekly-plan)<br>
         <code>mobile/src/theme/index.tsx</code> — the Ghar visual system (terracotta/cream, Fraunces/Mukta) actually used by every real screen<br>
         <code>mobile/src/theme/theme.ts, hooks/, components/ThemedText.tsx, ThemedView.tsx</code> — the earlier, plainer light/dark tokens (kept for parity, not currently used by any screen)<br>
         <code>mobile/src/onboarding/</code> — the shared answer store, chip/header components, state list, and the answers→backend mapping layer (toHouseholdWrite.ts)<br>
@@ -2860,6 +2901,44 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">Gives households a way to plan an entire week's meal classes in one sitting, which Home then reconciles against day by day — without this, Home would only ever show generic top-picks, never a household's own deliberate weekly choices.</div>
     <div class="dd-label">Last touched</div>
     <div class="dd-text">S62 · Aug 4, 2026</div>
+  </div>
+</div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-calibration-core" onclick="toggleDetail('mod-calibration-core')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">ghar_re_core/calibration.py</span></div>
+    <span class="detail-chevron" id="chev-mod-calibration-core">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-calibration-core">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Builds the post-onboarding "dish pick" calibration grid — 3 meal slots × 5 dishes each: 3 genuinely good-fit dishes ("expected_positive") mixed with 2 still-safe-and-diet-eligible but deliberately weak-fit dishes ("planted_negative"). If a user likes a weak-fit dish, that's a strong, cheap early signal for correcting their taste profile. Ported from the reference repo scareme21-create/NewFoo's calibration.py design, adapted without its distance.py (this engine has no meal-distance module and building one was out of scope) — "low score among still-eligible dishes" stands in as the negative-planting proxy. Built the same way meal_planner.py was: it only calls scoring.py/derivation.py/catalogue.py's existing public functions, never touches Core Spine math.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>calibration.py</code> — <code>calibration_grid(household, catalogue=None, weekday="Monday", household_id=None, n_positive=3, n_negative=2)</code>: ranks every slot-eligible dish by the existing engine score, picks top-N diverse-by-class/cuisine as positives and N low-scoring diverse-but-eligible dishes as negatives (excluding any cuisine/class a positive already used); shuffles cell order per household+slot (seeded RNG) so <code>cell_role</code> is never positionally guessable<br>
+      <code>tests/test_calibration.py</code> — 4 tests: grid shape/role-counts per slot, every returned dish (positive AND negative) independently passes <code>scoring.eligible</code>, deterministic selection without a household_id, and a household_id only reorders cells, never changes which dishes are picked<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Cold-start taste calibration used to just confirm the engine's own top guesses (a flat like-list of its best picks) — this makes the very first "like" tap a genuine correction opportunity, since a like on a planted weak-fit dish is a much stronger signal than another like on something the engine already knew was good. <code>cell_role</code> rides in the existing <code>feedback_events.detail</code> jsonb column (migration 038 already has a free-form detail field and a 'like' CHECK value) — no new migration needed.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S63 · Aug 4</div>
+  </div>
+</div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-plan-edge" onclick="toggleDetail('mod-plan-edge')">
+    <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">plan edge function (supabase/functions/plan)</span></div>
+    <span class="detail-chevron" id="chev-mod-plan-edge">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-plan-edge">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">The WP-18 planning edge function — a single handler that routes every onboarding→plan→recipe surface (cold_start, calibration, meal, weekly, class, recipe) to the matching signed ghar_re_service endpoint via one SURFACES lookup table, and writes a recommendation_events row for surfaces whose "like" taps need to resolve later through POST /v1/feedback.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>handler.ts</code> — the SURFACES map (path + needsHousehold per surface); <b>(S63)</b> added a <code>calibration</code> entry (<code>{ path: "/v1/calibration", needsHousehold: true }</code>) and extended the existing cold-start-only recommendation_events write block to also cover <code>surface === "calibration"</code>, flattening <code>result.body.slots</code> into one array so a calibration "like" tap can resolve via request_id exactly like cold-start likes already do<br>
+      <code>index.ts</code> — entrypoint, unchanged this session<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">One shared orchestration path means every new planning surface (calibration included) gets signed calls, household resolution, and feedback-event logging for free instead of each surface reimplementing that plumbing.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S63 · Aug 4 (added calibration surface; originally WP-18, S49-era)</div>
   </div>
 </div>
 <!-- MODULES_INJECT -->
@@ -3294,6 +3373,13 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">mobile/app/(auth)/sign-in.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S62</td><td class="fr-desc">Post-sign-in redirect for a completed-onboarding household changed from /recommendations to "/" (Home)</td></tr>
   <tr><td class="fr-file mono">mobile/app/recipe/[dish].tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S62</td><td class="fr-desc">Comment-only — updated a stale reference to daily-plan to point at the new Home tab location</td></tr>
   <tr><td class="fr-file mono">mobile/app/recommendations.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S62</td><td class="fr-desc">Comment-only — now unrouted/orphaned; header comment explains why it was kept (working feedback-capture logic) instead of deleted</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/calibration.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S63</td><td class="fr-desc">calibration_grid(): 3-slot × 5-dish taste-calibration grid (3 expected-positive + 2 planted-negative), additive-only over scoring.py/derivation.py/catalogue.py</td></tr>
+  <tr><td class="fr-file mono">ghar_re_core/tests/test_calibration.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S63</td><td class="fr-desc">4 tests: grid shape/role-counts, every dish independently eligible, deterministic selection, household_id only reorders cells</td></tr>
+  <tr><td class="fr-file mono">ghar_re_service/ghar_re_service/engine.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S63</td><td class="fr-desc">+plan_calibration() translation wrapper calling calibration_grid, attaches Cloudinary image URLs to every cell</td></tr>
+  <tr><td class="fr-file mono">ghar_re_service/ghar_re_service/main.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S63</td><td class="fr-desc">+POST /v1/calibration route, wired into SIGNED_PATHS and the rate-limited path set</td></tr>
+  <tr><td class="fr-file mono">supabase/functions/plan/handler.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S63</td><td class="fr-desc">+calibration entry in SURFACES map; recommendation_events write block now also covers surface==="calibration"</td></tr>
+  <tr><td class="fr-file mono">mobile/src/api/plan.ts</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S63</td><td class="fr-desc">+cell_role field on PlanDish (plumbing only), +CalibrationResponse type, +fetchCalibrationGrid()</td></tr>
+  <tr><td class="fr-file mono">mobile/app/cold-start.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S63</td><td class="fr-desc">Rewritten: flat 15-dish like-list → 3×5 calibration grid of DishCards with heart-toggle + best-effort feedback post, same nav position</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3947,6 +4033,46 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">How was this session verified, given no simulator/browser was available?</div>
     <div class="decision-a">Ran `cd mobile && npm run typecheck` (tsc --noEmit) — zero errors. No test suite exists for mobile/ (no test script in package.json, no *.test.* files anywhere under mobile/). The app itself was not visually run; this is disclosed explicitly rather than implied as done.</div>
     <div class="decision-meta">S62 &middot; Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why a brand-new calibration.py file instead of extending meal_planner.py or scoring.py?</div>
+    <div class="decision-a">The Founder explicitly required the RE core's actual scoring/eligibility/derivation math to stay untouched this session. An additive-only file that only calls existing public functions — mirroring meal_planner.py's own established charter — satisfies that constraint while still building the feature.</div>
+    <div class="decision-meta">S63 · Aug 4</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why no new DB migration for cell_role?</div>
+    <div class="decision-a">feedback_events.event_type already has a 'like' CHECK value and a free-form detail jsonb column (migration 038) — cell_role rides in detail rather than needing a new column or constraint.</div>
+    <div class="decision-meta">S63 · Aug 4</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why does "low score among still-eligible dishes" stand in for NewFoo's distance.py meal-class-distance negative-planting?</div>
+    <div class="decision-a">This engine has no distance/similarity module, and building one was explicitly out of scope for this session (it would touch/extend core RE machinery). Low score among still-eligible dishes is a cheap proxy using only fields the engine already computes — never relaxes eligibility, never fabricates a dish.</div>
+    <div class="decision-meta">S63 · Aug 4</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why is cell order shuffled per household+slot with a seeded RNG?</div>
+    <div class="decision-a">So which grid cell holds an expected-positive vs. a planted-negative can never be guessed positionally — cell_role is returned in the payload purely as feedback plumbing and is never meant to be shown in the UI. A fixed cell order (e.g. always positives first) would leak the signal visually even without reading the field.</div>
+    <div class="decision-meta">S63 · Aug 4</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why React Query on cold-start.tsx instead of NewFoo's raw useEffect for data fetching?</div>
+    <div class="decision-a">This repo already standardized on React Query for all server state in every other screen — matching that existing convention rather than the reference repo's older pattern.</div>
+    <div class="decision-meta">S63 · Aug 4</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why key "liked" by `${slot}:${dishName}` instead of just the dish name?</div>
+    <div class="decision-a">The same dish can legitimately appear in more than one slot's grid. The old flat-list screen's plain-name key would have conflated likes across slots — this keeps each slot's like state independent.</div>
+    <div class="decision-meta">S63 · Aug 4</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why does a failed feedback POST never block the UI?</div>
+    <div class="decision-a">The like/heart toggle is a UX affordance first and a data-collection signal second — a flaky network call to POST /v1/feedback should never prevent a user from continuing through onboarding. The feedback call is fired best-effort and its failure is swallowed, not surfaced as an error state.</div>
+    <div class="decision-meta">S63 · Aug 4</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why did the pairing.py/golden-fixture changes and onboarding step-1..4/OnboardingChips.tsx changes visible in the working tree get left out of this session's documentation?</div>
+    <div class="decision-a">Those are uncommitted, in-progress edits from a concurrent developer/session in the same working tree (a Founder-ratified protein-category pairing widening, and separate onboarding-step guard work) — not part of what this session built. Confirmed via git diff that the one pre-existing test_golden_master.py failure traces to that other session's in-progress pairing.py change, not to anything in calibration.py.</div>
+    <div class="decision-meta">S63 · Aug 4</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -10913,7 +11039,7 @@ function deepDiveFeature(featureLabel){
     </div>
   </div><!-- /page-s61 -->
 
-  <div id="page-s62" class="page-content">
+  <div id="page-s62" class="page-content" style="display:none">
 
     <!-- ── Session header ── -->
     <div class="page-header">
@@ -11302,6 +11428,441 @@ function deepDiveFeature(featureLabel){
     </script>
 
   </div><!-- /page-s62 -->
+
+  <div id="page-s63" class="page-content">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S63 · Dish-pick calibration grid — 3 meal slots × 5 dishes, mixing good matches with deliberate mismatches</div>
+      <div class="page-subtitle">Replaced the post-onboarding flat like-list with a smarter 3×5 grid (breakfast/lunch/dinner, 5 dishes each) that quietly mixes 3 dishes the engine genuinely thinks fit with 2 dishes that are still 100% safe to eat but a deliberately weak personal match — so an early "like" tap on a mismatch is a cheap, strong signal for correcting someone's taste profile sooner.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The post-onboarding taste-calibration screen was a flat scrolling list of 15 dishes, all of them the engine's own top guesses — liking one only ever confirmed what the engine already believed, never corrected it.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">The same screen now shows a 3×5 grid — Breakfast/Lunch/Dinner columns, 5 dish cards each — where 2 of the 5 per slot are deliberately weak-fit (but still safe/diet-eligible) dishes. Liking one of those is a much stronger, earlier correction signal. Which 2 those are is never shown or guessable in the UI.</div>
+      </div>
+    </div>
+
+    <!-- ── Files changed this session ── -->
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">ghar_re_core/calibration.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_core/tests/test_calibration.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/engine.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">ghar_re_service/ghar_re_service/main.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">supabase/functions/plan/handler.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/src/api/plan.ts</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/cold-start.tsx</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <!-- ── Summary card ── -->
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 4, 2026<br>7 things touched</div>
+      </div>
+      <div class="session-card-desc">Replicated a UI/UX pattern from reference repo scareme21-create/NewFoo's onboarding/final-dish.tsx: a new additive-only calibration.py picks, per meal slot, the top-3 diverse dishes the engine's existing score genuinely likes plus 2 diverse dishes that are still safe/eligible but score low — a lightweight proxy for NewFoo's meal-distance negative-planting since this repo has no distance.py module. The RE core's actual scoring/eligibility/derivation math (scoring.py, derivation.py, pairing.py, catalogue.py, pipeline.py, knowledge.py, config.py, cohort_plan.py) was NOT touched. Wired end-to-end: a new engine.py wrapper, a new /v1/calibration route, a new SURFACES entry + feedback-event write in the plan edge function, a new mobile API client function, and a full rewrite of cold-start.tsx from a flat list into the 3×5 grid.</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">1</div><div class="stat-l">Screen</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">4</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">2</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+
+    <!-- ── View tabs ── -->
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s63','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s63','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s63','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s63-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s63','cold-start-screen')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Calibration screen shows a 3×5 grid instead of a flat list</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Breakfast/Lunch/Dinner columns, 5 dish cards each with an image and a heart-toggle. Two of the five per slot are quietly weaker personal fits — nothing on screen marks which ones.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s63','cold-start-screen')">
+            <div class="step-num num-blue">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Tapping a dish toggles a like and a "N selected" footer counter updates</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A single Skip/Finish button always continues to the weekly plan regardless of how many (or how few) dishes were liked — this screen never blocks progress.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ every tap fires a best-effort feedback event and pulls its data from app logic</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s63','plan-ts-calibration')">
+            <div class="step-num num-purple">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">App asks the server for the calibration grid</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A React Query call fetches the grid once on screen mount, matching how every other screen in this app fetches server state.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s63','engine-calibration')">
+            <div class="step-num num-purple">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Engine assembles the grid and attaches dish images</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">A thin translation wrapper turns the core's raw picks into the same response shape (with photos) every other planning surface already returns.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s63','calibration-core')">
+            <div class="step-num num-purple">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Core picks 3 good matches + 2 safe-but-weak matches per meal, shuffled</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Uses the engine's existing scoring — never invents a score or relaxes safety — just decides which already-eligible dishes to surface and in what mix.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ a "like" tap rides through the server to become a stored signal — no schema change needed</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" style="opacity:.45">
+            <div class="step-num num-teal">—</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">No new migration this session</span></div>
+              <div class="step-desc">feedback_events already has a 'like' event type and a free-form detail jsonb column (migration 038) — the mismatch/match bookkeeping rides in there instead of needing a new column.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s63','main-calibration-route')">
+            <div class="step-num num-amber">6</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">A new /v1/calibration endpoint is added to the recommendation engine's service</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Signed and rate-limited the same way every other planning endpoint already is.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s63','handler-calibration-surface')">
+            <div class="step-num num-amber">7</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">The app's planning edge function learns the calibration surface and can resolve its "like" taps</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Same request-forwarding + feedback-logging plumbing every other WP-18 surface (like cold-start) already had.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Actually run the app to visually confirm the 3×5 grid layout, heart-toggle overlay, and the "N selected" footer — this session verified only via pytest + tsc --noEmit, never in a simulator/browser. Separately: the other concurrent session's pairing.py protein-category widening and onboarding step-1..4 guard fixes are tracked outside this session and still need their own review/merge.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s63-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s63-calibration-core" onclick="toggleDetail('s63-calibration-core')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">ghar_re_core/calibration.py</span></div>
+          <span class="detail-chevron" id="chev-s63-calibration-core">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s63-calibration-core">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Exports <code>calibration_grid(household, catalogue=None, weekday="Monday", household_id=None, n_positive=3, n_negative=2)</code>. For each of breakfast/lunch/dinner it ranks every slot-eligible dish by the existing engine score, picks the top-3 diverse-by-class/cuisine dishes as expected_positive, and separately picks 2 low-scoring diverse dishes (still eligible/safe, excluding any cuisine/class a positive already used) as planted_negative.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A household's derived profile + the dish catalogue (same inputs meal_planner.py already uses)</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A dict of 3 slots, each holding 5 dish cells tagged expected_positive/planted_negative, cell order shuffled per household+slot</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">_ranked_eligible() scores every slot-eligible dish</span><span class="dd-arrow">→</span><span class="dd-node">_pick_positives() top-3 diverse</span><span class="dd-arrow">→</span><span class="dd-node">_pick_negatives() bottom-2 diverse, excluding positives' class/cuisine</span><span class="dd-arrow">→</span><span class="dd-node">shuffle cell order (seeded)</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">out.append((S.score(d, theta, ctx, objective), d))</span>  ← _ranked_eligible() reuses scoring.py's own score() call unchanged; calibration.py never computes a score itself</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why is this a new file instead of a function inside meal_planner.py?</div>
+            <div class="dd-why-a">Founder required the RE core's actual scoring/eligibility/derivation math to stay untouched this session. A brand-new additive file that only calls existing public functions — mirroring meal_planner.py's own established charter — satisfies that while still building the feature; extending meal_planner.py would have meant editing an existing WP-18 core file rather than adding alongside it.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does _pick_negatives() exclude any cuisine/class already used by a positive?</div>
+            <div class="dd-why-a">Without that exclusion a "mismatch" dish could accidentally share a cuisine or class with a genuine top pick, diluting the calibration signal — the two roles need to feel genuinely distinct to the household, not just differently scored.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s63-calibration-tests" onclick="toggleDetail('s63-calibration-tests')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">ghar_re_core/tests/test_calibration.py</span></div>
+          <span class="detail-chevron" id="chev-s63-calibration-tests">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s63-calibration-tests">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">4 tests covering calibration_grid(): correct grid shape and role-counts per slot, every returned dish (positive AND negative) independently passes scoring.eligible, deterministic dish selection with no household_id, and that a household_id only reorders cells, never changes which dishes get picked.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Fixture households + the test catalogue</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Pass/fail assertions on grid shape, safety, and determinism</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">build fixture household</span><span class="dd-arrow">→</span><span class="dd-node">call calibration_grid()</span><span class="dd-arrow">→</span><span class="dd-node">assert shape/eligibility/determinism</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">python -m pytest ghar_re_core/tests/test_calibration.py -q</span>  ← all 4 pass on their own; run alongside test_meal_planner.py (13 passed total) to confirm no interference with the sibling WP-18 planner module</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why specifically assert every negative dish passes scoring.eligible, not just that it exists?</div>
+            <div class="dd-why-a">The entire safety promise of "planted_negative but still safe" rests on that one guarantee — a test that only checked count/shape could pass even if a negative dish accidentally violated an allergen or diet rule. The test asserts eligibility independently for every cell, positive or negative.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s63-engine-calibration" onclick="toggleDetail('s63-engine-calibration')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">ghar_re_service/ghar_re_service/engine.py</span></div>
+          <span class="detail-chevron" id="chev-s63-engine-calibration">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s63-engine-calibration">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Added <code>plan_calibration(request, catalogue, config)</code> alongside the existing <code>plan_cold_start</code> — calls <code>ghar_re_core.calibration.calibration_grid</code> and attaches a Cloudinary image URL to every cell in the response, the same composition pattern every other WP-18 surface in this file already follows.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The raw HTTP request body + the loaded catalogue/config</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">The calibration grid dict, each dish cell now carrying an image URL</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">main.py's /v1/calibration route</span><span class="dd-arrow">→</span><span class="dd-node">plan_calibration()</span><span class="dd-arrow">→</span><span class="dd-node">calib.calibration_grid()</span><span class="dd-arrow">→</span><span class="dd-node">attach image URLs</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">res = calib.calibration_grid(...)</span>  ← the only place engine.py touches calibration logic; everything else in this function is response shaping, no maths</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does image-attaching happen here instead of inside calibration.py?</div>
+            <div class="dd-why-a">calibration.py is Core Spine-adjacent and deliberately has no knowledge of Cloudinary/media — engine.py is the translation layer whose whole job is decorating core responses with service-level concerns (images, HTTP shape), keeping the core testable without any network/media dependency.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s63-main-calibration-route" onclick="toggleDetail('s63-main-calibration-route')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">ghar_re_service/ghar_re_service/main.py</span></div>
+          <span class="detail-chevron" id="chev-s63-main-calibration-route">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s63-main-calibration-route">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Added "/v1/calibration" to SIGNED_PATHS and the rate-limited path set, and a new route <code>POST /v1/calibration</code> calling <code>_planning_call("calibration", engine.plan_calibration, payload, request)</code> — identical wiring to /v1/cold-start.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">A signed, rate-limited POST /v1/calibration request</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">The calibration grid response, or a rejected request if unsigned/rate-limited</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">request hits ratelimit.py</span><span class="dd-arrow">→</span><span class="dd-node">auth.py signature check</span><span class="dd-arrow">→</span><span class="dd-node">calibration() route</span><span class="dd-arrow">→</span><span class="dd-node">_planning_call → engine.plan_calibration</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">return _planning_call("calibration", engine.plan_calibration, payload, request)</span>  ← the whole route body; reuses the shared _planning_call helper every other WP-18 route already funnels through</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why add this to both SIGNED_PATHS and the rate-limited set rather than just one?</div>
+            <div class="dd-why-a">Every other publicly-reachable planning route added since S39 gets both guards — omitting either for this one new route would leave it as the sole unprotected surface, an inconsistency worth avoiding rather than a deliberate exception.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s63-handler-calibration-surface" onclick="toggleDetail('s63-handler-calibration-surface')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">supabase/functions/plan/handler.ts</span></div>
+          <span class="detail-chevron" id="chev-s63-handler-calibration-surface">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s63-handler-calibration-surface">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Added a <code>calibration</code> entry to the SURFACES map (<code>{ path: "/v1/calibration", needsHousehold: true }</code>), and extended the existing cold-start-only recommendation_events write block to also cover <code>surface === "calibration"</code>, flattening result.body.slots into one array — so a calibration "like" tap can resolve via request_id through POST /v1/feedback exactly like cold-start likes already do.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">POST /plan { surface: "calibration" } from the mobile app</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">The signed engine's calibration response, plus a logged recommendation_events row per dish for later feedback resolution</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">mobile calls POST /plan surface:"calibration"</span><span class="dd-arrow">→</span><span class="dd-node">SURFACES lookup → /v1/calibration</span><span class="dd-arrow">→</span><span class="dd-node">signed call to ghar_re_service</span><span class="dd-arrow">→</span><span class="dd-node">flatten slots → write recommendation_events</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">if ((surface === "cold_start" || surface === "calibration") && resolvedHouseholdId) {</span>  ← the one line that decides whether a surface's dishes get logged for later feedback resolution; calibration now shares that path with cold_start</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why extend the cold-start write block instead of writing a separate one for calibration?</div>
+            <div class="dd-why-a">Both surfaces need the exact same thing — a resolvable request_id per suggested dish so a later "like" can be traced back — duplicating the block would just create two copies of the same logic to keep in sync. A shared condition with a surface-specific flatten step keeps it one code path.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s63-plan-ts-calibration" onclick="toggleDetail('s63-plan-ts-calibration')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">mobile/src/api/plan.ts</span></div>
+          <span class="detail-chevron" id="chev-s63-plan-ts-calibration">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s63-plan-ts-calibration">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Added <code>cell_role?: "expected_positive" | "planted_negative"</code> to the PlanDish interface (plumbing only, never rendered), a new CalibrationResponse interface (<code>{kind, slots: {breakfast, lunch, dinner}, request_id?}</code>), and <code>fetchCalibrationGrid()</code> calling <code>apiPost("/plan", { surface: "calibration" })</code>.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">None — a parameterless fetch call</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A typed CalibrationResponse: 3 slots of 5 dishes each</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">cold-start.tsx mounts</span><span class="dd-arrow">→</span><span class="dd-node">useQuery calls fetchCalibrationGrid()</span><span class="dd-arrow">→</span><span class="dd-node">apiPost("/plan", {surface:"calibration"})</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">return apiPost&lt;CalibrationResponse&gt;("/plan", { surface: "calibration" });</span>  ← the entire new API client function; reuses the same apiPost the rest of the app already calls, just a new surface string</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why mark cell_role optional (?) on PlanDish rather than a separate DishCalibrationCell type?</div>
+            <div class="dd-why-a">PlanDish is already shared across every planning surface's dish shape — adding one optional field keeps a single dish type instead of forking a near-duplicate type just for this one surface's extra bookkeeping field.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s63-cold-start-screen" onclick="toggleDetail('s63-cold-start-screen')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">mobile/app/cold-start.tsx</span></div>
+          <span class="detail-chevron" id="chev-s63-cold-start-screen">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s63-cold-start-screen">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Rewritten in place (same route, same place in the nav chain — still reached from (onboarding)/step-5.tsx's router.replace("/cold-start"), still calls router.push("/weekly-plan") on continue). Was a flat scrolling list of 15 dishes; is now a 3-column grid (Breakfast/Lunch/Dinner headers) × 5 rows of DishCards, using useTheme() tokens throughout — fixing a prior inconsistency where this screen hardcoded raw hex colors while every other screen used the theme.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">The CalibrationResponse fetched via useQuery(["calibration-grid"], fetchCalibrationGrid)</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A 3×5 grid of tappable dish cards, a "N selected" counter, and a Skip/Finish button that always continues to /weekly-plan</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">screen mounts, fetches grid</span><span class="dd-arrow">→</span><span class="dd-node">renders 3 columns × 5 DishCards</span><span class="dd-arrow">→</span><span class="dd-node">tap toggles liked set keyed slot:dishName</span><span class="dd-arrow">→</span><span class="dd-node">best-effort postFeedback()</span><span class="dd-arrow">→</span><span class="dd-node">Finish → router.push("/weekly-plan")</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">detail: { cell_role: args.dish.cell_role, tapped: true }</span>  ← the one line that actually carries the calibration signal — cell_role is read off the fetched dish and echoed straight back into the feedback event's detail jsonb, never shown in the UI</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why does the Finish button always continue to /weekly-plan regardless of selection count?</div>
+            <div class="dd-why-a">This screen's job is calibration signal collection, not a hard gate — forcing a minimum number of likes before continuing would add onboarding friction for no correctness reason; a household that likes nothing still needs its weekly plan.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">Was the navigation graph changed at all?</div>
+            <div class="dd-why-a">No — same route (/cold-start), same entry point (onboarding step-5's router.replace), same exit point (router.push to /weekly-plan). Only what renders inside the screen changed.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Visually verify the grid in a simulator/browser; the other concurrent session's pairing.py and onboarding step-1..4/OnboardingChips.tsx work is out of scope here and should be reviewed on its own.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s63-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S63 = [
+      {
+        id: 'dish-pick-calibration-grid',
+        label: 'Dish-pick calibration grid',
+        steps: [
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'cold-start.tsx mounts and fetches the grid',
+            desc: 'The screen renders three columns (Breakfast/Lunch/Dinner) and asks React Query for the calibration data as soon as it mounts.',
+            codeFlow: [ {chip:'mobile/app/cold-start.tsx'}, {label:'useQuery calls'}, {chip:'mobile/src/api/plan.ts'}, {label:'fetchCalibrationGrid()'} ],
+            files: [
+              {path:'mobile/app/cold-start.tsx', desc:'Renders the 3×5 grid, handles like-taps and the Skip/Finish footer'},
+              {path:'mobile/src/api/plan.ts', desc:'fetchCalibrationGrid() — the typed API client call for this surface'}
+            ],
+            api: {endpoint:'POST /plan', note:'{ surface: "calibration" } — routed by the plan edge function to the signed engine call'},
+            db: null
+          },
+          {
+            layer: 'Middleware',
+            tag: 'API',
+            title: 'plan edge function forwards the request and logs it for feedback',
+            desc: 'The SURFACES map resolves "calibration" to the engine\'s /v1/calibration path, forwards the signed call, and writes one recommendation_events row per suggested dish so a later like can be resolved back to it.',
+            codeFlow: [ {chip:'supabase/functions/plan/handler.ts'}, {label:'SURFACES.calibration'}, {label:'→ signed call'}, {chip:'ghar_re_service /v1/calibration'} ],
+            files: [
+              {path:'supabase/functions/plan/handler.ts', desc:'Routes the surface, forwards the signed call, writes recommendation_events'}
+            ],
+            api: {endpoint:'POST /v1/calibration', note:'Signed, rate-limited call from the edge function to the recommendation engine service'},
+            db: {table:'recommendation_events', op:'INSERT', note:'One row per suggested dish, so a later like/dislike can resolve via request_id'}
+          },
+          {
+            layer: 'Server',
+            tag: 'API',
+            title: 'main.py routes the signed request to the engine wrapper',
+            desc: 'The FastAPI route checks the signature and rate limit (same guards as every other planning route), then calls the translation wrapper.',
+            codeFlow: [ {chip:'ghar_re_service/ghar_re_service/main.py'}, {label:'_planning_call'}, {chip:'engine.plan_calibration'} ],
+            files: [
+              {path:'ghar_re_service/ghar_re_service/main.py', desc:'POST /v1/calibration route, signed + rate-limited'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Server',
+            tag: 'API',
+            title: 'engine.py composes the response and attaches dish images',
+            desc: 'plan_calibration() calls the core grid builder, then decorates every dish cell with a Cloudinary image URL — the same pattern every other WP-18 surface uses.',
+            codeFlow: [ {chip:'ghar_re_service/ghar_re_service/engine.py'}, {label:'plan_calibration()'}, {label:'calls'}, {chip:'ghar_re_core/calibration.py'}, {label:'calibration_grid()'} ],
+            files: [
+              {path:'ghar_re_service/ghar_re_service/engine.py', desc:'plan_calibration() — translation wrapper, attaches images'},
+              {path:'ghar_re_core/calibration.py', desc:'calibration_grid() — the actual pick logic, additive-only over existing scoring'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'User taps a dish; a best-effort feedback event fires',
+            desc: 'The tap toggles the heart overlay immediately and fires postFeedback() with the dish\'s cell_role in the detail field — a network failure here never blocks the UI.',
+            codeFlow: [ {chip:'mobile/app/cold-start.tsx'}, {label:'onPress → postFeedback()'}, {chip:'mobile/src/api/feedback.ts'} ],
+            files: [
+              {path:'mobile/app/cold-start.tsx', desc:'Toggles the liked set keyed by ${slot}:${dishName}, fires the feedback call'}
+            ],
+            api: {endpoint:'POST /v1/feedback', note:'Best-effort; detail.cell_role rides along so a like on a planted_negative dish is identifiable later'},
+            db: {table:'feedback_events', op:'INSERT', note:'event_type "like", detail jsonb carries cell_role — no new column needed (migration 038)'}
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s63-flows', window.FEATURE_FLOWS_S63);
+    </script>
+
+  </div><!-- /page-s63 -->
 
   <!-- SESSIONS_INJECT -->
 
