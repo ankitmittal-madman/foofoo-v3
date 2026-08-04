@@ -169,6 +169,8 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     addons = []
     for index, member in enumerate(hh.get("q12_member_ages") or []):
         role = member.get("role") if isinstance(member, dict) else None
+        if not isinstance(role, str):
+            continue
         class_code = addon_classes.get(role, {}).get(request.get("slot", "dinner"))
         if not class_code:
             continue
