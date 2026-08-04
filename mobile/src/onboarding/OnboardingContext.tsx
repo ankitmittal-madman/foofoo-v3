@@ -101,6 +101,27 @@ export function isSplitAgeHousehold(household: HouseholdType | null): boolean {
   return household != null && SPLIT_AGE_HOUSEHOLDS.includes(household);
 }
 
+/**
+ * earliestIncompleteStep — the lowest-numbered step (1-4) whose own required field(s) are still
+ * unanswered, mirroring each step screen's own `canContinue` gate (step-1's household type,
+ * step-2's home state + city, step-3's diet). Step 5's only required field (cookCapability) is
+ * excluded — its own screen already gates Continue on that. Returns null when steps 1-3 are all
+ * satisfied, meaning any step 1-5 route can safely render.
+ *
+ * Needed because a step screen only guards ITS OWN required field, not earlier ones — landing
+ * directly on step-5 via a deep link/hard refresh (bypassing steps 1-4 entirely) previously fell
+ * through every screen's local check and only surfaced as a cryptic ERR_HOUSEHOLD_INCOMPLETE
+ * after submitting on step 5.
+ * @param answers - the current onboarding answer bag.
+ * @returns the step number to redirect to, or null if steps 1-3's required fields are all set.
+ */
+export function earliestIncompleteStep(answers: OnboardingAnswers): number | null {
+  if (answers.householdType === null) return 1;
+  if (answers.homeState === null || !answers.currentCity?.trim()) return 2;
+  if (answers.diet === null) return 3;
+  return null;
+}
+
 // ---- Consent (DOC-P3-06 §06.1 — POST /v1/consent) ---------------------------
 //
 // Captured on a dedicated screen before Screen 1 (api-contract-audit-2026-07-30.md HIGH finding —
