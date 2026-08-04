@@ -15,8 +15,13 @@ const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
  * (already filtered server-side to classes with at least one backing dish — see meal_planner.
  * weekly_class_plan's dish_count) and lets the user pick one per day/slot, then finalize.
  *
- * Finalizing writes the selection to weeklyPlanStore (device-local for now) and moves to the daily
- * plan, which reconciles that day's dishes to ONLY the finalized class — the WP-18 guarantee.
+ * Finalizing writes the selection to weeklyPlanStore (device-local for now) and moves to the Home
+ * tab (today's plan), which reconciles that day's dishes to ONLY the finalized class — the WP-18
+ * guarantee. Relocated into the (tabs) group as the second, persistent "Week Plan" tab per the
+ * Founder's restructuring request — previously this screen was reachable only mid-flow via
+ * cold-start -> weekly-plan -> daily-plan; the route path itself ("/weekly-plan") is unchanged
+ * since expo-router strips the "(tabs)" group segment from the URL, so cold-start.tsx's existing
+ * router.push("/weekly-plan") still resolves here unmodified.
  */
 export default function WeeklyPlan() {
   const query = useQuery<WeeklyPlanResponse>({
@@ -27,7 +32,7 @@ export default function WeeklyPlan() {
 
   const finalize = useMutation({
     mutationFn: (plan: FinalizedWeek) => saveWeeklyPlan(plan),
-    onSuccess: () => router.replace("/daily-plan"),
+    onSuccess: () => router.replace("/today"),
   });
 
   function choose(weekday: string, slot: SlotName, classCode: string) {

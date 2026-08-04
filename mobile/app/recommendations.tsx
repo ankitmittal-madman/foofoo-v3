@@ -9,6 +9,15 @@ import { describeApiError } from "@/api/errorMessages";
 import type { FeedbackEventType, Plate, RecommendationsResponse } from "@/api/types";
 
 /**
+ * ORPHANED as of the tabs/home restructuring: no route in the app links here anymore (index.tsx
+ * and sign-in.tsx now redirect to "/today" — the (tabs) Home tab's today's-meal-selection screen —
+ * instead of here). Left in place unrouted rather than deleted: its feedback-capture UI
+ * (like/dislike/accept -> POST /v1/feedback, see PlateCard below) is real, working logic that
+ * nothing else in the app currently duplicates, and no other screen was confirmed to have fully
+ * absorbed it, so removing the file outright risked silently losing that capability rather than
+ * just its route. If a future pass confirms feedback capture has a home elsewhere (e.g. wired into
+ * the Home tab's dish cards), this file can be deleted then.
+ *
  * Phase 1: proves the wire, not the UI (task instruction §4) — plain list rendering of whatever
  * `plates[]` the RE returns, no photos/cards/swipe. recommendations/handler.ts always returns a
  * valid 200 (RE failure -> fallback plate), so this screen has no "recommendation failed" case to

@@ -42,9 +42,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install packages (ghar_re_core + ghar_re_service, editable, with test + lint extras)
+      - name: Install packages (ghar_re_core + ghar_re_service, editable, with test + lint + training extras)
         run: |
-          pip install -e ".[test,lint]"
+          pip install -e ".[test,lint,training]"
           pip install -e "ghar_re_service[test]"
       # Lint + format check. ruff config lives in the root pyproject.toml and covers BOTH packages,
       # so the two halves of the RE cannot drift into different style rules (Phase C.5 Task 3,

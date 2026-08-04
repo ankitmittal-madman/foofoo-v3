@@ -7,7 +7,8 @@ import { describeApiError } from "@/api/errorMessages";
 
 /**
  * WP-18 surface 5 — the meal-detail screen. Full recipe (ingredients, steps, times) + Cloudinary
- * image for one dish, reached by tapping any dish card in cold-start / daily-plan.
+ * image for one dish, reached by tapping any dish card in cold-start / the Home tab (formerly
+ * daily-plan.tsx, relocated to app/(tabs)/today.tsx).
  */
 export default function RecipeDetail() {
   const { dish } = useLocalSearchParams<{ dish: string }>();

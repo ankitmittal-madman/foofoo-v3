@@ -725,9 +725,13 @@ function deepDiveFeature(featureLabel){
       <span class="nav-icon">🍆</span> S60 · Batches 8-13 + WP-19 retargeted to public.dishes
       <span class="nav-badge">Aug 3</span>
     </div>
-    <div class="nav-item active" onclick="showPage('s61')">
+    <div class="nav-item" onclick="showPage('s61')">
       <span class="nav-icon">🧠</span> S61 · RE Phase 3: s_pref stub + training pipeline
       <span class="nav-badge">Aug 3</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s62')">
+      <span class="nav-icon">🍱</span> S62 · Home tab (today's meals) + Week Plan tab
+      <span class="nav-badge">Aug 4</span>
     </div>
     <!-- NAV_INJECT -->
   </div>
@@ -738,11 +742,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">16</span>
+      <span class="nav-badge">19</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">273</span>
+      <span class="nav-badge">287</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -1258,9 +1262,21 @@ function deepDiveFeature(featureLabel){
           <div class="arch-node-name">mobile/app/(onboarding)/</div>
           <div class="arch-node-desc">4 onboarding screens · S43</div>
         </div>
-        <div class="arch-node is-new" onclick="jumpModule('mobile-app')">
+        <div class="arch-node" onclick="jumpModule('mobile-app')">
           <div class="arch-node-name">mobile/app/recommendations.tsx</div>
-          <div class="arch-node-desc">Plain plate list · S43</div>
+          <div class="arch-node-desc">Plain plate list · S43 — ORPHANED as of S62, no route links here anymore</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('tabs-layout')">
+          <div class="arch-node-name">mobile/app/(tabs)/_layout.tsx</div>
+          <div class="arch-node-desc">Bottom tab bar: Home, Week Plan · S62</div>
+        </div>
+        <div class="arch-node is-new" onclick="jumpModule('home-tab')">
+          <div class="arch-node-name">mobile/app/(tabs)/today.tsx</div>
+          <div class="arch-node-desc">Home — today's breakfast/lunch/dinner · S62</div>
+        </div>
+        <div class="arch-node is-mod" onclick="jumpModule('weekly-plan-tab')">
+          <div class="arch-node-name">mobile/app/(tabs)/weekly-plan.tsx</div>
+          <div class="arch-node-desc">Week Plan — 7-day class picker, moved into tabs · S62</div>
         </div>
         <!-- ARCH_PHONE_INJECT -->
       </div>
@@ -2324,7 +2340,23 @@ function deepDiveFeature(featureLabel){
       <div class="tl-note">Closed the last of the plan's 4 phases. `s_pref` is now a real, registry-wired ScoringModule (`ghar_re_core/preference.py`, phase="pref") — but two independent checks (its own enabled/artifact logic, and its weight defaulting to 0.0) keep it a strict no-op today, since no trained artifact and no real feedback data exist yet. Proved `base()`/`score()`'s existing behaviour never changed: golden-master ran before and after, byte-identical, zero diff. Built `ghar_re_core/model_provider.py` (NullModelArtifactProvider is the only provider ever actually constructed; FileModelArtifactProvider is the seam for later) and `ghar_re_core/training/` (dataset loading + labeling with an FD-11 no-fabricated-labels guard, a runnable `train_pref_model.py` CLI, holdout eval) — added `scikit-learn`/`joblib` as a new optional extra. Also caught and fixed a missed `pref_model.yaml` in `ghar_re_service`'s baked config bundle (full `ghar_re_service/tests/` suite failed until `export_bundle.py`'s allow-list and the bundle itself were updated). Final tally: golden-master 1 passed, `ghar_re_core/tests/` 83 passed, `ghar_re_service/tests/` 68 passed.</div>
     </div>
   </div>
-  <!-- TIMELINE_INJECT -->
+  <div class="timeline-row">
+  <div class="tl-date">Aug 4</div>
+  <div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div>
+  <div class="tl-content">
+    <span class="tl-badge" style="background:#e8f8f2;color:#0e7a5a">S62</span>
+    <div class="tl-title">Home tab (today's meals) + Week Plan tab, horizontal-scrolling dish cards</div>
+    <div class="tl-chips">
+      <span class="tl-chip" onclick="showPage('s62')">(tabs)/_layout.tsx</span>
+      <span class="tl-chip" onclick="showPage('s62')">Home tab</span>
+      <span class="tl-chip" onclick="showPage('s62')">Week Plan tab</span>
+      <span class="tl-chip" onclick="showPage('s62')">daily-plan.tsx deleted</span>
+      <span class="tl-chip" onclick="showPage('s62')">redirect fixes</span>
+    </div>
+    <div class="tl-note">Split the combined daily-plan screen into persistent Home + Week Plan tabs and made dish options scroll horizontally; still pending: visual verification in a simulator, and a decision on orphaned recommendations.tsx.</div>
+  </div>
+</div>
+<!-- TIMELINE_INJECT -->
   </div>
 
   <!-- ── Modules ── -->
@@ -2772,6 +2804,64 @@ function deepDiveFeature(featureLabel){
     <div class="dd-text">S61 · Aug 3 2026</div>
   </div>
 </div>
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-tabs-layout" onclick="toggleDetail('mod-tabs-layout')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">Tabs layout (Home / Week Plan)</span></div>
+    <span class="detail-chevron" id="chev-mod-tabs-layout">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-tabs-layout">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Declares the app's persistent bottom-nav tab bar using Expo Router's Tabs, per its own header comment: Home listed first/lands first, Week Plan second — "route paths are unaffected by the (tabs) group segment."</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>mobile/app/(tabs)/_layout.tsx</code> — declares the two-tab Tabs component with headers hidden<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Makes Week Plan a first-class, always-reachable surface instead of a screen only found mid-onboarding — the Founder's explicit ask this session.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S62 · Aug 4, 2026</div>
+  </div>
+</div>
+
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-home-tab" onclick="toggleDetail('mod-home-tab')">
+    <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">Home tab — today's meals</span></div>
+    <span class="detail-chevron" id="chev-mod-home-tab">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-home-tab">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Shows today's actual weekday's breakfast/lunch/dinner options as horizontally-scrolling dish cards. Supersedes the retired daily-plan.tsx: same slot-fetch and finalized-class reconciliation logic (WP-18 guarantee), but no day-picker and cards scroll sideways instead of stacking vertically.</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>mobile/app/(tabs)/today.tsx</code> — Home screen; SlotSection() fetches and reconciles each meal slot's dishes, renders them in a horizontal ScrollView<br>
+      <code>mobile/src/api/plan.ts</code> — fetchSlotOptions() / fetchClassDishes(), the same personalized/scored API client used previously<br>
+      <code>mobile/src/lib/weeklyPlanStore.ts</code> — loadWeeklyPlan(), reads the locally-stored finalized weekly class plan<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">This is what a returning user sees first and most often — it's what makes today's meal decision fast (no day-picker to fiddle with) and lets more dish options be browsed per slot without a long vertical scroll. Retires and fully replaces the former "daily-plan" module (mobile/app/daily-plan.tsx, deleted this session — no separate module entry existed for it before now).</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S62 · Aug 4, 2026</div>
+  </div>
+</div>
+
+<div class="detail-item">
+  <div class="detail-row" id="row-mod-weekly-plan-tab" onclick="toggleDetail('mod-weekly-plan-tab')">
+    <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">Week Plan tab — 7-day class picker</span></div>
+    <span class="detail-chevron" id="chev-mod-weekly-plan-tab">▾</span>
+  </div>
+  <div class="detail-drawer" id="draw-mod-weekly-plan-tab">
+    <div class="dd-label">What this does</div>
+    <div class="dd-text">Lets a household pick a meal class for each day/slot across a 7-day week, then finalize the plan. Unchanged this session except its finalize-success redirect, which used to point at the now-deleted /daily-plan and now points at Home ("/").</div>
+    <div class="dd-label">Files / tables in this module</div>
+    <div class="dd-text">
+      <code>mobile/app/(tabs)/weekly-plan.tsx</code> — moved (git mv) from mobile/app/weekly-plan.tsx; fetchWeeklyPlan(), chip-picker UI, finalize mutation<br>
+    </div>
+    <div class="dd-label">How it helps the app</div>
+    <div class="dd-text">Gives households a way to plan an entire week's meal classes in one sitting, which Home then reconciles against day by day — without this, Home would only ever show generic top-picks, never a household's own deliberate weekly choices.</div>
+    <div class="dd-label">Last touched</div>
+    <div class="dd-text">S62 · Aug 4, 2026</div>
+  </div>
+</div>
 <!-- MODULES_INJECT -->
   </div>
 
@@ -3196,6 +3286,14 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">ghar_re_core/tests/test_preference.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">Proves s_pref's neutral value, phase="pref" isolation from base()/score()'s default combine() calls, and ModelArtifactProvider's None-handling</td></tr>
   <tr><td class="fr-file mono">ghar_re_core/tests/test_training_pipeline.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S61</td><td class="fr-desc">Fixture-only: dataset labeling rules, the insufficient-data/non-real-data refusal guard, and one end-to-end pipeline run producing a loadable artifact</td></tr>
   <tr><td class="fr-file mono">ghar_re_core/tests/test_scoring_registry.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S61</td><td class="fr-desc">Updated the Phase-1 "phase=pref is empty" assertion to "phase=pref contains exactly s_pref" — an intentional, expected update, not a scoring-math change</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(tabs)/_layout.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S62</td><td class="fr-desc">Expo Router Tabs layout — Home tab first/default, Week Plan tab second</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(tabs)/today.tsx</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S62</td><td class="fr-desc">New Home tab — today's breakfast/lunch/dinner only, dish options as horizontally-scrolling cards</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(tabs)/weekly-plan.tsx</td><td><span class="tag tag-mod">Moved+mod</span></td><td class="fr-session">S62</td><td class="fr-desc">Moved (git mv) from mobile/app/weekly-plan.tsx into the tabs group; finalize redirect changed from /daily-plan to "/" (Home)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/daily-plan.tsx</td><td><span class="tag tag-mod">Deleted</span></td><td class="fr-session">S62</td><td class="fr-desc">Removed — fully superseded by the new (tabs)/today.tsx Home screen; its logic was ported, not lost</td></tr>
+  <tr><td class="fr-file mono">mobile/app/index.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S62</td><td class="fr-desc">Post-onboarding-complete Redirect target changed from /recommendations to "/" (Home)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/(auth)/sign-in.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S62</td><td class="fr-desc">Post-sign-in redirect for a completed-onboarding household changed from /recommendations to "/" (Home)</td></tr>
+  <tr><td class="fr-file mono">mobile/app/recipe/[dish].tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S62</td><td class="fr-desc">Comment-only — updated a stale reference to daily-plan to point at the new Home tab location</td></tr>
+  <tr><td class="fr-file mono">mobile/app/recommendations.tsx</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S62</td><td class="fr-desc">Comment-only — now unrouted/orphaned; header comment explains why it was kept (working feedback-capture logic) instead of deleted</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -3819,6 +3917,36 @@ function deepDiveFeature(featureLabel){
     <div class="decision-q">Why does ghar_re_service's baked config bundle need updating for a ghar_re_core-only change?</div>
     <div class="decision-a">ghar_re_core/config.py's Config.__init__ loads every runtime YAML config file unconditionally, including the new pref_model.yaml — and the production service reads its config from a pre-baked bundle directory (RE-DOC-10 §8), not from data/source/ directly. Missing this caused the full ghar_re_service/tests/ suite to fail with FileNotFoundError; fixed by adding pref_model.yaml to export_bundle.py's CONFIG_FILES allow-list and re-running the exporter, which also regenerated manifest.json's version hash.</div>
     <div class="decision-meta">S61 &middot; Aug 3, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why leave recommendations.tsx in place instead of deleting it now that nothing routes to it?</div>
+    <div class="decision-a">It contains working like/dislike/accept feedback-capture logic (POST /v1/feedback) that wasn't confirmed to exist anywhere else in the app. Deleting it risked silently losing that capability rather than deliberately migrating it. Left in place, unrouted, with a header comment explaining the orphan status and the rationale — a future session should decide whether to port the feedback logic elsewhere or retire it for good.</div>
+    <div class="decision-meta">S62 &middot; Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why does cold-start.tsx need no changes even though weekly-plan.tsx moved into a route group?</div>
+    <div class="decision-a">Expo Router strips parenthesized group segments (like "(tabs)") from the actual URL path, so cold-start.tsx's existing router.push("/weekly-plan") still resolves correctly — now served from (tabs)/weekly-plan.tsx transparently. Verified by reading cold-start.tsx directly rather than assuming the framework behavior.</div>
+    <div class="decision-meta">S62 &middot; Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why does the Home tab live at "/today" instead of "/" like a typical Expo Router tabs-group index screen?</div>
+    <div class="decision-a">Corrected after the initial S62 pass: naming the tabs group's Home screen "index.tsx" would make it resolve to "/" via group-segment stripping — but app/index.tsx (OUTSIDE the tabs group) already owns "/" as the root auth/onboarding-status gate. Two files resolving to the same route is a real collision, and the gate redirecting a completed user to "/" would be an immediate self-redirect loop, not just an unlikely edge case. Fixed by naming the screen (tabs)/today.tsx (route "/today") and pointing every "go to Home" redirect (index.tsx's gate, sign-in.tsx, weekly-plan.tsx's finalize) at "/today" directly instead of "/".</div>
+    <div class="decision-meta">S62 &middot; Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why delete daily-plan.tsx instead of leaving it unrouted like recommendations.tsx?</div>
+    <div class="decision-a">daily-plan.tsx's entire purpose (today's meals) is now Home's entire purpose, and its logic was fully ported into (tabs)/today.tsx — keeping both would create two near-duplicate screens whose logic could drift apart over time. recommendations.tsx was kept only because it holds feedback-capture logic not confirmed to exist elsewhere; daily-plan.tsx had no such unique, unmigrated capability.</div>
+    <div class="decision-meta">S62 &middot; Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">Why was ghar_re_core/meal_planner.py (pre-existing uncommitted WIP) left untouched this session?</div>
+    <div class="decision-a">It belongs to a separate, unrelated in-progress cook-capability feature and was explicitly out of scope for this frontend-only tabs/navigation restructuring. ghar_re_core/, ghar_re_service/, and supabase/functions/ were not touched at all this session.</div>
+    <div class="decision-meta">S62 &middot; Aug 4, 2026</div>
+  </div>
+  <div class="decision-item">
+    <div class="decision-q">How was this session verified, given no simulator/browser was available?</div>
+    <div class="decision-a">Ran `cd mobile && npm run typecheck` (tsc --noEmit) — zero errors. No test suite exists for mobile/ (no test script in package.json, no *.test.* files anywhere under mobile/). The app itself was not visually run; this is disclosed explicitly rather than implied as done.</div>
+    <div class="decision-meta">S62 &middot; Aug 4, 2026</div>
   </div>
   <!-- DECISIONS_INJECT -->
   </div>
@@ -10730,7 +10858,7 @@ function deepDiveFeature(featureLabel){
     </div>
   </div><!-- /page-s60 -->
 
-  <div id="page-s61" class="page-content">
+  <div id="page-s61" class="page-content" style="display:none">
     <div class="page-header">
       <div class="page-title">S61 · Recommendation Engine Phase 3 (final phase) — s_pref stub, ModelArtifactProvider, training pipeline</div>
       <div class="page-subtitle">Closed the last gap in the 4-phase RE build: the master scoring formula's `+ w_pref·S_pref` term now exists as a real, registry-wired ScoringModule instead of only a docstring comment — but it is deliberately UNFIT, contributing exactly 0.0 to every live score, since no real training data or trained model exists yet. Also built (but never ran against real data) the offline training pipeline that will one day produce that model.</div>
@@ -10784,6 +10912,396 @@ function deepDiveFeature(featureLabel){
       </div>
     </div>
   </div><!-- /page-s61 -->
+
+  <div id="page-s62" class="page-content">
+
+    <!-- ── Session header ── -->
+    <div class="page-header">
+      <div class="page-title">S62 · Home tab (today's meals) + Week Plan tab, horizontal-scrolling dish cards</div>
+      <div class="page-subtitle">Split the app's main screen into two persistent tabs — Home now shows only TODAY's breakfast/lunch/dinner, and the 7-day class picker moved to its own "Week Plan" tab below it. Each meal slot's dish options now scroll sideways as cards instead of stacking in a long vertical list.</div>
+    </div>
+
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The app had one combined "daily plan" screen that mixed today's meals with a day-picker, and a separate weekly class-picker screen reached only mid-flow from cold-start. Dish options for each meal slot were a long vertical list you had to scroll down through.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-label">✅ After this session</div>
+        <div class="impact-text">Home and Week Plan are now two persistent tabs, Home first. Home shows only today's actual weekday's breakfast/lunch/dinner — no day-picker needed. Each meal slot's dish suggestions scroll sideways as cards, so more options fit without a long scroll. Signing in or finishing onboarding now lands on Home instead of the old flat recommendations feed.</div>
+      </div>
+    </div>
+
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">mobile/app/(tabs)/_layout.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(tabs)/today.tsx</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(tabs)/weekly-plan.tsx</span><span class="tag tag-mod">Moved+mod</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/daily-plan.tsx</span><span class="tag tag-mod">Deleted</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/index.tsx</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/(auth)/sign-in.tsx</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/recipe/[dish].tsx</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">mobile/app/recommendations.tsx</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">Aug 4, 2026<br>8 things touched</div>
+      </div>
+      <div class="session-card-desc">Founder asked for Week Plan as its own nav item below Home, Home showing only today's meals, and horizontally-scrolling dish cards per slot. Built an Expo Router Tabs group with Home first and Week Plan second; ported daily-plan.tsx's slot-fetch/reconciliation logic into the new Home screen but dropped its day-picker; moved weekly-plan.tsx into the tabs group and pointed its finalize-redirect at Home; deleted the now-superseded daily-plan.tsx; fixed every stale redirect/reference across index.tsx, sign-in.tsx, recipe/[dish].tsx, and recommendations.tsx. Verified with `npm run typecheck` (zero errors) — no test suite exists for mobile/, and the app was not run in a simulator (none available in this environment).</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">4</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">0</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">0</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+
+    <!-- ── View tabs ── -->
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="switchView('s62','swim')">Swim lane flow</div>
+      <div class="view-tab" onclick="switchView('s62','detail')">Detail drill-down</div>
+      <div class="view-tab" onclick="switchView('s62','flows')">Feature flows</div>
+    </div>
+
+    <!-- ══ SWIM LANE VIEW ══ -->
+    <div id="s62-swim" class="view-pane active">
+
+      <div class="swim-lane lane-blue">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Phone</div>
+          <div class="swim-label-sub">user sees</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" onclick="jumpDetail('s62','tabs-layout')">
+            <div class="step-num num-blue">1</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Two tabs appear: Home, then Week Plan</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">The app now shows a persistent bottom-nav with Home listed first and Week Plan second — Week Plan is no longer buried inside the sign-up flow.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s62','home-tab')">
+            <div class="step-num num-blue">2</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Home shows only today's meals</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Breakfast, lunch, and dinner for today's actual weekday — no day-picker, no other days shown.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s62','home-tab')">
+            <div class="step-num num-blue">3</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Dish options scroll sideways</span><span class="tag tag-new">New</span></div>
+              <div class="step-desc">Each meal slot's suggested dishes are now cards you swipe through left-to-right, instead of a tall stacked list.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s62','weekly-plan-tab')">
+            <div class="step-num num-blue">4</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Week Plan tab still picks the 7-day class plan</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Same 7-day class-picker as before, just reachable any time from the tab bar instead of only mid-onboarding — and finishing it now takes you back to Home.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ tapping a dish card or finishing Week Plan hands off to app logic</div>
+
+      <div class="swim-lane" style="margin-bottom:10px">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">App logic</div>
+          <div class="swim-label-sub">hooks / code</div>
+        </div></div>
+        <div class="swim-body" style="background:var(--purple-bg);border-color:var(--purple-border)">
+          <div class="swim-step" onclick="jumpDetail('s62','home-tab')">
+            <div class="step-num num-purple">5</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Home reconciles today's slot against any finalized weekly class</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Ported from the old daily-plan.tsx: if a class was finalized for today's slot in Week Plan, Home shows only that class's dishes; otherwise it shows top personalized picks.</div>
+            </div>
+          </div>
+          <div class="swim-step" onclick="jumpDetail('s62','redirects')">
+            <div class="step-num num-purple">6</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">Sign-in / onboarding-complete now redirects to Home</span><span class="tag tag-mod">Modified</span></div>
+              <div class="step-desc">Both the root auth gate and the sign-in screen used to send a returning user to the old flat recommendations feed — both now send them to the Home tab.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕ no database or server changes this session</div>
+
+      <div class="swim-lane lane-teal">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Database</div>
+          <div class="swim-label-sub">Supabase</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" style="opacity:.45">
+            <div class="step-num num-teal">—</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">No database changes this session</span></div>
+              <div class="step-desc">Purely frontend-only work — the same personalized/scored API calls already in use were reused as-is.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swim-arrow">↕</div>
+
+      <div class="swim-lane lane-amber">
+        <div class="swim-label"><div class="swim-label-inner">
+          <div class="swim-label-title">Server</div>
+          <div class="swim-label-sub">edge functions</div>
+        </div></div>
+        <div class="swim-body">
+          <div class="swim-step" style="opacity:.45">
+            <div class="step-num num-amber">—</div>
+            <div class="step-content">
+              <div class="step-title-row"><span class="step-title">No server changes this session</span></div>
+              <div class="step-desc">ghar_re_core, ghar_re_service, and supabase/functions were explicitly out of scope and untouched.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Actually run the app in a simulator/browser to visually confirm the tab bar order, the horizontal-scroll card behavior, and the reconciliation banner text — this session verified only via `tsc --noEmit`, never visually. Decide recommendations.tsx's fate (keep orphaned, wire its feedback logic elsewhere, or delete) now that it's unrouted.</div>
+      </div>
+
+    </div><!-- /swim -->
+
+    <!-- ══ DETAIL DRILL-DOWN VIEW ══ -->
+    <div id="s62-detail" class="view-pane">
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s62-tabs-layout" onclick="toggleDetail('s62-tabs-layout')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/app/(tabs)/_layout.tsx</span></div>
+          <span class="detail-chevron" id="chev-s62-tabs-layout">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s62-tabs-layout">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Declares the app's persistent bottom tab bar using Expo Router's `Tabs` component, with Home (`index`) first and Week Plan (`weekly-plan`) second. Declaration order is what actually makes "Week Plan below Home" true — Tabs renders in the order screens are listed.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">None — a static route declaration</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A two-tab bottom nav wrapping the Home and Week Plan screens</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">App loads</span><span class="dd-arrow">→</span><span class="dd-node">Tabs layout mounts</span><span class="dd-arrow">→</span><span class="dd-node">Home tab renders first</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">&lt;Tabs.Screen name="index" options={{ title: "Home" }} /&gt;</span>  ← declared before the Week Plan screen, so Home is the first/default tab</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Does moving weekly-plan.tsx into a "(tabs)" group change its URL?</div>
+            <div class="dd-why-a">No — Expo Router strips parenthesized group segment names from the URL path, so `/weekly-plan` still resolves correctly. Existing `router.push("/weekly-plan")` calls elsewhere (e.g. cold-start.tsx) needed no changes.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s62-home-tab" onclick="toggleDetail('s62-home-tab')">
+          <div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">mobile/app/(tabs)/today.tsx</span></div>
+          <span class="detail-chevron" id="chev-s62-home-tab">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s62-home-tab">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The new Home tab. Computes today's actual weekday once (`new Date().getDay()`, no day-picker) and renders a `SlotSection` for breakfast/lunch/dinner. Each slot fetches real personalized dish options and reconciles them against any locally-stored finalized weekly plan.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Today's weekday + any finalized weekly plan from local storage</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">Three horizontally-scrolling rows of dish cards, one per meal slot</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">Home mounts</span><span class="dd-arrow">→</span><span class="dd-node">loadWeeklyPlan()</span><span class="dd-arrow">→</span><span class="dd-node">fetchClassDishes or fetchSlotOptions per slot</span><span class="dd-arrow">→</span><span class="dd-node">horizontal ScrollView of cards</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">&lt;ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}&gt;</span>  ← turns each slot's dish list into a sideways-scrolling row instead of a vertical stack</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why keep the finalized-class reconciliation logic instead of a simpler always-personalized feed?</div>
+            <div class="dd-why-a">A user who already finalized a weekly class plan expects Home to honor it, not show unrelated top picks — this is the same WP-18 guarantee daily-plan.tsx already had; only the day-picker and vertical layout were dropped, the reconciliation rule itself was carried over unchanged.</div>
+          </div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why fixed-width (180px) cards instead of a percentage width?</div>
+            <div class="dd-why-a">A fixed width keeps card size predictable regardless of screen size, so the horizontal scroll gesture always has a consistent amount of content peeking in from the edge to signal "more to scroll."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s62-weekly-plan-tab" onclick="toggleDetail('s62-weekly-plan-tab')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">mobile/app/(tabs)/weekly-plan.tsx</span></div>
+          <span class="detail-chevron" id="chev-s62-weekly-plan-tab">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s62-weekly-plan-tab">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">The 7-day class-picker screen, moved (git mv, history preserved) from `mobile/app/weekly-plan.tsx` into the new tabs group. Its own chip-picker UI and "Finalize plan" logic (`fetchWeeklyPlan`) are unchanged — only the finalize-success redirect target changed.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">User's chip selections for each day/slot's meal class</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A finalized weekly plan saved locally, then a redirect to Home</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">User taps Finalize plan</span><span class="dd-arrow">→</span><span class="dd-node">finalize mutation succeeds</span><span class="dd-arrow">→</span><span class="dd-node">router.replace("/today")</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">onSuccess: () => router.replace("/today"),</span>  ← used to redirect to the now-deleted /daily-plan route; now goes straight to the Home tab</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why "/today" instead of "/" or a "/(tabs)" route?</div>
+            <div class="dd-why-a">Corrected post-review: "/" is app/index.tsx's own root auth/onboarding gate, not the tabs group's Home screen — naming the Home screen "index.tsx" would have collided with that file on the same route and made the gate self-redirect. The Home tab lives at "/today" instead, and every "go to Home" redirect (root gate, sign-in, this finalize) points there directly.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s62-redirects" onclick="toggleDetail('s62-redirects')">
+          <div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">mobile/app/index.tsx, mobile/app/(auth)/sign-in.tsx</span></div>
+          <span class="detail-chevron" id="chev-s62-redirects">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s62-redirects">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">Both files gate access after auth/onboarding checks. Each had a hardcoded `/recommendations` destination for a user who has already completed onboarding — both now point at `/` (Home) instead, since `/recommendations` is no longer the app's landing surface.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">Whether onboarding is complete for the current household</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">A Redirect/router.replace to "/" (Home) or the onboarding flow</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">App boots or sign-in succeeds</span><span class="dd-arrow">→</span><span class="dd-node">check onboarding status</span><span class="dd-arrow">→</span><span class="dd-node">redirect to "/" if complete</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">return &lt;Redirect href={complete ? "/" : "/(onboarding)/consent"} /&gt;;</span>  ← index.tsx's root gate, now landing completed users on Home instead of the retired recommendations feed</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why not delete recommendations.tsx outright once nothing routes to it?</div>
+            <div class="dd-why-a">It contains working like/dislike/accept feedback-capture logic (POST /v1/feedback) that wasn't confirmed to exist anywhere else in the app — deleting it risked silently losing that capability. Left in place, unrouted, with a header comment explaining the orphan status.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-row" id="row-s62-daily-plan-removed" onclick="toggleDetail('s62-daily-plan-removed')">
+          <div class="detail-left"><span class="tag tag-mod">Deleted</span><span class="detail-name">mobile/app/daily-plan.tsx</span></div>
+          <span class="detail-chevron" id="chev-s62-daily-plan-removed">▾</span>
+        </div>
+        <div class="detail-drawer" id="draw-s62-daily-plan-removed">
+          <div class="dd-label">What this does</div>
+          <div class="dd-text">No longer exists. Its combined day-picker + today's-meals screen is fully superseded by the new `(tabs)/today.tsx` Home screen; its route is gone from the app.</div>
+          <div class="dd-label">Input → Output</div>
+          <div class="dd-io">
+            <div class="dd-io-col dd-io-in"><div class="dd-io-label">Input</div><div class="dd-io-text">n/a — removed</div></div>
+            <div class="dd-io-arrow">→</div>
+            <div class="dd-io-col dd-io-out"><div class="dd-io-label">Output</div><div class="dd-io-text">n/a — removed</div></div>
+          </div>
+          <div class="dd-label">Flow through it</div>
+          <div class="dd-flow"><span class="dd-node">daily-plan.tsx (retired)</span><span class="dd-arrow">→</span><span class="dd-node">logic ported to (tabs)/today.tsx</span></div>
+          <div class="dd-label">Key line of code</div>
+          <div class="dd-code"><span class="dd-hl">(file deleted)</span>  ← its slot-fetch/reconciliation logic was ported into the new Home tab, not lost</div>
+          <div class="dd-why">
+            <div class="dd-why-q">Why delete instead of leaving it unrouted like recommendations.tsx?</div>
+            <div class="dd-why-a">daily-plan.tsx's entire purpose (today's meals) is now Home's entire purpose — keeping both would mean two near-duplicate screens with drifting logic. recommendations.tsx was kept only because it holds feedback-capture logic not confirmed to live elsewhere; daily-plan.tsx had no such unique capability.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next session</div>
+        <div class="next-text">Visually verify in a simulator; resolve recommendations.tsx's long-term fate.</div>
+      </div>
+
+    </div><!-- /detail -->
+
+    <!-- ══ FEATURE FLOWS VIEW ══ -->
+    <div id="s62-flows" class="view-pane"></div>
+    <script>
+    window.FEATURE_FLOWS_S62 = [
+      {
+        id: 'home-weekplan-nav',
+        label: "Today's meal selection + Week Plan navigation",
+        steps: [
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'Bottom tab bar renders Home then Week Plan',
+            desc: "The app's persistent tab bar shows Home first and Week Plan second, per the Founder's requested ordering.",
+            codeFlow: [ {chip:'mobile/app/(tabs)/_layout.tsx'}, {label:'declares'}, {chip:'mobile/app/(tabs)/today.tsx'}, {label:'and'}, {chip:'mobile/app/(tabs)/weekly-plan.tsx'} ],
+            files: [
+              {path:'mobile/app/(tabs)/_layout.tsx', desc:'Expo Router Tabs layout — Home first, Week Plan second'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'Home screen mounts, computes today',
+            desc: "Home works out today's actual weekday (no day-picker) and renders three meal slot sections.",
+            codeFlow: [ {chip:'mobile/app/(tabs)/today.tsx'}, {label:'renders'}, {chip:'SlotSection (inline)'} ],
+            files: [
+              {path:'mobile/app/(tabs)/today.tsx', desc:"Home tab — today's breakfast/lunch/dinner as horizontal-scroll dish cards"}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'App logic',
+            tag: 'HOOK',
+            title: 'Reconcile today against any finalized weekly plan',
+            desc: 'Loads the locally-stored finalized weekly plan and checks whether a class was already picked for this slot today.',
+            codeFlow: [ {chip:'mobile/src/lib/weeklyPlanStore.ts'}, {label:'loadWeeklyPlan()'}, {label:'returns to'}, {chip:'mobile/app/(tabs)/today.tsx'} ],
+            files: [
+              {path:'mobile/src/lib/weeklyPlanStore.ts', desc:'Reads/writes the locally-stored finalized weekly class plan'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'App logic',
+            tag: 'API',
+            title: 'Fetch dish options for the slot',
+            desc: 'If a class was finalized for this slot, fetches that class\'s dishes; otherwise fetches top personalized picks.',
+            codeFlow: [ {chip:'mobile/app/(tabs)/today.tsx'}, {label:'calls'}, {chip:'mobile/src/api/plan.ts'}, {label:'fetchClassDishes / fetchSlotOptions'} ],
+            files: [
+              {path:'mobile/src/api/plan.ts', desc:'API client functions for fetching slot options and class-specific dishes'}
+            ],
+            api: {endpoint:'fetchSlotOptions / fetchClassDishes (existing plan API)', note:'Same real personalized/scored API calls used by the old daily-plan.tsx — no mock data, no scoring logic touched'},
+            db: null
+          },
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'Dish cards render in a horizontal scroll row',
+            desc: 'Each slot\'s dish options render as fixed-width cards in a sideways-scrolling row instead of a vertical list.',
+            codeFlow: [ {chip:'mobile/app/(tabs)/today.tsx'}, {label:'renders'}, {chip:'ScrollView horizontal + dish cards'} ],
+            files: [
+              {path:'mobile/app/(tabs)/today.tsx', desc:'Renders each PlanDish as a 180px-wide Pressable card in a horizontal ScrollView'}
+            ],
+            api: null,
+            db: null
+          },
+          {
+            layer: 'Phone',
+            tag: 'UI',
+            title: 'Week Plan tab finalizes 7-day classes, redirects to Home',
+            desc: 'Unchanged chip-picker UI; only the post-finalize redirect target changed, from the deleted /daily-plan to Home.',
+            codeFlow: [ {chip:'mobile/app/(tabs)/weekly-plan.tsx'}, {label:'onSuccess'}, {label:'router.replace("/")'} ],
+            files: [
+              {path:'mobile/app/(tabs)/weekly-plan.tsx', desc:'7-day class-picker; finalize mutation now redirects to Home ("/") instead of the retired /daily-plan'}
+            ],
+            api: null,
+            db: null
+          }
+        ]
+      }
+    ];
+    renderFeatureFlows('s62-flows', window.FEATURE_FLOWS_S62);
+    </script>
+
+  </div><!-- /page-s62 -->
 
   <!-- SESSIONS_INJECT -->
 

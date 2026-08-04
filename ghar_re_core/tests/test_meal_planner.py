@@ -124,3 +124,35 @@ def test_jain_household_surfaces_only_jain_dishes():
     cat = Catalogue()
     for d in MP.cold_start_top15(hh)["dishes"]:
         assert cat.get(d["name"]).jain_compatible == "Y"
+
+
+def test_cold_start_top15_varies_by_day_for_the_same_household():
+    """household_id alone is a FIXED seed for a fixed real user, so the exploration swap would
+    replay identically forever (the Founder-reported 'looks static across repeat views' gap).
+    variety_salt decorrelates the seed per day: same household + different day -> a genuinely
+    different top-15 is possible (not guaranteed for every household/day pair, since a narrow
+    theta can legitimately have too few eligible/diverse candidates to swap among — but at least
+    one of these two consecutive-day draws should differ for a normal household)."""
+    hh = _hh()
+    day1 = MP.cold_start_top15(hh, n=15, household_id="hh-42", variety_salt="2026-08-04")
+    day2 = MP.cold_start_top15(hh, n=15, household_id="hh-42", variety_salt="2026-08-05")
+    day1_again = MP.cold_start_top15(hh, n=15, household_id="hh-42", variety_salt="2026-08-04")
+    # same household + same day -> perfectly reproducible (not flaky/random per request)
+    assert [d["name"] for d in day1["dishes"]] == [d["name"] for d in day1_again["dishes"]]
+    # same household + different day -> at least a chance to differ (this household/theta does)
+    assert [d["name"] for d in day1["dishes"]] != [d["name"] for d in day2["dishes"]]
+
+
+def test_cold_start_top15_variety_never_changes_the_underlying_scores():
+    """Exploration only ever changes WHICH already-eligible, already-scored dish gets picked —
+    personalization (theta-derived ranking) itself must never degrade just because the day's
+    variety_salt differs. Every dish that appears on any day's list carries the exact same score
+    it would get with no exploration at all (household_id=None)."""
+    hh = _hh()
+    baseline = MP.cold_start_top15(hh, n=15)
+    baseline_scores = {d["name"]: d["score"] for d in baseline["dishes"]}
+    for salt in ("2026-08-04", "2026-08-05", "2026-08-06"):
+        varied = MP.cold_start_top15(hh, n=15, household_id="hh-42", variety_salt=salt)
+        for d in varied["dishes"]:
+            if d["name"] in baseline_scores:
+                assert d["score"] == baseline_scores[d["name"]]

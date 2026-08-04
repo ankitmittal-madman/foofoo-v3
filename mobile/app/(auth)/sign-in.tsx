@@ -4,9 +4,12 @@
  * signup-without-session case (email confirmation required) can be handled explicitly,
  * same as source; SessionContext's own onAuthStateChange listener still picks up the
  * resulting session automatically for the rest of the app. Post sign-up now routes to
- * /create-id and post sign-in to /recommendations — this repo's real screens, not
- * source's /plan (which was never built here) or /authed (a throwaway source screen,
- * not ported).
+ * /create-id and post sign-in to "/today" (the (tabs) group's Home tab) — this repo's real
+ * screens, not source's /plan (which was never built here) or /authed (a throwaway
+ * source screen, not ported). Home previously was /recommendations' plate-feed; the
+ * frontend restructuring retired that as the landing surface in favor of today's
+ * breakfast/lunch/dinner selection. Goes straight to "/today", not "/" — "/" is
+ * app/index.tsx's own auth/onboarding gate, which would just redirect here again.
  */
 import { useState } from "react";
 import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -74,7 +77,7 @@ export default function SignIn() {
           });
           return null;
         });
-        router.replace(status?.complete ? "/recommendations" : "/(onboarding)/consent");
+        router.replace(status?.complete ? "/today" : "/(onboarding)/consent");
       }
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : "Something went wrong. Please try again.");

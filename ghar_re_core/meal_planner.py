@@ -18,6 +18,7 @@ ranked by the same score. Class plan and dish list can never disagree.
 All functions take a raw household dict (fixtures.HOUSEHOLDS shape), derive θ once, and return
 plain JSON-serialisable dicts so the FastAPI layer can hand them straight back.
 """
+import datetime
 import random
 
 from ghar_re_core import scoring as S
@@ -162,7 +163,8 @@ def _theta_obj(household):
     return theta, objective
 
 
-def cold_start_top15(household, catalogue=None, n=15, weekday="Monday", household_id=None):
+def cold_start_top15(household, catalogue=None, n=15, weekday="Monday", household_id=None,
+                      variety_salt=None):
     """Surface 1 — the post-onboarding preference primer: the n (default 15) top-scoring, DIVERSE
     dishes across breakfast/lunch/dinner, for the user to like and seed their taste profile. Diverse
     = capped per meal class and per cuisine so it spans the plan, not one class 15 times.
@@ -170,12 +172,25 @@ def cold_start_top15(household, catalogue=None, n=15, weekday="Monday", househol
     `household_id`: when given, seeds a household-stable RNG so `_diversify` applies
     CONFIG.bandit_epsilon exploration (see its docstring) — two households with identical answers
     (same cohort, same theta) get varied top-n sets instead of always converging on the exact same
-    15 dishes, while a given household's own result stays stable call-to-call until its answers or
-    the catalogue actually change. Omitted (None) => no exploration, exact prior deterministic
-    behaviour (existing tests/fixtures that don't pass household_id are unaffected)."""
+    15 dishes. Omitted (None) => no exploration, exact prior deterministic behaviour (existing
+    tests/fixtures that don't pass household_id are unaffected).
+
+    `variety_salt`: mixed into the same seed alongside household_id so a GIVEN household's own
+    list also varies — e.g. a fresh top-15 each day the user revisits cold-start, instead of the
+    exact same list forever (the Founder-reported "doesn't feel dynamic" gap: seeding purely by
+    household_id made the swap pattern replay identically on every repeat view, since a real
+    household's id never changes). Defaults to today's UTC date (YYYY-MM-DD) when omitted, so
+    the default behaviour is "changes once a day," not "changes every request" — the underlying
+    ranking is theta/score-derived and untouched either way; only which already-eligible,
+    already-scored dish the exploration tie-break defers to shift. Pass an explicit value (e.g.
+    in tests) for a reproducible seed."""
     cat = catalogue or Catalogue()
     theta, objective = _theta_obj(household)
-    rng = random.Random(household_id) if household_id is not None else None
+    if household_id is None:
+        rng = None
+    else:
+        salt = variety_salt if variety_salt is not None else datetime.date.today().isoformat()
+        rng = random.Random(f"{household_id}:{salt}")
     # pool the best of each main slot, then diversify across the merged pool
     pool = {}
     for slot in MAIN_SLOTS:
