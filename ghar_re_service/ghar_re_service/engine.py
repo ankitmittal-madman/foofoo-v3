@@ -157,7 +157,11 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     # Deterministic lifecycle add-ons remain separate from the household's primary meal.  These
     # are food-role rules only; health-condition add-ons intentionally require clinical review.
     addon_classes = {
-        "infant": {"breakfast": "BF_INFANT_6M_SOFT", "lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
+        "infant": {
+            "breakfast": "BF_INFANT_6M_SOFT",
+            "lunch": "LD_CHILD_MILD_PLATE",
+            "dinner": "LD_CHILD_MILD_PLATE",
+        },
         "toddler": {"lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
         "school_child": {"lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
         "elder": {"lunch": "LD_ELDERLY_SOFT_DIGESTIVE", "dinner": "LD_ELDERLY_SOFT_DIGESTIVE"},
@@ -177,7 +181,14 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         if addon["options"]:
             view = addon["options"][0]
             media.attach_image(view)
-            addons.append({"member_index": index, "member_role": role, "class_code": class_code, "dish": view})
+            addons.append(
+                {
+                    "member_index": index,
+                    "member_role": role,
+                    "class_code": class_code,
+                    "dish": view,
+                }
+            )
     res["addons"] = addons
     return res
 
