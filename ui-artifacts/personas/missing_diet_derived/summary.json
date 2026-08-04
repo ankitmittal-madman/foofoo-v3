@@ -1,0 +1,12 @@
+{
+  "key": "missing_diet_derived",
+  "label": "Household missing q5_diet",
+  "ok": false,
+  "error": "page.goto: Target page, context or browser has been closed",
+  "steps": [
+    {
+      "label": "signed-up",
+      "screenshot": "001-signed-up.png"
+    }
+  ]
+}

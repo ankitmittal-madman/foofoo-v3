@@ -1,0 +1,24 @@
+{
+  "key": "empty_household_derived",
+  "label": "Empty household object",
+  "ok": false,
+  "error": "locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for getByTestId('onboarding-step2-continue')\n",
+  "steps": [
+    {
+      "label": "signed-up",
+      "screenshot": "001-signed-up.png"
+    },
+    {
+      "label": "consent-loaded",
+      "screenshot": "002-consent-loaded.png"
+    },
+    {
+      "label": "consent-continue",
+      "screenshot": "003-consent-continue.png"
+    },
+    {
+      "label": "step1-continue",
+      "screenshot": "004-step1-continue.png"
+    }
+  ]
+}

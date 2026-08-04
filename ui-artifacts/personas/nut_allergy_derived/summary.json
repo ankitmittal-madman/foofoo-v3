@@ -1,0 +1,48 @@
+{
+  "key": "nut_allergy_derived",
+  "label": "Peanut-allergic vegetarian",
+  "ok": false,
+  "error": "The \"path\" argument must be of type string. Received undefined",
+  "steps": [
+    {
+      "label": "signed-up",
+      "screenshot": "001-signed-up.png"
+    },
+    {
+      "label": "consent-loaded",
+      "screenshot": "002-consent-loaded.png"
+    },
+    {
+      "label": "consent-continue",
+      "screenshot": "003-consent-continue.png"
+    },
+    {
+      "label": "step1-household",
+      "screenshot": "004-step1-household.png"
+    },
+    {
+      "label": "step1-continue",
+      "screenshot": "005-step1-continue.png"
+    },
+    {
+      "label": "step2-state",
+      "screenshot": "006-step2-state.png"
+    },
+    {
+      "label": "step2-city",
+      "screenshot": "007-step2-city.png"
+    },
+    {
+      "label": "step2-continue",
+      "screenshot": "008-step2-continue.png"
+    },
+    {
+      "label": "step3-diet",
+      "screenshot": "009-step3-diet.png"
+    },
+    {
+      "label": "step3-continue",
+      "screenshot": "010-step3-continue.png"
+    }
+  ]
+}

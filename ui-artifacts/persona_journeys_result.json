@@ -1,0 +1,19 @@
+{
+  "status": "partial",
+  "url": "http://localhost:8081",
+  "total": 2,
+  "ok": 1,
+  "failed": 1,
+  "personas": [
+    {
+      "key": "single_professional_blr",
+      "ok": false,
+      "error": "ENOSPC: no space left on device, write"
+    },
+    {
+      "key": "joint_family_elders_delhi",
+      "ok": true,
+      "error": null
+    }
+  ]
+}

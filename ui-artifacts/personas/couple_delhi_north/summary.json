@@ -1,0 +1,73 @@
+{
+  "key": "couple_delhi_north",
+  "label": "Couple, Delhi (North)",
+  "ok": true,
+  "expect_status": 200,
+  "recommendations_status": 200,
+  "steps": [
+    {
+      "label": "signed-up",
+      "screenshot": "001-signed-up.png"
+    },
+    {
+      "label": "consent-loaded",
+      "screenshot": "002-consent-loaded.png"
+    },
+    {
+      "label": "consent-continue",
+      "screenshot": "003-consent-continue.png"
+    },
+    {
+      "label": "step1-household",
+      "screenshot": "004-step1-household.png"
+    },
+    {
+      "label": "step1-earners",
+      "screenshot": "005-step1-earners.png"
+    },
+    {
+      "label": "step1-continue",
+      "screenshot": "006-step1-continue.png"
+    },
+    {
+      "label": "step2-state",
+      "screenshot": "007-step2-state.png"
+    },
+    {
+      "label": "step2-city",
+      "screenshot": "008-step2-city.png"
+    },
+    {
+      "label": "step2-continue",
+      "screenshot": "009-step2-continue.png"
+    },
+    {
+      "label": "step3-diet",
+      "screenshot": "010-step3-diet.png"
+    },
+    {
+      "label": "step3-continue",
+      "screenshot": "011-step3-continue.png"
+    },
+    {
+      "label": "step4-continue",
+      "screenshot": "012-step4-continue.png"
+    },
+    {
+      "label": "step5-age",
+      "screenshot": "013-step5-age.png"
+    },
+    {
+      "label": "step5-filled",
+      "screenshot": "014-step5-filled.png"
+    },
+    {
+      "label": "step5-finish",
+      "screenshot": "015-step5-finish.png"
+    },
+    {
+      "label": "post-onboarding-landing",
+      "screenshot": "016-post-onboarding-landing.png"
+    }
+  ]
+}
