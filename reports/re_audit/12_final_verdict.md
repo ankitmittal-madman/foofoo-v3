@@ -16,7 +16,7 @@ file — every number below is carried forward from a cited report.
 | Database (schema hygiene/RLS/lifecycle) | **~85%** | report 07, 11 |
 | Seed Data (core catalogue vs alias/legacy) | **~99% catalogue / ~5% certified aliases** | report 06, 11 |
 | Research → executable config coverage | **~25%** | report 05 |
-| Production Readiness (deployment + spine's own pre-launch gates) | **~0-20%** — nothing deployed; 1 of 5 spine-named pre-launch gates fully met | report 11 |
+| Production Readiness (deployment + spine's own pre-launch gates) | **CORRECTED (2026-08-04): ~40-60%, not 0-20%.** Deployment is live and healthy (report 07 §6, report 11 §Deployment — this session's "nothing deployed" claim was stale). 3 of 5 spine-named gates now met (contract/CI, deployment, catalogue cutover); allergen hidden-derivative graph and full nutrition/PRIOR knowledge-population remain the real gaps. | report 07, 11 |
 
 **Documentation-only vs executable, overall**: a large fraction of spec generation 1
 (RE-DOC-01-05 — cohort matrix, MMR, 4-state model, Never/Not-Today decay) remains **documentation

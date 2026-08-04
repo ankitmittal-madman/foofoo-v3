@@ -63,7 +63,8 @@ before adding new features), **P1** (closes a real functional gap in the shipped
      Regression-tested (`test_vegan_diet_filter_rejects_dairy_accepts_known_vegan_dish`). **Not yet
      wired to onboarding UI/API** (`q5_diet` schema/mobile step-4 would need a `vegan` option added)
      — that's a separate, larger UI task, not done here.
-   - **Halal remains genuinely unimplemented, and deliberately not attempted this pass.** Unlike
+   - **Halal — POSTPONED (Founder decision, 2026-08-04), remains genuinely unimplemented and
+     deliberately not attempted this pass.** Unlike
      vegan (a food-composition question this repo already had the data for), halal is a
      certification/process question — zabiha slaughter method, cross-contamination, alcohol-derived
      extracts — that this codebase has no source data for and this audit has no religious/
@@ -88,15 +89,25 @@ before adding new features), **P1** (closes a real functional gap in the shipped
    resolved hero names via exact-match wiring — see `ghar_re_core/knowledge.py`
    `COMFORT_HERO_TO_DISH` — still far short of the 810-dish catalogue). Also still open: nothing is
    deployed to Fly.io (report 11), so this code-complete cutover has not yet served a real user.
-10. **Activate `s_pref` personal-history learning** once real feedback density clears the FD-11 gate
-    (`min_real_events: 10000`, `min_households: 500`, report 09 §3). The pipeline is built and
-    honestly gated — this is a matter of waiting for real usage volume, not further engineering, but
-    should be tracked as a concrete milestone rather than left silently inert indefinitely.
-11. **Ingredient substitution graph** (SP-F14) and **festival calendar boost** (report 03 dim 16) —
-    both explicitly tagged `OPEN`/`[later]` by the Core Spine itself; no urgency implied by any
-    canonical source.
-12. **Cosine-similarity/embedding cross-cuisine discovery** (SP-F6, report 03) — spec-only today; a
-    genuine v2 feature, not a v1 regression.
+10. **Activate `s_pref` personal-history learning — POSTPONED (Founder decision, 2026-08-04)**
+    until real feedback density clears the FD-11 gate (`min_real_events: 10000`,
+    `min_households: 500`, report 09 §3). The pipeline is built and honestly gated — this is a
+    matter of waiting for real usage volume, not further engineering, but should be tracked as a
+    concrete milestone rather than left silently inert indefinitely.
+11. **Ingredient substitution graph (SP-F14) — RESOLVED (2026-08-04).** `ghar_re_core/substitution.py`
+    + `data/dish_substitutions_v1.csv` — 13 curated (dish, dish, variant_type) pairs (veg_swap,
+    protein_swap), each verified against the real catalogue, tested. Deliberately scoped: a real
+    working dish-level substitution lookup, not the general multi-hop ingredient graph SP-F14
+    originally envisioned — honestly labeled as 13 pairs, not claimed as exhaustive.
+    **Festival calendar boost — POSTPONED (Founder decision, 2026-08-04).** No field anywhere;
+    explicitly tagged `[later]` by the Core Spine itself; no urgency implied by any canonical source.
+12. **Cosine-similarity/embedding cross-cuisine discovery (SP-F6) — RESOLVED (2026-08-04).**
+    `ghar_re_core/similarity.py` — real IDF-weighted cosine similarity over ingredient vectors
+    (the spine's own `delta_ING = 1 - cosine(...)` formula, previously only a proxy in
+    `pairing.same_base()`), plus `cross_cuisine_similar()` for discovery. Tested against the real
+    catalogue (e.g. Butter Chicken ↔ Chicken Changezi, 0.87 similarity, different cuisine groups).
+    Does not touch the pairing hard-gate proxy — new discovery feature, zero scoring-path/
+    golden-master impact.
 13. **RESOLVED (2026-08-04) — see FD-19.** The spec-generation-1 → generation-2 pivot (BASE×GAIN_Q15,
     epsilon-greedy exploration, `lifecycle_stage` cold-start ramping replacing MMR/4-state-model/
     Never-Not-Today-decay) is now Founder-ratified as the intended design, closing the governance

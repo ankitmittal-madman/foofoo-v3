@@ -23,7 +23,7 @@ exact ratio. Where confidence is low, it is stated as such rather than smoothed 
 | Seed Data — core ICD-1 catalogue | **~99-100%** | report 06 §1 — production-scale, ETL'd, checksummed |
 | Seed Data — dish-ontology aliases | **786 rows committed / 37 rows (4.7%) certified** | report 06 §4 |
 | Synergies (cross-module interactions) | **6/9 real, 1/9 partial, 2/9 not built** — ~72% weighted | report 08 |
-| Deployment / production reachability | **0% — nothing is deployed** | RE-DOC-13 Executive Summary, unchanged by this audit (out of scope, no infra access) |
+| Deployment / production reachability | **CORRECTED (2026-08-04): deployed and healthy, not 0%.** Live-verified this session — `https://ghar-re.fly.dev/healthz`/`/readyz` both healthy, `/v1/meta` responding. The "0%" claim was stale (this audit ran without live infra access and trusted an out-of-date executive summary). **Still genuinely open**: the live instance's `bundle_version` predates this session's content additions — see §Deployment below for the 3-command redeploy needed to ship them. | Live curl this session; `ghar_re_service/README.md` §Deployment, `ghar_re_service/fly.toml` |
 
 ## What "production readiness" means given the two-generation history
 
@@ -46,13 +46,32 @@ list:
 |---|---|
 | Allergen hidden-derivative folding (SP-F13) | **Not met** — schema-and-data both absent post schema-drop |
 | Jain filter correctness against full catalogue | **Code correct; full-catalogue data population unverified** |
-| Real catalogue cutover (dishes, sig scores, PRIOR table, nutrition) | **Not met** — golden sample still in production scoring path |
+| Real catalogue cutover (dishes, sig scores, PRIOR table, nutrition) | **Code/cutover met** (report 07 §6); knowledge-layer completeness partial — sig scores 113/810 curated, PRIOR table 18/18 zone×slot cells (no season dim yet), nutrition macros 50/810 |
 | Contract/CI gates (schema validation, golden-master regression) | **Met** — confirmed live in CI per RE-DOC-12, re-confirmed by 93/93 passing tests this session |
-| Deployment (Fly.io live, HMAC verified in production) | **Not met** — nothing deployed |
+| Deployment (Fly.io live, HMAC verified in production) | **CORRECTED (2026-08-04): Met.** Live-verified `/healthz`/`/readyz`/`/v1/meta` this session. See §Deployment below for the redeploy needed to ship this session's content additions. |
 
-**Net: the engine is well-built for what it claims to be (a v1 rule-based recommendation core on a
-golden sample), but is not yet safe or complete to serve the real, full catalogue to real users in
-production** — the gating items above are the spine's own words, not this audit's invention.
+**Net (revised 2026-08-04): the engine is well-built, deployed, and healthy — the remaining gap is
+knowledge-layer completeness (allergen derivative graph, full-catalogue sig scores/nutrition), not
+deployment or code.** The gating items above are the spine's own words, not this audit's invention.
+
+## Deployment — how to ship this session's content changes (2026-08-04)
+
+The service is already deployed and running; nothing here is a first-time deploy. To push this
+session's catalogue/knowledge additions (sig-score batch 2, dish_macro nutrition, expanded
+comfort-heroes, the substitution graph, cosine-similarity module) to the live instance, in order:
+
+1. **Regenerate the bundle** (already done and committed this session, but if re-running):
+   `cd /path/to/repo && PYTHONPATH=.:ghar_re_service python3 -m ghar_re_service.scripts.export_bundle`
+2. **Build and deploy the image** (from the repo root, per `ghar_re_service/README.md` §Deployment):
+   `fly deploy --config ghar_re_service/fly.toml --dockerfile ghar_re_service/Dockerfile .`
+   (Requires `fly` CLI installed and authenticated against the `ghar-re` Fly.io app — this is the
+   one step that needs Founder/ops credentials; it cannot be run from this session.)
+3. **Verify the rollout**: `fly status --app ghar-re` (expect 1 machine, state "started"), then
+   `curl https://ghar-re.fly.dev/v1/meta` and confirm `bundle_version` changed from
+   `sha256:a9da8f4f0f1f57a4` (the version live as of this session) to a new hash.
+
+That's the whole redeploy — no schema migration, no secret rotation, no downtime (Fly's rolling
+strategy in `fly.toml` brings up the new machine and waits for `/readyz` before retiring the old one).
 
 ## Critical Self-Review
 

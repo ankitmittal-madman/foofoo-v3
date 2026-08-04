@@ -138,10 +138,15 @@ the 39-dish `ghar_re_core.fixtures` golden sample, with the real 810-dish catalo
 of `ghar_re_service` loads the real 810-dish catalogue, not the golden sample. The golden sample
 remains in use only for `ghar_re_core`'s own test suite (`test_pipeline.py`, `test_golden_master.py`),
 which construct their own `Catalogue(F.DISHES)` directly, bypassing `resolve_providers()` by design
-(that's what makes them a stable regression lock). **What is genuinely still true**: report 11's
-separate "Deployment: 0%" finding stands — nothing is deployed to Fly.io, so this code-complete
-cutover has not yet served a single real user. "Cutover done in code" and "deployed to production"
-are two different facts; only the first is resolved here.
+(that's what makes them a stable regression lock).
+
+**Correction (2026-08-04, item 9 of this session's closeout): report 11's "Deployment: 0%" finding
+is also stale.** Live-verified this session: `https://ghar-re.fly.dev/healthz` → `{"status":"alive"}`,
+`/readyz` → `{"status":"ready"}`, `/v1/meta` → responds with a real `bundle_version`. The service IS
+deployed and healthy on Fly.io. What's still true: `/v1/meta`'s `bundle_version` reflects a bundle
+built before this session's catalogue/knowledge additions (sig-scores batch 2, dish_macro,
+comfort-hero expansion, substitution graph, cosine similarity) — a `fly deploy` is needed to ship
+those, not a first-time deployment. See report 11 §Deployment and the redeploy steps recorded there.
 
 ## Critical Self-Review
 
