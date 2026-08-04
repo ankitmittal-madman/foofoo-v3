@@ -77,7 +77,11 @@ jobs:
           # Build remotely on Vercel. Local `vercel build` depends on runner shell discovery and
           # currently fails before Expo starts (`spawn sh ENOENT`), while the same source exports
           # successfully through Expo and Vercel's hosted build environment.
-          url=$(vercel deploy --token="$VERCEL_TOKEN")
+          # Preview URLs are intentionally protected by Vercel Authentication. Deploy main to
+          # the project's existing public production test domain so Playwright reaches FooFoo,
+          # not Vercel's login page.
+          vercel deploy --prod --token="$VERCEL_TOKEN"
+          url="https://foofoo-v3.vercel.app"
           echo "Deployed preview: $url"
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "Waiting for the deployment to become reachable..."
