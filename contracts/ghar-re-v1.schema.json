@@ -48,7 +48,7 @@
         "q2_working_professionals": { "type": "integer", "minimum": 0 },
         "q3_home_state": { "type": "string" },
         "q4_current_city": { "type": "string" },
-        "q5_diet": { "type": "string", "enum": ["veg", "eggetarian", "non_veg"] },
+        "q5_diet": { "type": "string", "enum": ["veg", "eggetarian", "non_veg", "vegan"] },
         "q6_nonveg_types": { "type": "array", "items": { "type": "string" } },
         "q7_veg_days": { "type": "array", "items": { "type": "string" } },
         "q8_is_jain": { "type": "boolean" },

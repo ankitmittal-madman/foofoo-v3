@@ -19,12 +19,14 @@ import {
 import type { AuthClaims, Logger } from "../_shared/mod.ts";
 import { makeRecommendationsHandler, type RecommendationDeps } from "../recommendations/handler.ts";
 import { callRecommendationEngine, type FetchLike } from "../recommendations/re-client.ts";
+import { validateRequest } from "../recommendations/contract.ts";
 import {
   allergenTokens,
   buildRequest,
   composeHouseholdRaw,
   type HouseholdRaw,
   memberRole,
+  normalizeProfileDiet,
   toMemberAge,
 } from "../recommendations/compose.ts";
 
@@ -514,6 +516,33 @@ Deno.test("composeHouseholdRaw joins the three live sources into one contract pa
   assertEquals(hh.q15_objective, "healthy_living"); // from household_answers
   assertEquals(hh.q12_member_ages.length, 2); // from household_members
   assertEquals(hh.cook_capability, "beginner"); // from profiles
+});
+
+Deno.test("profile diet values are normalized into contract-safe Q5 plus independent Jain state", () => {
+  assertEquals(normalizeProfileDiet("jain"), "veg");
+  assertEquals(normalizeProfileDiet("egg"), "eggetarian");
+  assertEquals(normalizeProfileDiet("vegan"), "vegan");
+  assertEquals(normalizeProfileDiet("non_veg"), "non_veg");
+
+  const hh = composeHouseholdRaw(
+    {
+      id: USER_ID,
+      home_state: "GJ",
+      current_city: "Ahmedabad",
+      diet_type: "jain",
+      religious_pref: "all",
+      allergen_flags: 0,
+      cook_capability: null,
+    },
+    null,
+    [],
+  );
+  assertEquals(hh.q5_diet, "veg");
+  assertEquals(hh.q8_is_jain, true);
+  assertEquals(
+    validateRequest(buildRequest(hh, undefined, "22222222-2222-4222-8222-222222222222")).valid,
+    true,
+  );
 });
 
 Deno.test("composeHouseholdRaw serves neutral defaults when onboarding is incomplete", () => {

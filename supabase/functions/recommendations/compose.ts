@@ -241,6 +241,19 @@ function normalizeStateCode(value: string | null): string | null {
   return STATE_CODE_TO_NAME[value.trim().toUpperCase()] ?? value;
 }
 
+/**
+ * Translate the wider profile diet vocabulary into the RE's Q5 vocabulary.
+ * Jain observance is carried independently by q8_is_jain, while the engine calls the database's
+ * `egg` choice `eggetarian`. Vegan remains distinct because the engine has a hard vegan filter.
+ */
+export function normalizeProfileDiet(value: string | null): string {
+  if (value === "egg") return "eggetarian";
+  if (value === "jain") return "veg";
+  if (value === "vegan") return "vegan";
+  if (value === "non_veg") return "non_veg";
+  return "veg";
+}
+
 /** Assemble HouseholdRaw from the three live row sets. Exported for direct unit testing. */
 export function composeHouseholdRaw(
   profile: ProfileRow,
@@ -255,7 +268,7 @@ export function composeHouseholdRaw(
     q8_is_jain: profile.religious_pref === "jain" || profile.diet_type === "jain",
     q3_home_state: normalizeStateCode(profile.home_state) ?? NEW_HOUSEHOLD.q3_home_state,
     q4_current_city: profile.current_city ?? NEW_HOUSEHOLD.q4_current_city,
-    q5_diet: profile.diet_type ?? NEW_HOUSEHOLD.q5_diet,
+    q5_diet: normalizeProfileDiet(profile.diet_type),
     q9_allergies: allergenTokens(profile.allergen_flags ?? 0),
     q1_household_type: a.q1_household_type ?? NEW_HOUSEHOLD_ANSWER_DEFAULTS.q1_household_type,
     q2_working_professionals: a.q2_working_professionals ??
