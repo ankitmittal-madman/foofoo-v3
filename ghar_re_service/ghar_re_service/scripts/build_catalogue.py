@@ -130,6 +130,15 @@ TERM_SYNONYMS_CSV = "term_synonyms_v2.csv"
 # data/source/README.md's own config table entry `../sig_scores_v1.csv` resolved relative to
 # that README's own directory. NOT inside data/source/ like every other file this module reads.
 SIG_SCORES_CSV = "sig_scores_v1.csv"
+# Lives at data/dish_macro_v1.csv — same "one level above source_dir" placement as
+# SIG_SCORES_CSV above, for the same reason (authored separately from dishes.xlsx, keyed by
+# dish_name). Added 2026-08-04 (Founder-directed backlog closeout, item 4): 50 dishes' real
+# nutrition macros (protein_g/fibre_g/fat_g/carbs_g/sugar_g/sodium_mg), AI-researched from
+# established Indian food-composition knowledge — same AI_RESEARCHED provenance standard as
+# the sig-score curation batches, not a lab-measured or live-cited source. Covers 50/810 dishes;
+# every other dish's macro fields remain None (an honest "not yet researched" state, never a
+# fabricated 0 or guessed average).
+DISH_MACRO_CSV = "dish_macro_v1.csv"
 
 # Ingredient categories (ingredients_v5.csv `category` column) treated as "the point of the dish"
 # for the is_main approximation. See module docstring's known blind spot re: dairy/paneer.
@@ -251,6 +260,28 @@ def load_sig_scores(source_dir: str) -> dict[str, str]:
     return out
 
 
+def load_dish_macro(source_dir: str) -> dict[str, dict]:
+    """normalized dish_name -> {protein_g, fibre_g, fat_g, carbs_g, sugar_g, sodium_mg}, from
+    ../dish_macro_v1.csv (data/dish_macro_v1.csv — one level above source_dir, same placement
+    convention as SIG_SCORES_CSV/load_sig_scores() above). Returns {} entries are simply absent
+    from the dict — callers must treat a missing key as "not yet researched", never fabricate a
+    default. All values are ints in the source CSV; cast to int here so build_report()/JSON
+    serialization gets a plain number, not a string."""
+    path = os.path.join(os.path.dirname(source_dir), DISH_MACRO_CSV)
+    out: dict[str, dict] = {}
+    with open(path, newline="", encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            out[_normalize_name(row["dish_name"])] = {
+                "protein_g": int(row["protein_g"]),
+                "fibre_g": int(row["fibre_g"]),
+                "fat_g": int(row["fat_g"]),
+                "carbs_g": int(row["carbs_g"]),
+                "sugar_g": int(row["sugar_g"]),
+                "sodium_mg": int(row["sodium_mg"]),
+            }
+    return out
+
+
 def resolve_ingredient(
     token: str, ing_map: dict[str, dict], alias_map: dict[str, str]
 ) -> tuple[str, bool]:
@@ -369,6 +400,7 @@ def transform_dish_row(
     cuisine_map: dict[str, dict],
     dish_synonyms: dict[str, list[str]],
     sig_scores_map: dict[str, str],
+    dish_macro_map: dict[str, dict],
     report: BuildReport,
 ) -> dict:
     name = row["Dish Name"]
@@ -428,6 +460,11 @@ def transform_dish_row(
     prep = row["Prep Mins"] or 0
     cook = row["Cooks Mins"] or 0
 
+    # Researched macro fields (2026-08-04, 50/810 dishes) — see load_dish_macro(). Absent for
+    # the other 760 dishes; those keep the None defaults below, an honest "not yet researched"
+    # state rather than a fabricated average.
+    macro_extra = dish_macro_map.get(_normalize_name(name), {})
+
     return {
         "name": name,
         "cuisine": cuisine,
@@ -470,12 +507,12 @@ def transform_dish_row(
         "ingredients": ingredients,
         "macro": {
             "calories": calories,
-            "protein_g": None,
-            "fibre_g": None,
-            "fat_g": None,
-            "carbs_g": None,
-            "sugar_g": None,
-            "sodium_mg": None,
+            "protein_g": macro_extra.get("protein_g"),
+            "fibre_g": macro_extra.get("fibre_g"),
+            "fat_g": macro_extra.get("fat_g"),
+            "carbs_g": macro_extra.get("carbs_g"),
+            "sugar_g": macro_extra.get("sugar_g"),
+            "sodium_mg": macro_extra.get("sodium_mg"),
         },
     }
 

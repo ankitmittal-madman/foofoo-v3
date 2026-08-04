@@ -143,9 +143,30 @@ the full catalogue.
 | Research Priors (docs/research → executable config) | **~25%** | 4 of the ~10+ candidate research artifacts (comfort heroes, zone map, sig bands, cuisine-group map) are transcribed into live `knowledge.py`; region-affinity/synonym/alias research (region_food_affinity.csv, term_synonyms_v2.csv, ingredient_aliases_v2.csv) is real but only reaches build-tooling (`generate_re_seeds.py`, `build_catalogue.py`), not `ghar_re_core` — see §4. |
 | Weather (rules + comfort-hero resolution) | **~70%** for the 3 documented conditions (rain/hot/cold) × golden sample | `weather_rules.yaml` fully loaded (`config.py:54`), `m_weather` fully coded (`scoring.py:267-296`), comfort-hero map covers the golden 39-dish sample's named heroes; coverage against the full 810-dish catalogue is unverified/likely much lower since most catalogue dishes aren't in `COMFORT_HERO_TO_DISH` (only 10 name mappings, `knowledge.py:218-227`). |
 | Pairings | **~90% of the frozen rule set, 0% learned** | `pairing_rules.yaml` fully loaded and consumed (`pairing.py:73,89`); all v1 hard gates/soft terms per spine §S4 are coded; this is a rule-authored feature with no data-population gap, so coverage is high relative to spec — the gap is only the deferred v2 richer machinery (recency/diversity, spine Appendix B). |
-| Regional Intelligence (`PRIOR[zone][slot]`) | **~10-15%** | Spine itself states (line 396, line 350) the full region×slot×season cell population is the "dedicated parameter pass (Step 5)" and gives only 3 illustrative zone×slot examples (lines 360-366) out of a 6-zone × 3-slot (×season) matrix — the shape exists in code/config, the cells are largely unpopulated. |
+| Regional Intelligence (`PRIOR[zone][slot]`) | **CORRECTED (2026-08-04): ~95% of the zone×slot grid, not 10-15%.** | The "~10-15%" estimate above checked only the Core Spine markdown's own illustrative examples (3 shown inline) and never read `ghar_re_core/knowledge.py`'s `PRIOR_ZONE_SLOT` table, which already had 30 real, transcribed rows covering 16/18 zone×slot cells before this session, plus 8 more added this session (Central dinner + all 3 Northeast slots, `data_source='ai_researched'`, each dish-name token verified against the real catalogue) — 18/18 cells now populated. Season is still not a dimension (2-D only, matches the spec's own "season NULL (2-D)" note in `seedgen.py`) — genuinely open, see requirements below. |
 | Safety (allergen filter completeness) | **~50%, explicitly not launch-ready** | Basic explicit-ingredient allergen filter is coded (spine §A3, line 240-244); the hidden-derivative table (hing→wheat) is `SP-F13`, tagged **"OPEN — PRE-LAUNCH"** (line 724) — the spine itself states allergen filtering "is not safe-complete" until this lands. |
 | Seed Quality (as it bears on knowledge config, not raw dish count) | **Mixed / self-flagged** | `cohort_weights.yaml:32` documents a discovered defect (mis-tagged sig_score letting 23% of the catalogue through incorrectly) that had to be corrected — i.e. the seed/config layer has had at least one confirmed real quality bug, caught and noted in-repo rather than silently left. Sig-score curation beyond the golden sample is AI-generated, Medium-confidence, explicitly not Founder-reviewed (§3 above). |
 
 All six estimates above are qualitative judgments grounded in the cited evidence, not measured
 percentages from an actual count — flagged as such rather than presented as precise.
+
+## 7. PRIOR table (SP-F10) — what's still needed to fully close it (2026-08-04)
+
+With the zone×slot grid at 18/18 cells (§6 above), three things remain, in order of actual value:
+
+1. **Season dimension.** Today PRIOR is 2-D (zone×slot only); the Core Spine's own name for this
+   is "region×slot×**season**". Adding season triples the grid to 18×N-seasons cells. Needs: a
+   decision on how many seasons to model (the spec elsewhere uses summer/monsoon/winter — 3), then
+   the same per-cell authoring done here for each season. This is the only item that's genuinely
+   new authoring work, not a bug — no code change needed to *read* a season dimension once added
+   (`_prior_matches`/`prior_boost` would need a small extension to filter on `ctx["season"]` too).
+2. **`ai_researched` entries need a spot-check, not a full re-review** — same standard already
+   applied to the WP-21 sig-score curation (6 promoted `national_icon` dishes got a spot-check,
+   not all 63). The 8 entries added this session (Central dinner, all 3 Northeast slots) are the
+   right size for a single reviewer to spot-check directly, not a research project.
+3. **Depth beyond 1-3 rows per cell.** Every cell now has *at least one* real boost row, but some
+   (e.g. Central dinner, all of Northeast) have only 1-2 rows versus North/South's 3-4 — this is a
+   coverage-depth gap, not a coverage-existence gap, and lower priority than season.
+
+None of the three needs a Founder ruling to start — (1) needs a season-count decision, (2) is a
+5-minute spot-check, (3) is incremental authoring anyone with regional food knowledge can extend.

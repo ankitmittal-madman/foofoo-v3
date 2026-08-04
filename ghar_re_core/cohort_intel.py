@@ -205,11 +205,21 @@ _AFF_CACHE_MAX = 512
 
 
 def _aff_signature(theta, ctx):
-    """Hashable signature of everything class_affinity() actually depends on."""
+    """Hashable signature of everything class_affinity() actually depends on. Must include every
+    theta field theta_features()/_time_pressure_band() read (lifecycle_stage, the numeric
+    time_pressure banding) in addition to time_route — two households can share home_state/
+    local_state/city_tier/household_type/time_route/diet/is_jain while differing in lifecycle
+    stage (e.g. a school-child household vs a weaning household), which changes theta_features'
+    main_cohort_id/lifecycle_stage/time_pressure inputs and therefore the affinity result; omitting
+    them here previously let such households collide on the same cache entry (bug found via
+    test_calibration.py + test_golden_master.py order-dependent flakiness — same signature, two
+    different theta's affinity silently reused)."""
     return (
         theta["home_state"]["value"], theta["local_state"]["value"], theta["city_tier"]["value"],
         theta["household_type"]["value"], theta["time_route"]["value"],
-        theta["diet"]["value"], theta["is_jain"]["value"], _partition_key(ctx),
+        theta["diet"]["value"], theta["is_jain"]["value"],
+        theta.get("lifecycle_stage", {}).get("value"), _time_pressure_band(theta),
+        _partition_key(ctx),
     )
 
 

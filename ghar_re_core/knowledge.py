@@ -334,7 +334,7 @@ PRIOR_ZONE_SLOT = [
     ("East",    "lunch", "dish_name", "macher jhol", 0.5, ["Daily"], "real"),
     ("East",    "lunch", "dish_name", "dal",    0.3, ["Daily"], "real"),
     ("Central", "lunch", "structure", "roti+dal+sabzi", 0.4, ["Daily"], "real"),
-    ("Central", "lunch", "dish_name", "dal-bafla", 0.3, ["Daily"], "real"),
+    ("Central", "lunch", "dish_name", "daal bafla", 0.3, ["Daily"], "real"),
     # ---- Dinner ----
     ("North",   "dinner", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "real"),
     ("North",   "dinner", "dish_name", "khichdi", 0.2, ["Comfort","Recovery","Weather"], "real"),
@@ -343,6 +343,23 @@ PRIOR_ZONE_SLOT = [
     ("West",    "dinner", "structure", "roti+sabzi", 0.4, ["Daily"], "real"),
     ("West",    "dinner", "dish_name", "khichdi", 0.2, ["Comfort","Recovery"], "real"),
     ("East",    "dinner", "dish_name", "jhol",    0.4, ["Daily"], "real"),
+    # ---- Added 2026-08-04 (reports/re_audit/05 §1 SP-F10, Founder-directed closure) ----
+    # Two real gaps confirmed by direct coverage check: Central had zero dinner rows despite having
+    # breakfast/lunch rows, and Northeast (zone "NE" in ZONE_MAP) had NO rows at all in any slot —
+    # both are now populated, sourced from established regional food-culture knowledge (not
+    # live-cited web sources), same epistemic standing/labeling as the WP-21 sig-score curation
+    # pass (data_source='ai_researched' — deliberately distinct from 'real'/verbatim-KB-transcribed
+    # and 'stub'/KB's-own-flagged-for-refinement, so provenance stays honest). Every dish_name token
+    # below is confirmed present in the real 810-dish catalogue bundle before being added.
+    ("Central", "dinner", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "ai_researched"),
+    ("Central", "dinner", "dish_name", "daal bafla", 0.2, ["Daily","Comfort"], "ai_researched"),
+    # NOTE: "assamese" cuisine maps to zone East (CUISINE_GROUP_MAP), not Northeast — only
+    # naga/manipuri/mizo/arunachali/sikkimese/meghalayan map to zone Northeast. Every dish_name
+    # token below is drawn only from those six cuisines, confirmed present in the real catalogue.
+    ("Northeast", "breakfast", "dish_name", "sel roti", 0.3, ["Daily"], "ai_researched"),
+    ("Northeast", "lunch",     "dish_name", "naga fish curry", 0.3, ["Daily"], "ai_researched"),
+    ("Northeast", "dinner",    "dish_name", "smoked pork with bamboo shoot", 0.3, ["Daily","Comfort"], "ai_researched"),
+    ("Northeast", "dinner",    "dish_name", "jadoh", 0.2, ["Daily"], "ai_researched"),
 ]
 
 # ---------------------------------------------------------------------------
