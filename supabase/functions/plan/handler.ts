@@ -22,6 +22,7 @@ import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 
 import { loadHouseholdRaw } from "../recommendations/compose.ts";
+import { recordRecommendationEvent } from "../recommendations/events.ts";
 import { callRecommendationEngine } from "../recommendations/re-client.ts";
 
 const SERVICE_NAME = "plan";
@@ -77,6 +78,8 @@ export function makePlanHandler(): Handler {
     for (const k of ["slot", "weekday", "class_code", "count", "dish_name", "top_classes"]) {
       if (body[k] !== undefined) payload[k] = body[k];
     }
+    let resolvedHouseholdId: string | undefined;
+    let stubbedHousehold = false;
     if (spec.needsHousehold) {
       const { household, householdId: hid, stubbed } = await loadHouseholdRaw(ctx, householdId);
       payload.household = household;
@@ -85,6 +88,8 @@ export function makePlanHandler(): Handler {
       // answers) don't always converge on the exact same top-n dishes. Harmless for the other
       // surfaces — they don't read household_id from the payload.
       payload.household_id = hid;
+      resolvedHouseholdId = hid;
+      stubbedHousehold = stubbed;
       log.info("plan.composed", { household_id: hid, stubbed });
     }
 
@@ -96,8 +101,35 @@ export function makePlanHandler(): Handler {
 
     if (result.ok) {
       log.info("plan.re_call_done", { latency_ms: latencyMs });
-      // Pass the RE body through as-is (RE-DOC-11 §6), additively stamping the trace id.
-      return jsonContract(result.body, ctx.traceId, 200);
+      // cold_start only: write a recommendation_events row so POST /v1/feedback (which resolves
+      // request_id -> recommendation_events, see feedback/events.ts) has something to resolve
+      // against — previously cold-start "likes" could never be recorded at all, since this surface
+      // never wrote a row here. Best-effort (recordRecommendationEvent never throws/never blocks
+      // the response, same as recommendations/handler.ts's own call site); skipped for a stubbed
+      // (no-profile-yet) household, same guard recordRecommendationEvent already applies itself.
+      if (surface === "cold_start" && resolvedHouseholdId) {
+        const dishes = (result.body as Record<string, unknown>).dishes;
+        const dishCount = Array.isArray(dishes) ? dishes.length : 0;
+        await recordRecommendationEvent(ctx, {
+          requestId,
+          householdId: resolvedHouseholdId,
+          outcome: "success",
+          plateCount: dishCount,
+          reServed: true,
+          plates: dishes,
+          latencyMs,
+          stubbed: stubbedHousehold,
+        });
+      }
+      // Pass the RE body through as-is (RE-DOC-11 §6), additively stamping the trace id AND
+      // request_id — unlike /v1/recommendations (engine.py's run() echoes request_id itself),
+      // none of the WP-18 planning surfaces (meal_planner.py) take or return request_id, so the
+      // client would otherwise have no way to reference this call in a later POST /v1/feedback
+      // (feedback/events.ts resolves by request_id + profile_id against recommendation_events —
+      // see the cold_start write above). Stamping the SAME requestId used for that write, not
+      // ctx.traceId, guarantees they always match even if a caller ever supplies its own
+      // request_id in the body.
+      return jsonContract({ ...result.body, request_id: requestId }, ctx.traceId, 200);
     }
 
     // Planning surfaces have no fallback plate (unlike recommendations) — surface a clean error the

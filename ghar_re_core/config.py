@@ -238,6 +238,24 @@ class Config:
         `enabled: true` without an explicit weight decision still contributes exactly 0.0."""
         return (self.pref or {}).get("w_pref", 0.0)
 
+    # --- training_readiness (pref_model.yaml <- the density gate WP-14 left unset) ---
+    @property
+    def pref_training_min_events(self):
+        """Minimum real, non-ambiguous labeled feedback rows (fleet-wide) required before
+        ghar_re_core.training.train_pref_model will fit anything — see
+        ghar_re_core.training.dataset.check_training_readiness. CODE-LEVEL SAFETY DEFAULT is a
+        never-satisfiable sentinel if pref_model.yaml or this key is missing: an unset threshold
+        must block training, not silently permit it (same fail-closed direction as every other
+        code-level safety default in this file — never guessed permissive)."""
+        return (self.pref or {}).get("training_readiness", {}).get("min_real_events", 10**9)
+
+    @property
+    def pref_training_min_households(self):
+        """Minimum distinct households contributing to the labeled export required before
+        training — see check_training_readiness. Same fail-closed code-level safety default
+        (a never-satisfiable sentinel) as pref_training_min_events if missing."""
+        return (self.pref or {}).get("training_readiness", {}).get("min_households", 10**9)
+
     # --- community priors (community_priors.csv <- KB §C1) ---
     # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a
     # file themselves (RE-DOC-11 §1/§2). Keyed by state -> {state, zone, diet_lean, cadence}.

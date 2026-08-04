@@ -15,6 +15,7 @@ from ghar_re_core.catalogue import Catalogue
 from ghar_re_core.training.dataset import (
     InsufficientDataError,
     build_labeled_dataset,
+    check_training_readiness,
     guard_sufficient_data,
 )
 from ghar_re_core.training.train_pref_model import train
@@ -88,6 +89,42 @@ def test_guard_refuses_on_single_class():
         guard_sufficient_data(labeled)
 
 
+def test_readiness_gate_refuses_below_min_events():
+    """check_training_readiness (item #4's density gate) is separate from and stricter than
+    guard_sufficient_data — enough rows/both classes to structurally fit is not the same as
+    enough rows to trust the fit."""
+    rows = _rows((["accept", "like"] * 3) + (["dislike"] * 3))  # 12 rows, both classes present
+    labeled = build_labeled_dataset(iter(rows))
+    guard_sufficient_data(labeled)  # passes — both classes present
+    with pytest.raises(InsufficientDataError, match="min_real_events"):
+        check_training_readiness(labeled, min_events=10000, min_households=1)
+
+
+def test_readiness_gate_refuses_below_min_households():
+    rows = _rows((["accept", "like"] * 3) + (["dislike"] * 3))
+    labeled_dicts = [dict(r, household_id="only-one-household") for r in rows]
+    labeled = build_labeled_dataset(iter(labeled_dicts))
+    with pytest.raises(InsufficientDataError, match="min_households"):
+        check_training_readiness(labeled, min_events=1, min_households=500)
+
+
+def test_readiness_gate_skips_household_check_when_export_carries_no_household_id():
+    """An export shape with no household_id anywhere is a data-shape gap, not itself evidence of
+    low household diversity — only min_events gates in that case (see the function's docstring)."""
+    rows = _rows((["accept", "like"] * 3) + (["dislike"] * 3))
+    labeled = build_labeled_dataset(iter(rows))
+    assert all(r.household_id is None for r in labeled)
+    check_training_readiness(labeled, min_events=1, min_households=500)  # does not raise
+
+
+def test_readiness_gate_passes_when_both_thresholds_met():
+    base_rows = _rows((["accept", "like"] * 3) + (["dislike"] * 3))  # 9 rows
+    rows = [dict(r, household_id=f"hh-{i}") for i, r in enumerate(base_rows)]
+    labeled = build_labeled_dataset(iter(rows))
+    assert len(labeled) == 9
+    check_training_readiness(labeled, min_events=9, min_households=9)  # does not raise
+
+
 def test_train_refuses_and_writes_nothing_on_insufficient_data(tmp_path):
     export_path = tmp_path / "export.jsonl"
     export_path.write_text("\n".join(json.dumps(r) for r in _rows(["accept", "like"])))
@@ -126,7 +163,11 @@ def test_train_end_to_end_on_fixture_dataset_produces_loadable_artifact(tmp_path
     out_path = tmp_path / "artifact.joblib"
     eval_out_path = tmp_path / "eval.json"
 
-    report = train(str(export_path), str(out_path), str(eval_out_path))
+    # skip_readiness_gate=True: this is a deliberately small fixture proving the PIPELINE works,
+    # not a real production-scale export — check_training_readiness's density gate (pref_model.yaml
+    # training_readiness) is exactly what should (and does, see test below) block a fixture this
+    # small in the default/production path.
+    report = train(str(export_path), str(out_path), str(eval_out_path), skip_readiness_gate=True)
 
     assert out_path.exists()
     assert eval_out_path.exists()
@@ -140,6 +181,22 @@ def test_train_end_to_end_on_fixture_dataset_produces_loadable_artifact(tmp_path
     x = artifact["vectorizer"].transform([rows and _fixture_features()])
     proba = artifact["model"].predict_proba(x)
     assert proba.shape[1] == 2
+
+
+def test_train_default_path_blocks_the_same_fixture_on_density_not_just_structure(tmp_path):
+    """Without skip_readiness_gate, the exact same small-but-structurally-valid fixture above
+    (real pref_model.yaml training_readiness thresholds: min_real_events=10000,
+    min_households=500) must still be refused — proving item #4's density gate is actually wired
+    into the default train() path, not just callable in isolation."""
+    event_types = (["accept", "like"] * 6) + (["dislike"] * 6)
+    export_path = tmp_path / "export.jsonl"
+    export_path.write_text("\n".join(json.dumps(r) for r in _rows(event_types)))
+    out_path = tmp_path / "artifact.joblib"
+
+    with pytest.raises(InsufficientDataError, match="min_real_events"):
+        train(str(export_path), str(out_path))  # skip_readiness_gate defaults to False
+
+    assert not out_path.exists(), "must never write an artifact when the readiness gate refuses"
 
 
 def _fixture_features():

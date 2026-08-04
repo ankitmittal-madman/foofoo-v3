@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet, Image } from "react-native";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { fetchColdStart } from "@/api/plan";
+import { postFeedback } from "@/api/feedback";
 import { describeApiError } from "@/api/errorMessages";
 import type { ColdStartResponse, PlanDish } from "@/api/plan";
 
@@ -11,10 +12,15 @@ import type { ColdStartResponse, PlanDish } from "@/api/plan";
  * dishes (already ranked by the RE across breakfast/lunch/dinner) and lets the user tap the ones
  * they like, seeding their cold-start taste profile before the weekly plan is built.
  *
- * "Liked" is local UI state only in this pass — it is not yet persisted to feedback_events (that
- * wiring is a follow-on once the weekly-plan/reconciliation flow this unblocks is proven). The
- * screen still fulfils its purpose: the user reviews and reacts to a representative slice of their
- * own plan before committing to it.
+ * "Liked" persists to feedback_events via POST /v1/feedback (event_type="like"), keyed off
+ * ColdStartResponse.request_id — plan/handler.ts now writes a recommendation_events row for this
+ * surface specifically so that resolution succeeds (previously cold-start likes could never be
+ * recorded at all: /v1/feedback requires request_id to match an existing recommendation_events
+ * row, and this surface never wrote one). Best-effort: a failed feedback POST never blocks the
+ * local "liked" UI state or the Continue flow — the user's screen still behaves correctly even if
+ * the write is lost, matching every other best-effort telemetry path in this codebase. Untapping a
+ * like sends nothing (there is no "unlike" event_type in feedback_events' CHECK constraint, and
+ * sending "dislike" would misrepresent a changed mind as an explicit negative reaction).
  */
 export default function ColdStart() {
   const [liked, setLiked] = useState<Set<string>>(new Set());
@@ -23,11 +29,21 @@ export default function ColdStart() {
     queryFn: () => fetchColdStart(15),
   });
 
+  const feedback = useMutation({
+    mutationFn: (dishName: string) => {
+      const requestId = query.data?.request_id;
+      if (!requestId) return Promise.reject(new Error("no request_id on this cold-start response"));
+      return postFeedback({ request_id: requestId, event_type: "like", dish_name: dishName });
+    },
+  });
+
   function toggleLike(name: string) {
     setLiked((prev) => {
       const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
+      const wasLiked = next.has(name);
+      if (wasLiked) next.delete(name);
       else next.add(name);
+      if (!wasLiked) feedback.mutate(name);
       return next;
     });
   }

@@ -57,6 +57,11 @@ class LabeledRow:
     label: int
     dish_name: str
     event_type: str
+    # Optional export field (not in every row's required shape above — an older/partial export
+    # may omit it): the household this row came from, used ONLY by check_training_readiness's
+    # distinct-household count below. Never fed into features/derive_theta (no household-identity
+    # leak into the model itself) — purely a density-accounting field.
+    household_id: str | None = None
 
 
 class InsufficientDataError(Exception):
@@ -108,7 +113,11 @@ def build_labeled_dataset(rows: Iterator[dict[str, Any]], catalogue: Catalogue |
         ctx = make_context(**row.get("ctx", {}))
         features = extract_features(dish, theta, ctx)
         label = 1 if event_type in _POSITIVE_EVENT_TYPES else 0
-        labeled.append(LabeledRow(features=features, label=label, dish_name=dish.name, event_type=event_type))
+        household_id = row.get("household_id")
+        labeled.append(LabeledRow(
+            features=features, label=label, dish_name=dish.name, event_type=event_type,
+            household_id=household_id if isinstance(household_id, str) else None,
+        ))
     return labeled
 
 
@@ -130,4 +139,36 @@ def guard_sufficient_data(labeled: list[LabeledRow]) -> None:
             "logistic regression needs both accept/like AND dislike examples to learn a real "
             "contrast; refusing to fit a single-class model rather than silently producing a "
             "constant, meaningless artifact."
+        )
+
+
+def check_training_readiness(labeled: list[LabeledRow], min_events: int, min_households: int) -> None:
+    """The density-level readiness gate WP-14 explicitly left unset ("flagged for the Founder, not
+    guessed") — separate from guard_sufficient_data's CORRECTNESS-only checks above (zero rows /
+    single label class), which this never replaces or loosens; both must pass. Raises
+    InsufficientDataError (never returns a partial ok) when either count is below its
+    `training_readiness` config threshold (pref_model.yaml, read via
+    CONFIG.pref_training_min_events/pref_training_min_households).
+
+    The household count is skipped (with the caller expected to log/report that, not silently
+    ignore it) when NO row in the export carries a household_id — an older/partial export shape,
+    not a real density signal either way; only `min_events` gates in that case."""
+    n_events = len(labeled)
+    if n_events < min_events:
+        raise InsufficientDataError(
+            f"Only {n_events} real labeled row(s) available, below the configured "
+            f"training_readiness.min_real_events={min_events} — refusing to train an artifact "
+            "this thin. This is an engineering-readiness gate (is there enough signal to trust a "
+            "fit at all), separate from guard_sufficient_data's structural checks."
+        )
+    household_ids = {row.household_id for row in labeled if row.household_id is not None}
+    if not household_ids:
+        return  # export carries no household_id at all — nothing to count, not a failure
+    n_households = len(household_ids)
+    if n_households < min_households:
+        raise InsufficientDataError(
+            f"Only {n_households} distinct household(s) contributed the {n_events} real labeled "
+            f"row(s) available, below the configured training_readiness.min_households="
+            f"{min_households} — refusing to train on signal this concentrated (a fit dominated "
+            "by a handful of households' taste isn't a fleet-wide preference model)."
         )

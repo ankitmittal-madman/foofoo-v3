@@ -25,6 +25,10 @@ export interface ColdStartResponse {
   kind: string;
   count: number;
   dishes: PlanDish[];
+  /** Stamped by plan/handler.ts specifically for this call — pass through to POST /v1/feedback
+   * (api/feedback.ts) so a cold-start "like" tap resolves to the recommendation_events row the
+   * handler wrote for this response. */
+  request_id?: string;
 }
 
 export interface SlotOptionsResponse {

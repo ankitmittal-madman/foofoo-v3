@@ -22,9 +22,11 @@ import argparse
 import json
 import sys
 
+from ghar_re_core.config import CONFIG
 from ghar_re_core.training.dataset import (
     InsufficientDataError,
     build_labeled_dataset,
+    check_training_readiness,
     guard_sufficient_data,
     iter_export_rows,
 )
@@ -43,17 +45,25 @@ def _vectorize(labeled_rows):
     return vectorizer, x, y
 
 
-def train(feedback_export_path: str, out_path: str, eval_out_path: str | None = None, test_size: float = 0.25, random_state: int = 0) -> dict:
-    """Runs the full pipeline end-to-end: load export -> filter/label -> guard -> vectorize ->
-    fit -> holdout-eval -> write artifact + report. Raises InsufficientDataError (propagated to
-    the CLI as a non-zero exit, message printed, NOTHING written) rather than ever producing a
-    "trained" artifact from insufficient or non-real data."""
+def train(feedback_export_path: str, out_path: str, eval_out_path: str | None = None, test_size: float = 0.25, random_state: int = 0, skip_readiness_gate: bool = False) -> dict:
+    """Runs the full pipeline end-to-end: load export -> filter/label -> guard -> readiness gate
+    -> vectorize -> fit -> holdout-eval -> write artifact + report. Raises InsufficientDataError
+    (propagated to the CLI as a non-zero exit, message printed, NOTHING written) rather than ever
+    producing a "trained" artifact from insufficient, non-real, or too-thin data.
+
+    `skip_readiness_gate`: bypasses ONLY check_training_readiness's density check (CLI --force) —
+    never guard_sufficient_data's structural correctness checks just above it, which always run
+    regardless. For a deliberate human test run against a small real export, not a default."""
     import joblib
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import train_test_split
 
     rows = build_labeled_dataset(iter_export_rows(feedback_export_path))
     guard_sufficient_data(rows)  # raises InsufficientDataError; caller must not catch-and-fit-anyway
+    if not skip_readiness_gate:
+        check_training_readiness(
+            rows, CONFIG.pref_training_min_events, CONFIG.pref_training_min_households,
+        )
 
     vectorizer, x, y = _vectorize(rows)
 
@@ -93,11 +103,18 @@ def main(argv=None) -> int:
     parser.add_argument("--eval-out", default=None, help="Optional path to write the eval report JSON.")
     parser.add_argument("--test-size", type=float, default=0.25)
     parser.add_argument("--random-state", type=int, default=0)
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Bypass the training_readiness density gate (pref_model.yaml) for a deliberate test "
+             "run against a small real export. Never bypasses guard_sufficient_data's structural "
+             "correctness checks (zero rows / single label class) — those always run.",
+    )
     args = parser.parse_args(argv)
 
     try:
         report = train(
             args.feedback_export, args.out, args.eval_out, args.test_size, args.random_state,
+            skip_readiness_gate=args.force,
         )
     except InsufficientDataError as e:
         print(f"REFUSING TO TRAIN: {e}", file=sys.stderr)
