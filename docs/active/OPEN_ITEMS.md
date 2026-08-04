@@ -107,7 +107,8 @@ see `docs/archive/completed-phases/` for history. Source audit:
   per-row `auth.uid()` evaluation to `(select auth.uid())`; paired rollback is present.
 - P2-5: Configure the repository's `FLY_STAGING_*` variables/secrets and protected `production`
   environment. The workflow now deploys `main` to staging and permits production only through a
-  manually dispatched, approval-capable environment.
+  manually dispatched, approval-capable environment. Until staging is configured, push runs emit
+  a warning and skip the staging-only steps instead of failing unrelated `main` checks.
 - P2-6: Completed locally — both Docker stages pin Python 3.11.15 slim-bookworm by digest.
 - P2-7: Archive dead `re_engine`-era ETL/validation scripts targeting dropped schemas.
 - P2-8: Resolve unindexed-FK and duplicate-index advisor findings.
