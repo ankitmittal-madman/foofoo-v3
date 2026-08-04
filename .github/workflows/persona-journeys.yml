@@ -55,6 +55,9 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
+      - name: Install Excel report dependency
+        run: pip install "openpyxl==3.1.5"
+
       - name: Deploy Expo web build to Vercel
         # The Vercel project already has Root Directory = mobile. Invoke the CLI from repository
         # root so it does not resolve that setting as mobile/mobile.
@@ -110,11 +113,23 @@ jobs:
             echo "No per-persona evidence directory — driver was skipped/blocked, nothing to render."
           fi
 
+      - name: Build and validate Excel and ZIP reports
+        if: always()
+        env:
+          GHAR_TEST_ENV: "production-test"
+        run: |
+          python3 ops/quality/runner/excel_report.py \
+            "${{ github.workspace }}/ops/quality/reports/persona-journeys" \
+            --kind persona-journey \
+            --run-id "${{ github.run_id }}-${{ github.run_attempt }}"
+
       - name: Upload the persona journey report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: persona-journey-report
-          path: ops/quality/reports/persona-journeys/
-          retention-days: 30
-          if-no-files-found: warn
+          name: persona-journey-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ops/quality/reports/persona-journeys/test-results.xlsx
+            ops/quality/reports/persona-journeys/persona-journey_*.zip
+          retention-days: 90
+          if-no-files-found: error

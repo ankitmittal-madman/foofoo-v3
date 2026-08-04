@@ -45,6 +45,8 @@ class Persona:
     forbid_ingredients: tuple[str, ...] = ()  # ingredient tokens that must never appear
     expect_warnings: bool | None = None  # True=must warn, False=must not, None=don't care
     note: str = ""
+    user_type: str = "synthetic"         # real inputs must use a pseudonymous test-user id
+    source_persona_id: str | None = None  # P01-P41 when grounded in the canonical workbook
 
 
 def _default_context() -> dict[str, Any]:
@@ -291,6 +293,7 @@ def real_persona_derived() -> list[Persona]:
                 key=f"real_{row['persona_id'].lower()}", label=row["persona_name"],
                 household=household, context=_default_context(), forbid_diet=forbid,
                 note=f"derived from persona_master {row['persona_id']} ({row['sub_cohort_label']})",
+                source_persona_id=row["persona_id"],
             ))
     return out
 

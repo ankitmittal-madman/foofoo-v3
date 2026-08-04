@@ -1,5 +1,6 @@
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet } from "react-native";
 import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { fetchHistory } from "@/api/plan";
 import { describeApiError } from "@/api/errorMessages";
 import type { RecommendationHistoryRow } from "@/api/plan";
@@ -52,7 +53,13 @@ export default function History() {
         <Text style={styles.empty}>No recommendations yet.</Text>
       ) : (
         events.map((e: RecommendationHistoryRow) => (
-          <View key={e.id} style={styles.row}>
+          <Pressable
+            key={e.id}
+            style={styles.row}
+            accessibilityRole="button"
+            accessibilityLabel={`View recommendation from ${new Date(e.created_at).toLocaleDateString()}`}
+            onPress={() => router.push({ pathname: "/history/[id]", params: { id: e.id } })}
+          >
             <Text style={styles.rowTitle}>
               {new Date(e.created_at).toLocaleDateString()} {e.slot ? `— ${e.slot}` : ""}
             </Text>
@@ -60,7 +67,8 @@ export default function History() {
               {OUTCOME_LABEL[e.outcome] ?? e.outcome} · {e.plate_count} dish
               {e.plate_count === 1 ? "" : "es"}
             </Text>
-          </View>
+            <Text style={styles.viewLink}>View dishes ›</Text>
+          </Pressable>
         ))
       )}
     </ScrollView>
@@ -75,5 +83,6 @@ const styles = StyleSheet.create({
   row: { borderTopWidth: 1, borderTopColor: "#EEE", paddingTop: 10, gap: 2 },
   rowTitle: { fontSize: 14, fontWeight: "600" },
   rowMeta: { fontSize: 12, color: "#6B6B6B" },
+  viewLink: { fontSize: 12, color: "#1F7A3F", fontWeight: "600", marginTop: 3 },
   error: { color: "#C0392B" },
 });

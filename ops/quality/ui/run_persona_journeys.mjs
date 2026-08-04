@@ -216,17 +216,22 @@ async function extractBearerToken(page) {
  * Silently skips a value with no matching testID (e.g. this mapper produced a token Screen 4/5
  * doesn't render a chip for) rather than failing the whole persona over one optional field.
  */
-async function fillChipGroup(page, prefix, values, steps, shot) {
+async function fillChipGroup(page, prefix, values, recordStep) {
   for (const v of values) {
     const el = page.getByTestId(`${prefix}-${v}`);
     if (await el.count()) {
       await el.first().click();
-      steps.push({ label: `${prefix}-${v}`, screenshot: await shot(`${prefix}-${v}`) });
+      await recordStep(`${prefix}-${v}`);
     }
   }
 }
 
 let shotCounter = 0;
+
+/** journeyStep — timestamp one completed UI action for chronological Excel reporting. */
+function journeyStep(label, screenshotName) {
+  return { label, action: label, screenshot: screenshotName, timestamp_utc: new Date().toISOString() };
+}
 
 /** screenshot — writes a numbered PNG for this persona and returns its filename (no dir side effects beyond that). */
 async function screenshot(page, _artifacts, label, personaDir) {
@@ -242,21 +247,41 @@ async function runPersona(browser, persona) {
   fs.mkdirSync(personaDir, { recursive: true });
   shotCounter = 0;
   const steps = [];
+  const recommendationEvents = [];
+  const startedAtUtc = new Date().toISOString();
+  let currentStage = "journey-start";
   const context = await browser.newContext();
   const page = await context.newPage();
 
   const shot = (label) => screenshot(page, steps, label, personaDir);
 
+  /** recordStep — keep the latest stage aligned with recommendation responses observed by Playwright. */
+  const recordStep = async (label) => {
+    currentStage = label;
+    steps.push(journeyStep(label, await shot(label)));
+  };
+
+  page.on("response", async (response) => {
+    if (!new URL(response.url()).pathname.endsWith("/v1/recommendations")) return;
+    const body = await response.json().catch(() => null);
+    recommendationEvents.push({
+      timestamp_utc: new Date().toISOString(),
+      stage_label: currentStage,
+      endpoint: "/v1/recommendations",
+      response: { status: response.status(), body },
+    });
+  });
+
   try {
     await signUpAndAuthenticate(page, persona.key);
-    steps.push({ label: "signed-up", screenshot: await shot("signed-up") });
+    await recordStep("signed-up");
 
     // Consent — gate on personalization=true so the flow can proceed into step-1.
     await page.goto(new URL("/consent", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
-    steps.push({ label: "consent-loaded", screenshot: await shot("consent-loaded") });
+    await recordStep("consent-loaded");
     const consentContinue = page.getByTestId("onboarding-consent-continue");
     await consentContinue.click({ timeout: 10000 });
-    steps.push({ label: "consent-continue", screenshot: await shot("consent-continue") });
+    await recordStep("consent-continue");
 
     const answers = personaToOnboardingAnswers(persona.household);
     const split = isSplitAge(answers.householdType);
@@ -265,17 +290,17 @@ async function runPersona(browser, persona) {
     await waitForPath(page, (u) => u.pathname.endsWith("/step-1"), 15000).catch(() => {});
     if (answers.householdType) {
       await page.getByTestId(`onboarding-step1-household-${answers.householdType}`).click({ timeout: 10000 });
-      steps.push({ label: "step1-household", screenshot: await shot("step1-household") });
+      await recordStep("step1-household");
     }
     if (answers.workingProfessionals != null) {
       const el = page.getByTestId(`onboarding-step1-earners-${answers.workingProfessionals}`);
       if (await el.count()) {
         await el.first().click();
-        steps.push({ label: "step1-earners", screenshot: await shot("step1-earners") });
+        await recordStep("step1-earners");
       }
     }
     await page.getByTestId("onboarding-step1-continue").click({ timeout: 10000 });
-    steps.push({ label: "step1-continue", screenshot: await shot("step1-continue") });
+    await recordStep("step1-continue");
 
     // ---- Step 2 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-2"), 15000).catch(() => {});
@@ -284,30 +309,30 @@ async function runPersona(browser, persona) {
       await page.getByTestId("onboarding-step2-state-search").fill(answers.homeState, { timeout: 10000 });
       const stateOption = page.getByTestId(`onboarding-step2-state-option-${answers.homeState}`);
       await stateOption.first().click({ timeout: 10000 });
-      steps.push({ label: "step2-state", screenshot: await shot("step2-state") });
+      await recordStep("step2-state");
     }
     if (answers.currentCity) {
       await page.getByTestId("onboarding-step2-city-input").fill(answers.currentCity, { timeout: 10000 });
-      steps.push({ label: "step2-city", screenshot: await shot("step2-city") });
+      await recordStep("step2-city");
     }
     await page.getByTestId("onboarding-step2-continue").click({ timeout: 10000 });
-    steps.push({ label: "step2-continue", screenshot: await shot("step2-continue") });
+    await recordStep("step2-continue");
 
     // ---- Step 3 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-3"), 15000).catch(() => {});
     if (answers.diet) {
       await page.getByTestId(`onboarding-step3-diet-${answers.diet}`).click({ timeout: 10000 });
-      steps.push({ label: "step3-diet", screenshot: await shot("step3-diet") });
+      await recordStep("step3-diet");
     }
-    await fillChipGroup(page, "onboarding-step3-meat", answers.meatPreferences, steps, shot);
-    await fillChipGroup(page, "onboarding-step3-vegday", answers.vegDays, steps, shot);
+    await fillChipGroup(page, "onboarding-step3-meat", answers.meatPreferences, recordStep);
+    await fillChipGroup(page, "onboarding-step3-vegday", answers.vegDays, recordStep);
     await page.getByTestId("onboarding-step3-continue").click({ timeout: 10000 });
-    steps.push({ label: "step3-continue", screenshot: await shot("step3-continue") });
+    await recordStep("step3-continue");
 
     // ---- Step 4 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-4"), 15000).catch(() => {});
-    await fillChipGroup(page, "onboarding-step4-allergen", answers.allergens, steps, shot);
-    await fillChipGroup(page, "onboarding-step4-condition", answers.medicalConditions, steps, shot);
+    await fillChipGroup(page, "onboarding-step4-allergen", answers.allergens, recordStep);
+    await fillChipGroup(page, "onboarding-step4-condition", answers.medicalConditions, recordStep);
     if (answers.allergensOther) {
       await page.getByTestId("onboarding-step4-allergen-other-input").fill(answers.allergensOther).catch(() => {});
     }
@@ -315,7 +340,7 @@ async function runPersona(browser, persona) {
       await page.getByTestId("onboarding-step4-condition-other-input").fill(answers.medicalConditionsOther).catch(() => {});
     }
     await page.getByTestId("onboarding-step4-continue").click({ timeout: 10000 });
-    steps.push({ label: "step4-continue", screenshot: await shot("step4-continue") });
+    await recordStep("step4-continue");
 
     // ---- Step 5 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-5"), 15000).catch(() => {});
@@ -325,19 +350,19 @@ async function runPersona(browser, persona) {
     } else if (answers.ageSingle) {
       await page.getByTestId(`onboarding-step5-age-single-${answers.ageSingle}`).click().catch(() => {});
     }
-    steps.push({ label: "step5-age", screenshot: await shot("step5-age") });
+    await recordStep("step5-age");
     if (answers.whoCooks) await page.getByTestId(`onboarding-step5-whocooks-${answers.whoCooks}`).click().catch(() => {});
     if (answers.cookCapability) await page.getByTestId(`onboarding-step5-cookcapability-${answers.cookCapability}`).click().catch(() => {});
     if (answers.eatOutFrequency) await page.getByTestId(`onboarding-step5-eatout-${answers.eatOutFrequency}`).click().catch(() => {});
     if (answers.cookingObjective) await page.getByTestId(`onboarding-step5-objective-${answers.cookingObjective}`).click().catch(() => {});
-    steps.push({ label: "step5-filled", screenshot: await shot("step5-filled") });
+    await recordStep("step5-filled");
 
     await page.getByTestId("onboarding-step5-continue").click({ timeout: 10000 });
-    steps.push({ label: "step5-finish", screenshot: await shot("step5-finish") });
+    await recordStep("step5-finish");
 
     // ---- Land on post-onboarding screen (cold-start) ----
     await waitForPath(page, (u) => u.pathname.includes("cold-start") || u.pathname.includes("recommendations"), 20000).catch(() => {});
-    steps.push({ label: "post-onboarding-landing", screenshot: await shot("post-onboarding-landing") });
+    await recordStep("post-onboarding-landing");
 
     // ---- Capture the actual /v1/recommendations result the app's own session would get ----
     const token = await extractBearerToken(page);
@@ -363,11 +388,29 @@ async function runPersona(browser, persona) {
       recommendations = { status: null, error: "no Supabase access_token found in page localStorage — could not call /v1/recommendations" };
     }
 
+    const finalRequestId = recommendations?.body?.request_id ?? null;
+    const alreadyCaptured = recommendationEvents.some(
+      (event) => event.response?.body?.request_id === finalRequestId && event.response?.status === recommendations?.status,
+    );
+    if (!alreadyCaptured) {
+      recommendationEvents.push({
+        timestamp_utc: new Date().toISOString(),
+        stage_label: "final-recommendations-api",
+        endpoint: "/v1/recommendations",
+        response: recommendations,
+      });
+    }
     fs.writeFileSync(path.join(personaDir, "recommendations.json"), JSON.stringify(recommendations, null, 2));
+    fs.writeFileSync(path.join(personaDir, "recommendation_events.json"), JSON.stringify(recommendationEvents, null, 2));
 
     const summary = {
       key: persona.key,
       label: persona.label,
+      test_user_id: persona.test_user_id || `${persona.user_type || "synthetic"}:${persona.key}`,
+      user_type: persona.user_type || "synthetic",
+      source_persona_id: persona.source_persona_id || null,
+      started_at_utc: startedAtUtc,
+      completed_at_utc: new Date().toISOString(),
       ok: true,
       expect_status: persona.expect_status,
       recommendations_status: recommendations?.status ?? null,
@@ -381,10 +424,16 @@ async function runPersona(browser, persona) {
     const summary = {
       key: persona.key,
       label: persona.label,
+      test_user_id: persona.test_user_id || `${persona.user_type || "synthetic"}:${persona.key}`,
+      user_type: persona.user_type || "synthetic",
+      source_persona_id: persona.source_persona_id || null,
+      started_at_utc: startedAtUtc,
+      completed_at_utc: new Date().toISOString(),
       ok: false,
       error: String(e && e.message ? e.message : e).slice(0, 1000),
       steps,
     };
+    fs.writeFileSync(path.join(personaDir, "recommendation_events.json"), JSON.stringify(recommendationEvents, null, 2));
     fs.writeFileSync(path.join(personaDir, "summary.json"), JSON.stringify(summary, null, 2));
     return summary;
   } finally {

@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8"]
+test = ["pytest>=8", "openpyxl>=3.1"]
 # Phase 3 s_pref training/eval pipeline (ghar_re_core/training/) — kept in its own extra since
 # nothing in the live scoring path (base()/score(), the default NullModelArtifactProvider) needs
 # sklearn/joblib at all; only running train_pref_model.py or its tests does.

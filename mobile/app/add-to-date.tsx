@@ -1,16 +1,21 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDishToDate, type Slot } from "@/api/plan";
 
 export default function AddToDate() {
-  const params = useLocalSearchParams<{ dish: string; classCode: string; slot: Slot }>();
-  const [chosen, setChosen] = useState<string | null>(null);
+  const params = useLocalSearchParams<{ dish: string; classCode: string; slot: Slot; date?: string }>();
+  const queryClient = useQueryClient();
+  const [chosen, setChosen] = useState<string | null>(params.date ?? null);
   const dates = Array.from({ length: 7 }, (_, index) => {
     const date = new Date();
-    date.setDate(date.getDate() + index + 1);
-    return date.toISOString().slice(0, 10);
+    date.setHours(12, 0, 0, 0);
+    date.setDate(date.getDate() + index);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   });
   const mutation = useMutation({
     mutationFn: (slotDate: string) => addDishToDate({
@@ -19,10 +24,16 @@ export default function AddToDate() {
       class_code: params.classCode,
       dish_name: params.dish,
     }),
-    onSuccess: () => router.back(),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["saved-week"] }),
+        queryClient.invalidateQueries({ queryKey: ["daily-plan"] }),
+      ]);
+      router.back();
+    },
   });
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Add {params.dish} to your plan</Text>
       {dates.map((date) => (
         <Pressable key={date} style={[styles.date, chosen === date && styles.selected]}
@@ -37,7 +48,7 @@ export default function AddToDate() {
         <Text style={styles.buttonText}>{mutation.isPending ? "Adding…" : "Add to plan"}</Text>
       </Pressable>
       {mutation.isError ? <Text style={styles.error}>Could not update your plan. Try again.</Text> : null}
-    </View>
+    </ScrollView>
   );
 }
 

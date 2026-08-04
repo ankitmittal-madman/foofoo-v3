@@ -32,6 +32,12 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 QUALITY_DIR = REPO_ROOT / "ops" / "quality"
 SUITES = QUALITY_DIR / "suites"
 
+# The workflows set PYTHONPATH explicitly, but the documented local one-command runner must have
+# the same import surface inside this orchestrator process (not only inside its subprocesses).
+for _path in (REPO_ROOT, REPO_ROOT / "ghar_re_service"):
+    if str(_path) not in sys.path:
+        sys.path.insert(0, str(_path))
+
 # PYTHONPATH every subprocess needs: repo root (ghar_re_core) + nested service package root.
 _ENV = {**os.environ, "PYTHONPATH": f"{REPO_ROOT}{os.pathsep}{REPO_ROOT / 'ghar_re_service'}"}
 
@@ -409,6 +415,7 @@ def run_all(report_dir: Path, quick: bool = False) -> list[StepResult]:
         ("quality-recsys", "8", "P0", "ops/quality/suites/test_recommendation_behavior.py", "recommendation"),
         ("quality-security", "13", "P0", "ops/quality/suites/test_api_security.py", "security"),
         ("quality-planning", "5", "P1", "ops/quality/suites/test_planning_surfaces.py", "contracts"),
+        ("quality-reporting", "17", "P0", "ops/quality/suites/test_excel_report.py", "contracts"),
     ]:
         _add(_run_pytest(report_dir, name, phase, prio, target, cat))
 
@@ -628,6 +635,22 @@ def main() -> int:
     steps = run_all(report_dir, quick=args.quick)
     verdict = score_and_verdict(steps)
     _write_reports(report_dir, steps, verdict, meta)
+
+    # Excel + ZIP are the mandatory human-readable/system-of-record outputs for every quality
+    # run. A test pass without a publishable workbook is not a complete test run.
+    try:
+        from ops.quality.runner.excel_report import build_report
+
+        build_report(
+            report_dir,
+            kind="quality-gate",
+            run_id=os.environ.get("GITHUB_RUN_ID") or report_dir.name,
+            environment=os.environ.get("GHAR_TEST_ENV", "ci" if args.ci else "local"),
+        )
+    except Exception as error:
+        _log(report_dir, f"report-publication: fail ({type(error).__name__}: {error})")
+        print(f"\nREPORT PUBLICATION FAILED: {error}", file=sys.stderr)
+        return 2
 
     # keep a stable pointer to the newest report
     (Path(args.report_root) / "latest.txt").write_text(str(report_dir), encoding="utf-8")

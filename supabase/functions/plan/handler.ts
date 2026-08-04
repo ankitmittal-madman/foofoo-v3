@@ -27,6 +27,7 @@ import type { Handler } from "../_shared/middleware/types.ts";
 import { loadHouseholdRaw, recordHouseholdContext } from "../recommendations/compose.ts";
 import {
   fetchRecentRecommendationEvents,
+  fetchRecommendationEvent,
   recordRecommendationEvent,
 } from "../recommendations/events.ts";
 import { callRecommendationEngine } from "../recommendations/re-client.ts";
@@ -78,7 +79,14 @@ export function makePlanHandler(): Handler {
       try {
         if (surface === "saved_week") {
           return jsonContract(
-            { kind: "saved_week", plan: await loadSavedWeek(ctx, householdId) },
+            {
+              kind: "saved_week",
+              plan: await loadSavedWeek(
+                ctx,
+                householdId,
+                typeof body.slot_date === "string" ? body.slot_date : undefined,
+              ),
+            },
             ctx.traceId,
             200,
           );
@@ -116,6 +124,7 @@ export function makePlanHandler(): Handler {
           String(body.weekday ?? ""),
           String(body.slot ?? ""),
           body.locked === true,
+          typeof body.slot_date === "string" ? body.slot_date : undefined,
         );
         return jsonContract({ kind: "slot_lock", slot: state }, ctx.traceId, 200);
       } catch (error) {
@@ -141,6 +150,22 @@ export function makePlanHandler(): Handler {
         : 20;
       const events = await fetchRecentRecommendationEvents(ctx, householdIdForHistory, limit);
       return jsonContract({ kind: "history", events }, ctx.traceId, 200);
+    }
+
+    if (surface === "history_detail") {
+      const householdId = claims.userId ?? null;
+      requireOwnership(claims, householdId);
+      const eventId = typeof body.event_id === "string" ? body.event_id : "";
+      if (!householdId || !eventId) {
+        throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "event_id is required" });
+      }
+      const event = await fetchRecommendationEvent(ctx, householdId, eventId);
+      if (!event) {
+        throw new AppError(API_ERRORS.ERR_RECOMMENDATION_EVENT_NOT_FOUND, {
+          detail: "history event not found",
+        });
+      }
+      return jsonContract({ kind: "history_detail", event }, ctx.traceId, 200);
     }
 
     // "profile" (P1-4, 2026-08) is also a pure read: the same composed household object
@@ -192,6 +217,7 @@ export function makePlanHandler(): Handler {
         "diet",
         "max_total_mins",
         "limit",
+        "exclude_dish_names",
       ]
     ) {
       if (body[k] !== undefined) payload[k] = body[k];
@@ -217,7 +243,17 @@ export function makePlanHandler(): Handler {
         dish_feedback_counts: online.dishFeedbackCounts,
         weather,
       };
-      payload.exclude_dish_names = online.excludeDishNames;
+      const requestedExclusions = Array.isArray(body.exclude_dish_names)
+        ? body.exclude_dish_names
+          .filter((name): name is string => typeof name === "string")
+          .slice(0, 50)
+        : [];
+      payload.exclude_dish_names = [
+        ...new Set([
+          ...online.excludeDishNames,
+          ...requestedExclusions,
+        ]),
+      ];
       payload.preference_by_dish = online.preferenceByDish;
       log.info("plan.composed", { household_id: hid, stubbed });
     }
@@ -277,6 +313,7 @@ export function makePlanHandler(): Handler {
           plates: dishes,
           latencyMs,
           stubbed: stubbedHousehold,
+          slot: typeof body.slot === "string" ? body.slot : undefined,
         });
         await recordProductEvent(ctx, {
           profileId: resolvedHouseholdId,

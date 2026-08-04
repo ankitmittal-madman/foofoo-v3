@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react-native";
+import { fireEvent, render, screen } from "@testing-library/react-native";
+import { router } from "expo-router";
 
 import History from "../history";
 
@@ -19,6 +20,7 @@ const mockHistoryResponse = {
 jest.mock("@tanstack/react-query", () => ({
   useQuery: jest.fn(() => ({ data: mockHistoryResponse, isLoading: false, isError: false })),
 }));
+jest.mock("expo-router", () => ({ router: { push: jest.fn() } }));
 jest.mock("@/api/plan", () => ({ fetchHistory: jest.fn() }));
 jest.mock("@/api/errorMessages", () => ({ describeApiError: () => "Request failed" }));
 
@@ -28,6 +30,11 @@ describe("History", () => {
 
     expect(screen.getByText("Your recommendation history")).toBeTruthy();
     expect(screen.getByText("Served · 1 dish")).toBeTruthy();
+    fireEvent.press(screen.getByLabelText("View recommendation from 8/4/2026"));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: "/history/[id]",
+      params: { id: "event-1" },
+    });
 
     view.unmount();
   });

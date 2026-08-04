@@ -16,9 +16,11 @@ function isoDate(value: Date): string {
   return value.toISOString().slice(0, 10);
 }
 
-export async function loadSavedWeek(ctx: RequestContext, profileId: string) {
+export async function loadSavedWeek(ctx: RequestContext, profileId: string, slotDate?: string) {
   const db = createServiceRoleClient(ctx.config);
-  const weekStart = isoDate(mondayUtc());
+  const reference = slotDate ? new Date(`${slotDate}T12:00:00Z`) : new Date();
+  if (Number.isNaN(reference.getTime())) throw new Error("invalid slot_date");
+  const weekStart = isoDate(mondayUtc(reference));
   const { data: plan, error } = await withTimeout(
     db.from("week_plans").select("id,status,is_locked,week_start_date,plan_slots(*)")
       .eq("profile_id", profileId).eq("week_start_date", weekStart).maybeSingle(),
@@ -115,13 +117,15 @@ export async function setSlotLock(
   weekday: string,
   mealSlot: string,
   locked: boolean,
+  slotDate?: string,
 ) {
-  const plan = await loadSavedWeek(ctx, profileId) as Record<string, unknown> | null;
+  const plan = await loadSavedWeek(ctx, profileId, slotDate) as Record<string, unknown> | null;
   if (!plan) throw new Error("save the weekly plan before locking a slot");
   const offset = WEEKDAYS.indexOf(weekday);
   if (offset < 0) throw new Error("invalid weekday");
-  const date = mondayUtc();
-  date.setUTCDate(date.getUTCDate() + offset);
+  const date = slotDate ? new Date(`${slotDate}T12:00:00Z`) : mondayUtc();
+  if (!slotDate) date.setUTCDate(date.getUTCDate() + offset);
+  if (Number.isNaN(date.getTime())) throw new Error("invalid slot_date");
   const db = createServiceRoleClient(ctx.config);
   const { data, error } = await withTimeout(
     db.from("plan_slots").update({

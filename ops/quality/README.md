@@ -13,6 +13,10 @@ ops/quality/run_full_quality_suite.sh --quick  # skip perf benchmark
 ```
 
 Reports land in `ops/quality/reports/<timestamp>/` and `reports/latest.txt` points at the newest.
+Every completed run also produces `test-results.xlsx` and a dated `quality-report_*.zip`. The
+workbook contains the run summary, every test case, errors, any persona journeys/recommendations
+that ran, and source-workbook traceability. Excel/ZIP publication is mandatory: the orchestrator
+returns a failure if it cannot build or validate them.
 
 ### Triage an existing report / re-validate a fix
 
@@ -36,7 +40,7 @@ python3 ops/quality/runner/report_reader.py --rerun-failed  # re-run only the fa
 | 13 | API security + secrets scan | ✅ runs |
 | 14 | Chaos / fail-safe probes (in-process) | ✅ runs |
 | 9-11 | Headless browser UI + accessibility, one screenshot/console/network capture per screen discovered from `mobile/app`'s own route tree | ✅ runs — needs `GHAR_WEB_URL` (e.g. `expo start --web`) |
-| WP-22 | Synthetic persona UI journeys — drives the real onboarding UI through all 100 personas, screenshots every answer/Continue, captures the resulting `/v1/recommendations` call, renders one HTML report per persona + an index grouped by outcome (200/422/warned) | ✅ wired into the orchestrator as the `ui-persona-journeys` step — needs `GHAR_WEB_URL`; each persona signs up its own fresh random-email account via the app's real sign-up flow (requires the target Supabase project to auto-confirm signups — no pre-provisioned test account needed); no RE scoring assertions. Report: `ops/quality/reports/<timestamp>/personas-ui/report/index.html`. Also runnable on demand via the `persona-journeys` GitHub Actions workflow (Actions tab → "Run workflow") — it starts `expo start --web` itself and uploads the HTML report as a build artifact. |
+| WP-22 | Synthetic persona UI journeys — drives the real onboarding UI through all 100 personas, screenshots every answer/Continue, captures the resulting `/v1/recommendations` call, renders one HTML report per persona + an index grouped by outcome (200/422/warned) | ✅ wired into the orchestrator as the `ui-persona-journeys` step — needs `GHAR_WEB_URL`; each persona signs up its own fresh random-email account via the app's real sign-up flow (requires the target Supabase project to auto-confirm signups — no pre-provisioned test account needed); no RE scoring assertions. Report: `ops/quality/reports/<timestamp>/personas-ui/report/index.html`. Also runnable on demand via the `persona-journeys` GitHub Actions workflow (Actions tab → "Run workflow") — it deploys the checked-out commit to the public production-test Vercel target and uploads Excel plus a ZIP artifact. |
 | 16-19 | Orchestrator, reports, dashboard, one command | ✅ this module |
 
 Gated suites are recorded as **skipped/blocked with the concrete reason**, never faked. Unlock them:
@@ -47,6 +51,28 @@ export GHAR_WEB_URL=http://localhost:8081  # enables Phase 9-11 (expo start --we
 # WP-22 needs no pre-provisioned account — it signs up its own per-persona random-email account
 # install Deno                         # enables Phase 6 edge-function tests
 ```
+
+## Run in GitHub Actions and download Excel
+
+For the complete UI persona flow, open **GitHub → Actions → persona-journeys → Run workflow**.
+Leave `persona_limit` blank for all personas or enter a small number such as `5` for a smoke run.
+When the run finishes, its **Artifacts** section contains
+`persona-journey-report-<run-id>-<attempt>` with:
+
+- `test-results.xlsx` — one dated user journey, recommendation dish, final plan, and outcome row
+  set per tested user; matching P01-P41 rows from the canonical source workbook are included for
+  comparison.
+- `persona-journey_*.zip` — the same workbook plus run metadata, errors, HTML, screenshots, and
+  per-user JSON evidence under `ui-artifacts/`.
+
+For all non-UI and conditionally available tests, run **GitHub → Actions → quality-gate → Run
+workflow**. Download `ghar-quality-report-<run-id>-<attempt>` and open the newest timestamped
+folder's `test-results.xlsx` or `quality-report_*.zip`. The workflow also runs automatically on
+pushes and pull requests that touch the engine, contracts, or quality program.
+
+Real-user test fixtures may be supplied to the persona driver through `GHAR_PERSONAS_JSON`, but
+must set `user_type: "real"` and a pseudonymous `test_user_id`; credentials and access tokens are
+never written to the workbook or logs.
 
 ## Honesty rules baked into the verdict
 
@@ -69,6 +95,7 @@ ops/quality/
   ui/personaToOnboardingAnswers.mjs   # WP-22 reverse mapper (persona q1..q15 -> OnboardingAnswers)
   personas/export_personas.py         # WP-22 persona JSON export for the Node driver
   runner/persona_journey_report.py    # WP-22 HTML report (per-persona pages + outcome index)
+  runner/excel_report.py              # validated Excel + ZIP publisher for every test workflow
   runner/orchestrator.py              # Phase 16-19 orchestrator + dashboard
   runner/perf_benchmark.py            # Phase 12
   runner/report_reader.py             # Phase 17/20 triage + re-validate

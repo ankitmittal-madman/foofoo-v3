@@ -124,7 +124,12 @@ export function fetchCalibrationGrid(): Promise<CalibrationResponse> {
 /** Surface 2 — a slot's 4–5 dish options (pass class_code to reconcile to one finalized class). */
 export function fetchSlotOptions(
   slot: Slot,
-  opts: { weekday?: string; class_code?: string; count?: number } = {},
+  opts: {
+    weekday?: string;
+    class_code?: string;
+    count?: number;
+    exclude_dish_names?: string[];
+  } = {},
 ): Promise<SlotOptionsResponse> {
   return apiPost<SlotOptionsResponse>("/plan", { surface: "meal_plan", slot, ...opts });
 }
@@ -143,8 +148,11 @@ export interface SavedWeekResponse {
   plan: { status: "draft" | "finalized"; plan_slots: SavedPlanSlot[] } | null;
 }
 
-export function fetchSavedWeek(): Promise<SavedWeekResponse> {
-  return apiPost<SavedWeekResponse>("/plan", { surface: "saved_week" });
+export function fetchSavedWeek(slotDate?: string): Promise<SavedWeekResponse> {
+  return apiPost<SavedWeekResponse>("/plan", {
+    surface: "saved_week",
+    ...(slotDate ? { slot_date: slotDate } : {}),
+  });
 }
 
 export function savedWeekSelections(response: SavedWeekResponse | undefined): WeekSelections {
@@ -179,8 +187,15 @@ export function setPlanSlotLock(
   weekday: string,
   slot: Slot,
   locked: boolean,
+  slotDate?: string,
 ): Promise<unknown> {
-  return apiPost("/plan", { surface: "lock_slot", weekday, slot, locked });
+  return apiPost("/plan", {
+    surface: "lock_slot",
+    weekday,
+    slot,
+    locked,
+    ...(slotDate ? { slot_date: slotDate } : {}),
+  });
 }
 
 export function addDishToDate(input: {
@@ -203,6 +218,7 @@ export function fetchClassDishes(
   classCode: string,
   weekday: string,
   count = 8,
+  excludeDishNames: string[] = [],
 ): Promise<SlotOptionsResponse> {
   return apiPost<SlotOptionsResponse>("/plan", {
     surface: "class_dishes",
@@ -210,6 +226,7 @@ export function fetchClassDishes(
     class_code: classCode,
     weekday,
     count,
+    ...(excludeDishNames.length > 0 ? { exclude_dish_names: excludeDishNames } : {}),
   });
 }
 
@@ -245,6 +262,7 @@ export interface RecommendationHistoryRow {
   slot: string | null;
   outcome: string;
   plate_count: number;
+  plates?: PlanDish[] | null;
 }
 
 export interface HistoryResponse {
@@ -255,6 +273,19 @@ export interface HistoryResponse {
 /** Surface 6 (P1-3) — the caller's own recent recommendation history. No RE call; a pure DB read. */
 export function fetchHistory(count = 20): Promise<HistoryResponse> {
   return apiPost<HistoryResponse>("/plan", { surface: "history", count });
+}
+
+export interface HistoryDetailResponse {
+  kind: "history_detail";
+  event: RecommendationHistoryRow;
+}
+
+/** Fetch one owned recommendation event for the history detail screen. */
+export function fetchHistoryEvent(eventId: string): Promise<HistoryDetailResponse> {
+  return apiPost<HistoryDetailResponse>("/plan", {
+    surface: "history_detail",
+    event_id: eventId,
+  });
 }
 
 /** The current composed household (P1-4, 2026-08) — same shape the RE itself scores against. */

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet, Image } from "react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import {
   fetchClassDishes,
   fetchSavedWeek,
@@ -13,11 +13,29 @@ import {
 import { postFeedback } from "@/api/feedback";
 import { describeApiError } from "@/api/errorMessages";
 import { loadWeeklyPlan, type FinalizedWeek, type SlotName } from "@/lib/weeklyPlanStore";
-import type { PlanAddon, PlanDish } from "@/api/plan";
+import type { PlanAddon, PlanDish, SlotOptionsResponse } from "@/api/plan";
 import type { FeedbackEventType } from "@/api/types";
 
 const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+/** Convert a local calendar date to YYYY-MM-DD without a UTC timezone shift. */
+function isoLocalDate(value: Date): string {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+/** Return today plus the next six local calendar dates for the meal-plan selector. */
+function upcomingDates(): string[] {
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date();
+    date.setHours(12, 0, 0, 0);
+    date.setDate(date.getDate() + index);
+    return isoLocalDate(date);
+  });
+}
 
 /**
  * Home tab — today's meal selection (breakfast/lunch/dinner), the app's new default landing
@@ -30,26 +48,33 @@ const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
  * screen reached mid-flow from here.
  */
 export default function Home() {
-  const weekday = WEEKDAYS[new Date().getDay()];
-  const [plan, setPlan] = useState<FinalizedWeek | null>(null);
-  const [locks, setLocks] = useState<Record<string, Partial<Record<SlotName, boolean>>>>({});
-  const [planLoaded, setPlanLoaded] = useState(false);
+  const dates = useRef(upcomingDates()).current;
+  const today = dates[0];
+  const [selectedDate, setSelectedDate] = useState(today);
+  const weekday = WEEKDAYS[new Date(`${selectedDate}T12:00:00`).getDay()];
+  const [offlinePlan, setOfflinePlan] = useState<FinalizedWeek | null>(null);
   const [refreshNonce, setRefreshNonce] = useState(0);
+  const saved = useQuery({
+    queryKey: ["saved-week", selectedDate],
+    queryFn: () => fetchSavedWeek(selectedDate),
+    staleTime: 0,
+  });
 
   useEffect(() => {
-    fetchSavedWeek()
-      .then((response) => {
-        setLocks(savedWeekLocks(response));
-        const serverPlan = savedWeekSelections(response);
-        if (Object.keys(serverPlan).length > 0) return serverPlan;
-        return loadWeeklyPlan();
-      })
-      .catch(() => loadWeeklyPlan())
-      .then((p) => setPlan(p))
-      .finally(() => setPlanLoaded(true));
+    loadWeeklyPlan().then(setOfflinePlan).catch(() => setOfflinePlan(null));
   }, []);
 
-  if (!planLoaded) {
+  useFocusEffect(useCallback(() => {
+    saved.refetch();
+  }, [selectedDate]));
+
+  const serverPlan = savedWeekSelections(saved.data);
+  const plan = Object.keys(serverPlan).length > 0
+    ? serverPlan
+    : selectedDate === today ? offlinePlan : null;
+  const locks = savedWeekLocks(saved.data);
+
+  if (saved.isLoading && !offlinePlan) {
     return (
       <View style={styles.center}>
         <ActivityIndicator />
@@ -59,8 +84,33 @@ export default function Home() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Today's plan</Text>
-      <Text style={styles.subheader}>{weekday}</Text>
+      <Text style={styles.header}>Meal plan</Text>
+      <Text style={styles.subheader}>Choose a date, then pick dishes for that day.</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dateRow}>
+        {dates.map((date) => {
+          const active = date === selectedDate;
+          const parsed = new Date(`${date}T12:00:00`);
+          return (
+            <Pressable
+              key={date}
+              accessibilityRole="button"
+              accessibilityState={{ selected: active }}
+              style={[styles.dateChip, active && styles.dateChipActive]}
+              onPress={() => setSelectedDate(date)}
+            >
+              <Text style={[styles.dateWeekday, active && styles.dateTextActive]}>
+                {parsed.toLocaleDateString(undefined, { weekday: "short" })}
+              </Text>
+              <Text style={[styles.dateDay, active && styles.dateTextActive]}>{parsed.getDate()}</Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+      <Text style={styles.selectedDateLabel}>
+        {new Date(`${selectedDate}T12:00:00`).toLocaleDateString(undefined, {
+          weekday: "long", month: "long", day: "numeric",
+        })}
+      </Text>
       <Pressable style={styles.refreshButton} onPress={() => setRefreshNonce((value) => value + 1)}>
         <Text style={styles.refreshButtonText}>Refresh unlocked meals</Text>
       </Pressable>
@@ -69,6 +119,7 @@ export default function Home() {
           key={slot}
           slot={slot}
           weekday={weekday}
+          slotDate={selectedDate}
           classCode={plan?.[weekday]?.[slot]}
           initiallyLocked={locks[weekday]?.[slot] === true}
           refreshNonce={refreshNonce}
@@ -81,33 +132,49 @@ export default function Home() {
 export function SlotSection({
   slot,
   weekday,
+  slotDate,
   classCode,
   initiallyLocked,
   refreshNonce,
 }: {
   slot: SlotName;
   weekday: string;
+  slotDate?: string;
   classCode?: string;
   initiallyLocked: boolean;
   refreshNonce: number;
 }) {
   const [locked, setLocked] = useState(initiallyLocked);
+  const previousDishNames = useRef<string[]>([]);
+  const previousResponse = useRef<SlotOptionsResponse | undefined>(undefined);
+  const effectiveRefreshNonce = locked ? 0 : refreshNonce;
   const query = useQuery({
-    queryKey: ["daily-plan", slot, weekday, classCode ?? null],
+    queryKey: ["daily-plan", slotDate ?? weekday, classCode ?? null, effectiveRefreshNonce],
     queryFn: () =>
       classCode
-        ? fetchClassDishes(slot, classCode, weekday, 8)
-        : fetchSlotOptions(slot, { weekday, count: 8 }),
+        ? fetchClassDishes(slot, classCode, weekday, 8, effectiveRefreshNonce > 0 ? previousDishNames.current : [])
+        : fetchSlotOptions(slot, {
+          weekday,
+          count: 8,
+          exclude_dish_names: effectiveRefreshNonce > 0 ? previousDishNames.current : [],
+        }),
   });
   const lock = useMutation({
-    mutationFn: (nextLocked: boolean) => setPlanSlotLock(weekday, slot, nextLocked),
+    mutationFn: (nextLocked: boolean) => setPlanSlotLock(weekday, slot, nextLocked, slotDate),
     onSuccess: (_data, nextLocked) => setLocked(nextLocked),
   });
 
   useEffect(() => setLocked(initiallyLocked), [initiallyLocked]);
   useEffect(() => {
-    if (refreshNonce > 0 && !locked) query.refetch();
-  }, [refreshNonce]); // locked/query are deliberately sampled when the user requests refresh.
+    if (query.data?.options?.length) {
+      previousDishNames.current = query.data.options.map((dish: PlanDish) => dish.name);
+      previousResponse.current = query.data;
+    }
+  }, [query.data]);
+
+  const response = query.data?.options?.length === 0 && effectiveRefreshNonce > 0
+    ? previousResponse.current ?? query.data
+    : query.data;
 
   return (
     <View style={styles.slotBlock}>
@@ -130,12 +197,21 @@ export function SlotSection({
         <Text style={styles.error}>{describeApiError(query.error)}</Text>
       ) : (
         <>
+          {query.data?.options?.length === 0 && effectiveRefreshNonce > 0 ? (
+            <Text style={styles.reconciledNote}>No additional dishes are available for this class yet.</Text>
+          ) : null}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}>
-            {(query.data?.options ?? []).map((d: PlanDish) => (
-              <DishCard key={d.name} dish={d} requestId={query.data?.request_id} slot={slot} />
+            {(response?.options ?? []).map((d: PlanDish) => (
+              <DishCard
+                key={d.name}
+                dish={d}
+                requestId={response?.request_id}
+                slot={slot}
+                slotDate={slotDate}
+              />
             ))}
           </ScrollView>
-          {(query.data?.addons ?? []).map((addon: PlanAddon) => (
+          {(response?.addons ?? []).map((addon: PlanAddon) => (
             <View key={`${addon.member_index}-${addon.class_code}`} style={styles.addonRow}>
               <Text style={styles.addonLabel}>{addon.member_role.replace("_", " ")} add-on</Text>
               <Text>{addon.dish.name}</Text>
@@ -157,8 +233,8 @@ export function SlotSection({
  * drove the class match (meal_class_name/cuisine) is honest given what this endpoint returns,
  * rather than fabricating a richer breakdown the API doesn't supply.
  */
-function DishCard({ dish, requestId, slot }: {
-  dish: PlanDish; requestId?: string; slot: SlotName;
+function DishCard({ dish, requestId, slot, slotDate }: {
+  dish: PlanDish; requestId?: string; slot: SlotName; slotDate?: string;
 }) {
   const [sent, setSent] = useState<FeedbackEventType | null>(null);
   const [showWhy, setShowWhy] = useState(false);
@@ -235,9 +311,9 @@ function DishCard({ dish, requestId, slot }: {
       {dish.meal_class_code ? (
         <Pressable onPress={() => router.push({
           pathname: "/add-to-date",
-          params: { dish: dish.name, classCode: dish.meal_class_code, slot },
+          params: { dish: dish.name, classCode: dish.meal_class_code, slot, date: slotDate },
         })} style={styles.feedbackButton}>
-          <Text style={styles.feedbackButtonText}>Add to date</Text>
+          <Text style={styles.feedbackButtonText}>Choose for this date</Text>
         </Pressable>
       ) : null}
     </View>
@@ -249,6 +325,13 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
   header: { fontSize: 24, fontWeight: "600" },
   subheader: { color: "#6B6B6B", fontSize: 14, marginTop: -8 },
+  dateRow: { gap: 8, paddingVertical: 2 },
+  dateChip: { minWidth: 48, borderWidth: 1, borderColor: "#D8D8D8", borderRadius: 10, padding: 8, alignItems: "center" },
+  dateChipActive: { borderColor: "#1F7A3F", backgroundColor: "#1F7A3F" },
+  dateWeekday: { color: "#666", fontSize: 11 },
+  dateDay: { fontSize: 16, fontWeight: "700" },
+  dateTextActive: { color: "white" },
+  selectedDateLabel: { fontSize: 16, fontWeight: "600" },
   slotBlock: { gap: 8, borderTopWidth: 1, borderTopColor: "#EEE", paddingTop: 10 },
   slotTitle: { fontSize: 18, fontWeight: "700", textTransform: "capitalize" },
   reconciledNote: { fontSize: 11, color: "#6B6B6B" },

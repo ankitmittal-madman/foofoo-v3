@@ -138,10 +138,8 @@ export async function recordRecommendationEvent(
   }
 }
 
-/** One row of a household's own recommendation history, as returned by the plan "history" surface
- * (P1-3, 2026-08). Deliberately narrow projection — no `plates` jsonb blob (that's per-request
- * audit detail, not what a "past plans" UI needs) and no other household's rows are ever
- * reachable, since the query is always scoped to the caller's own resolved household_id. */
+/** One row of a household's own recommendation history. `plates` is loaded only for the detail
+ * surface; no other household's rows are reachable because every query is profile-scoped. */
 export interface RecommendationHistoryRow {
   id: string;
   request_id: string;
@@ -149,6 +147,7 @@ export interface RecommendationHistoryRow {
   slot: string | null;
   outcome: string;
   plate_count: number;
+  plates?: unknown;
 }
 
 /**
@@ -183,5 +182,34 @@ export async function fetchRecentRecommendationEvents(
       detail: e instanceof Error ? e.message : String(e),
     });
     return [];
+  }
+}
+
+/** Fetch one recommendation event, always scoped to the authenticated caller's profile. */
+export async function fetchRecommendationEvent(
+  ctx: RequestContext,
+  householdId: string,
+  eventId: string,
+): Promise<RecommendationHistoryRow | null> {
+  try {
+    const db = createServiceRoleClient(ctx.config);
+    const { data, error } = await withTimeout(
+      db
+        .from("recommendation_events")
+        .select("id, request_id, created_at, slot, outcome, plate_count, plates")
+        .eq("profile_id", householdId)
+        .eq("id", eventId)
+        .maybeSingle(),
+      "recommendations.events.fetchRecommendationEvent",
+    );
+    if (error) throw error;
+    return data as RecommendationHistoryRow | null;
+  } catch (e) {
+    ctx.logger.warn("recommendation_history.detail_fetch_failed", {
+      household_id: householdId,
+      event_id: eventId,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+    return null;
   }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet } from "react-native";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { fetchSavedWeek, fetchWeeklyPlan, savedWeekSelections, saveWeekPlan } from "@/api/plan";
 import type { WeeklyClass, WeeklyPlanResponse } from "@/api/plan";
@@ -24,12 +24,13 @@ const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
  * router.push("/weekly-plan") still resolves here unmodified.
  */
 export default function WeeklyPlan() {
+  const queryClient = useQueryClient();
   const query = useQuery<WeeklyPlanResponse>({
     queryKey: ["weekly-plan"],
     queryFn: () => fetchWeeklyPlan(3),
   });
   const [selected, setSelected] = useState<FinalizedWeek>({});
-  const saved = useQuery({ queryKey: ["saved-week"], queryFn: fetchSavedWeek });
+  const saved = useQuery({ queryKey: ["saved-week"], queryFn: () => fetchSavedWeek() });
 
   useEffect(() => {
     if (saved.data?.plan) setSelected(savedWeekSelections(saved.data));
@@ -39,6 +40,10 @@ export default function WeeklyPlan() {
     mutationFn: async (plan: FinalizedWeek) => {
       await saveWeekPlan(plan, true);
       await saveWeeklyPlan(plan); // offline read-through cache; server remains authoritative
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["saved-week"] }),
+        queryClient.invalidateQueries({ queryKey: ["daily-plan"] }),
+      ]);
     },
     onSuccess: () => router.replace("/today"),
   });

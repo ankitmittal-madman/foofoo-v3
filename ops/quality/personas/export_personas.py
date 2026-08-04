@@ -46,6 +46,9 @@ def main() -> None:
             "forbid_ingredients": list(p.forbid_ingredients),
             "expect_warnings": p.expect_warnings,
             "note": p.note,
+            "user_type": p.user_type,
+            "source_persona_id": p.source_persona_id,
+            "test_user_id": f"synthetic:{p.key}",
         })
     json.dump(out, sys.stdout, indent=2)
     sys.stdout.write("\n")
