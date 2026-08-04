@@ -64,24 +64,28 @@ export default function OnboardingConsent() {
         </Text>
 
         <ConsentRow
+          testID="onboarding-consent-personalization"
           label="Personalize my recommendations"
           hint="Required — without this we can't build meal plans around your household."
           value={consent.personalization ?? true}
           onChange={(v) => setConsent({ personalization: v })}
         />
         <ConsentRow
+          testID="onboarding-consent-analytics"
           label="Help improve FooFoo with usage analytics"
           hint="Optional."
           value={consent.analytics ?? true}
           onChange={(v) => setConsent({ analytics: v })}
         />
         <ConsentRow
+          testID="onboarding-consent-push"
           label="Send me push notifications"
           hint="Optional — meal reminders and plan updates."
           value={consent.pushNotifications ?? false}
           onChange={(v) => setConsent({ pushNotifications: v })}
         />
         <ConsentRow
+          testID="onboarding-consent-retention"
           label="Retain my data to improve future plans"
           hint="Optional."
           value={consent.dataRetention ?? true}
@@ -97,6 +101,7 @@ export default function OnboardingConsent() {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + t.spacing.md }]}>
         <Pressable
+          testID="onboarding-consent-continue"
           onPress={handleContinue}
           style={({ pressed }) => [styles.button, { backgroundColor: t.colors.selected, opacity: pressed ? 0.9 : 1 }]}
         >
@@ -112,11 +117,13 @@ function ConsentRow({
   hint,
   value,
   onChange,
+  testID,
 }: {
   label: string;
   hint: string;
   value: boolean;
   onChange: (v: boolean) => void;
+  testID?: string;
 }) {
   const t = useTheme();
   return (
@@ -125,7 +132,7 @@ function ConsentRow({
         <Text style={[styles.rowLabel, { color: t.colors.text, fontFamily: t.fonts.bodySemiBold }]}>{label}</Text>
         <Text style={[styles.rowHint, { color: t.colors.textSecondary, fontFamily: t.fonts.body }]}>{hint}</Text>
       </View>
-      <Switch value={value} onValueChange={onChange} />
+      <Switch testID={testID} value={value} onValueChange={onChange} />
     </View>
   );
 }

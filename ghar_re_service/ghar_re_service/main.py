@@ -45,6 +45,7 @@ SIGNED_PATHS = frozenset(
         "/v1/recommendations",
         # WP-18 planning surfaces — all compute calls, so all signed + rate-limited.
         "/v1/cold-start",
+        "/v1/calibration",
         "/v1/meal-plan",
         "/v1/weekly-plan",
         "/v1/class-dishes",
@@ -122,6 +123,7 @@ RATE_LIMITED_PATHS = frozenset(
         "/v1/recommendations",
         "/v1/meta",
         "/v1/cold-start",
+        "/v1/calibration",
         "/v1/meal-plan",
         "/v1/weekly-plan",
         "/v1/class-dishes",
@@ -389,6 +391,13 @@ def _planning_call(name, fn, payload, request, needs_household=True):
 def cold_start(request: Request, payload: dict = Body(...)):  # noqa: B008
     """WP-18 surface 1: top-15 diverse dishes for the post-onboarding preference primer."""
     return _planning_call("cold_start", engine.plan_cold_start, payload, request)
+
+
+@app.post("/v1/calibration")
+def calibration(request: Request, payload: dict = Body(...)):  # noqa: B008
+    """WP-18 dish-pick surface: 3 slots x 5 dishes (3 expected-positive + 2 planted-mismatch,
+    cell_role never surfaced to the client) for the post-onboarding calibration grid."""
+    return _planning_call("calibration", engine.plan_calibration, payload, request)
 
 
 @app.post("/v1/meal-plan")

@@ -47,9 +47,9 @@ before adding new features), **P1** (closes a real functional gap in the shipped
    functionality (operational logging, feature flags, weather caching, push notifications), not
    accidentally-orphaned debris. Keep-vs-archive is a product/ops call this audit does not make —
    see the Founder decision log for the open question.
-6. **G6 pairing bug** (`pairing.py:99-110`, report 02, 09 §6) — already a tracked, Founder-level
-   decision (fixing it changes golden-master scoring output), not a silent defect. Include it in the
-   next scoring-review cycle rather than leaving it perpetually deferred with no decision date.
+6. **RESOLVED (2026-08-04) — see FD-19, `docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md`.**
+   G6 fixed: `pairing.py`'s `l_protein` check widened to `set(l.dish_category) & protein_cat`
+   (all four named categories). Golden-master regenerated, diff reviewed, 165/165 tests pass.
 7. **Vegan/halal/no-beef dietary filters — status update 2026-08-04.** Two of the three corrected
    this pass:
    - **No-beef/no-pork was already a real, working hard filter**, not "prose-only" as originally
@@ -93,13 +93,10 @@ before adding new features), **P1** (closes a real functional gap in the shipped
     canonical source.
 12. **Cosine-similarity/embedding cross-cuisine discovery** (SP-F6, report 03) — spec-only today; a
     genuine v2 feature, not a v1 regression.
-13. **4-state evolution/confidence model, MMR variety, Never/Not-Today decay** (RE-DOC-01-05
-    concepts) — these were superseded by different, evidenced mechanisms in the actually-built
-    engine (report 02, 01 §B), not silently dropped. If the Founder wants the *specific* algorithms
-    (MMR λ=0.7, exponential Not-Today decay) rather than their functional replacements, that is a new
-    engineering decision, not a bug fix — flag as a design choice to explicitly ratify or formally
-    supersede in governance, since no document currently records that spec generation 1's algorithms
-    were intentionally replaced.
+13. **RESOLVED (2026-08-04) — see FD-19.** The spec-generation-1 → generation-2 pivot (BASE×GAIN_Q15,
+    epsilon-greedy exploration, `lifecycle_stage` cold-start ramping replacing MMR/4-state-model/
+    Never-Not-Today-decay) is now Founder-ratified as the intended design, closing the governance
+    gap; generation-1's specific algorithms are not to be resurrected.
 
 ## P3 — hygiene / documentation cleanup
 

@@ -97,17 +97,15 @@ def compat(d, l):
     if d_rich != l_rich:
         val += b_balance
     # G6 protein-veg balance: pulse/protein liquid + veg dry (or vice versa)
-    # ⚠️ KNOWN GAP (surfaced by ruff F841, Phase C.5 — flagged, deliberately NOT fixed here):
-    # protein_cat below names FOUR protein categories, but the l_protein check on the next line
-    # only tests {"dal_lentil"} (plus the non_veg/egg diet fallback). A liquid whose category is
-    # kebab / egg_dish / curry therefore does not earn the b_protein bonus unless its diet also
-    # happens to be non_veg/egg. Widening the check to `set(l.dish_category) & protein_cat` is a
-    # one-line change, but it CHANGES SCORING OUTPUT for affected plates — which is a reviewed
-    # recommendation-quality decision for the Founder, not a lint cleanup. The golden-master test
-    # will fail loudly the moment someone makes it, which is exactly the intended behaviour.
-    # The constant is kept (not deleted) so the intended rule stays visible in the code.
-    protein_cat = {"dal_lentil", "kebab", "egg_dish", "curry"}  # noqa: F841 — see note above
-    l_protein = bool(set(l.dish_category) & {"dal_lentil"}) or l.diet in ("non_veg", "egg")
+    # FIXED (Founder-ratified 2026-08-04, reports/re_audit/10_remaining_work.md #6): l_protein
+    # previously only tested {"dal_lentil"}, silently excluding kebab/egg_dish/curry liquids from
+    # the b_protein bonus unless their diet also happened to be non_veg/egg. Widened to the full
+    # protein_cat set below, per the fix this comment block previously described but deliberately
+    # deferred. CHANGES SCORING OUTPUT for affected plates — golden-master files were regenerated
+    # in the same change (`python -m ghar_re_core.tests.test_golden_master --update`), diff
+    # reviewed, not silently absorbed.
+    protein_cat = {"dal_lentil", "kebab", "egg_dish", "curry"}
+    l_protein = bool(set(l.dish_category) & protein_cat) or l.diet in ("non_veg", "egg")
     d_veg = "dry_sabzi" in d.dish_category
     if l_protein and d_veg:
         val += b_protein

@@ -68,6 +68,7 @@ export default function OnboardingStep2() {
           Determines your regional cuisine affinity — independent of where you currently live.
         </Text>
         <Pressable
+          testID="onboarding-step2-state-field"
           onPress={() => setPickerOpen(true)}
           style={({ pressed }) => [styles.field, { backgroundColor: t.colors.surface, borderColor: t.colors.border, opacity: pressed ? 0.95 : 1 }]}
         >
@@ -80,6 +81,7 @@ export default function OnboardingStep2() {
         <Text style={[styles.sectionLabel, { color: t.colors.textSecondary, fontFamily: t.fonts.bodySemiBold }]}>CURRENT CITY</Text>
         <Text style={[styles.helper, { color: t.colors.textSecondary, fontFamily: t.fonts.body }]}>Where you live day to day.</Text>
         <TextInput
+          testID="onboarding-step2-city-input"
           value={currentCity ?? ""}
           onChangeText={(v) => setAnswers({ currentCity: v })}
           placeholder="e.g. Pune"
@@ -96,6 +98,7 @@ export default function OnboardingStep2() {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + t.spacing.md }]}>
         <Pressable
+          testID="onboarding-step2-continue"
           disabled={!canContinue || mutation.isPending}
           onPress={() => mutation.mutate()}
           style={({ pressed }) => [styles.button, { backgroundColor: canContinue ? t.colors.selected : t.colors.disabled, opacity: pressed && canContinue ? 0.9 : 1 }]}
@@ -131,7 +134,7 @@ export default function OnboardingStep2() {
               renderItem={({ item }) => {
                 const selected = item === homeState;
                 return (
-                  <Pressable onPress={() => selectState(item)} style={({ pressed }) => [styles.row, { opacity: pressed ? 0.6 : 1 }]}>
+                  <Pressable testID={`onboarding-step2-state-option-${item}`} onPress={() => selectState(item)} style={({ pressed }) => [styles.row, { opacity: pressed ? 0.6 : 1 }]}>
                     <Text style={[styles.rowText, { color: selected ? t.colors.primary : t.colors.text, fontFamily: selected ? t.fonts.bodySemiBold : t.fonts.body }]}>{item}</Text>
                     {selected ? <Text style={[styles.rowCheck, { color: t.colors.primary }]}>✓</Text> : null}
                   </Pressable>

@@ -20,12 +20,12 @@
       "hero_dish": null,
       "heroes": [
         "Cabbage Sabzi",
-        "Gujarati Toor Dal"
+        "Gujarati Kadhi"
       ],
-      "liquid": "Gujarati Toor Dal",
-      "plate_calories": 320,
-      "score": 6.02699,
-      "support": "Roti"
+      "liquid": "Gujarati Kadhi",
+      "plate_calories": 300,
+      "score": 6.035986,
+      "support": "Rice"
     },
     {
       "dry": "Dhokla",
@@ -33,12 +33,12 @@
       "hero_dish": null,
       "heroes": [
         "Dhokla",
-        "Gujarati Kadhi"
+        "Gujarati Toor Dal"
       ],
-      "liquid": "Gujarati Kadhi",
-      "plate_calories": 340,
-      "score": 5.472905,
-      "support": "Rice"
+      "liquid": "Gujarati Toor Dal",
+      "plate_calories": 360,
+      "score": 5.465865,
+      "support": "Roti"
     },
     {
       "dry": null,

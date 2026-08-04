@@ -19,13 +19,13 @@
       "form": "pair",
       "hero_dish": null,
       "heroes": [
-        "Moong Dal",
+        "Gujarati Kadhi",
         "Pumpkin Sabzi"
       ],
-      "liquid": "Moong Dal",
+      "liquid": "Gujarati Kadhi",
       "plate_calories": 320,
-      "score": 3.764066,
-      "support": "Roti"
+      "score": 3.83376,
+      "support": "Rice"
     },
     {
       "dry": "Dhokla",
@@ -33,12 +33,12 @@
       "hero_dish": null,
       "heroes": [
         "Dhokla",
-        "Gujarati Kadhi"
+        "Moong Dal"
       ],
-      "liquid": "Gujarati Kadhi",
+      "liquid": "Moong Dal",
       "plate_calories": 340,
-      "score": 3.343867,
-      "support": "Rice"
+      "score": 3.649032,
+      "support": "Roti"
     },
     {
       "dry": "Aloo Posto",

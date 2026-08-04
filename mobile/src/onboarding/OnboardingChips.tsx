@@ -13,10 +13,15 @@ export function ChipGroup({
   options,
   selected,
   onToggle,
+  testIDPrefix,
 }: {
   options: ChipOption[];
   selected: string[];
   onToggle: (value: string) => void;
+  // Additive, optional: lets each onboarding screen give its chip instances a stable,
+  // screen-scoped testID (e.g. "onboarding-step3-meat-chicken") for the WP-22 UI journey
+  // driver, without every call site needing its own bespoke chip component.
+  testIDPrefix?: string;
 }) {
   const t = useTheme();
   return (
@@ -26,6 +31,7 @@ export function ChipGroup({
         return (
           <Pressable
             key={opt.value}
+            testID={testIDPrefix ? `${testIDPrefix}-${opt.value}` : undefined}
             onPress={() => onToggle(opt.value)}
             style={({ pressed }) => [
               styles.chip,

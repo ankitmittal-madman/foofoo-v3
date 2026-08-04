@@ -158,20 +158,20 @@ export default function OnboardingStep5() {
         {split ? (
           <>
             <Section label="ELDEST IN THE HOME">
-              <ChipGroup options={AGE_RANGES} selected={sel("ageEldest")} onToggle={(v) => selectOne("ageEldest", v)} />
+              <ChipGroup options={AGE_RANGES} selected={sel("ageEldest")} onToggle={(v) => selectOne("ageEldest", v)} testIDPrefix="onboarding-step5-age-eldest" />
             </Section>
             <Section label="YOUNGEST IN THE HOME" hint="Helps us keep meals gentle enough for little ones.">
-              <ChipGroup options={AGE_YOUNGEST} selected={sel("ageYoungest")} onToggle={(v) => selectOne("ageYoungest", v)} />
+              <ChipGroup options={AGE_YOUNGEST} selected={sel("ageYoungest")} onToggle={(v) => selectOne("ageYoungest", v)} testIDPrefix="onboarding-step5-age-youngest" />
             </Section>
           </>
         ) : (
           <Section label="AGE GROUP">
-            <ChipGroup options={AGE_RANGES} selected={sel("ageSingle")} onToggle={(v) => selectOne("ageSingle", v)} />
+            <ChipGroup options={AGE_RANGES} selected={sel("ageSingle")} onToggle={(v) => selectOne("ageSingle", v)} testIDPrefix="onboarding-step5-age-single" />
           </Section>
         )}
 
         <Section label="WHO COOKS?">
-          <ChipGroup options={WHO_COOKS} selected={sel("whoCooks")} onToggle={(v) => selectOne("whoCooks", v)} />
+          <ChipGroup options={WHO_COOKS} selected={sel("whoCooks")} onToggle={(v) => selectOne("whoCooks", v)} testIDPrefix="onboarding-step5-whocooks" />
         </Section>
 
         <View
@@ -186,16 +186,16 @@ export default function OnboardingStep5() {
             error={attemptedContinue && !canContinue}
             errorText="Please select your cooking skill to continue."
           >
-            <ChipGroup options={COOK_CAPABILITY} selected={sel("cookCapability")} onToggle={(v) => selectOne("cookCapability", v as CookCapability)} />
+            <ChipGroup options={COOK_CAPABILITY} selected={sel("cookCapability")} onToggle={(v) => selectOne("cookCapability", v as CookCapability)} testIDPrefix="onboarding-step5-cookcapability" />
           </Section>
         </View>
 
         <Section label="HOW OFTEN DO YOU EAT OUT?">
-          <ChipGroup options={EAT_OUT} selected={sel("eatOutFrequency")} onToggle={(v) => selectOne("eatOutFrequency", v)} />
+          <ChipGroup options={EAT_OUT} selected={sel("eatOutFrequency")} onToggle={(v) => selectOne("eatOutFrequency", v)} testIDPrefix="onboarding-step5-eatout" />
         </Section>
 
         <Section label="WHAT ARE YOU COOKING FOR?" hint="Skip and we'll aim for awesome taste.">
-          <ChipGroup options={OBJECTIVES} selected={sel("cookingObjective")} onToggle={(v) => selectOne("cookingObjective", v)} />
+          <ChipGroup options={OBJECTIVES} selected={sel("cookingObjective")} onToggle={(v) => selectOne("cookingObjective", v)} testIDPrefix="onboarding-step5-objective" />
         </Section>
 
         {mutation.isError ? (
@@ -207,6 +207,7 @@ export default function OnboardingStep5() {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + t.spacing.md }]}>
         <Pressable
+          testID="onboarding-step5-continue"
           disabled={mutation.isPending}
           onPress={handleContinue}
           style={({ pressed }) => [styles.button, { backgroundColor: t.colors.selected, opacity: pressed ? 0.9 : 1 }]}

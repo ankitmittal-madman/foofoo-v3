@@ -19,6 +19,9 @@ export interface PlanDish {
   score: number;
   image_url: string | null;
   slot?: string;
+  /** Engine-internal calibration bookkeeping (calibration surface only) — plumbing for feedback,
+   * never rendered by any screen. */
+  cell_role?: "expected_positive" | "planted_negative";
 }
 
 export interface ColdStartResponse {
@@ -28,6 +31,12 @@ export interface ColdStartResponse {
   /** Stamped by plan/handler.ts specifically for this call — pass through to POST /v1/feedback
    * (api/feedback.ts) so a cold-start "like" tap resolves to the recommendation_events row the
    * handler wrote for this response. */
+  request_id?: string;
+}
+
+export interface CalibrationResponse {
+  kind: string;
+  slots: { breakfast: PlanDish[]; lunch: PlanDish[]; dinner: PlanDish[] };
   request_id?: string;
 }
 
@@ -81,6 +90,12 @@ export type Slot = "breakfast" | "lunch" | "dinner";
 /** Surface 1 — post-onboarding top-N (default 15) diverse dishes to like/seed preferences. */
 export function fetchColdStart(count = 15): Promise<ColdStartResponse> {
   return apiPost<ColdStartResponse>("/plan", { surface: "cold_start", count });
+}
+
+/** Dish-pick calibration grid — 3 slots x 5 dishes (3 expected-positive + 2 planted-mismatch,
+ * cell_role never shown in the UI, only echoed back on feedback). */
+export function fetchCalibrationGrid(): Promise<CalibrationResponse> {
+  return apiPost<CalibrationResponse>("/plan", { surface: "calibration" });
 }
 
 /** Surface 2 — a slot's 4–5 dish options (pass class_code to reconcile to one finalized class). */

@@ -4,6 +4,7 @@
  * THIN orchestration, same frozen boundary as recommendations/handler.ts (Edge owns auth/DB, the RE
  * owns the math). One function multiplexes the five planning surfaces via `body.surface`:
  *   cold_start    -> RE /v1/cold-start     (15 diverse dishes to seed preferences)
+ *   calibration   -> RE /v1/calibration    (3 slots x 5 dishes: dish-pick calibration grid)
  *   meal_plan     -> RE /v1/meal-plan      (a slot's 4–5 dish options)
  *   weekly_plan   -> RE /v1/weekly-plan    (7 days × slots, top-3 classes each)
  *   class_dishes  -> RE /v1/class-dishes   (reconciliation: dishes of a finalized class)
@@ -30,6 +31,7 @@ const SERVICE_NAME = "plan";
 // surface -> { RE path, whether it needs the composed household }
 const SURFACES: Record<string, { path: string; needsHousehold: boolean }> = {
   cold_start: { path: "/v1/cold-start", needsHousehold: true },
+  calibration: { path: "/v1/calibration", needsHousehold: true },
   meal_plan: { path: "/v1/meal-plan", needsHousehold: true },
   weekly_plan: { path: "/v1/weekly-plan", needsHousehold: true },
   class_dishes: { path: "/v1/class-dishes", needsHousehold: true },
@@ -101,14 +103,18 @@ export function makePlanHandler(): Handler {
 
     if (result.ok) {
       log.info("plan.re_call_done", { latency_ms: latencyMs });
-      // cold_start only: write a recommendation_events row so POST /v1/feedback (which resolves
-      // request_id -> recommendation_events, see feedback/events.ts) has something to resolve
-      // against — previously cold-start "likes" could never be recorded at all, since this surface
-      // never wrote a row here. Best-effort (recordRecommendationEvent never throws/never blocks
-      // the response, same as recommendations/handler.ts's own call site); skipped for a stubbed
-      // (no-profile-yet) household, same guard recordRecommendationEvent already applies itself.
-      if (surface === "cold_start" && resolvedHouseholdId) {
-        const dishes = (result.body as Record<string, unknown>).dishes;
+      // cold_start / calibration only: write a recommendation_events row so POST /v1/feedback
+      // (which resolves request_id -> recommendation_events, see feedback/events.ts) has something
+      // to resolve against — previously cold-start "likes" could never be recorded at all, since
+      // these surfaces never wrote a row here. Best-effort (recordRecommendationEvent never
+      // throws/never blocks the response, same as recommendations/handler.ts's own call site);
+      // skipped for a stubbed (no-profile-yet) household, same guard recordRecommendationEvent
+      // already applies itself.
+      if ((surface === "cold_start" || surface === "calibration") && resolvedHouseholdId) {
+        const body = result.body as Record<string, unknown>;
+        const dishes = surface === "calibration"
+          ? Object.values((body.slots as Record<string, unknown[]>) ?? {}).flat()
+          : body.dishes;
         const dishCount = Array.isArray(dishes) ? dishes.length : 0;
         await recordRecommendationEvent(ctx, {
           requestId,

@@ -127,17 +127,17 @@ export default function OnboardingStep3() {
           {diet === "non_veg" ? (
             <>
               <FollowUp label="MEAT PREFERENCES" hint="Pick what you enjoy, or “Any”.">
-                <ChipGroup options={MEATS} selected={answers.meatPreferences} onToggle={toggleMeat} />
+                <ChipGroup options={MEATS} selected={answers.meatPreferences} onToggle={toggleMeat} testIDPrefix="onboarding-step3-meat" />
               </FollowUp>
               <FollowUp label="ANY VEG-ONLY DAYS?" hint="We’ll keep these days fully vegetarian.">
-                <ChipGroup options={DAYS} selected={answers.vegDays} onToggle={(v) => toggle("vegDays", v)} />
+                <ChipGroup options={DAYS} selected={answers.vegDays} onToggle={(v) => toggle("vegDays", v)} testIDPrefix="onboarding-step3-vegday" />
               </FollowUp>
             </>
           ) : null}
 
           {diet === "eggetarian" ? (
             <FollowUp label="ANY VEG-ONLY DAYS?" hint="We’ll keep these days fully vegetarian.">
-              <ChipGroup options={DAYS} selected={answers.vegDays} onToggle={(v) => toggle("vegDays", v)} />
+              <ChipGroup options={DAYS} selected={answers.vegDays} onToggle={(v) => toggle("vegDays", v)} testIDPrefix="onboarding-step3-vegday" />
             </FollowUp>
           ) : null}
         </View>
@@ -151,6 +151,7 @@ export default function OnboardingStep3() {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + t.spacing.md }]}>
         <Pressable
+          testID="onboarding-step3-continue"
           disabled={!canContinue || mutation.isPending}
           onPress={() => mutation.mutate()}
           style={({ pressed }) => [styles.button, { backgroundColor: canContinue ? t.colors.selected : t.colors.disabled, opacity: pressed && canContinue ? 0.9 : 1 }]}
@@ -176,6 +177,7 @@ function DietCard({ option, selected, onPress }: { option: DietOption; selected:
   const toneColor = option.tone === "plant" ? t.colors.success : option.tone === "egg" ? t.colors.accent : t.colors.primary;
   return (
     <Pressable
+      testID={`onboarding-step3-diet-${option.value}`}
       onPress={onPress}
       style={({ pressed }) => [styles.dietCard, { backgroundColor: selected ? t.colors.selected : t.colors.surface, borderColor: selected ? t.colors.selected : t.colors.border, opacity: pressed ? 0.94 : 1 }]}
     >

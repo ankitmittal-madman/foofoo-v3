@@ -99,9 +99,10 @@ export default function OnboardingStep4() {
 
         <Text style={[styles.sectionLabel, { color: t.colors.textSecondary, fontFamily: t.fonts.bodySemiBold }]}>ALLERGIES</Text>
         <Text style={[styles.hint, { color: t.colors.textSecondary, fontFamily: t.fonts.body }]}>We&apos;ll never recommend a dish containing these.</Text>
-        <ChipGroup options={ALLERGENS} selected={answers.allergens} onToggle={(v) => toggleOption("allergens", "allergensOther", v)} />
+        <ChipGroup options={ALLERGENS} selected={answers.allergens} onToggle={(v) => toggleOption("allergens", "allergensOther", v)} testIDPrefix="onboarding-step4-allergen" />
         {answers.allergens.includes("others") ? (
           <OtherInput
+            testID="onboarding-step4-allergen-other-input"
             value={answers.allergensOther}
             onChangeText={(v) => setAnswers({ allergensOther: v })}
             placeholder="Tell us what you're allergic to"
@@ -114,9 +115,10 @@ export default function OnboardingStep4() {
 
         <Text style={[styles.sectionLabel, { color: t.colors.textSecondary, fontFamily: t.fonts.bodySemiBold }]}>MEDICAL CONDITIONS</Text>
         <Text style={[styles.hint, { color: t.colors.textSecondary, fontFamily: t.fonts.body }]}>Optional — you can skip this.</Text>
-        <ChipGroup options={MEDICAL_CONDITIONS} selected={answers.medicalConditions} onToggle={(v) => toggleOption("medicalConditions", "medicalConditionsOther", v)} />
+        <ChipGroup options={MEDICAL_CONDITIONS} selected={answers.medicalConditions} onToggle={(v) => toggleOption("medicalConditions", "medicalConditionsOther", v)} testIDPrefix="onboarding-step4-condition" />
         {answers.medicalConditions.includes("others") ? (
           <OtherInput
+            testID="onboarding-step4-condition-other-input"
             value={answers.medicalConditionsOther}
             onChangeText={(v) => setAnswers({ medicalConditionsOther: v })}
             placeholder="Tell us about your condition"
@@ -135,7 +137,7 @@ export default function OnboardingStep4() {
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + t.spacing.md }]}>
-        <Pressable disabled={mutation.isPending} onPress={handleContinue} style={({ pressed }) => [styles.button, { backgroundColor: t.colors.selected, opacity: pressed ? 0.9 : 1 }]}>
+        <Pressable testID="onboarding-step4-continue" disabled={mutation.isPending} onPress={handleContinue} style={({ pressed }) => [styles.button, { backgroundColor: t.colors.selected, opacity: pressed ? 0.9 : 1 }]}>
           <Text style={[styles.buttonLabel, { fontFamily: t.fonts.bodySemiBold, color: t.colors.onSelected }]}>{mutation.isPending ? "Saving..." : "Continue →"}</Text>
         </Pressable>
       </View>
@@ -157,15 +159,16 @@ export default function OnboardingStep4() {
  *                "Others" selected but this field left blank).
  * @param errorText - the message shown under the box when `error` is true.
  */
-function OtherInput({ value, onChangeText, placeholder, onLayout, onFocus, error, errorText }: {
+function OtherInput({ value, onChangeText, placeholder, onLayout, onFocus, error, errorText, testID }: {
   value: string; onChangeText: (v: string) => void; placeholder: string;
   onLayout?: (e: LayoutChangeEvent) => void; onFocus?: () => void;
-  error?: boolean; errorText?: string;
+  error?: boolean; errorText?: string; testID?: string;
 }) {
   const t = useTheme();
   return (
     <View onLayout={onLayout}>
       <TextInput
+        testID={testID}
         value={value}
         onChangeText={onChangeText}
         onFocus={onFocus}

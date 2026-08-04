@@ -15,6 +15,7 @@ import json
 import uuid
 from typing import Any
 
+from ghar_re_core import calibration as calib
 from ghar_re_core import meal_planner as planner
 from ghar_re_core import pipeline as core_pipeline
 from ghar_re_core import scoring as S
@@ -113,6 +114,21 @@ def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any
         household_id=request.get("household_id"),
     )
     _with_images(res["dishes"])
+    return res
+
+
+def plan_calibration(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
+    """WP-18 dish-pick surface: 3 slots x 5 dishes (3 expected-positive + 2 planted-mismatch,
+    cell_role never surfaced to the client) for the post-onboarding calibration grid."""
+    hh = build_household_dict(request["household"])
+    res = calib.calibration_grid(
+        hh,
+        catalogue,
+        weekday=request.get("weekday", "Monday"),
+        household_id=request.get("household_id"),
+    )
+    for slot_dishes in res["slots"].values():
+        _with_images(slot_dishes)
     return res
 
 

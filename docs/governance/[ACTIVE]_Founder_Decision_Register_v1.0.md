@@ -86,6 +86,7 @@ Applied to every item in this Register, per the task's own taxonomy:
 | FD-16 | Seeds 101/102 rollback gap — permanent acceptance | Ratified | §7 |
 | FD-17 | REPO-CERT-017 permanent numbering skip | Ratified | §7 |
 | FD-18 | LF-C design-phase inputs: weekly-plan derivation, bandit re-grain target, config-table unification timing | Ratified | §7 |
+| FD-19 | Spec-generation-1→2 algorithm pivot ratification + G6 pairing fix | Ratified | §7 |
 | PD-01 | Class-first architecture | Ratified | §8 |
 | PD-02 | RE module isolation ("the RE is the product") | Ratified | §8 |
 | PD-03 | Freemium monetization, 90-day habit window | Ratified | §8 |
@@ -472,6 +473,26 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Acceptance Criteria:** Satisfied by this ratification itself for the purpose of unblocking LF-C's design phase; each of (a)/(b)/(c) gets its own acceptance criteria when actually implemented.
 - **Future Review Trigger:** None for (a) — folded into LF-C permanently. (b) and (c) are tracked as near-term, non-blocking follow-ups — revisit if LF-C's design phase surfaces new information that changes either recommendation.
 - **Source Evidence:** `[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md` §8 (Table Classification), §9 (Requires Founder Decision), §12 (Recommended Future Architecture), §13 (Migration Roadmap), §14 (Founder Decisions Required, items 2–4).
+
+### FD-19 — Ratify the spec-generation-1 → generation-2 algorithm pivot; approve the G6 pairing fix
+- **Status:** Ratified (2026-08-04, Founder decision, this session) · **Origin:** `reports/re_audit/10_remaining_work.md` items #6 and #13 (2026-08-04 RE knowledge-base audit)
+- **Context:** Spec generation 1 (RE-DOC-01–05: MMR λ=0.70 variety re-ranking, exponential Never/Not-Today decay, a 4-state confidence-evolution model) was never built. The actually-shipped Python engine (`ghar_re_core`) instead implements a different, evidenced design: BASE×GAIN_Q15 scoring, epsilon-greedy exploration, `lifecycle_stage`-based cold-start ramping. No governance document previously recorded whether this was an intentional pivot or an unfinished migration — the same class of gap RE-DOC-12 flagged for the earlier two-engine (TS/Python) question. Separately, `pairing.py`'s G6 protein-veg balance check (`compat()`, lines ~99-110) had a known, code-commented bug: `l_protein` only tested `dish_category == {"dal_lentil"}` when the surrounding `protein_cat` constant named four categories (`dal_lentil`, `kebab`, `egg_dish`, `curry`) — kebab/egg_dish/curry liquids never earned the `b_protein` bonus unless their `diet` also happened to be non_veg/egg. Both were previously left open pending exactly this kind of dated ruling.
+- **Problem Statement:** (a) Is generation-2's mechanism set the ratified intended design, or does generation-1's specific algorithm list (MMR, 4-state model, Never/Not-Today decay) still need to be built? (b) Does the G6 fix apply now, accepting that it changes golden-master scoring output for affected plates?
+- **Alternatives Considered:** (a) Ratify generation-2 as-is (recommended — it is real, tested (93/93 passing pre-session, 165/165 post), evidenced, and already in production) vs. require generation-1's specific algorithms be built to match the original spec vs. leave both unratified indefinitely. (b) Apply the one-line widen-to-`protein_cat` fix now (recommended — the comment left in the code since Phase C.5 already named the exact fix) vs. leave G6 as a permanently-known bug.
+- **Final Decision:** Ratified — generation-2's actually-shipped mechanisms (BASE×GAIN_Q15, epsilon-greedy exploration, `lifecycle_stage` cold-start ramping) are confirmed as the intended design, superseding spec-generation-1's MMR/4-state-model/Never-Not-Today-decay concept list; the latter are not to be resurrected. G6 fixed: `l_protein` now checks `set(l.dish_category) & protein_cat` (all four named categories), `ghar_re_core/pairing.py`. Golden-master files regenerated same-session (`python -m ghar_re_core.tests.test_golden_master --update`) — all 4 golden cases' scored plates changed; diff reviewed, not silently absorbed; 165/165 tests pass post-update.
+- **Business Rationale:** Users see more accurate protein-veg-balanced plate pairings (kebab/egg_dish/curry-liquid pairs now correctly credited); no user-facing regression expected, only additional plates now correctly favored under an existing, already-shipped rule.
+- **Technical Rationale:** (a) Generation-2 is real, running in production, and test-certified — ratifying it as intentional rather than leaving it as an undocumented pivot closes a documentation/governance gap, not an engineering one, per the audit's own framing. (b) The fix was already fully specified in the pre-existing code comment (Phase C.5); this ratification is what the comment said was needed before applying it — a reviewed, dated Founder decision, not a silent lint cleanup.
+- **Engineering Impact:** None further for (a) — no code change, only ratification. (b) is applied and merged this session.
+- **AI Impact:** None. **Recommendation Engine Impact:** (a) None (no behavior change, only its governance status). (b) Changes `compat()`'s `b_protein` bonus eligibility for kebab/egg_dish/curry-category liquids — a real, intentional scoring change.
+- **Database Impact:** None. **API Impact:** None. **Batch Impact:** None. **ETL Impact:** None. **Architecture Impact:** None — both items are within the already-frozen Core Spine's own module boundaries.
+- **Affected Documents:** `reports/re_audit/10_remaining_work.md` (items #6, #13 marked resolved by reference to this entry). RE-DOC-01–05 remain on disk as historical record per the never-delete-a-superseded-document rule (GOV-02) — not stamped SUPERSEDED by this entry itself, since they were never the shipped implementation; this Register entry is the authoritative record that generation-2 superseded their algorithm list in practice.
+- **Affected Work Packages:** None new.
+- **Affected Tests:** `ghar_re_core/tests/golden/*.json` (all 4 regenerated), `ghar_re_core/tests/test_golden_master.py` (passes against new baseline).
+- **Affected Epics:** None currently.
+- **Implementation Notes:** `ghar_re_core/pairing.py`'s `compat()` comment updated in place to record this ratification date rather than describing the fix as still-deferred.
+- **Acceptance Criteria:** Satisfied by this ratification and the merged code/golden-master change itself.
+- **Future Review Trigger:** None for (a) — permanent. None for (b) — the fix is final, not provisional.
+- **Source Evidence:** `ghar_re_core/pairing.py` (pre-fix code comment naming the exact fix and its scoring-output caveat); `reports/re_audit/10_remaining_work.md` items #6, #13; live test run, this session (165/165 passing post-fix).
 
 ---
 

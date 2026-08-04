@@ -54,16 +54,16 @@
       "support": "Rice"
     },
     {
-      "dry": "Dhokla",
+      "dry": "Pumpkin Sabzi",
       "form": "pair",
       "hero_dish": null,
       "heroes": [
-        "Dhokla",
-        "Pithla"
+        "Pithla",
+        "Pumpkin Sabzi"
       ],
       "liquid": "Pithla",
-      "plate_calories": 360,
-      "score": 4.081443,
+      "plate_calories": 340,
+      "score": 4.134334,
       "support": "Rice"
     },
     {

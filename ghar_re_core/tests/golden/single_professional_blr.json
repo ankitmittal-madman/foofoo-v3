@@ -28,6 +28,19 @@
       "support": "Rice"
     },
     {
+      "dry": "Lauki Sabzi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Lauki Sabzi",
+        "Sarson Ka Saag"
+      ],
+      "liquid": "Sarson Ka Saag",
+      "plate_calories": 390,
+      "score": 4.488395,
+      "support": "Rice"
+    },
+    {
       "dry": "Idli",
       "form": "pair",
       "hero_dish": null,
@@ -54,6 +67,19 @@
       "support": "Poori"
     },
     {
+      "dry": "Aloo Gobi",
+      "form": "pair",
+      "hero_dish": null,
+      "heroes": [
+        "Aloo Gobi",
+        "Punjabi Kadhi Pakora"
+      ],
+      "liquid": "Punjabi Kadhi Pakora",
+      "plate_calories": 540,
+      "score": 4.101682,
+      "support": "Rice"
+    },
+    {
       "dry": "Kanda Bhaji",
       "form": "pair",
       "hero_dish": null,
@@ -64,32 +90,6 @@
       "liquid": "Gujarati Kadhi",
       "plate_calories": 490,
       "score": 4.009803,
-      "support": "Rice"
-    },
-    {
-      "dry": "Lauki Sabzi",
-      "form": "pair",
-      "hero_dish": null,
-      "heroes": [
-        "Lauki Sabzi",
-        "Sarson Ka Saag"
-      ],
-      "liquid": "Sarson Ka Saag",
-      "plate_calories": 390,
-      "score": 3.970503,
-      "support": "Rice"
-    },
-    {
-      "dry": "Egg Bhurji",
-      "form": "pair",
-      "hero_dish": null,
-      "heroes": [
-        "Egg Bhurji",
-        "Punjabi Kadhi Pakora"
-      ],
-      "liquid": "Punjabi Kadhi Pakora",
-      "plate_calories": 570,
-      "score": 3.63305,
       "support": "Rice"
     }
   ]

@@ -101,6 +101,7 @@ export default function OnboardingStep1() {
             return (
               <Pressable
                 key={opt.value}
+                testID={`onboarding-step1-household-${opt.value}`}
                 onPress={() => selectHousehold(opt.value)}
                 style={({ pressed }) => [
                   styles.card,
@@ -132,6 +133,7 @@ export default function OnboardingStep1() {
                   return (
                     <Pressable
                       key={opt.value}
+                      testID={`onboarding-step1-earners-${opt.value}`}
                       onPress={() => setAnswers({ workingProfessionals: opt.value })}
                       style={({ pressed }) => [
                         styles.earnerCard,
@@ -160,6 +162,7 @@ export default function OnboardingStep1() {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + t.spacing.md }]}>
         <Pressable
+          testID="onboarding-step1-continue"
           disabled={!canContinue || mutation.isPending}
           onPress={() => mutation.mutate()}
           style={({ pressed }) => [styles.button, { backgroundColor: canContinue ? t.colors.selected : t.colors.disabled, opacity: pressed && canContinue ? 0.9 : 1 }]}
