@@ -9,7 +9,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.foofoo.mobile"
+      "bundleIdentifier": "app.foofoo.mobile",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      },
+      "entitlements": {
+        "aps-environment": "production",
+        "com.apple.security.application-groups": ["group.app.foofoo.mobile.onesignal"]
+      }
     },
     "android": {
       "package": "app.foofoo.mobile"
@@ -18,7 +25,10 @@
       "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      ["onesignal-expo-plugin", { "mode": "production" }],
+      "expo-router"
+    ],
     "extra": {
       "router": {
         "origin": false

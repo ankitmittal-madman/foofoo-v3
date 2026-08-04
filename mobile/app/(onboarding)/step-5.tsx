@@ -32,6 +32,7 @@ import { ChipGroup, type ChipOption } from "@/onboarding/OnboardingChips";
 import { step5ToPayload } from "@/onboarding/toHouseholdWrite";
 import { postHousehold } from "@/api/household";
 import { postConsent } from "@/api/consent";
+import { configureNotificationConsent } from "@/notifications/oneSignal";
 import { describeApiError } from "@/api/errorMessages";
 import { useSession } from "@/auth/SessionContext";
 import { PRIVACY_POLICY_VERSION } from "@/onboarding/privacyPolicy";
@@ -116,6 +117,7 @@ export default function OnboardingStep5() {
           consents,
           privacy_policy_version: consent.privacyPolicyVersion ?? PRIVACY_POLICY_VERSION,
         });
+        await configureNotificationConsent(consent.pushNotifications ?? false);
         setConsent({ submitted: true });
       }
 

@@ -145,12 +145,23 @@ export const UserJourney = {
   /**
    * One POST /v1/feedback call resolved (WP-15) — real event_type vocabulary from
    * public.feedback_events (migration 038): accept | edit | swap | like | dislike |
-   * shown_not_tapped. This is the substrate the Core Spine's `w_pref·S_pref` term (pinned to 0
-   * in v1) will eventually learn from — logged here purely as narrative, no scoring effect yet.
+   * shown_not_tapped plus explicit plan controls. Preference and suppression state is updated by
+   * feedback/events.ts; this logger remains narrative-only.
    */
   logFeedbackRecorded(
     profileId: string,
-    eventType: "accept" | "edit" | "swap" | "like" | "dislike" | "shown_not_tapped",
+    eventType:
+      | "accept"
+      | "edit"
+      | "swap"
+      | "like"
+      | "dislike"
+      | "shown_not_tapped"
+      | "never"
+      | "not_today"
+      | "lock"
+      | "unlock"
+      | "add_to_date",
     dishResolved: boolean,
   ): void {
     const verb: Record<typeof eventType, string> = {
@@ -160,6 +171,11 @@ export const UserJourney = {
       like: "liked a dish",
       dislike: "disliked a dish",
       shown_not_tapped: "was shown a dish they didn't tap on",
+      never: "permanently excluded a dish",
+      not_today: "suppressed a dish for today",
+      lock: "locked a meal slot",
+      unlock: "unlocked a meal slot",
+      add_to_date: "added a dish to another date",
     };
     const narrative = `Household ${verb[eventType]}` +
       (dishResolved ? "." : " (dish not yet matched to the catalogue — recorded anyway).");

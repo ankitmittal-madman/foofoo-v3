@@ -20,6 +20,11 @@ export const FEEDBACK_EVENT_TYPES = [
   "like",
   "dislike",
   "shown_not_tapped",
+  "never",
+  "not_today",
+  "lock",
+  "unlock",
+  "add_to_date",
 ] as const;
 
 export type FeedbackEventType = typeof FEEDBACK_EVENT_TYPES[number];

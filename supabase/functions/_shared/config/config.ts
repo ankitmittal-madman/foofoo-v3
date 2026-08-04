@@ -23,6 +23,8 @@ export interface AppConfig {
   readonly gharReServiceSecret: string;
   /** Optional real alerting sink URL (P1-7). Null when unset -- telemetry falls back to log-only. */
   readonly telemetryWebhookUrl: string | null;
+  readonly oneSignalRestApiKey: string | null;
+  readonly oneSignalAppId: string | null;
 }
 
 /** Dev-only defaults for the Ghar RE service. NEVER used in staging/production (guarded below). */
@@ -87,6 +89,8 @@ export function loadConfig(): AppConfig {
     gharReServiceUrl: gharReServiceUrl ?? GHAR_RE_DEV_URL,
     gharReServiceSecret: gharReServiceSecret ?? GHAR_RE_DEV_SECRET,
     telemetryWebhookUrl: read(ENV_VARS.TELEMETRY_WEBHOOK_URL),
+    oneSignalRestApiKey: read(ENV_VARS.ONESIGNAL_REST_API_KEY),
+    oneSignalAppId: read(ENV_VARS.ONESIGNAL_APP_ID),
   });
 }
 

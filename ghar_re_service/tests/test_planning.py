@@ -63,7 +63,26 @@ def test_cold_start_returns_15_diverse_dishes(client):
 def test_meal_plan_slot_options(client):
     r = _post(client, "/v1/meal-plan", {"household": _hh(), "slot": "dinner"})
     assert r.status_code == 200
-    assert 1 <= len(r.json()["options"]) <= 5
+    assert len(r.json()["options"]) == 8
+
+
+def test_meal_plan_honours_online_suppression_and_affinity(client):
+    baseline = _post(client, "/v1/meal-plan", {"household": _hh(), "slot": "dinner", "count": 8})
+    assert baseline.status_code == 200
+    first = baseline.json()["options"][0]["name"]
+    promoted = baseline.json()["options"][-1]["name"]
+    personalized = _post(client, "/v1/meal-plan", {
+        "household": _hh(),
+        "slot": "dinner",
+        "count": 8,
+        "exclude_dish_names": [first],
+        "preference_by_dish": {promoted: 1.0},
+        "context": {"interaction_count": 12},
+    })
+    assert personalized.status_code == 200
+    names = [dish["name"] for dish in personalized.json()["options"]]
+    assert first not in names
+    assert names.index(promoted) < 7
 
 
 def test_weekly_plan_shape(client):

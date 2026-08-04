@@ -30,6 +30,9 @@ import {
   recordRecommendationEvent,
 } from "../recommendations/events.ts";
 import { callRecommendationEngine } from "../recommendations/re-client.ts";
+import { loadOnlineRecommendationState } from "../recommendations/personalization.ts";
+import { addDishToDate, loadSavedWeek, saveWeek, setSlotLock } from "./state.ts";
+import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 
 const SERVICE_NAME = "plan";
 
@@ -62,6 +65,63 @@ export function makePlanHandler(): Handler {
     }
 
     const surface = typeof body.surface === "string" ? body.surface : "";
+
+    if (["saved_week", "save_week", "lock_slot", "add_to_date"].includes(surface)) {
+      const householdId = (typeof body.household_id === "string" ? body.household_id : null) ??
+        claims.userId ?? null;
+      requireOwnership(claims, householdId);
+      if (!householdId) {
+        throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "no household_id" });
+      }
+      try {
+        if (surface === "saved_week") {
+          return jsonContract(
+            { kind: "saved_week", plan: await loadSavedWeek(ctx, householdId) },
+            ctx.traceId,
+            200,
+          );
+        }
+        if (surface === "save_week") {
+          const selections = body.selections && typeof body.selections === "object"
+            ? body.selections as Record<string, Record<string, string>>
+            : {};
+          const plan = await saveWeek(ctx, householdId, selections, body.finalize === true);
+          return jsonContract({ kind: "saved_week", plan }, ctx.traceId, 200);
+        }
+        if (surface === "add_to_date") {
+          const state = await addDishToDate(
+            ctx,
+            householdId,
+            String(body.slot_date ?? ""),
+            String(body.slot ?? ""),
+            String(body.class_code ?? ""),
+            String(body.dish_name ?? ""),
+          );
+          await recordProductEvent(ctx, {
+            profileId: householdId,
+            eventName: "recommendation_add_to_date",
+            properties: {
+              slot_date: body.slot_date,
+              slot: body.slot,
+              dish_name: body.dish_name,
+            },
+          });
+          return jsonContract({ kind: "add_to_date", slot: state }, ctx.traceId, 200);
+        }
+        const state = await setSlotLock(
+          ctx,
+          householdId,
+          String(body.weekday ?? ""),
+          String(body.slot ?? ""),
+          body.locked === true,
+        );
+        return jsonContract({ kind: "slot_lock", slot: state }, ctx.traceId, 200);
+      } catch (error) {
+        throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
+          detail: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
 
     // "history" (P1-3, 2026-08) is a pure read -- no RE call, no household composition, just the
     // caller's own recommendation_events rows. Handled as a special case rather than added to
@@ -132,6 +192,15 @@ export function makePlanHandler(): Handler {
       payload.household_id = hid;
       resolvedHouseholdId = hid;
       stubbedHousehold = stubbed;
+      const online = await loadOnlineRecommendationState(ctx, hid);
+      payload.context = {
+        slot: body.slot,
+        weekday: body.weekday,
+        interaction_count: online.interactionCount,
+        dish_feedback_counts: online.dishFeedbackCounts,
+      };
+      payload.exclude_dish_names = online.excludeDishNames;
+      payload.preference_by_dish = online.preferenceByDish;
       log.info("plan.composed", { household_id: hid, stubbed });
     }
 
@@ -190,6 +259,17 @@ export function makePlanHandler(): Handler {
           plates: dishes,
           latencyMs,
           stubbed: stubbedHousehold,
+        });
+        await recordProductEvent(ctx, {
+          profileId: resolvedHouseholdId,
+          eventName: "recommendation_slate_served",
+          requestId,
+          properties: {
+            surface,
+            slot: body.slot ?? null,
+            dish_count: dishCount,
+            latency_ms: latencyMs,
+          },
         });
       }
       // Pass the RE body through as-is (RE-DOC-11 §6), additively stamping the trace id AND

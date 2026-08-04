@@ -66,7 +66,7 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
     }
 
 
-def _ranked(cat, theta, ctx, objective, predicate=None):
+def _ranked(cat, theta, ctx, objective, predicate=None, preference_by_dish=None):
     """(score, dish) for every slot-appropriate, eligible dish, best first. `predicate` further
     restricts the pool (e.g. to one meal class) without ever loosening eligibility."""
     out = []
@@ -77,7 +77,12 @@ def _ranked(cat, theta, ctx, objective, predicate=None):
             continue
         if predicate is not None and not predicate(d):
             continue
-        out.append((S.score(d, theta, ctx, objective), d))
+        # Online affinities are deliberately a bounded re-rank term, not a hard filter and not a
+        # mutation of the frozen Core Spine. Explicit Never/Not-Today intent is handled separately
+        # through exclude_dish_names before this function is called.
+        affinity = float((preference_by_dish or {}).get(d.name, 0.0) or 0.0)
+        affinity = max(-1.0, min(1.0, affinity))
+        out.append((S.score(d, theta, ctx, objective) + 0.35 * affinity, d))
     out.sort(key=lambda x: -x[0])
     return out
 
@@ -212,17 +217,36 @@ def cold_start_top15(household, catalogue=None, n=15, weekday="Monday", househol
     }
 
 
-def slot_options(household, slot, catalogue=None, n=5, weekday="Monday", class_code=None):
+def slot_options(household, slot, catalogue=None, n=8, weekday="Monday", class_code=None,
+                 context=None, exclude_dish_names=None, preference_by_dish=None):
     """Surface 2 — a slot's 4–5 best meal options. If `class_code` is given, this is also the
     reconciliation path (surface 4): only dishes of that class are considered."""
     cat = catalogue or Catalogue()
     theta, objective = _theta_obj(household)
-    ctx = make_context(slot=slot, weekday=weekday)
+    context = context or {}
+    weather = context.get("weather") or {}
+    ctx = make_context(
+        slot=slot,
+        weekday=weekday,
+        season=context.get("season", "transitional"),
+        weather_condition=weather.get("weather_condition") or weather.get("condition"),
+        temp_c=weather.get("temp_c"),
+        is_raining=bool(weather.get("is_raining", False)),
+        active_modes=context.get("active_modes") or [],
+        calorie_target=context.get("calorie_target"),
+    )
+    ctx["interaction_count"] = max(0, int(context.get("interaction_count", 0) or 0))
+    excluded = set(exclude_dish_names or [])
     # multi-membership (WP-17.1): a dish is eligible for a class if that class is ANY of its classes
     # (primary or secondary), not only its single primary — so behavioural DN_ dinner classes reconcile
     # to the dishes they overlap with the LD_ pool, instead of falling back to regional plates.
-    pred = (lambda d: class_code in K.dish_to_class_codes(d.name)) if class_code else None
-    ranked = _ranked(cat, theta, ctx, objective, predicate=pred)
+    def pred(d):
+        if d.name in excluded:
+            return False
+        return class_code in K.dish_to_class_codes(d.name) if class_code else True
+    ranked = _ranked(
+        cat, theta, ctx, objective, predicate=pred, preference_by_dish=preference_by_dish
+    )
     picked = ranked[:n] if class_code else _diversify(ranked, n, per_class=1, per_cuisine=2)
     return {
         "household": household.get("label"),
@@ -235,12 +259,16 @@ def slot_options(household, slot, catalogue=None, n=5, weekday="Monday", class_c
     }
 
 
-def dishes_for_class(household, slot, class_code, catalogue=None, n=8, weekday="Monday"):
+def dishes_for_class(household, slot, class_code, catalogue=None, n=8, weekday="Monday",
+                      context=None, exclude_dish_names=None, preference_by_dish=None):
     """Surface 4 — RECONCILIATION. Given a day's finalized meal CLASS, return only the eligible
     dishes of that class for the slot, best-scored first. Thin wrapper over slot_options so the
     class-filter path can never diverge from the option-ranking path."""
-    return dict(slot_options(household, slot, catalogue=catalogue, n=n, weekday=weekday,
-                             class_code=class_code), kind="reconciled_class_dishes")
+    return dict(slot_options(
+        household, slot, catalogue=catalogue, n=n, weekday=weekday, class_code=class_code,
+        context=context, exclude_dish_names=exclude_dish_names,
+        preference_by_dish=preference_by_dish,
+    ), kind="reconciled_class_dishes")
 
 
 _RECENT_WINDOW = 2   # days a class is held back from re-topping the same slot, once it has led

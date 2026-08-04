@@ -28,6 +28,7 @@ import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
 import type { FeedbackEventType } from "../_shared/validation/feedback-schema.ts";
+import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 
 export interface FeedbackEventInput {
   profileId: string;
@@ -107,6 +108,25 @@ export async function recordFeedbackEvent(
     }
   }
 
+  // Client retries are safe: one intent per served recommendation/dish/event. Return the original
+  // result without applying its affinity delta twice.
+  const existingQuery = db.from("feedback_events").select("id,created_at").eq(
+    "profile_id",
+    ev.profileId,
+  ).eq("recommendation_event_id", recRow.id).eq("event_type", ev.eventType);
+  const { data: existing, error: existingError } = await withTimeout(
+    dishId === null
+      ? existingQuery.is("dish_id", null).maybeSingle()
+      : existingQuery.eq("dish_id", dishId).maybeSingle(),
+    "feedback.events.idempotency_lookup",
+  );
+  if (existingError) {
+    throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: existingError.message });
+  }
+  if (existing) {
+    return { id: existing.id as string, createdAt: existing.created_at as string, dishResolved };
+  }
+
   const { data: inserted, error } = await withTimeout(
     db
       .from("feedback_events")
@@ -133,12 +153,81 @@ export async function recordFeedbackEvent(
     throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: error.message });
   }
 
+  // Apply explicit intent and a bounded online preference update synchronously. A successful
+  // feedback response therefore guarantees that the next recommendation reads the new state.
+  // Values are deliberately small and clamped; explicit Never/Not-Today use hard exclusions.
+  if (dishId && ev.dishName) {
+    if (ev.eventType === "never") {
+      const { error: stateError } = await withTimeout(
+        db.from("never_list").upsert({
+          profile_id: ev.profileId,
+          dish_id: dishId,
+          nevered_at: new Date().toISOString(),
+          is_active: true,
+        }, { onConflict: "profile_id,dish_id" }),
+        "feedback.events.never",
+      );
+      if (stateError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: stateError.message });
+    } else if (ev.eventType === "not_today") {
+      const effectiveUntil = new Date();
+      effectiveUntil.setUTCHours(18, 30, 0, 0); // next IST midnight when still ahead
+      if (effectiveUntil <= new Date()) effectiveUntil.setUTCDate(effectiveUntil.getUTCDate() + 1);
+      const { error: stateError } = await withTimeout(
+        db.from("not_today_suppression").upsert({
+          profile_id: ev.profileId,
+          dish_id: dishId,
+          suppressed_at: new Date().toISOString(),
+          effective_until: effectiveUntil.toISOString(),
+          is_active: true,
+        }, { onConflict: "profile_id,dish_id" }),
+        "feedback.events.not_today",
+      );
+      if (stateError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: stateError.message });
+    }
+
+    const delta = ev.eventType === "like" || ev.eventType === "accept"
+      ? 0.2
+      : ev.eventType === "dislike" || ev.eventType === "never"
+      ? -0.3
+      : 0;
+    if (delta !== 0) {
+      const { data: taste, error: tasteReadError } = await withTimeout(
+        db.from("user_taste_vectors").select("dish_affinity").eq("profile_id", ev.profileId)
+          .maybeSingle(),
+        "feedback.events.taste_read",
+      );
+      if (tasteReadError) {
+        throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: tasteReadError.message });
+      }
+      const affinities = { ...((taste?.dish_affinity ?? {}) as Record<string, number>) };
+      affinities[ev.dishName] = Math.max(-1, Math.min(1, (affinities[ev.dishName] ?? 0) + delta));
+      const { error: tasteWriteError } = await withTimeout(
+        db.from("user_taste_vectors").upsert({
+          profile_id: ev.profileId,
+          dish_affinity: affinities,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "profile_id" }),
+        "feedback.events.taste_write",
+      );
+      if (tasteWriteError) {
+        throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: tasteWriteError.message });
+      }
+    }
+  }
+
   ctx.logger.info("feedback_event.recorded", {
     id: inserted.id,
     profile_id: ev.profileId,
     request_id: ev.requestId,
     event_type: ev.eventType,
     dish_resolved: dishResolved,
+  });
+  await recordProductEvent(ctx, {
+    profileId: ev.profileId,
+    eventName: `recommendation_${ev.eventType}`,
+    requestId: ev.requestId,
+    dishId,
+    properties: { slot: ev.slot ?? null, dish_name: ev.dishName ?? null },
   });
 
   return { id: inserted.id as string, createdAt: inserted.created_at as string, dishResolved };

@@ -24,6 +24,13 @@ export interface PlanDish {
   cell_role?: "expected_positive" | "planted_negative";
 }
 
+export interface PlanAddon {
+  member_index: number;
+  member_role: string;
+  class_code: string;
+  dish: PlanDish;
+}
+
 export interface ColdStartResponse {
   kind: string;
   count: number;
@@ -50,6 +57,7 @@ export interface SlotOptionsResponse {
    * Home tab (today.tsx) can resolve to the recommendation_events row the handler now writes for
    * meal_plan/class_dishes surfaces too — same pattern as ColdStartResponse.request_id. */
   request_id?: string;
+  addons?: PlanAddon[];
 }
 
 export interface WeeklyClass {
@@ -108,6 +116,57 @@ export function fetchSlotOptions(
   opts: { weekday?: string; class_code?: string; count?: number } = {},
 ): Promise<SlotOptionsResponse> {
   return apiPost<SlotOptionsResponse>("/plan", { surface: "meal_plan", slot, ...opts });
+}
+
+export type WeekSelections = Record<string, Partial<Record<Slot, string>>>;
+
+export interface SavedPlanSlot {
+  slot_date: string;
+  meal_slot: Slot;
+  class_code: string;
+  is_locked: boolean;
+}
+
+export interface SavedWeekResponse {
+  kind: "saved_week";
+  plan: { status: "draft" | "finalized"; plan_slots: SavedPlanSlot[] } | null;
+}
+
+export function fetchSavedWeek(): Promise<SavedWeekResponse> {
+  return apiPost<SavedWeekResponse>("/plan", { surface: "saved_week" });
+}
+
+export function savedWeekSelections(response: SavedWeekResponse | undefined): WeekSelections {
+  const selections: WeekSelections = {};
+  for (const row of response?.plan?.plan_slots ?? []) {
+    const weekday = new Date(`${row.slot_date}T12:00:00Z`).toLocaleDateString("en-US", {
+      weekday: "long",
+      timeZone: "UTC",
+    });
+    selections[weekday] = { ...selections[weekday], [row.meal_slot]: row.class_code };
+  }
+  return selections;
+}
+
+export function saveWeekPlan(selections: WeekSelections, finalize: boolean): Promise<unknown> {
+  return apiPost("/plan", { surface: "save_week", selections, finalize });
+}
+
+export function setPlanSlotLock(
+  weekday: string,
+  slot: Slot,
+  locked: boolean,
+): Promise<unknown> {
+  return apiPost("/plan", { surface: "lock_slot", weekday, slot, locked });
+}
+
+export function addDishToDate(input: {
+  slot_date: string;
+  slot: Slot;
+  class_code: string;
+  dish_name: string;
+}): Promise<unknown> {
+  return apiPost("/plan", { surface: "add_to_date", ...input });
 }
 
 /** Surface 3 — the weekly class plan (7 days × slots, top-3 dish-backed classes each). */

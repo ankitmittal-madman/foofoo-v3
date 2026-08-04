@@ -95,10 +95,22 @@ Deno.test("parseFeedbackRequest rejects an unknown event_type with ERR_FEEDBACK_
   assertEquals(e.httpStatus, 422);
 });
 
-Deno.test("FEEDBACK_EVENT_TYPES matches the feedback_events CHECK constraint (migration 038)", () => {
+Deno.test("FEEDBACK_EVENT_TYPES matches the feedback_events CHECK constraint (migration 053)", () => {
   assertEquals(
     [...FEEDBACK_EVENT_TYPES].sort(),
-    ["accept", "dislike", "edit", "like", "shown_not_tapped", "swap"].sort(),
+    [
+      "accept",
+      "add_to_date",
+      "dislike",
+      "edit",
+      "like",
+      "lock",
+      "never",
+      "not_today",
+      "shown_not_tapped",
+      "swap",
+      "unlock",
+    ].sort(),
   );
 });
 

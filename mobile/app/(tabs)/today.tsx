@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet, Image } from "react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { fetchClassDishes, fetchSlotOptions } from "@/api/plan";
+import { fetchClassDishes, fetchSavedWeek, fetchSlotOptions, savedWeekSelections, setPlanSlotLock } from "@/api/plan";
 import { postFeedback } from "@/api/feedback";
 import { describeApiError } from "@/api/errorMessages";
 import { loadWeeklyPlan, type FinalizedWeek, type SlotName } from "@/lib/weeklyPlanStore";
-import type { PlanDish } from "@/api/plan";
+import type { PlanAddon, PlanDish } from "@/api/plan";
 import type { FeedbackEventType } from "@/api/types";
 
 const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
@@ -28,10 +28,14 @@ export default function Home() {
   const [planLoaded, setPlanLoaded] = useState(false);
 
   useEffect(() => {
-    loadWeeklyPlan().then((p) => {
-      setPlan(p);
-      setPlanLoaded(true);
-    });
+    fetchSavedWeek()
+      .then((response) => {
+        const serverPlan = savedWeekSelections(response);
+        if (Object.keys(serverPlan).length > 0) return serverPlan;
+        return loadWeeklyPlan();
+      })
+      .then((p) => setPlan(p))
+      .finally(() => setPlanLoaded(true));
   }, []);
 
   if (!planLoaded) {
@@ -66,8 +70,8 @@ function SlotSection({
     queryKey: ["daily-plan", slot, weekday, classCode ?? null],
     queryFn: () =>
       classCode
-        ? fetchClassDishes(slot, classCode, weekday, 5)
-        : fetchSlotOptions(slot, { weekday, count: 5 }),
+        ? fetchClassDishes(slot, classCode, weekday, 8)
+        : fetchSlotOptions(slot, { weekday, count: 8 }),
   });
 
   return (
@@ -83,15 +87,19 @@ function SlotSection({
       ) : query.isError ? (
         <Text style={styles.error}>{describeApiError(query.error)}</Text>
       ) : (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.cardRow}
-        >
-          {(query.data?.options ?? []).map((d: PlanDish) => (
-            <DishCard key={d.name} dish={d} requestId={query.data?.request_id} />
+        <>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}>
+            {(query.data?.options ?? []).map((d: PlanDish) => (
+              <DishCard key={d.name} dish={d} requestId={query.data?.request_id} weekday={weekday} slot={slot} />
+            ))}
+          </ScrollView>
+          {(query.data?.addons ?? []).map((addon: PlanAddon) => (
+            <View key={`${addon.member_index}-${addon.class_code}`} style={styles.addonRow}>
+              <Text style={styles.addonLabel}>{addon.member_role.replace("_", " ")} add-on</Text>
+              <Text>{addon.dish.name}</Text>
+            </View>
           ))}
-        </ScrollView>
+        </>
       )}
     </View>
   );
@@ -107,15 +115,26 @@ function SlotSection({
  * drove the class match (meal_class_name/cuisine) is honest given what this endpoint returns,
  * rather than fabricating a richer breakdown the API doesn't supply.
  */
-function DishCard({ dish, requestId }: { dish: PlanDish; requestId?: string }) {
+function DishCard({ dish, requestId, weekday, slot }: {
+  dish: PlanDish; requestId?: string; weekday: string; slot: SlotName;
+}) {
   const [sent, setSent] = useState<FeedbackEventType | null>(null);
   const [showWhy, setShowWhy] = useState(false);
+  const [locked, setLocked] = useState(false);
   const feedback = useMutation({
     mutationFn: (eventType: FeedbackEventType) => {
       if (!requestId) return Promise.reject(new Error("no request_id on this response"));
       return postFeedback({ request_id: requestId, event_type: eventType, dish_name: dish.name });
     },
     onSuccess: (_data, eventType) => setSent(eventType),
+  });
+  const lock = useMutation({
+    mutationFn: async () => {
+      await setPlanSlotLock(weekday, slot, !locked);
+      if (!requestId) throw new Error("no request_id on this response");
+      await postFeedback({ request_id: requestId, event_type: locked ? "unlock" : "lock", dish_name: dish.name, slot });
+    },
+    onSuccess: () => setLocked((value) => !value),
   });
 
   return (
@@ -160,6 +179,28 @@ function DishCard({ dish, requestId }: { dish: PlanDish; requestId?: string }) {
           </Text>
         </Pressable>
       </View>
+      <View style={styles.feedbackRow}>
+        <Pressable disabled={feedback.isPending || !requestId}
+          onPress={() => feedback.mutate("not_today")} style={styles.feedbackButton}>
+          <Text style={styles.feedbackButtonText}>Not today</Text>
+        </Pressable>
+        <Pressable disabled={feedback.isPending || !requestId}
+          onPress={() => feedback.mutate("never")} style={styles.feedbackButton}>
+          <Text style={styles.feedbackButtonText}>Never</Text>
+        </Pressable>
+      </View>
+      <Pressable disabled={lock.isPending} onPress={() => lock.mutate()}
+        style={[styles.feedbackButton, locked && styles.feedbackButtonActive]}>
+        <Text style={styles.feedbackButtonText}>{locked ? "Locked" : "Lock this meal"}</Text>
+      </Pressable>
+      {dish.meal_class_code ? (
+        <Pressable onPress={() => router.push({
+          pathname: "/add-to-date",
+          params: { dish: dish.name, classCode: dish.meal_class_code, slot },
+        })} style={styles.feedbackButton}>
+          <Text style={styles.feedbackButtonText}>Add to date</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -201,4 +242,6 @@ const styles = StyleSheet.create({
   },
   feedbackButtonActive: { borderColor: "#4A6FA5", backgroundColor: "#EEF3FA" },
   feedbackButtonText: { fontSize: 12, fontWeight: "600" },
+  addonRow: { borderLeftWidth: 3, borderLeftColor: "#4A6FA5", paddingLeft: 10, paddingVertical: 6 },
+  addonLabel: { fontSize: 11, color: "#4A6FA5", textTransform: "capitalize" },
 });

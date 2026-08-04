@@ -63,6 +63,13 @@ def build_context(ctx: dict[str, Any], exclude_dish_ids: list[str] | None = None
         calorie_target=ctx.get("calorie_target"),
     )
     core_ctx["exclude_dish_ids"] = exclude_dish_ids or []
+    # These are online, household-specific features composed by the Edge layer.  Keeping them
+    # here is essential: cohort decay and exploration both read the core context, not the raw
+    # HTTP request.  Previously the JSON contract accepted interaction_count but this translation
+    # silently dropped it, leaving every returning household in cold-start weighting forever.
+    core_ctx["interaction_count"] = max(0, int(ctx.get("interaction_count", 0) or 0))
+    feedback_counts = ctx.get("dish_feedback_counts")
+    core_ctx["dish_feedback_counts"] = feedback_counts if isinstance(feedback_counts, list) else []
     return core_ctx
 
 
@@ -139,11 +146,39 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         hh,
         request.get("slot", "dinner"),
         catalogue,
-        n=int(request.get("count", 5)),
+        n=int(request.get("count", 8)),
         weekday=request.get("weekday", "Monday"),
         class_code=request.get("class_code"),
+        context=request.get("context") or {},
+        exclude_dish_names=request.get("exclude_dish_names") or [],
+        preference_by_dish=request.get("preference_by_dish") or {},
     )
     _with_images(res["options"])
+    # Deterministic lifecycle add-ons remain separate from the household's primary meal.  These
+    # are food-role rules only; health-condition add-ons intentionally require clinical review.
+    addon_classes = {
+        "infant": {"breakfast": "BF_INFANT_6M_SOFT", "lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
+        "toddler": {"lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
+        "school_child": {"lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
+        "elder": {"lunch": "LD_ELDERLY_SOFT_DIGESTIVE", "dinner": "LD_ELDERLY_SOFT_DIGESTIVE"},
+    }
+    addons = []
+    for index, member in enumerate(hh.get("q12_member_ages") or []):
+        role = member.get("role") if isinstance(member, dict) else None
+        class_code = addon_classes.get(role, {}).get(request.get("slot", "dinner"))
+        if not class_code:
+            continue
+        addon = planner.dishes_for_class(
+            hh, request.get("slot", "dinner"), class_code, catalogue=catalogue, n=1,
+            weekday=request.get("weekday", "Monday"), context=request.get("context") or {},
+            exclude_dish_names=request.get("exclude_dish_names") or [],
+            preference_by_dish=request.get("preference_by_dish") or {},
+        )
+        if addon["options"]:
+            view = addon["options"][0]
+            media.attach_image(view)
+            addons.append({"member_index": index, "member_role": role, "class_code": class_code, "dish": view})
+    res["addons"] = addons
     return res
 
 
@@ -165,6 +200,9 @@ def plan_class_dishes(request: dict[str, Any], catalogue, config) -> dict[str, A
         catalogue,
         n=int(request.get("count", 8)),
         weekday=request.get("weekday", "Monday"),
+        context=request.get("context") or {},
+        exclude_dish_names=request.get("exclude_dish_names") or [],
+        preference_by_dish=request.get("preference_by_dish") or {},
     )
     _with_images(res["options"])
     return res

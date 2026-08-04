@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet } from "react-native";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { fetchWeeklyPlan } from "@/api/plan";
+import { fetchSavedWeek, fetchWeeklyPlan, savedWeekSelections, saveWeekPlan } from "@/api/plan";
 import type { WeeklyClass, WeeklyPlanResponse } from "@/api/plan";
 import { describeApiError } from "@/api/errorMessages";
 import type { SlotName } from "@/lib/weeklyPlanStore";
@@ -29,9 +29,17 @@ export default function WeeklyPlan() {
     queryFn: () => fetchWeeklyPlan(3),
   });
   const [selected, setSelected] = useState<FinalizedWeek>({});
+  const saved = useQuery({ queryKey: ["saved-week"], queryFn: fetchSavedWeek });
+
+  useEffect(() => {
+    if (saved.data?.plan) setSelected(savedWeekSelections(saved.data));
+  }, [saved.data]);
 
   const finalize = useMutation({
-    mutationFn: (plan: FinalizedWeek) => saveWeeklyPlan(plan),
+    mutationFn: async (plan: FinalizedWeek) => {
+      await saveWeekPlan(plan, true);
+      await saveWeeklyPlan(plan); // offline read-through cache; server remains authoritative
+    },
     onSuccess: () => router.replace("/today"),
   });
 
@@ -96,8 +104,8 @@ export default function WeeklyPlan() {
         </View>
       ))}
       <Pressable
-        style={[styles.button, chosenCount === 0 && styles.buttonDisabled]}
-        disabled={chosenCount === 0 || finalize.isPending}
+        style={[styles.button, chosenCount !== totalSlots && styles.buttonDisabled]}
+        disabled={chosenCount !== totalSlots || finalize.isPending}
         onPress={() => finalize.mutate(selected)}
       >
         <Text style={styles.buttonText}>

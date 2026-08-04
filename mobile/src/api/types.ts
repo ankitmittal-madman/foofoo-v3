@@ -133,7 +133,9 @@ export interface RecommendationsResponse {
 
 // ---- POST /v1/feedback (WP-15) ----------------------------------------------
 
-export type FeedbackEventType = "accept" | "edit" | "swap" | "like" | "dislike" | "shown_not_tapped";
+export type FeedbackEventType =
+  | "accept" | "edit" | "swap" | "like" | "dislike" | "shown_not_tapped"
+  | "never" | "not_today" | "lock" | "unlock" | "add_to_date";
 
 export interface FeedbackRequest {
   /** RecommendationsResponse.request_id — the only recommendation identifier this client is ever

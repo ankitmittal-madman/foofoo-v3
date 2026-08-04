@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabaseClient";
+import { identifyOneSignalUser, initializeOneSignal } from "@/notifications/oneSignal";
 
 interface SessionContextValue {
   session: Session | null;
@@ -25,6 +26,10 @@ const SessionContext = createContext<SessionContextValue | undefined>(undefined)
 export function SessionProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    initializeOneSignal().then(() => identifyOneSignalUser(session?.user.id ?? null));
+  }, [session?.user.id]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
