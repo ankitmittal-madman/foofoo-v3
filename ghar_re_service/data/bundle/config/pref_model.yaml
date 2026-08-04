@@ -23,3 +23,15 @@ model_artifact_path: null
 # pattern in config.py) — even if `enabled` is mistakenly flipped on without a real weight
 # decision, the term still contributes exactly 0.0 to score() until a human sets this too.
 w_pref: 0.0
+
+# training_readiness: the density gate WP-14 explicitly left unset ("flagged for the Founder,
+# not guessed") — ghar_re_core.training.train_pref_model refuses to fit anything below these
+# counts (see ghar_re_core.training.dataset.check_training_readiness), separate from and in
+# addition to guard_sufficient_data's structural checks (zero rows / single label class) just
+# above it in that module. These are STARTING numbers, not a permanent law — revisit once real
+# feedback_events volume exists and an actual accrual rate is observed. CODE-LEVEL SAFETY DEFAULT
+# (config.py) if this block or either key is missing is a never-satisfiable sentinel, so an unset
+# threshold blocks training rather than silently permitting it.
+training_readiness:
+  min_real_events: 10000    # fleet-wide real (accept/like/dislike) labeled rows
+  min_households: 500       # distinct households contributing at least one such row

@@ -8,7 +8,8 @@ from ghar_re_core import fixtures as F
 from ghar_re_core import knowledge as K
 from ghar_re_core import scoring as S
 from ghar_re_core import pairing as P
-from ghar_re_core.catalogue import Catalogue
+from ghar_re_core import catalogue as C
+from ghar_re_core.catalogue import Catalogue, _CUISINE_STATE
 from ghar_re_core.derivation import derive_theta
 from ghar_re_core.pipeline import recommend, make_context
 
@@ -88,6 +89,25 @@ def test_weaning_household_respects_a4_floor():
             assert d.spice_level <= 1
             assert set(d.texture) & {"soft", "smooth", "fluffy", "sticky"}
             assert not (set(d.texture) & {"crunchy", "crispy", "dense", "chewy"})
+
+
+# ---------------------------------------------------------------------------
+# 6. A3 allergen filter catches hidden-derivative gluten carriers (SP-F13), not just explicit
+#    ingredient-level allergen flags — Sambar's own ingredients carry no explicit gluten flag,
+#    but its sambar_powder ingredient is a known hing-containing (wheat-carrier) spice blend.
+# ---------------------------------------------------------------------------
+def test_allergen_filter_catches_hidden_derivative_gluten():
+    sambar = CAT.get_dish("md5:Sambar")
+    assert sambar is not None, "golden-master fixture 'Sambar' missing — test fixture drifted"
+    assert "sambar_powder" in sambar.ingredient_names
+    assert not any(
+        C.ingredient_info(ing).get("allergen_type") == "gluten"
+        for ing in sambar.ingredient_names
+    ), "test assumption broken: an ingredient now carries an explicit gluten flag"
+    assert "gluten" in C.dish_allergens(sambar), "hidden-derivative gluten (via sambar_powder/hing) not detected"
+
+    gluten_free_hh = {"allergens": {"value": ["gluten"], "confidence": "explicit", "reason": "explicit", "band": "stable"}}
+    assert not S.pass_allergen(sambar, gluten_free_hh, {}), "gluten-allergic household must not pass Sambar"
 
 
 # ---------------------------------------------------------------------------
@@ -316,6 +336,27 @@ def test_cuisine_zone_coverage():
             if zone is None:
                 unmapped.append((name, group))
     assert unmapped == [], f"cuisines with no resolvable zone (name, cuisine_group): {unmapped}"
+
+
+# ---------------------------------------------------------------------------
+# 14b. Dish.state_origin: (a) a dish dict that already carries a resolved state_origin (as the
+# real-catalogue build_catalogue.py now does, sourced from cuisines_v4.csv's full 65-cuisine
+# table) must not be clobbered by the legacy 10-cuisine-only fixtures lookup; (b) the golden
+# sample (whose dicts never set this key) must still fall back to that legacy lookup unchanged,
+# so this dimension's real-catalogue-coverage fix cannot silently alter a locked golden-master score.
+# ---------------------------------------------------------------------------
+def test_state_origin_prefers_dict_value_but_falls_back_for_golden_sample():
+    from ghar_re_core.catalogue import Dish
+
+    raw = dict(F.DISHES[0])
+    assert "state_origin" not in raw, "golden-sample fixture dict unexpectedly carries state_origin"
+    d = Dish(raw)
+    assert d.state_origin == _CUISINE_STATE.get(raw["cuisine"]), "golden sample must use the legacy lookup"
+
+    raw2 = dict(F.DISHES[0])
+    raw2["state_origin"] = "Test State"
+    d2 = Dish(raw2)
+    assert d2.state_origin == "Test State", "an already-resolved state_origin must not be overwritten"
 
 
 # ---------------------------------------------------------------------------

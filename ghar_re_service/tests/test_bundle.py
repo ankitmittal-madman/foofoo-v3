@@ -95,6 +95,20 @@ def test_bundle_catalogue_matches_build_catalogue_output(built):
     assert {d.name for d in bundled.dishes} == {d["name"] for d in fresh_dishes}
 
 
+def test_bundle_catalogue_has_full_state_origin_coverage(built):
+    """Regression guard for the state_origin gap reports/re_audit/10_remaining_work.md §P2-9 and
+    WP-14 §3.2 both flagged (536/810 dishes, 66%, had no state_origin, silently zeroing
+    scoring._cuis()'s same-state 1.00-weight term for most of the real catalogue). Root cause was
+    two-fold: build_catalogue.transform_dish_row() loaded cuisine_map but never wrote
+    state_origin into the returned dict, and ghar_re_core.catalogue.Dish unconditionally
+    overwrote any state_origin with its own 10-cuisine-only legacy lookup. Both fixed; this
+    asserts the real 810-dish catalogue now has 100% coverage, not just that the code runs."""
+    out, _ = built
+    bundled = providers.BundleCatalogueProvider(out).load()
+    missing = [d.name for d in bundled.dishes if d.state_origin is None]
+    assert missing == [], f"{len(missing)}/810 dishes have no state_origin: {missing[:10]}..."
+
+
 def test_engine_runs_from_bundle_without_repo_config(built, monkeypatch):
     """The container case: serve a real recommendation with the config layer read ONLY from the
     bundle. Pointing core_config at a non-existent repo path first proves the bundle is genuinely

@@ -50,9 +50,13 @@ def pass_jain(dish, theta, ctx):
 
 def pass_allergen(dish, theta, ctx):
     """A3 hard filter, safety-critical: rejects any dish carrying an allergen the household has
-    declared (Q9/Q10). Only covers explicit-ingredient allergens (the hidden-derivative /
-    cross-contamination layer is explicitly out of scope for this version)."""
-    # A3 allergen (Q9/Q10) — SAFETY-CRITICAL basic pass (hidden-derivative layer out of scope).
+    declared (Q9/Q10). Covers explicit-ingredient allergens plus the known hidden-derivative
+    carriers in catalogue.HIDDEN_DERIVATIVE_ALLERGENS (e.g. hing/asafoetida and soy sauce both
+    commonly carry wheat/gluten as a commercial-form carrier, not an intrinsic ingredient
+    property) — see catalogue.dish_allergens() for the cited list. Not an exhaustive
+    cross-contamination/hidden-derivative layer covering every possible commercial-product risk,
+    only the specific, sourced cases catalogued so far."""
+    # A3 allergen (Q9/Q10) — SAFETY-CRITICAL basic pass + known hidden-derivative carriers.
     hh_allergens = set(theta["allergens"]["value"])
     return not (C.dish_allergens(dish) & hh_allergens)
 

@@ -46,7 +46,13 @@ class Dish:
         self.__dict__.update(d)
         self.id = "md5:" + d["name"]
         self.cuisine_group = _CUISINE_GROUP.get(d["cuisine"])
-        self.state_origin = _CUISINE_STATE.get(d["cuisine"])
+        # Real-catalogue dish dicts (build_catalogue.py) already carry a resolved state_origin
+        # sourced from cuisines_v4.csv's 65-cuisine table (see module docstring above for why that
+        # source can't be used for the golden sample without changing its locked BASE scores).
+        # Golden-sample dicts (fixtures._dish()) never set this key, so .get() falls through to the
+        # legacy 10-cuisine lookup for them, unchanged — this line only ADDS coverage for the real
+        # catalogue's other 55 cuisines, it cannot alter any golden-master score.
+        self.state_origin = d.get("state_origin") or _CUISINE_STATE.get(d["cuisine"])
         self.zone = _GROUP_ZONE.get(self.cuisine_group)
         # sig_band is None for any dish with no KB-sourced/curated signature score (real-catalogue
         # dishes not yet scored in sig_scores_v1.csv — see ghar_re_service/scripts/build_catalogue.py).
