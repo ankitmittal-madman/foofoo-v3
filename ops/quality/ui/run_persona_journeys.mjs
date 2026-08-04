@@ -148,9 +148,9 @@ function randomTestCredentials(personaKey) {
  */
 async function signUpAndAuthenticate(page, personaKey) {
   const { email, password } = randomTestCredentials(personaKey);
-  // mode=signup is (auth)/sign-in.tsx's own query param for opening straight into its signup
-  // toggle state — no extra click needed to switch off the default sign-in tab.
-  await page.goto(new URL("/(auth)/sign-in?mode=signup", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+  // Route groups such as `(auth)` organize Expo Router source files but are deliberately omitted
+  // from browser URLs. `mode=signup` opens sign-in.tsx directly in its signup state.
+  await page.goto(new URL("/sign-in?mode=signup", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
   const emailInput = page.locator('[data-testid="signin-email"], input[type="email"], input[placeholder*="mail" i]').first();
   const passwordInput = page.locator('[data-testid="signin-password"], input[type="password"]').first();
   await emailInput.fill(email, { timeout: 10000 });
@@ -252,7 +252,7 @@ async function runPersona(browser, persona) {
     steps.push({ label: "signed-up", screenshot: await shot("signed-up") });
 
     // Consent — gate on personalization=true so the flow can proceed into step-1.
-    await page.goto(new URL("/(onboarding)/consent", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+    await page.goto(new URL("/consent", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
     steps.push({ label: "consent-loaded", screenshot: await shot("consent-loaded") });
     const consentContinue = page.getByTestId("onboarding-consent-continue");
     await consentContinue.click({ timeout: 10000 });
