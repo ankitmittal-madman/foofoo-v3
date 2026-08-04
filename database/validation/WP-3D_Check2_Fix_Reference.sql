@@ -1,4 +1,13 @@
--- Reference only — this is the proposed fix for Check 2 in 900_structural_validation.sql,
+-- SUPERSEDED (2026-08-04): Check 2's underlying bug (search-path-sensitive conrelid::regclass::text
+-- comparison) was independently fixed a different way, under WP-6E3, in the live file
+-- (900_structural_validation.sql's Check 2 now uses conrelid = ANY(ARRAY[...]::regclass[]) — verify
+-- there directly rather than trusting this note). The join-based rewrite proposed below was never
+-- applied and is now moot. Kept only as a historical record of the originally-proposed approach;
+-- do not apply it. Non-conforming filename (no NNN_ prefix) also flagged in
+-- reports/re_audit/07_database_audit.md §5 — a rename needs Founder authorization per the repo's
+-- naming standard (WP-5AA), not done here.
+--
+-- Reference only — this was the proposed fix for Check 2 in 900_structural_validation.sql,
 -- provided for founder review before Claude Code applies it as part of WP-3D.
 -- Do NOT run this standalone against production; it is a snippet to replace the existing
 -- Check 2 block in the live file, not a new migration.

@@ -1,3 +1,5 @@
+-- STALE — target schema dropped 2026-08-03 (migration 050_drop_unused_ghar_re_schema.sql / prior re_engine retirement). Not run by any live migration, CI step, or ops script (verified by repo-wide grep, 2026-08-04). Kept for historical/provenance record only — do not apply to a live database.
+
 -- Migration: 115_seed_re_household_addon_plans.sql
 -- Title: re_engine.re_household_addon_plans (7,992)
 -- Layer: re_engine seed (WP-6RE-GEN v1.0); requires migration 030 (SER-001 city_tier)

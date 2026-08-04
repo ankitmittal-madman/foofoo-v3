@@ -64,6 +64,18 @@ class Dish:
         # ingredient token set (main + all) for ING-block / same-base / allergen work
         self.ingredient_names = [i for i, _ in d["ingredients"]]
         self.main_ingredients = [i for i, m in d["ingredients"] if m]
+        # vegan_compatible: computed here (not pre-baked per-dish like jain_compatible/
+        # farali_compatible) so both the golden sample and the real catalogue share one derivation,
+        # from ingredients_v5.csv's existing is_vegan column (already populated — dairy/honey are
+        # correctly N). Same conservative stance as jain_compatible: diet must be 'veg' AND every
+        # ingredient must be a KNOWN vegan ingredient — an unresolved/unknown ingredient makes the
+        # dish False, never guessed True. A pre-baked "vegan_compatible" key (if one is ever added
+        # to a raw dish dict) is honored as an override, matching the state_origin precedent.
+        self.vegan_compatible = d.get("vegan_compatible")
+        if self.vegan_compatible is None:
+            self.vegan_compatible = self.diet == "veg" and all(
+                _ING.get(ing, {}).get("is_vegan", False) for ing in self.ingredient_names
+            )
 
     def has_tag(self, field, value):
         """Return True if this dish's `field` (a list attribute, e.g. 'texture' or 'richness')
@@ -134,6 +146,7 @@ with open(_os.path.join(_cfg.SRC, "ingredients_v5.csv")) as _f:
             is_allergen=_r["is_allergen"] == "Y",
             allergen_type=_r["allergen_type"] or None,
             is_jain_compatible=_r["is_jain_compatible"] == "Y",
+            is_vegan=_r["is_vegan"] == "Y",
         )
 
 

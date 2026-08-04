@@ -75,6 +75,28 @@ def test_pure_veg_never_gets_non_veg():
 
 
 # ---------------------------------------------------------------------------
+# 4b. A1 diet filter: a 'vegan' household (no golden-sample fixture sets q5_diet='vegan' today,
+# so this is a direct unit test of pass_diet/vegan_compatible, not a full pipeline run) must
+# reject dairy dishes and accept a known-vegan dish, using ingredients_v5.csv's existing
+# is_vegan column (previously unread anywhere in ghar_re_core).
+# ---------------------------------------------------------------------------
+def test_vegan_diet_filter_rejects_dairy_accepts_known_vegan_dish():
+    theta = {"diet": {"value": "vegan"}, "veg_days": {"value": []}}
+    ctx = {}
+    dal = CAT.get("Sambar")  # veg, no dairy ingredient among its listed ingredients
+    assert dal is not None
+    assert dal.vegan_compatible is True
+    assert S.pass_diet(dal, theta, ctx) is True
+
+    # any golden-sample dish containing a dairy ingredient must be rejected
+    dairy_dish = next(
+        d for d in CAT if any(C.ingredient_info(i).get("category") == "dairy" for i in d.ingredient_names)
+    )
+    assert dairy_dish.vegan_compatible is False
+    assert S.pass_diet(dairy_dish, theta, ctx) is False
+
+
+# ---------------------------------------------------------------------------
 # 5. the weaning-present household's plates respect the spice/texture floor (A4)
 # ---------------------------------------------------------------------------
 def test_weaning_household_respects_a4_floor():

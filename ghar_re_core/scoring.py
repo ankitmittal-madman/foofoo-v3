@@ -24,6 +24,8 @@ def pass_diet(dish, theta, ctx):
     effective = diet
     if "veg_egg" in modes or veg_day:
         effective = "veg"                     # session tighten (restriction only, upward)
+    if effective == "vegan":
+        return dish.vegan_compatible
     if effective == "veg":
         return dish.diet == "veg"
     if effective in ("eggetarian", "egg"):
