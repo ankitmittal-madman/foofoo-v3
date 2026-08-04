@@ -51,7 +51,7 @@ jobs:
 
       - name: Install packages (ghar_re_core + ghar_re_service, editable, with test extras)
         run: |
-          pip install -e ".[test,lint]"
+          pip install -e ".[test,lint,training]"
           pip install -e "ghar_re_service[test]"
           pip install jsonschema
 

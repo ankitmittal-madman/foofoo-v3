@@ -97,7 +97,9 @@ export function flattenServedDishes(plates: unknown): ServedDish[] {
   if (!Array.isArray(plates)) return [];
   const out: ServedDish[] = [];
   for (const p of plates) {
-    if (p && typeof p === "object" && Array.isArray((p as Record<string, unknown>).hero_dish_names)) {
+    if (
+      p && typeof p === "object" && Array.isArray((p as Record<string, unknown>).hero_dish_names)
+    ) {
       for (const name of (p as Record<string, unknown>).hero_dish_names as unknown[]) {
         if (typeof name === "string" && name.length > 0) out.push({ dishName: name });
       }

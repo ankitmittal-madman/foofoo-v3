@@ -299,7 +299,9 @@ export async function loadHouseholdRaw(
   const [profileRes, answersRes, membersRes] = await Promise.all([
     withTimeout(
       db.from("profiles")
-        .select("id, home_state, current_city, diet_type, religious_pref, allergen_flags, cook_capability")
+        .select(
+          "id, home_state, current_city, diet_type, religious_pref, allergen_flags, cook_capability",
+        )
         .eq("id", profileId).maybeSingle(),
       "recommendations.compose.loadProfile",
     ),
@@ -553,7 +555,9 @@ export async function buildExcludeDishIds(
       const plates = row.plates;
       if (!Array.isArray(plates)) continue;
       for (const p of plates) {
-        if (p && typeof p === "object" && Array.isArray((p as Record<string, unknown>).hero_dish_ids)) {
+        if (
+          p && typeof p === "object" && Array.isArray((p as Record<string, unknown>).hero_dish_ids)
+        ) {
           for (const id of (p as Record<string, unknown>).hero_dish_ids as unknown[]) {
             if (typeof id === "string" && id.length > 0) ids.add(id);
           }
