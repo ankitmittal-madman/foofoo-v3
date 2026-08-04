@@ -18,6 +18,8 @@ ranked by the same score. Class plan and dish list can never disagree.
 All functions take a raw household dict (fixtures.HOUSEHOLDS shape), derive θ once, and return
 plain JSON-serialisable dicts so the FastAPI layer can hand them straight back.
 """
+import random
+
 from ghar_re_core import scoring as S
 from ghar_re_core import cohort_plan as CP
 from ghar_re_core import knowledge as K
@@ -79,28 +81,45 @@ def _ranked(cat, theta, ctx, objective, predicate=None):
     return out
 
 
-def _diversify(ranked, n, per_class=2, per_cuisine=3):
+def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
     """Take the top n dishes while capping repeats per meal class and per cuisine, so the surface
     isn't 15 near-identical dals. Falls back to filling from the remainder if the caps are too
-    tight to reach n."""
+    tight to reach n.
+
+    `rng`: when given (household-seeded, see cold_start_top15), applies CONFIG.bandit_epsilon
+    exploration — the same already-Founder-approved rate ghar_re_core.exploration uses for the
+    weekly-pairing swap (bandit_weights.yaml, code-level safety default 0.0) — so two households
+    that land on an identical theta (e.g. same cohort answers) don't always converge on the exact
+    same top-n: at each candidate, with probability epsilon, the pick is deferred to let a later
+    candidate have a turn, rather than always taking the next-best greedy option. Deterministic
+    per household (stable seed) and a strict no-op when rng is None, so every existing caller
+    (slot_options/dishes_for_class, and any cold_start_top15 call with no household_id) keeps its
+    exact prior greedy behaviour — this never touches score or eligibility, only pick order."""
+    epsilon = CONFIG.bandit_epsilon if rng is not None else 0.0
     picked, seen_class, seen_cuisine = [], {}, {}
+    deferred = []
     for score, d in ranked:
         code = K.dish_to_class_code(d.name)
         if seen_class.get(code, 0) >= per_class:
             continue
         if seen_cuisine.get(d.cuisine, 0) >= per_cuisine:
             continue
+        if epsilon > 0 and rng.random() < epsilon:
+            deferred.append((score, d))          # exploration: give a later candidate its turn
+            continue
         picked.append((score, d))
         seen_class[code] = seen_class.get(code, 0) + 1
         seen_cuisine[d.cuisine] = seen_cuisine.get(d.cuisine, 0) + 1
         if len(picked) >= n:
             return picked
-    # top-up if caps left us short
+    # top-up if caps (or deferrals) left us short — deferred picks first, then the remainder,
+    # so an exploration deferral still gets a genuine second chance rather than being discarded.
     if len(picked) < n:
         chosen = {id(d) for _, d in picked}
-        for score, d in ranked:
+        for score, d in deferred + ranked:
             if id(d) not in chosen:
                 picked.append((score, d))
+                chosen.add(id(d))
                 if len(picked) >= n:
                     break
     return picked[:n]
@@ -113,12 +132,20 @@ def _theta_obj(household):
     return theta, objective
 
 
-def cold_start_top15(household, catalogue=None, n=15, weekday="Monday"):
+def cold_start_top15(household, catalogue=None, n=15, weekday="Monday", household_id=None):
     """Surface 1 — the post-onboarding preference primer: the n (default 15) top-scoring, DIVERSE
     dishes across breakfast/lunch/dinner, for the user to like and seed their taste profile. Diverse
-    = capped per meal class and per cuisine so it spans the plan, not one class 15 times."""
+    = capped per meal class and per cuisine so it spans the plan, not one class 15 times.
+
+    `household_id`: when given, seeds a household-stable RNG so `_diversify` applies
+    CONFIG.bandit_epsilon exploration (see its docstring) — two households with identical answers
+    (same cohort, same theta) get varied top-n sets instead of always converging on the exact same
+    15 dishes, while a given household's own result stays stable call-to-call until its answers or
+    the catalogue actually change. Omitted (None) => no exploration, exact prior deterministic
+    behaviour (existing tests/fixtures that don't pass household_id are unaffected)."""
     cat = catalogue or Catalogue()
     theta, objective = _theta_obj(household)
+    rng = random.Random(household_id) if household_id is not None else None
     # pool the best of each main slot, then diversify across the merged pool
     pool = {}
     for slot in MAIN_SLOTS:
@@ -128,7 +155,7 @@ def cold_start_top15(household, catalogue=None, n=15, weekday="Monday"):
             if prev is None or score > prev[0]:
                 pool[d.name] = (score, d, slot, ctx)
     ranked = sorted(((v[0], v[1]) for v in pool.values()), key=lambda x: -x[0])
-    picked = _diversify(ranked, n)
+    picked = _diversify(ranked, n, rng=rng)
     slot_of = {v[1].name: (v[2], v[3]) for v in pool.values()}
     return {
         "household": household.get("label"),

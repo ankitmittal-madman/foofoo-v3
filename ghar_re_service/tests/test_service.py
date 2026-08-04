@@ -17,6 +17,7 @@ import pytest
 from fastapi.testclient import TestClient
 from ghar_re_service.providers import DEV_INSECURE_SECRET
 
+from ghar_re_core import config as cfgmod
 from ghar_re_core import fixtures as F
 from ghar_re_service import auth, main
 
@@ -115,27 +116,37 @@ def test_recommendations_omits_decision_trace_by_default(client):
 
 
 def test_recommendations_include_decision_trace(client):
-    req = _req("couple_mumbai_mh")
-    req["include_decision_trace"] = True
-    r = _post(client, req)
-    assert r.status_code == 200
-    body = r.json()
-    trace = body["decision_trace"]
-    funnel = trace["funnel"]
-    assert funnel[0]["stage"] == "catalogue_total"
-    # WP-8G Option A added a final after_exclude_dish_ids_filter stage to the funnel (a no-op
-    # stage here since this request sends no exclude_dish_ids), so the funnel's last stage moved
-    # from after_fasting_filter to it.
-    assert funnel[-1]["stage"] == "after_exclude_dish_ids_filter"
-    counts = [s["count"] for s in funnel]
-    assert counts == sorted(counts, reverse=True)
-    assert len(trace["winners"]) == len(body["plates"])
-    assert 0 <= len(trace["alternatives_considered"]) <= 5
-    # opting into the trace must never change which plates are actually served
-    plain = _post(client, _req("couple_mumbai_mh")).json()
-    traced_ids = [p["hero_dish_ids"] for p in body["plates"]]
-    plain_ids = [p["hero_dish_ids"] for p in plain["plates"]]
-    assert traced_ids == plain_ids
+    # Pin Phase 2 exploration's epsilon to 0 for this whole test: it makes two independent,
+    # unseeded requests and compares which plates were served. Under the real (nonzero)
+    # bandit_weights.yaml epsilon, each request can roll its own independent explore/exploit
+    # decision, which would make that comparison flaky for a reason that has nothing to do with
+    # include_decision_trace.
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {"exploration": {"epsilon": 0.0, "exploration_boost": 0.0}}
+        req = _req("couple_mumbai_mh")
+        req["include_decision_trace"] = True
+        r = _post(client, req)
+        assert r.status_code == 200
+        body = r.json()
+        trace = body["decision_trace"]
+        funnel = trace["funnel"]
+        assert funnel[0]["stage"] == "catalogue_total"
+        # WP-8G Option A added a final after_exclude_dish_ids_filter stage to the funnel (a no-op
+        # stage here since this request sends no exclude_dish_ids), so the funnel's last stage moved
+        # from after_fasting_filter to it.
+        assert funnel[-1]["stage"] == "after_exclude_dish_ids_filter"
+        counts = [s["count"] for s in funnel]
+        assert counts == sorted(counts, reverse=True)
+        assert len(trace["winners"]) == len(body["plates"])
+        assert 0 <= len(trace["alternatives_considered"]) <= 5
+        # opting into the trace must never change which plates are actually served
+        plain = _post(client, _req("couple_mumbai_mh")).json()
+        traced_ids = [p["hero_dish_ids"] for p in body["plates"]]
+        plain_ids = [p["hero_dish_ids"] for p in plain["plates"]]
+        assert traced_ids == plain_ids
+    finally:
+        cfgmod.active_config().bandit = orig
 
 
 def test_recommendations_tolerates_unknown_fields(client):

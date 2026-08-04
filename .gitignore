@@ -36,3 +36,6 @@ supabase/.branches/
 
 # Claude Code local permission overrides — personal to this machine/session, never shared via git.
 .claude/settings.local.json
+
+# npm-installed dependency trees — regenerated via `npm install`, never checked in.
+node_modules/

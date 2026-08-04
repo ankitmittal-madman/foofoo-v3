@@ -80,6 +80,11 @@ export function makePlanHandler(): Handler {
     if (spec.needsHousehold) {
       const { household, householdId: hid, stubbed } = await loadHouseholdRaw(ctx, householdId);
       payload.household = household;
+      // Cold-start exploration seed (ghar_re_core.meal_planner.cold_start_top15): a stable
+      // per-household RNG seed so two households that land on an identical theta (same cohort
+      // answers) don't always converge on the exact same top-n dishes. Harmless for the other
+      // surfaces — they don't read household_id from the payload.
+      payload.household_id = hid;
       log.info("plan.composed", { household_id: hid, stubbed });
     }
 

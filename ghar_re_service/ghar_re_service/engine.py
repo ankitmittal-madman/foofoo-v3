@@ -92,7 +92,10 @@ def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any
     """Surface 1: post-onboarding top-15 preference primer (diverse top dishes)."""
     hh = build_household_dict(request["household"])
     n = int(request.get("count", 15))
-    res = planner.cold_start_top15(hh, catalogue, n=n, weekday=request.get("weekday", "Monday"))
+    res = planner.cold_start_top15(
+        hh, catalogue, n=n, weekday=request.get("weekday", "Monday"),
+        household_id=request.get("household_id"),
+    )
     _with_images(res["dishes"])
     return res
 
