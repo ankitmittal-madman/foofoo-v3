@@ -41,6 +41,10 @@ export interface HouseholdRaw {
   q13_who_cooks: string;
   q14_eat_out_per_week: number;
   q15_objective: string;
+  /** WP-18 addition (profiles.cook_capability, not part of the original Q1-15 set) — feeds
+   * ghar_re_core.meal_planner's cook-capability ranking bias (cold_start_top15), NOT the FROZEN
+   * Core Spine BASE score (see meal_planner.py's _apply_cook_capability_bias docstring for why). */
+  cook_capability: string | null;
 }
 
 /**
@@ -154,6 +158,7 @@ const NEW_HOUSEHOLD: HouseholdRaw = {
   q8_is_jain: false,
   q9_allergies: [],
   q12_member_ages: [{ role: "adult", age: 32 }],
+  cook_capability: null,
 };
 
 interface ProfileRow {
@@ -163,6 +168,7 @@ interface ProfileRow {
   diet_type: string | null;
   religious_pref: string | null;
   allergen_flags: number | null;
+  cook_capability: string | null;
 }
 
 interface AnswersRow {
@@ -262,6 +268,7 @@ export function composeHouseholdRaw(
     q14_eat_out_per_week: a.q14_eat_out_per_week ??
       NEW_HOUSEHOLD_ANSWER_DEFAULTS.q14_eat_out_per_week,
     q15_objective: a.q15_objective ?? NEW_HOUSEHOLD_ANSWER_DEFAULTS.q15_objective,
+    cook_capability: profile.cook_capability ?? NEW_HOUSEHOLD.cook_capability,
     // A household with a profile but zero member rows still needs one member for the RE's
     // household-size maths — treat it as a single adult rather than sending an empty array.
     q12_member_ages: memberAges.length > 0 ? memberAges : [{ role: "adult", age: 32 }],
@@ -292,7 +299,7 @@ export async function loadHouseholdRaw(
   const [profileRes, answersRes, membersRes] = await Promise.all([
     withTimeout(
       db.from("profiles")
-        .select("id, home_state, current_city, diet_type, religious_pref, allergen_flags")
+        .select("id, home_state, current_city, diet_type, religious_pref, allergen_flags, cook_capability")
         .eq("id", profileId).maybeSingle(),
       "recommendations.compose.loadProfile",
     ),
@@ -344,52 +351,71 @@ const DEFAULT_CONTEXT = {
 
 /**
  * Load the household's most recent stored context, if any. Returns undefined when the household
- * has none — the caller then falls back to DEFAULT_CONTEXT, so a household that has never had a
- * context row still gets a recommendation.
+ * has none, or the lookup itself fails — the caller then falls back to DEFAULT_CONTEXT, so a
+ * household that has never had a context row (or hits a transient DB error) still gets a
+ * recommendation. Best-effort, same convention as buildExcludeDishIds below: a lookup failure
+ * degrades to "no stored context", never blocks or fails the request.
+ *
+ * Previously defined but never called by handler.ts (WP-14 §3 finding) — every request fell
+ * through to DEFAULT_CONTEXT/a one-shot caller override regardless of real history. Now wired
+ * into buildRequest's call site (handler.ts) as the middle tier of DEFAULT_CONTEXT < stored
+ * history < explicit per-request override.
  */
 export async function loadLatestContext(
   ctx: RequestContext,
   profileId: string,
 ): Promise<Record<string, unknown> | undefined> {
-  const db = createServiceRoleClient(ctx.config);
-  const { data, error } = await withTimeout(
-    db.from("household_context")
-      .select(
-        "slot, season, weekday, weather_condition, temp_c, is_raining, humidity, " +
-          "active_modes, calorie_target",
-      )
-      .eq("profile_id", profileId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    "recommendations.compose.loadLatestContext",
-  );
+  try {
+    const db = createServiceRoleClient(ctx.config);
+    const { data, error } = await withTimeout(
+      db.from("household_context")
+        .select(
+          "slot, season, weekday, weather_condition, temp_c, is_raining, humidity, " +
+            "active_modes, calorie_target",
+        )
+        .eq("profile_id", profileId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      "recommendations.compose.loadLatestContext",
+    );
 
-  if (error) throw error;
-  if (!data) return undefined;
+    if (error) throw error;
+    if (!data) return undefined;
 
-  // Reshape the flat row into the contract's nested `weather` object. The double assertion is
-  // needed because supabase-js types `data` as a union that includes its own error shape; the
-  // `error` branch is already returned above, so only the row shape can reach here.
-  const row = data as unknown as Record<string, unknown>;
-  return {
-    slot: row.slot ?? DEFAULT_CONTEXT.slot,
-    season: row.season ?? DEFAULT_CONTEXT.season,
-    weekday: row.weekday ?? DEFAULT_CONTEXT.weekday,
-    weather: {
-      is_raining: row.is_raining ?? false,
-      temp_c: row.temp_c ?? null,
-      humidity: row.humidity ?? null,
-      condition: row.weather_condition ?? null,
-    },
-    active_modes: row.active_modes ?? [],
-    calorie_target: row.calorie_target ?? null,
-  };
+    // Reshape the flat row into the contract's nested `weather` object. The double assertion is
+    // needed because supabase-js types `data` as a union that includes its own error shape; the
+    // `error` branch is already returned above, so only the row shape can reach here.
+    const row = data as unknown as Record<string, unknown>;
+    return {
+      slot: row.slot ?? DEFAULT_CONTEXT.slot,
+      season: row.season ?? DEFAULT_CONTEXT.season,
+      weekday: row.weekday ?? DEFAULT_CONTEXT.weekday,
+      weather: {
+        is_raining: row.is_raining ?? false,
+        temp_c: row.temp_c ?? null,
+        humidity: row.humidity ?? null,
+        condition: row.weather_condition ?? null,
+      },
+      active_modes: row.active_modes ?? [],
+      calorie_target: row.calorie_target ?? null,
+    };
+  } catch (e) {
+    ctx.logger.warn("household_context.load_failed", {
+      profile_id: profileId,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+    return undefined;
+  }
 }
 
-/** Assemble the ghar-re-v1 request. `contextOverride` (from the request body) wins over defaults.
- * `interactionCount` (§0.2), when supplied, is merged into `context` BEFORE the payload is
- * returned — i.e. before validateRequest() runs at the handler's call site — since
+/** Assemble the ghar-re-v1 request. Three-tier context precedence, lowest to highest:
+ * DEFAULT_CONTEXT (hardcoded) < `storedContext` (this household's own last-used context, from
+ * loadLatestContext) < `contextOverride` (explicit, this request's body) — a returning household
+ * with no explicit override gets ITS OWN recent context instead of always the same hardcoded
+ * dinner/monsoon/Thursday default (WP-14 §3 gap; loadLatestContext existed but nothing called it
+ * until now). `interactionCount` (§0.2), when supplied, is merged into `context` BEFORE the
+ * payload is returned — i.e. before validateRequest() runs at the handler's call site — since
  * `w_cohort_effective`/`foreign_demote_effective` (ghar_re_core/config.py) both key off
  * `ctx['interaction_count']` and were dead code paths (always `n=0`) without a real caller ever
  * populating it. */
@@ -399,8 +425,13 @@ export function buildRequest(
   requestId: string,
   interactionCount?: number,
   excludeDishIds?: string[],
+  storedContext?: Record<string, unknown>,
 ): Record<string, unknown> {
-  const context: Record<string, unknown> = { ...DEFAULT_CONTEXT, ...(contextOverride ?? {}) };
+  const context: Record<string, unknown> = {
+    ...DEFAULT_CONTEXT,
+    ...(storedContext ?? {}),
+    ...(contextOverride ?? {}),
+  };
   if (typeof interactionCount === "number") {
     context.interaction_count = interactionCount;
   }

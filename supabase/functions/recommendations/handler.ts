@@ -27,6 +27,7 @@ import {
   countInteractions,
   type HouseholdRaw,
   loadHouseholdRaw,
+  loadLatestContext,
   recordHouseholdContext,
 } from "./compose.ts";
 import { validateRequest, validateResponse } from "./contract.ts";
@@ -55,6 +56,8 @@ export interface RecommendationDeps {
   countInteractionsFn?: typeof countInteractions;
   /** WP-8G Option A — injectable so tests never need a live recommendation_events table. */
   buildExcludeDishIdsFn?: typeof buildExcludeDishIds;
+  /** WP-14 §3 — injectable so tests never need a live household_context table. */
+  loadLatestContextFn?: typeof loadLatestContext;
 }
 
 function plateCount(body: Record<string, unknown>): number {
@@ -72,6 +75,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
   const recordContext = deps.recordContext ?? recordHouseholdContext;
   const countInteractionsFn = deps.countInteractionsFn ?? countInteractions;
   const buildExcludeDishIdsFn = deps.buildExcludeDishIdsFn ?? buildExcludeDishIds;
+  const loadLatestContextFn = deps.loadLatestContextFn ?? loadLatestContext;
 
   return async (req, ctx) => {
     if (req.method !== "POST") {
@@ -132,7 +136,19 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     // resurfacing the exact same plates. Best-effort (buildExcludeDishIdsFn never throws — see
     // compose.ts) — a lookup failure degrades to no exclusions, never blocks the request.
     const excludeDishIds = await buildExcludeDishIdsFn(ctx, hid);
-    const payload = buildRequest(household, contextOverride, requestId, interactionCount, excludeDishIds);
+    // WP-14 §3: this household's own most recent context (if any), sitting between
+    // DEFAULT_CONTEXT and an explicit per-request override in buildRequest's precedence — so a
+    // returning household with no override gets ITS real recent context instead of always
+    // dinner/monsoon/Thursday. Best-effort (loadLatestContextFn never throws — see compose.ts).
+    const storedContext = await loadLatestContextFn(ctx, hid);
+    const payload = buildRequest(
+      household,
+      contextOverride,
+      requestId,
+      interactionCount,
+      excludeDishIds,
+      storedContext,
+    );
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext

@@ -79,6 +79,7 @@ const TEST_HOUSEHOLD: HouseholdRaw = {
   q13_who_cooks: "self",
   q14_eat_out_per_week: 2,
   q15_objective: "awesome_taste",
+  cook_capability: "intermediate",
 };
 
 /** Inject the fixed household above, so no test below touches a database. */
@@ -492,6 +493,7 @@ Deno.test("composeHouseholdRaw joins the three live sources into one contract pa
       diet_type: "veg",
       religious_pref: "jain",
       allergen_flags: 2, // dairy
+      cook_capability: "beginner",
     },
     {
       q1_household_type: "couple",
@@ -511,6 +513,7 @@ Deno.test("composeHouseholdRaw joins the three live sources into one contract pa
   assertEquals(hh.q9_allergies, ["dairy"]); // derived from the bitfield
   assertEquals(hh.q15_objective, "healthy_living"); // from household_answers
   assertEquals(hh.q12_member_ages.length, 2); // from household_members
+  assertEquals(hh.cook_capability, "beginner"); // from profiles
 });
 
 Deno.test("composeHouseholdRaw serves neutral defaults when onboarding is incomplete", () => {
@@ -524,6 +527,7 @@ Deno.test("composeHouseholdRaw serves neutral defaults when onboarding is incomp
       diet_type: "non_veg",
       religious_pref: "all",
       allergen_flags: 0,
+      cook_capability: null,
     },
     null,
     [],

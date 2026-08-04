@@ -45,6 +45,16 @@ def test_cold_start_top15_diverse_and_eligible():
         assert d["score"] is not None
 
 
+def test_cold_start_top15_favors_quicker_dishes_for_beginner_cooks():
+    """End-to-end: a 'beginner' cook_capability measurably shifts cold_start_top15 toward lower
+    total_mins dishes vs. an otherwise-identical 'advanced' household, without changing eligibility
+    (both still get exactly n diverse, eligible dishes — see test_cold_start_top15_diverse_and_eligible)."""
+    beginner_dishes = MP.cold_start_top15(_hh(cook_capability="beginner"), n=15)["dishes"]
+    advanced_dishes = MP.cold_start_top15(_hh(cook_capability="advanced"), n=15)["dishes"]
+    avg = lambda dishes: sum(d["total_mins"] for d in dishes) / len(dishes)  # noqa: E731
+    assert avg(beginner_dishes) <= avg(advanced_dishes)
+
+
 def test_slot_options_returns_a_short_eligible_list():
     hh = _hh(q5_diet="veg")
     opts = MP.slot_options(hh, "dinner", n=5)["options"]
@@ -84,6 +94,26 @@ def test_dishes_for_class_reconciliation_contract():
     # memberships (primary or secondary), so the day's dish list can never show an off-class dish.
     for d in rec["options"]:
         assert chosen in K.dish_to_class_codes(d["name"])
+
+
+def test_cook_capability_bias_reorders_beginner_without_changing_scores():
+    """_apply_cook_capability_bias is a RANKING adjustment only (meal_planner.py's own charter —
+    never invents a score, never touches eligibility): a 'beginner' household should see
+    within-budget dishes ranked ahead of longer ones, with every original (score, dish) pair and
+    every score value preserved exactly, just reordered."""
+    from types import SimpleNamespace
+    quick = SimpleNamespace(name="quick", total_mins=20)
+    slow = SimpleNamespace(name="slow", total_mins=90)
+    unknown = SimpleNamespace(name="unknown", total_mins=None)
+    ranked = [(0.9, slow), (0.8, quick), (0.7, unknown)]  # best-first, slow happens to score highest
+
+    beginner = MP._apply_cook_capability_bias(ranked, "beginner")
+    assert [d.name for _, d in beginner] == ["quick", "unknown", "slow"]
+    assert sorted(s for s, _ in beginner) == sorted(s for s, _ in ranked)  # no score was altered
+
+    # no-op for intermediate/advanced/unknown cook_capability — original order preserved exactly
+    for cap in ("intermediate", "advanced", None, "not_a_real_value"):
+        assert MP._apply_cook_capability_bias(ranked, cap) == ranked
 
 
 def test_jain_household_surfaces_only_jain_dishes():

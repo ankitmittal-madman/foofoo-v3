@@ -81,6 +81,36 @@ def _ranked(cat, theta, ctx, objective, predicate=None):
     return out
 
 
+# Beginner-cook time budget (minutes) for the soft re-rank below. Deliberately NOT a
+# base_weights.yaml W_k or a new BASE-formula term: the FROZEN Core Spine's §S2 PART B formula
+# (docs/architecture/ghar-re/ghar_re_v1_0_core_spine_FROZEN.md, "B9. Weight defaults") is closed at
+# exactly 7 named W_k terms + PRIOR[zone][slot] — it does not include an effort/time term despite
+# base_weights.yaml's orphaned `W_EFFORT: 0.40` and derivation.py's unconsumed `effort_ceiling`
+# theta field (neither is read anywhere in scoring.py; confirmed by grep). Extending BASE itself
+# to consume either would silently go beyond what's actually frozen/ratified, so this stays
+# entirely a meal_planner.py RANKING adjustment instead (this module's own charter: "RANKS or
+# GROUPS dishes the engine already scores... nothing new decides eligibility or invents a score" —
+# scores are never touched, only pick ORDER, via a stable partition, same spirit as _diversify's
+# own class/cuisine caps below). Founder should revisit whether W_EFFORT/effort_ceiling ought to be
+# formally added to a future Core Spine revision instead of staying dormant config.
+_BEGINNER_TIME_BUDGET_MINS = 45
+
+
+def _apply_cook_capability_bias(ranked, cook_capability):
+    """Stable-partition an already-`_ranked()` (score, dish) list so a 'beginner' household sees
+    dishes within `_BEGINNER_TIME_BUDGET_MINS` ranked ahead of longer ones, WITHOUT changing any
+    dish's score or excluding anything — a beginner can still see an ambitious dish, just later.
+    No-op (returns `ranked` unchanged) for 'intermediate'/'advanced'/unknown cook_capability, or
+    when a dish has no total_mins to compare (never demoted for missing data)."""
+    if cook_capability != "beginner":
+        return ranked
+    within_budget = [pair for pair in ranked
+                     if pair[1].total_mins is None or pair[1].total_mins <= _BEGINNER_TIME_BUDGET_MINS]
+    over_budget = [pair for pair in ranked
+                   if pair[1].total_mins is not None and pair[1].total_mins > _BEGINNER_TIME_BUDGET_MINS]
+    return within_budget + over_budget
+
+
 def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
     """Take the top n dishes while capping repeats per meal class and per cuisine, so the surface
     isn't 15 near-identical dals. Falls back to filling from the remainder if the caps are too
@@ -155,6 +185,7 @@ def cold_start_top15(household, catalogue=None, n=15, weekday="Monday", househol
             if prev is None or score > prev[0]:
                 pool[d.name] = (score, d, slot, ctx)
     ranked = sorted(((v[0], v[1]) for v in pool.values()), key=lambda x: -x[0])
+    ranked = _apply_cook_capability_bias(ranked, household.get("cook_capability"))
     picked = _diversify(ranked, n, rng=rng)
     slot_of = {v[1].name: (v[2], v[3]) for v in pool.values()}
     return {
