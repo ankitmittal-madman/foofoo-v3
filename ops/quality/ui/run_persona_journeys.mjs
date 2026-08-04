@@ -119,6 +119,34 @@ async function waitForPath(page, predicate, timeoutMs) {
   throw new Error(`waitForPath timed out after ${timeoutMs}ms (last url: ${lastUrl})`);
 }
 
+/**
+ * clickUntilPath — submit an onboarding step and retry only when the UI remains on that step.
+ *
+ * A production-test save can occasionally hit a transient network failure. The real UI keeps the
+ * user on the same screen and makes Continue retryable, so the journey driver mirrors that human
+ * recovery instead of immediately looking for controls on the next screen. A completed journey
+ * step is recorded only after the expected route is visible.
+ */
+async function clickUntilPath(page, testId, predicate, recordStep, label, attempts = 3) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    if (predicate(new URL(page.url()))) {
+      await recordStep(label);
+      return;
+    }
+    await page.getByTestId(testId).click({ timeout: 10000 });
+    try {
+      await waitForPath(page, predicate, 20000);
+      await recordStep(label);
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await page.waitForTimeout(1000 * attempt);
+    }
+  }
+  throw new Error(`${label} failed after ${attempts} attempts: ${lastError?.message ?? "route did not change"}`);
+}
+
 let personas;
 try {
   personas = loadPersonas();
@@ -211,6 +239,22 @@ async function extractBearerToken(page) {
   });
 }
 
+/** Resolve the native Supabase Edge Functions base used by the deployed mobile application. */
+async function resolveApiBaseUrl(page) {
+  const configured = process.env.GHAR_API_BASE_URL?.replace(/\/$/, "");
+  if (configured) return configured;
+
+  const projectRef = await page.evaluate(() => {
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      const match = key?.match(/^sb-([a-z0-9]+)-auth-token$/i);
+      if (match) return match[1];
+    }
+    return null;
+  });
+  return projectRef ? `https://${projectRef}.supabase.co/functions/v1` : null;
+}
+
 /**
  * fillChipGroup — clicks every testID matching `${prefix}-${value}` for each value in `values`.
  * Silently skips a value with no matching testID (e.g. this mapper produced a token Screen 4/5
@@ -279,9 +323,13 @@ async function runPersona(browser, persona) {
     // Consent — gate on personalization=true so the flow can proceed into step-1.
     await page.goto(new URL("/consent", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
     await recordStep("consent-loaded");
-    const consentContinue = page.getByTestId("onboarding-consent-continue");
-    await consentContinue.click({ timeout: 10000 });
-    await recordStep("consent-continue");
+    await clickUntilPath(
+      page,
+      "onboarding-consent-continue",
+      (u) => u.pathname.endsWith("/step-1"),
+      recordStep,
+      "consent-continue",
+    );
 
     const answers = personaToOnboardingAnswers(persona.household);
     const split = isSplitAge(answers.householdType);
@@ -299,8 +347,13 @@ async function runPersona(browser, persona) {
         await recordStep("step1-earners");
       }
     }
-    await page.getByTestId("onboarding-step1-continue").click({ timeout: 10000 });
-    await recordStep("step1-continue");
+    await clickUntilPath(
+      page,
+      "onboarding-step1-continue",
+      (u) => u.pathname.endsWith("/step-2"),
+      recordStep,
+      "step1-continue",
+    );
 
     // ---- Step 2 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-2"), 15000).catch(() => {});
@@ -315,8 +368,13 @@ async function runPersona(browser, persona) {
       await page.getByTestId("onboarding-step2-city-input").fill(answers.currentCity, { timeout: 10000 });
       await recordStep("step2-city");
     }
-    await page.getByTestId("onboarding-step2-continue").click({ timeout: 10000 });
-    await recordStep("step2-continue");
+    await clickUntilPath(
+      page,
+      "onboarding-step2-continue",
+      (u) => u.pathname.endsWith("/step-3"),
+      recordStep,
+      "step2-continue",
+    );
 
     // ---- Step 3 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-3"), 15000).catch(() => {});
@@ -326,8 +384,13 @@ async function runPersona(browser, persona) {
     }
     await fillChipGroup(page, "onboarding-step3-meat", answers.meatPreferences, recordStep);
     await fillChipGroup(page, "onboarding-step3-vegday", answers.vegDays, recordStep);
-    await page.getByTestId("onboarding-step3-continue").click({ timeout: 10000 });
-    await recordStep("step3-continue");
+    await clickUntilPath(
+      page,
+      "onboarding-step3-continue",
+      (u) => u.pathname.endsWith("/step-4"),
+      recordStep,
+      "step3-continue",
+    );
 
     // ---- Step 4 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-4"), 15000).catch(() => {});
@@ -339,8 +402,13 @@ async function runPersona(browser, persona) {
     if (answers.medicalConditionsOther) {
       await page.getByTestId("onboarding-step4-condition-other-input").fill(answers.medicalConditionsOther).catch(() => {});
     }
-    await page.getByTestId("onboarding-step4-continue").click({ timeout: 10000 });
-    await recordStep("step4-continue");
+    await clickUntilPath(
+      page,
+      "onboarding-step4-continue",
+      (u) => u.pathname.endsWith("/step-5"),
+      recordStep,
+      "step4-continue",
+    );
 
     // ---- Step 5 ----
     await waitForPath(page, (u) => u.pathname.endsWith("/step-5"), 15000).catch(() => {});
@@ -357,32 +425,38 @@ async function runPersona(browser, persona) {
     if (answers.cookingObjective) await page.getByTestId(`onboarding-step5-objective-${answers.cookingObjective}`).click().catch(() => {});
     await recordStep("step5-filled");
 
-    await page.getByTestId("onboarding-step5-continue").click({ timeout: 10000 });
-    await recordStep("step5-finish");
+    await clickUntilPath(
+      page,
+      "onboarding-step5-continue",
+      (u) => u.pathname.includes("cold-start") || u.pathname.includes("recommendations"),
+      recordStep,
+      "step5-finish",
+    );
 
     // ---- Land on post-onboarding screen (cold-start) ----
-    await waitForPath(page, (u) => u.pathname.includes("cold-start") || u.pathname.includes("recommendations"), 20000).catch(() => {});
     await recordStep("post-onboarding-landing");
 
     // ---- Capture the actual /v1/recommendations result the app's own session would get ----
     const token = await extractBearerToken(page);
     let recommendations = null;
     if (token) {
-      const apiBase = await page.evaluate(() => window.location.origin).catch(() => url);
-      const resp = await page
-        .evaluate(
-          async ({ base, tok }) => {
-            const res = await fetch(`${base}/v1/recommendations`, {
-              method: "POST",
-              headers: { "content-type": "application/json", authorization: `Bearer ${tok}` },
-              body: JSON.stringify({}),
-            });
-            const json = await res.json().catch(() => null);
-            return { status: res.status, body: json };
-          },
-          { base: apiBase, tok: token },
-        )
-        .catch((e) => ({ status: null, error: String(e) }));
+      const apiBase = await resolveApiBaseUrl(page);
+      const resp = apiBase
+        ? await page
+            .evaluate(
+              async ({ base, tok }) => {
+                const res = await fetch(`${base}/recommendations`, {
+                  method: "POST",
+                  headers: { "content-type": "application/json", authorization: `Bearer ${tok}` },
+                  body: JSON.stringify({}),
+                });
+                const json = await res.json().catch(() => null);
+                return { status: res.status, body: json };
+              },
+              { base: apiBase, tok: token },
+            )
+          .catch((e) => ({ status: null, error: String(e) }))
+        : { status: null, error: "could not resolve the Supabase Edge Functions base URL" };
       recommendations = resp;
     } else {
       recommendations = { status: null, error: "no Supabase access_token found in page localStorage — could not call /v1/recommendations" };
@@ -402,6 +476,16 @@ async function runPersona(browser, persona) {
     }
     fs.writeFileSync(path.join(personaDir, "recommendations.json"), JSON.stringify(recommendations, null, 2));
     fs.writeFileSync(path.join(personaDir, "recommendation_events.json"), JSON.stringify(recommendationEvents, null, 2));
+
+    const expectedStatus = Number(persona.expect_status);
+    if (recommendations?.status !== expectedStatus) {
+      throw new Error(
+        `recommendations returned ${recommendations?.status ?? "no status"}; expected ${expectedStatus}`,
+      );
+    }
+    if (expectedStatus === 200 && !recommendations?.body?.plates?.length) {
+      throw new Error("recommendations returned HTTP 200 without any dish plates");
+    }
 
     const summary = {
       key: persona.key,
