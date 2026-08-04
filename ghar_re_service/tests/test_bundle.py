@@ -45,16 +45,16 @@ def test_bundle_version_is_deterministic(built, tmp_path):
 
 
 def _copy_source_tree(dest_parent):
-    """Copy data/source/ AND its sibling sig_scores_v1.csv into an isolated tmp dir, mirroring
-    the real repo layout (build_catalogue.load_sig_scores() resolves that file one level ABOVE
-    source_dir, per data/source/README.md's own `../sig_scores_v1.csv` config-table entry — a
-    bare copy of data/source/ alone is no longer a self-contained source tree)."""
+    """Copy data/source/ AND its siblings sig_scores_v1.csv/dish_macro_v1.csv into an isolated tmp
+    dir, mirroring the real repo layout (build_catalogue.load_sig_scores()/load_dish_macro()
+    resolve those files one level ABOVE source_dir, per data/source/README.md's own `../*.csv`
+    config-table entries — a bare copy of data/source/ alone is no longer a self-contained
+    source tree)."""
     src = dest_parent / "src"
     shutil.copytree(export_bundle.DEFAULT_SOURCE_DIR, src)
-    real_sig_scores = os.path.join(
-        os.path.dirname(export_bundle.DEFAULT_SOURCE_DIR), "sig_scores_v1.csv"
-    )
-    shutil.copy(real_sig_scores, dest_parent / "sig_scores_v1.csv")
+    parent = os.path.dirname(export_bundle.DEFAULT_SOURCE_DIR)
+    for fname in ("sig_scores_v1.csv", "dish_macro_v1.csv"):
+        shutil.copy(os.path.join(parent, fname), dest_parent / fname)
     return src
 
 

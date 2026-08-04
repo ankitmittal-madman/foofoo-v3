@@ -539,11 +539,13 @@ def build_catalogue(source_dir: str = DEFAULT_SOURCE_DIR) -> tuple[list[dict], B
     cuisine_map = load_cuisines(source_dir)
     dish_synonyms = load_dish_synonyms(source_dir)
     sig_scores_map = load_sig_scores(source_dir)
+    dish_macro_map = load_dish_macro(source_dir)
 
     report = BuildReport()
     dishes = [
         transform_dish_row(
-            row, ing_map, alias_map, cuisine_map, dish_synonyms, sig_scores_map, report
+            row, ing_map, alias_map, cuisine_map, dish_synonyms, sig_scores_map,
+            dish_macro_map, report,
         )
         for row in _read_dish_rows(source_dir)
     ]
