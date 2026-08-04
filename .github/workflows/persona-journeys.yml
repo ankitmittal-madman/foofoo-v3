@@ -58,7 +58,9 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Deploy Expo web build to Vercel
-        working-directory: mobile
+        # The Vercel project already has Root Directory = mobile. Invoke the CLI from repository
+        # root so it does not resolve that setting as mobile/mobile.
+        working-directory: .
         id: vercel_deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
