@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet, Image } from "react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { fetchClassDishes, fetchSavedWeek, fetchSlotOptions, savedWeekSelections, setPlanSlotLock } from "@/api/plan";
+import {
+  fetchClassDishes,
+  fetchSavedWeek,
+  fetchSlotOptions,
+  savedWeekLocks,
+  savedWeekSelections,
+  setPlanSlotLock,
+} from "@/api/plan";
 import { postFeedback } from "@/api/feedback";
 import { describeApiError } from "@/api/errorMessages";
 import { loadWeeklyPlan, type FinalizedWeek, type SlotName } from "@/lib/weeklyPlanStore";
@@ -25,15 +32,19 @@ const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
 export default function Home() {
   const weekday = WEEKDAYS[new Date().getDay()];
   const [plan, setPlan] = useState<FinalizedWeek | null>(null);
+  const [locks, setLocks] = useState<Record<string, Partial<Record<SlotName, boolean>>>>({});
   const [planLoaded, setPlanLoaded] = useState(false);
+  const [refreshNonce, setRefreshNonce] = useState(0);
 
   useEffect(() => {
     fetchSavedWeek()
       .then((response) => {
+        setLocks(savedWeekLocks(response));
         const serverPlan = savedWeekSelections(response);
         if (Object.keys(serverPlan).length > 0) return serverPlan;
         return loadWeeklyPlan();
       })
+      .catch(() => loadWeeklyPlan())
       .then((p) => setPlan(p))
       .finally(() => setPlanLoaded(true));
   }, []);
@@ -50,22 +61,37 @@ export default function Home() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Today's plan</Text>
       <Text style={styles.subheader}>{weekday}</Text>
+      <Pressable style={styles.refreshButton} onPress={() => setRefreshNonce((value) => value + 1)}>
+        <Text style={styles.refreshButtonText}>Refresh unlocked meals</Text>
+      </Pressable>
       {SLOTS.map((slot) => (
-        <SlotSection key={slot} slot={slot} weekday={weekday} classCode={plan?.[weekday]?.[slot]} />
+        <SlotSection
+          key={slot}
+          slot={slot}
+          weekday={weekday}
+          classCode={plan?.[weekday]?.[slot]}
+          initiallyLocked={locks[weekday]?.[slot] === true}
+          refreshNonce={refreshNonce}
+        />
       ))}
     </ScrollView>
   );
 }
 
-function SlotSection({
+export function SlotSection({
   slot,
   weekday,
   classCode,
+  initiallyLocked,
+  refreshNonce,
 }: {
   slot: SlotName;
   weekday: string;
   classCode?: string;
+  initiallyLocked: boolean;
+  refreshNonce: number;
 }) {
+  const [locked, setLocked] = useState(initiallyLocked);
   const query = useQuery({
     queryKey: ["daily-plan", slot, weekday, classCode ?? null],
     queryFn: () =>
@@ -73,10 +99,26 @@ function SlotSection({
         ? fetchClassDishes(slot, classCode, weekday, 8)
         : fetchSlotOptions(slot, { weekday, count: 8 }),
   });
+  const lock = useMutation({
+    mutationFn: (nextLocked: boolean) => setPlanSlotLock(weekday, slot, nextLocked),
+    onSuccess: (_data, nextLocked) => setLocked(nextLocked),
+  });
+
+  useEffect(() => setLocked(initiallyLocked), [initiallyLocked]);
+  useEffect(() => {
+    if (refreshNonce > 0 && !locked) query.refetch();
+  }, [refreshNonce]); // locked/query are deliberately sampled when the user requests refresh.
 
   return (
     <View style={styles.slotBlock}>
       <Text style={styles.slotTitle}>{slot}</Text>
+      <Pressable
+        disabled={lock.isPending || !classCode}
+        onPress={() => lock.mutate(!locked)}
+        style={[styles.feedbackButton, locked && styles.feedbackButtonActive, !classCode && styles.buttonDisabled]}
+      >
+        <Text style={styles.feedbackButtonText}>{locked ? "Locked" : "Lock this meal"}</Text>
+      </Pressable>
       {classCode ? (
         <Text style={styles.reconciledNote}>from your finalized plan</Text>
       ) : (
@@ -90,7 +132,7 @@ function SlotSection({
         <>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}>
             {(query.data?.options ?? []).map((d: PlanDish) => (
-              <DishCard key={d.name} dish={d} requestId={query.data?.request_id} weekday={weekday} slot={slot} />
+              <DishCard key={d.name} dish={d} requestId={query.data?.request_id} slot={slot} />
             ))}
           </ScrollView>
           {(query.data?.addons ?? []).map((addon: PlanAddon) => (
@@ -115,26 +157,17 @@ function SlotSection({
  * drove the class match (meal_class_name/cuisine) is honest given what this endpoint returns,
  * rather than fabricating a richer breakdown the API doesn't supply.
  */
-function DishCard({ dish, requestId, weekday, slot }: {
-  dish: PlanDish; requestId?: string; weekday: string; slot: SlotName;
+function DishCard({ dish, requestId, slot }: {
+  dish: PlanDish; requestId?: string; slot: SlotName;
 }) {
   const [sent, setSent] = useState<FeedbackEventType | null>(null);
   const [showWhy, setShowWhy] = useState(false);
-  const [locked, setLocked] = useState(false);
   const feedback = useMutation({
     mutationFn: (eventType: FeedbackEventType) => {
       if (!requestId) return Promise.reject(new Error("no request_id on this response"));
       return postFeedback({ request_id: requestId, event_type: eventType, dish_name: dish.name });
     },
     onSuccess: (_data, eventType) => setSent(eventType),
-  });
-  const lock = useMutation({
-    mutationFn: async () => {
-      await setPlanSlotLock(weekday, slot, !locked);
-      if (!requestId) throw new Error("no request_id on this response");
-      await postFeedback({ request_id: requestId, event_type: locked ? "unlock" : "lock", dish_name: dish.name, slot });
-    },
-    onSuccess: () => setLocked((value) => !value),
   });
 
   return (
@@ -156,10 +189,20 @@ function DishCard({ dish, requestId, weekday, slot }: {
         <Text style={styles.whyLink}>{showWhy ? "Hide why" : "Why this?"}</Text>
       </Pressable>
       {showWhy ? (
-        <Text style={styles.whyText}>
-          Match score {dish.score.toFixed(2)} — {dish.cuisine} cuisine
-          {dish.meal_class_name ? `, ${dish.meal_class_name} class` : ""}.
-        </Text>
+        <View style={styles.explanationBlock}>
+          <Text style={styles.whyText}>
+            Match score {dish.score.toFixed(2)} — {dish.cuisine} cuisine
+            {dish.meal_class_name ? `, ${dish.meal_class_name} class` : ""}.
+          </Text>
+          {(dish.explanation?.top_contributors ?? []).map((item) => (
+            <Text key={item.module} style={styles.contributionText}>
+              {item.module.replace(/^m_/, "").replaceAll("_", " ")}: {item.weighted >= 0 ? "+" : ""}{item.weighted.toFixed(2)}
+            </Text>
+          ))}
+          {dish.explanation?.weather_contribution ? (
+            <Text style={styles.contributionText}>Weather match: {dish.explanation.weather_contribution.toFixed(2)}</Text>
+          ) : null}
+        </View>
       ) : null}
       <View style={styles.feedbackRow}>
         <Pressable
@@ -189,10 +232,6 @@ function DishCard({ dish, requestId, weekday, slot }: {
           <Text style={styles.feedbackButtonText}>Never</Text>
         </Pressable>
       </View>
-      <Pressable disabled={lock.isPending} onPress={() => lock.mutate()}
-        style={[styles.feedbackButton, locked && styles.feedbackButtonActive]}>
-        <Text style={styles.feedbackButtonText}>{locked ? "Locked" : "Lock this meal"}</Text>
-      </Pressable>
       {dish.meal_class_code ? (
         <Pressable onPress={() => router.push({
           pathname: "/add-to-date",
@@ -242,6 +281,11 @@ const styles = StyleSheet.create({
   },
   feedbackButtonActive: { borderColor: "#4A6FA5", backgroundColor: "#EEF3FA" },
   feedbackButtonText: { fontSize: 12, fontWeight: "600" },
+  buttonDisabled: { opacity: 0.45 },
+  refreshButton: { alignSelf: "flex-start", borderWidth: 1, borderColor: "#1F7A3F", borderRadius: 8, padding: 10 },
+  refreshButtonText: { color: "#1F7A3F", fontWeight: "600" },
+  explanationBlock: { gap: 2 },
+  contributionText: { fontSize: 11, color: "#555", textTransform: "capitalize" },
   addonRow: { borderLeftWidth: 3, borderLeftColor: "#4A6FA5", paddingLeft: 10, paddingVertical: 6 },
   addonLabel: { fontSize: 11, color: "#4A6FA5", textTransform: "capitalize" },
 });

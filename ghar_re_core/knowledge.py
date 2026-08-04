@@ -19,17 +19,17 @@ is 'ai_generated'/'stub' only. The Task-4 data_source integrity test scopes to t
 # ---------------------------------------------------------------------------
 ZONE_MAP = [
     # cuisine_group, zone, dish_count, data_source
-    ("north_indian",     "North",     210, "real"),
-    ("mughlai_nawabi",   "North",     210, "real"),   # KB groups mughlai under North
-    ("south_indian",     "South",     141, "real"),
-    ("west_indian",      "West",       96, "real"),
-    ("east_indian",      "East",       68, "real"),
-    ("central_indian",   "Central",    22, "real"),
-    ("northeast_indian", "Northeast",  31, "real"),
-    ("street_food",      "PanIndia",   55, "real"),
-    ("chinese_asian",    "Global",    187, "real"),   # foreign/other -> Global
-    ("continental",      "Global",    187, "real"),
-    ("italian",          "Global",    187, "real"),
+    ("north_indian", "North", 210, "real"),
+    ("mughlai_nawabi", "North", 210, "real"),  # KB groups mughlai under North
+    ("south_indian", "South", 141, "real"),
+    ("west_indian", "West", 96, "real"),
+    ("east_indian", "East", 68, "real"),
+    ("central_indian", "Central", 22, "real"),
+    ("northeast_indian", "Northeast", 31, "real"),
+    ("street_food", "PanIndia", 55, "real"),
+    ("chinese_asian", "Global", 187, "real"),  # foreign/other -> Global
+    ("continental", "Global", 187, "real"),
+    ("italian", "Global", 187, "real"),
     # The remaining cuisine_group values from cuisines_v4.csv (real 810-dish catalogue) that
     # weren't yet enumerated above — all genuinely foreign, so the KB §R1 "foreign/other -> Global"
     # rule (already the comment on chinese_asian above) now covers ALL of them explicitly instead
@@ -38,21 +38,21 @@ ZONE_MAP = [
     # middle_eastern 10 + mexican 9 + vietnamese 8 + burmese 5 + bhutanese 4 + mediterranean 1 +
     # anglo_indian 0 + american 0 = 187 in the real catalogue), repeated per row exactly like the
     # three existing Global rows already do — not a per-cuisine_group count.
-    ("japanese",         "Global",    187, "real"),
-    ("korean",           "Global",    187, "real"),
-    ("thai",             "Global",    187, "real"),
-    ("vietnamese",       "Global",    187, "real"),
-    ("middle_eastern",   "Global",    187, "real"),
-    ("mexican",          "Global",    187, "real"),
-    ("american",         "Global",    187, "real"),
-    ("burmese",          "Global",    187, "real"),
-    ("bhutanese",        "Global",    187, "real"),
-    ("mediterranean",    "Global",    187, "real"),
+    ("japanese", "Global", 187, "real"),
+    ("korean", "Global", 187, "real"),
+    ("thai", "Global", 187, "real"),
+    ("vietnamese", "Global", 187, "real"),
+    ("middle_eastern", "Global", 187, "real"),
+    ("mexican", "Global", 187, "real"),
+    ("american", "Global", 187, "real"),
+    ("burmese", "Global", 187, "real"),
+    ("bhutanese", "Global", 187, "real"),
+    ("mediterranean", "Global", 187, "real"),
     # anglo_indian: genuinely a boundary case (colonial-era Indian/British fusion, cuisines_v4.csv
     # gives it state_origin='Pan-India' rather than any single region or foreign country) — not a
     # core North/South/West/East/Central/Northeast/PanIndia regional palette, so it falls under the
     # KB's own "...or OTHER" half of "foreign/other -> Global", not a silent guess.
-    ("anglo_indian",     "Global",    187, "real"),
+    ("anglo_indian", "Global", 187, "real"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -68,29 +68,71 @@ ZONE_MAP = [
 # explicitly not touched here). Verified identical to fixtures.CUISINES for all 10 legacy cuisines
 # (same cuisine_group in both sources), so this introduces no drift for the 39-dish golden sample.
 CUISINE_GROUP_MAP = {
-    "american": "american", "andhra": "south_indian", "anglo_indian": "anglo_indian",
-    "arunachali": "northeast_indian", "assamese": "east_indian", "awadhi": "mughlai_nawabi",
-    "bengali": "east_indian", "bhutanese": "bhutanese", "bihari": "north_indian",
-    "bundelkhandi": "north_indian", "burmese": "burmese", "chettinad": "south_indian",
-    "chhattisgarhi": "central_indian", "chinese_authentic": "chinese_asian",
-    "continental": "continental", "coorg": "south_indian", "delhi": "north_indian",
-    "goan": "west_indian", "gujarati": "west_indian", "himachali": "north_indian",
-    "hyderabadi": "mughlai_nawabi", "indian_bakery": "street_food",
-    "indian_tibetan": "chinese_asian", "indo_chinese": "chinese_asian", "indori": "central_indian",
-    "italian": "italian", "japanese": "japanese", "jharkhandi": "east_indian",
-    "karnataka": "south_indian", "kashmiri": "north_indian", "kerala": "south_indian",
-    "kolhapuri": "west_indian", "konkani": "west_indian", "korean": "korean",
-    "kutchi": "west_indian", "lebanese": "middle_eastern", "madhya_pradesh": "central_indian",
-    "maharashtrian": "west_indian", "malabar": "south_indian", "malvani": "west_indian",
-    "mangalorean": "south_indian", "manipuri": "northeast_indian", "mediterranean": "mediterranean",
-    "meghalayan": "northeast_indian", "mexican": "mexican",
-    "middle_eastern_generic": "middle_eastern", "mizo": "northeast_indian",
-    "mughlai": "mughlai_nawabi", "naga": "northeast_indian", "odia": "east_indian",
-    "parsi": "west_indian", "punjabi": "north_indian", "rajasthani": "north_indian",
-    "sikkimese": "northeast_indian", "sindhi": "north_indian",
-    "street_food_generic": "street_food", "tamil": "south_indian", "telangana": "south_indian",
-    "thai": "thai", "tripuri": "northeast_indian", "udupi": "south_indian", "up": "north_indian",
-    "uttarakhandi": "north_indian", "vidarbha": "west_indian", "vietnamese": "vietnamese",
+    "american": "american",
+    "andhra": "south_indian",
+    "anglo_indian": "anglo_indian",
+    "arunachali": "northeast_indian",
+    "assamese": "east_indian",
+    "awadhi": "mughlai_nawabi",
+    "bengali": "east_indian",
+    "bhutanese": "bhutanese",
+    "bihari": "north_indian",
+    "bundelkhandi": "north_indian",
+    "burmese": "burmese",
+    "chettinad": "south_indian",
+    "chhattisgarhi": "central_indian",
+    "chinese_authentic": "chinese_asian",
+    "continental": "continental",
+    "coorg": "south_indian",
+    "delhi": "north_indian",
+    "goan": "west_indian",
+    "gujarati": "west_indian",
+    "himachali": "north_indian",
+    "hyderabadi": "mughlai_nawabi",
+    "indian_bakery": "street_food",
+    "indian_tibetan": "chinese_asian",
+    "indo_chinese": "chinese_asian",
+    "indori": "central_indian",
+    "italian": "italian",
+    "japanese": "japanese",
+    "jharkhandi": "east_indian",
+    "karnataka": "south_indian",
+    "kashmiri": "north_indian",
+    "kerala": "south_indian",
+    "kolhapuri": "west_indian",
+    "konkani": "west_indian",
+    "korean": "korean",
+    "kutchi": "west_indian",
+    "lebanese": "middle_eastern",
+    "madhya_pradesh": "central_indian",
+    "maharashtrian": "west_indian",
+    "malabar": "south_indian",
+    "malvani": "west_indian",
+    "mangalorean": "south_indian",
+    "manipuri": "northeast_indian",
+    "mediterranean": "mediterranean",
+    "meghalayan": "northeast_indian",
+    "mexican": "mexican",
+    "middle_eastern_generic": "middle_eastern",
+    "mizo": "northeast_indian",
+    "mughlai": "mughlai_nawabi",
+    "naga": "northeast_indian",
+    "odia": "east_indian",
+    "parsi": "west_indian",
+    "punjabi": "north_indian",
+    "rajasthani": "north_indian",
+    "sikkimese": "northeast_indian",
+    "sindhi": "north_indian",
+    "street_food_generic": "street_food",
+    "tamil": "south_indian",
+    "telangana": "south_indian",
+    "thai": "thai",
+    "tripuri": "northeast_indian",
+    "udupi": "south_indian",
+    "up": "north_indian",
+    "uttarakhandi": "north_indian",
+    "vidarbha": "west_indian",
+    "vietnamese": "vietnamese",
 }
 
 # ---------------------------------------------------------------------------
@@ -100,46 +142,89 @@ CUISINE_GROUP_MAP = {
 # cuisine's state_origin, not just the dish's own. Real source data, not invented.
 # ---------------------------------------------------------------------------
 CUISINE_STATE_ORIGIN = {
-    'american': 'USA', 'andhra': 'Andhra Pradesh', 'anglo_indian': 'Pan-India',
-    'arunachali': 'Arunachal Pradesh', 'assamese': 'Assam', 'awadhi': 'Lucknow/UP',
-    'bengali': 'West Bengal', 'bhutanese': 'Bhutan', 'bihari': 'Bihar',
-    'bundelkhandi': 'Bundelkhand (MP/UP)', 'burmese': 'Burma', 'chettinad': 'TN (Karaikudi)',
-    'chhattisgarhi': 'Chhattisgarh', 'chinese_authentic': 'China', 'continental': 'Europe (generic)',
-    'coorg': 'Karnataka (Coorg)', 'delhi': 'Delhi', 'goan': 'Goa',
-    'gujarati': 'Gujarat', 'himachali': 'Himachal Pradesh', 'hyderabadi': 'Hyderabad',
-    'indian_bakery': 'Pan-India', 'indian_tibetan': 'Hill stations/NE', 'indo_chinese': 'Pan-India (Kolkata origin)',
-    'indori': 'MP (Indore)', 'italian': 'Italy', 'japanese': 'Japan',
-    'jharkhandi': 'Jharkhand', 'karnataka': 'Karnataka', 'kashmiri': 'J&K',
-    'kerala': 'Kerala', 'kolhapuri': 'Maharashtra (Kolhapur)', 'konkani': 'Konkan Coast',
-    'korean': 'South Korea', 'kutchi': 'Gujarat (Kutch)', 'lebanese': 'Lebanon',
-    'madhya_pradesh': 'Madhya Pradesh', 'maharashtrian': 'Maharashtra', 'malabar': 'Kerala (North)',
-    'malvani': 'Maharashtra (Konkan)', 'mangalorean': 'Karnataka (Mangalore)', 'manipuri': 'Manipur',
-    'mediterranean': 'Mediterranean region', 'meghalayan': 'Meghalaya', 'mexican': 'Mexico',
-    'middle_eastern_generic': 'Middle East', 'mizo': 'Mizoram', 'mughlai': 'Delhi/UP',
-    'naga': 'Nagaland', 'odia': 'Odisha', 'parsi': 'Mumbai/Gujarat',
-    'punjabi': 'Punjab', 'rajasthani': 'Rajasthan', 'sikkimese': 'Sikkim',
-    'sindhi': 'Sindh (diaspora)', 'street_food_generic': 'Pan-India', 'tamil': 'Tamil Nadu',
-    'telangana': 'Telangana', 'thai': 'Thailand', 'tripuri': 'Tripura',
-    'udupi': 'Karnataka (Udupi)', 'up': 'Uttar Pradesh', 'uttarakhandi': 'Uttarakhand',
-    'vidarbha': 'Maharashtra (Vidarbha)', 'vietnamese': 'Vietnam',
+    "american": "USA",
+    "andhra": "Andhra Pradesh",
+    "anglo_indian": "Pan-India",
+    "arunachali": "Arunachal Pradesh",
+    "assamese": "Assam",
+    "awadhi": "Lucknow/UP",
+    "bengali": "West Bengal",
+    "bhutanese": "Bhutan",
+    "bihari": "Bihar",
+    "bundelkhandi": "Bundelkhand (MP/UP)",
+    "burmese": "Burma",
+    "chettinad": "TN (Karaikudi)",
+    "chhattisgarhi": "Chhattisgarh",
+    "chinese_authentic": "China",
+    "continental": "Europe (generic)",
+    "coorg": "Karnataka (Coorg)",
+    "delhi": "Delhi",
+    "goan": "Goa",
+    "gujarati": "Gujarat",
+    "himachali": "Himachal Pradesh",
+    "hyderabadi": "Hyderabad",
+    "indian_bakery": "Pan-India",
+    "indian_tibetan": "Hill stations/NE",
+    "indo_chinese": "Pan-India (Kolkata origin)",
+    "indori": "MP (Indore)",
+    "italian": "Italy",
+    "japanese": "Japan",
+    "jharkhandi": "Jharkhand",
+    "karnataka": "Karnataka",
+    "kashmiri": "J&K",
+    "kerala": "Kerala",
+    "kolhapuri": "Maharashtra (Kolhapur)",
+    "konkani": "Konkan Coast",
+    "korean": "South Korea",
+    "kutchi": "Gujarat (Kutch)",
+    "lebanese": "Lebanon",
+    "madhya_pradesh": "Madhya Pradesh",
+    "maharashtrian": "Maharashtra",
+    "malabar": "Kerala (North)",
+    "malvani": "Maharashtra (Konkan)",
+    "mangalorean": "Karnataka (Mangalore)",
+    "manipuri": "Manipur",
+    "mediterranean": "Mediterranean region",
+    "meghalayan": "Meghalaya",
+    "mexican": "Mexico",
+    "middle_eastern_generic": "Middle East",
+    "mizo": "Mizoram",
+    "mughlai": "Delhi/UP",
+    "naga": "Nagaland",
+    "odia": "Odisha",
+    "parsi": "Mumbai/Gujarat",
+    "punjabi": "Punjab",
+    "rajasthani": "Rajasthan",
+    "sikkimese": "Sikkim",
+    "sindhi": "Sindh (diaspora)",
+    "street_food_generic": "Pan-India",
+    "tamil": "Tamil Nadu",
+    "telangana": "Telangana",
+    "thai": "Thailand",
+    "tripuri": "Tripura",
+    "udupi": "Karnataka (Udupi)",
+    "up": "Uttar Pradesh",
+    "uttarakhandi": "Uttarakhand",
+    "vidarbha": "Maharashtra (Vidarbha)",
+    "vietnamese": "Vietnam",
 }
 
 # cuisine -> parent_cuisine, transcribed verbatim from data/source/cuisines_v4.csv's own
 # parent_cuisine column (12 of 65 rows are populated; the rest have no parent). Same purpose as
 # CUISINE_STATE_ORIGIN above.
 CUISINE_PARENT = {
-    'awadhi': 'mughlai',
-    'chettinad': 'tamil',
-    'coorg': 'karnataka',
-    'indori': 'madhya_pradesh',
-    'kolhapuri': 'maharashtrian',
-    'kutchi': 'gujarati',
-    'lebanese': 'middle_eastern_generic',
-    'malabar': 'kerala',
-    'malvani': 'maharashtrian',
-    'mangalorean': 'karnataka',
-    'udupi': 'karnataka',
-    'vidarbha': 'maharashtrian',
+    "awadhi": "mughlai",
+    "chettinad": "tamil",
+    "coorg": "karnataka",
+    "indori": "madhya_pradesh",
+    "kolhapuri": "maharashtrian",
+    "kutchi": "gujarati",
+    "lebanese": "middle_eastern_generic",
+    "malabar": "kerala",
+    "malvani": "maharashtrian",
+    "mangalorean": "karnataka",
+    "udupi": "karnataka",
+    "vidarbha": "maharashtrian",
 }
 
 # ---------------------------------------------------------------------------
@@ -156,15 +241,42 @@ CUISINE_PARENT = {
 # the full name; a value that is already a full name (or an unknown token) passes through unchanged.
 # ---------------------------------------------------------------------------
 STATE_CODE_TO_NAME = {
-    "AN": "Andaman & Nicobar Islands", "AP": "Andhra Pradesh", "AR": "Arunachal Pradesh",
-    "AS": "Assam", "BR": "Bihar", "CH": "Chandigarh", "CT": "Chhattisgarh",
-    "DN": "Dadra & Nagar Haveli and Daman & Diu", "DL": "Delhi", "GA": "Goa", "GJ": "Gujarat",
-    "HR": "Haryana", "HP": "Himachal Pradesh", "JK": "Jammu & Kashmir", "JH": "Jharkhand",
-    "KA": "Karnataka", "KL": "Kerala", "LA": "Ladakh", "LD": "Lakshadweep", "MP": "Madhya Pradesh",
-    "MH": "Maharashtra", "MN": "Manipur", "ML": "Meghalaya", "MZ": "Mizoram", "NL": "Nagaland",
-    "OD": "Odisha", "PY": "Puducherry", "PB": "Punjab", "RJ": "Rajasthan", "SK": "Sikkim",
-    "TN": "Tamil Nadu", "TS": "Telangana", "TR": "Tripura", "UP": "Uttar Pradesh",
-    "UK": "Uttarakhand", "WB": "West Bengal",
+    "AN": "Andaman & Nicobar Islands",
+    "AP": "Andhra Pradesh",
+    "AR": "Arunachal Pradesh",
+    "AS": "Assam",
+    "BR": "Bihar",
+    "CH": "Chandigarh",
+    "CT": "Chhattisgarh",
+    "DN": "Dadra & Nagar Haveli and Daman & Diu",
+    "DL": "Delhi",
+    "GA": "Goa",
+    "GJ": "Gujarat",
+    "HR": "Haryana",
+    "HP": "Himachal Pradesh",
+    "JK": "Jammu & Kashmir",
+    "JH": "Jharkhand",
+    "KA": "Karnataka",
+    "KL": "Kerala",
+    "LA": "Ladakh",
+    "LD": "Lakshadweep",
+    "MP": "Madhya Pradesh",
+    "MH": "Maharashtra",
+    "MN": "Manipur",
+    "ML": "Meghalaya",
+    "MZ": "Mizoram",
+    "NL": "Nagaland",
+    "OD": "Odisha",
+    "PY": "Puducherry",
+    "PB": "Punjab",
+    "RJ": "Rajasthan",
+    "SK": "Sikkim",
+    "TN": "Tamil Nadu",
+    "TS": "Telangana",
+    "TR": "Tripura",
+    "UP": "Uttar Pradesh",
+    "UK": "Uttarakhand",
+    "WB": "West Bengal",
 }
 
 
@@ -179,17 +291,32 @@ def normalize_state(value):
 
 # State -> zone (KB §R1 "State→zone" line). Rajasthan flagged palette-North/diet-West (⚑).
 STATE_ZONE = {
-    "Delhi": "North", "Punjab": "North", "Haryana": "North", "Uttar Pradesh": "North",
-    "Uttarakhand": "North", "Himachal Pradesh": "North", "J&K": "North",
-    "Maharashtra": "West", "Gujarat": "West", "Goa": "West",
-    "Tamil Nadu": "South", "Kerala": "South", "Karnataka": "South",
-    "Andhra Pradesh": "South", "Telangana": "South",
-    "West Bengal": "East", "Odisha": "East", "Bihar": "East", "Jharkhand": "East",
-    "Madhya Pradesh": "Central", "Chhattisgarh": "Central",
+    "Delhi": "North",
+    "Punjab": "North",
+    "Haryana": "North",
+    "Uttar Pradesh": "North",
+    "Uttarakhand": "North",
+    "Himachal Pradesh": "North",
+    "J&K": "North",
+    "Maharashtra": "West",
+    "Gujarat": "West",
+    "Goa": "West",
+    "Tamil Nadu": "South",
+    "Kerala": "South",
+    "Karnataka": "South",
+    "Andhra Pradesh": "South",
+    "Telangana": "South",
+    "West Bengal": "East",
+    "Odisha": "East",
+    "Bihar": "East",
+    "Jharkhand": "East",
+    "Madhya Pradesh": "Central",
+    "Chhattisgarh": "Central",
     "Assam": "Northeast",
     # ⚑ Rajasthan = palette-North / diet-West. Palette zone (used for m_palette/comfort hero) = North.
     "Rajasthan": "North",
 }
+
 
 # ---------------------------------------------------------------------------
 # KB §R3 — Comfort-hero maps (weather × zone). ✓ = verified in catalogue → 'real';
@@ -202,49 +329,50 @@ def _ch(zone, weather, name, verified):
     this keeps that provenance rule in one place instead of repeating it on every row below."""
     return (zone, weather, name, verified, "real" if verified else "stub")
 
+
 COMFORT_HERO_MAP = [
     # RAIN / MONSOON
-    _ch("North",    "rain", "Pakora",        True),
-    _ch("North",    "rain", "Samosa",        True),
-    _ch("North",    "rain", "Kadhi-Pakora",  True),
-    _ch("North",    "rain", "Aloo Paratha",  True),
-    _ch("West-MH",  "rain", "Kanda Bhaji",   True),
-    _ch("West-MH",  "rain", "Vada Pav",      True),
-    _ch("West-MH",  "rain", "Pithla",        True),
-    _ch("West-MH",  "rain", "Sol Kadhi",     True),
-    _ch("West-GJ",  "rain", "Bhajiya",       False),
-    _ch("West-GJ",  "rain", "Dal-Dhokli",    False),
-    _ch("West-GJ",  "rain", "Methi Na Gota", False),
-    _ch("South-TN", "rain", "Bajji/Bonda",   False),
-    _ch("South-TN", "rain", "Medu Vada",     True),
-    _ch("South-TN", "rain", "Rasam-Rice",    True),
-    _ch("South-KL", "rain", "Parippu Vada",  False),
-    _ch("South-KL", "rain", "Pazham Pori",   False),
-    _ch("East-WB",  "rain", "Khichuri",      True),
-    _ch("East-WB",  "rain", "Telebhaja",     False),
-    _ch("Central",  "rain", "Poha",          True),
-    _ch("Central",  "rain", "Pakora",        True),
-    _ch("NE",       "rain", "Thukpa",        False),
-    _ch("NE",       "rain", "Momos",         False),
+    _ch("North", "rain", "Pakora", True),
+    _ch("North", "rain", "Samosa", True),
+    _ch("North", "rain", "Kadhi-Pakora", True),
+    _ch("North", "rain", "Aloo Paratha", True),
+    _ch("West-MH", "rain", "Kanda Bhaji", True),
+    _ch("West-MH", "rain", "Vada Pav", True),
+    _ch("West-MH", "rain", "Pithla", True),
+    _ch("West-MH", "rain", "Sol Kadhi", True),
+    _ch("West-GJ", "rain", "Bhajiya", False),
+    _ch("West-GJ", "rain", "Dal-Dhokli", False),
+    _ch("West-GJ", "rain", "Methi Na Gota", False),
+    _ch("South-TN", "rain", "Bajji/Bonda", False),
+    _ch("South-TN", "rain", "Medu Vada", True),
+    _ch("South-TN", "rain", "Rasam-Rice", True),
+    _ch("South-KL", "rain", "Parippu Vada", False),
+    _ch("South-KL", "rain", "Pazham Pori", False),
+    _ch("East-WB", "rain", "Khichuri", True),
+    _ch("East-WB", "rain", "Telebhaja", False),
+    _ch("Central", "rain", "Poha", True),
+    _ch("Central", "rain", "Pakora", True),
+    _ch("NE", "rain", "Thukpa", False),
+    _ch("NE", "rain", "Momos", False),
     # SUMMER / HEATWAVE
-    _ch("North",    "summer", "Sattu",        True),
-    _ch("North",    "summer", "Chaas",        False),
-    _ch("North",    "summer", "Aam Panna",    False),
-    _ch("West",     "summer", "Sol Kadhi",    True),
-    _ch("West",     "summer", "Aamras",       False),
-    _ch("South",    "summer", "Curd Rice",    True),
-    _ch("South",    "summer", "Neer Mor",     False),
-    _ch("East",     "summer", "Panta Bhat",   False),
+    _ch("North", "summer", "Sattu", True),
+    _ch("North", "summer", "Chaas", False),
+    _ch("North", "summer", "Aam Panna", False),
+    _ch("West", "summer", "Sol Kadhi", True),
+    _ch("West", "summer", "Aamras", False),
+    _ch("South", "summer", "Curd Rice", True),
+    _ch("South", "summer", "Neer Mor", False),
+    _ch("East", "summer", "Panta Bhat", False),
     # WINTER / COLD
-    _ch("North",    "winter", "Sarson Ka Saag", True),
-    _ch("North",    "winter", "Nihari",         True),
-    _ch("North",    "winter", "Gajar Halwa",    False),
-    _ch("West-GJ",  "winter", "Undhiyu",        True),
-    _ch("West-MH",  "winter", "Pithla",         True),
-    _ch("West-MH",  "winter", "Bajra Bhakri",   False),
-    _ch("South",    "winter", "Ven Pongal",     True),
-    _ch("South",    "winter", "Rasam",          True),
-    _ch("East",     "winter", "Pithe",          False),
+    _ch("North", "winter", "Sarson Ka Saag", True),
+    _ch("North", "winter", "Nihari", True),
+    _ch("North", "winter", "Gajar Halwa", False),
+    _ch("West-GJ", "winter", "Undhiyu", True),
+    _ch("West-MH", "winter", "Pithla", True),
+    _ch("West-MH", "winter", "Bajra Bhakri", False),
+    _ch("South", "winter", "Ven Pongal", True),
+    _ch("South", "winter", "Rasam", True),
+    _ch("East", "winter", "Pithe", False),
 ]
 
 # KB §R3 hero NAME (as authored) -> the golden catalogue dish name that realises it.
@@ -269,7 +397,8 @@ COMFORT_HERO_TO_DISH = {
     "Kanda Bhaji": "Pakora (Mixed Veg)",
     "Sarson Ka Saag": "Sarson Ka Saag",
     "Curd Rice": "Curd Rice",
-    "Rasam": "Rasam", "Rasam-Rice": "Rasam",
+    "Rasam": "Rasam",
+    "Rasam-Rice": "Rasam",
     "Medu Vada": "Medu Vada",
     "Khichuri": "Bhuna Khichuri",
     "Undhiyu": "Undhiyu",
@@ -305,12 +434,27 @@ WEATHER_TAG_TO_KB = {"rainy": "rain", "hot_weather": "summer", "cold_weather": "
 # ---------------------------------------------------------------------------
 SIG_SCORE_BANDS = [
     # score, band_name, definition, data_source
-    (1.00, "national_icon", "recognized/iconic across India (Butter Chicken, Hyderabadi Biryani, Masala Dosa)", "real"),
-    (0.90, "state_icon",    "defining dish of a state (Dal Makhani, Undhiyu, Nihari, Litti Chokha)", "real"),
-    (0.75, "regional_hero", "strong regional standard (Bisi Bele Bath, Macher Jhol, Puran Poli)", "real"),
-    (0.60, "very_common",   "well-known everyday-plus (Rajma Chawal, Poha, Aloo Paratha)", "real"),
-    (0.40, "common",        "ordinary named dish (standard dals, upma, sabzi-with-name)", "real"),
-    (0.20, "utility",       "plain staple (steamed rice, plain dal, roti, papad)", "real"),
+    (
+        1.00,
+        "national_icon",
+        "recognized/iconic across India (Butter Chicken, Hyderabadi Biryani, Masala Dosa)",
+        "real",
+    ),
+    (
+        0.90,
+        "state_icon",
+        "defining dish of a state (Dal Makhani, Undhiyu, Nihari, Litti Chokha)",
+        "real",
+    ),
+    (
+        0.75,
+        "regional_hero",
+        "strong regional standard (Bisi Bele Bath, Macher Jhol, Puran Poli)",
+        "real",
+    ),
+    (0.60, "very_common", "well-known everyday-plus (Rajma Chawal, Poha, Aloo Paratha)", "real"),
+    (0.40, "common", "ordinary named dish (standard dals, upma, sabzi-with-name)", "real"),
+    (0.20, "utility", "plain staple (steamed rice, plain dal, roti, papad)", "real"),
 ]
 BAND_TO_SCORE = {b[1]: b[0] for b in SIG_SCORE_BANDS}
 
@@ -321,13 +465,61 @@ BAND_TO_SCORE = {b[1]: b[0] for b in SIG_SCORE_BANDS}
 # ---------------------------------------------------------------------------
 NEGATIVE_PRIORS = [
     # discouragement, context, action, in_spine, enforced_via, status, data_source
-    ("two rich/creamy gravies together", "any plate", "penalty (S4 hard-gate)", True,  "pairing_rules.yaml", "active", "real"),
-    ("two same-base gravies (both tomato-onion / both coconut)", "any plate", "penalty", True, "pairing_rules.yaml", "active", "real"),
-    ("two dry heroes as the pair", "any plate", "penalty", True, "pairing_rules.yaml", "active", "real"),
-    ("cross-region pair (Bengali + Punjabi hero)", "any plate", "penalty (cuisine-dist gate)", True, "pairing_rules.yaml", "active", "real"),
+    (
+        "two rich/creamy gravies together",
+        "any plate",
+        "penalty (S4 hard-gate)",
+        True,
+        "pairing_rules.yaml",
+        "active",
+        "real",
+    ),
+    (
+        "two same-base gravies (both tomato-onion / both coconut)",
+        "any plate",
+        "penalty",
+        True,
+        "pairing_rules.yaml",
+        "active",
+        "real",
+    ),
+    (
+        "two dry heroes as the pair",
+        "any plate",
+        "penalty",
+        True,
+        "pairing_rules.yaml",
+        "active",
+        "real",
+    ),
+    (
+        "cross-region pair (Bengali + Punjabi hero)",
+        "any plate",
+        "penalty (cuisine-dist gate)",
+        True,
+        "pairing_rules.yaml",
+        "active",
+        "real",
+    ),
     ("deep-fried / very-heavy", "heatwave day", "demote", True, "weather", "active", "real"),
-    ("heavy lunch -> heavy dinner (same day)", "slot sequence", "demote (v2 needs history)", False, "not_yet_active", "deferred_v2", "real"),
-    ("three of the same vegetable base (e.g. 3 potato dishes)", "across the 7", "demote (variety)", False, "not_yet_active", "deferred_v2", "real"),
+    (
+        "heavy lunch -> heavy dinner (same day)",
+        "slot sequence",
+        "demote (v2 needs history)",
+        False,
+        "not_yet_active",
+        "deferred_v2",
+        "real",
+    ),
+    (
+        "three of the same vegetable base (e.g. 3 potato dishes)",
+        "across the 7",
+        "demote (variety)",
+        False,
+        "not_yet_active",
+        "deferred_v2",
+        "real",
+    ),
     ("raw salads / street-style", "peak monsoon", "mild demote", True, "weather", "active", "real"),
 ]
 
@@ -337,15 +529,22 @@ NEGATIVE_PRIORS = [
 # ---------------------------------------------------------------------------
 INGREDIENT_NORMALIZATION = [
     # surface_token, canonical, norm_type, expansion(list|None), note, data_source
-    ("coriander_seeds", "coriander", "alias",       None, None, "real"),
-    ("cumin_powder",    "cumin",     "alias",       None, None, "real"),
-    ("basmati_rice",    "rice",      "variety",     None, "basmati flag", "real"),
-    ("mixed_vegetables", None,       "expansion",   ["potato","carrot","beans","peas","cauliflower"], "KB ⚑ needs refinement", "stub"),
-    ("grated_coconut",  "coconut",   "form",        None, None, "real"),
-    ("fish_fillet",     "fish",      "form",        None, None, "real"),
-    ("dhaniya",         "coriander", "synonym",     None, None, "real"),
-    ("palak",           "spinach",   "synonym",     None, None, "real"),
-    ("mutton",          "goat",      "equivalence", None, None, "real"),
+    ("coriander_seeds", "coriander", "alias", None, None, "real"),
+    ("cumin_powder", "cumin", "alias", None, None, "real"),
+    ("basmati_rice", "rice", "variety", None, "basmati flag", "real"),
+    (
+        "mixed_vegetables",
+        None,
+        "expansion",
+        ["potato", "carrot", "beans", "peas", "cauliflower"],
+        "KB ⚑ needs refinement",
+        "stub",
+    ),
+    ("grated_coconut", "coconut", "form", None, None, "real"),
+    ("fish_fillet", "fish", "form", None, None, "real"),
+    ("dhaniya", "coriander", "synonym", None, None, "real"),
+    ("palak", "spinach", "synonym", None, None, "real"),
+    ("mutton", "goat", "equivalence", None, None, "real"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -357,41 +556,41 @@ INGREDIENT_NORMALIZATION = [
 # ---------------------------------------------------------------------------
 PRIOR_ZONE_SLOT = [
     # ---- Breakfast ----
-    ("North",   "breakfast", "dish_name", "paratha", 0.4, ["Daily"], "real"),
-    ("North",   "breakfast", "dish_name", "poha",    0.3, ["Daily"], "real"),
-    ("North",   "breakfast", "dish_name", "chila",   0.3, ["Daily"], "real"),
-    ("South",   "breakfast", "dish_name", "idli",    0.5, ["Daily"], "real"),
-    ("South",   "breakfast", "dish_name", "dosa",    0.5, ["Daily"], "real"),
-    ("South",   "breakfast", "dish_name", "upma",    0.3, ["Daily"], "real"),
-    ("South",   "breakfast", "dish_name", "pongal",  0.3, ["Daily","Festival","Comfort"], "real"),
-    ("West",    "breakfast", "dish_name", "poha",       0.5, ["Daily"], "real"),
-    ("West",    "breakfast", "dish_name", "thalipeeth", 0.3, ["Daily"], "real"),
-    ("West",    "breakfast", "dish_name", "upma",       0.3, ["Daily"], "real"),
-    ("East",    "breakfast", "dish_name", "luchi",      0.4, ["Weekend","Daily"], "stub"),   # KB ⚑
-    ("East",    "breakfast", "dish_name", "bread-omelette", 0.2, ["Daily"], "stub"),         # KB ⚑
-    ("Central", "breakfast", "dish_name", "poha",    0.5, ["Daily"], "real"),
+    ("North", "breakfast", "dish_name", "paratha", 0.4, ["Daily"], "real"),
+    ("North", "breakfast", "dish_name", "poha", 0.3, ["Daily"], "real"),
+    ("North", "breakfast", "dish_name", "chila", 0.3, ["Daily"], "real"),
+    ("South", "breakfast", "dish_name", "idli", 0.5, ["Daily"], "real"),
+    ("South", "breakfast", "dish_name", "dosa", 0.5, ["Daily"], "real"),
+    ("South", "breakfast", "dish_name", "upma", 0.3, ["Daily"], "real"),
+    ("South", "breakfast", "dish_name", "pongal", 0.3, ["Daily", "Festival", "Comfort"], "real"),
+    ("West", "breakfast", "dish_name", "poha", 0.5, ["Daily"], "real"),
+    ("West", "breakfast", "dish_name", "thalipeeth", 0.3, ["Daily"], "real"),
+    ("West", "breakfast", "dish_name", "upma", 0.3, ["Daily"], "real"),
+    ("East", "breakfast", "dish_name", "luchi", 0.4, ["Weekend", "Daily"], "stub"),  # KB ⚑
+    ("East", "breakfast", "dish_name", "bread-omelette", 0.2, ["Daily"], "stub"),  # KB ⚑
+    ("Central", "breakfast", "dish_name", "poha", 0.5, ["Daily"], "real"),
     # ---- Lunch ----
-    ("North",   "lunch", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "real"),
-    ("North",   "lunch", "dish_name", "rajma",  0.3, ["Daily","Comfort"], "real"),
-    ("North",   "lunch", "dish_name", "chole",  0.3, ["Daily"], "real"),
-    ("South",   "lunch", "structure", "rice+sambar",  0.5, ["Daily"], "real"),
-    ("South",   "lunch", "dish_name", "rasam",   0.5, ["Daily"], "real"),
-    ("South",   "lunch", "dish_name", "poriyal", 0.3, ["Daily"], "real"),
-    ("South",   "lunch", "dish_name", "curd rice", 0.3, ["Daily","Weather"], "real"),
-    ("West",    "lunch", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "real"),
-    ("West",    "lunch", "dish_name", "varan",  0.3, ["Daily"], "real"),
-    ("East",    "lunch", "dish_name", "macher jhol", 0.5, ["Daily"], "real"),
-    ("East",    "lunch", "dish_name", "dal",    0.3, ["Daily"], "real"),
+    ("North", "lunch", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "real"),
+    ("North", "lunch", "dish_name", "rajma", 0.3, ["Daily", "Comfort"], "real"),
+    ("North", "lunch", "dish_name", "chole", 0.3, ["Daily"], "real"),
+    ("South", "lunch", "structure", "rice+sambar", 0.5, ["Daily"], "real"),
+    ("South", "lunch", "dish_name", "rasam", 0.5, ["Daily"], "real"),
+    ("South", "lunch", "dish_name", "poriyal", 0.3, ["Daily"], "real"),
+    ("South", "lunch", "dish_name", "curd rice", 0.3, ["Daily", "Weather"], "real"),
+    ("West", "lunch", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "real"),
+    ("West", "lunch", "dish_name", "varan", 0.3, ["Daily"], "real"),
+    ("East", "lunch", "dish_name", "macher jhol", 0.5, ["Daily"], "real"),
+    ("East", "lunch", "dish_name", "dal", 0.3, ["Daily"], "real"),
     ("Central", "lunch", "structure", "roti+dal+sabzi", 0.4, ["Daily"], "real"),
     ("Central", "lunch", "dish_name", "daal bafla", 0.3, ["Daily"], "real"),
     # ---- Dinner ----
-    ("North",   "dinner", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "real"),
-    ("North",   "dinner", "dish_name", "khichdi", 0.2, ["Comfort","Recovery","Weather"], "real"),
-    ("South",   "dinner", "structure", "rice+rasam", 0.3, ["Daily"], "real"),
-    ("South",   "dinner", "dish_name", "dosa",    0.3, ["Daily"], "real"),
-    ("West",    "dinner", "structure", "roti+sabzi", 0.4, ["Daily"], "real"),
-    ("West",    "dinner", "dish_name", "khichdi", 0.2, ["Comfort","Recovery"], "real"),
-    ("East",    "dinner", "dish_name", "jhol",    0.4, ["Daily"], "real"),
+    ("North", "dinner", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "real"),
+    ("North", "dinner", "dish_name", "khichdi", 0.2, ["Comfort", "Recovery", "Weather"], "real"),
+    ("South", "dinner", "structure", "rice+rasam", 0.3, ["Daily"], "real"),
+    ("South", "dinner", "dish_name", "dosa", 0.3, ["Daily"], "real"),
+    ("West", "dinner", "structure", "roti+sabzi", 0.4, ["Daily"], "real"),
+    ("West", "dinner", "dish_name", "khichdi", 0.2, ["Comfort", "Recovery"], "real"),
+    ("East", "dinner", "dish_name", "jhol", 0.4, ["Daily"], "real"),
     # ---- Added 2026-08-04 (reports/re_audit/05 §1 SP-F10, Founder-directed closure) ----
     # Two real gaps confirmed by direct coverage check: Central had zero dinner rows despite having
     # breakfast/lunch rows, and Northeast (zone "NE" in ZONE_MAP) had NO rows at all in any slot —
@@ -401,14 +600,22 @@ PRIOR_ZONE_SLOT = [
     # and 'stub'/KB's-own-flagged-for-refinement, so provenance stays honest). Every dish_name token
     # below is confirmed present in the real 810-dish catalogue bundle before being added.
     ("Central", "dinner", "structure", "roti+sabzi+dal", 0.4, ["Daily"], "ai_researched"),
-    ("Central", "dinner", "dish_name", "daal bafla", 0.2, ["Daily","Comfort"], "ai_researched"),
+    ("Central", "dinner", "dish_name", "daal bafla", 0.2, ["Daily", "Comfort"], "ai_researched"),
     # NOTE: "assamese" cuisine maps to zone East (CUISINE_GROUP_MAP), not Northeast — only
     # naga/manipuri/mizo/arunachali/sikkimese/meghalayan map to zone Northeast. Every dish_name
     # token below is drawn only from those six cuisines, confirmed present in the real catalogue.
     ("Northeast", "breakfast", "dish_name", "sel roti", 0.3, ["Daily"], "ai_researched"),
-    ("Northeast", "lunch",     "dish_name", "naga fish curry", 0.3, ["Daily"], "ai_researched"),
-    ("Northeast", "dinner",    "dish_name", "smoked pork with bamboo shoot", 0.3, ["Daily","Comfort"], "ai_researched"),
-    ("Northeast", "dinner",    "dish_name", "jadoh", 0.2, ["Daily"], "ai_researched"),
+    ("Northeast", "lunch", "dish_name", "naga fish curry", 0.3, ["Daily"], "ai_researched"),
+    (
+        "Northeast",
+        "dinner",
+        "dish_name",
+        "smoked pork with bamboo shoot",
+        0.3,
+        ["Daily", "Comfort"],
+        "ai_researched",
+    ),
+    ("Northeast", "dinner", "dish_name", "jadoh", 0.2, ["Daily"], "ai_researched"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -422,7 +629,7 @@ KB_C1_LEAN = {
     "Rajasthan": ("strongly_veg", "rare/weekend"),
     "Gujarat": ("strongly_veg", "rare/weekend"),
     "Haryana": ("strongly_veg", "rare/weekend"),
-    "Punjab": ("strongly_veg", "rare/weekend"),   # KB: "Punjab(veg-lean)" under Strongly veg
+    "Punjab": ("strongly_veg", "rare/weekend"),  # KB: "Punjab(veg-lean)" under Strongly veg
     "Madhya Pradesh": ("strongly_veg", "rare/weekend"),
     # KB "Mixed"
     "Uttar Pradesh": ("mixed", "weekend/frequent"),
@@ -447,12 +654,14 @@ def community_vs_kb_conflicts():
     """Cross-check community_priors.csv (BASE) against KB §C1. Returns a list of conflict dicts.
     Does NOT silently resolve — the founder resolves (Task 3 D6)."""
     import csv, os
+
     conflicts = []
     csv_states = {}
     path = os.path.join(os.path.dirname(__file__), "..", "data", "source", "community_priors.csv")
     with open(path) as f:
         for r in csv.DictReader(f):
             csv_states[r["state"]] = r["diet_lean"]
+
     # normalise KB veg_leaning vs strongly_veg: treat 'veg_leaning' as compatible with strongly_veg
     def _fam(lean):
         if lean in ("strongly_veg", "veg_leaning"):
@@ -460,13 +669,16 @@ def community_vs_kb_conflicts():
         if lean in ("strongly_non_veg", "non_veg_leaning"):
             return "nonveg"
         return "mixed"
+
     for state, (kb_lean, _band) in KB_C1_LEAN.items():
         if state not in csv_states:
             conflicts.append(dict(state=state, kind="missing_in_csv", kb=kb_lean, csv=None))
             continue
         csv_lean = csv_states[state]
         if _fam(csv_lean) != _fam(kb_lean):
-            conflicts.append(dict(state=state, kind="lean_family_mismatch", kb=kb_lean, csv=csv_lean))
+            conflicts.append(
+                dict(state=state, kind="lean_family_mismatch", kb=kb_lean, csv=csv_lean)
+            )
     for state, csv_lean in csv_states.items():
         if state not in KB_C1_LEAN:
             conflicts.append(dict(state=state, kind="missing_in_kb", kb=None, csv=csv_lean))
@@ -478,11 +690,19 @@ def community_vs_kb_conflicts():
 # Lets the West Maharashtra household resolve to 'West-MH' (Kanda Bhaji) not generic West.
 # ---------------------------------------------------------------------------
 STATE_TO_KB_SUBZONE = {
-    "Maharashtra": "West-MH", "Goa": "West-MH",
-    "Gujarat": "West-GJ", "Rajasthan": "North",
-    "Tamil Nadu": "South-TN", "Andhra Pradesh": "South-TN", "Telangana": "South-TN",
-    "Karnataka": "South-TN", "Kerala": "South-KL",
-    "West Bengal": "East-WB", "Odisha": "East-WB", "Bihar": "East-WB", "Jharkhand": "East-WB",
+    "Maharashtra": "West-MH",
+    "Goa": "West-MH",
+    "Gujarat": "West-GJ",
+    "Rajasthan": "North",
+    "Tamil Nadu": "South-TN",
+    "Andhra Pradesh": "South-TN",
+    "Telangana": "South-TN",
+    "Karnataka": "South-TN",
+    "Kerala": "South-KL",
+    "West Bengal": "East-WB",
+    "Odisha": "East-WB",
+    "Bihar": "East-WB",
+    "Jharkhand": "East-WB",
     "Assam": "NE",
 }
 
@@ -526,6 +746,7 @@ def _load_class_first_csv(name):
     baked bundle; see RE-DOC-10 §8 / config.py on why a path relative to this file would break in a
     container). Callers cache into a module-level global so the file is parsed once per process."""
     from ghar_re_core.config import SRC
+
     path = _os.path.join(SRC, "class_first_v1", name)
     with open(path, newline="") as f:
         return list(_csv.DictReader(f))
@@ -543,16 +764,22 @@ def dish_to_class_code(dish_name):
     the dish is in neither source (e.g. a brand-new dish added after the last classify run)."""
     global _DISH_TO_CLASS, _DISH_OVERRIDES
     if _DISH_TO_CLASS is None:
-        _DISH_TO_CLASS = {}
+        # Build both maps locally and publish them together.  Recommendation
+        # requests execute in FastAPI's worker pool; exposing the first empty
+        # map before the second exists lets a concurrent cold-start request
+        # reach ``_DISH_OVERRIDES.get`` while that global is still None.
+        dish_to_class = {}
         for r in _load_class_first_csv("class_dish_options.csv"):
-            _DISH_TO_CLASS.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
-        _DISH_OVERRIDES = {}
+            dish_to_class.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
+        dish_overrides = {}
         try:
             for r in _load_class_first_csv("dish_class_map.csv"):
                 if r["meal_class_code"]:
-                    _DISH_OVERRIDES.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
+                    dish_overrides.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
         except FileNotFoundError:
             pass  # map is optional; exact curated map still works without it
+        _DISH_OVERRIDES = dish_overrides
+        _DISH_TO_CLASS = dish_to_class
     key = dish_name.strip().lower()
     return _DISH_TO_CLASS.get(key) or _DISH_OVERRIDES.get(key)
 
@@ -576,7 +803,8 @@ def dish_to_class_codes(dish_name):
             for r in _load_class_first_csv("dish_class_map.csv"):
                 if r["meal_class_code"]:
                     _DISH_TO_CLASSES.setdefault(r["dish_name"].strip().lower(), set()).add(
-                        r["meal_class_code"])
+                        r["meal_class_code"]
+                    )
         except FileNotFoundError:
             pass
     return frozenset(_DISH_TO_CLASSES.get(dish_name.strip().lower(), ()))

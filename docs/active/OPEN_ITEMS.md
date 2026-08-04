@@ -76,11 +76,12 @@ see `docs/archive/completed-phases/` for history. Source audit:
 
 ## P1-5: Mobile automated test coverage
 - **Priority:** P1
-- **Status:** Partially completed 2026-08-04 — honest scoping, not full 8-journey coverage. Jest +
-  jest-expo + @testing-library/react-native infra stood up from scratch (previously zero test
-  files, no jest config). 9 passing tests: pure-logic coverage for allergen-bit encoding and API
-  error-message mapping. No RN component-render tests yet (e.g. Settings' confirmation-phrase
-  gating). **Remaining:** component-render tests for the new P0-2/P0-4/P1-3/P1-4 screens.
+- **Status:** Component coverage completed locally 2026-08-04. The release candidate has 16
+  passing Jest tests across 8 suites, including component-render coverage for Search, Settings,
+  Today, History and Profile Edit plus durable offline feedback-queue coverage. The Settings test
+  also drove an accessibility-state improvement for its destructive confirmation button. A GitHub
+  Actions mobile gate runs install, typecheck, Jest and Expo web export. **Remaining:**
+  physical-device E2E journeys, especially offline reconnect and push delivery.
 - **Files involved:** `mobile/package.json`, `mobile/jest.config.js`, `mobile/jest.setup.js`, `mobile/src/onboarding/__tests__/`, `mobile/src/api/__tests__/`.
 
 ## P1-6: Wire IDF-cosine distance into pairing/scoring
@@ -102,9 +103,12 @@ see `docs/archive/completed-phases/` for history. Source audit:
 - P2-1: Expand nutrition data beyond 50/810 dishes.
 - P2-2: Expand comfort-hero mapping beyond 17/36 resolved heroes.
 - P2-3: Populate PRIOR table for PanIndia/Global zones (187/810 dishes get no regional prior boost).
-- P2-4: Fix RLS policies re-evaluating `auth.uid()` per-row instead of `(select auth.uid())`.
-- P2-5: Add a staging/approval gate before `fly_deploy.yml`'s auto-deploy.
-- P2-6: Pin the Docker image by digest, not tag.
+- P2-4: Apply and live-verify local migration 054, which changes user-owned RLS policies from
+  per-row `auth.uid()` evaluation to `(select auth.uid())`; paired rollback is present.
+- P2-5: Configure the repository's `FLY_STAGING_*` variables/secrets and protected `production`
+  environment. The workflow now deploys `main` to staging and permits production only through a
+  manually dispatched, approval-capable environment.
+- P2-6: Completed locally — both Docker stages pin Python 3.11.15 slim-bookworm by digest.
 - P2-7: Archive dead `re_engine`-era ETL/validation scripts targeting dropped schemas.
 - P2-8: Resolve unindexed-FK and duplicate-index advisor findings.
 
@@ -112,6 +116,22 @@ see `docs/archive/completed-phases/` for history. Source audit:
 - P3-1: Festival calendar mapping (currently fully absent).
 - P3-2: Disease/health-condition dish suitability (currently fully absent; needs real clinical input).
 - P3-3: Activate `s_pref` personalization once feedback volume clears a real training threshold (currently 9 rows).
-- P3-4: Build a real multi-hop ingredient/dish knowledge graph (current state is flat lookup tables).
-- P3-5: Load-test the RE service at full 810-dish scale and re-size the Fly.io machine.
+- P3-4: Expand and safety-review the new local traversable dish→ingredient→dish/substitution graph.
+  The graph framework, bounded traversal, provenance and allergen provenance are implemented and
+  tested, but broader curated ontology and component-replacement coverage remain future work.
+- P3-5: Production load/soak and Fly sizing remain open. The local 810-dish service passed a
+  300-request run at concurrency 20 with 0 errors and p95 2.03s after a cold-start cache race was
+  fixed; production topology and sustained soak still require deployment credentials/traffic.
+
+## Local release-candidate work awaiting deployment/operational verification
+- Cached OpenWeatherMap context is wired into the active plan path with a three-hour TTL and
+  fail-soft fallback; production needs `OPENWEATHERMAP_API_KEY` and provider/cache verification.
+- Safety-aware search with cuisine, diet, meal and cook-time filters is implemented end to end,
+  including a mobile Search tab; production search latency still needs measurement after deploy.
+- Daily plan explanations now include top scoring contributions, and unlocked slots can be
+  selectively refreshed while server-persisted locks are respected.
+- The mobile query cache and feedback queue survive restarts and flush after reconnect; broader
+  device E2E coverage remains open as described in P1-5.
+- MMR slate reranking and offline NDCG/recall/coverage/calibration evaluation tooling are in place;
+  a real held-out interaction dataset and promotion thresholds remain data-dependent.
 </content>

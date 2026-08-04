@@ -3,12 +3,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Fraunces_600SemiBold, Fraunces_700Bold } from "@expo-google-fonts/fraunces";
 import { Mukta_400Regular, Mukta_500Medium, Mukta_600SemiBold } from "@expo-google-fonts/mukta";
 
 import { SessionProvider } from "@/auth/SessionContext";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, restoreQueryCache, startQueryCachePersistence } from "@/lib/queryClient";
+import { flushFeedbackQueue } from "@/api/feedback";
 import { ThemeProvider, useTheme } from "@/theme";
 
 // Ghar theme + brand fonts (Fraunces/Mukta) ported from scareme21-create/NewFoo's root
@@ -30,6 +31,18 @@ export default function RootLayout() {
     Mukta_500Medium,
     Mukta_600SemiBold,
   });
+  const [cacheRestored, setCacheRestored] = useState(false);
+
+  useEffect(() => {
+    let stopPersistence: (() => void) | undefined;
+    restoreQueryCache()
+      .finally(() => {
+        stopPersistence = startQueryCachePersistence();
+        setCacheRestored(true);
+        flushFeedbackQueue().catch(() => {});
+      });
+    return () => stopPersistence?.();
+  }, []);
 
   useEffect(() => {
     if (loaded || error) {
@@ -37,7 +50,7 @@ export default function RootLayout() {
     }
   }, [loaded, error]);
 
-  if (!loaded && !error) {
+  if ((!loaded && !error) || !cacheRestored) {
     return null;
   }
 

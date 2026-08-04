@@ -22,6 +22,7 @@ import {
   webhookSink,
   z,
 } from "../_shared/mod.ts";
+import { classifyWeather } from "../_shared/services/weather.ts";
 import type { Handler, Middleware } from "../_shared/mod.ts";
 
 function withEnv(vars: Record<string, string>, fn: () => void | Promise<void>) {
@@ -199,4 +200,11 @@ Deno.test("validate() throws VALIDATION_FAILED on bad input", () => {
     "validation",
   );
   assertEquals(validate(schema, { n: 5 }).n, 5);
+});
+
+Deno.test("live weather conditions map to the RE's deterministic context tokens", () => {
+  assertEquals(classifyWeather("Thunderstorm", 29), "rain");
+  assertEquals(classifyWeather("Clear", 40), "heatwave");
+  assertEquals(classifyWeather("Clouds", 9), "cold_snap");
+  assertEquals(classifyWeather("Clouds", 25), null);
 });

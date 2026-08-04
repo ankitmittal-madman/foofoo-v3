@@ -1,0 +1,30 @@
+{
+  "household": {
+    "label": "load-test household",
+    "q1_household_type": "couple",
+    "q2_working_professionals": 2,
+    "q3_home_state": "Maharashtra",
+    "q4_current_city": "Mumbai",
+    "q5_diet": "veg",
+    "q6_nonveg_types": [],
+    "q7_veg_days": [],
+    "q8_is_jain": false,
+    "q9_allergies": [],
+    "q10_allergy_other": null,
+    "q11_conditions": [],
+    "q12_member_ages": [
+      { "role": "adult", "age": 32 },
+      { "role": "adult", "age": 30 }
+    ],
+    "q13_who_cooks": "self",
+    "q14_eat_out_per_week": 2,
+    "q15_objective": "awesome_taste",
+    "cook_capability": "intermediate"
+  },
+  "context": {
+    "slot": "dinner",
+    "weekday": "Monday",
+    "season": "monsoon",
+    "weather": { "is_raining": true, "temp_c": 27, "weather_condition": "rain" }
+  }
+}

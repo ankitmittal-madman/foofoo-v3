@@ -64,6 +64,25 @@ def test_meal_plan_slot_options(client):
     r = _post(client, "/v1/meal-plan", {"household": _hh(), "slot": "dinner"})
     assert r.status_code == 200
     assert len(r.json()["options"]) == 8
+    assert r.json()["options"][0]["explanation"]["top_contributors"]
+
+
+def test_search_is_filtered_ranked_and_safety_aware(client):
+    r = _post(
+        client,
+        "/v1/search",
+        {
+            "household": _hh(),
+            "query": "paneer",
+            "slot": "dinner",
+            "limit": 10,
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["kind"] == "dish_search"
+    assert body["count"] <= 10
+    assert all("paneer" in f"{dish['name']} {dish['cuisine']}".lower() for dish in body["options"])
 
 
 def test_meal_plan_honours_online_suppression_and_affinity(client):

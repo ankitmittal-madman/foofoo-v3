@@ -18,6 +18,17 @@ export interface PlanDish {
   total_mins: number | null;
   score: number;
   image_url: string | null;
+  explanation?: {
+    base_total: number;
+    q15_contribution: number;
+    weather_contribution: number;
+    top_contributors: Array<{
+      module: string;
+      value: number;
+      weight: number;
+      weighted: number;
+    }>;
+  };
   slot?: string;
   /** Engine-internal calibration bookkeeping (calibration surface only) — plumbing for feedback,
    * never rendered by any screen. */
@@ -148,6 +159,18 @@ export function savedWeekSelections(response: SavedWeekResponse | undefined): We
   return selections;
 }
 
+export function savedWeekLocks(response: SavedWeekResponse | undefined): Record<string, Partial<Record<Slot, boolean>>> {
+  const locks: Record<string, Partial<Record<Slot, boolean>>> = {};
+  for (const row of response?.plan?.plan_slots ?? []) {
+    const weekday = new Date(`${row.slot_date}T12:00:00Z`).toLocaleDateString("en-US", {
+      weekday: "long",
+      timeZone: "UTC",
+    });
+    locks[weekday] = { ...locks[weekday], [row.meal_slot]: row.is_locked };
+  }
+  return locks;
+}
+
 export function saveWeekPlan(selections: WeekSelections, finalize: boolean): Promise<unknown> {
   return apiPost("/plan", { surface: "save_week", selections, finalize });
 }
@@ -193,6 +216,25 @@ export function fetchClassDishes(
 /** Surface 5 — full recipe + image for one dish (the meal-detail screen). */
 export function fetchRecipe(dishName: string): Promise<RecipeResponse> {
   return apiPost<RecipeResponse>("/plan", { surface: "recipe", dish_name: dishName });
+}
+
+export interface DishSearchFilters {
+  cuisine?: string;
+  diet?: string;
+  slot?: Slot;
+  max_total_mins?: number;
+  limit?: number;
+}
+
+export interface DishSearchResponse {
+  kind: "dish_search";
+  query: string;
+  count: number;
+  options: PlanDish[];
+}
+
+export function searchDishes(query: string, filters: DishSearchFilters = {}): Promise<DishSearchResponse> {
+  return apiPost<DishSearchResponse>("/plan", { surface: "search", query, ...filters });
 }
 
 /** One past recommendation event (P1-3, 2026-08) — a row of the household's own history. */

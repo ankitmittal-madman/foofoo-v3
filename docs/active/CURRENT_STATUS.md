@@ -12,6 +12,15 @@
 > Expo Doctor (18/18), Android bundle export and Vercel web export pass. OneSignal server
 > credentials are configured; a physical-device native build remains the final push-delivery test.
 
+> **Local release candidate (not yet claimed deployed):** search/filter UI and API, cached live
+> weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
+> query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
+> migration 054 RLS optimization, pinned container bases, staging/manual-production workflows and
+> mobile CI are implemented. Verification passes: 699 Python tests (27 skipped), 80 Deno tests,
+> 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
+> 810-dish local load
+> run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
+
 | Dimension | % |
 |---|---|
 | Overall Production Readiness | ~78% |
@@ -39,7 +48,11 @@
 - **Database:** real production data (802 dishes, 33 real users, 126+ recommendation events), RLS
   correct; the `household_context` write gap (P0-1) is fixed and deployed — new requests now
   persist correctly.
-- **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; region/nutrition/comfort-hero/substitution real but narrow; festival and health-condition mapping absent.
+- **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete;
+  region/nutrition/comfort-hero/substitution real but narrow. A local bounded graph
+  traversal/provenance layer now connects dishes, ingredients and curated substitutions; broader
+  ontology review, festival mapping and clinically governed health-condition suitability remain
+  absent/pending.
 
 See `docs/active/OPEN_ITEMS.md` for what's actionable, `docs/active/LAUNCH_BLOCKERS.md` for what
 gates a public launch, `docs/active/ROADMAP.md` for sequencing.

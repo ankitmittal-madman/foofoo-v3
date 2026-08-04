@@ -14,14 +14,13 @@
 # rather than the >= ranges in pyproject.toml. Ranges are right for a library consumed by others;
 # an image is a build artefact and must be reproducible. To upgrade, change a version here
 # deliberately and rebuild — never let a rebuild silently pick up something new.
-# NOTE: pinning by tag, not by digest. A digest pin (python:3.11.15-slim-bookworm@sha256:...) is
-# strictly stronger and is the recommended hardening step once you run a first real build — the
-# digest has to come from a registry pull, which this sandbox cannot do.
+# The multi-platform registry digest was resolved from Docker Hub on 2026-08-04. Keeping the tag
+# alongside it preserves readability while the digest makes rebuilds immutable.
 
 # ---------------------------------------------------------------------------
 # Stage 1 — builder
 # ---------------------------------------------------------------------------
-FROM python:3.11.15-slim-bookworm AS builder
+FROM python:3.11.15-slim-bookworm@sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba AS builder
 
 ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
@@ -53,7 +52,7 @@ RUN pip install --no-cache-dir --no-deps /build/ghar_re_service
 # ---------------------------------------------------------------------------
 # Stage 2 — runtime
 # ---------------------------------------------------------------------------
-FROM python:3.11.15-slim-bookworm AS runtime
+FROM python:3.11.15-slim-bookworm@sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba AS runtime
 
 # Unbuffered stdout so the structured JSON log lines (RE-DOC-10 §10) reach the platform's log
 # collector as they happen, instead of sitting in a buffer until the process exits.

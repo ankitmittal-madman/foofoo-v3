@@ -16,6 +16,7 @@ export default function TabsLayout() {
     <Tabs initialRouteName="today" screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="today" options={{ title: "Home" }} />
       <Tabs.Screen name="weekly-plan" options={{ title: "Week Plan" }} />
+      <Tabs.Screen name="search" options={{ title: "Search" }} />
       <Tabs.Screen name="settings" options={{ title: "Settings" }} />
     </Tabs>
   );

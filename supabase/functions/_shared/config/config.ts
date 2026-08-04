@@ -25,6 +25,7 @@ export interface AppConfig {
   readonly telemetryWebhookUrl: string | null;
   readonly oneSignalRestApiKey: string | null;
   readonly oneSignalAppId: string | null;
+  readonly openWeatherMapApiKey: string | null;
 }
 
 /** Dev-only defaults for the Ghar RE service. NEVER used in staging/production (guarded below). */
@@ -91,6 +92,7 @@ export function loadConfig(): AppConfig {
     telemetryWebhookUrl: read(ENV_VARS.TELEMETRY_WEBHOOK_URL),
     oneSignalRestApiKey: read(ENV_VARS.ONESIGNAL_REST_API_KEY),
     oneSignalAppId: read(ENV_VARS.ONESIGNAL_APP_ID),
+    openWeatherMapApiKey: read(ENV_VARS.OPENWEATHERMAP_API_KEY),
   });
 }
 

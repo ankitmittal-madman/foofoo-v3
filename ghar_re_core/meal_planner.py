@@ -18,6 +18,7 @@ ranked by the same score. Class plan and dish list can never disagree.
 All functions take a raw household dict (fixtures.HOUSEHOLDS shape), derive θ once, and return
 plain JSON-serialisable dicts so the FastAPI layer can hand them straight back.
 """
+
 import datetime
 import random
 
@@ -32,6 +33,7 @@ from ghar_re_core.pipeline import make_context
 MAIN_SLOTS = ("breakfast", "lunch", "dinner")
 WEEK = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 _CLASS_NAMES = None
+MMR_LAMBDA = 0.75
 
 
 def _class_names():
@@ -39,6 +41,7 @@ def _class_names():
     global _CLASS_NAMES
     if _CLASS_NAMES is None:
         import csv
+
         _CLASS_NAMES = {}
         with open(CP._src_path("meal_class_master.csv"), newline="") as f:
             for r in csv.DictReader(f):
@@ -53,6 +56,7 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
     dish belongs to several classes), label it with THAT class rather than its primary, since that is
     the class the user finalized it under. Falls back to the dish's primary class otherwise."""
     code = label_class or K.dish_to_class_code(d.name)
+    explanation = S.explain_dish(d, theta, ctx, objective)
     return {
         "name": d.name,
         "cuisine": d.cuisine,
@@ -63,6 +67,16 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
         "heaviness": d.heaviness,
         "total_mins": d.total_mins,
         "score": round(S.score(d, theta, ctx, objective) if score is None else score, 4),
+        "explanation": {
+            "base_total": explanation["base_total"],
+            "q15_contribution": explanation["q15_contribution"],
+            "weather_contribution": explanation["weather_contribution"],
+            "top_contributors": sorted(
+                explanation["base_contributors"],
+                key=lambda item: abs(item["weighted"]),
+                reverse=True,
+            )[:3],
+        },
     }
 
 
@@ -71,9 +85,9 @@ def _ranked(cat, theta, ctx, objective, predicate=None, preference_by_dish=None)
     restricts the pool (e.g. to one meal class) without ever loosening eligibility."""
     out = []
     for d in cat:
-        if S.m_slot(d, ctx) == 0.0:               # not valid for this slot
+        if S.m_slot(d, ctx) == 0.0:  # not valid for this slot
             continue
-        if not S.eligible(d, theta, ctx):          # A1–A5 correctness/observance filters
+        if not S.eligible(d, theta, ctx):  # A1–A5 correctness/observance filters
             continue
         if predicate is not None and not predicate(d):
             continue
@@ -110,10 +124,16 @@ def _apply_cook_capability_bias(ranked, cook_capability):
     when a dish has no total_mins to compare (never demoted for missing data)."""
     if cook_capability != "beginner":
         return ranked
-    within_budget = [pair for pair in ranked
-                     if pair[1].total_mins is None or pair[1].total_mins <= _BEGINNER_TIME_BUDGET_MINS]
-    over_budget = [pair for pair in ranked
-                   if pair[1].total_mins is not None and pair[1].total_mins > _BEGINNER_TIME_BUDGET_MINS]
+    within_budget = [
+        pair
+        for pair in ranked
+        if pair[1].total_mins is None or pair[1].total_mins <= _BEGINNER_TIME_BUDGET_MINS
+    ]
+    over_budget = [
+        pair
+        for pair in ranked
+        if pair[1].total_mins is not None and pair[1].total_mins > _BEGINNER_TIME_BUDGET_MINS
+    ]
     return within_budget + over_budget
 
 
@@ -141,7 +161,7 @@ def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
         if seen_cuisine.get(d.cuisine, 0) >= per_cuisine:
             continue
         if epsilon > 0 and rng.random() < epsilon:
-            deferred.append((score, d))          # exploration: give a later candidate its turn
+            deferred.append((score, d))  # exploration: give a later candidate its turn
             continue
         picked.append((score, d))
         seen_class[code] = seen_class.get(code, 0) + 1
@@ -161,6 +181,46 @@ def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
     return picked[:n]
 
 
+def _dish_similarity(left, right):
+    """Bounded content similarity for MMR: class, cuisine and main-ingredient overlap."""
+    same_class = 1.0 if K.dish_to_class_code(left.name) == K.dish_to_class_code(right.name) else 0.0
+    same_cuisine = 1.0 if left.cuisine == right.cuisine else 0.0
+    left_ingredients, right_ingredients = set(left.main_ingredients), set(right.main_ingredients)
+    union = left_ingredients | right_ingredients
+    ingredient_overlap = len(left_ingredients & right_ingredients) / len(union) if union else 0.0
+    return 0.5 * same_class + 0.3 * same_cuisine + 0.2 * ingredient_overlap
+
+
+def _mmr_rerank(ranked, n, diversity_lambda=MMR_LAMBDA):
+    """Maximal Marginal Relevance reranking with deterministic tie breaks and top-score padding."""
+    if not ranked or n <= 0:
+        return []
+    candidates = list(ranked)
+    scores = [score for score, _ in candidates]
+    low, high = min(scores), max(scores)
+
+    def relevance(score):
+        return (score - low) / (high - low) if high > low else 1.0
+
+    selected = [candidates.pop(0)]
+    while candidates and len(selected) < n:
+        best_index = max(
+            range(len(candidates)),
+            key=lambda index: (
+                diversity_lambda * relevance(candidates[index][0])
+                - (1.0 - diversity_lambda)
+                * max(_dish_similarity(candidates[index][1], chosen[1]) for chosen in selected),
+                candidates[index][0],
+                candidates[index][1].name,
+            ),
+        )
+        selected.append(candidates.pop(best_index))
+    if len(selected) < n:
+        chosen = {dish.name for _, dish in selected}
+        selected.extend(pair for pair in ranked if pair[1].name not in chosen)
+    return selected[:n]
+
+
 def _theta_obj(household):
     """Derive θ + resolve the household's objective once."""
     theta = derive_theta(household)
@@ -168,8 +228,9 @@ def _theta_obj(household):
     return theta, objective
 
 
-def cold_start_top15(household, catalogue=None, n=15, weekday="Monday", household_id=None,
-                      variety_salt=None):
+def cold_start_top15(
+    household, catalogue=None, n=15, weekday="Monday", household_id=None, variety_salt=None
+):
     """Surface 1 — the post-onboarding preference primer: the n (default 15) top-scoring, DIVERSE
     dishes across breakfast/lunch/dinner, for the user to like and seed their taste profile. Diverse
     = capped per meal class and per cuisine so it spans the plan, not one class 15 times.
@@ -212,13 +273,26 @@ def cold_start_top15(household, catalogue=None, n=15, weekday="Monday", househol
         "household": household.get("label"),
         "kind": "cold_start_top_dishes",
         "count": len(picked),
-        "dishes": [dict(_dish_view(d, theta, slot_of[d.name][1], objective, score),
-                        slot=slot_of[d.name][0]) for score, d in picked],
+        "dishes": [
+            dict(
+                _dish_view(d, theta, slot_of[d.name][1], objective, score), slot=slot_of[d.name][0]
+            )
+            for score, d in picked
+        ],
     }
 
 
-def slot_options(household, slot, catalogue=None, n=8, weekday="Monday", class_code=None,
-                 context=None, exclude_dish_names=None, preference_by_dish=None):
+def slot_options(
+    household,
+    slot,
+    catalogue=None,
+    n=8,
+    weekday="Monday",
+    class_code=None,
+    context=None,
+    exclude_dish_names=None,
+    preference_by_dish=None,
+):
     """Surface 2 — a slot's 4–5 best meal options. If `class_code` is given, this is also the
     reconciliation path (surface 4): only dishes of that class are considered."""
     cat = catalogue or Catalogue()
@@ -237,6 +311,7 @@ def slot_options(household, slot, catalogue=None, n=8, weekday="Monday", class_c
     )
     ctx["interaction_count"] = max(0, int(context.get("interaction_count", 0) or 0))
     excluded = set(exclude_dish_names or [])
+
     # multi-membership (WP-17.1): a dish is eligible for a class if that class is ANY of its classes
     # (primary or secondary), not only its single primary — so behavioural DN_ dinner classes reconcile
     # to the dishes they overlap with the LD_ pool, instead of falling back to regional plates.
@@ -244,34 +319,123 @@ def slot_options(household, slot, catalogue=None, n=8, weekday="Monday", class_c
         if d.name in excluded:
             return False
         return class_code in K.dish_to_class_codes(d.name) if class_code else True
+
     ranked = _ranked(
         cat, theta, ctx, objective, predicate=pred, preference_by_dish=preference_by_dish
     )
-    picked = ranked[:n] if class_code else _diversify(ranked, n, per_class=1, per_cuisine=2)
+    picked = ranked[:n] if class_code else _mmr_rerank(ranked, n)
     return {
         "household": household.get("label"),
         "slot": slot,
         "weekday": weekday,
         "class_code": class_code,
         "count": len(picked),
-        "options": [_dish_view(d, theta, ctx, objective, score, label_class=class_code)
-                    for score, d in picked],
+        "options": [
+            _dish_view(d, theta, ctx, objective, score, label_class=class_code)
+            for score, d in picked
+        ],
     }
 
 
-def dishes_for_class(household, slot, class_code, catalogue=None, n=8, weekday="Monday",
-                      context=None, exclude_dish_names=None, preference_by_dish=None):
+def dishes_for_class(
+    household,
+    slot,
+    class_code,
+    catalogue=None,
+    n=8,
+    weekday="Monday",
+    context=None,
+    exclude_dish_names=None,
+    preference_by_dish=None,
+):
     """Surface 4 — RECONCILIATION. Given a day's finalized meal CLASS, return only the eligible
     dishes of that class for the slot, best-scored first. Thin wrapper over slot_options so the
     class-filter path can never diverge from the option-ranking path."""
-    return dict(slot_options(
-        household, slot, catalogue=catalogue, n=n, weekday=weekday, class_code=class_code,
-        context=context, exclude_dish_names=exclude_dish_names,
-        preference_by_dish=preference_by_dish,
-    ), kind="reconciled_class_dishes")
+    return dict(
+        slot_options(
+            household,
+            slot,
+            catalogue=catalogue,
+            n=n,
+            weekday=weekday,
+            class_code=class_code,
+            context=context,
+            exclude_dish_names=exclude_dish_names,
+            preference_by_dish=preference_by_dish,
+        ),
+        kind="reconciled_class_dishes",
+    )
 
 
-_RECENT_WINDOW = 2   # days a class is held back from re-topping the same slot, once it has led
+def search_dishes(
+    household,
+    catalogue=None,
+    query="",
+    cuisine=None,
+    diet=None,
+    slot=None,
+    max_total_mins=None,
+    limit=30,
+    weekday="Monday",
+    context=None,
+):
+    """Safety-aware catalogue search using the same hard eligibility rules as recommendations.
+
+    Search is intentionally performed over the startup-loaded in-memory catalogue: the production
+    catalogue is small enough for a bounded scan, and this avoids a second database-backed safety
+    implementation drifting from `eligible()`. Results are relevance-first (name prefix/name
+    substring/cuisine), then recommendation score, with deterministic ordering.
+    """
+    cat = catalogue or Catalogue()
+    theta, objective = _theta_obj(household)
+    context = context or {}
+    weather = context.get("weather") or {}
+    ctx = make_context(
+        slot=slot or "dinner",
+        weekday=weekday,
+        season=context.get("season", "transitional"),
+        weather_condition=weather.get("weather_condition") or weather.get("condition"),
+        temp_c=weather.get("temp_c"),
+        is_raining=bool(weather.get("is_raining", False)),
+    )
+    needle = str(query or "").strip().casefold()
+    cuisine_filter = str(cuisine or "").strip().casefold()
+    diet_filter = str(diet or "").strip().casefold()
+    matches = []
+    for dish in cat:
+        if not S.eligible(dish, theta, ctx):
+            continue
+        if slot and S.m_slot(dish, ctx) == 0.0:
+            continue
+        if cuisine_filter and dish.cuisine.casefold() != cuisine_filter:
+            continue
+        if diet_filter and dish.diet.casefold() != diet_filter:
+            continue
+        if max_total_mins is not None and (
+            dish.total_mins is None or dish.total_mins > int(max_total_mins)
+        ):
+            continue
+        haystack = f"{dish.name} {dish.cuisine} {K.dish_to_class_code(dish.name) or ''}".casefold()
+        if needle and needle not in haystack:
+            continue
+        relevance = 3 if dish.name.casefold().startswith(needle) and needle else 0
+        relevance += 2 if needle and needle in dish.name.casefold() else 0
+        relevance += 1 if needle and needle in dish.cuisine.casefold() else 0
+        score = S.score(dish, theta, ctx, objective)
+        matches.append((relevance, score, dish.name, dish))
+    matches.sort(key=lambda item: (-item[0], -item[1], item[2]))
+    selected = matches[: max(1, min(int(limit), 50))]
+    return {
+        "kind": "dish_search",
+        "query": query,
+        "count": len(selected),
+        "options": [
+            _dish_view(dish, theta, ctx, objective, score) for _, score, _, dish in selected
+        ],
+    }
+
+
+_RECENT_WINDOW = 2  # days a class is held back from re-topping the same slot, once it has led
 
 
 def weekly_class_plan(household, top_classes=3, catalogue=None):
@@ -293,7 +457,9 @@ def weekly_class_plan(household, top_classes=3, catalogue=None):
     backing = _class_dish_counts(cat)
     meta = CP._class_meta()
     days = []
-    recent_leaders = {slot: [] for slot in MAIN_SLOTS}   # slot -> class codes that led on recent days
+    recent_leaders = {
+        slot: [] for slot in MAIN_SLOTS
+    }  # slot -> class codes that led on recent days
     for day in WEEK:
         slots = {}
         full_plans = {}
@@ -305,7 +471,7 @@ def weekly_class_plan(household, top_classes=3, catalogue=None):
             held_back = set(recent_leaders[slot])
             top, deferred = [], []
             for code, weight in ranked:
-                if backing.get(code, 0) == 0:      # never offer a class with no dishes to reconcile to
+                if backing.get(code, 0) == 0:  # never offer a class with no dishes to reconcile to
                     continue
                 item = {
                     "class_code": code,
@@ -314,12 +480,12 @@ def weekly_class_plan(household, top_classes=3, catalogue=None):
                     "dish_count": backing.get(code, 0),
                 }
                 if code in held_back:
-                    deferred.append(item)          # led recently — only used if the pool runs dry
+                    deferred.append(item)  # led recently — only used if the pool runs dry
                     continue
                 top.append(item)
                 if len(top) >= top_classes:
                     break
-            for item in deferred:                  # pool too thin to fill without repeating — allow it
+            for item in deferred:  # pool too thin to fill without repeating — allow it
                 if len(top) >= top_classes:
                     break
                 top.append(item)
@@ -338,8 +504,11 @@ def _ensure_weekend_special(slots, full_plans, backing, meta, top_classes):
     full class_plan, so diet/Jain/allergen gating is never bypassed) to the front of whichever main
     slot it belongs to. No-op if the household's plan contains no eligible special class at all
     (e.g. every special class was diet-gated out) — never fabricates a class outside the plan."""
-    already = any(item["class_code"] in CP._WEEKEND_SPECIAL_CLASSES
-                  for slot in ("lunch", "dinner") for item in slots.get(slot, []))
+    already = any(
+        item["class_code"] in CP._WEEKEND_SPECIAL_CLASSES
+        for slot in ("lunch", "dinner")
+        for item in slots.get(slot, [])
+    )
     if already:
         return
     candidates = []
@@ -369,7 +538,9 @@ def _class_dish_counts(cat):
     if _DISH_COUNTS is None:
         counts: dict = {}
         for d in cat:
-            for code in K.dish_to_class_codes(d.name):  # multi-membership: count every class a dish backs
+            for code in K.dish_to_class_codes(
+                d.name
+            ):  # multi-membership: count every class a dish backs
                 counts[code] = counts.get(code, 0) + 1
         _DISH_COUNTS = counts
     return _DISH_COUNTS

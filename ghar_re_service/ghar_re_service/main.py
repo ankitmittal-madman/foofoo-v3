@@ -50,6 +50,7 @@ SIGNED_PATHS = frozenset(
         "/v1/weekly-plan",
         "/v1/class-dishes",
         "/v1/recipe",
+        "/v1/search",
     }
 )
 
@@ -128,6 +129,7 @@ RATE_LIMITED_PATHS = frozenset(
         "/v1/weekly-plan",
         "/v1/class-dishes",
         "/v1/recipe",
+        "/v1/search",
     }
 )
 
@@ -422,3 +424,9 @@ def class_dishes(request: Request, payload: dict = Body(...)):  # noqa: B008
 def recipe(request: Request, payload: dict = Body(...)):  # noqa: B008
     """WP-18 surface 5: full recipe + image for one dish (the meal-detail screen)."""
     return _planning_call("recipe", engine.recipe_detail, payload, request, needs_household=False)
+
+
+@app.post("/v1/search")
+def search(request: Request, payload: dict = Body(...)):  # noqa: B008
+    """Safety-aware dish search with cuisine, diet, slot and cook-time filters."""
+    return _planning_call("search", engine.plan_search, payload, request)

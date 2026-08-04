@@ -130,6 +130,10 @@ function DeleteAccountFlow({ userId, onDeleted }: { userId: string; onDeleted: (
       <Pressable
         style={[styles.button, styles.dangerButton, phrase !== REQUIRED_CONFIRMATION_PHRASE && styles.buttonDisabled]}
         disabled={phrase !== REQUIRED_CONFIRMATION_PHRASE || remove.isPending}
+        accessibilityRole="button"
+        accessibilityState={{
+          disabled: phrase !== REQUIRED_CONFIRMATION_PHRASE || remove.isPending,
+        }}
         onPress={() => remove.mutate()}
         testID="settings-delete-confirm-button"
       >

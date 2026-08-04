@@ -33,6 +33,7 @@ import { callRecommendationEngine } from "../recommendations/re-client.ts";
 import { loadOnlineRecommendationState } from "../recommendations/personalization.ts";
 import { addDishToDate, loadSavedWeek, saveWeek, setSlotLock } from "./state.ts";
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
+import { loadWeatherContext } from "../_shared/services/weather.ts";
 
 const SERVICE_NAME = "plan";
 
@@ -44,6 +45,7 @@ const SURFACES: Record<string, { path: string; needsHousehold: boolean }> = {
   weekly_plan: { path: "/v1/weekly-plan", needsHousehold: true },
   class_dishes: { path: "/v1/class-dishes", needsHousehold: true },
   recipe: { path: "/v1/recipe", needsHousehold: false },
+  search: { path: "/v1/search", needsHousehold: true },
 };
 
 /** Build the POST /v1/plan handler. */
@@ -177,7 +179,21 @@ export function makePlanHandler(): Handler {
     // dish_name/top_classes) pass straight through; the household is composed from the live tables
     // for the surfaces that need it (never trusted from the client).
     const payload: Record<string, unknown> = { request_id: requestId };
-    for (const k of ["slot", "weekday", "class_code", "count", "dish_name", "top_classes"]) {
+    for (
+      const k of [
+        "slot",
+        "weekday",
+        "class_code",
+        "count",
+        "dish_name",
+        "top_classes",
+        "query",
+        "cuisine",
+        "diet",
+        "max_total_mins",
+        "limit",
+      ]
+    ) {
       if (body[k] !== undefined) payload[k] = body[k];
     }
     let resolvedHouseholdId: string | undefined;
@@ -193,11 +209,13 @@ export function makePlanHandler(): Handler {
       resolvedHouseholdId = hid;
       stubbedHousehold = stubbed;
       const online = await loadOnlineRecommendationState(ctx, hid);
+      const weather = await loadWeatherContext(ctx, household.q4_current_city);
       payload.context = {
         slot: body.slot,
         weekday: body.weekday,
         interaction_count: online.interactionCount,
         dish_feedback_counts: online.dishFeedbackCounts,
+        weather,
       };
       payload.exclude_dish_names = online.excludeDishNames;
       payload.preference_by_dish = online.preferenceByDish;

@@ -153,4 +153,6 @@ export interface FeedbackResponse {
   event_type: FeedbackEventType;
   recorded_at: string;
   trace_id: string;
+  /** True when the device durably queued the event for delivery after connectivity returns. */
+  queued?: boolean;
 }

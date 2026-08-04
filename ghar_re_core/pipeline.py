@@ -4,9 +4,11 @@ ghar_re.pipeline — end-to-end orchestration of the Ghar RE v1.0 rebuild.
     raw Q1-Q15  ->  D1-D7 derivation (θ)  ->  hard filters (§S2A)  ->  BASE (§S2B) × GAIN_Q15 (§S3)
                 ->  pairing guardrails + plate_score (§S4)  ->  assemble-7 + carb attach  ->  7 plates
 
-Weather is a MOCKED injected input (no live API in v1): ctx carries weather_condition / temp_c /
+Weather is an injected input: the Edge layer supplies cached provider data when configured, while
+tests and offline callers can inject deterministic weather_condition / temp_c /
 is_raining, per Task 3 point 3.
 """
+
 from ghar_re_core.config import CONFIG
 from ghar_re_core.catalogue import Catalogue
 from ghar_re_core.derivation import derive_theta
@@ -25,10 +27,18 @@ def recommend(household, ctx, catalogue=None, with_trace=False, session_log_dir=
     objective = household.get("q15_objective") or CONFIG.default_objective
     if with_trace:
         plates, decision_trace = pairing.assemble_7(
-            cat, theta, ctx, objective, n=7, household_label=household.get("label"), with_trace=True,
+            cat,
+            theta,
+            ctx,
+            objective,
+            n=7,
+            household_label=household.get("label"),
+            with_trace=True,
         )
     else:
-        plates = pairing.assemble_7(cat, theta, ctx, objective, n=7, household_label=household.get("label"))
+        plates = pairing.assemble_7(
+            cat, theta, ctx, objective, n=7, household_label=household.get("label")
+        )
         decision_trace = None
     result = dict(
         household=household["label"],
@@ -43,31 +53,48 @@ def recommend(household, ctx, catalogue=None, with_trace=False, session_log_dir=
         # Write a per-user Markdown trace (ops/logs/session-log/<label>.md). Dev/ops aid — the Fly
         # service is stateless and never writes to the repo at runtime; call this from a local run.
         from ghar_re_core.session_log import write_session_log
+
         result["session_log_path"] = write_session_log(household, ctx, cat, session_log_dir)
     return result
 
 
-def make_context(slot="dinner", season="transitional", weekday="Monday",
-                 weather_condition=None, temp_c=None, is_raining=False,
-                 active_modes=None, calorie_target=None):
+def make_context(
+    slot="dinner",
+    season="transitional",
+    weekday="Monday",
+    weather_condition=None,
+    temp_c=None,
+    is_raining=False,
+    active_modes=None,
+    calorie_target=None,
+):
     """Build the `ctx` dict recommend() needs — the meal slot, season, weekday, and (mocked)
     weather conditions plus any active modes (e.g. fasting) or calorie target for this run.
     All arguments are optional and default to a plain weekday dinner with no weather/mode/
     calorie constraints."""
-    return dict(slot=slot, season=season, weekday=weekday,
-                weather_condition=weather_condition, temp_c=temp_c, is_raining=is_raining,
-                active_modes=active_modes or [], calorie_target=calorie_target)
+    return dict(
+        slot=slot,
+        season=season,
+        weekday=weekday,
+        weather_condition=weather_condition,
+        temp_c=temp_c,
+        is_raining=is_raining,
+        active_modes=active_modes or [],
+        calorie_target=calorie_target,
+    )
 
 
 def format_result(res):
     """Render one recommend() result as a short human-readable text block (household, key
     derived-profile facts, and the 7 scored plates) — used by the CLI demo below, not by any
     scoring logic."""
-    lines = [f"Household: {res['household']}  |  objective={res['objective']}  |  "
-             f"{res['versions']['spine']} · {res['versions']['kb']} · {res['versions']['config']}",
-             f"  region={res['theta']['region']['value']} blend={res['theta']['blend']['value']} "
-             f"income={res['theta']['income_band']['value']} spice_ceiling={res['theta']['spice_ceiling']['value']} "
-             f"jain={res['theta']['is_jain']['value']} weaning={res['theta']['weaning_present']['value']}"]
+    lines = [
+        f"Household: {res['household']}  |  objective={res['objective']}  |  "
+        f"{res['versions']['spine']} · {res['versions']['kb']} · {res['versions']['config']}",
+        f"  region={res['theta']['region']['value']} blend={res['theta']['blend']['value']} "
+        f"income={res['theta']['income_band']['value']} spice_ceiling={res['theta']['spice_ceiling']['value']} "
+        f"jain={res['theta']['is_jain']['value']} weaning={res['theta']['weaning_present']['value']}",
+    ]
     for i, p in enumerate(res["plates"], 1):
         lines.append(f"   {i}. [{p['score']:.3f}] {pairing.plate_label(p)}")
     return "\n".join(lines)
@@ -75,6 +102,7 @@ def format_result(res):
 
 if __name__ == "__main__":
     from ghar_re_core import fixtures as F
+
     cat = Catalogue()
     for hh in F.HOUSEHOLDS:
         ctx = make_context(slot="dinner", season="transitional")

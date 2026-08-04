@@ -43,7 +43,7 @@ def build_household_dict(hh: dict[str, Any]) -> dict[str, Any]:
 def build_context(ctx: dict[str, Any], exclude_dish_ids: list[str] | None = None) -> dict[str, Any]:
     """Map the contract context to a core context dict.
 
-    Weather is mocked/injected in v1 — there is no live weather API.
+    Weather is injected by the Edge layer, which owns provider access and caching.
 
     `exclude_dish_ids` (WP-8G Option A) is a REQUEST-level field, not part of the contract's
     HouseholdContext object, so it's threaded in as a separate argument here rather than read off
@@ -221,6 +221,25 @@ def plan_class_dishes(request: dict[str, Any], catalogue, config) -> dict[str, A
         context=request.get("context") or {},
         exclude_dish_names=request.get("exclude_dish_names") or [],
         preference_by_dish=request.get("preference_by_dish") or {},
+    )
+    _with_images(res["options"])
+    return res
+
+
+def plan_search(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
+    """Safety-aware full-catalogue search and structured filters."""
+    hh = build_household_dict(request["household"])
+    res = planner.search_dishes(
+        hh,
+        catalogue=catalogue,
+        query=request.get("query", ""),
+        cuisine=request.get("cuisine"),
+        diet=request.get("diet"),
+        slot=request.get("slot"),
+        max_total_mins=request.get("max_total_mins"),
+        limit=request.get("limit", 30),
+        weekday=request.get("weekday", "Monday"),
+        context=request.get("context") or {},
     )
     _with_images(res["options"])
     return res
