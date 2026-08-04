@@ -23,11 +23,13 @@ from ghar_re_service import auth, engine, main
 
 
 def test_build_context_preserves_online_features():
-    context = engine.build_context({
-        "slot": "dinner",
-        "interaction_count": 9,
-        "dish_feedback_counts": [{"dish_name": "Poha", "served": 2, "rejected": 1}],
-    })
+    context = engine.build_context(
+        {
+            "slot": "dinner",
+            "interaction_count": 9,
+            "dish_feedback_counts": [{"dish_name": "Poha", "served": 2, "rejected": 1}],
+        }
+    )
     assert context["interaction_count"] == 9
     assert context["dish_feedback_counts"][0]["served"] == 2
 

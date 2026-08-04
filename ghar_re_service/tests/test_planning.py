@@ -71,14 +71,18 @@ def test_meal_plan_honours_online_suppression_and_affinity(client):
     assert baseline.status_code == 200
     first = baseline.json()["options"][0]["name"]
     promoted = baseline.json()["options"][-1]["name"]
-    personalized = _post(client, "/v1/meal-plan", {
-        "household": _hh(),
-        "slot": "dinner",
-        "count": 8,
-        "exclude_dish_names": [first],
-        "preference_by_dish": {promoted: 1.0},
-        "context": {"interaction_count": 12},
-    })
+    personalized = _post(
+        client,
+        "/v1/meal-plan",
+        {
+            "household": _hh(),
+            "slot": "dinner",
+            "count": 8,
+            "exclude_dish_names": [first],
+            "preference_by_dish": {promoted: 1.0},
+            "context": {"interaction_count": 12},
+        },
+    )
     assert personalized.status_code == 200
     names = [dish["name"] for dish in personalized.json()["options"]]
     assert first not in names

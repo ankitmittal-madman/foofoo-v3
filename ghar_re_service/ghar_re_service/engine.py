@@ -173,8 +173,13 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         if not class_code:
             continue
         addon = planner.dishes_for_class(
-            hh, request.get("slot", "dinner"), class_code, catalogue=catalogue, n=1,
-            weekday=request.get("weekday", "Monday"), context=request.get("context") or {},
+            hh,
+            request.get("slot", "dinner"),
+            class_code,
+            catalogue=catalogue,
+            n=1,
+            weekday=request.get("weekday", "Monday"),
+            context=request.get("context") or {},
             exclude_dish_names=request.get("exclude_dish_names") or [],
             preference_by_dish=request.get("preference_by_dish") or {},
         )
