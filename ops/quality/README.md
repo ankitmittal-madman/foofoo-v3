@@ -36,7 +36,7 @@ python3 ops/quality/runner/report_reader.py --rerun-failed  # re-run only the fa
 | 13 | API security + secrets scan | ✅ runs |
 | 14 | Chaos / fail-safe probes (in-process) | ✅ runs |
 | 9-11 | Headless browser UI + accessibility, one screenshot/console/network capture per screen discovered from `mobile/app`'s own route tree | ✅ runs — needs `GHAR_WEB_URL` (e.g. `expo start --web`) |
-| WP-22 | Synthetic persona UI journeys — drives the real onboarding UI through all 100 personas, screenshots every answer/Continue, captures the resulting `/v1/recommendations` call, renders one HTML report per persona + an index grouped by outcome (200/422/warned) | ✅ runs — needs `GHAR_WEB_URL` + a signed-in test account (`GHAR_SIGNIN_EMAIL`/`GHAR_SIGNIN_PASSWORD`); no RE scoring assertions |
+| WP-22 | Synthetic persona UI journeys — drives the real onboarding UI through all 100 personas, screenshots every answer/Continue, captures the resulting `/v1/recommendations` call, renders one HTML report per persona + an index grouped by outcome (200/422/warned) | ✅ wired into the orchestrator as the `ui-persona-journeys` step — needs `GHAR_WEB_URL` + a signed-in test account (`GHAR_SIGNIN_EMAIL`/`GHAR_SIGNIN_PASSWORD`); no RE scoring assertions. Report: `ops/quality/reports/<timestamp>/personas-ui/report/index.html`. Also runnable on demand via the `persona-journeys` GitHub Actions workflow (Actions tab → "Run workflow") — it starts `expo start --web` itself and uploads the HTML report as a build artifact. |
 | 16-19 | Orchestrator, reports, dashboard, one command | ✅ this module |
 
 Gated suites are recorded as **skipped/blocked with the concrete reason**, never faked. Unlock them:

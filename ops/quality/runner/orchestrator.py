@@ -310,6 +310,49 @@ def step_ui(report_dir: Path) -> StepResult:
                       artifacts=["playwright/ui_result.json"])
 
 
+def step_ui_personas(report_dir: Path) -> StepResult:
+    """WP-22: drive the real onboarding UI through all 100 synthetic personas (run_persona_journeys.mjs),
+    then render the per-persona + index HTML report (persona_journey_report.py). SKIP truthfully
+    (never fabricate UI evidence) if there's no web target, or the driver itself has nothing to do
+    without live sign-in credentials — same honesty rule as step_ui."""
+    from shutil import which
+
+    cat = report_dir / "personas-ui"
+    cat.mkdir(parents=True, exist_ok=True)
+    if which("node") is None:
+        return StepResult("ui-persona-journeys", "WP-22", "blocked", "P1",
+                          "node not available", reason="Node.js not installed")
+    env = {**os.environ, "GHAR_UI_OUT": str(cat)}
+    t0 = time.time()
+    proc = subprocess.run(["node", str(QUALITY_DIR / "ui" / "run_persona_journeys.mjs")],
+                          cwd=REPO_ROOT, env=env, capture_output=True, text=True)
+    (cat / "node.log").write_text(proc.stdout + proc.stderr, encoding="utf-8")
+    result_file = cat / "persona_journeys_result.json"
+    data = json.loads(result_file.read_text()) if result_file.exists() else {"status": "fail"}
+    status = {"pass": "pass", "partial": "warn", "skipped": "skip",
+              "blocked": "blocked", "fail": "fail"}.get(data.get("status", "fail"), "fail")
+    artifacts = ["personas-ui/persona_journeys_result.json"]
+
+    # Only render the HTML report when the driver actually produced per-persona evidence
+    # (personas/ subdir) — rendering over a skipped/blocked run would fabricate an empty report.
+    if (cat / "personas").is_dir():
+        report_proc = subprocess.run(
+            [sys.executable, str(QUALITY_DIR / "runner" / "persona_journey_report.py"), str(cat)],
+            cwd=REPO_ROOT, capture_output=True, text=True,
+        )
+        (cat / "report_render.log").write_text(
+            report_proc.stdout + report_proc.stderr, encoding="utf-8",
+        )
+        if (cat / "report" / "index.html").exists():
+            artifacts.append("personas-ui/report/index.html")
+
+    summary = (f"{data.get('ok', 0)}/{data.get('total', 0)} personas completed their journey"
+               if "total" in data else data.get("reason", "persona UI journey run complete"))
+    return StepResult("ui-persona-journeys", "WP-22", status, "P1", summary,
+                      duration_s=round(time.time() - t0, 2), reason=data.get("reason", ""),
+                      artifacts=artifacts)
+
+
 def step_chaos(report_dir: Path) -> StepResult:
     """Phase 14: in-process resilience probes — the service must fail SAFE, not crash.
 
@@ -376,6 +419,7 @@ def run_all(report_dir: Path, quick: bool = False) -> list[StepResult]:
     _add(step_db(report_dir))
     _add(step_edge(report_dir))
     _add(step_ui(report_dir))
+    _add(step_ui_personas(report_dir))
 
     _log(report_dir, "=== Ghar Quality Suite end ===")
     return steps

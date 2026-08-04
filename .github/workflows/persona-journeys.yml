@@ -1,0 +1,118 @@
+name: persona-journeys
+
+# WP-22 — on-demand synthetic persona UI journeys.
+#
+# Manually triggered (Actions tab -> "Run workflow"). Drives the REAL onboarding UI (consent ->
+# step-1..step-5) through Playwright, one full pass per persona from ops/quality/personas.py (100
+# personas: 7 golden + 8 derived + 41 real_persona_derived + 44 adversarial), screenshotting every
+# answer/Continue, then captures whatever the app's own POST /v1/recommendations call returns once
+# onboarding completes. Renders one HTML report per persona + an index grouped by outcome
+# (200/422/warned), uploaded as a build artifact.
+#
+# This is NOT part of quality-gate.yml: it needs a live web target (Expo web) and a pre-provisioned
+# signed-in test account, both of which are unavailable/undesirable on every push. It is deliberately
+# a separate, opt-in workflow — same honesty rule as the local driver: without the required secrets
+# it records a truthful SKIPPED result rather than fabricating evidence, it does not fail the build.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   GHAR_SIGNIN_EMAIL / GHAR_SIGNIN_PASSWORD   — a pre-provisioned test account (onboarding is only
+#                                                 reachable while signed in)
+#   EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY / EXPO_PUBLIC_API_BASE_URL
+#                                               — same values mobile/.env.example documents, for the
+#                                                 web build this workflow boots to actually reach the
+#                                                 real backend
+on:
+  workflow_dispatch:
+    inputs:
+      persona_limit:
+        description: "Run only the first N personas (blank = all 100, fast smoke pass e.g. 5)"
+        required: false
+        default: ""
+
+jobs:
+  persona-journeys:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install mobile app dependencies
+        working-directory: mobile
+        run: npm ci
+
+      - name: Install Playwright driver dependencies
+        working-directory: ops/quality/ui
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Write mobile/.env from secrets
+        working-directory: mobile
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+        run: |
+          if [ -z "$EXPO_PUBLIC_SUPABASE_URL" ] || [ -z "$EXPO_PUBLIC_API_BASE_URL" ]; then
+            echo "::warning::EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_API_BASE_URL secrets are not set — the web build will boot but every API call will fail. Set them under Settings -> Secrets and variables -> Actions to get real journeys instead of all-failed ones."
+          fi
+          cat > .env <<EOF
+          EXPO_PUBLIC_SUPABASE_URL=${EXPO_PUBLIC_SUPABASE_URL}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY=${EXPO_PUBLIC_SUPABASE_ANON_KEY}
+          EXPO_PUBLIC_API_BASE_URL=${EXPO_PUBLIC_API_BASE_URL}
+          EOF
+
+      - name: Start Expo web (background)
+        working-directory: mobile
+        run: |
+          nohup npx expo start --web --port 8081 > /tmp/expo-web.log 2>&1 &
+          echo "Waiting for the Expo web dev server to come up..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8081 > /dev/null; then
+              echo "Expo web is up."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Expo web never came up within 5 minutes — dumping its log:"
+          cat /tmp/expo-web.log
+          exit 1
+
+      - name: Run the persona UI journey driver
+        env:
+          GHAR_WEB_URL: "http://localhost:8081"
+          GHAR_UI_OUT: "${{ github.workspace }}/ops/quality/reports/persona-journeys"
+          GHAR_SIGNIN_EMAIL: ${{ secrets.GHAR_SIGNIN_EMAIL }}
+          GHAR_SIGNIN_PASSWORD: ${{ secrets.GHAR_SIGNIN_PASSWORD }}
+          GHAR_PERSONAS_LIMIT: ${{ github.event.inputs.persona_limit }}
+        run: node ops/quality/ui/run_persona_journeys.mjs
+
+      - name: Render the HTML report
+        if: always()
+        run: |
+          out="${{ github.workspace }}/ops/quality/reports/persona-journeys"
+          if [ -d "$out/personas" ]; then
+            python3 ops/quality/runner/persona_journey_report.py "$out"
+          else
+            echo "No per-persona evidence directory — driver was skipped/blocked, nothing to render."
+          fi
+
+      - name: Show the Expo web log (only on failure, for triage)
+        if: failure()
+        run: cat /tmp/expo-web.log || true
+
+      - name: Upload the persona journey report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: persona-journey-report
+          path: ops/quality/reports/persona-journeys/
+          retention-days: 30
+          if-no-files-found: warn
