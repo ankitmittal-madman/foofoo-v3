@@ -40,7 +40,9 @@ def _plate_label(p) -> str:
     return plate_label(p)
 
 
-def build_decision_trace(household_label, ctx, objective, all_plates, chosen, funnel=None) -> dict:
+def build_decision_trace(
+    household_label, ctx, objective, all_plates, chosen, funnel=None, theta=None, idf=None
+) -> dict:
     """Build the decision-trace dict for one Assemble-7 decision — the same payload
     log_assemble7_decision below writes to the logger, but returned directly so a caller (e.g.
     pipeline.recommend()) can include it in an API response regardless of whether any logging
@@ -64,6 +66,23 @@ def build_decision_trace(household_label, ctx, objective, all_plates, chosen, fu
         {"rank": i, "plate": _plate_label(p), "score": round(p["score"], 4)}
         for i, p in enumerate(chosen, 1)
     ]
+    # Additive-only, per-winner structured explanation (eligibility/rejected-filters, BASE
+    # contributors, Q15 contribution, weather contribution, pairing contribution) — the six
+    # categories the Founder-directed RE compliance review (2026-08) requires be explainable.
+    # Only computed when the caller supplies theta+idf (assemble_7 does, whenever with_trace=True);
+    # omitted from `winners[i]` entirely otherwise, so this never changes trace shape for a caller
+    # that doesn't opt in.
+    if theta is not None and idf is not None:
+        from ghar_re_core import scoring as _S
+        from ghar_re_core.pairing import _plate_dishes, explain_pairing
+        for i, p in enumerate(chosen):
+            dishes = _plate_dishes(p)
+            explanation = {
+                "dishes": [_S.explain_dish(d, theta, ctx, objective) for d in dishes]
+            }
+            if p["form"] == "pair":
+                explanation["pairing"] = explain_pairing(p["dry"], p["liquid"], idf)
+            winners[i]["explanation"] = explanation
 
     # Alternatives: the highest-scoring candidates that did NOT make it into the served set,
     # each with the concrete reason it lost (mirrors the actual guards in pairing.assemble_7).

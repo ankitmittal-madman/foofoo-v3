@@ -16,7 +16,8 @@ Only future work, strictly ordered. Full detail/evidence for every item:
 8. Enable Supabase leaked-password-protection (P1-1)
 9. Real monitoring/alerting (P1-7)
 10. Mobile automated test coverage (P1-5, highest value once #2-7 stabilize)
-11. Wire IDF-cosine distance into pairing/scoring (P1-6, needs a Founder decision)
+
+P1-6 (IDF-cosine distance into pairing/scoring): Completed. Archived.
 
 ## P2
 12. Expand nutrition data coverage

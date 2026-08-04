@@ -574,7 +574,7 @@ def explain_dish(dish, theta, ctx, objective, shared_hero=True):
     eligibility = explain_eligibility(dish, theta, ctx, shared_hero=shared_hero)
     base_total, contributions = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="base")
     base_contributors = [
-        {"module": c.name, "value": round(c.value, 4), "weight": round(c.weight, 4),
+        {"module": c.module, "value": round(c.value, 4), "weight": round(c.weight, 4),
          "weighted": round(c.value * c.weight, 4)}
         for c in contributions
     ]

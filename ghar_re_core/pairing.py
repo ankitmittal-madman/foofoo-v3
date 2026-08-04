@@ -247,7 +247,11 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None, with
     decision_log.log_assemble7_decision(household_label, ctx, objective, plates, chosen, funnel)
 
     if with_trace:
-        trace = decision_log.build_decision_trace(household_label, ctx, objective, plates, chosen, funnel)
+        idf = SIM.build_idf(catalogue)
+        trace = decision_log.build_decision_trace(
+            household_label, ctx, objective, plates, chosen, funnel,
+            theta=theta, idf=idf,
+        )
         # Additive-only: exploration_trace is empty ([]) whenever exploration didn't fire (the
         # golden-master/every-live-household case), so this never changes existing trace shape
         # for a no-op call — it only ever ADDS a key, never removes/renames one.
@@ -281,3 +285,36 @@ def plate_label(p):
     if p.get("support"):
         s += f"  (+ {p['support']})"
     return s
+
+
+def explain_pairing(d, l, idf):
+    """Structured explanation for one dry+liquid pair's pairing contribution: the hard-gate
+    results (both_rich/same_base/cuisine_dist) and the soft compat() breakdown (richness balance,
+    protein-veg balance, same-taste penalty), plus the final compat total. Calls the exact same
+    functions allowed()/compat() use — does not recompute or approximate. Founder-directed RE
+    compliance review, 2026-08 (explanation-generation item)."""
+    same_base_val = same_base(d, l, idf)
+    both_rich_val = both_rich(d, l)
+    cd = cuisine_dist(d, l)
+    d_rich = bool(set(d.richness) & (RICH_TAGS | {"oily"}))
+    l_rich = bool(set(l.richness) & (RICH_TAGS | {"oily"}))
+    protein_cat = {"dal_lentil", "kebab", "egg_dish", "curry"}
+    l_protein = bool(set(l.dish_category) & protein_cat) or l.diet in ("non_veg", "egg")
+    d_veg = "dry_sabzi" in d.dish_category
+    same_taste = bool(set(d.primary_taste) & set(l.primary_taste))
+    return {
+        "dry": d.name,
+        "liquid": l.name,
+        "hard_gates": {
+            "both_rich": both_rich_val,
+            "same_base": same_base_val,
+            "cuisine_dist": round(cd, 4),
+            "cuisine_coherent": cd <= CONFIG.theta_region,
+        },
+        "soft_terms": {
+            "richness_balance_applies": d_rich != l_rich,
+            "protein_veg_balance_applies": l_protein and d_veg,
+            "same_taste_penalty_applies": same_taste,
+        },
+        "compat_total": round(compat(d, l), 4),
+    }

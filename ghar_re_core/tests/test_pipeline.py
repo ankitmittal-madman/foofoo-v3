@@ -173,6 +173,106 @@ def test_pairing_guardrails_hold_on_chosen_pairs():
                 assert P.allowed(d, l, idf)
 
 
+# ---------------------------------------------------------------------------
+# 8b. Founder-directed RE compliance review (2026-08): _cuis() 0.70 same-parent-cuisine tier,
+# m_season()'s monsoon "0 else" branch, theta_base config, and the new explain_dish/
+# explain_pairing/explain_eligibility functions. Uses the real 810-dish catalogue (not the
+# golden sample) since none of the golden sample's cuisines exercise the parent-cuisine tier.
+# ---------------------------------------------------------------------------
+def _real_catalogue():
+    import json, os
+    path = os.path.normpath(os.path.join(
+        os.path.dirname(__file__), "..", "..", "ghar_re_service", "data", "bundle", "catalogue.json"
+    ))
+    with open(path) as f:
+        return Catalogue(json.load(f))
+
+
+def test_cuis_same_parent_cuisine_tier():
+    real_cat = _real_catalogue()
+    d = next(d for d in real_cat if d.cuisine == "malabar")
+    assert d.state_origin != "Kerala"  # confirms this dish does NOT hit the 1.00 exact-match tier
+    assert S._cuis(d, "Kerala") == 0.70, "malabar (parent=kerala) vs state Kerala must hit the 0.70 tier"
+
+
+def test_cuis_exact_state_still_beats_parent_tier():
+    real_cat = _real_catalogue()
+    d = next(d for d in real_cat if d.cuisine == "punjabi")
+    assert S._cuis(d, "Punjab") == 1.00
+
+
+def test_cuis_no_relation_is_zero():
+    real_cat = _real_catalogue()
+    d = next(d for d in real_cat if d.cuisine == "japanese")
+    assert S._cuis(d, "Punjab") == 0.0
+
+
+def test_theta_base_config_matches_frozen_spec():
+    # Core Spine FROZEN §S4 line 641: theta_base default 0.6.
+    assert S.CONFIG.theta_base == 0.6
+
+
+def test_m_season_monsoon_non_rainy_dish_scores_zero_not_neutral():
+    # Core Spine FROZEN §B3 line 318: "monsoon -> +1 rainy/comfort, 0 else" — unlike summer/
+    # winter, monsoon has no neutral 0.5 default.
+    non_rainy = next(d for d in CAT if "rainy" not in d.weather_affinity)
+    assert S.m_season(non_rainy, {"season": "monsoon"}) == 0.0
+
+
+def test_m_season_monsoon_rainy_dish_scores_one():
+    rainy = next(d for d in CAT if "rainy" in d.weather_affinity)
+    assert S.m_season(rainy, {"season": "monsoon"}) == 1.0
+
+
+def test_explain_eligibility_reports_rejected_filters():
+    hh = HH["jain_couple_ahmedabad"]
+    theta = derive_theta(hh)
+    ctx = make_context(slot="dinner", season="transitional")
+    non_jain = next(d for d in CAT if d.jain_compatible == "N")
+    result = S.explain_eligibility(non_jain, theta, ctx)
+    assert result["eligible"] is False
+    assert "jain" in result["rejected_filters"]
+
+
+def test_explain_dish_matches_live_score_computation():
+    hh = HH["single_professional_blr"]
+    theta = derive_theta(hh)
+    ctx = make_context(slot="dinner", season="transitional")
+    dish = next(d for d in CAT if S.eligible(d, theta, ctx))
+    explanation = S.explain_dish(dish, theta, ctx, "awesome_taste")
+    assert explanation["eligibility"]["eligible"] is True
+    assert explanation["base_total"] == round(S.base(dish, theta, ctx), 4)
+    assert explanation["q15_contribution"] == round(S.gain_q15(dish, "awesome_taste"), 4)
+    assert explanation["weather_contribution"] == round(S.m_weather(dish, theta, ctx), 4)
+    # every named BASE module from the registry must appear as a contributor
+    contributor_names = {c["module"] for c in explanation["base_contributors"]}
+    assert {"m_palette", "m_slot", "m_season", "sig", "m_age", "m_household", "m_weather"} <= contributor_names
+
+
+def test_explain_pairing_matches_live_compat_and_gates():
+    idf = P.SIM.build_idf(CAT)
+    dry = next(d for d in CAT if d.hero_role == "dry")
+    liquid = next(d for d in CAT if d.hero_role == "liquid")
+    explanation = P.explain_pairing(dry, liquid, idf)
+    assert explanation["compat_total"] == round(P.compat(dry, liquid), 4)
+    assert explanation["hard_gates"]["same_base"] == P.same_base(dry, liquid, idf)
+
+
+def test_decision_trace_winners_carry_structured_explanations_when_requested():
+    hh = HH["single_professional_blr"]
+    theta = derive_theta(hh)
+    ctx = make_context(slot="dinner", season="transitional")
+    chosen, trace = P.assemble_7(CAT, theta, ctx, "awesome_taste", with_trace=True)
+    assert len(trace["winners"]) == len(chosen)
+    for winner in trace["winners"]:
+        assert "explanation" in winner
+        assert "dishes" in winner["explanation"]
+        for dish_explanation in winner["explanation"]["dishes"]:
+            assert "base_contributors" in dish_explanation
+            assert "q15_contribution" in dish_explanation
+            assert "weather_contribution" in dish_explanation
+
+
 def test_guardrails_match_kb_negative_priors():
     # The KB §N1 in_spine=yes structural rows must be exactly the pairing hard gates we enforce.
     active_structural = {

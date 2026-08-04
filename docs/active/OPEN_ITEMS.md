@@ -109,14 +109,8 @@ see `docs/archive/completed-phases/` for history. Source audit:
 
 ## P1-6: Wire IDF-cosine distance into pairing/scoring
 - **Priority:** P1
-- **Area:** Recommendation Engine
-- **Evidence:** `ghar_re_core/similarity.py` implements the frozen spec's `d(a,b)` cosine formula; `pairing.py`'s `same_base()` still uses a cruder set-intersection proxy, and the cosine module's own docstring confirms it's used only for a separate discovery helper.
-- **Why it matters:** The one real gap between the frozen spec and running code.
-- **Current status:** OPEN — needs a Founder-level decision since it changes golden-master scoring output.
-- **Expected outcome:** Either a ratified decision to wire it in (with golden-master regeneration), or a ratified decision to leave the proxy as the permanent design.
-- **Files involved:** `ghar_re_core/pairing.py`, `ghar_re_core/similarity.py`, `ghar_re_core/tests/golden/`.
-- **Estimated effort:** Medium (the hard part is already built).
-- **Dependencies:** Founder decision.
+- **Status:** Completed. Archived — see `docs/archive/completed-phases/[ACTIVE]_RE_Compliance_Review_2026-08-04_v1.0.md` (Item 2).
+- `same_base()` now computes `cosine(base-ingredient vectors) > theta_base` exactly per the frozen spec (theta_base=0.6, taken from the spec, not invented); golden-master verified unaffected on the 39-dish sample. Also fixed in the same review: `_cuis()`'s missing 0.70 "same parent cuisine" tier, and an `m_season` monsoon-branch bug (returned 0.5 instead of the spec's required 0).
 
 ## P1-7: Real monitoring/alerting
 - **Priority:** P1
