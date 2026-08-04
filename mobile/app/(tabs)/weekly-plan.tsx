@@ -76,7 +76,7 @@ export default function WeeklyPlan() {
   const chosenCount = Object.values(selected).reduce((n, s) => n + Object.keys(s).length, 0);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView testID="weekly-plan-screen" contentContainerStyle={styles.container}>
       <Text style={styles.header}>Your weekly plan</Text>
       <Text style={styles.subheader}>Pick a meal class for each slot, then finalize.</Text>
       {days.map((day: WeeklyPlanResponse["days"][number]) => (
@@ -86,10 +86,11 @@ export default function WeeklyPlan() {
             <View key={slot} style={styles.slotRow}>
               <Text style={styles.slotLabel}>{slot}</Text>
               <View style={styles.chipRow}>
-                {(day.slots[slot] ?? []).map((c: WeeklyClass) => {
+                {(day.slots[slot] ?? []).map((c: WeeklyClass, index: number) => {
                   const isChosen = selected[day.weekday]?.[slot] === c.class_code;
                   return (
                     <Pressable
+                      testID={`weekly-plan-${day.weekday}-${slot}-${index}`}
                       key={c.class_code}
                       style={[styles.chip, isChosen && styles.chipChosen]}
                       onPress={() => choose(day.weekday, slot, c.class_code)}
@@ -109,6 +110,7 @@ export default function WeeklyPlan() {
         </View>
       ))}
       <Pressable
+        testID="weekly-plan-finalize"
         style={[styles.button, chosenCount !== totalSlots && styles.buttonDisabled]}
         disabled={chosenCount !== totalSlots || finalize.isPending}
         onPress={() => finalize.mutate(selected)}

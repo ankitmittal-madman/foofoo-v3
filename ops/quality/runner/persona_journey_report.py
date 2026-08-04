@@ -32,7 +32,14 @@ def _load_persona(persona_dir: Path) -> dict | None:
     summary = json.loads(summary_path.read_text())
     recs_path = persona_dir / "recommendations.json"
     recommendations = json.loads(recs_path.read_text()) if recs_path.exists() else None
-    return {"dir": persona_dir, "summary": summary, "recommendations": recommendations}
+    api_events_path = persona_dir / "api_events.json"
+    api_events = json.loads(api_events_path.read_text()) if api_events_path.exists() else []
+    return {
+        "dir": persona_dir,
+        "summary": summary,
+        "recommendations": recommendations,
+        "api_events": api_events,
+    }
 
 
 def _outcome_bucket(entry: dict) -> str:
@@ -68,6 +75,22 @@ def _persona_page(entry: dict) -> str:
         steps_html.append(f'<figure><figcaption>{caption}</figcaption>{img_tag}</figure>')
 
     recs_json = html.escape(json.dumps(entry.get("recommendations"), indent=2))
+    api_events_json = html.escape(json.dumps(entry.get("api_events") or [], indent=2))
+    feature_rows = []
+    for feature in summary.get("feature_results") or []:
+        feature_rows.append(
+            "<tr>"
+            f'<td>{html.escape(str(feature.get("name", "")))}</td>'
+            f'<td>{html.escape(str(feature.get("status", "")))}</td>'
+            f'<td>{html.escape(str(feature.get("error") or feature.get("reason") or ""))}</td>'
+            "</tr>"
+        )
+    feature_table = (
+        "<table><thead><tr><th>Feature</th><th>Status</th><th>Detail</th></tr></thead>"
+        f"<tbody>{''.join(feature_rows)}</tbody></table>"
+        if feature_rows
+        else "<p><em>no feature results recorded</em></p>"
+    )
     status_line = "OK" if ok else f"FAILED — {html.escape(str(error))}"
 
     return f"""<!doctype html>
@@ -80,6 +103,8 @@ figure {{ margin: 0 0 24px 0; border: 1px solid #333; border-radius: 8px; paddin
 figcaption {{ font-size: 13px; color: #9ab; margin-bottom: 8px; font-weight: 600; }}
 img {{ max-width: 900px; width: 100%; border-radius: 4px; border: 1px solid #222; }}
 pre {{ background: #14161a; border: 1px solid #333; border-radius: 8px; padding: 12px; overflow: auto; font-size: 12px; }}
+table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
+th, td {{ border: 1px solid #333; padding: 8px; text-align: left; vertical-align: top; }}
 a {{ color: #7cf; }}
 .status-ok {{ color: #6d6; }} .status-fail {{ color: #e66; }}
 </style></head>
@@ -87,10 +112,14 @@ a {{ color: #7cf; }}
 <p><a href="index.html">&larr; back to index</a></p>
 <h1>{label} <span class="meta">({key})</span></h1>
 <p class="{'status-ok' if ok else 'status-fail'}">{status_line}</p>
+<h2>Feature coverage</h2>
+{feature_table}
 <h2>Steps</h2>
 {''.join(steps_html) or '<p><em>no steps recorded</em></p>'}
 <h2>Recommendations capture</h2>
 <pre>{recs_json}</pre>
+<h2>API and user-event evidence</h2>
+<pre>{api_events_json}</pre>
 </body></html>"""
 
 

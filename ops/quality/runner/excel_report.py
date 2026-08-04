@@ -36,6 +36,10 @@ REQUIRED_SHEETS = (
     "Run_Summary",
     "Users",
     "Journey_Events",
+    "Feature_Coverage",
+    "API_Events",
+    "Surface_Dishes",
+    "Plan_Selections",
     "Recommendations",
     "Final_Meal_Plans",
     "Test_Results",
@@ -213,6 +217,10 @@ def _load_persona_evidence(report_dir: Path, run_id: str) -> dict[str, list[list
     plans: list[list[Any]] = []
     tests: list[list[Any]] = []
     errors: list[list[Any]] = []
+    features: list[list[Any]] = []
+    api_events: list[list[Any]] = []
+    surface_dishes: list[list[Any]] = []
+    plan_selections: list[list[Any]] = []
     personas_root = report_dir / "personas"
     if not personas_root.exists():
         personas_root = report_dir / "personas-ui" / "personas"
@@ -224,6 +232,10 @@ def _load_persona_evidence(report_dir: Path, run_id: str) -> dict[str, list[list
             "plans": plans,
             "tests": tests,
             "errors": errors,
+            "features": features,
+            "api_events": api_events,
+            "surface_dishes": surface_dishes,
+            "plan_selections": plan_selections,
         }
 
     for persona_dir in sorted(path for path in personas_root.iterdir() if path.is_dir()):
@@ -276,6 +288,136 @@ def _load_persona_evidence(report_dir: Path, run_id: str) -> dict[str, list[list
                     "pass" if summary.get("ok") else "incomplete",
                 ]
             )
+
+        for feature in summary.get("feature_results") or []:
+            features.append(
+                [
+                    run_id,
+                    user_id,
+                    summary.get("key"),
+                    feature.get("name"),
+                    feature.get("status"),
+                    feature.get("started_at_utc"),
+                    feature.get("completed_at_utc"),
+                    feature.get("reason"),
+                    feature.get("error"),
+                ]
+            )
+            tests.append(
+                [
+                    run_id,
+                    "persona-feature",
+                    user_id,
+                    summary.get("key"),
+                    feature.get("name"),
+                    "pass" if feature.get("status") != "not-applicable" else "not-applicable",
+                    feature.get("status"),
+                    feature.get("status"),
+                    feature.get("error") or feature.get("reason"),
+                    feature.get("completed_at_utc") or completed,
+                ]
+            )
+
+        for event in _read_json(persona_dir / "api_events.json", []) or []:
+            request_body = event.get("request_body") if isinstance(event, dict) else None
+            response = event.get("response") if isinstance(event, dict) else None
+            response = response if isinstance(response, dict) else {}
+            response_body = response.get("body")
+            response_body = response_body if isinstance(response_body, dict) else {}
+            api_events.append(
+                [
+                    run_id,
+                    user_id,
+                    event.get("timestamp_utc"),
+                    event.get("stage_label"),
+                    event.get("method"),
+                    event.get("endpoint"),
+                    request_body.get("surface") if isinstance(request_body, dict) else None,
+                    request_body.get("event_type") if isinstance(request_body, dict) else None,
+                    request_body.get("dish_name") if isinstance(request_body, dict) else None,
+                    response.get("status"),
+                    response_body.get("kind"),
+                    response_body.get("request_id"),
+                    request_body,
+                    response_body,
+                ]
+            )
+            surface = request_body.get("surface") if isinstance(request_body, dict) else None
+            request_id = response_body.get("request_id")
+
+            dish_groups: list[tuple[str | None, list[Any]]] = []
+            if isinstance(response_body.get("slots"), dict):
+                dish_groups.extend(
+                    (str(slot), dishes)
+                    for slot, dishes in response_body["slots"].items()
+                    if isinstance(dishes, list)
+                )
+            for field in ("options", "dishes", "plates"):
+                if isinstance(response_body.get(field), list):
+                    dish_groups.append(
+                        (
+                            request_body.get("slot") if isinstance(request_body, dict) else None,
+                            response_body[field],
+                        )
+                    )
+            for slot, dishes in dish_groups:
+                for rank, dish in enumerate(dishes, start=1):
+                    if not isinstance(dish, dict) or not dish.get("name"):
+                        continue
+                    surface_dishes.append(
+                        [
+                            run_id,
+                            user_id,
+                            event.get("timestamp_utc"),
+                            event.get("stage_label"),
+                            surface,
+                            slot or dish.get("slot"),
+                            rank,
+                            dish.get("name"),
+                            dish.get("cuisine"),
+                            dish.get("diet"),
+                            dish.get("meal_class_code"),
+                            dish.get("meal_class_name"),
+                            dish.get("score"),
+                            dish.get("cell_role"),
+                            request_id,
+                        ]
+                    )
+
+            if isinstance(request_body, dict) and surface == "save_week":
+                for weekday, slots in (request_body.get("selections") or {}).items():
+                    if not isinstance(slots, dict):
+                        continue
+                    for slot, class_code in slots.items():
+                        plan_selections.append(
+                            [
+                                run_id,
+                                user_id,
+                                event.get("timestamp_utc"),
+                                "weekly-class",
+                                weekday,
+                                None,
+                                slot,
+                                class_code,
+                                None,
+                                request_body.get("finalize"),
+                            ]
+                        )
+            if isinstance(request_body, dict) and surface == "add_to_date":
+                plan_selections.append(
+                    [
+                        run_id,
+                        user_id,
+                        event.get("timestamp_utc"),
+                        "dated-dish",
+                        None,
+                        request_body.get("slot_date"),
+                        request_body.get("slot"),
+                        request_body.get("class_code"),
+                        request_body.get("dish_name"),
+                        True,
+                    ]
+                )
 
         rec_events = _read_json(persona_dir / "recommendation_events.json", None)
         if not isinstance(rec_events, list):
@@ -335,6 +477,10 @@ def _load_persona_evidence(report_dir: Path, run_id: str) -> dict[str, list[list
         "plans": plans,
         "tests": tests,
         "errors": errors,
+        "features": features,
+        "api_events": api_events,
+        "surface_dishes": surface_dishes,
+        "plan_selections": plan_selections,
     }
 
 
@@ -458,7 +604,24 @@ def _validate_workbook(path: Path, *, require_users: bool) -> None:
         raise ValueError("persona report contains no user rows")
     if require_users and workbook["Journey_Events"].max_row <= 1:
         raise ValueError("persona report contains no journey event rows")
+    if require_users and workbook["Feature_Coverage"].max_row <= 1:
+        raise ValueError("persona report contains no feature coverage rows")
+    if require_users and workbook["API_Events"].max_row <= 1:
+        raise ValueError("persona report contains no API event rows")
     workbook.close()
+
+
+def _validate_persona_screenshots(report_dir: Path) -> None:
+    """Require every screenshot referenced by a persona summary to exist in the evidence ZIP."""
+    personas_root = report_dir / "personas"
+    for persona_dir in sorted(path for path in personas_root.iterdir() if path.is_dir()):
+        summary = _read_json(persona_dir / "summary.json", {}) or {}
+        for step in summary.get("steps") or []:
+            screenshot = step.get("screenshot")
+            if not screenshot:
+                raise ValueError(f"journey step has no screenshot: {persona_dir.name}/{step.get('label')}")
+            if not (persona_dir / screenshot).is_file():
+                raise ValueError(f"referenced journey screenshot is missing: {persona_dir.name}/{screenshot}")
 
 
 def _write_archive(report_dir: Path, paths: ReportPaths, kind: str) -> None:
@@ -576,6 +739,82 @@ def build_report(
     )
     _add_sheet(
         workbook,
+        "Feature_Coverage",
+        [
+            "run_id",
+            "test_user_id",
+            "persona_key",
+            "feature",
+            "status",
+            "started_at_utc",
+            "completed_at_utc",
+            "reason",
+            "failure_reason",
+        ],
+        persona["features"],
+    )
+    _add_sheet(
+        workbook,
+        "API_Events",
+        [
+            "run_id",
+            "test_user_id",
+            "event_timestamp_utc",
+            "journey_stage",
+            "method",
+            "endpoint",
+            "plan_surface",
+            "user_event_type",
+            "dish_name",
+            "http_status",
+            "response_kind",
+            "request_id",
+            "request_body",
+            "response_body",
+        ],
+        persona["api_events"],
+    )
+    _add_sheet(
+        workbook,
+        "Surface_Dishes",
+        [
+            "run_id",
+            "test_user_id",
+            "event_timestamp_utc",
+            "journey_stage",
+            "plan_surface",
+            "meal_slot",
+            "dish_rank",
+            "dish_name",
+            "cuisine",
+            "diet",
+            "meal_class_code",
+            "meal_class_name",
+            "score",
+            "calibration_role",
+            "request_id",
+        ],
+        persona["surface_dishes"],
+    )
+    _add_sheet(
+        workbook,
+        "Plan_Selections",
+        [
+            "run_id",
+            "test_user_id",
+            "event_timestamp_utc",
+            "selection_type",
+            "weekday",
+            "slot_date",
+            "meal_slot",
+            "class_code",
+            "dish_name",
+            "finalized",
+        ],
+        persona["plan_selections"],
+    )
+    _add_sheet(
+        workbook,
         "Recommendations",
         [
             "run_id",
@@ -663,6 +902,8 @@ def build_report(
     _add_sheet(workbook, "Source_Meal_Plans", source_plan_headers, source_plan_rows)
     workbook.save(paths.workbook)
     _validate_workbook(paths.workbook, require_users=kind == "persona-journey")
+    if kind == "persona-journey":
+        _validate_persona_screenshots(report_dir)
     _write_manifest(report_dir, paths, run_id, kind, environment, source_workbook, generated_at)
     _write_archive(report_dir, paths, kind)
     _json_log(

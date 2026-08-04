@@ -31,7 +31,7 @@ export default function HistoryDetail() {
   const dishes = Array.isArray(event.plates) ? event.plates : [];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView testID="history-detail-screen" contentContainerStyle={styles.container}>
       <Pressable onPress={() => router.back()} accessibilityRole="button">
         <Text style={styles.back}>‹ Recommendation history</Text>
       </Pressable>

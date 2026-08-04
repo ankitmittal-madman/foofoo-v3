@@ -4,10 +4,11 @@ name: persona-journeys
 #
 # Manually triggered (Actions tab -> "Run workflow"). Drives the REAL onboarding UI (consent ->
 # step-1..step-5) through Playwright, one full pass per persona from ops/quality/personas.py (100
-# personas: 7 golden + 8 derived + 41 real_persona_derived + 44 adversarial), screenshotting every
-# answer/Continue, then captures whatever the app's own POST /v1/recommendations call returns once
-# onboarding completes. Renders one HTML report per persona + an index grouped by outcome
-# (200/422/warned), uploaded as a build artifact.
+# personas: 7 golden + 8 derived + 41 real_persona_derived + 44 adversarial). For accepted
+# personas it continues through cold-start calibration, all 21 weekly slots, dated Home meals,
+# feedback/lock/refresh events, recipes, add-to-date, search, settings, profile, history and guarded
+# data-rights controls. Contract-rejected personas retain their complete negative-path evidence.
+# Every rendered stage, API response and user event is recorded in HTML, Excel and the evidence ZIP.
 #
 # This is NOT part of quality-gate.yml: it needs a live web target, which is
 # unavailable/undesirable on every push. It is deliberately a separate, opt-in workflow — same
@@ -31,7 +32,7 @@ on:
   workflow_dispatch:
     inputs:
       persona_limit:
-        description: "Run only the first N personas (blank = all 100, fast smoke pass e.g. 5)"
+        description: "Run first N full app journeys (blank = all 100; use 1-5 for a fast smoke pass)"
         required: false
         default: ""
 

@@ -19,7 +19,7 @@ export default function Settings() {
   const userId = session?.user.id;
 
   return (
-    <View style={styles.container}>
+    <View testID="settings-screen" style={styles.container}>
       <Text style={styles.header}>Settings</Text>
 
       <View style={styles.section}>
@@ -85,6 +85,7 @@ function ExportButton() {
   return (
     <View style={{ gap: 8 }}>
       <Pressable
+        testID="settings-export-button"
         style={styles.button}
         disabled={start.isPending || poll.isPending}
         onPress={() => (jobId ? poll.mutate(jobId) : start.mutate())}

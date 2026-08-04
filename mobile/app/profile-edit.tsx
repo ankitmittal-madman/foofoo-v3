@@ -75,7 +75,7 @@ export default function ProfileEdit() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView testID="profile-edit-screen" contentContainerStyle={styles.container}>
       <Text style={styles.header}>Edit preferences</Text>
 
       <Text style={styles.label}>Diet</Text>

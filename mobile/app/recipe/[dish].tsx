@@ -41,7 +41,7 @@ export default function RecipeDetail() {
   const recipe = data?.recipe;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView testID="recipe-screen" contentContainerStyle={styles.container}>
       {data?.image_url ? (
         <Image source={{ uri: data.image_url }} style={styles.hero} />
       ) : (
@@ -81,7 +81,7 @@ export default function RecipeDetail() {
         </>
       )}
 
-      <Pressable style={styles.secondaryButton} onPress={() => router.back()}>
+      <Pressable testID="recipe-back" style={styles.secondaryButton} onPress={() => router.back()}>
         <Text style={styles.secondaryButtonText}>Back</Text>
       </Pressable>
     </ScrollView>

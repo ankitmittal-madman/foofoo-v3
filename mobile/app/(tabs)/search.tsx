@@ -20,10 +20,11 @@ export default function SearchScreen() {
   });
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <ScrollView testID="search-screen" contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <Text style={styles.header}>Find a dish</Text>
       <View style={styles.searchRow}>
         <TextInput
+          testID="search-input"
           accessibilityLabel="Dish, cuisine, or meal class"
           placeholder="Dish, cuisine, or meal class"
           value={draft}
@@ -31,7 +32,7 @@ export default function SearchScreen() {
           onSubmitEditing={() => setQuery(draft.trim())}
           style={styles.input}
         />
-        <Pressable style={styles.searchButton} onPress={() => setQuery(draft.trim())}>
+        <Pressable testID="search-submit" style={styles.searchButton} onPress={() => setQuery(draft.trim())}>
           <Text style={styles.searchButtonText}>Search</Text>
         </Pressable>
       </View>
@@ -45,8 +46,8 @@ export default function SearchScreen() {
       {results.isFetching ? <ActivityIndicator /> : null}
       {results.isError ? <Text style={styles.error}>{describeApiError(results.error)}</Text> : null}
       {results.data && results.data.options.length === 0 ? <Text>No matching safe dishes found.</Text> : null}
-      {(results.data?.options ?? []).map((dish) => (
-        <Pressable key={dish.name} style={styles.result} onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: dish.name } })}>
+      {(results.data?.options ?? []).map((dish, index) => (
+        <Pressable testID={`search-result-${index}`} key={dish.name} style={styles.result} onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: dish.name } })}>
           {dish.image_url ? <Image source={{ uri: dish.image_url }} style={styles.image} /> : <View style={styles.image} />}
           <View style={styles.resultBody}>
             <Text style={styles.name}>{dish.name}</Text>

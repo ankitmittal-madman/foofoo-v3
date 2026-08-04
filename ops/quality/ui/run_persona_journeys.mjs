@@ -281,8 +281,27 @@ function journeyStep(label, screenshotName) {
 async function screenshot(page, _artifacts, label, personaDir) {
   shotCounter += 1;
   const name = `${String(shotCounter).padStart(3, "0")}-${label}.png`;
-  await page.screenshot({ path: path.join(personaDir, name), fullPage: true }).catch(() => {});
+  await page.screenshot({ path: path.join(personaDir, name), fullPage: true });
   return name;
+}
+
+/** Wait for a rendered application surface, not merely an Expo Router URL change. */
+async function waitForSurface(page, testId, timeout = 45000) {
+  await page.getByTestId(testId).waitFor({ state: "visible", timeout });
+}
+
+/** Click an action and require the corresponding backend endpoint to complete successfully. */
+async function clickWithApi(page, locator, endpoint, timeout = 30000) {
+  const responsePromise = page.waitForResponse(
+    (response) => new URL(response.url()).pathname.endsWith(`/v1/${endpoint}`),
+    { timeout },
+  );
+  await locator.click({ timeout: 10000 });
+  const response = await responsePromise;
+  if (response.status() >= 400) {
+    throw new Error(`${endpoint} returned HTTP ${response.status()}`);
+  }
+  return response;
 }
 
 /** runPersona — drives one persona end-to-end through consent + step-1..5, then the recs call. */
@@ -292,6 +311,9 @@ async function runPersona(browser, persona) {
   shotCounter = 0;
   const steps = [];
   const recommendationEvents = [];
+  const apiEvents = [];
+  const apiEventTasks = [];
+  const featureResults = [];
   const startedAtUtc = new Date().toISOString();
   let currentStage = "journey-start";
   const context = await browser.newContext();
@@ -305,16 +327,50 @@ async function runPersona(browser, persona) {
     steps.push(journeyStep(label, await shot(label)));
   };
 
-  page.on("response", async (response) => {
-    if (!new URL(response.url()).pathname.endsWith("/v1/recommendations")) return;
-    const body = await response.json().catch(() => null);
-    recommendationEvents.push({
-      timestamp_utc: new Date().toISOString(),
-      stage_label: currentStage,
-      endpoint: "/v1/recommendations",
-      response: { status: response.status(), body },
-    });
+  page.on("response", (response) => {
+    const task = (async () => {
+      const endpointMatch = new URL(response.url()).pathname.match(/\/v1\/([^/?]+)$/);
+      if (!endpointMatch) return;
+      const body = await response.json().catch(() => null);
+      const request = response.request();
+      let requestBody = null;
+      try {
+        requestBody = request.postDataJSON();
+      } catch {
+        requestBody = request.postData() || null;
+      }
+      const event = {
+        timestamp_utc: new Date().toISOString(),
+        stage_label: currentStage,
+        endpoint: `/v1/${endpointMatch[1]}`,
+        method: request.method(),
+        request_body: requestBody,
+        response: { status: response.status(), body },
+      };
+      apiEvents.push(event);
+      if (endpointMatch[1] === "recommendations") recommendationEvents.push(event);
+    })();
+    apiEventTasks.push(task);
   });
+
+  const feature = async (name, fn, { required = true, continueOnFailure = false } = {}) => {
+    const started = new Date().toISOString();
+    try {
+      await fn();
+      featureResults.push({ name, status: "pass", started_at_utc: started, completed_at_utc: new Date().toISOString() });
+      return true;
+    } catch (error) {
+      featureResults.push({
+        name,
+        status: required ? "fail" : "warn",
+        started_at_utc: started,
+        completed_at_utc: new Date().toISOString(),
+        error: String(error?.message ?? error).slice(0, 1000),
+      });
+      if (required && !continueOnFailure) throw error;
+      return false;
+    }
+  };
 
   try {
     await signUpAndAuthenticate(page, persona.key);
@@ -433,8 +489,145 @@ async function runPersona(browser, persona) {
       "step5-finish",
     );
 
-    // ---- Land on post-onboarding screen (cold-start) ----
-    await recordStep("post-onboarding-landing");
+    const expectedStatus = Number(persona.expect_status);
+
+    // Contract-rejected personas cannot render personalized product surfaces. Their complete
+    // negative-path evidence is the onboarding journey plus the expected recommendations 422.
+    if (expectedStatus === 200) {
+      await feature("cold-start calibration renders", async () => {
+        await waitForSurface(page, "cold-start-screen");
+        await recordStep("cold-start-loaded");
+      });
+      await feature("cold-start likes generate feedback events", async () => {
+        for (const slot of ["breakfast", "lunch", "dinner"]) {
+          await clickWithApi(page, page.getByTestId(`cold-start-${slot}-dish-0`), "feedback");
+          await recordStep(`cold-start-like-${slot}`);
+        }
+      });
+      await feature("cold-start continues to weekly plan", async () => {
+        await page.getByTestId("cold-start-finish").click();
+        await waitForPath(page, (u) => u.pathname.endsWith("/weekly-plan"), 20000);
+        await waitForSurface(page, "weekly-plan-screen");
+        await recordStep("weekly-plan-loaded");
+      });
+      await feature("weekly plan supplies and saves 7x3 classes", async () => {
+        const choices = page.locator('[data-testid^="weekly-plan-"][data-testid$="-0"]');
+        const count = await choices.count();
+        if (count !== 21) throw new Error(`weekly plan rendered ${count}/21 first-choice class controls`);
+        for (let index = 0; index < count; index += 1) await choices.nth(index).click();
+        await recordStep("weekly-plan-21-slots-selected");
+        await clickWithApi(page, page.getByTestId("weekly-plan-finalize"), "plan", 45000);
+        await waitForPath(page, (u) => u.pathname.endsWith("/today"), 20000);
+        await waitForSurface(page, "home-screen");
+        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
+        await recordStep("home-meal-plan-loaded");
+      });
+      await feature("home explanation and feedback event types", async () => {
+        await page.goto(new URL("/today", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+        await waitForSurface(page, "home-screen");
+        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
+        await page.getByTestId("home-breakfast-why-0").click();
+        await recordStep("home-why-this-opened");
+        const feedbackActions = [
+          ["like", 0], ["dislike", 1], ["not-today", 2], ["never", 3],
+        ];
+        for (const [event, index] of feedbackActions) {
+          const control = page.getByTestId(`home-breakfast-${event}-${index}`);
+          if (!(await control.count())) throw new Error(`missing home ${event} control`);
+          await clickWithApi(page, control, "feedback");
+          await recordStep(`home-feedback-${event}`);
+        }
+      }, { continueOnFailure: true });
+      await feature("home lock refresh and next-date recommendations", async () => {
+        await page.goto(new URL("/today", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+        await waitForSurface(page, "home-screen");
+        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
+        await clickWithApi(page, page.getByTestId("home-breakfast-lock"), "plan");
+        await recordStep("home-breakfast-locked");
+        await clickWithApi(page, page.getByTestId("home-refresh"), "plan", 45000);
+        await page.waitForTimeout(750);
+        await recordStep("home-unlocked-meals-refreshed");
+        const dateControls = page.locator('[data-testid^="home-date-"]');
+        if ((await dateControls.count()) < 2) throw new Error("next date selector is missing");
+        await clickWithApi(page, dateControls.nth(1), "plan", 45000);
+        await page.waitForTimeout(750);
+        await recordStep("home-next-date-loaded");
+      }, { continueOnFailure: true });
+      await feature("recipe details render", async () => {
+        await page.goto(new URL("/today", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+        await waitForSurface(page, "home-screen");
+        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
+        await page.getByTestId("home-breakfast-dish-0").click();
+        await waitForSurface(page, "recipe-screen");
+        await recordStep("recipe-detail-loaded");
+        await page.getByTestId("recipe-back").click();
+        await waitForSurface(page, "home-screen");
+      }, { continueOnFailure: true });
+      await feature("dish can be assigned to a dated plan", async () => {
+        await page.goto(new URL("/today", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+        await waitForSurface(page, "home-screen");
+        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
+        const choose = page.getByTestId("home-breakfast-choose-date-0");
+        if (!(await choose.count())) throw new Error("dated-plan control missing from recommended dish");
+        await choose.click();
+        await waitForSurface(page, "add-to-date-screen");
+        await recordStep("add-to-date-loaded");
+        await clickWithApi(page, page.getByTestId("add-to-date-submit"), "plan");
+        await waitForSurface(page, "home-screen");
+        await recordStep("dish-added-to-date");
+      }, { continueOnFailure: true });
+      await feature("safe dish search and search recipe", async () => {
+        await page.goto(new URL("/search", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+        await waitForSurface(page, "search-screen");
+        await page.getByTestId("search-input").fill("dal");
+        await clickWithApi(page, page.getByTestId("search-submit"), "plan");
+        await page.getByTestId("search-result-0").waitFor({ state: "visible", timeout: 30000 });
+        await recordStep("search-results-loaded");
+        await page.getByTestId("search-result-0").click();
+        await waitForSurface(page, "recipe-screen");
+        await recordStep("search-recipe-loaded");
+      }, { continueOnFailure: true });
+      await feature("settings and profile preferences", async () => {
+        await page.goto(new URL("/settings", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+        await waitForSurface(page, "settings-screen");
+        await recordStep("settings-loaded");
+        await page.getByTestId("settings-profile-edit-link").click();
+        await waitForSurface(page, "profile-edit-screen");
+        await recordStep("profile-preferences-loaded");
+        await clickWithApi(page, page.getByTestId("profile-edit-save"), "household");
+        await waitForSurface(page, "settings-screen");
+        await recordStep("profile-preferences-saved");
+      }, { continueOnFailure: true });
+      await feature("recommendation history and detail", async () => {
+        await page.goto(new URL("/settings", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+        await waitForSurface(page, "settings-screen");
+        await page.getByTestId("settings-history-link").click();
+        await waitForSurface(page, "history-screen");
+        await recordStep("recommendation-history-loaded");
+        const firstEvent = page.getByTestId("history-event-0");
+        if (!(await firstEvent.count())) throw new Error("recommendation history contains no event rows");
+        await firstEvent.click();
+        await waitForSurface(page, "history-detail-screen");
+        await recordStep("recommendation-history-detail-loaded");
+      }, { continueOnFailure: true });
+      await feature("data-rights controls are guarded", async () => {
+        await page.goto(new URL("/settings", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
+        await waitForSurface(page, "settings-screen");
+        if (!(await page.getByTestId("settings-export-button").isVisible())) throw new Error("data export control is not visible");
+        if (await page.getByTestId("settings-delete-confirm-button").isEnabled()) {
+          throw new Error("account deletion is enabled without confirmation phrase");
+        }
+        await recordStep("data-rights-controls-verified");
+      }, { continueOnFailure: true });
+    } else {
+      featureResults.push({
+        name: "authenticated product surfaces",
+        status: "not-applicable",
+        reason: `persona expects recommendations HTTP ${expectedStatus}`,
+        completed_at_utc: new Date().toISOString(),
+      });
+      await recordStep("post-onboarding-contract-rejection-path");
+    }
 
     // ---- Capture the actual /v1/recommendations result the app's own session would get ----
     const token = await extractBearerToken(page);
@@ -462,6 +655,8 @@ async function runPersona(browser, persona) {
       recommendations = { status: null, error: "no Supabase access_token found in page localStorage — could not call /v1/recommendations" };
     }
 
+    await Promise.allSettled(apiEventTasks);
+
     const finalRequestId = recommendations?.body?.request_id ?? null;
     const alreadyCaptured = recommendationEvents.some(
       (event) => event.response?.body?.request_id === finalRequestId && event.response?.status === recommendations?.status,
@@ -476,8 +671,8 @@ async function runPersona(browser, persona) {
     }
     fs.writeFileSync(path.join(personaDir, "recommendations.json"), JSON.stringify(recommendations, null, 2));
     fs.writeFileSync(path.join(personaDir, "recommendation_events.json"), JSON.stringify(recommendationEvents, null, 2));
+    fs.writeFileSync(path.join(personaDir, "api_events.json"), JSON.stringify(apiEvents, null, 2));
 
-    const expectedStatus = Number(persona.expect_status);
     if (recommendations?.status !== expectedStatus) {
       throw new Error(
         `recommendations returned ${recommendations?.status ?? "no status"}; expected ${expectedStatus}`,
@@ -487,6 +682,7 @@ async function runPersona(browser, persona) {
       throw new Error("recommendations returned HTTP 200 without any dish plates");
     }
 
+    const failedFeatures = featureResults.filter((result) => result.status === "fail");
     const summary = {
       key: persona.key,
       label: persona.label,
@@ -495,9 +691,13 @@ async function runPersona(browser, persona) {
       source_persona_id: persona.source_persona_id || null,
       started_at_utc: startedAtUtc,
       completed_at_utc: new Date().toISOString(),
-      ok: true,
+      ok: failedFeatures.length === 0,
+      error: failedFeatures.length
+        ? `${failedFeatures.length} feature test(s) failed: ${failedFeatures.map((result) => result.name).join(", ")}`
+        : undefined,
       expect_status: persona.expect_status,
       recommendations_status: recommendations?.status ?? null,
+      feature_results: featureResults,
       steps,
     };
     fs.writeFileSync(path.join(personaDir, "summary.json"), JSON.stringify(summary, null, 2));
@@ -515,9 +715,12 @@ async function runPersona(browser, persona) {
       completed_at_utc: new Date().toISOString(),
       ok: false,
       error: String(e && e.message ? e.message : e).slice(0, 1000),
+      feature_results: featureResults,
       steps,
     };
+    await Promise.allSettled(apiEventTasks);
     fs.writeFileSync(path.join(personaDir, "recommendation_events.json"), JSON.stringify(recommendationEvents, null, 2));
+    fs.writeFileSync(path.join(personaDir, "api_events.json"), JSON.stringify(apiEvents, null, 2));
     fs.writeFileSync(path.join(personaDir, "summary.json"), JSON.stringify(summary, null, 2));
     return summary;
   } finally {

@@ -87,7 +87,7 @@ export default function ColdStart() {
   const count = liked.size;
 
   return (
-    <View style={[styles.root, { backgroundColor: t.colors.background }]}>
+    <View testID="cold-start-screen" style={[styles.root, { backgroundColor: t.colors.background }]}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={[styles.header, { color: t.colors.heading, fontFamily: t.fonts.headlineBold }]}>
           Select what you like
@@ -104,12 +104,13 @@ export default function ColdStart() {
                   {label}
                 </Text>
               </View>
-              {(slots?.[key] ?? []).map((dish: PlanDish) => (
+              {(slots?.[key] ?? []).map((dish: PlanDish, index: number) => (
                 <DishCard
                   key={dish.name}
                   dish={dish}
                   liked={liked.has(`${key}:${dish.name}`)}
                   onToggle={() => toggleLike(dish, key)}
+                  testID={`cold-start-${key}-dish-${index}`}
                   t={t}
                 />
               ))}
@@ -123,6 +124,7 @@ export default function ColdStart() {
           {count > 0 ? `${count} selected` : "No problem — skip is always fine"}
         </Text>
         <Pressable
+          testID="cold-start-finish"
           style={[styles.button, { backgroundColor: t.colors.selected }]}
           onPress={() => router.push("/weekly-plan")}
         >
@@ -139,15 +141,17 @@ function DishCard({
   dish,
   liked,
   onToggle,
+  testID,
   t,
 }: {
   dish: PlanDish;
   liked: boolean;
   onToggle: () => void;
+  testID: string;
   t: ReturnType<typeof useTheme>;
 }) {
   return (
-    <Pressable style={styles.card} onPress={onToggle}>
+    <Pressable testID={testID} style={styles.card} onPress={onToggle}>
       <View style={[styles.imageWrap, { backgroundColor: t.colors.surfaceMuted }]}>
         {dish.image_url ? (
           <Image source={{ uri: dish.image_url }} style={styles.image} />

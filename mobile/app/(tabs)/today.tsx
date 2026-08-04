@@ -83,7 +83,7 @@ export default function Home() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView testID="home-screen" contentContainerStyle={styles.container}>
       <Text style={styles.header}>Meal plan</Text>
       <Text style={styles.subheader}>Choose a date, then pick dishes for that day.</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dateRow}>
@@ -92,6 +92,7 @@ export default function Home() {
           const parsed = new Date(`${date}T12:00:00`);
           return (
             <Pressable
+              testID={`home-date-${date}`}
               key={date}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
@@ -111,7 +112,7 @@ export default function Home() {
           weekday: "long", month: "long", day: "numeric",
         })}
       </Text>
-      <Pressable style={styles.refreshButton} onPress={() => setRefreshNonce((value) => value + 1)}>
+      <Pressable testID="home-refresh" style={styles.refreshButton} onPress={() => setRefreshNonce((value) => value + 1)}>
         <Text style={styles.refreshButtonText}>Refresh unlocked meals</Text>
       </Pressable>
       {SLOTS.map((slot) => (
@@ -180,6 +181,7 @@ export function SlotSection({
     <View style={styles.slotBlock}>
       <Text style={styles.slotTitle}>{slot}</Text>
       <Pressable
+        testID={`home-${slot}-lock`}
         disabled={lock.isPending || !classCode}
         onPress={() => lock.mutate(!locked)}
         style={[styles.feedbackButton, locked && styles.feedbackButtonActive, !classCode && styles.buttonDisabled]}
@@ -201,13 +203,14 @@ export function SlotSection({
             <Text style={styles.reconciledNote}>No additional dishes are available for this class yet.</Text>
           ) : null}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}>
-            {(response?.options ?? []).map((d: PlanDish) => (
+            {(response?.options ?? []).map((d: PlanDish, index: number) => (
               <DishCard
                 key={d.name}
                 dish={d}
                 requestId={response?.request_id}
                 slot={slot}
                 slotDate={slotDate}
+                index={index}
               />
             ))}
           </ScrollView>
@@ -233,8 +236,8 @@ export function SlotSection({
  * drove the class match (meal_class_name/cuisine) is honest given what this endpoint returns,
  * rather than fabricating a richer breakdown the API doesn't supply.
  */
-function DishCard({ dish, requestId, slot, slotDate }: {
-  dish: PlanDish; requestId?: string; slot: SlotName; slotDate?: string;
+function DishCard({ dish, requestId, slot, slotDate, index }: {
+  dish: PlanDish; requestId?: string; slot: SlotName; slotDate?: string; index: number;
 }) {
   const [sent, setSent] = useState<FeedbackEventType | null>(null);
   const [showWhy, setShowWhy] = useState(false);
@@ -249,6 +252,7 @@ function DishCard({ dish, requestId, slot, slotDate }: {
   return (
     <View style={styles.dishCard}>
       <Pressable
+        testID={`home-${slot}-dish-${index}`}
         onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: dish.name } })}
       >
         {dish.image_url ? (
@@ -261,7 +265,7 @@ function DishCard({ dish, requestId, slot, slotDate }: {
           <Text style={styles.dishMeta}>{dish.meal_class_name ?? dish.cuisine}</Text>
         </View>
       </Pressable>
-      <Pressable onPress={() => setShowWhy((v) => !v)}>
+      <Pressable testID={`home-${slot}-why-${index}`} onPress={() => setShowWhy((v) => !v)}>
         <Text style={styles.whyLink}>{showWhy ? "Hide why" : "Why this?"}</Text>
       </Pressable>
       {showWhy ? (
@@ -282,6 +286,7 @@ function DishCard({ dish, requestId, slot, slotDate }: {
       ) : null}
       <View style={styles.feedbackRow}>
         <Pressable
+          testID={`home-${slot}-like-${index}`}
           disabled={feedback.isPending || !requestId}
           onPress={() => feedback.mutate("like")}
           style={[styles.feedbackButton, sent === "like" && styles.feedbackButtonActive]}
@@ -289,6 +294,7 @@ function DishCard({ dish, requestId, slot, slotDate }: {
           <Text style={styles.feedbackButtonText}>{sent === "like" ? "Liked" : "Like"}</Text>
         </Pressable>
         <Pressable
+          testID={`home-${slot}-dislike-${index}`}
           disabled={feedback.isPending || !requestId}
           onPress={() => feedback.mutate("dislike")}
           style={[styles.feedbackButton, sent === "dislike" && styles.feedbackButtonActive]}
@@ -299,17 +305,17 @@ function DishCard({ dish, requestId, slot, slotDate }: {
         </Pressable>
       </View>
       <View style={styles.feedbackRow}>
-        <Pressable disabled={feedback.isPending || !requestId}
+        <Pressable testID={`home-${slot}-not-today-${index}`} disabled={feedback.isPending || !requestId}
           onPress={() => feedback.mutate("not_today")} style={styles.feedbackButton}>
           <Text style={styles.feedbackButtonText}>Not today</Text>
         </Pressable>
-        <Pressable disabled={feedback.isPending || !requestId}
+        <Pressable testID={`home-${slot}-never-${index}`} disabled={feedback.isPending || !requestId}
           onPress={() => feedback.mutate("never")} style={styles.feedbackButton}>
           <Text style={styles.feedbackButtonText}>Never</Text>
         </Pressable>
       </View>
       {dish.meal_class_code ? (
-        <Pressable onPress={() => router.push({
+        <Pressable testID={`home-${slot}-choose-date-${index}`} onPress={() => router.push({
           pathname: "/add-to-date",
           params: { dish: dish.name, classCode: dish.meal_class_code, slot, date: slotDate },
         })} style={styles.feedbackButton}>

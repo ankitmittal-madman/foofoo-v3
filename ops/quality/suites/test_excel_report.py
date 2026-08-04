@@ -39,6 +39,14 @@ def _persona_evidence(report_dir: Path) -> None:
                 "ok": True,
                 "expect_status": 200,
                 "recommendations_status": 200,
+                "feature_results": [
+                    {
+                        "name": "cold-start calibration renders",
+                        "status": "pass",
+                        "started_at_utc": "2026-08-04T10:03:00+00:00",
+                        "completed_at_utc": "2026-08-04T10:04:00+00:00",
+                    }
+                ],
                 "started_at_utc": "2026-08-04T10:00:00+00:00",
                 "completed_at_utc": "2026-08-04T10:05:00+00:00",
                 "steps": [
@@ -52,9 +60,35 @@ def _persona_evidence(report_dir: Path) -> None:
         ),
         encoding="utf-8",
     )
+    (persona_dir / "001.png").write_bytes(b"test screenshot evidence")
     (persona_dir / "recommendation_events.json").write_text(
         json.dumps(
             [
+                {
+                    "timestamp_utc": "2026-08-04T10:04:10+00:00",
+                    "stage_label": "cold-start-loaded",
+                    "method": "POST",
+                    "endpoint": "/v1/plan",
+                    "request_body": {"surface": "calibration"},
+                    "response": {
+                        "status": 200,
+                        "body": {
+                            "kind": "calibration",
+                            "request_id": "request-1",
+                            "slots": {
+                                "breakfast": [
+                                    {
+                                        "name": "Dal",
+                                        "cuisine": "North Indian",
+                                        "diet": "veg",
+                                        "score": 8.2,
+                                        "cell_role": "expected_positive",
+                                    }
+                                ]
+                            },
+                        },
+                    },
+                },
                 {
                     "timestamp_utc": "2026-08-04T10:04:30+00:00",
                     "stage_label": "post-onboarding-landing",
@@ -74,6 +108,53 @@ def _persona_evidence(report_dir: Path) -> None:
                                 }
                             ],
                         },
+                    },
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    (persona_dir / "api_events.json").write_text(
+        json.dumps(
+            [
+                {
+                    "timestamp_utc": "2026-08-04T10:04:10+00:00",
+                    "stage_label": "cold-start-loaded",
+                    "method": "POST",
+                    "endpoint": "/v1/plan",
+                    "request_body": {"surface": "calibration"},
+                    "response": {
+                        "status": 200,
+                        "body": {
+                            "kind": "calibration",
+                            "request_id": "request-1",
+                            "slots": {
+                                "breakfast": [
+                                    {
+                                        "name": "Dal",
+                                        "cuisine": "North Indian",
+                                        "diet": "veg",
+                                        "score": 8.2,
+                                        "cell_role": "expected_positive",
+                                    }
+                                ]
+                            },
+                        },
+                    },
+                },
+                {
+                    "timestamp_utc": "2026-08-04T10:04:15+00:00",
+                    "stage_label": "cold-start-like-breakfast",
+                    "method": "POST",
+                    "endpoint": "/v1/feedback",
+                    "request_body": {
+                        "event_type": "like",
+                        "dish_name": "Dal",
+                        "request_id": "request-1",
+                    },
+                    "response": {
+                        "status": 200,
+                        "body": {"id": "feedback-1", "event_type": "like"},
                     },
                 }
             ]
@@ -113,6 +194,13 @@ def test_persona_report_contains_journey_dishes_source_plan_and_zip(tmp_path: Pa
     assert tuple(workbook.sheetnames) == REQUIRED_SHEETS
     assert workbook["Users"].max_row == 2
     assert workbook["Journey_Events"].max_row == 2
+    assert workbook["Feature_Coverage"].max_row == 2
+    assert workbook["Feature_Coverage"]["D2"].value == "cold-start calibration renders"
+    assert workbook["API_Events"].max_row == 3
+    assert workbook["API_Events"]["H3"].value == "like"
+    assert workbook["API_Events"]["I3"].value == "Dal"
+    assert workbook["Surface_Dishes"].max_row == 2
+    assert workbook["Surface_Dishes"]["H2"].value == "Dal"
     assert workbook["Recommendations"].max_row == 3
     assert workbook["Final_Meal_Plans"].max_row == 2
     assert workbook["Source_Personas"]["A2"].value == "P01"

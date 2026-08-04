@@ -47,13 +47,14 @@ export default function History() {
   const events = query.data?.events ?? [];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView testID="history-screen" contentContainerStyle={styles.container}>
       <Text style={styles.header}>Your recommendation history</Text>
       {events.length === 0 ? (
         <Text style={styles.empty}>No recommendations yet.</Text>
       ) : (
-        events.map((e: RecommendationHistoryRow) => (
+        events.map((e: RecommendationHistoryRow, index: number) => (
           <Pressable
+            testID={`history-event-${index}`}
             key={e.id}
             style={styles.row}
             accessibilityRole="button"

@@ -33,17 +33,17 @@ export default function AddToDate() {
     },
   });
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView testID="add-to-date-screen" contentContainerStyle={styles.container}>
       <Text style={styles.title}>Add {params.dish} to your plan</Text>
-      {dates.map((date) => (
-        <Pressable key={date} style={[styles.date, chosen === date && styles.selected]}
+      {dates.map((date, index) => (
+        <Pressable testID={`add-to-date-option-${index}`} key={date} style={[styles.date, chosen === date && styles.selected]}
           onPress={() => setChosen(date)}>
           <Text>{new Date(`${date}T12:00:00`).toLocaleDateString(undefined, {
             weekday: "long", month: "short", day: "numeric",
           })}</Text>
         </Pressable>
       ))}
-      <Pressable disabled={!chosen || mutation.isPending} style={styles.button}
+      <Pressable testID="add-to-date-submit" disabled={!chosen || mutation.isPending} style={styles.button}
         onPress={() => chosen && mutation.mutate(chosen)}>
         <Text style={styles.buttonText}>{mutation.isPending ? "Adding…" : "Add to plan"}</Text>
       </Pressable>
