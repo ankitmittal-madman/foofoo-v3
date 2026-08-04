@@ -161,15 +161,16 @@ def test_non_standalone_gets_valid_support():
 #    cuisine_coherence — and these gates ARE the KB §N1 in_spine rows.
 # ---------------------------------------------------------------------------
 def test_pairing_guardrails_hold_on_chosen_pairs():
+    idf = P.SIM.build_idf(CAT)
     for k, res in _all_default_runs().items():
         for p in res["plates"]:
             if p["form"] == "pair":
                 d, l = p["dry"], p["liquid"]
                 assert not P.both_rich(d, l), f"{k}: both_rich {d.name}+{l.name}"
-                assert not P.same_base(d, l), f"{k}: same_base {d.name}+{l.name}"
+                assert not P.same_base(d, l, idf), f"{k}: same_base {d.name}+{l.name}"
                 assert P.cuisine_dist(d, l) <= S.CONFIG.theta_region, \
                     f"{k}: cuisine incoherent {d.name}+{l.name}"
-                assert P.allowed(d, l)
+                assert P.allowed(d, l, idf)
 
 
 def test_guardrails_match_kb_negative_priors():

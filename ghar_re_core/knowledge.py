@@ -94,6 +94,55 @@ CUISINE_GROUP_MAP = {
 }
 
 # ---------------------------------------------------------------------------
+# cuisine -> state_origin, transcribed verbatim from data/source/cuisines_v4.csv's own
+# state_origin column (all 65 rows) — added 2026-08 for Core Spine FROZEN §B1's `cuis(x,S)`
+# "0.70 if same parent_cuisine" tier (scoring._cuis()), which needs to resolve a cuisine's PARENT
+# cuisine's state_origin, not just the dish's own. Real source data, not invented.
+# ---------------------------------------------------------------------------
+CUISINE_STATE_ORIGIN = {
+    'american': 'USA', 'andhra': 'Andhra Pradesh', 'anglo_indian': 'Pan-India',
+    'arunachali': 'Arunachal Pradesh', 'assamese': 'Assam', 'awadhi': 'Lucknow/UP',
+    'bengali': 'West Bengal', 'bhutanese': 'Bhutan', 'bihari': 'Bihar',
+    'bundelkhandi': 'Bundelkhand (MP/UP)', 'burmese': 'Burma', 'chettinad': 'TN (Karaikudi)',
+    'chhattisgarhi': 'Chhattisgarh', 'chinese_authentic': 'China', 'continental': 'Europe (generic)',
+    'coorg': 'Karnataka (Coorg)', 'delhi': 'Delhi', 'goan': 'Goa',
+    'gujarati': 'Gujarat', 'himachali': 'Himachal Pradesh', 'hyderabadi': 'Hyderabad',
+    'indian_bakery': 'Pan-India', 'indian_tibetan': 'Hill stations/NE', 'indo_chinese': 'Pan-India (Kolkata origin)',
+    'indori': 'MP (Indore)', 'italian': 'Italy', 'japanese': 'Japan',
+    'jharkhandi': 'Jharkhand', 'karnataka': 'Karnataka', 'kashmiri': 'J&K',
+    'kerala': 'Kerala', 'kolhapuri': 'Maharashtra (Kolhapur)', 'konkani': 'Konkan Coast',
+    'korean': 'South Korea', 'kutchi': 'Gujarat (Kutch)', 'lebanese': 'Lebanon',
+    'madhya_pradesh': 'Madhya Pradesh', 'maharashtrian': 'Maharashtra', 'malabar': 'Kerala (North)',
+    'malvani': 'Maharashtra (Konkan)', 'mangalorean': 'Karnataka (Mangalore)', 'manipuri': 'Manipur',
+    'mediterranean': 'Mediterranean region', 'meghalayan': 'Meghalaya', 'mexican': 'Mexico',
+    'middle_eastern_generic': 'Middle East', 'mizo': 'Mizoram', 'mughlai': 'Delhi/UP',
+    'naga': 'Nagaland', 'odia': 'Odisha', 'parsi': 'Mumbai/Gujarat',
+    'punjabi': 'Punjab', 'rajasthani': 'Rajasthan', 'sikkimese': 'Sikkim',
+    'sindhi': 'Sindh (diaspora)', 'street_food_generic': 'Pan-India', 'tamil': 'Tamil Nadu',
+    'telangana': 'Telangana', 'thai': 'Thailand', 'tripuri': 'Tripura',
+    'udupi': 'Karnataka (Udupi)', 'up': 'Uttar Pradesh', 'uttarakhandi': 'Uttarakhand',
+    'vidarbha': 'Maharashtra (Vidarbha)', 'vietnamese': 'Vietnam',
+}
+
+# cuisine -> parent_cuisine, transcribed verbatim from data/source/cuisines_v4.csv's own
+# parent_cuisine column (12 of 65 rows are populated; the rest have no parent). Same purpose as
+# CUISINE_STATE_ORIGIN above.
+CUISINE_PARENT = {
+    'awadhi': 'mughlai',
+    'chettinad': 'tamil',
+    'coorg': 'karnataka',
+    'indori': 'madhya_pradesh',
+    'kolhapuri': 'maharashtrian',
+    'kutchi': 'gujarati',
+    'lebanese': 'middle_eastern_generic',
+    'malabar': 'kerala',
+    'malvani': 'maharashtrian',
+    'mangalorean': 'karnataka',
+    'udupi': 'karnataka',
+    'vidarbha': 'maharashtrian',
+}
+
+# ---------------------------------------------------------------------------
 # State 2-letter code -> full name normalization.
 #
 # The live app writes profiles.home_state as the 2-letter code ("MP"), NOT the full name — it

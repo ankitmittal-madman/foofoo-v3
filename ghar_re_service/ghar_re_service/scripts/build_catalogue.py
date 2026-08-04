@@ -544,8 +544,14 @@ def build_catalogue(source_dir: str = DEFAULT_SOURCE_DIR) -> tuple[list[dict], B
     report = BuildReport()
     dishes = [
         transform_dish_row(
-            row, ing_map, alias_map, cuisine_map, dish_synonyms, sig_scores_map,
-            dish_macro_map, report,
+            row,
+            ing_map,
+            alias_map,
+            cuisine_map,
+            dish_synonyms,
+            sig_scores_map,
+            dish_macro_map,
+            report,
         )
         for row in _read_dish_rows(source_dir)
     ]

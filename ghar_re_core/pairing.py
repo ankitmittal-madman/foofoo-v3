@@ -164,6 +164,8 @@ def build_plates(catalogue, theta, ctx, objective):
     poolable = [d for d in elig if d.hero_role in ("dry", "liquid", "single", "standalone")
                 and S.m_slot(d, ctx) > 0]
     scores = {d.name: S.score(d, theta, ctx, objective) for d in poolable}
+    # catalogue-wide IDF, built once per call (not per pair) for the same_base() cosine gate.
+    idf = SIM.build_idf(catalogue)
 
     DRY = [d for d in poolable if d.hero_role == "dry"]
     LIQ = [d for d in poolable if d.hero_role == "liquid"]
@@ -173,7 +175,7 @@ def build_plates(catalogue, theta, ctx, objective):
     plates = []
     for d in DRY:
         for l in LIQ:
-            if allowed(d, l):
+            if allowed(d, l, idf):
                 p = dict(form="pair", dry=d, liquid=l, heroes={d.name, l.name})
                 plates.append(p)
     for s in SINGLE:

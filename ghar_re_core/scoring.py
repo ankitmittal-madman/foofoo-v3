@@ -164,11 +164,22 @@ def eligible(dish, theta, ctx, shared_hero=True):
 # =====================================================================================
 def _cuis(dish, state):
     """§B1 cuis(x, state): how well a dish's cuisine matches a given state, from 1.00 (exact same
-    state of origin) down to 0.40 (same broad zone) to 0.0 (no relation) — the core regional-fit
-    building block m_palette() blends across a household's home and local state."""
-    # §B1 cuis(x,S): 1.00 same state, 0.70 same parent, 0.40 same group/zone, 0.15 adjacent, else 0.
+    state of origin) down through 0.70 (same parent cuisine) to 0.40 (same broad zone) to 0.0
+    (no relation) — the core regional-fit building block m_palette() blends across a household's
+    home and local state.
+
+    The spec's fourth tier, 0.15 for "adjacent zone", is NOT implemented: no zone-adjacency table
+    exists anywhere in this codebase or any frozen source document, and inventing one (which
+    zones count as adjacent to which) would be a fabricated parameter, not a correction — flagged
+    as a genuine, disclosed gap (Founder Decision required to author the adjacency table), not
+    silently applied."""
+    # §B1 cuis(x,S): 1.00 same state, 0.70 same parent cuisine, 0.40 same group/zone, else 0.
+    # (0.15 adjacent-zone tier not implemented — see docstring.)
     if dish.state_origin == state:
         return 1.00
+    parent = K.CUISINE_PARENT.get(dish.cuisine)
+    if parent and K.CUISINE_STATE_ORIGIN.get(parent) == state:
+        return 0.70
     dish_zone = dish.zone
     state_zone = K.STATE_ZONE.get(state)
     if dish_zone and state_zone and dish_zone == state_zone:
@@ -218,9 +229,9 @@ def m_season(dish, ctx):
             return 1.0
         return 0.5
     if season == "monsoon":
-        if "rainy" in wa:
-            return 1.0
-        return 0.5
+        # §B3: "monsoon -> +1 rainy/comfort, 0 else" (Core Spine FROZEN line 318) — unlike
+        # summer/winter, monsoon has no neutral 0.5 default; a non-rainy dish gets 0, not 0.5.
+        return 1.0 if "rainy" in wa else 0.0
     return 0.5
 
 
@@ -522,3 +533,58 @@ def _zone_state(zone):
     rep = {"North": "Delhi", "South": "Tamil Nadu", "East": "West Bengal",
            "West": "Maharashtra", "Central": "Madhya Pradesh", "Northeast": "Assam"}
     return rep.get(zone, "Delhi")
+
+
+# =====================================================================================
+# EXPLANATION (additive, read-only) — Founder-directed RE compliance review, 2026-08.
+# Surfaces the same values score()/base()/gain_q15()/m_weather()/eligible() already compute,
+# structured for a caller building a human-facing "why this dish" explanation. Calls the exact
+# same functions the live scoring path uses — never recomputes or approximates the math, and
+# never influences scoring/ranking/filtering itself (same LOGGING-ONLY guarantee decision_log.py
+# already documents for its own trace).
+# =====================================================================================
+_FILTER_CHECKS = [
+    ("diet", pass_diet), ("jain", pass_jain), ("allergen", pass_allergen),
+    ("weaning", pass_weaning), ("fasting", pass_mode_fasting),
+    ("exclude_dish_ids", pass_exclude_dish_ids),
+]
+
+
+def explain_eligibility(dish, theta, ctx, shared_hero=True):
+    """Structured eligibility explanation: which named hard filter(s), if any, this dish fails.
+    Reuses eligible()'s own pass_* functions in the same order, so this can never silently drift
+    from what eligible() actually decides. Returns {"eligible": bool, "rejected_filters": [str]}."""
+    rejected = []
+    for name, check in _FILTER_CHECKS:
+        if name == "weaning" and not shared_hero:
+            continue  # eligible() itself skips this filter when shared_hero=False
+        if not check(dish, theta, ctx):
+            rejected.append(name)
+    return {"eligible": len(rejected) == 0, "rejected_filters": rejected}
+
+
+def explain_dish(dish, theta, ctx, objective, shared_hero=True):
+    """Structured explanation for one dish's score: eligibility, BASE contributors (per-module
+    value/weight, from the same ScoringModule registry base() delegates to), the Q15 gain value,
+    and the weather-term's own value (m_weather is one of the BASE contributors already, called
+    out separately here since it's one of the task's named explanation categories). Does not call
+    score()/base() themselves — calls DEFAULT_REGISTRY.combine() and gain_q15()/m_weather()
+    directly, the exact same functions those do, so the numbers are identical, not approximated."""
+    from ghar_re_core.modules_default import DEFAULT_REGISTRY
+    eligibility = explain_eligibility(dish, theta, ctx, shared_hero=shared_hero)
+    base_total, contributions = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="base")
+    base_contributors = [
+        {"module": c.name, "value": round(c.value, 4), "weight": round(c.weight, 4),
+         "weighted": round(c.value * c.weight, 4)}
+        for c in contributions
+    ]
+    q15_gain = gain_q15(dish, objective)
+    weather_value = m_weather(dish, theta, ctx)
+    return {
+        "dish": dish.name,
+        "eligibility": eligibility,
+        "base_total": round(base_total, 4),
+        "base_contributors": base_contributors,
+        "q15_contribution": round(q15_gain, 4),
+        "weather_contribution": round(weather_value, 4),
+    }
