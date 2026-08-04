@@ -274,6 +274,9 @@ Deno.test("a household can be created across multiple calls (resume-after-partia
     assertEquals(profile.current_city, "Mumbai");
     assertEquals(profile.diet_type, "veg");
     assertEquals(profile.cook_capability, "intermediate");
+    // onboarding_completed previously stayed false forever (never set anywhere) — all five
+    // required fields being known on this call is the moment onboarding actually completes.
+    assertEquals(profile.onboarding_completed, true);
   });
 });
 

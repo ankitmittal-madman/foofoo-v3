@@ -118,7 +118,14 @@ export function makeHouseholdHandler(deps: HouseholdDeps = {}): Handler {
         // in store.ts). The two are already guaranteed equal by requireOwnership above; this is
         // belt-and-suspenders so the write itself cannot create a profile for anyone but the
         // authenticated caller, even if a future change to the ownership check above had a bug.
-        createdThisCall = await upsertProfileRow(ctx, claims.userId, accumulated);
+        // onboarding_completed was previously never set anywhere in this codebase (confirmed by a
+        // full grep) — profiles.onboarding_completed stayed false forever, for every household.
+        // All five PROFILE_REQUIRED_FIELDS being known (missing.length === 0, just above) IS the
+        // definition of onboarding completing, so this is the one correct place to flip it true.
+        createdThisCall = await upsertProfileRow(ctx, claims.userId, {
+          ...accumulated,
+          onboarding_completed: true,
+        });
         // The row is guaranteed to exist after a successful atomic upsert, whether THIS call
         // created it (createdThisCall === true) or a concurrent/earlier call already had
         // (createdThisCall === false, ON CONFLICT DO NOTHING skipped it) — either way it's there.

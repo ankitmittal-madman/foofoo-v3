@@ -10,6 +10,8 @@ If a formula appears to be needed here, it belongs in ghar_re_core, not this fil
 
 from __future__ import annotations
 
+import hashlib
+import json
 import uuid
 from typing import Any
 
@@ -63,6 +65,17 @@ def build_context(ctx: dict[str, Any], exclude_dish_ids: list[str] | None = None
     return core_ctx
 
 
+def _request_rng_seed(household: dict[str, Any], context: dict[str, Any]) -> int:
+    """Stable RNG seed for ghar_re_core.exploration's epsilon-greedy swap, derived from the
+    request's own content rather than true randomness — so identical requests (same household +
+    context) always get the same served plates (RE-DOC-11 persistence/repeatability guarantee),
+    while distinct households/contexts still land on independent dice-rolls, matching the
+    household-seeded RNG precedent in ghar_re_core.meal_planner.cold_start_top15."""
+    payload = json.dumps({"household": household, "context": context}, sort_keys=True, default=str)
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    return int(digest[:16], 16)
+
+
 def _principal_hero(plate):
     """The hero whose BASE breakdown represents the plate's contributions.
 
@@ -93,7 +106,10 @@ def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any
     hh = build_household_dict(request["household"])
     n = int(request.get("count", 15))
     res = planner.cold_start_top15(
-        hh, catalogue, n=n, weekday=request.get("weekday", "Monday"),
+        hh,
+        catalogue,
+        n=n,
+        weekday=request.get("weekday", "Monday"),
         household_id=request.get("household_id"),
     )
     _with_images(res["dishes"])
@@ -152,6 +168,7 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
     request_id = request.get("request_id") or str(uuid.uuid4())
     hh = build_household_dict(request["household"])
     ctx = build_context(request["context"], request.get("exclude_dish_ids"))
+    ctx["_rng_seed"] = _request_rng_seed(hh, request["context"])
     objective = hh.get("q15_objective") or config.default_objective
     want_trace = bool(request.get("include_decision_trace"))
 

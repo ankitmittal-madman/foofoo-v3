@@ -10,9 +10,12 @@ own served/rejected history (`ctx['dish_feedback_counts']`) shows is under-serve
 sees a little variety rather than the same greedy top-N forever.
 
 No dish's score is ever changed here — CONFIG.bandit_epsilon (data/source/bandit_weights.yaml,
-code-level safety default 0.0) only decides WHETHER to explore; ctx['_rng_seed'] (test-only, never
-part of the production request schema — see contracts/ghar-re-v1.schema.json, which does not
-define it) makes that one dice-roll reproducible for tests.
+code-level safety default 0.0) only decides WHETHER to explore; ctx['_rng_seed'] makes that one
+dice-roll reproducible. It is never part of the production request schema (see
+contracts/ghar-re-v1.schema.json, which does not define it) — ghar_re_service.engine.run derives
+it internally from a hash of the request's own household+context content (so identical requests
+stay repeatable, per RE-DOC-11, without ever going through true unseeded randomness), and tests
+set it directly for the same reason.
 """
 import random
 
@@ -70,8 +73,9 @@ def epsilon_greedy_select(chosen, candidate_plates, ctx):
     `candidate_plates`: the full scored candidate pool (pairing.build_plates's output) that
         `chosen` was drawn from, so a swap-in candidate can only ever be something that was
         already eligible and already scored.
-    `ctx`: request context; reads `dish_feedback_counts` (served/rejected history) and the
-        test-only `_rng_seed` (never part of the production request schema).
+    `ctx`: request context; reads `dish_feedback_counts` (served/rejected history) and
+        `_rng_seed` (never part of the production request schema — engine.run derives it from
+        the request's own content so identical requests stay repeatable).
 
     With probability CONFIG.bandit_epsilon (YAML default 0.15, code-level safety default 0.0 —
     see ghar_re_core/config.py), replaces the single LOWEST-scored already-chosen plate with the
