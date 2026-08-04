@@ -4,7 +4,7 @@
 **Version:** v1.1
 **Date:** 2026-07-16
 **Placement:** docs/governance/[ACTIVE]_Repository_Naming_Standard_v1.1.md
-**Supersedes:** `[ACTIVE]_Repository_Naming_Standard_v1.0.md` (retained unchanged, stamped SUPERSEDED, per `CLAUDE.md`'s never-delete rule). All content below is carried forward from v1.0 unchanged except §4A (new) and this header.
+**Supersedes:** `[ACTIVE]_Repository_Naming_Standard_v1.1.md` (retained unchanged, stamped SUPERSEDED, per `CLAUDE.md`'s never-delete rule). All content below is carried forward from v1.0 unchanged except §4A (new) and this header.
 **Dependencies:** DOC-P3-09 §06E; CLAUDE.md; Project Baseline Register; `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05; `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`.
 
 ---
@@ -75,7 +75,7 @@ CLAUDE.md references this standard. Every new authoritative document, migration,
 
 ## Versioning & Placement
 
-`[ACTIVE]_Repository_Naming_Standard_v1.1.md` → docs/governance/. Supersedes `[ACTIVE]_Repository_Naming_Standard_v1.0.md` (retained, stamped, not deleted).
+`[ACTIVE]_Repository_Naming_Standard_v1.1.md` → docs/governance/. Supersedes `[ACTIVE]_Repository_Naming_Standard_v1.1.md` (retained, stamped, not deleted).
 
 ## Founder Sign-off
 

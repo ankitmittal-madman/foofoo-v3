@@ -1,7 +1,7 @@
 # DOC-P3-04 · Data Architecture and Entity Relationship Model
 **Version:** 1.3
 **Date:** June 2026
-**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
+**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.1.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **Prerequisites:** DOC-P3-02 CDM v1.1, DOC-P3-03 v1.0, DOC-P3-03A v1.0 (all must be read first)
 **Next document:** DOC-P3-05 · Database Schema (migration files, derived directly from this document)
 

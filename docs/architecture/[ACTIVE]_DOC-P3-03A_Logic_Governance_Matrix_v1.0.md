@@ -2,7 +2,7 @@
 
 **Version:** 1.0
 **Date:** June 2026
-**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
+**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.1.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **Companion to:** DOC-P3-03 · Business Logic and Algorithm Specification v1.0
 **Purpose:** Governance, traceability, execution classification, auditability, and validation of all 61 logical functions defined in P3-03. Does not redefine business logic.
 **Next document:** DOC-P3-04 · Data Architecture and Entity Relationship Model

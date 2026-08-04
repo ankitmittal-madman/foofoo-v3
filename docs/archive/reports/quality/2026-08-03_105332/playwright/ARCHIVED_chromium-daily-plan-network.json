@@ -1,0 +1,37 @@
+[
+  {
+    "url": "http://localhost:8081/daily-plan",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "url": "http://localhost:8081/node_modules/expo-router/entry.bundle?platform=web&dev=true&hot=false&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "url": "http://localhost:8081/assets/?unstable_path=.%2Fnode_modules%2F%40expo-google-fonts%2Ffraunces%2F700Bold/Fraunces_700Bold.ttf",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "url": "http://localhost:8081/assets/?unstable_path=.%2Fnode_modules%2F%40expo-google-fonts%2Ffraunces%2F600SemiBold/Fraunces_600SemiBold.ttf",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "url": "http://localhost:8081/assets/?unstable_path=.%2Fnode_modules%2F%40expo-google-fonts%2Fmukta%2F400Regular/Mukta_400Regular.ttf",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "url": "http://localhost:8081/assets/?unstable_path=.%2Fnode_modules%2F%40expo-google-fonts%2Fmukta%2F600SemiBold/Mukta_600SemiBold.ttf",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "url": "http://localhost:8081/assets/?unstable_path=.%2Fnode_modules%2F%40expo-google-fonts%2Fmukta%2F500Medium/Mukta_500Medium.ttf",
+    "method": "GET",
+    "status": 200
+  }
+]

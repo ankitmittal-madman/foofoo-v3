@@ -1,5 +1,6 @@
 -- Migration: 039_rls_internal_table_drift_fix.sql
--- Investigates: ops/audits/audit-rls/rls-audit.md Findings 1 and 2, live-DB drift against
+-- Investigates: docs/archive/audits/ops/audit-rls/ARCHIVED_rls-audit.md Findings 1 and 2,
+--   live-DB drift against
 --   019_rls_policies.sql's stated intent.
 --
 -- Finding 1 (partition-child tables) — INVESTIGATED, NO FIX NEEDED, not applied here:

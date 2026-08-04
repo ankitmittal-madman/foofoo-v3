@@ -56,7 +56,7 @@ Add `is_main_ingredient boolean NOT NULL DEFAULT false` to `public.dish_ingredie
 ## 10. Cross-references
 
 - `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-11 (dominant-ingredient derivation rule — still Pending, unaffected by this SER).
-- `docs/project-history/certificates/[ACTIVE]_REPO-CERT-019_WP-8FA_CandidateRepository_Audit_v1.0.md` (origin of the blocker).
+- `docs/archive/certificates/ARCHIVED_REPO-CERT-019_WP-8FA_CandidateRepository_Audit_v1.0.md` (origin of the blocker).
 - `database/migrations/009_content_junctions.sql` (current `dish_ingredients` definition).
 - `[ACTIVE]_SER-001_re_cohorts_city_tier_v1.0.md` (SER format precedent).
 

@@ -70,7 +70,7 @@ confirmed risks documenting a guess as a confirmed root cause.
 
 ```bash
 # Debug log from root-cause investigation (correct path per repo structure)
-cat ops/logs/session-log/debug-log.md 2>/dev/null | tail -50
+cat logs/hygiene-reports/debug-log.md 2>/dev/null | tail -50
 git log --oneline -10
 
 # Check knowledge-book decisions log — helps establish what "correct" behavior was

@@ -89,7 +89,7 @@ def pass_exclude_dish_ids(dish, theta, ctx):
     the request's `exclude_dish_ids` (additive/optional — omitted or empty is a no-op, matching
     every existing caller/fixture that predates this field). Always a hard pool-stage exclusion,
     never a scoring penalty, so an excluded dish can never surface even at score rank 1 — see
-    docs/project-history/work-packages/[DRAFT]_WP-8G_Recommendation_Variety_on_Refresh_v1.0.md
+    docs/archive/implementation/work-packages/ARCHIVED_WP-8G_Recommendation_Variety_on_Refresh_v1.0.md
     §1 Option A."""
     excl = ctx.get("exclude_dish_ids")
     if not excl:

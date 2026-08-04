@@ -1,0 +1,66 @@
+# STATUS
+
+ARCHIVED
+
+## Reason
+
+Implementation completed.
+
+This document is retained for historical reference only.
+
+It must not be used as the primary implementation guide.
+
+Refer to the active documentation for the current source of truth.
+
+---
+
+STATUS: ARCHIVED
+Reason: Superseded by docs/archive/audits/re_audit_v2/ (the 2026-08-04 clean-room re-audit), which is itself superseded by docs/active/. Kept for historical reference only.
+
+# RE Algorithm Coverage Audit — Phase 2
+
+Scope: `ghar_re_core/*.py` (pipeline.py, scoring.py, derivation.py, pairing.py, exploration.py,
+meal_planner.py, cohort_intel.py, cohort_plan.py, preference.py, modules.py, modules_default.py,
+features.py, training/*.py), read in full, cross-referenced against RE-DOC-01–05 (classfirst_v1)
+and RE-DOC-10–13 (as-built) spec generations. All tests: `python3 -m pytest ghar_re_core/tests/ -q`
+→ **93 passed** (no failures), run on HEAD, `2026-08-04`.
+
+The implementation is its own third generation, distinct from both spec sets: a Python
+θ-derivation → hard-filter → BASE×GAIN → pairing/assemble-7 pipeline (matches RE-DOC-10/11's shape),
+with a WP-16/WP-17 "cohort intelligence" layer added on top that is NOT documented in RE-DOC-10-13 as
+read previously — it is a learned factorized class-affinity model (`cohort_intel.py`) blended with a
+compositional persona/state/migration plan (`cohort_plan.py`), which together are the functional
+replacement for the older spec's "cohort matrix" idea, but built from a trained log-linear model +
+authored composition rather than a static persona lookup table.
+
+## Component-by-component status
+
+| Component | Status | Evidence |
+|---|---|---|
+| Onboarding / D1–D7 derivation | **Implemented** (D1–D6; D7 explicitly stubbed) | `ghar_re_core/derivation.py:52-241` computes D1 income (`:69-91`), D4 blend (`:93-125`), D2 time route (`:127-154`), D3 adventurousness (`:156-167`), D5 household constraints incl. new `lifecycle_stage` (`:190-222`), D6 tiered community prior (`:224-236`). D7 latent is `field({}, "D7", ...)` — literally empty (`:238-239`), matching the module docstring "D7 latent = {} (not implemented)" (`:8`). |
+| Hard filters (A1–A6) | **Implemented** | `scoring.py:16-153` — A1 diet (`pass_diet`), A2 Jain (`pass_jain`, non-negotiable), A3 allergen (`pass_allergen`, explicit-ingredient only — hidden-derivative layer explicitly out of scope per docstring `:54`), A4 weaning (`pass_weaning`, the one hard age filter), WP-8G exclude_dish_ids (`pass_exclude_dish_ids`), A5 fasting mode, A6 calorie (plate-level, in `pairing.py:244-245`). `eligibility_funnel()` (`:115-135`) gives observability without being authoritative. |
+| Meal classes | **Implemented**, but as a data/lookup layer not a hard 26-class taxonomy | `ghar_re_core/knowledge.py` (`dish_to_class_code`/`dish_to_class_codes`, referenced throughout scoring.py/cohort_intel.py/cohort_plan.py/meal_planner.py) maps dishes to `meal_class_code`s from `class_first_v1/meal_class_master.csv` (`cohort_plan.py:102-118`); WP-17.1 supports **multi-membership** (a dish can back >1 class — `meal_planner.py:221-224`), diverging from the older spec's presumed single-class taxonomy. |
+| Candidate generation | **Implemented** | `pairing.build_plates()` (`pairing.py:164-194`) — eligible+slot-valid dishes pooled by `hero_role` (dry/liquid/single/standalone). |
+| BASE score (§S2B) | **Implemented** | `scoring.py:159-324` — 7 W_k-weighted terms (m_palette, m_slot, m_season, sig, m_age, m_household, m_weather) + prior_boost, now routed through a `ScoringModule` registry (`modules.py`, `modules_default.py`) added by the "Phase 1 registry refactor" — explicitly documented as score-neutral (`scoring.py:315-320`). `conf_k` pinned 1.0 per v1. |
+| Q15 gain | **Implemented** | `scoring.py:326-398` — `gain_q15()`, gs_indulgence/gs_light/gs_protein sub-scores, `kappa` pinned 1.0, clamped to `gain_bounds`. |
+| Cohort/class-affinity term (`s_cohort`) | **Implemented**, graded not binary (WP-16/17, supersedes RE-DOC-01-05's cohort-matrix concept) | `scoring.py:401-412` (`s_cohort`) delegates to `cohort_intel.class_affinity()` (`cohort_intel.py:216-286`), itself a fusion of a trained log-linear frequency model (`_class_affinity_uncached`) and `cohort_plan.class_plan()`'s compositional persona/state/migration derivation (`cohort_plan.py:269-340`). Weight decays with `interaction_count` (cold-start-strong) via `CONFIG.w_cohort_effective` (`modules_default.py:79-83`). |
+| Foreign demote (`s_foreign`) | **Implemented** | `scoring.py:415-419`, wired as a negative-weight module (`modules_default.py:84-91`) — decaying with interaction_count, never a filter. |
+| Pairing guardrails | **Implemented, with one known unfixed bug (G6)** | `pairing.py:21-117` — G1 not-both-rich (`both_rich`), G2 not-same-base (`same_base`), cuisine-coherence gate (`cuisine_dist`/`allowed`), G5 richness-balance soft term, **G6 protein-veg balance soft term is still narrower than intended**: `protein_cat` names 4 categories (`dal_lentil`,`kebab`,`egg_dish`,`curry`) but the actual check on the next line only tests `{"dal_lentil"}` plus a non_veg/egg diet fallback (`pairing.py:109-110`) — flagged in-code as a deliberate, reviewed non-fix (`:100-108`, `ruff F841` suppressed with `noqa`), not silently regressed. |
+| Assemble-7 | **Implemented** | `pairing.py:197-259` — greedy best-score-first walk with no-duplicate-hero guard, discovery-dial cap (`rho_disc`-driven), default carb attach (§S4.4), optional A6 calorie drop, decision logging. |
+| Ranking | **Implemented** | `score()` (`scoring.py:422-444`) = BASE×GAIN + cohort/foreign terms (phase="cohort") + pref term (phase="pref", currently always 0.0 — see below); `plate_score()` (`pairing.py:123-132`) sorts assemble-7's candidates. |
+| Fallback (Phase C / thin-catalogue coverage) | **Partial** | `meal_planner.weekly_class_plan()` reports `dish_count` per class (`:253-254`) and refuses to offer a class with zero backing dishes (`:280`); `_ensure_weekend_special()` (`meal_planner.py:307-332`) promotes a diet-compatible special class only from the household's own plan — no fabricated fallback. This is a meal-planner-level improvement over RE-DOC-12's "one hardcoded dish" finding, but it is a *class-selection* safeguard, not a documented per-zone dish-level fallback; whether the core `pipeline.recommend()`/service path still has a single hardcoded Phase-C dish was **not directly re-verified against the edge-function/ghar_re_service runtime path** in this pass (out of the ghar_re_core file set audited) — flag as unconfirmed, not claimed fixed. |
+| History (personal) | **Partial — plumbing exists, learning term is an inert stub** | See item 09 report; `ctx['dish_feedback_counts']` feeds `exploration.py`'s selection-stage swap (real, live) but the actual `w_history·PersonalHistory`-style *scoring* term the older spec described does not exist as a scored BASE/cohort module — the closest analogue, `s_pref` (Phase 3), is architecturally wired (`preference.py`, `modules_default.py:97-102`) but numerically always `0.0` today (no trained artifact, `pref_model.yaml enabled: false`). |
+| Feedback | **Implemented (plumbing) / Deferred (learning)** | `ghar_re_core/training/dataset.py` builds labeled rows from a feedback export honoring FD-11 (real-only, ambiguous events excluded, `:1-174`); `train_pref_model.py` fits+writes an artifact but is explicitly never run against real production data yet (`:14-17`). |
+| Cold start | **Implemented** | `meal_planner.cold_start_top15()` (`:166-212`) — top-15 diverse dishes across slots, cook_capability-biased (`_apply_cook_capability_bias`, `:100-112`), household-seeded epsilon-greedy diversify (`:115-156`), `variety_salt` day-decorrelation (`:180-193`); `s_cohort`/`s_foreign` are explicitly "cold-start-strong, decaying with interaction_count" (`scoring.py:426-427`). |
+| Evolution / confidence (A/B/C/D 4-state model) | **Missing / Deprecated relative to RE-DOC-01-05** | No 4-state evolution machinery found anywhere in `ghar_re_core/*.py`; confidence is pinned to 1.0 everywhere per v1 (`derivation.py:8`, `modules.py:27-28`) rather than an evolving per-field confidence state machine. This spec-01-05 concept appears superseded, not implemented in any form. |
+| Exploration (bandit) | **Implemented — real epsilon-greedy, live in production config** | `ghar_re_core/exploration.py` — full module, see report 09 for wiring detail. `data/source/bandit_weights.yaml` sets `epsilon: 0.15` (non-zero production default), not merely a test-only value. No Thompson Sampling anywhere in the repo (grep found none). |
+| Variety / MMR (λ=0.7 guard) | **Deprecated / reimplemented differently** | No MMR/λ mechanism found. Variety is instead achieved via: (a) assemble-7's no-duplicate-hero guard + discovery-dial cap (`pairing.py:221-228`), (b) `meal_planner._diversify()`'s per-class/per-cuisine caps (`meal_planner.py:115-156`), (c) `weekly_class_plan`'s `_RECENT_WINDOW` cross-day repeat suppression (`meal_planner.py:246,277-300`). Functionally covers the same "don't repeat/collapse" goal as MMR, but not the same algorithm — the old spec's specific λ=0.7 MMR formula is not present. |
+| Suppression (Never/Not-Today, exponential decay) | **Missing** | No exponential-decay suppression list or "Never/Not-Today" state machinery found in any audited file. The closest analogues are: WP-8G's one-shot `exclude_dish_ids` hard filter (`scoring.py:81-91`, session-scoped, not persistent/decaying) and the interaction_count-based decay of `w_cohort`/`foreign_demote` (which decay a *scoring weight*, not a per-dish suppression state). No evidence of a per-dish "never show again" / "not today, decaying" table or logic. |
+
+## Notes on scope/limits of this pass
+- `catalogue.py`, `knowledge.py`, `config.py`, `session_log.py`, `decision_log.py`, `fixtures.py`,
+  `seedgen.py` were read where needed for cross-reference (e.g. `config.py` for `bandit_epsilon`,
+  `w_pref`) but not exhaustively re-audited term-by-term in this report — they are support/config
+  modules, not scoring/algorithm logic themselves.
+- The Fly.io `ghar_re_service` runtime wrapper and `supabase/functions/recommendations/*` were only
+  checked for the specific items requested in the delta audit (report 09), not read in full here.

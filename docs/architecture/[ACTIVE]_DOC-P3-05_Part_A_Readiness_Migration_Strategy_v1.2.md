@@ -1,7 +1,7 @@
 # DOC-P3-05 · Database Implementation and Migration Specification
 **Version:** 1.2 — Part (a) of 4
 **Date:** June 2026
-**Status:** ACTIVE — Phase (a), enhanced with implementation governance (Phases 7–14) per founder request. [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
+**Status:** ACTIVE — Phase (a), enhanced with implementation governance (Phases 7–14) per founder request. [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.1.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **Implements:** DOC-P3-04 v1.2 (approved) exactly — zero new architecture
 **Prerequisite documents reloaded for this pass:** Context Baseline & Readiness Assessment, DOC-P3-02 v1.1, DOC-P3-03 v1.0, DOC-P3-03A v1.0, DOC-P3-04 v1.2
 

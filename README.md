@@ -12,8 +12,8 @@ must not be described as deployed until their migrations/functions/builds are pr
 ## Start here
 - **AI assistants / contributors:** read `CLAUDE.md` (repo operating rules) first.
 - **Documentation index:** `docs/README.md`.
-- **Latest certification:** `docs/project-history/certificates/[ACTIVE]_REPO-CERT-006_Repository_Green_Certification_v1.0.md`.
-- **What's next:** `docs/roadmaps/[ACTIVE]_FooFoo_Project_Roadmap_v1.1.md` (next gate: Data Gate — Seed Engineering).
+- **Latest certification:** `docs/archive/certificates/ARCHIVED_REPO-CERT-006_Repository_Green_Certification_v1.0.md`.
+- **What's next:** `docs/active/ROADMAP.md`.
 
 ## Layout
 - `database/migrations/` — ordered PostgreSQL/Supabase schema migrations.

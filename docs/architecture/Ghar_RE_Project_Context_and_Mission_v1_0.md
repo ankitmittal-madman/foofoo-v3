@@ -14,7 +14,7 @@ FooFoo is an AI-powered meal decision assistant for Indian households — person
 
 The old Recommendation Engine design — 41 fixed personas, cohort-based `FinalScore` scoring, class-first candidate generation, the interaction-count weight ladder, the 4-state (DAU-based) evolution model — is fully superseded. It does not apply to this Project. If old terminology (persona, cohort, class plan, weight ladder tiers) surfaces anywhere, treat it as legacy vocabulary, not a design constraint.
 
-**This section is partially superseded — never edited in place, kept verbatim above per the repo's Version & Lifecycle Rules (never delete a superseded statement; stamp and keep both). See §2A immediately below for the amendment and docs/project-history/work-packages/[DRAFT]_WP-15_Class_Enriched_Recommendation_v1.0.md for the full rationale and certificate reference.**
+**This section is partially superseded — never edited in place, kept verbatim above per the repo's Version & Lifecycle Rules (never delete a superseded statement; stamp and keep both). See §2A immediately below for the amendment and docs/archive/implementation/work-packages/ARCHIVED_WP-15_Class_Enriched_Recommendation_v1.0.md for the full rationale and certificate reference.**
 
 ## 2A. AMENDMENT (2026-08-02) — class-taxonomy/cohort-prior SCIENCE un-retired; FIXED PERSONAS remain retired
 

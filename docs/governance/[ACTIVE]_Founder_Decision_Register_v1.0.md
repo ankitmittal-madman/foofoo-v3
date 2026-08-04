@@ -131,7 +131,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `git log origin/main --oneline` (confirms `e113ffa`/`e76bd9c` present, re-verified this session at `b27ca58`).
 
 ### FD-02 — Rule on DCR-8D-01 (weight-ladder worked-example inconsistency)
-- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/project-history/[ACTIVE]_WP-8D_Pre_Implementation_Architecture_Reconciliation_v1.0.md`
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/archive/reports/project-history/ARCHIVED_WP-8D_Pre_Implementation_Architecture_Reconciliation_v1.0.md`
 - **Context:** `DOC-P3-03` §07's own worked example uses inconsistent interpolation references between weight-ladder tiers.
 - **Problem Statement:** Two readings of the interpolation rule are both textually defensible.
 - **Alternatives Considered:** The two competing readings are described in the primary source; this Register does not restate them, per instruction to cite rather than copy.
@@ -152,7 +152,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `supabase/functions/_shared/services/re/scoring.ts` (`interpolateWeightLadder`); `_tests/re_core.test.ts`.
 
 ### FD-03 — Rule on DCR-8E-01 (Day-0 confidence 0.65 cap vs 1.0 schema ceiling)
-- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/project-history/work-packages/[ACTIVE]_WP-8E_RE_Integration_Layer_v1.0.md`, line ~53
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/archive/implementation/work-packages/ARCHIVED_WP-8E_RE_Integration_Layer_v1.0.md`, line ~53
 - **Context:** LF-A08 states additive onboarding-confidence contributions sum to 1.00 for a fully-answered onboarding, but also states "Maximum at Day 0 completion: 0.65."
 - **Problem Statement:** The schema's confidence range allows up to 1.0; the Day-0 text caps it at 0.65 — which governs?
 - **Alternatives Considered:** Not separately enumerated in the source beyond the two conflicting statements themselves.
@@ -172,7 +172,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `supabase/functions/_shared/services/onboarding/orchestrator.ts` (clamp logic).
 
 ### FD-04 — Promote DOC-P4-02 from DRAFT to ACTIVE (AD-01 countersignature)
-- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/architecture/[DRAFT]_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md` §3
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/archive/historical/architecture/ARCHIVED_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md` §3
 - **Context:** DOC-P4-02 itself states: *"Status: DRAFT — pending Founder sign-off. Contains one open architectural decision (AD-01) that GATES onboarding implementation."*
 - **Problem Statement:** What happens to a user's first weekly plan at the end of onboarding — three options are laid out in DOC-P4-02 §3 itself (capture-only/deferred generation; synchronous first-plan generation; cohort-only deferral), with a non-binding recommendation for Option 1.
 - **Alternatives Considered:** The three options are fully specified in DOC-P4-02 §3 — cited, not copied, per this Register's own rule.
@@ -190,10 +190,10 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Implementation Notes:** Architecture is already built and tested against Option 1's implication — countersigning ratifies existing work rather than requiring new work.
 - **Acceptance Criteria:** Founder selects one of the three AD-01 options in writing.
 - **Future Review Trigger:** None.
-- **Source Evidence:** `docs/architecture/[DRAFT]_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md` §3.
+- **Source Evidence:** `docs/archive/historical/architecture/ARCHIVED_DOC-P4-02_Service_and_Edge_Function_Specifications_v1.0.md` §3.
 
 ### FD-05 — Resolve the systemic ACTIVE-vs-DRAFT status contradiction across the frozen document set
-- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/governance/[ACTIVE]_Repository_Naming_Conflict_Report_v1.0.md` (2026-07-13)
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/archive/reports/governance/ARCHIVED_Repository_Naming_Conflict_Report_v1.0.md` (2026-07-13)
 - **Context:** `DOC-P3-02`, `DOC-P3-03`, `DOC-P3-03A`, `DOC-P3-04`, `DOC-P3-05-Part-A`, and the vNext Addendum all carry the `[ACTIVE]` filename token while their own internal headers read "DRAFT — pending Founder sign-off," with blank signature lines.
 - **Problem Statement:** Is a document "frozen" because its filename says ACTIVE, or only once actually signed? The naming standard and the documents' own headers disagree.
 - **Alternatives Considered:** (a) sign the batch of documents; (b) amend the naming standard to state sign-off is not required for ACTIVE status. Both stated in `Final_Evidence_Closure_v1.0.md` §8 FD-05, sourced from the Conflict Report's own framing.
@@ -210,7 +210,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Implementation Notes:** None — pure governance action.
 - **Acceptance Criteria:** Either a batch Founder signature, or a naming-standard amendment.
 - **Future Review Trigger:** None.
-- **Source Evidence:** `docs/governance/[ACTIVE]_Repository_Naming_Conflict_Report_v1.0.md`.
+- **Source Evidence:** `docs/archive/reports/governance/ARCHIVED_Repository_Naming_Conflict_Report_v1.0.md`.
 
 ### FD-06 — Priority ruling on member add-ons (LF-C) build order
 - **Status:** Pending · **Origin:** synthesized in `Final_Evidence_Closure_v1.0.md` §8 (no pre-existing primary source — stated plainly, not invented provenance)
@@ -289,7 +289,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Implementation Notes:** Cheap, one-time text update.
 - **Acceptance Criteria:** DOC-10 §10 updated and re-verified against live Supabase project settings.
 - **Future Review Trigger:** None.
-- **Source Evidence:** `docs/project-history/certificates/[ACTIVE]_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md`; live Supabase project ref confirmed this audit chain.
+- **Source Evidence:** `docs/archive/certificates/ARCHIVED_REPO-CERT-009_WP-6E2_Canonical_Production_Sync_v1.0.md`; live Supabase project ref confirmed this audit chain.
 
 ### FD-10 — Approve the improved LF-D07 fallback behavior as the documented standard
 - **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/architecture/[ACTIVE]_RE-DOC-01_Architecture.docx` §05 vs. `supabase/functions/_shared/services/re/constraints.ts`
@@ -309,7 +309,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `supabase/functions/_shared/services/re/constraints.ts` (`handleConstraintConflict`).
 
 ### FD-11 — Rule on the `mainIngredientClass` "dominant ingredient" derivation rule
-- **Status:** Pending · **Origin:** `docs/project-history/work-packages/[ACTIVE]_WP-8FA_CandidateRepository_Architecture_Audit_v1.0.md`, blocker 8F-02
+- **Status:** Pending · **Origin:** `docs/archive/implementation/work-packages/ARCHIVED_WP-8FA_CandidateRepository_Architecture_Audit_v1.0.md`, blocker 8F-02
 - **Context:** `ingredients.category` exists in the raw source CSV but was never seeded; no rule defines which ingredient "dominates" a multi-ingredient dish.
 - **Problem Statement:** `CandidateRepository`'s `mainIngredientClass` field cannot be computed without this rule, and WP-8F's own STOP discipline forbids fabricating a default.
 - **Alternatives Considered:** By weight/quantity; by listing order in source data; via a curated override table — enumerated in `Engineering_Execution_Baseline_v1.0.md` §6 FD-11, sourced from the WP-8FA audit's own framing.
@@ -326,12 +326,12 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Implementation Notes:** Do not implement a default in the meantime — per WP-8F's own explicit rule against fabricated defaults.
 - **Acceptance Criteria:** Founder specifies the dominant-ingredient rule; `CandidateRepository` implements it; a new adapter test asserts correct behavior on a multi-ingredient dish.
 - **Future Review Trigger:** None.
-- **Source Evidence:** `docs/project-history/certificates/[ACTIVE]_REPO-CERT-019_WP-8FA_CandidateRepository_Audit_v1.0.md`.
+- **Source Evidence:** `docs/archive/certificates/ARCHIVED_REPO-CERT-019_WP-8FA_CandidateRepository_Audit_v1.0.md`.
 
 **[FD-11 update, 2026-07-17]** `main_ingredient_class` tags (14 values, added to `public.tags` as a Tier-2 dimension — see `[ACTIVE]_DOC-P3-13_Main_Ingredient_Derivation_Heuristic_v1.0.md`) are confirmed **`is_user_facing = false`, ratified by the Founder.** Rationale: this is an internal scoring/variety dimension (per its stated purpose in DOC-P3-02, "improves ContentMatch quality"), not a user-visible filter or badge. **Revisit only if a future feature specifically needs user-facing filtering by ingredient class** — no such feature exists today. This does not itself close FD-11 in full: the broader dominant-ingredient derivation rule and the `is_main_ingredient` data load are tracked separately (WP-10, `[ACTIVE]_DOC-P3-13_...`); this note settles the narrower `is_user_facing` question only.
 
 ### FD-12 — `dish_combos` cuisine-destination column
-- **Status:** Pending (half-closed) · **Origin:** `docs/research/[ACTIVE]_Phase3_5_Project_Integration_Review_v1.0.md` §9/§14 (`B4-GAP-001`, `B5-GAP-003`), `docs/research/[ACTIVE]_Batch5_Pipeline_Package_v1.1.md` (`B5-RES-003`)
+- **Status:** Pending (half-closed) · **Origin:** `docs/archive/reports/research/ARCHIVED_Phase3_5_Project_Integration_Review_v1.0.md` §9/§14 (`B4-GAP-001`, `B5-GAP-003`), `docs/research/[ACTIVE]_Batch5_Pipeline_Package_v1.1.md` (`B5-RES-003`)
 - **Context:** The original finding said neither `dishes` nor `dish_combos` had a cuisine-destination column. Live verification this audit chain confirms `dishes.cuisine_id` now exists (migration `021_cuisines_reference.sql`) — resolved on that side — but `dish_combos` still has **no** cuisine column at all, confirmed via direct `information_schema.columns` query.
 - **Problem Statement:** Does `dish_combos` need the same fix, and if so, what value goes in it for each of the 35 rows?
 - **Alternatives Considered:** Add `dish_combos.cuisine_id` (nullable FK, same pattern as `dishes`) with a deterministic backfill from combo-member dishes' dominant cuisine; or explicitly rule combo-level cuisine out of scope for MVP if no feature needs it — both stated in last session's Founder Decision Book, sourced from direct schema comparison.
@@ -475,7 +475,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md` §8 (Table Classification), §9 (Requires Founder Decision), §12 (Recommended Future Architecture), §13 (Migration Roadmap), §14 (Founder Decisions Required, items 2–4).
 
 ### FD-19 — Ratify the spec-generation-1 → generation-2 algorithm pivot; approve the G6 pairing fix
-- **Status:** Ratified (2026-08-04, Founder decision, this session) · **Origin:** `reports/re_audit/10_remaining_work.md` items #6 and #13 (2026-08-04 RE knowledge-base audit)
+- **Status:** Ratified (2026-08-04, Founder decision, this session) · **Origin:** `docs/archive/audits/re_audit_archive/ARCHIVED_10_remaining_work.md` items #6 and #13 (2026-08-04 RE knowledge-base audit)
 - **Context:** Spec generation 1 (RE-DOC-01–05: MMR λ=0.70 variety re-ranking, exponential Never/Not-Today decay, a 4-state confidence-evolution model) was never built. The actually-shipped Python engine (`ghar_re_core`) instead implements a different, evidenced design: BASE×GAIN_Q15 scoring, epsilon-greedy exploration, `lifecycle_stage`-based cold-start ramping. No governance document previously recorded whether this was an intentional pivot or an unfinished migration — the same class of gap RE-DOC-12 flagged for the earlier two-engine (TS/Python) question. Separately, `pairing.py`'s G6 protein-veg balance check (`compat()`, lines ~99-110) had a known, code-commented bug: `l_protein` only tested `dish_category == {"dal_lentil"}` when the surrounding `protein_cat` constant named four categories (`dal_lentil`, `kebab`, `egg_dish`, `curry`) — kebab/egg_dish/curry liquids never earned the `b_protein` bonus unless their `diet` also happened to be non_veg/egg. Both were previously left open pending exactly this kind of dated ruling.
 - **Problem Statement:** (a) Is generation-2's mechanism set the ratified intended design, or does generation-1's specific algorithm list (MMR, 4-state model, Never/Not-Today decay) still need to be built? (b) Does the G6 fix apply now, accepting that it changes golden-master scoring output for affected plates?
 - **Alternatives Considered:** (a) Ratify generation-2 as-is (recommended — it is real, tested (93/93 passing pre-session, 165/165 post), evidenced, and already in production) vs. require generation-1's specific algorithms be built to match the original spec vs. leave both unratified indefinitely. (b) Apply the one-line widen-to-`protein_cat` fix now (recommended — the comment left in the code since Phase C.5 already named the exact fix) vs. leave G6 as a permanently-known bug.
@@ -485,16 +485,16 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Engineering Impact:** None further for (a) — no code change, only ratification. (b) is applied and merged this session.
 - **AI Impact:** None. **Recommendation Engine Impact:** (a) None (no behavior change, only its governance status). (b) Changes `compat()`'s `b_protein` bonus eligibility for kebab/egg_dish/curry-category liquids — a real, intentional scoring change.
 - **Database Impact:** None. **API Impact:** None. **Batch Impact:** None. **ETL Impact:** None. **Architecture Impact:** None — both items are within the already-frozen Core Spine's own module boundaries.
-- **Affected Documents:** `reports/re_audit/10_remaining_work.md` (items #6, #13 marked resolved by reference to this entry). RE-DOC-01–05 remain on disk as historical record per the never-delete-a-superseded-document rule (GOV-02) — not stamped SUPERSEDED by this entry itself, since they were never the shipped implementation; this Register entry is the authoritative record that generation-2 superseded their algorithm list in practice.
+- **Affected Documents:** `docs/archive/audits/re_audit_archive/ARCHIVED_10_remaining_work.md` (items #6, #13 marked resolved by reference to this entry). RE-DOC-01–05 remain on disk as historical record per the never-delete-a-superseded-document rule (GOV-02) — not stamped SUPERSEDED by this entry itself, since they were never the shipped implementation; this Register entry is the authoritative record that generation-2 superseded their algorithm list in practice.
 - **Affected Work Packages:** None new.
 - **Affected Tests:** `ghar_re_core/tests/golden/*.json` (all 4 regenerated), `ghar_re_core/tests/test_golden_master.py` (passes against new baseline).
 - **Affected Epics:** None currently.
 - **Implementation Notes:** `ghar_re_core/pairing.py`'s `compat()` comment updated in place to record this ratification date rather than describing the fix as still-deferred.
 - **Acceptance Criteria:** Satisfied by this ratification and the merged code/golden-master change itself.
 - **Future Review Trigger:** None for (a) — permanent. None for (b) — the fix is final, not provisional.
-- **Source Evidence:** `ghar_re_core/pairing.py` (pre-fix code comment naming the exact fix and its scoring-output caveat); `reports/re_audit/10_remaining_work.md` items #6, #13; live test run, this session (165/165 passing post-fix).
+- **Source Evidence:** `ghar_re_core/pairing.py` (pre-fix code comment naming the exact fix and its scoring-output caveat); `docs/archive/audits/re_audit_archive/ARCHIVED_10_remaining_work.md` items #6, #13; live test run, this session (165/165 passing post-fix).
 
-**[FD-19 extension, 2026-08-04, same-day Founder decision]** Scope extended to cover the same class of question for the Meal Genome (reports/re_audit/03_meal_genome_audit.md): RE-DOC-02 specifies 20 literal, named genome dimensions; the actually-built, FROZEN Core Spine instead organizes dish attributes into five semantic tag groups (Sensory/Preparation/Nutrition/Structure/Identity) plus an ingredient block — ~89 tag dimensions, not 20 named fields, with none of the 20 a byte-for-byte match (report 03's per-dimension table: ~11 have a direct functional analogue, ~4 more have schema but unverified population, ~5 have no equivalent and were restructured or dropped). This is the identical situation FD-19 already ratified for the scoring algorithm — a real, evidenced, shipped generation-2 design superseding an unbuilt generation-1 spec, previously undocumented as an intentional choice. **Ratified: the Core Spine's five-group tag model is confirmed as the intended, final genome structure.** RE-DOC-02's literal 20-dimension list is not to be built to spec; it is superseded in practice by the Core Spine, the same way generation-1's scoring concepts were. RE-DOC-02 itself is not edited or stamped SUPERSEDED (GOV-02, historical record preserved) — this Register entry is the authoritative record of the supersession. No code change results from this ratification itself — the Core Spine model is already what's implemented; this closes the governance gap only. Source: `reports/re_audit/03_meal_genome_audit.md` (full per-dimension table), `docs/architecture/ghar-re/ghar_re_v1_0_core_spine_FROZEN.md` (the ratified structure).
+**[FD-19 extension, 2026-08-04, same-day Founder decision]** Scope extended to cover the same class of question for the Meal Genome (docs/archive/audits/re_audit_archive/ARCHIVED_03_meal_genome_audit.md): RE-DOC-02 specifies 20 literal, named genome dimensions; the actually-built, FROZEN Core Spine instead organizes dish attributes into five semantic tag groups (Sensory/Preparation/Nutrition/Structure/Identity) plus an ingredient block — ~89 tag dimensions, not 20 named fields, with none of the 20 a byte-for-byte match (report 03's per-dimension table: ~11 have a direct functional analogue, ~4 more have schema but unverified population, ~5 have no equivalent and were restructured or dropped). This is the identical situation FD-19 already ratified for the scoring algorithm — a real, evidenced, shipped generation-2 design superseding an unbuilt generation-1 spec, previously undocumented as an intentional choice. **Ratified: the Core Spine's five-group tag model is confirmed as the intended, final genome structure.** RE-DOC-02's literal 20-dimension list is not to be built to spec; it is superseded in practice by the Core Spine, the same way generation-1's scoring concepts were. RE-DOC-02 itself is not edited or stamped SUPERSEDED (GOV-02, historical record preserved) — this Register entry is the authoritative record of the supersession. No code change results from this ratification itself — the Core Spine model is already what's implemented; this closes the governance gap only. Source: `docs/archive/audits/re_audit_archive/ARCHIVED_03_meal_genome_audit.md` (full per-dimension table), `docs/architecture/ghar-re/ghar_re_v1_0_core_spine_FROZEN.md` (the ratified structure).
 
 ---
 
@@ -528,7 +528,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Alternatives Considered:** Not re-read in full this session — cited from the Validation Audit's own reconstruction, not re-derived.
 - **Business Rationale:** Habit formation before monetization, consistent with DOC-01's retention-first philosophy.
 - **Affected Documents:** DOC-08. **Affected Epics:** None directly (business-model layer, not an engineering Epic).
-- **Source Evidence:** `docs/project-history/work-packages/[ACTIVE]_WP-9_Validation_Audit_v1.0.md` §A.1 (not re-verified independently this session — flagged as citing a secondary reconstruction, not the primary `.docx`, for time reasons).
+- **Source Evidence:** `docs/archive/implementation/work-packages/ARCHIVED_WP-9_Validation_Audit_v1.0.md` §A.1 (not re-verified independently this session — flagged as citing a secondary reconstruction, not the primary `.docx`, for time reasons).
 
 ### PD-04 — Invite-only GTM to 500 DAU
 - **Status:** Ratified · **Origin:** `docs/product/[ACTIVE]_DOC-07_GTM_v1.0.docx`, per Validation Audit §A.1

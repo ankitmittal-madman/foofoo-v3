@@ -1,0 +1,294 @@
+# STATUS
+
+ARCHIVED
+
+## Reason
+
+Implementation completed.
+
+This document is retained for historical reference only.
+
+It must not be used as the primary implementation guide.
+
+Refer to the active documentation for the current source of truth.
+
+---
+
+[0m[38;5;245m------- pre-test output -------[0m
+(node:72326) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[0m[38;5;245m----- pre-test output end -----[0m
+[0m[38;5;245mrunning 16 tests from ./functions/_tests/consent.test.ts[0m
+parseConsentRequest accepts a well-formed body ... [0m[32mok[0m [0m[38;5;245m(6ms)[0m
+parseConsentRequest rejects a missing profile_id with ERR_VALIDATION_FAILED (400) ... [0m[32mok[0m [0m[38;5;245m(4ms)[0m
+parseConsentRequest rejects an empty consents array (400) ... [0m[32mok[0m [0m[38;5;245m(992µs)[0m
+parseConsentRequest rejects a non-boolean granted (400) ... [0m[32mok[0m [0m[38;5;245m(800µs)[0m
+parseConsentRequest rejects an unknown consent_type with ERR_CONSENT_TYPE_INVALID (422) ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+requireOwnership passes when JWT user_id matches the resource owner ... [0m[32mok[0m [0m[38;5;245m(279µs)[0m
+requireOwnership throws ERR_OWNERSHIP_MISMATCH (403) on mismatch ... [0m[32mok[0m [0m[38;5;245m(336µs)[0m
+authenticate attaches verified claims to the context ... [0m[32mok[0m [0m[38;5;245m(24ms)[0m
+authenticate throws ERR_UNAUTHENTICATED (401) when the bearer header is missing ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+authenticate throws ERR_UNAUTHENTICATED (401) when the verifier rejects ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+captureConsent records rows and resolves personalization_granted = true ...
+[0m[38;5;245m------- output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.211Z","msg":"consent_captured","trace_id":"ad528023-2082-43a5-ba5f-09a404e3e745","method":"GET","path":"/v1/consent","component":"ConsentService","count":2,"personalization_granted":true}
+[0m[38;5;245m----- output end -----[0m
+captureConsent records rows and resolves personalization_granted = true ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+captureConsent resolves personalization_granted = false when personalization denied ...
+[0m[38;5;245m------- output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.212Z","msg":"consent_captured","trace_id":"ccf5a431-ee6e-455b-ad95-773b8bdc40e5","method":"GET","path":"/v1/consent","component":"ConsentService","count":1,"personalization_granted":false}
+[0m[38;5;245m----- output end -----[0m
+captureConsent resolves personalization_granted = false when personalization denied ... [0m[32mok[0m [0m[38;5;245m(703µs)[0m
+captureConsent resolves personalization_granted = false when personalization absent ...
+[0m[38;5;245m------- output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.213Z","msg":"consent_captured","trace_id":"7c7cb5e2-82f8-4ad1-8cd2-ecd12838b3eb","method":"GET","path":"/v1/consent","component":"ConsentService","count":1,"personalization_granted":false}
+[0m[38;5;245m----- output end -----[0m
+captureConsent resolves personalization_granted = false when personalization absent ... [0m[32mok[0m [0m[38;5;245m(945µs)[0m
+POST /v1/consent happy path returns 201 with contract-shaped body ...
+[0m[38;5;245m------- output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.216Z","msg":"request_start","trace_id":"38306bd8-8fdb-4188-8191-be3e954dbd1f","method":"POST","path":"/v1/consent"}
+{"level":"info","ts":"2026-08-03T11:07:14.217Z","msg":"consent_captured","trace_id":"38306bd8-8fdb-4188-8191-be3e954dbd1f","method":"POST","path":"/v1/consent","component":"ConsentService","count":2,"personalization_granted":true}
+{"level":"info","ts":"2026-08-03T11:07:14.218Z","msg":"Household recorded consent decisions — personalization: granted; analytics: declined. Personalization is ON for this household.","event":"user_journey","profile":"11111111…","category":"consent"}
+{"level":"info","ts":"2026-08-03T11:07:14.222Z","msg":"request_finish","trace_id":"38306bd8-8fdb-4188-8191-be3e954dbd1f","method":"POST","path":"/v1/consent","status":201,"latency_ms":7}
+[0m[38;5;245m----- output end -----[0m
+POST /v1/consent happy path returns 201 with contract-shaped body ... [0m[32mok[0m [0m[38;5;245m(18ms)[0m
+POST /v1/consent returns 403 when JWT user_id != body profile_id ...
+[0m[38;5;245m------- output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.235Z","msg":"request_start","trace_id":"514ed72c-6fed-4690-8506-074667f0a2ff","method":"POST","path":"/v1/consent"}
+{"level":"warn","ts":"2026-08-03T11:07:14.237Z","msg":"request_rejected","trace_id":"514ed72c-6fed-4690-8506-074667f0a2ff","method":"POST","path":"/v1/consent","code":"ERR_OWNERSHIP_MISMATCH","status":403,"detail":"ownership check failed"}
+[0m[38;5;245m----- output end -----[0m
+POST /v1/consent returns 403 when JWT user_id != body profile_id ... [0m[32mok[0m [0m[38;5;245m(8ms)[0m
+POST /v1/consent returns 422 for an unknown consent_type ...
+[0m[38;5;245m------- output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.245Z","msg":"request_start","trace_id":"b598bb0f-dff9-47a3-bf95-2ad3b47175d2","method":"POST","path":"/v1/consent"}
+{"level":"warn","ts":"2026-08-03T11:07:14.248Z","msg":"request_rejected","trace_id":"b598bb0f-dff9-47a3-bf95-2ad3b47175d2","method":"POST","path":"/v1/consent","code":"ERR_CONSENT_TYPE_INVALID","status":422}
+[0m[38;5;245m----- output end -----[0m
+POST /v1/consent returns 422 for an unknown consent_type ... [0m[32mok[0m [0m[38;5;245m(8ms)[0m
+[0m[38;5;245m------- post-test output -------[0m
+(node:72326) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[0m[38;5;245m----- post-test output end -----[0m
+[0m[38;5;245mrunning 12 tests from ./functions/_tests/feedback.test.ts[0m
+parseFeedbackRequest accepts a well-formed body ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+parseFeedbackRequest accepts a body with no dish_name (e.g. 'accept' the whole plate) ... [0m[32mok[0m [0m[38;5;245m(465µs)[0m
+parseFeedbackRequest rejects a missing request_id (400) ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+parseFeedbackRequest rejects an empty request_id (400) ... [0m[32mok[0m [0m[38;5;245m(808µs)[0m
+parseFeedbackRequest rejects an unknown event_type with ERR_FEEDBACK_EVENT_TYPE_INVALID (422) ... [0m[32mok[0m [0m[38;5;245m(511µs)[0m
+FEEDBACK_EVENT_TYPES matches the feedback_events CHECK constraint (migration 038) ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+POST /v1/feedback happy path returns 201 with contract-shaped body ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.782Z","msg":"request_start","trace_id":"df632413-6a48-427e-9c68-fa4a4f9d7c5b","method":"POST","path":"/v1/feedback"}
+{"level":"info","ts":"2026-08-03T11:07:14.784Z","msg":"Household liked a dish.","event":"user_journey","profile":"11111111…","category":"feedback"}
+{"level":"info","ts":"2026-08-03T11:07:14.787Z","msg":"request_finish","trace_id":"df632413-6a48-427e-9c68-fa4a4f9d7c5b","method":"POST","path":"/v1/feedback","status":201,"latency_ms":5}
+[0m[38;5;245m----- post-test output end -----[0m
+POST /v1/feedback happy path returns 201 with contract-shaped body ... [0m[32mok[0m [0m[38;5;245m(40ms)[0m
+POST /v1/feedback returns 422 for an unknown event_type before recordEvent is ever called ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.797Z","msg":"request_start","trace_id":"f8a45090-242b-420b-847d-c4ef1dac1b0e","method":"POST","path":"/v1/feedback"}
+{"level":"warn","ts":"2026-08-03T11:07:14.798Z","msg":"request_rejected","trace_id":"f8a45090-242b-420b-847d-c4ef1dac1b0e","method":"POST","path":"/v1/feedback","code":"ERR_FEEDBACK_EVENT_TYPE_INVALID","status":422}
+[0m[38;5;245m----- post-test output end -----[0m
+POST /v1/feedback returns 422 for an unknown event_type before recordEvent is ever called ... [0m[32mok[0m [0m[38;5;245m(4ms)[0m
+POST /v1/feedback propagates ERR_RECOMMENDATION_EVENT_NOT_FOUND (404) from the writer ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.801Z","msg":"request_start","trace_id":"22ebe74f-0147-4d90-ae63-3640e6b325b8","method":"POST","path":"/v1/feedback"}
+{"level":"warn","ts":"2026-08-03T11:07:14.802Z","msg":"request_rejected","trace_id":"22ebe74f-0147-4d90-ae63-3640e6b325b8","method":"POST","path":"/v1/feedback","code":"ERR_RECOMMENDATION_EVENT_NOT_FOUND","status":404}
+[0m[38;5;245m----- post-test output end -----[0m
+POST /v1/feedback propagates ERR_RECOMMENDATION_EVENT_NOT_FOUND (404) from the writer ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+POST /v1/feedback propagates ERR_OWNERSHIP_MISMATCH (403) when the recommendation_event belongs to another profile ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.805Z","msg":"request_start","trace_id":"1c2d02d5-f09b-4362-8ecf-5bdf23c79b90","method":"POST","path":"/v1/feedback"}
+{"level":"warn","ts":"2026-08-03T11:07:14.806Z","msg":"request_rejected","trace_id":"1c2d02d5-f09b-4362-8ecf-5bdf23c79b90","method":"POST","path":"/v1/feedback","code":"ERR_OWNERSHIP_MISMATCH","status":403,"detail":"recommendation_event belongs to a different profile"}
+[0m[38;5;245m----- post-test output end -----[0m
+POST /v1/feedback propagates ERR_OWNERSHIP_MISMATCH (403) when the recommendation_event belongs to another profile ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+POST /v1/feedback returns 401 when unauthenticated ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.807Z","msg":"request_start","trace_id":"95907d70-4dd7-43f3-967b-389acf565f68","method":"POST","path":"/v1/feedback"}
+{"level":"warn","ts":"2026-08-03T11:07:14.809Z","msg":"request_rejected","trace_id":"95907d70-4dd7-43f3-967b-389acf565f68","method":"POST","path":"/v1/feedback","code":"ERR_UNAUTHENTICATED","status":401,"detail":"missing/malformed bearer"}
+[0m[38;5;245m----- post-test output end -----[0m
+POST /v1/feedback returns 401 when unauthenticated ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+POST /v1/feedback returns 405 for a non-POST method ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:14.811Z","msg":"request_start","trace_id":"8e130524-30c6-4b1a-885d-29d00765540d","method":"GET","path":"/v1/feedback"}
+{"level":"warn","ts":"2026-08-03T11:07:14.812Z","msg":"request_rejected","trace_id":"8e130524-30c6-4b1a-885d-29d00765540d","method":"GET","path":"/v1/feedback","code":"METHOD_NOT_ALLOWED","status":405}
+[0m[38;5;245m----- post-test output end -----[0m
+POST /v1/feedback returns 405 for a non-POST method ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+[0m[38;5;245m------- post-test output -------[0m
+(node:72326) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[0m[38;5;245m----- post-test output end -----[0m
+[0m[38;5;245mrunning 8 tests from ./functions/_tests/foundation.test.ts[0m
+config loads when required env is present ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+config fails fast on missing required secret ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+logger initializes and honors min level ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"error","ts":"2026-08-03T11:07:15.355Z","msg":"should emit","trace_id":"t-1"}
+[0m[38;5;245m----- post-test output end -----[0m
+logger initializes and honors min level ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+AppError produces client-safe JSON without internal detail ... [0m[32mok[0m [0m[38;5;245m(484µs)[0m
+middleware pipeline composes and error boundary maps AppError to status ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"warn","ts":"2026-08-03T11:07:15.373Z","msg":"request_rejected","trace_id":"8abe4f85-3b7b-4c6a-8bad-7b9d0ddce30f","method":"GET","path":"/v1/anything","code":"NOT_FOUND","status":404,"detail":"x"}
+{"level":"info","ts":"2026-08-03T11:07:15.372Z","msg":"request_start","trace_id":"8abe4f85-3b7b-4c6a-8bad-7b9d0ddce30f","method":"GET","path":"/v1/anything"}
+[0m[38;5;245m----- post-test output end -----[0m
+middleware pipeline composes and error boundary maps AppError to status ... [0m[32mok[0m [0m[38;5;245m(25ms)[0m
+compose applies middleware outermost-first ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+DI container builds a service-role client lazily ... [0m[32mok[0m [0m[38;5;245m(6ms)[0m
+validate() throws VALIDATION_FAILED on bad input ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+[0m[38;5;245m------- post-test output -------[0m
+(node:72326) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[0m[38;5;245m----- post-test output end -----[0m
+[0m[38;5;245mrunning 16 tests from ./functions/_tests/household.test.ts[0m
+household_id owned by another user is rejected before ANY store function runs (403) ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:15.743Z","msg":"request_start","trace_id":"e82ddb42-ce36-4cdf-9fa5-7785c2baa10b","method":"POST","path":"/v1/household"}
+{"level":"warn","ts":"2026-08-03T11:07:15.744Z","msg":"request_rejected","trace_id":"e82ddb42-ce36-4cdf-9fa5-7785c2baa10b","method":"POST","path":"/v1/household","code":"ERR_OWNERSHIP_MISMATCH","status":403,"detail":"ownership check failed"}
+[0m[38;5;245m----- post-test output end -----[0m
+household_id owned by another user is rejected before ANY store function runs (403) ... [0m[32mok[0m [0m[38;5;245m(21ms)[0m
+household_id equal to the caller's own id is allowed through ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:15.752Z","msg":"request_start","trace_id":"333863c7-96bd-4afc-9205-861d9bfd24ed","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.755Z","msg":"household.answers_upserted","trace_id":"333863c7-96bd-4afc-9205-861d9bfd24ed","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.755Z","msg":"Household answered onboarding screen(s): screen_primary_cook_name","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.756Z","msg":"request_finish","trace_id":"333863c7-96bd-4afc-9205-861d9bfd24ed","method":"POST","path":"/v1/household","status":200,"latency_ms":4}
+[0m[38;5;245m----- post-test output end -----[0m
+household_id equal to the caller's own id is allowed through ... [0m[32mok[0m [0m[38;5;245m(5ms)[0m
+omitting household_id defaults to the caller's own id and is allowed through ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:15.757Z","msg":"request_start","trace_id":"18d10751-d469-4d09-b88a-73e7884b4e01","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.758Z","msg":"household.answers_upserted","trace_id":"18d10751-d469-4d09-b88a-73e7884b4e01","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.758Z","msg":"Household answered onboarding screen(s): screen_current_city","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.759Z","msg":"request_finish","trace_id":"18d10751-d469-4d09-b88a-73e7884b4e01","method":"POST","path":"/v1/household","status":200,"latency_ms":1}
+[0m[38;5;245m----- post-test output end -----[0m
+omitting household_id defaults to the caller's own id and is allowed through ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+profile is NOT created while a required field is still missing (no fabricated default) ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:15.760Z","msg":"request_start","trace_id":"aa109828-b5ea-4e45-beea-41e1f83867e8","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.761Z","msg":"household.answers_upserted","trace_id":"aa109828-b5ea-4e45-beea-41e1f83867e8","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.761Z","msg":"Household answered onboarding screen(s): screen_primary_cook_name, screen_home_state, screen_current_city, screen_diet_type","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.762Z","msg":"request_finish","trace_id":"aa109828-b5ea-4e45-beea-41e1f83867e8","method":"POST","path":"/v1/household","status":200,"latency_ms":2}
+[0m[38;5;245m----- post-test output end -----[0m
+profile is NOT created while a required field is still missing (no fabricated default) ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+a household can be created across multiple calls (resume-after-partial-completion) ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:15.763Z","msg":"request_start","trace_id":"eed537e1-4464-480d-8aa4-45570972cb7a","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.764Z","msg":"household.answers_upserted","trace_id":"eed537e1-4464-480d-8aa4-45570972cb7a","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.764Z","msg":"Household answered onboarding screen(s): screen_primary_cook_name, screen_home_state","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.764Z","msg":"request_finish","trace_id":"eed537e1-4464-480d-8aa4-45570972cb7a","method":"POST","path":"/v1/household","status":200,"latency_ms":1}
+{"level":"info","ts":"2026-08-03T11:07:15.765Z","msg":"request_start","trace_id":"73c5f581-6612-426f-a02e-d952f4ccf1a6","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.765Z","msg":"household.answers_upserted","trace_id":"73c5f581-6612-426f-a02e-d952f4ccf1a6","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.766Z","msg":"Household answered onboarding screen(s): screen_current_city, screen_diet_type","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.766Z","msg":"request_finish","trace_id":"73c5f581-6612-426f-a02e-d952f4ccf1a6","method":"POST","path":"/v1/household","status":200,"latency_ms":1}
+{"level":"info","ts":"2026-08-03T11:07:15.767Z","msg":"request_start","trace_id":"5224f6ab-df05-45a0-b79c-71d4720c1b1a","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.767Z","msg":"household.answers_upserted","trace_id":"5224f6ab-df05-45a0-b79c-71d4720c1b1a","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.767Z","msg":"household.profile_created","trace_id":"5224f6ab-df05-45a0-b79c-71d4720c1b1a","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household"}
+{"level":"info","ts":"2026-08-03T11:07:15.767Z","msg":"Household answered onboarding screen(s): screen_cook_capability → profile created (all required fields now known)","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.768Z","msg":"request_finish","trace_id":"5224f6ab-df05-45a0-b79c-71d4720c1b1a","method":"POST","path":"/v1/household","status":200,"latency_ms":1}
+[0m[38;5;245m----- post-test output end -----[0m
+a household can be created across multiple calls (resume-after-partial-completion) ... [0m[32mok[0m [0m[38;5;245m(5ms)[0m
+a repeat call after the profile already exists does not re-create it ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:15.769Z","msg":"request_start","trace_id":"3d30bc11-a82e-42e3-845d-d97e06f960b7","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.769Z","msg":"household.answers_upserted","trace_id":"3d30bc11-a82e-42e3-845d-d97e06f960b7","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.769Z","msg":"household.profile_created","trace_id":"3d30bc11-a82e-42e3-845d-d97e06f960b7","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household"}
+{"level":"info","ts":"2026-08-03T11:07:15.770Z","msg":"Household answered onboarding screen(s): screen_primary_cook_name, screen_home_state, screen_current_city, screen_diet_type, screen_cook_capability → profile created (all required fields now known)","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.770Z","msg":"request_finish","trace_id":"3d30bc11-a82e-42e3-845d-d97e06f960b7","method":"POST","path":"/v1/household","status":200,"latency_ms":1}
+{"level":"info","ts":"2026-08-03T11:07:15.773Z","msg":"request_start","trace_id":"e51d1762-0531-4eb5-b9bc-bca349e72b3b","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.773Z","msg":"household.answers_upserted","trace_id":"e51d1762-0531-4eb5-b9bc-bca349e72b3b","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.773Z","msg":"Household answered onboarding screen(s): screen_primary_cook_name, screen_home_state, screen_current_city, screen_diet_type, screen_cook_capability","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.773Z","msg":"request_finish","trace_id":"e51d1762-0531-4eb5-b9bc-bca349e72b3b","method":"POST","path":"/v1/household","status":200,"latency_ms":1}
+[0m[38;5;245m----- post-test output end -----[0m
+a repeat call after the profile already exists does not re-create it ... [0m[32mok[0m [0m[38;5;245m(5ms)[0m
+members can be written on a later call once the profile exists ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:15.775Z","msg":"request_start","trace_id":"b0fcc2a2-2ef7-4009-9eda-c96535df68d6","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.777Z","msg":"household.answers_upserted","trace_id":"b0fcc2a2-2ef7-4009-9eda-c96535df68d6","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.777Z","msg":"household.profile_created","trace_id":"b0fcc2a2-2ef7-4009-9eda-c96535df68d6","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household"}
+{"level":"info","ts":"2026-08-03T11:07:15.777Z","msg":"Household answered onboarding screen(s): screen_primary_cook_name, screen_home_state, screen_current_city, screen_diet_type, screen_cook_capability → profile created (all required fields now known)","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.777Z","msg":"request_finish","trace_id":"b0fcc2a2-2ef7-4009-9eda-c96535df68d6","method":"POST","path":"/v1/household","status":200,"latency_ms":3}
+{"level":"info","ts":"2026-08-03T11:07:15.778Z","msg":"request_start","trace_id":"dbad58d4-85ca-456c-b8f9-d47d27aab8ff","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.781Z","msg":"household.answers_upserted","trace_id":"dbad58d4-85ca-456c-b8f9-d47d27aab8ff","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"info","ts":"2026-08-03T11:07:15.781Z","msg":"household.members_written","trace_id":"dbad58d4-85ca-456c-b8f9-d47d27aab8ff","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","count":1}
+{"level":"info","ts":"2026-08-03T11:07:15.781Z","msg":"Household answered onboarding screen(s):  → 1 household member(s) saved","event":"user_journey","profile":"11111111…","category":"onboarding"}
+{"level":"info","ts":"2026-08-03T11:07:15.781Z","msg":"request_finish","trace_id":"dbad58d4-85ca-456c-b8f9-d47d27aab8ff","method":"POST","path":"/v1/household","status":200,"latency_ms":3}
+[0m[38;5;245m----- post-test output end -----[0m
+members can be written on a later call once the profile exists ... [0m[32mok[0m [0m[38;5;245m(7ms)[0m
+household_members supplied before the profile exists is rejected (422), upsertMembers never called ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:15.783Z","msg":"request_start","trace_id":"55672be8-f655-4a22-a74e-553da6671354","method":"POST","path":"/v1/household"}
+{"level":"info","ts":"2026-08-03T11:07:15.783Z","msg":"household.answers_upserted","trace_id":"55672be8-f655-4a22-a74e-553da6671354","method":"POST","path":"/v1/household","household_id":"11111111-1111-1111-1111-111111111111","service":"household","fields":[]}
+{"level":"warn","ts":"2026-08-03T11:07:15.783Z","msg":"request_rejected","trace_id":"55672be8-f655-4a22-a74e-553da6671354","method":"POST","path":"/v1/household","code":"ERR_HOUSEHOLD_INCOMPLETE","status":422}
+[0m[38;5;245m----- post-test output end -----[0m
+household_members supplied before the profile exists is rejected (422), upsertMembers never called ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+targetFor resolves household_answers keys, profiles keys, and rejects unknown keys ... [0m[32mok[0m [0m[38;5;245m(227µs)[0m
+parseHouseholdWriteRequest rejects a structurally malformed body (400) ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+parseHouseholdWriteRequest rejects an unrecognized question_key (422) ... [0m[32mok[0m [0m[38;5;245m(555µs)[0m
+parseHouseholdWriteRequest rejects an answer_value outside its field's vocabulary (422) ... [0m[32mok[0m [0m[38;5;245m(633µs)[0m
+a skipped screen's answer_value is not validated ... [0m[32mok[0m [0m[38;5;245m(214µs)[0m
+parseHouseholdWriteRequest rejects a member condition outside the 15-value vocabulary ... [0m[32mok[0m [0m[38;5;245m(470µs)[0m
+buildHouseholdAnswersPatch keeps only non-skipped household_answers-targeted screens ... [0m[32mok[0m [0m[38;5;245m(530µs)[0m
+missingRequiredProfileFields reports exactly the unknown required fields ... [0m[32mok[0m [0m[38;5;245m(255µs)[0m
+[0m[38;5;245m------- post-test output -------[0m
+(node:72326) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[0m[38;5;245m----- post-test output end -----[0m
+[0m[38;5;245mrunning 13 tests from ./functions/_tests/recommendations.test.ts[0m
+POST /v1/recommendations success passes RE plates[]/contributions[] through as-is ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:16.334Z","msg":"request_start","trace_id":"6b821874-baaf-401b-8994-48894d3b2eaa","method":"POST","path":"/v1/recommendations"}
+{"level":"info","ts":"2026-08-03T11:07:16.335Z","msg":"recommendation.auth_ok","trace_id":"6b821874-baaf-401b-8994-48894d3b2eaa","method":"POST","path":"/v1/recommendations","request_id":"6b821874-baaf-401b-8994-48894d3b2eaa","service":"recommendations","user_id":"11111111-1111-1111-1111-111111111111"}
+{"level":"info","ts":"2026-08-03T11:07:16.335Z","msg":"recommendation.composed","trace_id":"6b821874-baaf-401b-8994-48894d3b2eaa","method":"POST","path":"/v1/recommendations","request_id":"6b821874-baaf-401b-8994-48894d3b2eaa","service":"recommendations","household_id":"11111111-1111-1111-1111-111111111111","stubbed":false}
+{"level":"info","ts":"2026-08-03T11:07:16.338Z","msg":"recommendation.re_call_done","trace_id":"6b821874-baaf-401b-8994-48894d3b2eaa","method":"POST","path":"/v1/recommendations","request_id":"6b821874-baaf-401b-8994-48894d3b2eaa","service":"recommendations","outcome":"success","latency_ms":0,"warnings":0}
+{"level":"info","ts":"2026-08-03T11:07:16.338Z","msg":"App served 1 recommended plate(s) — the RE responded normally. (0ms)","event":"user_journey","profile":"11111111…","category":"recommendation"}
+{"level":"info","ts":"2026-08-03T11:07:16.340Z","msg":"request_finish","trace_id":"6b821874-baaf-401b-8994-48894d3b2eaa","method":"POST","path":"/v1/recommendations","status":200,"latency_ms":6}
+[0m[38;5;245m----- post-test output end -----[0m
+POST /v1/recommendations success passes RE plates[]/contributions[] through as-is ... [0m[32mok[0m [0m[38;5;245m(20ms)[0m
+POST /v1/recommendations timeout returns a fallback plate (valid 200, not retried) ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:16.343Z","msg":"request_start","trace_id":"487899e9-7619-4c68-89d5-a0910b428b2e","method":"POST","path":"/v1/recommendations"}
+{"level":"info","ts":"2026-08-03T11:07:16.343Z","msg":"recommendation.auth_ok","trace_id":"487899e9-7619-4c68-89d5-a0910b428b2e","method":"POST","path":"/v1/recommendations","request_id":"487899e9-7619-4c68-89d5-a0910b428b2e","service":"recommendations","user_id":"11111111-1111-1111-1111-111111111111"}
+{"level":"info","ts":"2026-08-03T11:07:16.344Z","msg":"recommendation.composed","trace_id":"487899e9-7619-4c68-89d5-a0910b428b2e","method":"POST","path":"/v1/recommendations","request_id":"487899e9-7619-4c68-89d5-a0910b428b2e","service":"recommendations","household_id":"11111111-1111-1111-1111-111111111111","stubbed":false}
+{"level":"warn","ts":"2026-08-03T11:07:16.344Z","msg":"recommendation.re_call_failed","trace_id":"487899e9-7619-4c68-89d5-a0910b428b2e","method":"POST","path":"/v1/recommendations","request_id":"487899e9-7619-4c68-89d5-a0910b428b2e","service":"recommendations","outcome":"timeout","latency_ms":0,"detail":"exceeded 2500ms"}
+{"level":"info","ts":"2026-08-03T11:07:16.344Z","msg":"App served a fallback plate — the RE did not respond in time. (0ms)","event":"user_journey","profile":"11111111…","category":"recommendation"}
+{"level":"info","ts":"2026-08-03T11:07:16.344Z","msg":"request_finish","trace_id":"487899e9-7619-4c68-89d5-a0910b428b2e","method":"POST","path":"/v1/recommendations","status":200,"latency_ms":1}
+[0m[38;5;245m----- post-test output end -----[0m
+POST /v1/recommendations timeout returns a fallback plate (valid 200, not retried) ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+re-client retries ONCE on a network error then succeeds ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+re-client does NOT retry on timeout ... [0m[32mok[0m [0m[38;5;245m(23ms)[0m
+malformed composed payload is rejected before the RE is called (400, RE never hit) ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:16.374Z","msg":"request_start","trace_id":"1b9ca921-5d7d-424e-8f73-8f7b0611ce1d","method":"POST","path":"/v1/recommendations"}
+{"level":"info","ts":"2026-08-03T11:07:16.374Z","msg":"recommendation.auth_ok","trace_id":"1b9ca921-5d7d-424e-8f73-8f7b0611ce1d","method":"POST","path":"/v1/recommendations","request_id":"1b9ca921-5d7d-424e-8f73-8f7b0611ce1d","service":"recommendations","user_id":"11111111-1111-1111-1111-111111111111"}
+{"level":"info","ts":"2026-08-03T11:07:16.374Z","msg":"recommendation.composed","trace_id":"1b9ca921-5d7d-424e-8f73-8f7b0611ce1d","method":"POST","path":"/v1/recommendations","request_id":"1b9ca921-5d7d-424e-8f73-8f7b0611ce1d","service":"recommendations","household_id":"stub","stubbed":true}
+{"level":"warn","ts":"2026-08-03T11:07:16.375Z","msg":"request_rejected","trace_id":"1b9ca921-5d7d-424e-8f73-8f7b0611ce1d","method":"POST","path":"/v1/recommendations","code":"ERR_VALIDATION_FAILED","status":400,"detail":"composed payload failed ghar-re-v1 contract: /household must have required property 'q5_diet'"}
+[0m[38;5;245m----- post-test output end -----[0m
+malformed composed payload is rejected before the RE is called (400, RE never hit) ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+household_id owned by another user is rejected before loadHousehold/compose runs (403) ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:16.376Z","msg":"request_start","trace_id":"d19d142d-113d-4e7f-b9c6-9a34014d11c5","method":"POST","path":"/v1/recommendations"}
+{"level":"warn","ts":"2026-08-03T11:07:16.377Z","msg":"request_rejected","trace_id":"d19d142d-113d-4e7f-b9c6-9a34014d11c5","method":"POST","path":"/v1/recommendations","code":"ERR_OWNERSHIP_MISMATCH","status":403,"detail":"ownership check failed"}
+[0m[38;5;245m----- post-test output end -----[0m
+household_id owned by another user is rejected before loadHousehold/compose runs (403) ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+household_id equal to the caller's own id is allowed through ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:16.378Z","msg":"request_start","trace_id":"8f15fd1a-7008-4856-93ff-40d6ba61c6d5","method":"POST","path":"/v1/recommendations"}
+{"level":"info","ts":"2026-08-03T11:07:16.378Z","msg":"recommendation.auth_ok","trace_id":"8f15fd1a-7008-4856-93ff-40d6ba61c6d5","method":"POST","path":"/v1/recommendations","request_id":"8f15fd1a-7008-4856-93ff-40d6ba61c6d5","service":"recommendations","user_id":"11111111-1111-1111-1111-111111111111"}
+{"level":"info","ts":"2026-08-03T11:07:16.378Z","msg":"recommendation.composed","trace_id":"8f15fd1a-7008-4856-93ff-40d6ba61c6d5","method":"POST","path":"/v1/recommendations","request_id":"8f15fd1a-7008-4856-93ff-40d6ba61c6d5","service":"recommendations","household_id":"11111111-1111-1111-1111-111111111111","stubbed":false}
+{"level":"info","ts":"2026-08-03T11:07:16.378Z","msg":"recommendation.re_call_done","trace_id":"8f15fd1a-7008-4856-93ff-40d6ba61c6d5","method":"POST","path":"/v1/recommendations","request_id":"8f15fd1a-7008-4856-93ff-40d6ba61c6d5","service":"recommendations","outcome":"success","latency_ms":0,"warnings":0}
+{"level":"info","ts":"2026-08-03T11:07:16.378Z","msg":"App served 1 recommended plate(s) — the RE responded normally. (0ms)","event":"user_journey","profile":"11111111…","category":"recommendation"}
+{"level":"info","ts":"2026-08-03T11:07:16.379Z","msg":"request_finish","trace_id":"8f15fd1a-7008-4856-93ff-40d6ba61c6d5","method":"POST","path":"/v1/recommendations","status":200,"latency_ms":1}
+[0m[38;5;245m----- post-test output end -----[0m
+household_id equal to the caller's own id is allowed through ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+omitting household_id defaults to the caller's own id and is allowed through ...
+[0m[38;5;245m------- post-test output -------[0m
+{"level":"info","ts":"2026-08-03T11:07:16.379Z","msg":"request_start","trace_id":"1faa700a-1640-45d2-994d-48b0202e8851","method":"POST","path":"/v1/recommendations"}
+{"level":"info","ts":"2026-08-03T11:07:16.380Z","msg":"recommendation.auth_ok","trace_id":"1faa700a-1640-45d2-994d-48b0202e8851","method":"POST","path":"/v1/recommendations","request_id":"1faa700a-1640-45d2-994d-48b0202e8851","service":"recommendations","user_id":"11111111-1111-1111-1111-111111111111"}
+{"level":"info","ts":"2026-08-03T11:07:16.380Z","msg":"recommendation.composed","trace_id":"1faa700a-1640-45d2-994d-48b0202e8851","method":"POST","path":"/v1/recommendations","request_id":"1faa700a-1640-45d2-994d-48b0202e8851","service":"recommendations","household_id":"11111111-1111-1111-1111-111111111111","stubbed":false}
+{"level":"info","ts":"2026-08-03T11:07:16.380Z","msg":"recommendation.re_call_done","trace_id":"1faa700a-1640-45d2-994d-48b0202e8851","method":"POST","path":"/v1/recommendations","request_id":"1faa700a-1640-45d2-994d-48b0202e8851","service":"recommendations","outcome":"success","latency_ms":0,"warnings":0}
+{"level":"info","ts":"2026-08-03T11:07:16.380Z","msg":"App served 1 recommended plate(s) — the RE responded normally. (0ms)","event":"user_journey","profile":"11111111…","category":"recommendation"}
+{"level":"info","ts":"2026-08-03T11:07:16.380Z","msg":"request_finish","trace_id":"1faa700a-1640-45d2-994d-48b0202e8851","method":"POST","path":"/v1/recommendations","status":200,"latency_ms":1}
+[0m[38;5;245m----- post-test output end -----[0m
+omitting household_id defaults to the caller's own id and is allowed through ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+allergenTokens decodes the frozen 7-bit allergen model ... [0m[32mok[0m [0m[38;5;245m(389µs)[0m
+memberRole maps the live conditions[] vocabulary to RE roles, strictest first ... [0m[32mok[0m [0m[38;5;245m(249µs)[0m
+toMemberAge uses the real age when present and a role default when NULL ... [0m[32mok[0m [0m[38;5;245m(214µs)[0m
+composeHouseholdRaw joins the three live sources into one contract payload ... [0m[32mok[0m [0m[38;5;245m(355µs)[0m
+composeHouseholdRaw serves neutral defaults when onboarding is incomplete ... [0m[32mok[0m [0m[38;5;245m(243µs)[0m
+
+[0m[32mok[0m | 65 passed | 0 failed [0m[38;5;245m(2s)[0m
+

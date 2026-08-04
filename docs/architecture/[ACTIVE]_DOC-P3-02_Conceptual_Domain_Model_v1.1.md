@@ -2,7 +2,7 @@
 
 **Version:** 1.1
 **Date:** June 2026
-**Status:** ACTIVE v1.1 — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
+**Status:** ACTIVE v1.1 — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.1.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **Author:** Claude (Solution Architect role)
 **Sources read:** DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, DOC-06, DOC-09, DOC-10, RE-DOC-01 through RE-DOC-05, all HTML visual documents
 **Next document:** DOC-P3-03 · Business Logic and Algorithm Specification

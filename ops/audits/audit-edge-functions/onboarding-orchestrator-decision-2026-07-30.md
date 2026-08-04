@@ -11,7 +11,7 @@ real `POST /v1/onboarding` Edge Function, which required building live-database 
 `RecommendationEngine`'s 11 ports (`_shared/services/adapters/re-engine-full-adapters.ts`, ~600
 lines, schema-verified against the live project).
 
-While doing this, `docs/architecture/RE-DOC-12_Ghar_RE_Status_and_Roadmap_v1_0.md` was found to
+While doing this, `docs/archive/reports/architecture/ARCHIVED_RE-DOC-12_Ghar_RE_Status_and_Roadmap_v1_0.md` was found to
 already document — before this session, unrelated to this audit — that this repository contains
 **two independent recommendation engines**:
 

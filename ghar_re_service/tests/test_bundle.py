@@ -96,7 +96,7 @@ def test_bundle_catalogue_matches_build_catalogue_output(built):
 
 
 def test_bundle_catalogue_has_full_state_origin_coverage(built):
-    """Regression guard for the state_origin gap reports/re_audit/10_remaining_work.md §P2-9 and
+    """Regression guard for the archived RE audit's state_origin gap (§P2-9) and
     WP-14 §3.2 both flagged (536/810 dishes, 66%, had no state_origin, silently zeroing
     scoring._cuis()'s same-state 1.00-weight term for most of the real catalogue). Root cause was
     two-fold: build_catalogue.transform_dish_row() loaded cuisine_map but never wrote

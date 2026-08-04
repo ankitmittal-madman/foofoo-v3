@@ -146,7 +146,8 @@ can correct any misclassification before you flag false positives.
   legitimate shared-data access)
 - Table with RLS **disabled** entirely and containing user data → **CRITICAL**
 
-Write `rls-audit.md`:
+Write `ops/audits/audit-rls/rls-audit.md` while the audit is current. A later governance pass
+archives completed reports:
 
 | Table | Role (user-owned/reference/junction) | Policies count | SELECT ok | INSERT ok | UPDATE ok | Status |
 |---|---|---|---|---|---|---|
@@ -183,7 +184,7 @@ follow-up in the report rather than fabricating a test.
 
 ## Step 8 — Completion summary
 
-Append to `rls-audit.md`:
+Append to `ops/audits/audit-rls/rls-audit.md`:
 
 ```
 ## Audit completed [date]
@@ -195,7 +196,7 @@ Cross-user isolation test: PASS / FAIL / MANUAL (not run)
 
 Commit:
 ```bash
-git add rls-audit.md supabase/migrations/ 2>/dev/null
+git add ops/audits/audit-rls/rls-audit.md supabase/migrations/ 2>/dev/null
 git commit -m "fix: RLS policy correctness audit — [one-line summary]"
 git push
 ```

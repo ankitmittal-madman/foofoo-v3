@@ -1,0 +1,568 @@
+{
+  "generated_at": "2026-08-04T02:24:36.974531+00:00",
+  "git_head": "cdf8b20",
+  "component_count": 78,
+  "by_kind": {
+    "python-package": 1,
+    "python-service": 1,
+    "http-endpoint": 9,
+    "edge-function": 9,
+    "mobile-screen": 17,
+    "mobile-api-client": 8,
+    "sql-migration": 2,
+    "sql-rollback": 1,
+    "sql-seed": 1,
+    "sql-validation": 1,
+    "api-contract": 1,
+    "test-suite": 21,
+    "ci-workflow": 6
+  },
+  "components": [
+    {
+      "name": "ghar_re_core",
+      "kind": "python-package",
+      "path": "ghar_re_core",
+      "detail": "Recommendation-engine math (frozen reference impl)",
+      "files": 37
+    },
+    {
+      "name": "ghar_re_service",
+      "kind": "python-service",
+      "path": "ghar_re_service",
+      "detail": "FastAPI production service hosting the RE",
+      "files": 26
+    },
+    {
+      "name": "GET /healthz",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "GET /readyz",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "GET /v1/meta",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "POST /v1/recommendations",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "POST /v1/cold-start",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "POST /v1/meal-plan",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "POST /v1/weekly-plan",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "POST /v1/class-dishes",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "POST /v1/recipe",
+      "kind": "http-endpoint",
+      "path": "ghar_re_service/ghar_re_service/main.py",
+      "detail": "FastAPI route on the RE service",
+      "files": 0
+    },
+    {
+      "name": "consent",
+      "kind": "edge-function",
+      "path": "supabase/functions/consent",
+      "detail": "Supabase/Deno edge function",
+      "files": 2
+    },
+    {
+      "name": "cron-hard-delete",
+      "kind": "edge-function",
+      "path": "supabase/functions/cron-hard-delete",
+      "detail": "Supabase/Deno edge function",
+      "files": 1
+    },
+    {
+      "name": "cron-retention-purge",
+      "kind": "edge-function",
+      "path": "supabase/functions/cron-retention-purge",
+      "detail": "Supabase/Deno edge function",
+      "files": 1
+    },
+    {
+      "name": "feedback",
+      "kind": "edge-function",
+      "path": "supabase/functions/feedback",
+      "detail": "Supabase/Deno edge function",
+      "files": 3
+    },
+    {
+      "name": "household",
+      "kind": "edge-function",
+      "path": "supabase/functions/household",
+      "detail": "Supabase/Deno edge function",
+      "files": 4
+    },
+    {
+      "name": "plan",
+      "kind": "edge-function",
+      "path": "supabase/functions/plan",
+      "detail": "Supabase/Deno edge function",
+      "files": 2
+    },
+    {
+      "name": "recommendations",
+      "kind": "edge-function",
+      "path": "supabase/functions/recommendations",
+      "detail": "Supabase/Deno edge function",
+      "files": 10
+    },
+    {
+      "name": "user-delete",
+      "kind": "edge-function",
+      "path": "supabase/functions/user-delete",
+      "detail": "Supabase/Deno edge function",
+      "files": 4
+    },
+    {
+      "name": "user-export",
+      "kind": "edge-function",
+      "path": "supabase/functions/user-export",
+      "detail": "Supabase/Deno edge function",
+      "files": 3
+    },
+    {
+      "name": "mobile/app/(auth)/sign-in.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/(auth)/sign-in.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/(onboarding)/_layout.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/(onboarding)/_layout.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/(onboarding)/consent.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/(onboarding)/consent.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/(onboarding)/step-1.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/(onboarding)/step-1.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/(onboarding)/step-2.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/(onboarding)/step-2.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/(onboarding)/step-3.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/(onboarding)/step-3.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/(onboarding)/step-4.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/(onboarding)/step-4.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/(onboarding)/step-5.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/(onboarding)/step-5.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/_layout.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/_layout.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/cold-start.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/cold-start.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/create-id.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/create-id.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/daily-plan.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/daily-plan.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/index.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/index.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/recipe/[dish].tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/recipe/[dish].tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/recommendations.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/recommendations.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/splash-2.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/splash-2.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/app/weekly-plan.tsx",
+      "kind": "mobile-screen",
+      "path": "mobile/app/weekly-plan.tsx",
+      "detail": "Expo Router screen",
+      "files": 0
+    },
+    {
+      "name": "mobile/src/api/client.ts",
+      "kind": "mobile-api-client",
+      "path": "mobile/src/api/client.ts",
+      "detail": "Mobile API client",
+      "files": 0
+    },
+    {
+      "name": "mobile/src/api/consent.ts",
+      "kind": "mobile-api-client",
+      "path": "mobile/src/api/consent.ts",
+      "detail": "Mobile API client",
+      "files": 0
+    },
+    {
+      "name": "mobile/src/api/errorMessages.ts",
+      "kind": "mobile-api-client",
+      "path": "mobile/src/api/errorMessages.ts",
+      "detail": "Mobile API client",
+      "files": 0
+    },
+    {
+      "name": "mobile/src/api/feedback.ts",
+      "kind": "mobile-api-client",
+      "path": "mobile/src/api/feedback.ts",
+      "detail": "Mobile API client",
+      "files": 0
+    },
+    {
+      "name": "mobile/src/api/household.ts",
+      "kind": "mobile-api-client",
+      "path": "mobile/src/api/household.ts",
+      "detail": "Mobile API client",
+      "files": 0
+    },
+    {
+      "name": "mobile/src/api/plan.ts",
+      "kind": "mobile-api-client",
+      "path": "mobile/src/api/plan.ts",
+      "detail": "Mobile API client",
+      "files": 0
+    },
+    {
+      "name": "mobile/src/api/recommendations.ts",
+      "kind": "mobile-api-client",
+      "path": "mobile/src/api/recommendations.ts",
+      "detail": "Mobile API client",
+      "files": 0
+    },
+    {
+      "name": "mobile/src/api/types.ts",
+      "kind": "mobile-api-client",
+      "path": "mobile/src/api/types.ts",
+      "detail": "Mobile API client",
+      "files": 0
+    },
+    {
+      "name": "database/migrations",
+      "kind": "sql-migration",
+      "path": "database/migrations",
+      "detail": "51 SQL files",
+      "files": 51
+    },
+    {
+      "name": "database/rollback",
+      "kind": "sql-rollback",
+      "path": "database/rollback",
+      "detail": "71 SQL files",
+      "files": 71
+    },
+    {
+      "name": "database/seeds",
+      "kind": "sql-seed",
+      "path": "database/seeds",
+      "detail": "43 SQL files",
+      "files": 43
+    },
+    {
+      "name": "database/validation",
+      "kind": "sql-validation",
+      "path": "database/validation",
+      "detail": "9 SQL files",
+      "files": 9
+    },
+    {
+      "name": "supabase/migrations",
+      "kind": "sql-migration",
+      "path": "supabase/migrations",
+      "detail": "1 SQL files",
+      "files": 1
+    },
+    {
+      "name": "contracts/ghar-re-v1.schema.json",
+      "kind": "api-contract",
+      "path": "contracts/ghar-re-v1.schema.json",
+      "detail": "JSON Schema contract",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_training_pipeline.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_training_pipeline.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_golden_master.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_golden_master.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_scoring_registry.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_scoring_registry.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_cohort_intel.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_cohort_intel.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_exploration.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_exploration.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_pipeline.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_pipeline.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_meal_planner.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_meal_planner.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_class_first_cohort.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_class_first_cohort.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_preference.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_preference.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_cohort_plan.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_cohort_plan.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_core/tests/test_comfort_hero.py",
+      "kind": "test-suite",
+      "path": "ghar_re_core/tests/test_comfort_hero.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ops/quality/suites/test_contract_boundary.py",
+      "kind": "test-suite",
+      "path": "ops/quality/suites/test_contract_boundary.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ops/quality/suites/test_recommendation_behavior.py",
+      "kind": "test-suite",
+      "path": "ops/quality/suites/test_recommendation_behavior.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ops/quality/suites/test_api_security.py",
+      "kind": "test-suite",
+      "path": "ops/quality/suites/test_api_security.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ops/quality/suites/test_planning_surfaces.py",
+      "kind": "test-suite",
+      "path": "ops/quality/suites/test_planning_surfaces.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_service/tests/test_service.py",
+      "kind": "test-suite",
+      "path": "ghar_re_service/tests/test_service.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_service/tests/test_bundle.py",
+      "kind": "test-suite",
+      "path": "ghar_re_service/tests/test_bundle.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_service/tests/test_auth.py",
+      "kind": "test-suite",
+      "path": "ghar_re_service/tests/test_auth.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_service/tests/test_contract.py",
+      "kind": "test-suite",
+      "path": "ghar_re_service/tests/test_contract.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_service/tests/test_ratelimit.py",
+      "kind": "test-suite",
+      "path": "ghar_re_service/tests/test_ratelimit.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": "ghar_re_service/tests/test_planning.py",
+      "kind": "test-suite",
+      "path": "ghar_re_service/tests/test_planning.py",
+      "detail": "Existing automated tests",
+      "files": 0
+    },
+    {
+      "name": ".github/workflows/backend-ci.yml",
+      "kind": "ci-workflow",
+      "path": ".github/workflows/backend-ci.yml",
+      "detail": "GitHub Actions workflow",
+      "files": 0
+    },
+    {
+      "name": ".github/workflows/drive-backup.yml",
+      "kind": "ci-workflow",
+      "path": ".github/workflows/drive-backup.yml",
+      "detail": "GitHub Actions workflow",
+      "files": 0
+    },
+    {
+      "name": ".github/workflows/fly_deploy.yml",
+      "kind": "ci-workflow",
+      "path": ".github/workflows/fly_deploy.yml",
+      "detail": "GitHub Actions workflow",
+      "files": 0
+    },
+    {
+      "name": ".github/workflows/mirror.yml",
+      "kind": "ci-workflow",
+      "path": ".github/workflows/mirror.yml",
+      "detail": "GitHub Actions workflow",
+      "files": 0
+    },
+    {
+      "name": ".github/workflows/quality-gate.yml",
+      "kind": "ci-workflow",
+      "path": ".github/workflows/quality-gate.yml",
+      "detail": "GitHub Actions workflow",
+      "files": 0
+    },
+    {
+      "name": ".github/workflows/re-ci.yml",
+      "kind": "ci-workflow",
+      "path": ".github/workflows/re-ci.yml",
+      "detail": "GitHub Actions workflow",
+      "files": 0
+    }
+  ]
+}

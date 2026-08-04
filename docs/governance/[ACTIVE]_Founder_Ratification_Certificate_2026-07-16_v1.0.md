@@ -44,7 +44,7 @@ Engineering proceeds only through the normal governance process — a ratified F
 | **FD-02** | The "continuous forward-transition reading" of DCR-8D-01's weight-ladder interpolation is confirmed as the ratified standard (already implemented in `interpolateWeightLadder`). | `DOC-P3-03` §07 (worked example to be corrected to match) |
 | **FD-03** | Day-0 confidence is clamped to [0.35, 0.65]; the 1.0 schema ceiling applies only to later warm-state evolution (already implemented in `orchestrator.ts`). | `DOC-P3-03` (LF-A08 section to note the clamp explicitly) |
 | **FD-04** | Ratified as **Option 2** — the first weekly plan is generated live/synchronously at the end of onboarding (not deferred), consistent with the existing OB-08b "aha moment" product decision. `DOC-P4-02` promotes DRAFT → ACTIVE on this basis. | `DOC-P4-02` (DRAFT → ACTIVE) |
-| **FD-05** | Ratified as **Option (b)** — the Repository Naming Standard is amended so `[ACTIVE]` status does not require a Founder signature line. The six affected documents (`DOC-P3-02`, `DOC-P3-03`, `DOC-P3-03A`, `DOC-P3-04`, `DOC-P3-05-Part-A`, APDF vNext Addendum) keep their `[ACTIVE]` filenames; their internal "DRAFT — pending Founder sign-off" headers are corrected, not the filenames. | The six documents named above; `docs/governance/[ACTIVE]_Repository_Naming_Standard_v1.0.md` (amendment required) |
+| **FD-05** | Ratified as **Option (b)** — the Repository Naming Standard is amended so `[ACTIVE]` status does not require a Founder signature line. The six affected documents (`DOC-P3-02`, `DOC-P3-03`, `DOC-P3-03A`, `DOC-P3-04`, `DOC-P3-05-Part-A`, APDF vNext Addendum) keep their `[ACTIVE]` filenames; their internal "DRAFT — pending Founder sign-off" headers are corrected, not the filenames. | The six documents named above; `docs/archive/historical/governance/ARCHIVED_Repository_Naming_Standard_v1.0.md` (amendment required) |
 | **FD-06** | Member add-ons (Epic 6) are sequenced after the repository adapters (Epic 1), ahead of the learning loop, per the Engineering Execution Baseline's recommendation. | `Engineering_Execution_Baseline_v1.0.md` |
 | **FD-08** | Grocery-list auto-generation is confirmed **OUT of MVP scope**. `DOC-04`'s existing Change Notice is correct; `DOC-01` §06 (which reads "Core — cannot defer") is corrected to match `DOC-04`, not the reverse. | `DOC-01` §06 (correction required) |
 | **FD-09** | The stale "locked" environment map in `DOC-10` §10 (superseded Supabase project ref / GitHub org) is approved for refresh to the current live values (`ankitmittal-madman/foofoo-v3`, project `slsqtlygeekdppuyiiff`). | `DOC-10` §10 (refresh required) |
@@ -78,7 +78,7 @@ The following documents are now stated by the Register/primary sources as needin
 
 - `DOC-P3-03` §07 (FD-02 worked example; FD-03 clamp note)
 - `DOC-P4-02` (FD-04: DRAFT → ACTIVE status change)
-- `docs/governance/[ACTIVE]_Repository_Naming_Standard_v1.0.md` (FD-05 amendment) and the six documents named in §3
+- `docs/archive/historical/governance/ARCHIVED_Repository_Naming_Standard_v1.0.md` (FD-05 amendment) and the six documents named in §3
 - `DOC-01` §06 (FD-08 correction)
 - `DOC-10` §10 (FD-09 refresh)
 - `RE-DOC-01` §05 (FD-10 update)

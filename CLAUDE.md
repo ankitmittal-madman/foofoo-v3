@@ -62,16 +62,18 @@ silently ending the session.
 Documentation-first. Class-first Recommendation Engine (household → cohort →
 class plan → dish pool). Discovery before recommendation, evidence before
 conclusion — never trust memory or prior summaries over live repository state.
-This repository's Git history begins 2026-07-13 (see docs/project-history/
-certificates/REPO-BOOT-03) after the original apverse-labs account was lost —
+This repository's Git history begins 2026-07-13 (see
+`docs/archive/certificates/ARCHIVED_REPO-BOOT-03_Repository_Migration_Certification_v1.0.md`)
+after the original apverse-labs account was lost —
 a reconstructed baseline, not continuous lineage.
 
 ## Folder Structure
 docs/product        — what FooFoo is, for whom
 docs/architecture    — how it's built (schema, RE design, UX, PRD)
 docs/governance      — standing rules (APDF, AGRs, Baseline Register)
-docs/project-history/work-packages   — proposed engineering work, DESIGNED until certified
-docs/project-history/certificates    — proof something was actually executed
+docs/project-history/work-packages   — unresolved/current engineering work only
+docs/archive/certificates            — historical proof of completed execution
+docs/archive                         — completed, superseded, and historical records; never primary guidance
 docs/research        — Batch1-6 discovery/canonicalization process
 docs/roadmaps        — forward plans
 docs/visuals         — interactive HTML explainers
@@ -92,7 +94,7 @@ Body: Executive Summary → numbered sections → Critical Self-Review →
 Versioning & Placement → Founder Sign-off (blank line, always last)
 
 ## Naming Standard (ratified WP-5AA — mandatory, never violate)
-See docs/governance/[ACTIVE]_Repository_Naming_Standard_v1.0.md (authoritative).
+See docs/governance/[ACTIVE]_Repository_Naming_Standard_v1.1.md (authoritative).
 Documents: [STATUS]_Document_Name_vMAJOR.MINOR.md where STATUS is exactly one of
 ACTIVE / DRAFT / FROZEN / SUPERSEDED / ARCHIVED (the five DOC-P3-09 §06E values).
 Version is a single dot (v1.0, v1.20) — never v1_0, 1.0, or v1.
@@ -104,11 +106,9 @@ if the status is a non-token lifecycle word or is ambiguous, STOP and ask — ne
 Bulk-renaming existing files requires explicit Founder authorization (as WP-5AA gave).
 
 ## Version & Lifecycle Rules
-Never delete a superseded document — stamp SUPERSEDED BY vX.Y with a
-changelog note, keep both (see docs/project-history/work-packages/
-REPO-WP-03 v1.0 for the reference example).
+Never delete a superseded document — archive it with its history intact.
 A Work Package's Status may only read COMPLETED if a companion certificate
-exists in docs/project-history/certificates/ with real execution output —
+exists in docs/archive/certificates/ with real execution output —
 never edited in place to claim completion.
 
 ## Git Workflow

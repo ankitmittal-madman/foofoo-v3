@@ -1,0 +1,241 @@
+{
+  "meta": {
+    "generated_at": "2026-08-03T10:53:32.164854+00:00",
+    "git_head": "60f785b",
+    "report_dir": "/home/ankit_mittal_mds02/foofoo-v3/ops/quality/reports/2026-08-03_105332"
+  },
+  "verdict": {
+    "total_test_cases": 212,
+    "passed": 208,
+    "failed": 0,
+    "skipped": 4,
+    "pass_pct": 100.0,
+    "quality_score": 100.0,
+    "can_launch_today": true,
+    "launch_readiness": "READY \u2014 all P0 surfaces verified with no failures",
+    "blockers": {
+      "P0": [],
+      "P1": [],
+      "P2": [],
+      "P3": []
+    },
+    "unverified_p0_surfaces": []
+  },
+  "steps": [
+    {
+      "name": "inventory",
+      "phase": "1-2",
+      "status": "pass",
+      "priority": "P3",
+      "summary": "73 components, 18 features",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.05,
+      "reason": "",
+      "artifacts": [
+        "inventory/inventory.json",
+        "inventory/inventory.md",
+        "inventory/feature_matrix.json",
+        "inventory/feature_matrix.md"
+      ],
+      "failures": []
+    },
+    {
+      "name": "ruff-lint",
+      "phase": "16",
+      "status": "pass",
+      "priority": "P2",
+      "summary": "clean",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.1,
+      "reason": "",
+      "artifacts": [
+        "static/ruff.log"
+      ],
+      "failures": []
+    },
+    {
+      "name": "unit-core",
+      "phase": "4",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "48 passed, 0 failed, 0 skipped",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 1.61,
+      "reason": "",
+      "artifacts": [
+        "recommendation/unit-core.junit.xml",
+        "recommendation/unit-core.log"
+      ],
+      "failures": []
+    },
+    {
+      "name": "unit-service",
+      "phase": "4",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "68 passed, 0 failed, 0 skipped",
+      "passed": 68,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 7.27,
+      "reason": "",
+      "artifacts": [
+        "contracts/unit-service.junit.xml",
+        "contracts/unit-service.log"
+      ],
+      "failures": []
+    },
+    {
+      "name": "quality-contract",
+      "phase": "6",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "5 passed, 0 failed, 0 skipped",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 2.18,
+      "reason": "",
+      "artifacts": [
+        "contracts/quality-contract.junit.xml",
+        "contracts/quality-contract.log"
+      ],
+      "failures": []
+    },
+    {
+      "name": "quality-recsys",
+      "phase": "8",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "63 passed, 0 failed, 4 skipped",
+      "passed": 63,
+      "failed": 0,
+      "skipped": 4,
+      "duration_s": 5.22,
+      "reason": "",
+      "artifacts": [
+        "recommendation/quality-recsys.junit.xml",
+        "recommendation/quality-recsys.log"
+      ],
+      "failures": []
+    },
+    {
+      "name": "quality-security",
+      "phase": "13",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "12 passed, 0 failed, 0 skipped",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 3.76,
+      "reason": "",
+      "artifacts": [
+        "security/quality-security.junit.xml",
+        "security/quality-security.log"
+      ],
+      "failures": []
+    },
+    {
+      "name": "quality-planning",
+      "phase": "5",
+      "status": "pass",
+      "priority": "P1",
+      "summary": "12 passed, 0 failed, 0 skipped",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 2.46,
+      "reason": "",
+      "artifacts": [
+        "contracts/quality-planning.junit.xml",
+        "contracts/quality-planning.log"
+      ],
+      "failures": []
+    },
+    {
+      "name": "chaos",
+      "phase": "14",
+      "status": "pass",
+      "priority": "P1",
+      "summary": "fail-safe behaviour held",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.0,
+      "reason": "",
+      "artifacts": [
+        "chaos/chaos.json"
+      ],
+      "failures": []
+    },
+    {
+      "name": "secrets-scan",
+      "phase": "13",
+      "status": "pass",
+      "priority": "P1",
+      "summary": "no hardcoded secret values detected",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.0,
+      "reason": "",
+      "artifacts": [
+        "security/secrets_scan.json"
+      ],
+      "failures": []
+    },
+    {
+      "name": "database",
+      "phase": "7",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "connected; 28 tables in ghar_re schema",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.0,
+      "reason": "",
+      "artifacts": [],
+      "failures": []
+    },
+    {
+      "name": "edge-functions",
+      "phase": "6",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "deno tests passed",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 2.11,
+      "reason": "",
+      "artifacts": [
+        "edge/deno.log"
+      ],
+      "failures": []
+    },
+    {
+      "name": "ui-playwright",
+      "phase": "9-11",
+      "status": "pass",
+      "priority": "P1",
+      "summary": "browser run complete",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 35.78,
+      "reason": "",
+      "artifacts": [
+        "playwright/ui_result.json"
+      ],
+      "failures": []
+    }
+  ]
+}

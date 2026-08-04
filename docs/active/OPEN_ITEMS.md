@@ -1,138 +1,61 @@
 # Open Items
 
-This document contains ONLY open/pending work, launch blockers, known bugs, missing
-implementation, incomplete datasets, missing ontology, missing APIs, missing tests, missing
-deployment work, security issues, and performance issues. Completed work is not listed here —
-see `docs/archive/completed-phases/` for history. Source audit:
-`docs/archive/audits/re_audit_v2/` (fresh clean-room audit, 2026-08-04).
+This file contains only unresolved work. Completed implementation and the evidence behind earlier
+findings are retained under `docs/archive/`.
 
----
+## P1 — Launch readiness
 
-## P0-1: Investigate the recommendation-events vs. plan-persistence gap
-- **Priority:** P0
-- **Status:** Completed 2026-08-04. Root cause: live edge-function logs showed `plan` is the sole
-  active traffic surface (zero `/v1/recommendations` requests) and `plan/handler.ts` simply never
-  called the already-correct, already-tested `recordHouseholdContext`. Fixed by wiring that call
-  into `plan/handler.ts` for every surface with a resolved household. Deployed to production
-  (`plan` function, v4, 2026-08-04).
-- **Files involved:** `supabase/functions/plan/handler.ts`.
+### Enable Supabase leaked-password protection
 
-## P0-2: Wire DPDP export/delete into the mobile app
-- **Priority:** P0
-- **Status:** Completed 2026-08-04. New `mobile/src/api/account.ts` (export request/poll,
-  delete-account with exact-phrase confirmation) wired into a new `mobile/app/(tabs)/settings.tsx`
-  screen, added to the tab layout.
-- **Files involved:** `mobile/src/api/account.ts`, `mobile/app/(tabs)/settings.tsx`, `mobile/app/(tabs)/_layout.tsx`.
-
-## P0-3: Decide the fate of the two parallel recommendation surfaces
-- **Priority:** P0
-- **Status:** Completed 2026-08-04. Decision: retired the dead surface — live logs confirmed zero
-  traffic to `mobile/app/recommendations.tsx`/`mobile/src/api/recommendations.ts`; both deleted.
-  `today.tsx` (the actually-routed screen) got the feedback/explanation UI instead (see P0-4/P1-2).
-- **Files involved:** `mobile/app/recommendations.tsx` (deleted), `mobile/src/api/recommendations.ts` (deleted).
-
-## P0-4: Feedback UI on the actively-routed screens
-- **Priority:** P0
-- **Status:** Completed 2026-08-04. `today.tsx` rewritten with a `DishCard` component: like/dislike
-  buttons wired to `POST /v1/feedback`, plus a "Why this?" toggle showing the match score and
-  cuisine/class explanation. Backend `FEEDBACK_ELIGIBLE_SURFACES` widened to include
-  `meal_plan`/`class_dishes` so feedback on these surfaces is actually accepted.
-- **Files involved:** `mobile/app/(tabs)/today.tsx`, `supabase/functions/plan/handler.ts`.
-
-## P1-1: Enable Supabase leaked-password-protection
-- **Priority:** P1
 - **Area:** Security
-- **Evidence:** Live Supabase Auth advisor, this session — currently disabled.
-- **Why it matters:** Free, real security improvement.
-- **Current status:** OPEN.
-- **Expected outcome:** Setting enabled in Supabase dashboard.
-- **Files involved:** N/A (dashboard setting).
-- **Estimated effort:** Trivial.
-- **Dependencies:** None.
+- **Status:** Open; explicitly deferred by Founder instruction dated 2026-08-04.
+- **Evidence:** Supabase Auth advisor reported the setting disabled.
+- **Completion:** Enable it in the Supabase dashboard and verify the advisor clears.
 
-## P1-2: Recommendation-explanation UI
-- **Priority:** P1
-- **Status:** Completed 2026-08-04, bundled with P0-4. `DishCard`'s "Why this?" toggle on
-  `today.tsx` renders the match score and cuisine/class explanation using the RE's existing
-  `contributions`/score fields.
-- **Files involved:** `mobile/app/(tabs)/today.tsx`.
+### Configure and verify alert delivery
 
-## P1-3: History/past-plans view
-- **Priority:** P1
-- **Status:** Completed 2026-08-04. New `"history"` surface on `plan/handler.ts` (pure read via
-  `fetchRecentRecommendationEvents`) plus a new `mobile/app/history.tsx` reverse-chronological
-  list screen, reachable from Settings.
-- **Files involved:** `supabase/functions/plan/handler.ts`, `supabase/functions/recommendations/events.ts`, `mobile/app/history.tsx`, `mobile/src/api/plan.ts`.
+- **Area:** Observability
+- **Status:** Open operational configuration.
+- **Evidence:** The webhook sink is implemented, but `TELEMETRY_WEBHOOK_URL` is not configured.
+- **Completion:** Configure a real destination and verify a controlled 500-level event arrives.
 
-## P1-4: Profile/preferences-edit screen
-- **Priority:** P1
-- **Status:** Completed 2026-08-04. New `"profile"` GET surface on `plan/handler.ts` and a real
-  UPDATE path added to `household/handler.ts` (previously the handler only ever created a
-  household once and silently no-op'd on repeat calls — genuine bug found and fixed while
-  building this, with regression tests added). New `mobile/app/profile-edit.tsx` screen. Also
-  fixed a stale validation cap on `allergen_flags` (7-bit max, should have been 9-bit per the
-  WP-21 fish/mustard extension — found while wiring this screen).
-- **Files involved:** `supabase/functions/plan/handler.ts`, `supabase/functions/household/handler.ts`, `supabase/functions/household/store.ts`, `supabase/functions/household/schema.ts`, `mobile/app/profile-edit.tsx`.
+### Complete physical-device E2E coverage
 
-## P1-5: Mobile automated test coverage
-- **Priority:** P1
-- **Status:** Component coverage completed locally 2026-08-04. The release candidate has 16
-  passing Jest tests across 8 suites, including component-render coverage for Search, Settings,
-  Today, History and Profile Edit plus durable offline feedback-queue coverage. The Settings test
-  also drove an accessibility-state improvement for its destructive confirmation button. A GitHub
-  Actions mobile gate runs install, typecheck, Jest and Expo web export. **Remaining:**
-  physical-device E2E journeys, especially offline reconnect and push delivery.
-- **Files involved:** `mobile/package.json`, `mobile/jest.config.js`, `mobile/jest.setup.js`, `mobile/src/onboarding/__tests__/`, `mobile/src/api/__tests__/`.
+- **Area:** Mobile testing
+- **Status:** Open. Local Jest/component gates exist; device journeys remain.
+- **Completion:** Verify offline reconnect, queued-feedback flush, and push delivery on native builds.
 
-## P1-6: Wire IDF-cosine distance into pairing/scoring
-- **Priority:** P1
-- **Status:** Completed. Archived — see `docs/archive/completed-phases/[ACTIVE]_RE_Compliance_Review_2026-08-04_v1.0.md` (Item 2).
-- `same_base()` now computes `cosine(base-ingredient vectors) > theta_base` exactly per the frozen spec (theta_base=0.6, taken from the spec, not invented); golden-master verified unaffected on the 39-dish sample. Also fixed in the same review: `_cuis()`'s missing 0.70 "same parent cuisine" tier, and an `m_season` monsoon-branch bug (returned 0.5 instead of the spec's required 0).
+## P2 — Production improvement
 
-## P1-7: Real monitoring/alerting
-- **Priority:** P1
-- **Status:** Completed 2026-08-04. `webhookSink()` (fire-and-forget POST, 3s timeout, never
-  suppresses the fallback log) plus `resolveTelemetrySink()` wired directly into
-  `error-boundary.ts` — the one place every request across every Edge Function already flows
-  through unconditionally — rather than via the never-instantiated `Container`. Activates when
-  `TELEMETRY_WEBHOOK_URL` is configured (not fabricated — no real webhook URL was provided this
-  session, so it currently falls back to log-only until Founder supplies one); log-only otherwise.
-- **Files involved:** `supabase/functions/_shared/telemetry/telemetry.ts`, `supabase/functions/_shared/middleware/error-boundary.ts`, `supabase/functions/_shared/config/env.ts`, `supabase/functions/_shared/config/config.ts`.
+- Expand nutrition data beyond 50 of 810 dishes.
+- Expand comfort-hero mapping beyond 17 of 36 resolved heroes.
+- Populate the regional-prior table for PanIndia and Global zones; 187 of 810 dishes currently
+  receive no regional-prior boost.
+- Apply and live-verify migration 054, including its RLS-policy performance change and rollback.
+- Configure `FLY_STAGING_*` variables/secrets and a protected `production` environment.
+- Archive dead `re_engine`-era ETL and validation scripts that target retired schemas.
+- Resolve unindexed-foreign-key and duplicate-index advisor findings.
+- Deploy and operationally verify the local release candidate: cached weather context, search and
+  filters, richer explanations, selective refresh, restart-safe query/feedback persistence, MMR
+  reranking, offline evaluation, bounded graph traversal, migration 054, and CI/deployment changes.
+- Run production catalogue-scale load/soak tests and revisit Fly.io sizing. The local 810-dish run
+  is evidence for local behavior only.
 
-## P2 items (production improvements, not launch-blocking)
-- P2-1: Expand nutrition data beyond 50/810 dishes.
-- P2-2: Expand comfort-hero mapping beyond 17/36 resolved heroes.
-- P2-3: Populate PRIOR table for PanIndia/Global zones (187/810 dishes get no regional prior boost).
-- P2-4: Apply and live-verify local migration 054, which changes user-owned RLS policies from
-  per-row `auth.uid()` evaluation to `(select auth.uid())`; paired rollback is present.
-- P2-5: Configure the repository's `FLY_STAGING_*` variables/secrets and protected `production`
-  environment. The workflow now deploys `main` to staging and permits production only through a
-  manually dispatched, approval-capable environment. Until staging is configured, push runs emit
-  a warning and skip the staging-only steps instead of failing unrelated `main` checks.
-- P2-6: Completed locally — both Docker stages pin Python 3.11.15 slim-bookworm by digest.
-- P2-7: Archive dead `re_engine`-era ETL/validation scripts targeting dropped schemas.
-- P2-8: Resolve unindexed-FK and duplicate-index advisor findings.
+## P3 — Product and intelligence evolution
 
-## P3 items (future roadmap)
-- P3-1: Festival calendar mapping (currently fully absent).
-- P3-2: Disease/health-condition dish suitability (currently fully absent; needs real clinical input).
-- P3-3: Activate `s_pref` personalization once feedback volume clears a real training threshold (currently 9 rows).
-- P3-4: Expand and safety-review the new local traversable dish→ingredient→dish/substitution graph.
-  The graph framework, bounded traversal, provenance and allergen provenance are implemented and
-  tested, but broader curated ontology and component-replacement coverage remain future work.
-- P3-5: Production load/soak and Fly sizing remain open. The local 810-dish service passed a
-  300-request run at concurrency 20 with 0 errors and p95 2.03s after a cold-start cache race was
-  fixed; production topology and sustained soak still require deployment credentials/traffic.
+- Add festival-calendar mapping.
+- Add health-condition suitability only with appropriate clinical governance.
+- Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
+- Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
 
-## Local release-candidate work awaiting deployment/operational verification
-- Cached OpenWeatherMap context is wired into the active plan path with a three-hour TTL and
-  fail-soft fallback; production needs `OPENWEATHERMAP_API_KEY` and provider/cache verification.
-- Safety-aware search with cuisine, diet, meal and cook-time filters is implemented end to end,
-  including a mobile Search tab; production search latency still needs measurement after deploy.
-- Daily plan explanations now include top scoring contributions, and unlocked slots can be
-  selectively refreshed while server-persisted locks are respected.
-- The mobile query cache and feedback queue survive restarts and flush after reconnect; broader
-  device E2E coverage remains open as described in P1-5.
-- MMR slate reranking and offline NDCG/recall/coverage/calibration evaluation tooling are in place;
-  a real held-out interaction dataset and promotion thresholds remain data-dependent.
-</content>
+## Active implementation documents retained for review
+
+The following specific-phase documents remain active because their completion or continuing value
+is not yet certain. They are intentionally not archived:
+
+- `docs/project-history/work-packages/[ACTIVE]_REPO-WP-04DA_Validation_Script_Corrections_v1.0.md`
+- `docs/project-history/work-packages/[ACTIVE]_WP-6_Deferred_Knowledge_Register_v1.0.csv`
+- `docs/project-history/work-packages/[DRAFT]_WP-12_Per_User_Recommendation_Decision_Trace_v1.0.md`
+- `docs/project-history/work-packages/[DRAFT]_WP-14_RE_Intelligence_Roadmap_v1.0.md`
+- `docs/project-history/work-packages/[DRAFT]_WP-18_Onboarding_Plan_Recipe_Flow_v1.0.md`
+- `docs/project-history/work-packages/[DRAFT]_WP-22_Synthetic_Persona_UI_Journey_Reports_v1.0.md`

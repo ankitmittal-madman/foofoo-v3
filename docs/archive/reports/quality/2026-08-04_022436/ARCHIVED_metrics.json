@@ -1,0 +1,22 @@
+{
+  "total_test_cases": 679,
+  "passed": 632,
+  "failed": 21,
+  "skipped": 26,
+  "pass_pct": 96.8,
+  "quality_score": 86.8,
+  "can_launch_today": false,
+  "launch_readiness": "NOT READY \u2014 P0 test failures present",
+  "blockers": {
+    "P0": [
+      "quality-recsys: 451 passed, 21 failed, 26 skipped"
+    ],
+    "P1": [],
+    "P2": [],
+    "P3": []
+  },
+  "unverified_p0_surfaces": [
+    "database: DATABASE_URL / SUPABASE_DB_URL not set \u2014 migrations, RLS, constraints, and data-integrity checks require a reachable Postgres with the Supabase auth.* bootstrap; not verifiable in this environment.",
+    "edge-functions: Deno runtime is not installed in this environment; `deno test` cannot execute. Install Deno (or run in Supabase CI) to validate consent/feedback/household/recommendations/user-delete/user-export functions."
+  ]
+}

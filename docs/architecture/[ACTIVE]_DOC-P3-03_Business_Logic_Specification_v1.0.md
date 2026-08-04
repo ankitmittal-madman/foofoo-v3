@@ -2,7 +2,7 @@
 
 **Version:** 1.0  
 **Date:** June 2026  
-**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.0.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.  
+**Status:** ACTIVE — [FD-05, ratified 2026-07-16] a Founder signature is not required for `[ACTIVE]` status per the amended `[ACTIVE]_Repository_Naming_Standard_v1.1.md`; content freeze is the ratification mechanism. See `[ACTIVE]_Founder_Decision_Register_v1.0.md` FD-05.
 **Prepared by:** Claude (Solution Architect role)  
 **Prerequisite:** DOC-P3-02 Conceptual Domain Model v1.1 (must be read before this document)  
 **Next document:** DOC-P3-04 · Data Architecture and Entity Relationship Model

@@ -1,0 +1,17 @@
+# STATUS
+
+ARCHIVED
+
+## Reason
+
+Implementation completed.
+
+This document is retained for historical reference only.
+
+It must not be used as the primary implementation guide.
+
+Refer to the active documentation for the current source of truth.
+
+---
+
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="12" time="0.978" timestamp="2026-08-03T10:52:21.661201+00:00" hostname="cs-867171362224-default"><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_household_surface_requires_signature[/v1/cold-start]" time="0.799" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_household_surface_requires_signature[/v1/meal-plan]" time="0.004" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_household_surface_requires_signature[/v1/weekly-plan]" time="0.003" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_household_surface_requires_signature[/v1/class-dishes]" time="0.003" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_household_surface_missing_household_is_422[/v1/cold-start]" time="0.006" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_household_surface_missing_household_is_422[/v1/meal-plan]" time="0.005" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_household_surface_missing_household_is_422[/v1/weekly-plan]" time="0.004" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_household_surface_missing_household_is_422[/v1/class-dishes]" time="0.004" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_cold_start_returns_result" time="0.067" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_meal_plan_returns_result" time="0.017" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_weekly_plan_returns_result" time="0.015" /><testcase classname="ops.quality.suites.test_planning_surfaces" name="test_recipe_surface_signed_and_handles_missing_dish" time="0.008" /></testsuite></testsuites>

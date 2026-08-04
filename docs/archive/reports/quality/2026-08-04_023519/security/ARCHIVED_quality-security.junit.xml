@@ -1,0 +1,17 @@
+# STATUS
+
+ARCHIVED
+
+## Reason
+
+Implementation completed.
+
+This document is retained for historical reference only.
+
+It must not be used as the primary implementation guide.
+
+Refer to the active documentation for the current source of truth.
+
+---
+
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="12" time="2.623" timestamp="2026-08-04T02:36:12.621887+00:00" hostname="cs-867171362224-default"><testcase classname="ops.quality.suites.test_api_security" name="test_unsigned_request_rejected_401" time="0.878" /><testcase classname="ops.quality.suites.test_api_security" name="test_missing_signature_header_401" time="0.004" /><testcase classname="ops.quality.suites.test_api_security" name="test_malformed_signature_401" time="0.004" /><testcase classname="ops.quality.suites.test_api_security" name="test_stale_signature_rejected_401" time="0.004" /><testcase classname="ops.quality.suites.test_api_security" name="test_tampered_body_rejected_401" time="0.004" /><testcase classname="ops.quality.suites.test_api_security" name="test_missing_required_field_is_422_not_500" time="0.009" /><testcase classname="ops.quality.suites.test_api_security" name="test_empty_body_is_clean_4xx_not_500" time="0.006" /><testcase classname="ops.quality.suites.test_api_security" name="test_unknown_fields_tolerated" time="0.087" /><testcase classname="ops.quality.suites.test_api_security" name="test_large_payload_does_not_500" time="0.059" /><testcase classname="ops.quality.suites.test_api_security" name="test_meta_requires_no_auth_but_is_reachable" time="0.004" /><testcase classname="ops.quality.suites.test_api_security" name="test_rate_limit_sheds_flood_with_429" time="0.777" /><testcase classname="ops.quality.suites.test_api_security" name="test_limiter_precedes_auth_unsigned_flood_returns_429" time="0.743" /></testsuite></testsuites>

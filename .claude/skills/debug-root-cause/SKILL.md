@@ -223,7 +223,8 @@ fix — don't claim "fixed" on the strength of typecheck/tests alone.
 
 ## Step 7 — Write a short root-cause record
 
-Append to `logs/hygiene-reports/debug-log.md` (create if missing):
+Append to `logs/hygiene-reports/debug-log.md` (create if missing). Completed incident records are
+archived during documentation-governance cleanup; do not append new work to an archive:
 
 ```markdown
 ## [date] — [one-line symptom description]

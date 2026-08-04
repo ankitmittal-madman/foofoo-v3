@@ -404,7 +404,8 @@ COMFORT_HERO_TO_DISH = {
     "Undhiyu": "Undhiyu",
     "Pithla": "Pithla",
     "Ven Pongal": "Ven Pongal",
-    # Added 2026-08-04 (reports/re_audit/05 §6, "10 named dishes" coverage gap): exact-name matches
+    # Added 2026-08-04 (docs/archive/audits/re_audit_archive/ARCHIVED_05_knowledge_base_audit.md §6,
+    # "10 named dishes" coverage gap): exact-name matches
     # confirmed present in the real 810-dish catalogue (ghar_re_service/data/bundle/catalogue.json)
     # that were simply never wired — same category of mechanical fix as the Pithla-Bhakri spelling
     # correction above (verbatim name match, no domain substitution judgment involved). Entries with
@@ -591,7 +592,8 @@ PRIOR_ZONE_SLOT = [
     ("West", "dinner", "structure", "roti+sabzi", 0.4, ["Daily"], "real"),
     ("West", "dinner", "dish_name", "khichdi", 0.2, ["Comfort", "Recovery"], "real"),
     ("East", "dinner", "dish_name", "jhol", 0.4, ["Daily"], "real"),
-    # ---- Added 2026-08-04 (reports/re_audit/05 §1 SP-F10, Founder-directed closure) ----
+    # ---- Added 2026-08-04 (docs/archive/audits/re_audit_archive/
+    # ARCHIVED_05_knowledge_base_audit.md §1 SP-F10, Founder-directed closure) ----
     # Two real gaps confirmed by direct coverage check: Central had zero dinner rows despite having
     # breakfast/lunch rows, and Northeast (zone "NE" in ZONE_MAP) had NO rows at all in any slot —
     # both are now populated, sourced from established regional food-culture knowledge (not

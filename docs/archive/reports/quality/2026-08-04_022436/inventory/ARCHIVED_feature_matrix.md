@@ -1,0 +1,40 @@
+# STATUS
+
+ARCHIVED
+
+## Reason
+
+Implementation completed.
+
+This document is retained for historical reference only.
+
+It must not be used as the primary implementation guide.
+
+Refer to the active documentation for the current source of truth.
+
+---
+
+# Feature Matrix (Phase 2)
+
+_Generated 2026-08-04T02:24:36.974531+00:00 · git `cdf8b20`_
+
+| feature | description | owner | dependencies | status | testability | priority | risk | missing | evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Recommendation engine (RE core math) | Class-first scoring/pipeline: household->cohort->class plan->dish pool. | ghar_re_core | seed data bundle, config YAMLs | implemented | automated (pytest, golden-master locked) | P0 | high | none identified | ghar_re_core/, ghar_re_core/tests/test_golden_master.py |
+| RE HTTP service | FastAPI service exposing 9 routes: GET /healthz, GET /readyz, GET /v1/meta, POST /v1/recommendations, POST /v1/cold-start, POST /v1/meal-plan, POST /v1/weekly-plan, POST /v1/class-dishes, POST /v1/recipe | ghar_re_service | ghar_re_core, data bundle, HMAC secret | implemented | automated (FastAPI TestClient + quality suites) | P0 | high | no live-deploy verification in this env | ghar_re_service/ghar_re_service/main.py |
+| Service auth (HMAC signature) | Signed service-to-service calls; fail-closed 401/503. | ghar_re_service/auth.py | shared secret | implemented | automated (test_auth + quality security suite) | P0 | high | prod secret rotation not verifiable here | ghar_re_service/ghar_re_service/auth.py |
+| Rate limiting | Sliding-window per-client limiter; 429 with Retry-After. | ghar_re_service/ratelimit.py | none | implemented | automated (test_ratelimit + quality security suite) | P1 | medium | distributed limiter (multi-instance) not present | ghar_re_service/ghar_re_service/ratelimit.py |
+| API contract (v1 schema) | JSON-Schema request/response contract, additive/open rule. | contracts/ | schema file | implemented | automated (contract suite) | P0 | high | none identified | contracts/ghar-re-v1.schema.json |
+| Onboarding flow (mobile) | Expo onboarding: 7 screens + consent. | mobile | RE service, Supabase auth | implemented | blocked-here (no running Expo web target / device) | P0 | high | no automated UI test; needs running web build or device farm | mobile/app/(onboarding)/ |
+| Auth / sign-in (mobile) | Supabase-backed sign-in + session context. | mobile/src/auth | Supabase | implemented | blocked-here (needs running app + Supabase) | P0 | high | no automated UI/e2e test in this env | mobile/app/(auth)/sign-in.tsx |
+| Edge function: consent | Supabase/Deno function 'consent'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P0 | high | Deno absent -> native deno test cannot run in this environment | supabase/functions/consent/ |
+| Edge function: cron-hard-delete | Supabase/Deno function 'cron-hard-delete'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P1 | medium | Deno absent -> native deno test cannot run in this environment | supabase/functions/cron-hard-delete/ |
+| Edge function: cron-retention-purge | Supabase/Deno function 'cron-retention-purge'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P1 | medium | Deno absent -> native deno test cannot run in this environment | supabase/functions/cron-retention-purge/ |
+| Edge function: feedback | Supabase/Deno function 'feedback'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P1 | medium | Deno absent -> native deno test cannot run in this environment | supabase/functions/feedback/ |
+| Edge function: household | Supabase/Deno function 'household'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P0 | medium | Deno absent -> native deno test cannot run in this environment | supabase/functions/household/ |
+| Edge function: plan | Supabase/Deno function 'plan'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P1 | medium | Deno absent -> native deno test cannot run in this environment | supabase/functions/plan/ |
+| Edge function: recommendations | Supabase/Deno function 'recommendations'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P0 | medium | Deno absent -> native deno test cannot run in this environment | supabase/functions/recommendations/ |
+| Edge function: user-delete | Supabase/Deno function 'user-delete'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P1 | high | Deno absent -> native deno test cannot run in this environment | supabase/functions/user-delete/ |
+| Edge function: user-export | Supabase/Deno function 'user-export'. | supabase/functions | Supabase DB, RE service (for recommendations) | implemented | blocked-here (Deno runtime not installed) | P1 | high | Deno absent -> native deno test cannot run in this environment | supabase/functions/user-export/ |
+| Database schema + migrations | Numbered SQL migrations/rollback/seeds/validation. | database/ | PostgreSQL 15 / Supabase | implemented | blocked-here (no live DB connection configured) | P0 | high | needs a reachable Postgres with auth.* bootstrap to execute | database/migrations/ |
+| Data-subject rights (export/delete) | user-export, user-delete, retention purge, hard delete. | supabase/functions | Supabase DB | implemented | blocked-here (Deno + DB) | P0 | high | DPDP-critical; no executable verification in this env | supabase/functions/user-delete/, user-export/, cron-* |

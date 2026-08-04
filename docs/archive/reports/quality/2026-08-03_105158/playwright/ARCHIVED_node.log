@@ -1,0 +1,339 @@
+{
+  "status": "pass",
+  "url": "http://localhost:8081",
+  "routes": [
+    "/sign-in",
+    "/consent",
+    "/step-1",
+    "/step-2",
+    "/step-3",
+    "/step-4",
+    "/step-5",
+    "/cold-start",
+    "/create-id",
+    "/daily-plan",
+    "/",
+    "/recipe/sample-dish",
+    "/recommendations",
+    "/splash-2",
+    "/weekly-plan"
+  ],
+  "browsers": {
+    "chromium": {
+      "status": "pass",
+      "screens": {
+        "/sign-in": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-sign-in.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/consent": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-consent.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/step-1": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-step-1.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/step-2": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-step-2.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/step-3": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-step-3.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/step-4": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-step-4.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/step-5": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-step-5.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/cold-start": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-cold-start.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/create-id": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-create-id.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/daily-plan": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-daily-plan.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-home.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/recipe/sample-dish": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-recipe-sample-dish.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/recommendations": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-recommendations.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/splash-2": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-splash-2.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        },
+        "/weekly-plan": {
+          "status": "pass",
+          "httpStatus": 200,
+          "screenshot": "chromium-weekly-plan.png",
+          "consoleErrors": 0,
+          "requests": 7,
+          "a11y": {
+            "title": "FooFoo",
+            "lang": "en",
+            "imageCount": 0,
+            "imagesMissingAlt": 0,
+            "landmarks": {
+              "main": 0,
+              "nav": 0
+            }
+          }
+        }
+      }
+    },
+    "firefox": {
+      "status": "unavailable",
+      "reason": "Error: browserType.launch: Executable doesn't exist at /home/ankit_mittal_mds02/.cache/ms-playwright/firefox-1538/firefox/firefox\n╔════════════════════════════════════════════════════════════╗\n║ Looks"
+    },
+    "webkit": {
+      "status": "unavailable",
+      "reason": "Error: browserType.launch: Executable doesn't exist at /home/ankit_mittal_mds02/.cache/ms-playwright/webkit-2336/pw_run.sh\n╔════════════════════════════════════════════════════════════╗\n║ Looks like P"
+    }
+  },
+  "artifacts": [
+    "chromium-sign-in.png",
+    "chromium-sign-in-console.json",
+    "chromium-sign-in-network.json",
+    "chromium-consent.png",
+    "chromium-consent-console.json",
+    "chromium-consent-network.json",
+    "chromium-step-1.png",
+    "chromium-step-1-console.json",
+    "chromium-step-1-network.json",
+    "chromium-step-2.png",
+    "chromium-step-2-console.json",
+    "chromium-step-2-network.json",
+    "chromium-step-3.png",
+    "chromium-step-3-console.json",
+    "chromium-step-3-network.json",
+    "chromium-step-4.png",
+    "chromium-step-4-console.json",
+    "chromium-step-4-network.json",
+    "chromium-step-5.png",
+    "chromium-step-5-console.json",
+    "chromium-step-5-network.json",
+    "chromium-cold-start.png",
+    "chromium-cold-start-console.json",
+    "chromium-cold-start-network.json",
+    "chromium-create-id.png",
+    "chromium-create-id-console.json",
+    "chromium-create-id-network.json",
+    "chromium-daily-plan.png",
+    "chromium-daily-plan-console.json",
+    "chromium-daily-plan-network.json",
+    "chromium-home.png",
+    "chromium-home-console.json",
+    "chromium-home-network.json",
+    "chromium-recipe-sample-dish.png",
+    "chromium-recipe-sample-dish-console.json",
+    "chromium-recipe-sample-dish-network.json",
+    "chromium-recommendations.png",
+    "chromium-recommendations-console.json",
+    "chromium-recommendations-network.json",
+    "chromium-splash-2.png",
+    "chromium-splash-2-console.json",
+    "chromium-splash-2-network.json",
+    "chromium-weekly-plan.png",
+    "chromium-weekly-plan-console.json",
+    "chromium-weekly-plan-network.json",
+    "chromium.har"
+  ]
+}

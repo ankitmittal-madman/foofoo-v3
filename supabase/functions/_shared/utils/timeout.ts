@@ -1,6 +1,6 @@
 /**
  * Timeout guard for internal Supabase/Postgres calls (MEDIUM audit finding —
- * ops/audits/audit-edge-functions/edge-function-audit.md: "no timeout guard on internal
+ * docs/archive/audits/ops/audit-edge-functions/ARCHIVED_edge-function-audit.md: "no timeout guard on internal
  * Supabase/Postgres calls in any function — only the external RE call has one").
  *
  * Mirrors the AbortController-based discipline already used for the external RE call

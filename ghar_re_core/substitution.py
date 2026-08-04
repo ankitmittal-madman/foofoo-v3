@@ -2,8 +2,9 @@
 ghar_re_core.substitution — ingredient/dish substitution graph (Core Spine SP-F14).
 
 Was schema-only, near-empty in the old dropped `ghar_re.dish_variants` table (2 rows, golden
-sample only, real 810-catalogue variant seed never built — see reports/re_audit/04_food_ontology_
-audit.md §2). Founder-directed backlog closeout (2026-08-04, item 5): a real, working substitution
+sample only, real 810-catalogue variant seed never built — see
+docs/archive/audits/re_audit_archive/ARCHIVED_04_food_ontology_audit.md §2). Founder-directed
+backlog closeout (2026-08-04, item 5): a real, working substitution
 graph, built at the layer the live engine actually reads (a bundled CSV, same placement convention
 as sig_scores_v1.csv/dish_macro_v1.csv), not a revived Postgres table the engine never queried.
 

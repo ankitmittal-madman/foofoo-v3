@@ -1,0 +1,2992 @@
+{
+  "meta": {
+    "generated_at": "2026-08-04T02:32:20.942928+00:00",
+    "git_head": "7ab63dc",
+    "report_dir": "ops/quality/reports/2026-08-04_023220"
+  },
+  "verdict": {
+    "total_test_cases": 679,
+    "passed": 653,
+    "failed": 0,
+    "skipped": 26,
+    "pass_pct": 100.0,
+    "quality_score": 90.0,
+    "can_launch_today": false,
+    "launch_readiness": "NOT CERTIFIABLE HERE \u2014 0 failing tests, but P0 surfaces (DB, edge functions) are UNVERIFIED in this environment; certify them in CI/staging before launch",
+    "blockers": {
+      "P0": [],
+      "P1": [],
+      "P2": [],
+      "P3": []
+    },
+    "unverified_p0_surfaces": [
+      "database: DATABASE_URL / SUPABASE_DB_URL not set \u2014 migrations, RLS, constraints, and data-integrity checks require a reachable Postgres with the Supabase auth.* bootstrap; not verifiable in this environment.",
+      "edge-functions: Deno runtime is not installed in this environment; `deno test` cannot execute. Install Deno (or run in Supabase CI) to validate consent/feedback/household/recommendations/user-delete/user-export functions."
+    ]
+  },
+  "steps": [
+    {
+      "name": "inventory",
+      "phase": "1-2",
+      "status": "pass",
+      "priority": "P3",
+      "summary": "78 components, 18 features",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.04,
+      "reason": "",
+      "artifacts": [
+        "inventory/inventory.json",
+        "inventory/inventory.md",
+        "inventory/feature_matrix.json",
+        "inventory/feature_matrix.md"
+      ],
+      "failures": [],
+      "cases": []
+    },
+    {
+      "name": "ruff-lint",
+      "phase": "16",
+      "status": "pass",
+      "priority": "P2",
+      "summary": "clean",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.51,
+      "reason": "",
+      "artifacts": [
+        "static/ruff.log"
+      ],
+      "failures": [],
+      "cases": []
+    },
+    {
+      "name": "unit-core",
+      "phase": "4",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "84 passed, 0 failed, 0 skipped",
+      "passed": 84,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 5.36,
+      "reason": "",
+      "artifacts": [
+        "recommendation/unit-core.junit.xml",
+        "recommendation/unit-core.log"
+      ],
+      "failures": [],
+      "cases": [
+        {
+          "test": "ghar_re_core.tests.test_class_first_cohort::test_dish_to_class_code_known_match_and_miss",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_class_first_cohort::test_s_cohort_is_graded_zero_to_one_never_fabricated",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_class_first_cohort::test_s_cohort_contributes_additively_with_coldstart_weight",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_class_first_cohort::test_coldstart_weight_decays_with_interaction_count",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_class_first_cohort::test_foreign_dishes_demoted_at_coldstart_and_decays",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_class_first_cohort::test_real_catalogue_coverage_is_full_and_honest",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_intel::test_theta_features_complete_and_recomputable",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_intel::test_lifecycle_stage_and_time_pressure_derived",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_intel::test_class_affinity_graded_slot_specific_and_bounded",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_intel::test_model_reproduces_a_real_cohort_primary_class",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_intel::test_generalizes_to_feature_combo_without_crashing",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_intel::test_migration_overlay_shifts_the_plan",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_intel::test_home_state_2letter_code_is_normalized_end_to_end",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_intel::test_cohort_membership_returns_ranked_anchors",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_plan::test_resolves_the_family_with_toddler_persona",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_plan::test_plan_is_graded_bounded_slot_specific",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_plan::test_plan_is_persona_core_and_regionally_grounded",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_plan::test_spine_science_diet_gate_veg_household",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_plan::test_lifecycle_reshaping_toddler_vs_dink",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_cohort_plan::test_migration_overlay_only_for_migrant",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_comfort_hero::test_west_mh_rain_comfort_heroes_resolve_to_real_catalogue_dishes",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_exploration::test_epsilon_zero_is_a_total_noop_for_every_golden_household",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_exploration::test_default_bandit_epsilon_is_zero_code_level_safety_default",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_exploration::test_epsilon_one_seeded_deterministically_swaps_a_lower_plate_in",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_exploration::test_cold_start_zero_history_is_not_permanently_inert_to_exploration",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_exploration::test_exploration_never_surfaces_an_excluded_dish",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_exploration::test_exclude_dish_ids_removes_a_would_be_top_dish",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_exploration::test_exclude_dish_ids_empty_or_omitted_is_a_noop",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_golden_master::test_golden_master_no_drift",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_meal_planner::test_cold_start_top15_diverse_and_eligible",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_meal_planner::test_slot_options_returns_a_short_eligible_list",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_meal_planner::test_weekly_class_plan_shape_and_dish_backed",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_meal_planner::test_dishes_for_class_reconciliation_contract",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_meal_planner::test_jain_household_surfaces_only_jain_dishes",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_each_household_gets_exactly_7_plates",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_no_duplicate_hero_within_seven",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_jain_household_never_gets_non_jain",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_pure_veg_never_gets_non_veg",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_weaning_household_respects_a4_floor",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_standalone_appears_alone_no_support",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_non_standalone_gets_valid_support",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_pairing_guardrails_hold_on_chosen_pairs",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_guardrails_match_kb_negative_priors",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_q15_shifts_ranking_expected_direction",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_weather_north_surfaces_pakora",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_weather_west_mh_surfaces_pithla",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_weather_is_zone_specific_not_generic",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_sample_dataset_data_source_integrity",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_kb_reference_verified_flag_maps_to_data_source",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_community_prior_vs_kb_c1_conflict_report",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_catalogue_handles_missing_sig_band",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_cuisine_zone_coverage",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_recommend_without_trace_omits_decision_trace",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_decision_trace_funnel_is_monotonically_non_increasing_and_ends_at_eligible_count",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_decision_trace_winners_match_served_plates",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_pipeline::test_decision_trace_never_changes_which_plates_are_served",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_s_pref_neutral_value_when_disabled_default_config",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_s_pref_neutral_value_when_enabled_but_no_artifact",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_s_pref_module_registered_with_zero_weight_by_default",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_base_never_includes_pref_phase",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_cohort_phase_never_includes_pref_phase",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_score_pref_term_is_zero_by_default",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_null_provider_is_the_default_active_provider",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_file_provider_returns_none_for_missing_path",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_preference::test_set_active_model_injection_seam",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_base_registry_matches_old_formula[single_professional_blr-ctx_kw0]",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_base_registry_matches_old_formula[jain_couple_ahmedabad-ctx_kw1]",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_base_registry_matches_old_formula[couple_toddler_pune-ctx_kw2]",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_base_registry_matches_old_formula[migrant_bihar_mumbai-ctx_kw3]",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_base_registry_matches_scoring_base[single_professional_blr-ctx_kw0]",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_base_registry_matches_scoring_base[jain_couple_ahmedabad-ctx_kw1]",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_base_registry_matches_scoring_base[couple_toddler_pune-ctx_kw2]",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_base_registry_matches_scoring_base[migrant_bihar_mumbai-ctx_kw3]",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_cohort_phase_matches_old_score_formula",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_scoring_registry::test_registry_module_names_match_expected_set",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_ambiguous_event_types_excluded_not_labelled_zero",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_non_real_data_source_excluded",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_accept_and_like_label_one_dislike_labels_zero",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_unknown_dish_name_skipped_not_fabricated",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_guard_refuses_on_zero_rows",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_guard_refuses_on_single_class",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_train_refuses_and_writes_nothing_on_insufficient_data",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_train_refuses_on_all_non_real_data_source",
+          "status": "pass"
+        },
+        {
+          "test": "ghar_re_core.tests.test_training_pipeline::test_train_end_to_end_on_fixture_dataset_produces_loadable_artifact",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "name": "unit-service",
+      "phase": "4",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "68 passed, 0 failed, 0 skipped",
+      "passed": 68,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 12.78,
+      "reason": "",
+      "artifacts": [
+        "contracts/unit-service.junit.xml",
+        "contracts/unit-service.log"
+      ],
+      "failures": [],
+      "cases": [
+        {
+          "test": "tests.test_auth::test_valid_signature_verifies",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_missing_signature_rejected",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_malformed_signature_rejected",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_tampered_body_rejected",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_wrong_secret_rejected",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_stale_timestamp_rejected",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_future_dated_timestamp_rejected",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_timestamp_inside_skew_window_accepted",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_missing_secret_falls_back_to_dev_secret_locally",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_missing_secret_raises_in_production",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_production_with_secret_loads",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_http_signed_request_succeeds",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_http_unsigned_request_is_401",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_http_tampered_body_is_401",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_http_stale_signature_is_401",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_http_401_happens_before_validation",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_auth::test_health_and_meta_remain_unauthenticated",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_bundle::test_bundle_has_expected_layout",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_bundle::test_bundle_version_is_deterministic",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_bundle::test_bundle_version_changes_when_config_changes",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_bundle::test_missing_config_file_fails_loudly",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_bundle::test_bundle_catalogue_matches_build_catalogue_output",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_bundle::test_engine_runs_from_bundle_without_repo_config",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_bundle::test_check_mode_detects_a_stale_bundle",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_contract::test_response_conforms_to_schema",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_contract::test_request_sample_conforms_to_schema",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_contract::test_unknown_request_field_is_tolerated",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_contract::test_unknown_response_field_is_tolerated",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_contract::test_missing_required_field_still_fails",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_contract::test_contributions_array_is_open_and_populated",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_contract::test_registry_base_matches_core_base",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_planning::test_cold_start_returns_15_diverse_dishes",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_planning::test_meal_plan_slot_options",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_planning::test_weekly_plan_shape",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_planning::test_class_dishes_reconciliation",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_planning::test_recipe_detail",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_planning::test_cold_start_requires_household",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_requests_under_the_limit_are_allowed",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_request_over_the_limit_is_refused",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_window_slides_rather_than_resetting_in_fixed_buckets",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_clients_are_limited_independently",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_refused_requests_do_not_extend_the_lockout",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_zero_disables_the_limiter_rather_than_blocking_everything",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_tracking_table_is_bounded",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_eviction_drops_least_recently_seen_first",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_invalid_construction_is_refused",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_client_key_prefers_the_proxy_supplied_ip",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_client_key_falls_back_to_socket_peer_then_constant",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_rate_limit_defaults_are_applied_when_unset",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_rate_limit_is_configurable_by_environment",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_malformed_rate_limit_fails_at_startup",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_http_over_limit_returns_429_before_signature_check",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_http_429_carries_retry_after",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_http_limit_is_per_client_ip",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_http_health_probes_are_never_rate_limited",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_http_rate_limited_requests_are_counted_separately",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_signed_traffic_is_unaffected_at_default_limits",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_ratelimit::test_rate_limit_config_builds_a_working_limiter",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_healthz_always_200",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_readyz_200_after_startup",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_readyz_and_recommend_503_before_ready",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_meta_returns_versions",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_recommendations_end_to_end",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_recommendations_omits_decision_trace_by_default",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_recommendations_include_decision_trace",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_recommendations_tolerates_unknown_fields",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_request_id_is_echoed",
+          "status": "pass"
+        },
+        {
+          "test": "tests.test_service::test_invalid_request_returns_422",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "name": "quality-contract",
+      "phase": "6",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "5 passed, 0 failed, 0 skipped",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 2.47,
+      "reason": "",
+      "artifacts": [
+        "contracts/quality-contract.junit.xml",
+        "contracts/quality-contract.log"
+      ],
+      "failures": [],
+      "cases": [
+        {
+          "test": "ops.quality.suites.test_contract_boundary::test_healthz_contract",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_contract_boundary::test_readyz_ready_after_startup",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_contract_boundary::test_meta_conforms_to_contract",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_contract_boundary::test_recommendation_response_conforms_to_contract",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_contract_boundary::test_response_request_id_is_echoed",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "name": "quality-recsys",
+      "phase": "8",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "472 passed, 0 failed, 26 skipped",
+      "passed": 472,
+      "failed": 0,
+      "skipped": 26,
+      "duration_s": 54.23,
+      "reason": "",
+      "artifacts": [
+        "recommendation/quality-recsys.junit.xml",
+        "recommendation/quality-recsys.log"
+      ],
+      "failures": [],
+      "cases": [
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[single_professional_blr]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[joint_family_elders_delhi]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[jain_couple_ahmedabad]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[couple_toddler_pune]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[couple_delhi_north]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[couple_mumbai_mh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[migrant_bihar_mumbai]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[jain_strict_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[nut_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[fasting_navratri_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[diabetic_senior_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[infant_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[empty_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[missing_diet_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[impossible_combo_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p01]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p02]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p03]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p04]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p05]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p06]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p07]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p08]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p09]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p10]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p11]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p12]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p13]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p14]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p15]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p16]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p17]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p18]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p19]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p20]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p21]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p22]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p23]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p24]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p25]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p26]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p27]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p28]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p29]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p30]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p31]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p32]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p33]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p34]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p35]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p36]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p37]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p38]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p39]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p40]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[real_p41]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_peanuts_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_peanuts_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_dairy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_dairy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_gluten_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_gluten_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_shellfish_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_shellfish_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_egg_allergen_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_egg_allergen_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_soy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_soy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_sesame_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[allergy_sesame_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[region_rajasthan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[region_kerala]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[region_telangana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[region_odisha]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[region_assam]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[region_haryana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[region_madhya_pradesh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[region_jharkhand]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[large_joint_family_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[large_joint_family_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[solo_elder_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[solo_elder_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[multi_allergy_0]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[multi_allergy_1]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[fasting_ramzan_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[fasting_ekadashi_jain_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[jain_dairy_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[egg_diet_egg_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[negative_age_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[unknown_diet_enum_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[huge_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[zero_professionals_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[centenarian_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[daily_eat_out_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[five_children_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[duplicate_allergy_entries_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[objective_awesome_taste_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[objective_healthy_living_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[objective_into_fitness_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_http_outcome[objective_protein_calculator_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[single_professional_blr]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[joint_family_elders_delhi]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[jain_couple_ahmedabad]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[couple_toddler_pune]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[couple_delhi_north]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[couple_mumbai_mh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[migrant_bihar_mumbai]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[jain_strict_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[nut_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[fasting_navratri_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[diabetic_senior_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[infant_household_derived]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[impossible_combo_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p01]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p02]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p03]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p04]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p05]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p06]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p07]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p08]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p09]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p10]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p11]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p12]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p13]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p14]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p15]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p16]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p17]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p18]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p19]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p20]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p21]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p22]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p23]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p24]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p25]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p26]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p27]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p28]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p29]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p30]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p31]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p32]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p33]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p34]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p35]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p36]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p37]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p38]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p39]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p40]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[real_p41]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_peanuts_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_peanuts_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_dairy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_dairy_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_gluten_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_gluten_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_shellfish_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_shellfish_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_egg_allergen_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_egg_allergen_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_soy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_soy_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_sesame_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[allergy_sesame_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[region_rajasthan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[region_kerala]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[region_telangana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[region_odisha]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[region_assam]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[region_haryana]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[region_madhya_pradesh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[region_jharkhand]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[large_joint_family_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[large_joint_family_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[solo_elder_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[solo_elder_non_veg]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[multi_allergy_0]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[multi_allergy_1]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[fasting_ramzan_derived]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[fasting_ekadashi_jain_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[jain_dairy_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[egg_diet_egg_allergy_derived]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[huge_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[zero_professionals_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[centenarian_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[daily_eat_out_derived]",
+          "status": "skip"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[five_children_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[duplicate_allergy_entries_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[objective_awesome_taste_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[objective_healthy_living_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[objective_into_fitness_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diet_exclusion[objective_protein_calculator_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[nut_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_peanuts_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_peanuts_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_dairy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_dairy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_gluten_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_gluten_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_shellfish_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_shellfish_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_egg_allergen_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_egg_allergen_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_soy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_soy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_sesame_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[allergy_sesame_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[multi_allergy_0]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[multi_allergy_1]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[jain_dairy_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[egg_diet_egg_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_allergen_exclusion[duplicate_allergy_entries_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[single_professional_blr]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[joint_family_elders_delhi]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[jain_couple_ahmedabad]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[couple_toddler_pune]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[couple_delhi_north]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[couple_mumbai_mh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[migrant_bihar_mumbai]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[jain_strict_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[nut_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[diabetic_senior_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[infant_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p01]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p02]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p03]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p04]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p05]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p06]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p07]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p08]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p09]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p10]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p11]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p12]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p13]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p14]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p15]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p16]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p17]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p18]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p19]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p20]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p21]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p22]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p23]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p24]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p25]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p26]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p27]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p28]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p29]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p30]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p31]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p32]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p33]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p34]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p35]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p36]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p37]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p38]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p39]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p40]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[real_p41]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_peanuts_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_peanuts_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_dairy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_dairy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_gluten_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_gluten_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_shellfish_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_shellfish_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_egg_allergen_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_egg_allergen_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_soy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_soy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_sesame_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[allergy_sesame_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[region_rajasthan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[region_kerala]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[region_telangana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[region_odisha]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[region_assam]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[region_haryana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[region_madhya_pradesh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[region_jharkhand]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[large_joint_family_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[large_joint_family_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[solo_elder_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[solo_elder_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[multi_allergy_0]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[multi_allergy_1]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[zero_professionals_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[centenarian_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[daily_eat_out_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[five_children_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[duplicate_allergy_entries_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[objective_awesome_taste_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[objective_healthy_living_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[objective_into_fitness_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_plate_count[objective_protein_calculator_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[single_professional_blr]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[joint_family_elders_delhi]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[jain_couple_ahmedabad]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[couple_toddler_pune]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[couple_delhi_north]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[couple_mumbai_mh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[migrant_bihar_mumbai]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[jain_strict_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[nut_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[fasting_navratri_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[diabetic_senior_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[infant_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[impossible_combo_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p01]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p02]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p03]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p04]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p05]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p06]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p07]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p08]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p09]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p10]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p11]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p12]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p13]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p14]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p15]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p16]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p17]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p18]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p19]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p20]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p21]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p22]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p23]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p24]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p25]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p26]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p27]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p28]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p29]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p30]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p31]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p32]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p33]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p34]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p35]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p36]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p37]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p38]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p39]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p40]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[real_p41]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_peanuts_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_peanuts_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_dairy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_dairy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_gluten_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_gluten_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_shellfish_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_shellfish_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_egg_allergen_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_egg_allergen_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_soy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_soy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_sesame_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[allergy_sesame_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[region_rajasthan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[region_kerala]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[region_telangana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[region_odisha]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[region_assam]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[region_haryana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[region_madhya_pradesh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[region_jharkhand]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[large_joint_family_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[large_joint_family_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[solo_elder_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[solo_elder_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[multi_allergy_0]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[multi_allergy_1]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[fasting_ramzan_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[fasting_ekadashi_jain_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[jain_dairy_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[egg_diet_egg_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[huge_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[zero_professionals_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[centenarian_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[daily_eat_out_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[five_children_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[duplicate_allergy_entries_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[objective_awesome_taste_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[objective_healthy_living_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[objective_into_fitness_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_diversity_and_ordering[objective_protein_calculator_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[single_professional_blr]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[joint_family_elders_delhi]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[jain_couple_ahmedabad]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[couple_toddler_pune]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[couple_delhi_north]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[couple_mumbai_mh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[migrant_bihar_mumbai]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[jain_strict_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[nut_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[fasting_navratri_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[diabetic_senior_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[infant_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[impossible_combo_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p01]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p02]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p03]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p04]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p05]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p06]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p07]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p08]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p09]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p10]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p11]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p12]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p13]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p14]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p15]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p16]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p17]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p18]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p19]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p20]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p21]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p22]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p23]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p24]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p25]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p26]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p27]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p28]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p29]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p30]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p31]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p32]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p33]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p34]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p35]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p36]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p37]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p38]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p39]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p40]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[real_p41]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_peanuts_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_peanuts_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_dairy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_dairy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_gluten_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_gluten_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_shellfish_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_shellfish_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_egg_allergen_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_egg_allergen_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_soy_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_soy_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_sesame_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[allergy_sesame_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[region_rajasthan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[region_kerala]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[region_telangana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[region_odisha]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[region_assam]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[region_haryana]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[region_madhya_pradesh]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[region_jharkhand]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[large_joint_family_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[large_joint_family_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[solo_elder_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[solo_elder_non_veg]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[multi_allergy_0]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[multi_allergy_1]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[fasting_ramzan_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[fasting_ekadashi_jain_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[jain_dairy_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[egg_diet_egg_allergy_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[huge_household_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[zero_professionals_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[centenarian_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[daily_eat_out_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[five_children_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[duplicate_allergy_entries_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[objective_awesome_taste_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[objective_healthy_living_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[objective_into_fitness_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_determinism[objective_protein_calculator_derived]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_recommendation_behavior::test_persona_fallback_warnings[NOTSET]",
+          "status": "skip"
+        }
+      ]
+    },
+    {
+      "name": "quality-security",
+      "phase": "13",
+      "status": "pass",
+      "priority": "P0",
+      "summary": "12 passed, 0 failed, 0 skipped",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 5.55,
+      "reason": "",
+      "artifacts": [
+        "security/quality-security.junit.xml",
+        "security/quality-security.log"
+      ],
+      "failures": [],
+      "cases": [
+        {
+          "test": "ops.quality.suites.test_api_security::test_unsigned_request_rejected_401",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_missing_signature_header_401",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_malformed_signature_401",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_stale_signature_rejected_401",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_tampered_body_rejected_401",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_missing_required_field_is_422_not_500",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_empty_body_is_clean_4xx_not_500",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_unknown_fields_tolerated",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_large_payload_does_not_500",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_meta_requires_no_auth_but_is_reachable",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_rate_limit_sheds_flood_with_429",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_api_security::test_limiter_precedes_auth_unsigned_flood_returns_429",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "name": "quality-planning",
+      "phase": "5",
+      "status": "pass",
+      "priority": "P1",
+      "summary": "12 passed, 0 failed, 0 skipped",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 4.4,
+      "reason": "",
+      "artifacts": [
+        "contracts/quality-planning.junit.xml",
+        "contracts/quality-planning.log"
+      ],
+      "failures": [],
+      "cases": [
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_household_surface_requires_signature[/v1/cold-start]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_household_surface_requires_signature[/v1/meal-plan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_household_surface_requires_signature[/v1/weekly-plan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_household_surface_requires_signature[/v1/class-dishes]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_household_surface_missing_household_is_422[/v1/cold-start]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_household_surface_missing_household_is_422[/v1/meal-plan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_household_surface_missing_household_is_422[/v1/weekly-plan]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_household_surface_missing_household_is_422[/v1/class-dishes]",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_cold_start_returns_result",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_meal_plan_returns_result",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_weekly_plan_returns_result",
+          "status": "pass"
+        },
+        {
+          "test": "ops.quality.suites.test_planning_surfaces::test_recipe_surface_signed_and_handles_missing_dish",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "name": "chaos",
+      "phase": "14",
+      "status": "warn",
+      "priority": "P1",
+      "summary": "chaos probe error: No module named 'ghar_re_service'",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.0,
+      "reason": "",
+      "artifacts": [],
+      "failures": [],
+      "cases": []
+    },
+    {
+      "name": "performance",
+      "phase": "12",
+      "status": "pass",
+      "priority": "P2",
+      "summary": "recommendations p50=96.59ms p99=228.7ms (threshold 1500.0ms, in-process)",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 12.61,
+      "reason": "",
+      "artifacts": [
+        "performance/perf.json"
+      ],
+      "failures": [],
+      "cases": []
+    },
+    {
+      "name": "secrets-scan",
+      "phase": "13",
+      "status": "pass",
+      "priority": "P1",
+      "summary": "no hardcoded secret values detected",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.0,
+      "reason": "",
+      "artifacts": [
+        "security/secrets_scan.json"
+      ],
+      "failures": [],
+      "cases": []
+    },
+    {
+      "name": "database",
+      "phase": "7",
+      "status": "skip",
+      "priority": "P0",
+      "summary": "no live database configured",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.0,
+      "reason": "DATABASE_URL / SUPABASE_DB_URL not set \u2014 migrations, RLS, constraints, and data-integrity checks require a reachable Postgres with the Supabase auth.* bootstrap; not verifiable in this environment.",
+      "artifacts": [],
+      "failures": [],
+      "cases": []
+    },
+    {
+      "name": "edge-functions",
+      "phase": "6",
+      "status": "blocked",
+      "priority": "P0",
+      "summary": "6 Deno edge-function test file(s) present but not runnable",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.0,
+      "reason": "Deno runtime is not installed in this environment; `deno test` cannot execute. Install Deno (or run in Supabase CI) to validate consent/feedback/household/recommendations/user-delete/user-export functions.",
+      "artifacts": [],
+      "failures": [],
+      "cases": []
+    },
+    {
+      "name": "ui-playwright",
+      "phase": "9-11",
+      "status": "skip",
+      "priority": "P1",
+      "summary": "GHAR_WEB_URL not set. The frontend is an Expo/React-Native app with no committed web build; provide a running web target (e.g. `expo start --web`) to enable browser tests.",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "duration_s": 0.07,
+      "reason": "GHAR_WEB_URL not set. The frontend is an Expo/React-Native app with no committed web build; provide a running web target (e.g. `expo start --web`) to enable browser tests.",
+      "artifacts": [
+        "playwright/ui_result.json"
+      ],
+      "failures": [],
+      "cases": []
+    }
+  ]
+}

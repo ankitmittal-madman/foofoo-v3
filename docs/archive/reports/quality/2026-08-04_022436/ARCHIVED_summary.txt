@@ -1,0 +1,47 @@
+# STATUS
+
+ARCHIVED
+
+## Reason
+
+Implementation completed.
+
+This document is retained for historical reference only.
+
+It must not be used as the primary implementation guide.
+
+Refer to the active documentation for the current source of truth.
+
+---
+
+GHAR PRODUCTION QUALITY REPORT
+Generated: 2026-08-04T02:24:36.921897+00:00  |  git: cdf8b20
+========================================================================
+Quality score: 86.8   Pass%: 96.8
+Tests: 632 passed / 21 failed / 26 skipped (679 total)
+Launch readiness: NOT READY — P0 test failures present
+Can launch today: NO
+========================================================================
+
+STEPS:
+  [PASS   ] inventory            (P3, phase 1-2) - 78 components, 18 features
+  [PASS   ] ruff-lint            (P2, phase 16) - clean
+  [PASS   ] unit-core            (P0, phase 4) - 84 passed, 0 failed, 0 skipped
+  [PASS   ] unit-service         (P0, phase 4) - 68 passed, 0 failed, 0 skipped
+  [PASS   ] quality-contract     (P0, phase 6) - 5 passed, 0 failed, 0 skipped
+  [FAIL   ] quality-recsys       (P0, phase 8) - 451 passed, 21 failed, 26 skipped
+  [PASS   ] quality-security     (P0, phase 13) - 12 passed, 0 failed, 0 skipped
+  [PASS   ] quality-planning     (P1, phase 5) - 12 passed, 0 failed, 0 skipped
+  [WARN   ] chaos                (P1, phase 14) - chaos probe error: No module named 'ghar_re_service'
+  [PASS   ] performance          (P2, phase 12) - recommendations p50=130.61ms p99=423.13ms (threshold 1500.0ms, in-process)
+  [PASS   ] secrets-scan         (P1, phase 13) - no hardcoded secret values detected
+  [SKIP   ] database             (P0, phase 7) - no live database configured
+  [BLOCKED] edge-functions       (P0, phase 6) - 6 Deno edge-function test file(s) present but not runnable
+  [SKIP   ] ui-playwright        (P1, phase 9-11) - GHAR_WEB_URL not set. The frontend is an Expo/React-Native app with no committed web build; provide a running web target (e.g. `expo start --web`) to enable browser tests.
+
+P0 BLOCKERS:
+  - quality-recsys: 451 passed, 21 failed, 26 skipped
+
+UNVERIFIED P0 SURFACES (cannot certify in this environment):
+  - database: DATABASE_URL / SUPABASE_DB_URL not set — migrations, RLS, constraints, and data-integrity checks require a reachable Postgres with the Supabase auth.* bootstrap; not verifiable in this environment.
+  - edge-functions: Deno runtime is not installed in this environment; `deno test` cannot execute. Install Deno (or run in Supabase CI) to validate consent/feedback/household/recommendations/user-delete/user-export functions.

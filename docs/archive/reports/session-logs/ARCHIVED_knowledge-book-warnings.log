@@ -1,0 +1,1787 @@
+# STATUS
+
+ARCHIVED
+
+## Reason
+
+Implementation completed.
+
+This document is retained for historical reference only.
+
+It must not be used as the primary implementation guide.
+
+Refer to the active documentation for the current source of truth.
+
+---
+
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_intel.py
+     - ghar_re_service/ghar_re_service/scripts/export_bundle.py
+     - ghar_re_service/ghar_re_service/scripts/prepare_cohort_intel.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - docs/archive/implementation/work-packages/ARCHIVED_WP-16_Cohort_Intelligence_Engine_v1.0.md
+     - ghar_re_core/cohort_intel.py
+     - ghar_re_core/knowledge.py
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/test_class_first_cohort.py
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/export_bundle.py
+     - ghar_re_service/ghar_re_service/scripts/prepare_cohort_intel.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/derivation.py
+     - ghar_re_core/knowledge.py
+     - ghar_re_core/tests/test_cohort_intel.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/derivation.py
+     - ghar_re_core/knowledge.py
+     - ghar_re_core/tests/test_cohort_intel.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/recommendations/compose.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - database/migrations/045_dish_name_synonyms_ontology.sql
+     - database/seeds/122_seed_dish_aliases.sql
+     - database/validation/907_dish_ontology_validation.sql
+     - ops/quality/inventory/generate_inventory.py
+     - ops/quality/suites/test_recommendation_behavior.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - mobile/package.json
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - mobile/app/(onboarding)/step-5.tsx
+     - mobile/app/recommendations.tsx
+     - ops/quality/runner/orchestrator.py
+     - supabase/functions/_shared/constants/schemas.ts
+     - supabase/functions/_shared/mod.ts
+     - supabase/functions/_shared/services/scheduler/hard-delete.ts
+     - supabase/functions/household/schema.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/re-client.ts
+     - supabase/functions/user-export/store.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - mobile/app/(onboarding)/step-5.tsx
+     - mobile/app/recommendations.tsx
+     - ops/quality/runner/orchestrator.py
+     - supabase/functions/_shared/constants/schemas.ts
+     - supabase/functions/_shared/mod.ts
+     - supabase/functions/_shared/services/scheduler/hard-delete.ts
+     - supabase/functions/household/schema.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/re-client.ts
+     - supabase/functions/user-export/store.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - mobile/app/(onboarding)/step-5.tsx
+     - mobile/app/recommendations.tsx
+     - ops/quality/runner/orchestrator.py
+     - supabase/functions/_shared/constants/schemas.ts
+     - supabase/functions/_shared/mod.ts
+     - supabase/functions/_shared/services/scheduler/hard-delete.ts
+     - supabase/functions/household/schema.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/re-client.ts
+     - supabase/functions/user-export/store.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - database/migrations/046_rehome_re_engine_live_tables.sql
+     - database/migrations/047_drop_legacy_re_engine_schema.sql
+     - database/rollback/046_rehome_re_engine_live_tables_rollback.sql
+     - database/rollback/047_drop_legacy_re_engine_schema_rollback.sql
+     - database/validation/908_re_engine_decommission_validation.sql
+     - docs/project-history/work-packages/[DRAFT]_WP-20_Retire_Legacy_re_engine_Schema_v1.0.md
+     - mobile/app/(onboarding)/step-5.tsx
+     - mobile/app/cold-start.tsx
+     - mobile/app/daily-plan.tsx
+     - mobile/app/recipe/[dish].tsx
+     - mobile/app/recommendations.tsx
+     - mobile/app/weekly-plan.tsx
+     - mobile/src/api/plan.ts
+     - mobile/src/lib/weeklyPlanStore.ts
+     - supabase/functions/_shared/constants/schemas.ts
+     - supabase/functions/_shared/mod.ts
+     - supabase/functions/_shared/services/scheduler/hard-delete.ts
+     - supabase/functions/household/schema.ts
+     - supabase/functions/plan/handler.ts
+     - supabase/functions/plan/index.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/re-client.ts
+     - supabase/functions/user-export/store.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - mobile/app/(onboarding)/step-5.tsx
+     - mobile/app/cold-start.tsx
+     - mobile/app/daily-plan.tsx
+     - mobile/app/recipe/[dish].tsx
+     - mobile/app/recommendations.tsx
+     - mobile/app/weekly-plan.tsx
+     - mobile/src/api/plan.ts
+     - mobile/src/lib/weeklyPlanStore.ts
+     - supabase/functions/plan/handler.ts
+     - supabase/functions/plan/index.ts
+     - supabase/functions/recommendations/re-client.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - mobile/app/(onboarding)/step-5.tsx
+     - mobile/app/cold-start.tsx
+     - mobile/app/daily-plan.tsx
+     - mobile/app/recipe/[dish].tsx
+     - mobile/app/recommendations.tsx
+     - mobile/app/weekly-plan.tsx
+     - mobile/src/api/plan.ts
+     - mobile/src/lib/weeklyPlanStore.ts
+     - supabase/functions/plan/handler.ts
+     - supabase/functions/plan/index.ts
+     - supabase/functions/recommendations/re-client.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - mobile/app/(onboarding)/step-5.tsx
+     - mobile/app/cold-start.tsx
+     - mobile/app/daily-plan.tsx
+     - mobile/app/recipe/[dish].tsx
+     - mobile/app/recommendations.tsx
+     - mobile/app/weekly-plan.tsx
+     - mobile/src/api/plan.ts
+     - mobile/src/lib/weeklyPlanStore.ts
+     - supabase/functions/plan/handler.ts
+     - supabase/functions/plan/index.ts
+     - supabase/functions/recommendations/re-client.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ops/quality/README.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/conftest.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/conftest.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/conftest.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/conftest.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/conftest.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/conftest.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ghar_re_service/data/bundle/manifest.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ghar_re_service/data/bundle/manifest.json
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/test_recommendation_behavior.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/test_recommendation_behavior.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/cohort_plan.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - ops/quality/personas/personas.py
+     - ops/quality/runner/orchestrator.py
+     - ops/quality/suites/test_recommendation_behavior.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - supabase/functions/recommendations/fallback.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/catalogue.py
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/fallback.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/catalogue.py
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/fallback.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - database/archive/ghar_re_backup_20260803/ghar_re_schema_and_data.sql
+     - database/etl/generate_icd1_seeds.py
+     - ghar_re_core/catalogue.py
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - mobile/app/(onboarding)/step-4.tsx
+     - mobile/src/onboarding/toHouseholdWrite.ts
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/fallback.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - database/archive/ghar_re_backup_20260803/ghar_re_schema_and_data.sql
+     - database/etl/generate_icd1_seeds.py
+     - ghar_re_core/catalogue.py
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - mobile/app/(onboarding)/step-4.tsx
+     - mobile/src/onboarding/toHouseholdWrite.ts
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/fallback.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - database/archive/ghar_re_backup_20260803/ghar_re_schema_and_data.sql
+     - database/validation/906_ghar_re_validation.sql
+     - database/validation/907_dish_ontology_validation.sql
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - database/archive/ghar_re_backup_20260803/ghar_re_schema_and_data.sql
+     - database/validation/906_ghar_re_validation.sql
+     - database/validation/907_dish_ontology_validation.sql
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - data/source/generate_sig_scores_v1.py
+     - database/archive/ghar_re_backup_20260803/ghar_re_schema_and_data.sql
+     - database/migrations/050_drop_unused_ghar_re_schema.sql
+     - database/rollback/049_extend_allergen_model_fish_mustard_rollback.sql
+     - database/rollback/050_drop_unused_ghar_re_schema_rollback.sql
+     - database/validation/906_ghar_re_validation.sql
+     - database/validation/907_dish_ontology_validation.sql
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - data/source/generate_sig_scores_v1.py
+     - database/archive/ghar_re_backup_20260803/ghar_re_schema_and_data.sql
+     - database/migrations/050_drop_unused_ghar_re_schema.sql
+     - database/rollback/049_extend_allergen_model_fish_mustard_rollback.sql
+     - database/rollback/050_drop_unused_ghar_re_schema_rollback.sql
+     - database/validation/906_ghar_re_validation.sql
+     - database/validation/907_dish_ontology_validation.sql
+     - docs/archive/implementation/work-packages/ARCHIVED_WP-21_Production_Hardening_Audit_v1.0.md
+     - supabase/config.toml
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - docs/archive/implementation/work-packages/ARCHIVED_WP-21_Production_Hardening_Audit_v1.0.md
+     - docs/project-history/work-packages/[DRAFT]_WP-21_Production_Hardening_Audit_v1.1.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_service/tests/test_planning.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_service/tests/test_planning.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_service/tests/test_planning.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_service/tests/test_planning.py
+     - supabase/functions/recommendations/fallback.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_service/data/bundle/catalogue.json
+     - ghar_re_service/data/bundle/manifest.json
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/recommendations/events.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/events.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/knowledge.py
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/events.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/knowledge.py
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/events.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/knowledge.py
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/events.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/knowledge.py
+     - ghar_re_core/tests/test_pipeline.py
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/events.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/knowledge.py
+     - ghar_re_core/tests/test_pipeline.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/events.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/knowledge.py
+     - ghar_re_core/tests/test_pipeline.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/events.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - data/source/base_weights.yaml
+     - ghar_re_core/knowledge.py
+     - ghar_re_core/modules.py
+     - ghar_re_core/modules_default.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/test_comfort_hero.py
+     - ghar_re_core/tests/test_pipeline.py
+     - ghar_re_core/tests/test_scoring_registry.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/_tests/served.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/events.ts
+     - supabase/functions/recommendations/handler.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/config.py
+     - ghar_re_core/pairing.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/config.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/recommendations/compose.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/config.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/config.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+     - ghar_re_service/data/bundle/config/base_weights.yaml
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/engine.py
+     - ghar_re_service/ghar_re_service/scripts/export_bundle.py
+     - ghar_re_service/tests/test_service.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - contracts/ghar-re-v1.schema.json
+     - ghar_re_core/config.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+     - ghar_re_service/data/bundle/config/base_weights.yaml
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/engine.py
+     - ghar_re_service/ghar_re_service/scripts/export_bundle.py
+     - ghar_re_service/tests/test_service.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/config.py
+     - ghar_re_core/modules_default.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/test_scoring_registry.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/tests/test_exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/tests/test_exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - pyproject.toml
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - ghar_re_service/tests/test_service.py
+     - pyproject.toml
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/exploration.py
+     - ghar_re_service/ghar_re_service/engine.py
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/tests/test_meal_planner.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/tests/test_meal_planner.py
+     - supabase/functions/_tests/recommendations.test.ts
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/tests/test_meal_planner.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/re-ci.yml
+     - ghar_re_core/meal_planner.py
+     - ghar_re_core/tests/test_meal_planner.py
+     - mobile/app/(auth)/sign-in.tsx
+     - mobile/app/(tabs)/weekly-plan.tsx
+     - mobile/app/daily-plan.tsx
+     - mobile/app/index.tsx
+     - mobile/app/recipe/[dish].tsx
+     - mobile/app/recommendations.tsx
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - .github/workflows/quality-gate.yml
+     - supabase/functions/recommendations/compose.ts
+     - supabase/functions/recommendations/served.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/catalogue.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/test_pipeline.py
+     - ghar_re_service/data/bundle/catalogue.json
+     - ghar_re_service/data/bundle/config/pref_model.yaml
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - ghar_re_service/tests/test_bundle.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - database/seeds/110_seed_re_states.sql
+     - database/seeds/111_seed_re_reference_hierarchy.sql
+     - database/seeds/112_seed_re_meal_classes.sql
+     - database/seeds/113_seed_re_cohorts.sql
+     - database/seeds/114_seed_re_weekly_class_plans.sql
+     - database/seeds/115_seed_re_household_addon_plans.sql
+     - database/seeds/116_seed_re_nonveg_logic.sql
+     - database/seeds/117_seed_re_dish_linked_icd1.sql
+     - database/seeds/120_ghar_re_kb_reference.sql
+     - database/seeds/121_ghar_re_golden_sample.sql
+     - database/validation/WP-3D_Check2_Fix_Reference.sql
+     - ghar_re_core/catalogue.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/test_pipeline.py
+     - reports/re_audit/10_remaining_work.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - database/seeds/110_seed_re_states.sql
+     - database/seeds/111_seed_re_reference_hierarchy.sql
+     - database/seeds/112_seed_re_meal_classes.sql
+     - database/seeds/113_seed_re_cohorts.sql
+     - database/seeds/114_seed_re_weekly_class_plans.sql
+     - database/seeds/115_seed_re_household_addon_plans.sql
+     - database/seeds/116_seed_re_nonveg_logic.sql
+     - database/seeds/117_seed_re_dish_linked_icd1.sql
+     - database/seeds/120_ghar_re_kb_reference.sql
+     - database/seeds/121_ghar_re_golden_sample.sql
+     - database/validation/WP-3D_Check2_Fix_Reference.sql
+     - ghar_re_core/catalogue.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/test_pipeline.py
+     - reports/re_audit/10_remaining_work.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/pairing.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ghar_re_service/ghar_re_service/engine.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md
+     - ghar_re_core/pairing.py
+     - ghar_re_core/tests/golden/couple_toddler_pune.json
+     - ghar_re_core/tests/golden/jain_couple_ahmedabad.json
+     - ghar_re_core/tests/golden/migrant_bihar_mumbai.json
+     - ghar_re_core/tests/golden/single_professional_blr.json
+     - ghar_re_service/ghar_re_service/engine.py
+     - ghar_re_service/ghar_re_service/main.py
+     - mobile/src/api/plan.ts
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md
+     - ghar_re_core/cohort_intel.py
+     - ghar_re_core/knowledge.py
+     - ghar_re_service/data/bundle/catalogue.json
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - reports/re_audit/05_knowledge_base_audit.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_service/data/bundle/catalogue.json
+     - ghar_re_service/data/bundle/manifest.json
+     - ghar_re_service/ghar_re_service/scripts/build_catalogue.py
+     - ghar_re_service/tests/test_bundle.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/07_database_audit.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/07_database_audit.md
+     - reports/re_audit/10_remaining_work.md
+     - reports/re_audit/11_production_readiness.md
+     - reports/re_audit/12_final_verdict.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/07_database_audit.md
+     - reports/re_audit/10_remaining_work.md
+     - reports/re_audit/11_production_readiness.md
+     - reports/re_audit/12_final_verdict.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/archive/01_requirement_traceability.md
+     - reports/re_audit/archive/02_algorithm_coverage.md
+     - reports/re_audit/archive/03_meal_genome_audit.md
+     - reports/re_audit/archive/04_food_ontology_audit.md
+     - reports/re_audit/archive/05_knowledge_base_audit.md
+     - reports/re_audit/archive/06_seed_data_audit.md
+     - reports/re_audit/archive/07_database_audit.md
+     - reports/re_audit/archive/08_synergy_matrix.md
+     - reports/re_audit/archive/09_missing_implementation_algorithm_delta.md
+     - reports/re_audit/archive/10_remaining_work.md
+     - reports/re_audit/archive/11_production_readiness.md
+     - reports/re_audit/archive/12_final_verdict.md
+     - reports/re_audit/archive/README.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/archive/01_requirement_traceability.md
+     - reports/re_audit/archive/02_algorithm_coverage.md
+     - reports/re_audit/archive/03_meal_genome_audit.md
+     - reports/re_audit/archive/04_food_ontology_audit.md
+     - reports/re_audit/archive/05_knowledge_base_audit.md
+     - reports/re_audit/archive/06_seed_data_audit.md
+     - reports/re_audit/archive/07_database_audit.md
+     - reports/re_audit/archive/08_synergy_matrix.md
+     - reports/re_audit/archive/09_missing_implementation_algorithm_delta.md
+     - reports/re_audit/archive/10_remaining_work.md
+     - reports/re_audit/archive/11_production_readiness.md
+     - reports/re_audit/archive/12_final_verdict.md
+     - reports/re_audit/archive/README.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/archive/01_requirement_traceability.md
+     - reports/re_audit/archive/02_algorithm_coverage.md
+     - reports/re_audit/archive/03_meal_genome_audit.md
+     - reports/re_audit/archive/04_food_ontology_audit.md
+     - reports/re_audit/archive/05_knowledge_base_audit.md
+     - reports/re_audit/archive/06_seed_data_audit.md
+     - reports/re_audit/archive/07_database_audit.md
+     - reports/re_audit/archive/08_synergy_matrix.md
+     - reports/re_audit/archive/09_missing_implementation_algorithm_delta.md
+     - reports/re_audit/archive/10_remaining_work.md
+     - reports/re_audit/archive/11_production_readiness.md
+     - reports/re_audit/archive/12_final_verdict.md
+     - reports/re_audit/archive/README.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/archive/01_requirement_traceability.md
+     - reports/re_audit/archive/02_algorithm_coverage.md
+     - reports/re_audit/archive/03_meal_genome_audit.md
+     - reports/re_audit/archive/04_food_ontology_audit.md
+     - reports/re_audit/archive/05_knowledge_base_audit.md
+     - reports/re_audit/archive/06_seed_data_audit.md
+     - reports/re_audit/archive/07_database_audit.md
+     - reports/re_audit/archive/08_synergy_matrix.md
+     - reports/re_audit/archive/09_missing_implementation_algorithm_delta.md
+     - reports/re_audit/archive/10_remaining_work.md
+     - reports/re_audit/archive/11_production_readiness.md
+     - reports/re_audit/archive/12_final_verdict.md
+     - reports/re_audit/archive/README.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/archive/01_requirement_traceability.md
+     - reports/re_audit/archive/02_algorithm_coverage.md
+     - reports/re_audit/archive/03_meal_genome_audit.md
+     - reports/re_audit/archive/04_food_ontology_audit.md
+     - reports/re_audit/archive/05_knowledge_base_audit.md
+     - reports/re_audit/archive/06_seed_data_audit.md
+     - reports/re_audit/archive/07_database_audit.md
+     - reports/re_audit/archive/08_synergy_matrix.md
+     - reports/re_audit/archive/09_missing_implementation_algorithm_delta.md
+     - reports/re_audit/archive/10_remaining_work.md
+     - reports/re_audit/archive/11_production_readiness.md
+     - reports/re_audit/archive/12_final_verdict.md
+     - reports/re_audit/archive/README.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - reports/re_audit/archive/01_requirement_traceability.md
+     - reports/re_audit/archive/02_algorithm_coverage.md
+     - reports/re_audit/archive/03_meal_genome_audit.md
+     - reports/re_audit/archive/04_food_ontology_audit.md
+     - reports/re_audit/archive/05_knowledge_base_audit.md
+     - reports/re_audit/archive/06_seed_data_audit.md
+     - reports/re_audit/archive/07_database_audit.md
+     - reports/re_audit/archive/08_synergy_matrix.md
+     - reports/re_audit/archive/09_missing_implementation_algorithm_delta.md
+     - reports/re_audit/archive/10_remaining_work.md
+     - reports/re_audit/archive/11_production_readiness.md
+     - reports/re_audit/archive/12_final_verdict.md
+     - reports/re_audit/archive/README.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - docs/active/CURRENT_STATUS.md
+     - docs/active/LAUNCH_BLOCKERS.md
+     - docs/active/OPEN_ITEMS.md
+     - docs/active/ROADMAP.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_01_requirement_traceability.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_02_algorithm_coverage.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_03_meal_genome_audit.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_04_food_ontology_audit.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_05_knowledge_base_audit.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_06_seed_data_audit.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_07_database_audit.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_08_synergy_matrix.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_09_missing_implementation_algorithm_delta.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_10_remaining_work.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_11_production_readiness.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_12_final_verdict.md
+     - docs/archive/audits/re_audit_archive/ARCHIVED_README.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_00_executive_summary.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_01_repository_inventory.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_02_system_topology.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_03_recommendation_engine_audit.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_04_food_knowledge_audit.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_05_database_audit.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_06_e2e_workflow_audit.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_07_security_audit.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_08_testing_audit.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_09_deployment_audit.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_10_production_readiness_scorecard.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_11_prioritized_backlog.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_12_recommended_build_sequence.md
+     - docs/archive/audits/re_audit_v2/ARCHIVED_README.md
+     - reports/re_audit/archive/README.md
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - data/source/pairing_rules.yaml
+     - ghar_re_core/config.py
+     - mobile/app/(auth)/sign-in.tsx
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - data/source/pairing_rules.yaml
+     - ghar_re_core/config.py
+     - ghar_re_core/pairing.py
+     - mobile/app/(auth)/sign-in.tsx
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/pairing.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/pairing.py
+     - ghar_re_core/tests/test_pipeline.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/pairing.py
+     - ghar_re_core/tests/test_pipeline.py
+     - ghar_re_service/data/bundle/config/pairing_rules.yaml
+     - ghar_re_service/data/bundle/manifest.json
+     - supabase/deno.json
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/pairing.py
+     - ghar_re_core/tests/test_pipeline.py
+     - ghar_re_service/data/bundle/config/pairing_rules.yaml
+     - ghar_re_service/data/bundle/manifest.json
+     - supabase/deno.json
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/pairing.py
+     - ghar_re_core/tests/test_pipeline.py
+     - ghar_re_service/data/bundle/config/pairing_rules.yaml
+     - ghar_re_service/data/bundle/manifest.json
+     - supabase/deno.json
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/knowledge.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/test_pipeline.py
+     - ghar_re_service/data/bundle/config/pairing_rules.yaml
+     - ghar_re_service/data/bundle/manifest.json
+     - supabase/deno.json
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/scoring.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/decision_log.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/decision_log.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/decision_log.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/test_pipeline.py
+     - ghar_re_service/data/bundle/manifest.json
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - ghar_re_core/decision_log.py
+     - ghar_re_core/pairing.py
+     - ghar_re_core/scoring.py
+     - ghar_re_core/tests/test_pipeline.py
+     - ghar_re_service/data/bundle/manifest.json
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - supabase/functions/plan/handler.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - mobile/src/api/recommendations.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - mobile/src/api/client.ts
+     - mobile/src/api/recommendations.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - mobile/app/(onboarding)/step-2.tsx
+     - mobile/app/(tabs)/settings.tsx
+     - mobile/src/api/plan.ts
+     - mobile/src/onboarding/toHouseholdWrite.ts
+     - supabase/functions/_shared/config/config.ts
+     - supabase/functions/_shared/config/env.ts
+     - supabase/functions/_shared/di/container.ts
+     - supabase/functions/_shared/middleware/error-boundary.ts
+     - supabase/functions/_shared/mod.ts
+     - supabase/functions/_shared/telemetry/telemetry.ts
+     - supabase/functions/_tests/foundation.test.ts
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+     - supabase/functions/household/schema.ts
+     - supabase/functions/household/store.ts
+     - supabase/functions/plan/handler.ts
+     - supabase/functions/recommendations/events.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - mobile/app/(onboarding)/step-2.tsx
+     - mobile/app/(tabs)/settings.tsx
+     - mobile/package.json
+     - mobile/src/api/plan.ts
+     - mobile/src/onboarding/toHouseholdWrite.ts
+     - supabase/functions/_shared/config/config.ts
+     - supabase/functions/_shared/config/env.ts
+     - supabase/functions/_shared/di/container.ts
+     - supabase/functions/_shared/middleware/error-boundary.ts
+     - supabase/functions/_shared/mod.ts
+     - supabase/functions/_shared/telemetry/telemetry.ts
+     - supabase/functions/_tests/foundation.test.ts
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+     - supabase/functions/household/schema.ts
+     - supabase/functions/household/store.ts
+     - supabase/functions/plan/handler.ts
+     - supabase/functions/recommendations/events.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.
+
+⚠️  KNOWLEDGE BOOK CHECK (session-knowledge-doc skill)
+   This session changed the files below (committed and/or uncommitted) but did
+   NOT update KNOWLEDGE.html:
+     - docs/active/CURRENT_STATUS.md
+     - docs/active/LAUNCH_BLOCKERS.md
+     - docs/active/OPEN_ITEMS.md
+     - mobile/app/(onboarding)/step-2.tsx
+     - mobile/app/(tabs)/settings.tsx
+     - mobile/package.json
+     - mobile/src/api/plan.ts
+     - mobile/src/onboarding/toHouseholdWrite.ts
+     - supabase/functions/_shared/config/config.ts
+     - supabase/functions/_shared/config/env.ts
+     - supabase/functions/_shared/di/container.ts
+     - supabase/functions/_shared/middleware/error-boundary.ts
+     - supabase/functions/_shared/mod.ts
+     - supabase/functions/_shared/telemetry/telemetry.ts
+     - supabase/functions/_tests/foundation.test.ts
+     - supabase/functions/_tests/household.test.ts
+     - supabase/functions/household/handler.ts
+     - supabase/functions/household/schema.ts
+     - supabase/functions/household/store.ts
+     - supabase/functions/plan/handler.ts
+     - supabase/functions/recommendations/events.ts
+   Per CLAUDE.md Session End: update KNOWLEDGE.html now (per
+   .claude/skills/session-knowledge-doc/SKILL.md), or state explicitly why
+   this session's changes don't warrant a new entry.

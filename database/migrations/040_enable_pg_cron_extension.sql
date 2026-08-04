@@ -6,7 +6,7 @@
 -- pg_cron/pg_net to the deployed function, which must be provisioned via Supabase Vault through
 -- the Dashboard (Database > Cron in the Supabase Studio, or `vault.create_secret` run manually
 -- with the real key value) — not something this migration file should ever contain in plain SQL.
--- See ops/audits/audit-dpdp/dpdp-compliance-report.md and the RUNBOOK note alongside this file
+-- See docs/archive/audits/ops/audit-dpdp/ARCHIVED_dpdp-compliance-report.md and the RUNBOOK note alongside this file
 -- for the exact manual step remaining.
 
 CREATE EXTENSION IF NOT EXISTS pg_cron;

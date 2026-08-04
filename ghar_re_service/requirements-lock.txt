@@ -1,6 +1,6 @@
 # Lockfile for ghar-re-service (extras: test). Generated 2026-07-30 the same way as
 # ../requirements-lock.txt — resolves the MEDIUM finding in
-# ops/audits/audit-dependencies/dependency-audit.md that neither Python project had a lockfile.
+# docs/archive/audits/ops/audit-dependencies/ARCHIVED_dependency-audit.md that neither Python project had a lockfile.
 # ghar-re-core is a path dependency (installed via `pip install -e ..` in dev, per this project's
 # own pyproject.toml comment) — its own third-party deps are still pinned below by version;
 # regenerate after any dependency change:

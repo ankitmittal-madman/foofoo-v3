@@ -1,0 +1,747 @@
+# STATUS
+
+ARCHIVED
+
+## Reason
+
+Implementation completed.
+
+This document is retained for historical reference only.
+
+It must not be used as the primary implementation guide.
+
+Refer to the active documentation for the current source of truth.
+
+---
+
+........................................................................ [ 14%]
+............................s.....s....s..................s...........ss [ 28%]
+ss.........s.s.s.s.s.s.s.s.s.s.s.s.s.ss..s...s.......................... [ 43%]
+........................................................................ [ 57%]
+........................................................................ [ 72%]
+...........................................F............F.........F..... [ 86%]
+...F..F..FF...F....F..F............F....F...F.F..FFF...F.F..F...Fs       [100%]
+=================================== FAILURES ===================================
+_______________ test_persona_determinism[jain_couple_ahmedabad] ________________
+
+persona = Persona(key='jain_couple_ahmedabad', label='Jain couple, Ahmedabad', household={'label': 'Jain couple, Ahmedabad', 'q1...expect_plates=7, forbid_diet=('non_veg',), forbid_ingredients=(), expect_warnings=None, note='golden-sample household')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: jain_couple_ahmedabad: non-deterministic recommendations across calls
+E       assert [['md5:Sannas...heeyal'], ...] == [['md5:Sannas...heeyal'], ...]
+E         
+E         At index 6 diff: ['md5:Neer Dosa', 'md5:Mor Kuzhambu'] != ['md5:Idiyappam', 'md5:Mor Kuzhambu']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "732b1edd-b8f0-4429-939d-0a0915f5f0e8"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "732b1edd-b8f0-4429-939d-0a0915f5f0e8", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 25.2}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "45eaac3f-d104-4aca-8941-987c425c2e59"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "45eaac3f-d104-4aca-8941-987c425c2e59", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 24.6}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "732b1edd-b8f0-4429-939d-0a0915f5f0e8"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "732b1edd-b8f0-4429-939d-0a0915f5f0e8", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 25.2}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "45eaac3f-d104-4aca-8941-987c425c2e59"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "45eaac3f-d104-4aca-8941-987c425c2e59", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 24.6}
+______________________ test_persona_determinism[real_p03] ______________________
+
+persona = Persona(key='real_p03', label='Working woman living alone', household={'q1_household_type': 'single', 'q2_working_prof...'non_veg',), forbid_ingredients=(), expect_warnings=None, note='derived from persona_master P03 (working_woman_alone)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p03: non-deterministic recommendations across calls
+E       assert [['md5:Thoran...Sambar'], ...] == [['md5:Thoran...Sambar'], ...]
+E         
+E         At index 6 diff: ['md5:Appam', 'md5:Avial'] != ['md5:Keerai Masiyal', 'md5:Vengaya Sambar']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "5418e44a-1f7b-4cd4-aa85-041f5fc85944"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "5418e44a-1f7b-4cd4-aa85-041f5fc85944", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 151.6}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "dc8aa9f2-5588-4ca2-a066-c87851c1f9c2"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "dc8aa9f2-5588-4ca2-a066-c87851c1f9c2", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 173.0}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "5418e44a-1f7b-4cd4-aa85-041f5fc85944"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "5418e44a-1f7b-4cd4-aa85-041f5fc85944", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 151.6}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "dc8aa9f2-5588-4ca2-a066-c87851c1f9c2"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "dc8aa9f2-5588-4ca2-a066-c87851c1f9c2", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 173.0}
+______________________ test_persona_determinism[real_p13] ______________________
+
+persona = Persona(key='real_p13', label='Joint/multi-generation family', household={'q1_household_type': 'couple_kids_parents', ...on_veg',), forbid_ingredients=(), expect_warnings=None, note='derived from persona_master P13 (joint_multigeneration)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p13: non-deterministic recommendations across calls
+E       assert [['md5:Paneer... Bhaji'], ...] == [['md5:Paneer... Bhaji'], ...]
+E         
+E         At index 6 diff: ['md5:Baingan Bharta', 'md5:Pakodi Ki Kadhi'] != ['md5:Paneer Tikka', 'md5:Pakodi Ki Kadhi']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "3830cb90-8ef0-48f3-b0aa-d210f06bd8ed"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "3830cb90-8ef0-48f3-b0aa-d210f06bd8ed", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 163.0}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "81e0ce82-480a-41f3-8a65-106e55365474"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "81e0ce82-480a-41f3-8a65-106e55365474", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 172.6}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "3830cb90-8ef0-48f3-b0aa-d210f06bd8ed"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "3830cb90-8ef0-48f3-b0aa-d210f06bd8ed", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 163.0}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "81e0ce82-480a-41f3-8a65-106e55365474"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "81e0ce82-480a-41f3-8a65-106e55365474", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 172.6}
+______________________ test_persona_determinism[real_p22] ______________________
+
+persona = Persona(key='real_p22', label='Cook-assisted household: skilled cook', household={'q1_household_type': 'couple', 'q2_w...on_veg',), forbid_ingredients=(), expect_warnings=None, note='derived from persona_master P22 (cook_assisted_skilled)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p22: non-deterministic recommendations across calls
+E       assert [['md5:Thoran...:Avial'], ...] == [['md5:Thoran...:Avial'], ...]
+E         
+E         At index 6 diff: ['md5:Vendakkai Poriyal', 'md5:Vengaya Sambar'] != ['md5:Idiyappam', 'md5:Avial (Kerala)']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "0a30bc1c-cae7-4e42-acb3-55c210bd4a40"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "0a30bc1c-cae7-4e42-acb3-55c210bd4a40", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 100.2}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "89c6ae7f-6691-44ef-8f66-38537ab9df98"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "89c6ae7f-6691-44ef-8f66-38537ab9df98", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 88.8}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "0a30bc1c-cae7-4e42-acb3-55c210bd4a40"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "0a30bc1c-cae7-4e42-acb3-55c210bd4a40", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 100.2}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "89c6ae7f-6691-44ef-8f66-38537ab9df98"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "89c6ae7f-6691-44ef-8f66-38537ab9df98", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 88.8}
+______________________ test_persona_determinism[real_p25] ______________________
+
+persona = Persona(key='real_p25', label='Maid-dependent minimal cooking / batch cook', household={'q1_household_type': 'couple',...eg',), forbid_ingredients=(), expect_warnings=None, note='derived from persona_master P25 (maid_dependent_batch_cook)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p25: non-deterministic recommendations across calls
+E       assert [['md5:Paneer...ainsoo'], ...] == [['md5:Paneer...ainsoo'], ...]
+E         
+E         At index 6 diff: ['md5:Kachhi Haldi Ki Sabzi', 'md5:Phaanu'] != ['md5:Haak (Kashmiri Greens)', 'md5:Phaanu']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "61f3e49b-9868-482f-b1f4-639fcb04378f"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "61f3e49b-9868-482f-b1f4-639fcb04378f", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 137.8}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "28a6f0fe-5c36-4369-8c0c-847eca26d91e"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "28a6f0fe-5c36-4369-8c0c-847eca26d91e", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 104.4}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "61f3e49b-9868-482f-b1f4-639fcb04378f"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "61f3e49b-9868-482f-b1f4-639fcb04378f", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 137.8}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "28a6f0fe-5c36-4369-8c0c-847eca26d91e"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "28a6f0fe-5c36-4369-8c0c-847eca26d91e", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 104.4}
+______________________ test_persona_determinism[real_p28] ______________________
+
+persona = Persona(key='real_p28', label='Migrant in metro preserving home-state food', household={'q1_household_type': 'single',...veg',), forbid_ingredients=(), expect_warnings=None, note='derived from persona_master P28 (migrant_adult_home_state)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p28: non-deterministic recommendations across calls
+E       assert [['md5:Thoran... Rasam'], ...] == [['md5:Thoran... Rasam'], ...]
+E         
+E         At index 6 diff: ['md5:Idiyappam', 'md5:Kuzhambu (Vathal)'] != ['md5:Appam', 'md5:Kuzhambu (Vathal)']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "28fae5e8-32f5-493a-85d3-575874bdae55"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "28fae5e8-32f5-493a-85d3-575874bdae55", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 100.4}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "dfd45e56-db17-4959-9e1b-c52020ef41ed"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "dfd45e56-db17-4959-9e1b-c52020ef41ed", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 84.9}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "28fae5e8-32f5-493a-85d3-575874bdae55"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "28fae5e8-32f5-493a-85d3-575874bdae55", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 100.4}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "dfd45e56-db17-4959-9e1b-c52020ef41ed"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "dfd45e56-db17-4959-9e1b-c52020ef41ed", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 84.9}
+______________________ test_persona_determinism[real_p29] ______________________
+
+persona = Persona(key='real_p29', label='Inter-state couple / mixed cuisine household', household={'q1_household_type': 'couple'... forbid_ingredients=(), expect_warnings=None, note='derived from persona_master P29 (interstate_couple_mixed_cuisine)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p29: non-deterministic recommendations across calls
+E       assert [['md5:Begun ...Shukto'], ...] == [['md5:Begun ...Shukto'], ...]
+E         
+E         At index 6 diff: ['md5:Saga Bhaja', 'md5:Dalma'] != ['md5:Bharli Vangi', 'md5:Amti']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "8e0eb777-dd62-4cd0-b898-a26801a4d664"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "8e0eb777-dd62-4cd0-b898-a26801a4d664", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 82.4}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "f047b880-9baa-42de-85a4-5a31c48760d9"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "f047b880-9baa-42de-85a4-5a31c48760d9", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 87.0}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "8e0eb777-dd62-4cd0-b898-a26801a4d664"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "8e0eb777-dd62-4cd0-b898-a26801a4d664", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 82.4}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "f047b880-9baa-42de-85a4-5a31c48760d9"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "f047b880-9baa-42de-85a4-5a31c48760d9", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 87.0}
+______________________ test_persona_determinism[real_p33] ______________________
+
+persona = Persona(key='real_p33', label='Mutton/Sunday special non-veg household', household={'q1_household_type': 'couple', 'q2...id_diet=(), forbid_ingredients=(), expect_warnings=None, note='derived from persona_master P33 (sunday_mutton_nonveg)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p33: non-deterministic recommendations across calls
+E       assert [['md5:Mutta ...:Saagu'], ...] == [['md5:Mutta ...:Saagu'], ...]
+E         
+E         At index 6 diff: ['md5:Appam', 'md5:Parippu Curry'] != ['md5:Poriyal', 'md5:Parippu Curry']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "81c85ea5-baa5-490f-86af-1e72439142bd"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "81c85ea5-baa5-490f-86af-1e72439142bd", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 144.9}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "68df234f-68ac-471c-a710-ec6a943b55ea"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "68df234f-68ac-471c-a710-ec6a943b55ea", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 195.5}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "81c85ea5-baa5-490f-86af-1e72439142bd"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "81c85ea5-baa5-490f-86af-1e72439142bd", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 144.9}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "68df234f-68ac-471c-a710-ec6a943b55ea"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "68df234f-68ac-471c-a710-ec6a943b55ea", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 195.5}
+______________________ test_persona_determinism[real_p38] ______________________
+
+persona = Persona(key='real_p38', label='Field-work heavy breakfast household', household={'q1_household_type': 'couple', 'q2_wo...g',), forbid_ingredients=(), expect_warnings=None, note='derived from persona_master P38 (field_work_heavy_breakfast)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p38: non-deterministic recommendations across calls
+E       assert [['md5:Bharli...:Avial'], ...] == [['md5:Bharli...:Avial'], ...]
+E         
+E         At index 6 diff: ['md5:Poriyal', 'md5:Parippu Curry'] != ['md5:Appam', 'md5:Manga Curry']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "921a8fd4-ec57-4b51-b07d-e16af7f5f4e0"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "921a8fd4-ec57-4b51-b07d-e16af7f5f4e0", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 314.7}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "4b1de1a6-6bcf-4669-8eeb-b6efba8308d8"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "4b1de1a6-6bcf-4669-8eeb-b6efba8308d8", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 175.5}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "921a8fd4-ec57-4b51-b07d-e16af7f5f4e0"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "921a8fd4-ec57-4b51-b07d-e16af7f5f4e0", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 314.7}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "4b1de1a6-6bcf-4669-8eeb-b6efba8308d8"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "4b1de1a6-6bcf-4669-8eeb-b6efba8308d8", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 175.5}
+______________________ test_persona_determinism[real_p41] ______________________
+
+persona = Persona(key='real_p41', label='Composite family: child + diabetic/elderly member', household={'q1_household_type': 'co...orbid_ingredients=(), expect_warnings=None, note='derived from persona_master P41 (child_plus_diabetic_elder_overlap)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: real_p41: non-deterministic recommendations across calls
+E       assert [['md5:Mochar...:Dalma'], ...] == [['md5:Mochar...:Dalma'], ...]
+E         
+E         At index 6 diff: ['md5:Baingan Bharta', 'md5:Dal Tadka'] != ['md5:Bhindi Masala', 'md5:Dal Tadka']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "504ac372-d7ba-469c-92b2-ccbebdbbcf2d"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "504ac372-d7ba-469c-92b2-ccbebdbbcf2d", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 93.4}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "93533776-82a3-4f02-a10c-f1f88daef4db"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "93533776-82a3-4f02-a10c-f1f88daef4db", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 203.4}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "504ac372-d7ba-469c-92b2-ccbebdbbcf2d"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "504ac372-d7ba-469c-92b2-ccbebdbbcf2d", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 93.4}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "93533776-82a3-4f02-a10c-f1f88daef4db"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "93533776-82a3-4f02-a10c-f1f88daef4db", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 203.4}
+_________________ test_persona_determinism[allergy_sesame_veg] _________________
+
+persona = Persona(key='allergy_sesame_veg', label='veg household allergic to sesame', household={'q1_household_type': 'couple', ..._diet=('non_veg',), forbid_ingredients=('sesame_seeds',), expect_warnings=None, note='allergen x diet matrix coverage')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: allergy_sesame_veg: non-deterministic recommendations across calls
+E       assert [['md5:Rasam ...:Avial'], ...] == [['md5:Rasam ...:Avial'], ...]
+E         
+E         At index 6 diff: ['md5:Paneer Bhurji', 'md5:Dal Makhani'] != ['md5:Paneer Tikka', 'md5:Dum Aloo']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "4d80f78a-2fc4-4103-89b2-4893182f65b5"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "4d80f78a-2fc4-4103-89b2-4893182f65b5", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 78.4}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "a985c49f-1fe4-4c2e-9d5c-ab92a16c1094"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "a985c49f-1fe4-4c2e-9d5c-ab92a16c1094", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 88.7}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "4d80f78a-2fc4-4103-89b2-4893182f65b5"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "4d80f78a-2fc4-4103-89b2-4893182f65b5", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 78.4}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "a985c49f-1fe4-4c2e-9d5c-ab92a16c1094"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "a985c49f-1fe4-4c2e-9d5c-ab92a16c1094", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 88.7}
+___________________ test_persona_determinism[region_odisha] ____________________
+
+persona = Persona(key='region_odisha', label='Household in Bhubaneswar, Odisha', household={'q1_household_type': 'couple', 'q2_w...tus=200, expect_plates=7, forbid_diet=(), forbid_ingredients=(), expect_warnings=None, note='region coverage gap-fill')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: region_odisha: non-deterministic recommendations across calls
+E       assert [['md5:Begun ...ok Dal'], ...] == [['md5:Begun ...ok Dal'], ...]
+E         
+E         At index 6 diff: ['md5:Fried Bombil', 'md5:Amti'] != ['md5:Bharli Vangi', 'md5:Amti']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "2b9a68de-6805-4ea4-b197-23333eb91697"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "2b9a68de-6805-4ea4-b197-23333eb91697", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 133.7}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "5bb1224d-a25e-4d81-a5f0-060e66076dbf"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "5bb1224d-a25e-4d81-a5f0-060e66076dbf", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 315.1}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "2b9a68de-6805-4ea4-b197-23333eb91697"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "2b9a68de-6805-4ea4-b197-23333eb91697", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 133.7}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "5bb1224d-a25e-4d81-a5f0-060e66076dbf"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "5bb1224d-a25e-4d81-a5f0-060e66076dbf", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 315.1}
+__________________ test_persona_determinism[region_jharkhand] __________________
+
+persona = Persona(key='region_jharkhand', label='Household in Ranchi, Jharkhand', household={'q1_household_type': 'couple', 'q2_...tus=200, expect_plates=7, forbid_diet=(), forbid_ingredients=(), expect_warnings=None, note='region coverage gap-fill')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: region_jharkhand: non-deterministic recommendations across calls
+E       assert [['md5:Begun ...ok Dal'], ...] == [['md5:Begun ...ok Dal'], ...]
+E         
+E         At index 6 diff: ['md5:Fried Bombil', 'md5:Amti'] != ['md5:Bharli Vangi', 'md5:Amti']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "4f211af7-30b0-44f4-a46e-17f6a088110b"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "4f211af7-30b0-44f4-a46e-17f6a088110b", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 164.1}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "bd5d541d-11c9-4383-a3dc-9741b655a218"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "bd5d541d-11c9-4383-a3dc-9741b655a218", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 142.9}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "4f211af7-30b0-44f4-a46e-17f6a088110b"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "4f211af7-30b0-44f4-a46e-17f6a088110b", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 164.1}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "bd5d541d-11c9-4383-a3dc-9741b655a218"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "bd5d541d-11c9-4383-a3dc-9741b655a218", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 142.9}
+_____________ test_persona_determinism[large_joint_family_non_veg] _____________
+
+persona = Persona(key='large_joint_family_non_veg', label='Large 3-generation joint family (non_veg)', household={'q1_household_... forbid_diet=(), forbid_ingredients=(), expect_warnings=None, note='extreme household size (6 members, 3 generations)')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: large_joint_family_non_veg: non-deterministic recommendations across calls
+E       assert [['md5:Bhindi... Marag'], ...] == [['md5:Bhindi... Marag'], ...]
+E         
+E         At index 6 diff: ['md5:Ker Sangri', 'md5:Dubuk'] != ['md5:Egg Curry', 'md5:Pakodi Ki Kadhi']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "feebc9df-dbfd-44ec-84e9-d22a52c6223b"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "feebc9df-dbfd-44ec-84e9-d22a52c6223b", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 424.8}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "866cc2db-f203-4ab3-9aff-3cf1105f9700"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "866cc2db-f203-4ab3-9aff-3cf1105f9700", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 213.9}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "feebc9df-dbfd-44ec-84e9-d22a52c6223b"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "feebc9df-dbfd-44ec-84e9-d22a52c6223b", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 424.8}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "866cc2db-f203-4ab3-9aff-3cf1105f9700"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "866cc2db-f203-4ab3-9aff-3cf1105f9700", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 213.9}
+__________________ test_persona_determinism[multi_allergy_0] ___________________
+
+persona = Persona(key='multi_allergy_0', label='Household with 3 simultaneous allergies', household={'q1_household_type': 'coupl...ts=('peanut', 'paneer', 'wheat_flour'), expect_warnings=None, note='multi-allergen exclusion must hold simultaneously')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: multi_allergy_0: non-deterministic recommendations across calls
+E       assert [['md5:Sannas... Bhaji'], ...] == [['md5:Sannas... Bhaji'], ...]
+E         
+E         At index 6 diff: ['md5:Idiyappam', 'md5:Manga Curry'] != ['md5:Poriyal', 'md5:Manga Curry']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "651122cc-93e1-433e-843f-a32f734590fc"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "651122cc-93e1-433e-843f-a32f734590fc", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 72.7}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "92c362dc-22c9-44de-89c4-dd87f9c0a5c0"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "92c362dc-22c9-44de-89c4-dd87f9c0a5c0", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 74.4}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "651122cc-93e1-433e-843f-a32f734590fc"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "651122cc-93e1-433e-843f-a32f734590fc", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 72.7}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "92c362dc-22c9-44de-89c4-dd87f9c0a5c0"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "92c362dc-22c9-44de-89c4-dd87f9c0a5c0", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 74.4}
+__________________ test_persona_determinism[multi_allergy_1] ___________________
+
+persona = Persona(key='multi_allergy_1', label='Household with 4 simultaneous allergies', household={'q1_household_type': 'coupl...', 'egg', 'soy_sauce', 'sesame_seeds'), expect_warnings=None, note='multi-allergen exclusion must hold simultaneously')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: multi_allergy_1: non-deterministic recommendations across calls
+E       assert [['md5:Bharli...akhani'], ...] == [['md5:Bharli...akhani'], ...]
+E         
+E         At index 6 diff: ['md5:Paneer Tikka', 'md5:Dum Aloo'] != ['md5:Rasam Vada', 'md5:Saagu']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "09817efe-e2f9-47b5-9485-c303151afa7a"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "09817efe-e2f9-47b5-9485-c303151afa7a", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 200.5}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "dff2a9e4-e6ab-4d55-8555-1b38fa5d4c97"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "dff2a9e4-e6ab-4d55-8555-1b38fa5d4c97", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 171.3}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "09817efe-e2f9-47b5-9485-c303151afa7a"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "09817efe-e2f9-47b5-9485-c303151afa7a", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 200.5}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "dff2a9e4-e6ab-4d55-8555-1b38fa5d4c97"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "dff2a9e4-e6ab-4d55-8555-1b38fa5d4c97", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 171.3}
+_______________ test_persona_determinism[fasting_ramzan_derived] _______________
+
+persona = Persona(key='fasting_ramzan_derived', label='Ramzan-observant non-veg household', household={'q1_household_type': 'cou..., forbid_ingredients=(), expect_warnings=None, note='fasting filter with non-veg household — must stay contract-valid')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: fasting_ramzan_derived: non-deterministic recommendations across calls
+E       assert [['md5:Mutta ...:Saagu'], ...] == [['md5:Mutta ...:Saagu'], ...]
+E         
+E         At index 6 diff: ['md5:Poriyal', 'md5:Parippu Curry'] != ['md5:Appam', 'md5:Parippu Curry']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "819e5fa4-7bb2-4c57-adf7-0291df96dd52"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "819e5fa4-7bb2-4c57-adf7-0291df96dd52", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 137.8}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "1e13bb5d-cf77-4f65-8a55-fda5e5c03d43"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "1e13bb5d-cf77-4f65-8a55-fda5e5c03d43", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 137.5}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "819e5fa4-7bb2-4c57-adf7-0291df96dd52"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "819e5fa4-7bb2-4c57-adf7-0291df96dd52", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 137.8}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "1e13bb5d-cf77-4f65-8a55-fda5e5c03d43"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "1e13bb5d-cf77-4f65-8a55-fda5e5c03d43", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 137.5}
+_______________ test_persona_determinism[huge_household_derived] _______________
+
+persona = Persona(key='huge_household_derived', label='Household with 20 members', household={'q1_household_type': 'couple_kids_...iet=('non_veg',), forbid_ingredients=(), expect_warnings=None, note='extreme member count must not crash the pipeline')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: huge_household_derived: non-deterministic recommendations across calls
+E       assert [['md5:Shukni...Sambar'], ...] == [['md5:Shukni...Sambar'], ...]
+E         
+E         At index 6 diff: ['md5:Aloo Pitika', 'md5:Aloo Dum (Bengali)'] != ['md5:Vendakkai Poriyal', 'md5:Manga Curry']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "dcc123b7-4fcc-4884-8ebd-b582a9f68b41"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "dcc123b7-4fcc-4884-8ebd-b582a9f68b41", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 81.1}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "6eaa6ea7-3068-4d5f-a04f-b9978954f0ed"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "6eaa6ea7-3068-4d5f-a04f-b9978954f0ed", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 105.4}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "dcc123b7-4fcc-4884-8ebd-b582a9f68b41"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "dcc123b7-4fcc-4884-8ebd-b582a9f68b41", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 81.1}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "6eaa6ea7-3068-4d5f-a04f-b9978954f0ed"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "6eaa6ea7-3068-4d5f-a04f-b9978954f0ed", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 105.4}
+________________ test_persona_determinism[centenarian_derived] _________________
+
+persona = Persona(key='centenarian_derived', label='Household with a 100-year-old member', household={'q1_household_type': 'coup...non_veg',), forbid_ingredients=(), expect_warnings=None, note='extreme age boundary (100) must not crash the pipeline')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: centenarian_derived: non-deterministic recommendations across calls
+E       assert [['md5:Bhindi...Pakora'], ...] == [['md5:Bhindi...Pakora'], ...]
+E         
+E         At index 6 diff: ['md5:Ker Sangri', 'md5:Mix Veg'] != ['md5:Paneer Bhurji', 'md5:Chainsoo']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "76249a56-af3f-44eb-8de6-4566cb2c7880"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "76249a56-af3f-44eb-8de6-4566cb2c7880", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 153.2}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "4d5e07dc-ad54-4851-bc0c-cd8bb7909c13"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "4d5e07dc-ad54-4851-bc0c-cd8bb7909c13", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 128.8}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "76249a56-af3f-44eb-8de6-4566cb2c7880"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "76249a56-af3f-44eb-8de6-4566cb2c7880", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 153.2}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "4d5e07dc-ad54-4851-bc0c-cd8bb7909c13"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "4d5e07dc-ad54-4851-bc0c-cd8bb7909c13", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 128.8}
+_________ test_persona_determinism[duplicate_allergy_entries_derived] __________
+
+persona = Persona(key='duplicate_allergy_entries_derived', label='Household with duplicate allergy entries', household={'q1_hous...id_ingredients=('peanut',), expect_warnings=None, note='duplicate allergy tokens must not break dedup/exclusion logic')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: duplicate_allergy_entries_derived: non-deterministic recommendations across calls
+E       assert [['md5:Rasam ...heeyal'], ...] == [['md5:Rasam ...heeyal'], ...]
+E         
+E         At index 6 diff: ['md5:Appam', 'md5:Avial'] != ['md5:Keerai Masiyal', 'md5:Avial']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "89929bde-aba1-484a-800d-27605ffda5e0"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "89929bde-aba1-484a-800d-27605ffda5e0", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 104.2}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "3a1c6840-c5c4-48d5-a2ad-4d1176c39c73"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "3a1c6840-c5c4-48d5-a2ad-4d1176c39c73", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 124.5}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "89929bde-aba1-484a-800d-27605ffda5e0"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "89929bde-aba1-484a-800d-27605ffda5e0", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 104.2}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "3a1c6840-c5c4-48d5-a2ad-4d1176c39c73"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "3a1c6840-c5c4-48d5-a2ad-4d1176c39c73", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 124.5}
+________ test_persona_determinism[objective_protein_calculator_derived] ________
+
+persona = Persona(key='objective_protein_calculator_derived', label='Veg household with objective=protein_calculator', household...lates=7, forbid_diet=('non_veg',), forbid_ingredients=(), expect_warnings=None, note='Q15 objective coverage gap-fill')
+signed_post = <function signed_post.<locals>._post at 0x7ab5321ba2a0>
+
+    @pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
+        p.key for p in PERSONAS if p.expect_status == 200])
+    def test_persona_determinism(persona, signed_post):
+        """The same request twice yields identical hero dishes (persistence/repeatability)."""
+        body = {"household": persona.household, "context": persona.context}
+        r1 = signed_post("/v1/recommendations", body)
+        r2 = signed_post("/v1/recommendations", body)
+        assert r1.status_code == 200 and r2.status_code == 200
+        heroes1 = [p["hero_dish_ids"] for p in r1.json()["plates"]]
+        heroes2 = [p["hero_dish_ids"] for p in r2.json()["plates"]]
+>       assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
+E       AssertionError: objective_protein_calculator_derived: non-deterministic recommendations across calls
+E       assert [['md5:Rasam ...Sambar'], ...] == [['md5:Rasam ...Sambar'], ...]
+E         
+E         At index 6 diff: ['md5:Appam', 'md5:Avial'] != ['md5:Paneer Bhurji', 'md5:Dal Makhani']
+E         Use -v to get more diff
+
+ops/quality/suites/test_recommendation_behavior.py:154: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"event": "request.received", "service": "ghar_re_service", "request_id": "e9884c31-acec-41d4-a3c4-c45ad8ac62cb"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "e9884c31-acec-41d4-a3c4-c45ad8ac62cb", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 75.1}
+{"event": "request.received", "service": "ghar_re_service", "request_id": "b8a6ce64-b80f-4007-bbc9-34b98a678f10"}
+{"event": "request.ok", "service": "ghar_re_service", "request_id": "b8a6ce64-b80f-4007-bbc9-34b98a678f10", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 142.1}
+------------------------------ Captured log call -------------------------------
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "e9884c31-acec-41d4-a3c4-c45ad8ac62cb"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "e9884c31-acec-41d4-a3c4-c45ad8ac62cb", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 75.1}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.received", "service": "ghar_re_service", "request_id": "b8a6ce64-b80f-4007-bbc9-34b98a678f10"}
+INFO     ghar_re_service:lifecycle.py:51 {"event": "request.ok", "service": "ghar_re_service", "request_id": "b8a6ce64-b80f-4007-bbc9-34b98a678f10", "outcome": "success", "plates": 7, "warnings": 0, "latency_ms": 142.1}
+=============================== warnings summary ===============================
+ops/quality/suites/test_recommendation_behavior.py::test_persona_http_outcome[single_professional_blr]
+  /usr/local/lib/python3.12/dist-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[jain_couple_ahmedabad]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p03]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p13]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p22]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p25]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p28]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p29]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p33]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p38]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[real_p41]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[allergy_sesame_veg]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[region_odisha]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[region_jharkhand]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[large_joint_family_non_veg]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[multi_allergy_0]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[multi_allergy_1]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[fasting_ramzan_derived]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[huge_household_derived]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[centenarian_derived]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[duplicate_allergy_entries_derived]
+FAILED ops/quality/suites/test_recommendation_behavior.py::test_persona_determinism[objective_protein_calculator_derived]
+21 failed, 451 passed, 26 skipped, 1 warning in 85.22s (0:01:25)
+

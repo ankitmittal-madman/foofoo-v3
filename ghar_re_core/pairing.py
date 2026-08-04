@@ -94,7 +94,7 @@ def compat(d, l):
     if d_rich != l_rich:
         val += b_balance
     # G6 protein-veg balance: pulse/protein liquid + veg dry (or vice versa)
-    # FIXED (Founder-ratified 2026-08-04, reports/re_audit/10_remaining_work.md #6): l_protein
+    # FIXED (Founder-ratified 2026-08-04, docs/archive/audits/re_audit_archive/ARCHIVED_10_remaining_work.md #6): l_protein
     # previously only tested {"dal_lentil"}, silently excluding kebab/egg_dish/curry liquids from
     # the b_protein bonus unless their diet also happened to be non_veg/egg. Widened to the full
     # protein_cat set below, per the fix this comment block previously described but deliberately
