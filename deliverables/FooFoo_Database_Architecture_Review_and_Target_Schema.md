@@ -1074,7 +1074,7 @@ All migrations follow expand → dual-write/backfill → validate → read cutov
 3. Assign/reconcile stable dish, ingredient, recipe, class, taxonomy-term and episode version IDs across database and bundle.
 4. Normalize recipe equipment/operation DAG, nutrient assertions, substitutions, availability, festival and reviewed safety provenance.
 5. Split normal primary eligibility from degraded review fallback and enforce the Section 14 promotion/multi-label policy in a publish RPC.
-6. Replace remaining mutable-name reconciliation in APIs/events. Runtime legacy class CSV fallback is retired by snapshot v2; production Fly promotion remains a release gate.
+6. Replace remaining mutable-name reconciliation in APIs/events. Runtime legacy class CSV fallback is retired in production by snapshot v2 and bundle `sha256:ffad5c55384244e3`.
 
 **Exit gate:** DB and bundle have identical ID/count/checksum manifests; every eligible item has complete safety ingredients and source/review status.
 

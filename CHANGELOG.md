@@ -6,6 +6,9 @@
 ## [Unreleased]
 
 ### Deployed
+- Production Fly workflow 31013721486 deployed commit `f88d0a2` and snapshot-v2 bundle
+  `sha256:ffad5c55384244e3`; `/readyz` passed and both legacy class-mapping CSVs are absent from the
+  runtime image.
 - Applied migrations 070–072 and redeployed `cron-dish-ontology` and `plan`: controlled external
   provider evaluation, exact-only USDA nutrients, normalized recommendation request/run/candidate
   lineage, and database-enforced Groq field/AI assertion policy are live.

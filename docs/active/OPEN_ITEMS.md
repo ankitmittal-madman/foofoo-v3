@@ -39,8 +39,6 @@ findings are retained under `docs/archive/`.
 - Expand comfort-hero mapping beyond 17 of 36 resolved heroes.
 - Populate the regional-prior table for PanIndia and Global zones; 187 of 810 dishes currently
   receive no regional-prior boost.
-- Approve and verify the Fly release carrying ontology snapshot v2. Local parity covers all 1,599
-  runtime lookup names and the bundle no longer includes either legacy class-mapping CSV.
 - Create/approve a funded Fly staging app and configure `FLY_STAGING_*` variables/secrets. The
   GitHub `Production` environment is now protected by a required reviewer and a main-only custom
   deployment-branch policy.
@@ -79,6 +77,8 @@ findings are retained under `docs/archive/`.
   historical scores.
 - Migration 072 makes AI field authority a database policy and normalizes AI generation inputs,
   assertion sources, AI-run links and immutable review decisions.
+- Production workflow 31013721486 deployed snapshot v2 and passed `/readyz`; the live Fly image no
+  longer contains either legacy class-mapping CSV, while parity covers all 1,599 lookup names.
 
 - Production migrations 057–059 resolved exposed trigger-function grants, 77 missing leading
   foreign-key indexes, two duplicate indexes, event-partition horizon automation, post-profile

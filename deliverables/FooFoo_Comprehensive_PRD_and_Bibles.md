@@ -2599,7 +2599,7 @@ This table distinguishes implemented product infrastructure from remaining exter
 | ML/control plane | Versioned features, rule-baseline registry, experiments, source/catalog/publish/review tables | Active baseline; no trained production model claimed |
 | Research panel | Private studies/participants/diaries plus authenticated enrolled-participant API | Operational infrastructure; recruitment not claimed |
 | Annotation system | Versioned batches/items, leased claims, multi-review labels and service-only API | Active infrastructure |
-| Legacy contraction | Canonical episode facts dual-written; snapshot v2 preserves all 1,599 class lookups without runtime mapping CSVs | Class CSV runtime dependency retired locally; event-table contraction still waits for observed parity |
+| Legacy contraction | Canonical episode facts dual-written; live snapshot v2 preserves all 1,599 class lookups without runtime mapping CSVs | Class CSV runtime dependency retired in production; event-table contraction still waits for observed parity |
 
 ### Decisions required from the Founder
 

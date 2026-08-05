@@ -105,7 +105,7 @@ Annotation batches pin corpus and handbook versions, required reviewers and agre
 
 ## 10. Compatibility and Legacy Disposition
 
-Compatibility is deliberate: dish/class planning and `recommendation_events` remain because active clients and feedback resolution use them. Episode slates/outcomes and normalized request/run/candidate lineage are the canonical new facts and are dual-written. Runtime class lookup has moved to snapshot v2, which embeds all 1,599 canonical and compatibility names; the two legacy mapping CSVs remain offline ETL inputs but are removed from the next recommendation bundle. Event-table contraction still waits for exposure/outcome, export/delete and rollback parity.
+Compatibility is deliberate: dish/class planning and `recommendation_events` remain because active clients and feedback resolution use them. Episode slates/outcomes and normalized request/run/candidate lineage are the canonical new facts and are dual-written. Runtime class lookup has moved to snapshot v2, which embeds all 1,599 canonical and compatibility names; production bundle `sha256:ffad5c55384244e3` omits both legacy mapping CSVs, which remain offline ETL inputs only. Event-table contraction still waits for exposure/outcome, export/delete and rollback parity.
 
 ## 11. Verification and Rollback
 

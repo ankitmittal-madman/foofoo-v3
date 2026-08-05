@@ -18,8 +18,9 @@
 > The ontology rollout initially activated `dish-ontology` v1, `plan` v9 and `feedback` v6;
 > current Edge versions are recorded in the production-hardening block below. Fly.io release v125
 > is healthy on both checks and serves immutable RE bundle `sha256:3d4cf579d1cf2565`. Snapshot v2
-> now preserves all 1,599 canonical/compatibility class lookups; the next Fly release removes both
-> legacy class-mapping CSVs from the runtime bundle without changing lookup behavior.
+> now preserves all 1,599 canonical/compatibility class lookups. Production workflow 31013721486
+> deployed commit `f88d0a2` with bundle `sha256:ffad5c55384244e3`; both legacy class-mapping CSVs
+> are absent from the live runtime image and `/readyz` passed.
 >
 > **Food-intelligence/episode completion release:** migrations 060–065 and seed 147 are live.
 > They add the leased enrichment worker and schedules, generic ontology graph, nutrient
@@ -93,7 +94,8 @@
 
 ## One-line state per major component
 - **RE core/service:** implemented, repository Python suite green (715 passed, 27 skipped), Fly
-  release v125 live-healthy with bundle `sha256:3d4cf579d1cf2565`.
+  image `deployment-01KZ945DR0VDXVEZBG3Y34H6KT` live-healthy with snapshot-v2 bundle
+  `sha256:ffad5c55384244e3`.
 - **Edge Functions:** implemented and tested (94 tests); current single-owner authorization model
   is enforced; `dish-ontology` v5, `recommendations` v11, `plan` v13 and `feedback` v7 deployed
   2026-08-05. Explicit membership/role authorization is still required before shared-household
