@@ -65,6 +65,10 @@
   `/readyz` and `/v1/meta` passed after the rolling release.
 
 ### Fixed
+- Reconnected the polished FooFoo mobile redesign to the server-authoritative weekly class plan
+  and complete meal-episode surface. Removed hard-coded 2024 dates and example meal decisions,
+  restored persisted 7×3 finalization, and added regression tests covering all 21 weekly slots
+  plus breakfast, lunch and dinner episode sections. Production persona run `31006023576` passed.
 - Reconciled the production persona driver with the meal-episode-first UI contract. Stable episode
   test hooks now cover primary meals, alternatives, locks, reasoned rejection, make-this feedback
   and recipe navigation instead of waiting for retired dish-card selectors.

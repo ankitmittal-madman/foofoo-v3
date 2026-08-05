@@ -34,6 +34,8 @@
 > authenticated consolidated ontology-record API. The production Expo web build is live at
 > `https://foofoo-v3.vercel.app`; the post-deploy persona journey passed on 2026-08-05 with
 > meal-episode rendering, feedback, recipes, slate persistence and evidence publication verified.
+> The later polished mobile shell was reconciled with the same server-authoritative 7×3 weekly
+> planner and live episode surface; production workflow `31006023576` passed after deployment.
 > The new RE eligible-set response is committed and tested but its Fly production rollout is
 > waiting for approval in GitHub's protected `Production` environment.
 >
