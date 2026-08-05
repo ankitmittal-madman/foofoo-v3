@@ -17,7 +17,8 @@ Only future work is listed here. Evidence and acceptance detail are in `OPEN_ITE
 8. Contract legacy compatibility facts only after episode dual-write/replay/privacy parity evidence.
 9. Deploy and operationally verify the remaining mobile/operational release candidate.
 10. Run production load/soak testing and revisit Fly.io sizing.
-11. Implement membership/role authorization and invitation UX before enabling shared households.
+11. Add mobile invitation/member-management UX and finish cook/member mutation permissions before
+    enabling the migration-073 shared-household backend broadly.
 
 ## P3 — Product and intelligence evolution
 

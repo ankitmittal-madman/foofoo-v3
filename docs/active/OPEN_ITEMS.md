@@ -50,10 +50,11 @@ findings are retained under `docs/archive/`.
   Functions, cached-weather/MMR-capable RE image and immutable bundle are live.
 - Run production catalogue-scale load/soak tests and revisit Fly.io sizing. The local 810-dish run
   is evidence for local behavior only.
-- Replace the current one-profile/one-household compatibility authorization rule with explicit
-  membership/role checks before enabling multi-user shared households or invitations. Migration
-  059 guarantees tenant continuity for the current product model; it does not by itself launch
-  shared-household collaboration.
+- Build the mobile invitation/member-management UX and complete the cook/member mutation matrix
+  before enabling shared-household collaboration broadly. Migration 073 and the
+  `household-access` API now provide membership history, hashed one-time invitations, role
+  changes, revocation, leave/rejoin and atomic owner transfer; recommendations and plan already
+  authorize active memberships instead of relying on user ID = household ID.
 
 ## P3 — Product and intelligence evolution
 
@@ -79,6 +80,11 @@ findings are retained under `docs/archive/`.
   assertion sources, AI-run links and immutable review decisions.
 - Production workflow 31013721486 deployed snapshot v2 and passed `/readyz`; the live Fly image no
   longer contains either legacy class-mapping CSV, while parity covers all 1,599 lookup names.
+- Migrations 073–074 are live and ledgered with exactly-one-owner enforcement, membership lifecycle
+  history, membership-based RLS and service-only permission RPCs. `household-access` v1,
+  `recommendations` v17 and `plan` v19 are active; validation 927 and the rollback-only owner
+  transfer/revoke smoke 928 and authenticated anti-probing validation 929 passed, and all
+  production households have exactly one active owner.
 
 - Production migrations 057–059 resolved exposed trigger-function grants, 77 missing leading
   foreign-key indexes, two duplicate indexes, event-partition horizon automation, post-profile
@@ -87,7 +93,7 @@ findings are retained under `docs/archive/`.
   all six trigger-only functions audited in migration 057 have zero client execute grants.
 - Event partitions are present through the six-month horizon and are maintained monthly by the
   `foofoo-event-partition-horizon` cron job.
-- `recommendations` v11, `plan` v10, and `feedback` v7 are live with household-aware writes; all
+- `recommendations` v17, `plan` v19, and `feedback` v7 are live with household-aware writes; all
   production tenant-continuity validation counts are zero.
 
 ## Active implementation documents retained for review

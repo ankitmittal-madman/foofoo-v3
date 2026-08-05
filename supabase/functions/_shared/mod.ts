@@ -33,6 +33,12 @@ export { claimsFromPayload, extractBearer } from "./auth/jwt.ts";
 export { assertOwns, assertRole, requireAuth } from "./auth/authorize.ts";
 export { authenticate, requireOwnership, supabaseJwtVerifier } from "./auth/authenticate.ts";
 export type { JwtVerifier } from "./auth/authenticate.ts";
+export {
+  HOUSEHOLD_PLAN_WRITE_ROLES,
+  HOUSEHOLD_READ_ROLES,
+  requireHouseholdRole,
+} from "./auth/household.ts";
+export type { HouseholdRole, HouseholdRoleLookup } from "./auth/household.ts";
 
 // validation
 export { validate, z } from "./validation/validate.ts";

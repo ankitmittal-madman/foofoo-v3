@@ -59,6 +59,16 @@
 > 192 candidates and 192 stage records, with no unlinked slate. `plan` and
 > `cron-dish-ontology` were redeployed against these contracts.
 >
+> **Shared-household authorization foundation:** migrations 073–074 are live and ledgered. They enforce
+> one active owner per household, records membership lifecycle history, supports atomic owner
+> transfer, role change, revoke, leave, invite creation and invite acceptance, and exposes
+> membership-aware RLS. Invite tokens are stored only as SHA-256 hashes. `household-access` v1,
+> `recommendations` v17 and `plan` v19 are live; recommendation reads accept any active role while
+> plan writes require owner or planner. Production validation and rollback-only role-transition
+> smoke tests and an authenticated cross-user anti-probing validation passed with zero invalid
+> households. Mobile invitation/role-management UX and the
+> remaining cook/member mutation matrix are still future work.
+>
 > **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
 > execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
 > automate a six-month event-partition horizon; provision a household and owner membership for
@@ -71,7 +81,7 @@
 > weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
 > query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
 > pinned container bases, staging/manual-production workflows and
-> mobile CI are implemented. Verification passes: 715 Python tests (27 skipped), 93 Deno tests,
+> mobile CI are implemented. Verification passes: 715 Python tests (27 skipped), 102 Deno tests,
 > 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
 > run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
@@ -87,7 +97,7 @@
 | Seed Data | 90% |
 | Database | 95% |
 | Security | 88% (database advisor remediations live; leaked-password screening needs a paid Supabase plan) |
-| Testing | 75% (backend suites green — 93 Deno + 715 repository Python tests; mobile has infra but no physical-device coverage yet) |
+| Testing | 75% (backend suites green — 102 Deno + 715 repository Python tests; mobile has infra but no physical-device coverage yet) |
 | Deployment | 95% (ontology DB/Edge and RE bundle live-verified 2026-08-05; mobile/device release remains) |
 | Frontend (mobile) | 70% |
 | Observability | 60% (scheduled production smoke/issue alerting added; application 500-level webhook destination remains unconfigured) |
@@ -96,10 +106,10 @@
 - **RE core/service:** implemented, repository Python suite green (715 passed, 27 skipped), Fly
   image `deployment-01KZ945DR0VDXVEZBG3Y34H6KT` live-healthy with snapshot-v2 bundle
   `sha256:ffad5c55384244e3`.
-- **Edge Functions:** implemented and tested (94 tests); current single-owner authorization model
-  is enforced; `dish-ontology` v5, `recommendations` v11, `plan` v13 and `feedback` v7 deployed
-  2026-08-05. Explicit membership/role authorization is still required before shared-household
-  collaboration is enabled.
+- **Edge Functions:** implemented and tested (102 tests); membership-aware authorization is live
+  in `household-access` v1, `recommendations` v17 and `plan` v19. The backend supports governed
+  invitations, owner transfer and lifecycle history; mobile collaboration UX and the complete
+  cook/member permission matrix are not yet enabled.
 - **Mobile app:** onboarding/cold-start/weekly-plan work; complete meal episodes are live on the
   production web client and passed the post-deploy persona journey; explanation, history,
   profile-edit, and
@@ -110,6 +120,8 @@
   RLS enabled; household context writes and tenant continuity are fixed and live. All profiles have
   a household and active owner membership, all scoped household IDs are non-null, advisor-reported
   missing FK indexes/duplicate indexes are resolved, and partition creation is automated.
+  Migration 073 adds membership history and guarantees exactly one active owner; the live
+  validation reports zero invalid households.
 - **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; a normalized,
   provenance-backed dish enrichment layer and class-bound candidate view are live for all 802
   production dishes;

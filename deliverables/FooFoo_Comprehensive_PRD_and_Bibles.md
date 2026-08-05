@@ -2585,6 +2585,7 @@ This table distinguishes implemented product infrastructure from remaining exter
 
 | PRD capability | Production implementation | State / release meaning |
 |---|---|---|
+| Household permissions | Migrations 073–074 membership history, exactly-one-owner constraint, hashed invites, atomic owner/role/revoke/leave/accept RPCs, JWT-safe role lookup and membership-aware recommendation/plan authorization | Backend active; mobile collaboration UX and the remaining cook/member mutation matrix are pending before broad enablement |
 | Complete meal episode | `food.plate_grammars`, recipes, episodes/components, workload/cadence; `/plan` episode surface is mobile-default | Active with dish/class compatibility fallback |
 | Ontology graph | Generic typed nodes/edges populated for dishes, aliases, ingredients, classes and catalogue features | Active; human review depth remains ongoing |
 | Nutrition assertions | Source-linked `food.nutrient_assertions`; internal estimates cover every dish; USDA demo-key evidence requires exact normalized names | Active/provisional; controlled sample was 4 exact / 5 wrong / 3 absent, so non-exact assertions are rejected |

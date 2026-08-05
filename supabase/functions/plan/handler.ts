@@ -13,12 +13,17 @@
  *   history       -> (no RE call, P1-3)    (the caller's own recent recommendation_events rows)
  *   profile       -> (no RE call, P1-4)    (the caller's own current diet/allergen/household answers)
  *
- * Flow: authenticate (middleware) → requireOwnership → loadHouseholdRaw (compose from live tables,
+ * Flow: authenticate (middleware) → requireHouseholdRole → loadHouseholdRaw (compose from live tables,
  * reused from recommendations/compose.ts) → signed call to the RE surface (re-client, path per
  * surface) → pass the RE body through as-is. No recommendation math here.
  */
 import { requireAuth } from "../_shared/auth/authorize.ts";
-import { requireOwnership } from "../_shared/auth/authenticate.ts";
+import {
+  HOUSEHOLD_PLAN_WRITE_ROLES,
+  HOUSEHOLD_READ_ROLES,
+  type HouseholdRoleLookup,
+  requireHouseholdRole,
+} from "../_shared/auth/household.ts";
 import { jsonContract } from "../_shared/api/response.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
@@ -40,6 +45,10 @@ import { recordMealEpisodeSlate } from "./episodes.ts";
 
 const SERVICE_NAME = "plan";
 
+export interface PlanDeps {
+  authorizeHousehold?: HouseholdRoleLookup;
+}
+
 // surface -> { RE path, whether it needs the composed household }
 const SURFACES: Record<string, { path: string; needsHousehold: boolean }> = {
   cold_start: { path: "/v1/cold-start", needsHousehold: true },
@@ -53,7 +62,7 @@ const SURFACES: Record<string, { path: string; needsHousehold: boolean }> = {
 };
 
 /** Build the POST /v1/plan handler. */
-export function makePlanHandler(): Handler {
+export function makePlanHandler(deps: PlanDeps = {}): Handler {
   return async (req, ctx) => {
     if (req.method !== "POST") {
       throw new AppError(ERROR_CATALOGUE.METHOD_NOT_ALLOWED);
@@ -75,10 +84,14 @@ export function makePlanHandler(): Handler {
     if (["saved_week", "save_week", "lock_slot", "add_to_date"].includes(surface)) {
       const householdId = (typeof body.household_id === "string" ? body.household_id : null) ??
         claims.userId ?? null;
-      requireOwnership(claims, householdId);
-      if (!householdId) {
-        throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "no household_id" });
-      }
+      await requireHouseholdRole(
+        ctx,
+        claims,
+        householdId,
+        surface === "saved_week" ? HOUSEHOLD_READ_ROLES : HOUSEHOLD_PLAN_WRITE_ROLES,
+        deps.authorizeHousehold,
+      );
+      if (!householdId) throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED);
       try {
         if (surface === "saved_week") {
           return jsonContract(
@@ -144,10 +157,14 @@ export function makePlanHandler(): Handler {
       const householdIdForHistory =
         (typeof body.household_id === "string" ? body.household_id : null) ??
           claims.userId ?? null;
-      requireOwnership(claims, householdIdForHistory);
-      if (!householdIdForHistory) {
-        throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "no household_id" });
-      }
+      await requireHouseholdRole(
+        ctx,
+        claims,
+        householdIdForHistory,
+        HOUSEHOLD_READ_ROLES,
+        deps.authorizeHousehold,
+      );
+      if (!householdIdForHistory) throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED);
       const limit = typeof body.count === "number" && body.count > 0
         ? Math.min(body.count, 50)
         : 20;
@@ -156,8 +173,15 @@ export function makePlanHandler(): Handler {
     }
 
     if (surface === "history_detail") {
-      const householdId = claims.userId ?? null;
-      requireOwnership(claims, householdId);
+      const householdId = (typeof body.household_id === "string" ? body.household_id : null) ??
+        claims.userId ?? null;
+      await requireHouseholdRole(
+        ctx,
+        claims,
+        householdId,
+        HOUSEHOLD_READ_ROLES,
+        deps.authorizeHousehold,
+      );
       const eventId = typeof body.event_id === "string" ? body.event_id : "";
       if (!householdId || !eventId) {
         throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "event_id is required" });
@@ -180,7 +204,13 @@ export function makePlanHandler(): Handler {
       const householdIdForProfile =
         (typeof body.household_id === "string" ? body.household_id : null) ??
           claims.userId ?? null;
-      requireOwnership(claims, householdIdForProfile);
+      await requireHouseholdRole(
+        ctx,
+        claims,
+        householdIdForProfile,
+        HOUSEHOLD_READ_ROLES,
+        deps.authorizeHousehold,
+      );
       const { household, stubbed } = await loadHouseholdRaw(ctx, householdIdForProfile);
       return jsonContract({ kind: "profile", household, stubbed }, ctx.traceId, 200);
     }
@@ -196,7 +226,13 @@ export function makePlanHandler(): Handler {
 
     const householdId = (typeof body.household_id === "string" ? body.household_id : null) ??
       claims.userId ?? null;
-    requireOwnership(claims, householdId);
+    await requireHouseholdRole(
+      ctx,
+      claims,
+      householdId,
+      HOUSEHOLD_READ_ROLES,
+      deps.authorizeHousehold,
+    );
 
     const requestId = (typeof body.request_id === "string" && body.request_id)
       ? body.request_id

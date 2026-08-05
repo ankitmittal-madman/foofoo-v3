@@ -5,7 +5,7 @@
 **Date:** 2026-08-05
 **Placement:** `docs/architecture/`
 **Supersedes:** Food Ontology and Meal Taxonomy Architecture v1.0; the food/episode implementation portions of DOC-10 Technical Architecture v1.0
-**Dependencies:** Comprehensive PRD and Intelligence Bibles v1.1; Database Architecture Review and Target Schema v1.1; migrations 055–072; seeds 146–147
+**Dependencies:** Comprehensive PRD and Intelligence Bibles v1.1; Database Architecture Review and Target Schema v1.1; migrations 055–074; seeds 146–147
 
 ## Executive Summary
 
@@ -15,7 +15,7 @@ This document, the comprehensive PRD, and the database target review are the imp
 
 ## 1. Production Baseline
 
-The production baseline on 5 August 2026 is migrations 055–072, seed 147, `dish-ontology`, `cron-dish-ontology`, `plan`, `research-panel`, and `research-annotations` Edge Functions. The catalogue contains 802 production dishes plus governed composite episodes. Every production dish has a background enrichment job and a published single-primary episode. The mobile episode client is on by default with a compatibility fallback. Migrations 065 and 070–072 complete relationship/source/AI provenance, controlled provider evaluation, database-enforced AI field policy and normalized recommendation request/run/candidate lineage.
+The production baseline on 5 August 2026 is migrations 055–074, seed 147, `dish-ontology`, `cron-dish-ontology`, `household-access`, `recommendations`, `plan`, `research-panel`, and `research-annotations` Edge Functions. The catalogue contains 802 production dishes plus governed composite episodes. Every production dish has a background enrichment job and a published single-primary episode. The mobile episode client is on by default with a compatibility fallback. Migrations 065 and 070–072 complete relationship/source/AI provenance, controlled provider evaluation, database-enforced AI field policy and normalized recommendation request/run/candidate lineage. Migrations 073–074 make active household membership, rather than profile/household ID equality, the authorization basis for recommendations and plans and bind cross-user service access to JWT role rather than function-owner identity.
 
 The first full external pass completed for all 802 canonical dishes with zero failed or pending jobs. FoodOn returned usable evidence for 104 dishes. USDA's free public demo key was evaluated against 12 Indian dishes: four exact matches, five semantic mismatches and three no-record cases. Only exact normalized names at record confidence `>=0.90` can now retain provisional USDA nutrients; migration 070 records the labelled evaluation and removed mismatched provisional assertions without deleting raw evidence.
 
@@ -29,6 +29,7 @@ The first full external pass completed for all 802 canonical dishes with zero fa
 | Runtime decisions | plans, slates/items, propensities, outcomes, replay | Preserve exactly what was eligible, ordered, shown, and later happened |
 | Online intelligence | `re_engine`, `ml`, and `ops` | Private state, feature/model registry, lineage, review and publication controls |
 | Research | studies, consented participants, diaries, annotation batches/items/labels | Separate consent, leases, reviewer identity tokens, and agreement policy |
+| Household authorization | memberships, membership events, hashed invites, role transitions | Exactly one active owner; API authorization precedes service-role access; dependents remain separate from account permissions |
 
 ## 3. Enrichment Pipeline
 
@@ -86,6 +87,17 @@ Feedback dual-writes typed outcomes for chosen, locked, cooked, ordered, replace
 | `POST /v1/feedback` | Authenticated user | record preference/pantry and typed episode outcomes |
 | `research-panel` | Authenticated, explicitly enrolled user | participation status and longitudinal meal diaries |
 | `research-annotations` | Service role only | create batches, queue/lease items and store annotations |
+| `POST /household-access` | Authenticated user or one-time invite token | list memberships, invite, accept, change role, revoke, transfer owner or leave through service-only RPCs |
+
+### 7.1 Household permission boundary
+
+Canonical authorization roles are `owner`, `planner`, `cook`, `member`, and `viewer`. Migration
+073 records membership lifecycle events and uses a deferred invariant plus an atomic transfer RPC
+to guarantee exactly one active owner. Invite secrets are returned once and only their SHA-256
+hashes are stored. RLS permits active members to read household/membership data; owner-only server
+paths manage invitations and roles. Recommendations are readable by every active role, while plan
+mutations currently require owner or planner. Mobile collaboration UX and cook/member-specific
+mutations remain explicitly outside the deployed surface until their role-matrix tests exist.
 
 ## 8. External Evidence Strategy
 
@@ -109,7 +121,7 @@ Compatibility is deliberate: dish/class planning and `recommendation_events` rem
 
 ## 11. Verification and Rollback
 
-Each migration 060–065 has a paired rollback and validation. Release gates cover queue coverage/leases, schema objects, safe promotion, episode/model/replay activation, research binding, provider requeue, complete relationship provenance, and the governed ontology read model. Edge functions use server-held secrets and service-role checks. Raw external payloads never enter the scoring hot path.
+Each migration 060–074 has a paired rollback and validation. Release gates cover queue coverage/leases, schema objects, safe promotion, episode/model/replay activation, research binding, provider requeue, complete relationship provenance, the governed ontology read model, household owner/role transitions and authenticated cross-user anti-probing. Edge functions use server-held secrets and service-role checks. Raw external payloads never enter the scoring hot path.
 
 The rollback order is clients/functions, schedules, seed/content, then schema. Published catalogue rows are append/supersede oriented; no rollback may delete canonical dishes or historical slates/outcomes.
 

@@ -12,7 +12,11 @@
  * RE (default deps use the real client/loader/event-writer).
  */
 import { requireAuth } from "../_shared/auth/authorize.ts";
-import { requireOwnership } from "../_shared/auth/authenticate.ts";
+import {
+  HOUSEHOLD_READ_ROLES,
+  type HouseholdRoleLookup,
+  requireHouseholdRole,
+} from "../_shared/auth/household.ts";
 import { jsonContract } from "../_shared/api/response.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
@@ -39,6 +43,7 @@ import { maybeLogSummary, recordRequest } from "./metrics.ts";
 const SERVICE_NAME = "recommendations";
 
 export interface RecommendationDeps {
+  authorizeHousehold?: HouseholdRoleLookup;
   loadHousehold?: (
     ctx: RequestContext,
     householdId: string | null,
@@ -76,6 +81,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
   const countInteractionsFn = deps.countInteractionsFn ?? countInteractions;
   const buildExcludeDishIdsFn = deps.buildExcludeDishIdsFn ?? buildExcludeDishIds;
   const loadLatestContextFn = deps.loadLatestContextFn ?? loadLatestContext;
+  const authorizeHousehold = deps.authorizeHousehold;
 
   return async (req, ctx) => {
     if (req.method !== "POST") {
@@ -100,11 +106,16 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     const householdId = (typeof body.household_id === "string" ? body.household_id : null) ??
       claims.userId ?? null;
 
-    // Sole Surface-B authorization boundary (DOC-P3-06 §05), same as consent/handler.ts: JWT
-    // user_id must equal the target household id. Runs BEFORE any household/context data is
-    // fetched, so an unauthorized caller supplying someone else's household_id never reaches
-    // compose.ts at all.
-    requireOwnership(claims, householdId);
+    // Role-aware Surface-B authorization runs before any service-role read. Compatibility
+    // households already have an active owner membership; shared households may additionally
+    // grant planner/cook/member/viewer read access without equating household id to JWT subject.
+    await requireHouseholdRole(
+      ctx,
+      claims,
+      householdId,
+      HOUSEHOLD_READ_ROLES,
+      authorizeHousehold,
+    );
 
     // request_id: use the caller's if supplied, else the request's trace id (already a UUIDv4).
     // Bound onto a child logger NOW so every log line for the rest of this request — auth already

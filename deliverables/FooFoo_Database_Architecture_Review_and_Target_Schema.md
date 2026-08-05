@@ -129,6 +129,28 @@ The following items moved from absent/scaffolded to deployed after the original 
 
 Legacy event contracts remain explicit compatibility bridges because the user required no break to the current recommender. Dish/class lookup is contracted locally: snapshot v2 contains every canonical and legacy-only lookup/membership, and the two mapping CSVs are no longer shipped in the runtime bundle. Event contraction still requires observed dual-write parity, privacy/export coverage and a rollback window; this is a governed release gate, not unfinished schema discovery.
 
+### 2B. Reconciled household-authorization delta — migrations 073–074
+
+Migration 073 is deployed and closes the backend portion of the highest-risk Phase 1 tenancy gap:
+
+- canonical `owner`, `planner`, `cook`, `member`, and `viewer` memberships are enforced through a
+  hardened membership helper and role-aware API checks;
+- a deferred database constraint guarantees exactly one active owner, while atomic service-only
+  RPCs handle owner transfer, role changes, revocation, leave, invite creation and acceptance;
+- `household_membership_events` preserves grant/change/revoke/leave/rejoin history even though the
+  expand-only compatibility membership table retains its composite key;
+- invitations retain only a SHA-256 token hash, and the raw token is returned once at creation;
+- membership-aware RLS protects households, memberships, invites and membership events;
+- `household-access`, recommendations and plan use explicit membership authorization. Any active
+  role may read recommendations/plans; plan mutations currently require owner or planner.
+
+Validation 927, rollback-only transition smoke 928 and authenticated anti-probing validation 929
+passed in production, including two owner
+transfers and member revocation, and no live household violates the owner invariant. This is an
+expand-only implementation: legacy owner projection and profile-as-household compatibility remain
+until broader tenant-key contraction evidence exists. Mobile invitation/member-management UX and
+the complete cook/member action matrix remain delivery work, so Phase 1 is not yet contracted.
+
 ## 3. Current-state database analysis
 
 ### 3.1 Current schema topology
@@ -1056,10 +1078,10 @@ All migrations follow expand → dual-write/backfill → validate → read cutov
 
 **Exit gate:** no known privacy omission, cross-account cache exposure, partial finalized plan, expired partition window, or unprotected clean-rebuild table.
 
-### Phase 1 — Establish household tenancy (`EXPANDED LIVE`; cutover/contract pending)
+### Phase 1 — Establish household tenancy (`ROLE BACKEND LIVE`; UX/cutover/contract pending)
 
 1. Keep the live `households`, memberships, invites and one-owner backfill from migration 055; deploy/verify release-candidate 059 so future profiles provision their compatibility household and the five covered roots become non-null.
-2. Add membership surrogate history, exactly-one-active-owner enforcement, owner-transfer RPC and the Section 14 role matrix.
+2. `LIVE/PARTIAL`: migration 073 adds membership event history, exactly-one-active-owner enforcement, owner-transfer/role/invite/leave RPCs and owner/planner plan authorization. Finish cook/member mutations and mobile collaboration UX.
 3. Add normalized constraints/allergens, cook profiles, equipment, geography and schedule history.
 4. Complete `household_id` population on every tenant root/child; add composite tenant FKs and membership-based RLS helpers.
 5. Update every API/cache/idempotency key to require household context while compatibility endpoints still bridge legacy equality.

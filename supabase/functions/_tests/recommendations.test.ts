@@ -12,6 +12,7 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
 import {
   API_ERRORS,
+  AppError,
   authenticate,
   defineHandler,
   resetConfigCacheForTests,
@@ -135,7 +136,10 @@ function fakeReResponse(requestId: string) {
 
 /** Build the assembled production pipeline with a fake JWT verifier + injected RE deps. */
 function pipeline(deps: RecommendationDeps) {
-  const handler = makeRecommendationsHandler(deps);
+  const handler = makeRecommendationsHandler({
+    authorizeHousehold: () => Promise.resolve("owner"),
+    ...deps,
+  });
   const verifier = () => Promise.resolve({ userId: USER_ID, role: "authenticated" } as AuthClaims);
   return defineHandler(handler, { middleware: [authenticate(verifier)] });
 }
@@ -381,6 +385,9 @@ Deno.test("household_id owned by another user is rejected before loadHousehold/c
     let reCalled = 0;
     let eventCalled = 0;
     const deps: RecommendationDeps = {
+      authorizeHousehold: () => {
+        throw new AppError(API_ERRORS.ERR_OWNERSHIP_MISMATCH);
+      },
       loadHousehold: () => {
         loadCalled++;
         return Promise.resolve({ household: TEST_HOUSEHOLD, householdId: USER_ID, stubbed: false });

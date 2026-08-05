@@ -6,6 +6,15 @@
 ## [Unreleased]
 
 ### Deployed
+- Applied and ledgered migration 073. Production now enforces exactly one active household owner,
+  records membership lifecycle history, supports atomic transfer/role/revoke/leave/invite flows,
+  and applies membership-aware RLS; validations 927–928 pass with zero invalid households.
+- Applied and ledgered migration 074 after a `SECURITY DEFINER` identity audit. Household-role
+  lookups now rely on JWT role/subject only; authenticated validation 929 proves callers cannot
+  probe another user's membership while service-role transitions remain operational.
+- Deployed `household-access` v1, `recommendations` v17 and `plan` v19. Invite secrets are stored
+  only as SHA-256 hashes, active members can read household recommendations/plans, and plan
+  mutations require owner or planner. All three deployed endpoints reject unauthenticated calls.
 - Production Fly workflow 31013721486 deployed commit `f88d0a2` and snapshot-v2 bundle
   `sha256:ffad5c55384244e3`; `/readyz` passed and both legacy class-mapping CSVs are absent from the
   runtime image.
