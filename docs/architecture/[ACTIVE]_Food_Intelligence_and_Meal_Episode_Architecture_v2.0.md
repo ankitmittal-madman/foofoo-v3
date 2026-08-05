@@ -5,7 +5,7 @@
 **Date:** 2026-08-05
 **Placement:** `docs/architecture/`
 **Supersedes:** Food Ontology and Meal Taxonomy Architecture v1.0; the food/episode implementation portions of DOC-10 Technical Architecture v1.0
-**Dependencies:** Comprehensive PRD and Intelligence Bibles v1.1; Database Architecture Review and Target Schema v1.1; migrations 055–064; seeds 146–147
+**Dependencies:** Comprehensive PRD and Intelligence Bibles v1.1; Database Architecture Review and Target Schema v1.1; migrations 055–065; seeds 146–147
 
 ## Executive Summary
 
@@ -15,9 +15,9 @@ This document, the comprehensive PRD, and the database target review are the imp
 
 ## 1. Production Baseline
 
-The production baseline on 5 August 2026 is migrations 055–064, seed 147, `dish-ontology`, `cron-dish-ontology`, `plan`, `research-panel`, and `research-annotations` Edge Functions. The catalogue contains 802 production dishes plus governed composite episodes. Every production dish has a background enrichment job and a published single-primary episode. The mobile episode client is on by default with a compatibility fallback.
+The production baseline on 5 August 2026 is migrations 055–065, seed 147, `dish-ontology`, `cron-dish-ontology`, `plan`, `research-panel`, and `research-annotations` Edge Functions. The catalogue contains 802 production dishes plus governed composite episodes. Every production dish has a background enrichment job and a published single-primary episode. The mobile episode client is on by default with a compatibility fallback. Migration 065 completes relationship-level provenance for aliases, ingredients, classes, constraints, regions and nutrition, and exposes a service-only consolidated ontology record through the authenticated Edge API.
 
-FoodOn returned usable evidence in the controlled evaluation. USDA FoodData Central returned HTTP 403 for the configured key; catalogue nutrition remains available, but USDA-derived assertions will not appear until the credential is activated/replaced and `ops.requeue_external_provider('usda_fdc')` is run.
+The first full external pass completed for all 802 canonical dishes with zero failed or pending jobs. FoodOn returned usable evidence for 104 dishes. USDA FoodData Central returned HTTP 403 for the configured key on every attempted lookup; catalogue nutrition remains available, but USDA-derived assertions will not appear until the credential is activated/replaced and `ops.requeue_external_provider('usda_fdc')` is run.
 
 ## 2. Bounded Contexts and Ownership
 
@@ -71,7 +71,7 @@ Feedback dual-writes typed outcomes for chosen, locked, cooked, ordered, replace
 
 | API | Trust boundary | Purpose |
 |---|---|---|
-| `POST /v1/dish-ontology` | Authenticated user | submit/update/status, classes and governed class candidates |
+| `POST /v1/dish-ontology` | Authenticated user | submit/update/status, classes, governed class candidates, and a complete provenance-bearing `ontology_record` by canonical ID or name |
 | `cron-dish-ontology` | Service role only | reconcile, claim, research, normalize and schedule refresh |
 | `POST /plan` meal episodes | Authenticated user | serve complete episode slate and persist exposure |
 | `POST /v1/feedback` | Authenticated user | record preference/pantry and typed episode outcomes |
@@ -100,7 +100,7 @@ Compatibility is deliberate: dish/class planning and `recommendation_events` rem
 
 ## 11. Verification and Rollback
 
-Each migration 060–064 has a paired rollback and validation. Release gates cover queue coverage/leases, schema objects, safe promotion, episode/model/replay activation, research binding and provider requeue. Edge functions use server-held secrets and service-role checks. Raw external payloads never enter the scoring hot path.
+Each migration 060–065 has a paired rollback and validation. Release gates cover queue coverage/leases, schema objects, safe promotion, episode/model/replay activation, research binding, provider requeue, complete relationship provenance, and the governed ontology read model. Edge functions use server-held secrets and service-role checks. Raw external payloads never enter the scoring hot path.
 
 The rollback order is clients/functions, schedules, seed/content, then schema. Published catalogue rows are append/supersede oriented; no rollback may delete canonical dishes or historical slates/outcomes.
 

@@ -388,6 +388,8 @@ def _planning_call(name, fn, payload, request, needs_household=True):
     state.counters.record("success")
     log_event(f"{name}.ok", request_id=request_id, outcome="success")
     result["request_id"] = request_id
+    result.setdefault("config_version", state.config.versions["config"])
+    result.setdefault("catalog_version", (state.bundle or {}).get("bundle_version"))
     return result
 
 

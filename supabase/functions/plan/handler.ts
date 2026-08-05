@@ -325,6 +325,17 @@ export function makePlanHandler(): Handler {
           weekday: typeof body.weekday === "string" ? body.weekday : undefined,
           classCode: typeof body.class_code === "string" ? body.class_code : undefined,
           modelVersion: String(episodeBody.model_version ?? "unknown"),
+          configVersion: String(episodeBody.config_version ?? "unknown"),
+          catalogVersion: typeof episodeBody.catalog_version === "string"
+            ? episodeBody.catalog_version
+            : null,
+          policyCode: String(episodeBody.policy_code ?? "episode_success_rule_v1"),
+          eligibleEpisodeHashes: Array.isArray(episodeBody.eligible_episode_hashes)
+            ? episodeBody.eligible_episode_hashes.filter((value): value is string =>
+              typeof value === "string"
+            )
+            : [],
+          householdSnapshot: payload.household as Record<string, unknown>,
           episodes: Array.isArray(episodeBody.episodes)
             ? episodeBody.episodes as Parameters<typeof recordMealEpisodeSlate>[1]["episodes"]
             : [],

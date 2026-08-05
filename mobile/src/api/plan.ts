@@ -117,8 +117,13 @@ export interface MealEpisodeResponse {
   slot: string;
   episodes: MealEpisode[];
   model_version: string;
+  config_version?: string;
+  catalog_version?: string | null;
+  policy_code?: string;
+  eligible_episode_hashes?: string[];
   warnings: string[];
   request_id?: string;
+  slate_id?: string;
 }
 
 function stableEpisodeHash(slot: Slot, dishName: string, index: number): string {

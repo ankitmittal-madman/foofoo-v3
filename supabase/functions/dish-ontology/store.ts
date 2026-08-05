@@ -183,6 +183,9 @@ export async function promoteExternalEvidence(
           source_type: "external_api",
           source_record_id: item.id,
           source_url: foodOn.iri,
+          extraction_method: "foodon_ols4_search_top_match",
+          source_version: "ols4",
+          last_verified_at: new Date().toISOString(),
           review_status: "provisional",
         }),
         "dishOntology.promoteFoodOnAssertion",
@@ -279,4 +282,21 @@ export async function fetchCandidates(
   const { data, error } = await withTimeout(query, "dishOntology.fetchCandidates");
   if (error) throw error;
   return data ?? [];
+}
+
+/** Read the complete governed ontology record without exposing raw provider payloads. */
+export async function fetchDishOntologyRecord(
+  ctx: RequestContext,
+  identity: { dishId?: string; name?: string },
+): Promise<Record<string, unknown> | null> {
+  const db = createServiceRoleClient(ctx.config);
+  const { data, error } = await withTimeout(
+    db.rpc("get_dish_ontology_record", {
+      p_dish_id: identity.dishId ?? null,
+      p_name: identity.name ?? null,
+    }),
+    "dishOntology.fetchDishOntologyRecord",
+  );
+  if (error) throw error;
+  return data && typeof data === "object" ? data as Record<string, unknown> : null;
 }

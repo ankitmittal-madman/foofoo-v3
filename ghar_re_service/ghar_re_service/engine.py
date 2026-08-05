@@ -285,18 +285,19 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
     count = max(1, min(int(request.get("count", 4)), 8))
     class_code = request.get("class_code")
     if isinstance(class_code, str) and class_code:
-        episodes = meal_episode.build_class_meal_episodes(
+        all_episodes = meal_episode.build_class_meal_episodes(
             household,
             context,
             class_code,
             catalogue,
-            count=count,
+            count=8,
             exclude_dish_names=request.get("exclude_dish_names") or [],
             preference_by_dish=request.get("preference_by_dish") or {},
         )
     else:
         result = core_pipeline.recommend(household, context, catalogue)
-        episodes = meal_episode.build_meal_episodes(result["plates"], household, context)[:count]
+        all_episodes = meal_episode.build_meal_episodes(result["plates"], household, context)
+    episodes = all_episodes[:count]
     for episode in episodes:
         for component in episode["components"]:
             if component["dish_id"] is not None:
@@ -305,6 +306,10 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
         "kind": "meal_episode_slate",
         "slot": context["slot"],
         "episodes": episodes,
+        # This is the complete deterministic episode set considered before the response-size cut.
+        # The Edge layer hashes it into the immutable exposure record for exact replay semantics.
+        "eligible_episode_hashes": [item["episode_hash"] for item in all_episodes],
+        "policy_code": "episode_success_rule_v1",
         "model_version": meal_episode.EPISODE_MODEL_VERSION,
         "warnings": [] if episodes else ["no safe meal episode could be formed"],
     }

@@ -23,15 +23,32 @@ interface EpisodeResult {
   intent_posterior?: Record<string, number>;
   practicality?: Record<string, unknown>;
   components?: Array<{ dish_id?: string | null }>;
+  [key: string]: unknown;
 }
 
 function hex(bytes: ArrayBuffer): string {
   return [...new Uint8Array(bytes)].map((value) => value.toString(16).padStart(2, "0")).join("");
 }
 
-async function eligibleSetHash(episodes: EpisodeResult[]): Promise<string> {
-  const stable = episodes.map((episode) => episode.episode_hash).sort().join("|");
+export async function eligibleSetHash(episodeHashes: string[]): Promise<string> {
+  const stable = [...episodeHashes].sort().join("|");
   return hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(stable)));
+}
+
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    const object = value as Record<string, unknown>;
+    return `{${
+      Object.keys(object).sort().map((key) => `${JSON.stringify(key)}:${stableJson(object[key])}`)
+        .join(",")
+    }}`;
+  }
+  return JSON.stringify(value) ?? "null";
+}
+
+export async function snapshotHash(value: unknown): Promise<string> {
+  return hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(stableJson(value))));
 }
 
 export async function recordMealEpisodeSlate(
@@ -43,20 +60,31 @@ export async function recordMealEpisodeSlate(
     weekday?: string;
     classCode?: string;
     modelVersion: string;
+    configVersion: string;
+    catalogVersion?: string | null;
+    policyCode: string;
+    eligibleEpisodeHashes: string[];
+    householdSnapshot: Record<string, unknown>;
     episodes: EpisodeResult[];
   },
 ): Promise<string> {
   const db = createServiceRoleClient(ctx.config);
-  const hash = await eligibleSetHash(input.episodes);
+  const eligibleHashes = input.eligibleEpisodeHashes.length
+    ? input.eligibleEpisodeHashes
+    : input.episodes.map((episode) => episode.episode_hash);
+  const hash = await eligibleSetHash(eligibleHashes);
+  const householdHash = await snapshotHash(input.householdSnapshot);
   const { data: slate, error: slateError } = await withTimeout(
     db.from("slates").upsert({
       request_id: input.requestId,
       household_id: input.householdId,
       surface: "today_meal_episode",
-      policy_code: "episode_success_rule_v1",
+      policy_code: input.policyCode,
       model_version: input.modelVersion,
-      config_version: input.modelVersion,
+      config_version: input.configVersion,
+      catalog_version: input.catalogVersion ?? null,
       eligible_set_hash: hash,
+      household_snapshot_hash: householdHash,
       context_snapshot: {
         slot: input.slot ?? null,
         weekday: input.weekday ?? null,
@@ -114,6 +142,11 @@ export async function recordMealEpisodeSlate(
     decision_trace: {
       practicality: episode.practicality ?? {},
       model_version: episode.predictions.model_version,
+      policy_code: input.policyCode,
+      eligible_set_hash: hash,
+      catalog_version: input.catalogVersion ?? null,
+      config_version: input.configVersion,
+      episode_snapshot: episode,
     },
   }));
   const { error: itemError } = await withTimeout(

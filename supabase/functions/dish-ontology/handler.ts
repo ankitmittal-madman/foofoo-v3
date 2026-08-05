@@ -10,6 +10,7 @@ import {
   autoPromoteSubmission,
   createSubmission,
   fetchCandidates,
+  fetchDishOntologyRecord,
   fetchMealClasses,
   loadSubmissionStatus,
   markResearchComplete,
@@ -137,8 +138,27 @@ export function makeDishOntologyHandler(): Handler {
       );
     }
 
+    if (action === "ontology_record") {
+      const dishId = typeof body.dish_id === "string" ? body.dish_id : undefined;
+      const name = typeof body.name === "string" ? body.name.normalize("NFKC").trim() : undefined;
+      if (!dishId && !name) {
+        throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
+          detail: "dish_id or name required",
+        });
+      }
+      if (
+        dishId &&
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(dishId)
+      ) {
+        throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "dish_id must be a UUID" });
+      }
+      const record = await fetchDishOntologyRecord(ctx, { dishId, name });
+      if (!record) throw new AppError(ERROR_CATALOGUE.NOT_FOUND);
+      return jsonContract({ kind: "dish_ontology_record", record }, ctx.traceId);
+    }
+
     throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
-      detail: "action must be submit, update, status, meal_classes, or candidates",
+      detail: "action must be submit, update, status, meal_classes, candidates, or ontology_record",
     });
   };
 }

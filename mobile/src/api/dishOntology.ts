@@ -36,3 +36,27 @@ export async function getDishSubmissionStatus(submissionId: string) {
     { action: "status", submission_id: submissionId },
   );
 }
+
+export interface DishOntologyRecord {
+  schema_version: "1";
+  dish: Record<string, unknown>;
+  aliases: Record<string, unknown>[];
+  ingredients: Record<string, unknown>[];
+  meal_classes: Record<string, unknown>[];
+  taxonomy: Record<string, unknown>[];
+  constraints: Record<string, unknown>[];
+  regional_affinities: Record<string, unknown>[];
+  nutrition: Record<string, unknown>[];
+  recipes: Record<string, unknown>[];
+  meal_episodes: Record<string, unknown>[];
+  relationships: Record<string, unknown>[];
+  evidence: Record<string, unknown>[];
+}
+
+/** Fetch one complete governed dish record with confidence and provenance metadata. */
+export async function getDishOntologyRecord(identity: { dishId?: string; name?: string }) {
+  return apiPost<{ kind: "dish_ontology_record"; record: DishOntologyRecord; trace_id: string }>(
+    "/v1/dish-ontology",
+    { action: "ontology_record", dish_id: identity.dishId, name: identity.name },
+  );
+}

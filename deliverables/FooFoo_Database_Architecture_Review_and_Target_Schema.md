@@ -4,7 +4,7 @@
 **Audience:** Engineering, data, recommendation/ML, product, privacy, and operations leadership
 **Version:** 1.1
 
-**Repository baseline:** migrations 001–064, seed 147, and deployed Edge functions on 5 August 2026
+**Repository baseline:** migrations 001–065, seed 147, and deployed Edge functions on 5 August 2026
 
 **Status:** Canonical current/target database architecture
 
@@ -17,7 +17,7 @@
 This review uses the following precedence:
 
 1. `deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md` is the target product, recommendation, food-intelligence, and database specification.
-2. `database/migrations/001...064`, seeds `146...147`, current Edge Functions, recommendation-service code, mobile API contracts, and Food Intelligence and Meal Episode Architecture v2.0 define the as-is implementation.
+2. `database/migrations/001...065`, seeds `146...147`, current Edge Functions, recommendation-service code, mobile API contracts, and Food Intelligence and Meal Episode Architecture v2.0 define the as-is implementation.
 3. `docs/active/CURRENT_STATUS.md`, `OPEN_ITEMS.md`, and `LAUNCH_BLOCKERS.md` distinguish deployed behavior from local release-candidate behavior.
 4. `docs/architecture/[ACTIVE]_DOC-P3-04_Data_Architecture_ERD_v1.3.md` supplies historical rationale, but migrations 046–056 supersede important parts. The broad legacy `re_engine` was dropped and a smaller target-aligned `re_engine` was recreated by 055; `ghar_re` remains absent.
 
@@ -109,7 +109,7 @@ The target database must become a household-scoped decision-memory platform. It 
 | P2 | Feature/model registry headers exist; immutable feature history/training snapshots/deployments do not | Learned ranking cannot be reproduced, promoted, or rolled back safely | Complete `ml` history, dataset manifest, deployment and parity contracts |
 | P2 | Partition lifecycle is only partially automated | Append-only parents can reject writes when future partitions are absent | Automate partition creation, default quarantine partitions, monitoring, and archival |
 
-### 2A. Reconciled implementation delta — migrations 060–064 and seed 147
+### 2A. Reconciled implementation delta — migrations 060–065 and seed 147
 
 The following items moved from absent/scaffolded to deployed after the original review snapshot:
 
@@ -120,11 +120,12 @@ The following items moved from absent/scaffolded to deployed after the original 
 | No nutrient assertions | `food.nutrients` and source-linked `nutrient_assertions`; catalogue estimates cover all production dishes | USDA provider key returned 403; external assertions pending credential repair |
 | Empty constraints/regions | Governed constraint and regional-affinity rows populated for every production dish | Health-condition suitability remains out of scope |
 | Empty ML/control tables | Active feature definitions, registered rule-baseline model, source registry, catalog version, content review and publish controls | No trained model is represented as production-ready |
-| No worker/cron | Leased skip-locked queue, service-only Edge worker, ten-minute execution, daily reconciliation, one-time all-dish backfill and 90-day refresh | Provider quality monitoring remains operational work |
+| No worker/cron | Leased skip-locked queue, service-only Edge worker, ten-minute execution, daily reconciliation, completed first pass for all 802 canonical dishes and 90-day refresh | USDA quality evaluation remains blocked by its HTTP-403 credential response |
 | No user-dish mobile flow | Authenticated staging API and mobile submission screen | Generative classification awaits a provider/safety decision |
 | Dish-first final object | Meal-episode surface is the client default; canonical slate items resolve catalogue episode IDs | Compatibility fallback remains for rollback |
 | No full replay/outcome/propensity path | Ordered slates/items, deterministic propensity, typed outcomes and replay function are active | Counterfactual learning waits for randomized exposure and volume |
 | No research/annotation operations | Private studies/participants/diaries, annotation batches/items/labels, participant API and service-only annotation API | Representative-panel recruitment is not claimed |
+| Selective relationship provenance and no consolidated ontology read | Migration 065 adds source record/URL, derivation, confidence, model, review and verification fields where the relation is itself an assertion; `get_dish_ontology_record` returns canonical data, recipes, episodes, graph, nutrition and evidence metadata | Pure vocabulary masters still follow their own catalog/version authority; raw provider payloads remain staging-only |
 
 Legacy dish/class and event contracts are retained as explicit compatibility bridges because the user required no break to the current recommender. They are no longer the target for new product behavior. Contraction requires observed dual-write parity, privacy/export coverage and a rollback window; this is a governed release gate, not unfinished schema discovery.
 

@@ -10,7 +10,7 @@
 
 **Status:** Canonical product and build specification
 
-**Implementation baseline:** migrations 055–064 and seed 147; reconciled 5 August 2026
+**Implementation baseline:** migrations 055–065 and seed 147; reconciled 5 August 2026
 
 **Audience:** Founders, Product, Design, Data Science, Food Science, Engineering, Growth, Operations
 
@@ -657,7 +657,7 @@ Removing a member starts a review before deleting member-linked preference evide
 | Cost | model and infra cost per WSMD tracked; LLM never on synchronous ranking hot path |
 | Freshness | catalog publishing SLA and feature staleness indicators |
 
-**Current-state note (repository, 5 Aug 2026):** complete-meal episode serving is the mobile default with a compatibility fallback; canonical slates, item propensities, typed outcomes and replay are active. Migrations 060–064 operate the ontology queue, graph, nutrients, research/annotation control plane and safe unknown-dish promotion. Seed 147 populates all 802 production dishes with constraints, regional affinities, nutrition estimates, recipes and published single-primary episodes, plus curated composite episodes. FoodOn enrichment is live. USDA integration is deployed but its configured production key returned HTTP 403 in the controlled evaluation and must be replaced or activated before USDA assertions can populate. Generative unknown-dish classification remains gated on the provider/data-residency and safety decisions in Section 82A.
+**Current-state note (repository, 5 Aug 2026):** complete-meal episode serving is the mobile default with a compatibility fallback; canonical slates, item propensities, typed outcomes and replay are active. Migrations 060–065 operate the ontology queue, graph, nutrients, research/annotation control plane, safe unknown-dish promotion, complete relationship provenance and the consolidated ontology read model. Seed 147 populates all 802 production dishes with constraints, regional affinities, nutrition estimates, recipes and published single-primary episodes, plus curated composite episodes. FoodOn enrichment is live. USDA integration is deployed but its configured production key returned HTTP 403 in the controlled evaluation and must be replaced or activated before USDA assertions can populate. Generative unknown-dish classification remains gated on the provider/data-residency and safety decisions in Section 82A.
 
 <!-- PAGEBREAK -->
 
@@ -2590,7 +2590,8 @@ This table distinguishes implemented product infrastructure from remaining exter
 | Nutrition assertions | Source-linked `food.nutrient_assertions`; internal catalogue estimates cover every production dish | Active/provisional; USDA key currently returns 403 |
 | Constraints and region | Three constraint assertions per production dish and state/cuisine affinities | Active/provisional; clinical claims remain excluded |
 | Dish aliases/ingredients/recipes/classes | Normalized aliases, ingredient links, class mappings and one draft recipe per production dish | Active; AI-draft recipes are not certified recipes |
-| Background enrichment | Durable leased queue, ten-minute worker, daily reconciliation and 90-day refresh | Active; all canonical dishes queued for at least one pass |
+| Governed ontology read | Authenticated `ontology_record` resolves a canonical ID/name and returns aliases, ingredients, classes, field assertions, constraints, regions, nutrition, recipes, episodes, graph relations and evidence metadata | Active; raw external payloads remain private staging evidence |
+| Background enrichment | Durable leased queue, ten-minute worker, daily reconciliation and 90-day refresh | Active; all 802 canonical dishes completed their first external pass with zero failed/pending jobs |
 | Unknown-dish mobile intake | Authenticated staging API and mobile form | Active |
 | Unknown-dish auto-promotion | Exact external name + entirely known safety ingredients | Active conservative rule; generative promotion awaiting decision |
 | Slates/propensity/replay/outcomes | Ordered slate/item persistence, exact deterministic propensity, typed outcomes and replay RPC | Active |

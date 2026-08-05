@@ -6,6 +6,21 @@
 ## [Unreleased]
 
 ### Deployed
+- Completed the first external-enrichment attempt for all 802 production dishes with zero pending
+  or failed jobs. FoodOn matched 104 dishes; USDA remained isolated at HTTP 403 for the configured
+  credential.
+- Applied migration 065 and deployed the updated `dish-ontology` function. Canonical dish records
+  can now be read through one authenticated provenance-bearing ontology response without exposing
+  raw external payloads.
+- Deployed `dish-ontology` v5 and `plan` v13; both continue to reject unauthenticated requests.
+
+### Added
+- Field-level source, derivation, model, confidence, review and verification metadata for dish
+  ingredients, aliases, class mappings, constraints, regional affinities and nutrient assertions.
+- Full eligible-set, household-snapshot and episode-response evidence in slate decision traces so
+  deterministic recommendation exposures can be reproduced instead of only listing shown items.
+
+### Deployed (food-intelligence foundation)
 - Production Supabase received migrations 060–064 and comprehensive seed 147. The live catalogue
   now has normalized recipes, meal episodes, ontology graph edges, nutrition assertions,
   constraints and regional affinities for all 802 canonical dishes, plus scheduled ten-minute
@@ -15,7 +30,7 @@
   jobs; FoodOn evidence succeeded while USDA FoodData Central returned HTTP 403 for the configured
   credential and remains isolated as a provider-level failure.
 
-### Added
+### Added (food-intelligence foundation)
 - A mobile missing-dish submission flow with conservative evidence-based promotion, and normalized
   food graph, nutrition, recipe, meal-episode, ML-control, replay, outcome, research-panel and
   annotation foundations.

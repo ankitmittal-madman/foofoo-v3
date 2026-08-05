@@ -107,6 +107,12 @@ def test_meal_episode_surface_returns_complete_practical_slate(client):
     body = r.json()
     assert body["kind"] == "meal_episode_slate"
     assert 1 <= len(body["episodes"]) <= 4
+    assert body["policy_code"] == "episode_success_rule_v1"
+    assert len(body["eligible_episode_hashes"]) >= len(body["episodes"])
+    assert {episode["episode_hash"] for episode in body["episodes"]}.issubset(
+        set(body["eligible_episode_hashes"])
+    )
+    assert body["config_version"]
     top = body["episodes"][0]
     assert top["components"]
     assert top["practicality"]["active_minutes"] >= 0

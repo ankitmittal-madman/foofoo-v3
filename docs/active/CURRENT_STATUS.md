@@ -21,21 +21,23 @@
 > CSV fallback remains enabled for one monitored rollback window. Unknown-dish AI promotion is
 > still disabled pending the Section 8 model/safety decisions in the ontology architecture.
 >
-> **Food-intelligence/episode completion release:** migrations 060–064 and seed 147 are live.
+> **Food-intelligence/episode completion release:** migrations 060–065 and seed 147 are live.
 > They add the leased enrichment worker and schedules, generic ontology graph, nutrient
 > assertions, complete catalogue constraints/regions/recipes/episodes, safe exact-match unknown
 > dish promotion, catalogue episode resolution, replay, ML/catalog controls, and research and
 > annotation operations. `dish-ontology`, `cron-dish-ontology`, `plan`, `research-panel`, and
-> `research-annotations` were deployed. A controlled 20-dish pass completed with zero worker
-> failures; FoodOn returned evidence, while USDA returned HTTP 403 for the configured key. Mobile
+> `research-annotations` were deployed. The first full external pass completed for all 802 dishes
+> with zero failed or pending jobs; FoodOn matched 104 dishes, while USDA returned HTTP 403 for
+> every attempted lookup with the configured key. Mobile
 > meal episodes are now default-on with compatibility fallback, and the missing-dish submission
-> screen is implemented locally pending the next mobile binary/web release.
+> screen is implemented. Migration 065 adds complete assertion/relationship provenance and the
+> authenticated consolidated ontology-record API; the production web build remains a release step.
 >
 > **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
 > execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
 > automate a six-month event-partition horizon; provision a household and owner membership for
 > every new profile; backfill existing tenant IDs; and enforce non-null household ownership on the
-> five household-scoped fact/context tables. `recommendations` v11, `plan` v10 and `feedback` v7
+> five household-scoped fact/context tables. `recommendations` v11, `plan` v13 and `feedback` v7
 > are live with household-aware writes. GitHub's `Production` environment now requires review and
 > permits deployments from `main` only.
 >
@@ -54,8 +56,8 @@
 | Architecture | 80% |
 | Backend (Edge Functions) | 90% |
 | Recommendation Engine | 85% |
-| Food Ontology | 75% |
-| Knowledge Graph | 25% (bounded local dish/ingredient/substitution traversal with provenance; not yet broad or production-governed) |
+| Food Ontology | 88% (production graph/read API and full catalogue coverage; USDA and generative policy remain external gates) |
+| Knowledge Graph | 70% (normalized production graph with provenance; subjective/festival/substitution breadth remains iterative) |
 | Seed Data | 90% |
 | Database | 95% |
 | Security | 88% (database advisor remediations live; leaked-password screening needs a paid Supabase plan) |
@@ -67,8 +69,8 @@
 ## One-line state per major component
 - **RE core/service:** implemented, repository Python suite green (715 passed, 27 skipped), Fly
   release v125 live-healthy with bundle `sha256:3d4cf579d1cf2565`.
-- **Edge Functions:** implemented and tested (85 tests); current single-owner authorization model
-  is enforced; `dish-ontology` v1, `recommendations` v11, `plan` v10 and `feedback` v7 deployed
+- **Edge Functions:** implemented and tested (89 tests); current single-owner authorization model
+  is enforced; `dish-ontology` v5, `recommendations` v11, `plan` v13 and `feedback` v7 deployed
   2026-08-05. Explicit membership/role authorization is still required before shared-household
   collaboration is enabled.
 - **Mobile app:** onboarding/cold-start/weekly-plan work; explanation, history, profile-edit, and
