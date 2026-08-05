@@ -12,10 +12,13 @@ This test locks the fix: for a West-MH household in the rain, _comfort_heroes_fo
 non-empty set that actually intersects the real catalogue's dish names — so this exact class of
 data-sync gap can never silently regress again.
 """
+
+import json
 import os
 import re
 
 from ghar_re_core import fixtures as F
+from ghar_re_core import knowledge
 from ghar_re_core.derivation import derive_theta
 from ghar_re_core.scoring import _comfort_heroes_for
 
@@ -26,7 +29,12 @@ HH = {h["id_key"]: h for h in F.HOUSEHOLDS}
 # catalogue" the plan means — WP-8/RE plumbing plan §0.3's own ground truth locates the gap
 # against this exact file.
 _SEEDS_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "..", "database", "seeds", "106_seed_dishes.sql",
+    os.path.dirname(__file__),
+    "..",
+    "..",
+    "database",
+    "seeds",
+    "106_seed_dishes.sql",
 )
 
 
@@ -57,3 +65,46 @@ def test_west_mh_rain_comfort_heroes_resolve_to_real_catalogue_dishes():
     # bug) and "Pakora (Mixed Veg)" (the domain-owner-confirmed "Kanda Bhaji" remap).
     assert "Pithla" in resolved
     assert "Pakora (Mixed Veg)" in resolved
+
+
+def test_new_production_comfort_aliases_exist_in_real_catalogue():
+    """Production-only spellings must never regress into silent no-op targets."""
+    bundle_path = os.path.join(
+        os.path.dirname(__file__), "..", "..", "ghar_re_service", "data", "bundle", "catalogue.json"
+    )
+    with open(bundle_path) as handle:
+        catalogue_names = {row["name"] for row in json.load(handle)}
+    expected = {
+        "Kadhi Pakora",
+        "Dal Dhokli",
+        "Pazhampori",
+        "Gajar Ka Halwa",
+        *{
+            alias
+            for aliases in knowledge.COMFORT_HERO_CATALOGUE_ALIASES.values()
+            for alias in aliases
+        },
+    }
+    missing = expected - catalogue_names
+    assert not missing
+
+
+def test_production_catalogue_resolves_at_least_23_unique_comfort_heroes():
+    """Lock the measured 23/36 coverage gain without fabricating absent dish substitutions."""
+    bundle_path = os.path.join(
+        os.path.dirname(__file__), "..", "..", "ghar_re_service", "data", "bundle", "catalogue.json"
+    )
+    with open(bundle_path) as handle:
+        catalogue_names = {row["name"] for row in json.load(handle)}
+    authored_heroes = {row[2] for row in knowledge.COMFORT_HERO_MAP}
+    resolved = {
+        hero
+        for hero in authored_heroes
+        if (
+            {knowledge.COMFORT_HERO_TO_DISH.get(hero, hero)}
+            | knowledge.COMFORT_HERO_CATALOGUE_ALIASES.get(hero, set())
+        )
+        & catalogue_names
+    }
+    assert len(authored_heroes) == 36
+    assert len(resolved) >= 23

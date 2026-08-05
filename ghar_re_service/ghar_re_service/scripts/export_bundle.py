@@ -68,6 +68,8 @@ CONFIG_FILES = (
     # `config.py`'s Config.__init__ loads this unconditionally alongside every other runtime
     # config file, so it must ship in the bundle exactly like bandit_weights.yaml above.
     "pref_model.yaml",
+    # Governed, versioned component grammars consumed by meal_episode generation at runtime.
+    "episode_grammars_v1.json",
     "community_priors.csv",
     # Ingredient MASTER attributes (category / allergen flags / Jain compatibility) — read by
     # ghar_re_core.catalogue at import time for allergen + Jain derivation. This is ingredient

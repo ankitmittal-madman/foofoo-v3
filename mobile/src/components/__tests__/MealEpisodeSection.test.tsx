@@ -46,13 +46,17 @@ const mockResponse = {
     source_plate_score: 1.2,
   }],
 };
+let mockQueryState = {
+  data: mockResponse,
+  isLoading: false,
+  isError: false,
+  error: null as Error | null,
+};
 
 jest.mock("expo-router", () => ({ router: { push: jest.fn() } }));
 jest.mock("@tanstack/react-query", () => ({
   useQuery: jest.fn(() => ({
-    data: mockResponse,
-    isLoading: false,
-    isError: false,
+    ...mockQueryState,
     refetch: mockRefetch,
   })),
   useMutation: jest.fn(() => ({ mutate: mockMutate, isPending: false })),
@@ -62,7 +66,10 @@ jest.mock("@/api/feedback", () => ({ postFeedback: jest.fn() }));
 jest.mock("@/api/errorMessages", () => ({ describeApiError: () => "Request failed" }));
 
 describe("MealEpisodeSection", () => {
-  beforeEach(() => mockMutate.mockClear());
+  beforeEach(() => {
+    mockMutate.mockClear();
+    mockQueryState = { data: mockResponse, isLoading: false, isError: false, error: null };
+  });
 
   it("renders a complete meal with practicality and reasoned rejection", async () => {
     render(
@@ -87,5 +94,29 @@ describe("MealEpisodeSection", () => {
     expect(screen.getByTestId("episode-dinner-reason-too-much-work")).toBeTruthy();
     fireEvent.press(screen.getByTestId("episode-dinner-reason-too-much-work"));
     await waitFor(() => expect(mockMutate).toHaveBeenCalled());
+  });
+
+  it("labels saved data when a refresh fails instead of hiding the meal", () => {
+    mockQueryState = {
+      data: mockResponse,
+      isLoading: false,
+      isError: true,
+      error: new Error("offline"),
+    };
+
+    render(
+      <MealEpisodeSection
+        slot="dinner"
+        weekday="Monday"
+        slotDate="2026-08-05"
+        classCode="LD_DAL_SABZI"
+        initiallyLocked={false}
+        refreshNonce={0}
+      />,
+    );
+
+    expect(screen.getByTestId("episode-dinner-cached-fallback")).toBeTruthy();
+    expect(screen.getByText("Showing your last saved meal while we reconnect.")).toBeTruthy();
+    expect(screen.getByText("Tori chana dal + phulka")).toBeTruthy();
   });
 });

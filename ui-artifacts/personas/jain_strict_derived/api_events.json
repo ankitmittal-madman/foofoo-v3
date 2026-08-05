@@ -1,0 +1,1452 @@
+[
+  {
+    "timestamp_utc": "2026-08-05T15:37:58.774Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/signup",
+    "method": "POST",
+    "request_body": {
+      "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+      "password": "Qa1-msg93zu4-gi5g7j-Ghar",
+      "data": {},
+      "gotrue_meta_security": {},
+      "code_challenge": null,
+      "code_challenge_method": null
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "access_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjVhODM1NDQxLTY4ZjYtNDM2Zi04YTEyLTg5YzRjMTE4ZDI5MCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nta3N3YWxxcG1tcW9qd2RtcWJ2LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJhYjZlMGYyNi1hNGI2LTQ5NzEtODI5Ny1lNmUxYzZhZjUzNzYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1OTQ3ODc4LCJpYXQiOjE3ODU5NDQyNzgsImVtYWlsIjoiZ2hhci1wZXJzb25hLWphaW5fc3RyaWN0X2Rlcml2ZWQtbXNnOTN6dTQtZ2k1ZzdqQGV4YW1wbGUuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImdoYXItcGVyc29uYS1qYWluX3N0cmljdF9kZXJpdmVkLW1zZzkzenU0LWdpNWc3akBleGFtcGxlLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImFiNmUwZjI2LWE0YjYtNDk3MS04Mjk3LWU2ZTFjNmFmNTM3NiJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg1OTQ0Mjc4fV0sInNlc3Npb25faWQiOiIyYjk3ZTIyMS03YWVhLTRlZjgtOGFlZi1hZmI4NjNkMTg3ZmQiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.2zCVQYBGBgrftoAnXuO5WEfSNOGwT_Am8kC3pt2ITLASABaEkygmoCsL95izHyXtWvygQ5WJKOPIRFWQ6CQRtQ",
+        "token_type": "bearer",
+        "expires_in": 3600,
+        "expires_at": 1785947878,
+        "refresh_token": "yhbhcechad6m",
+        "user": {
+          "id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+          "aud": "authenticated",
+          "role": "authenticated",
+          "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+          "email_confirmed_at": "2026-08-05T15:37:58.68997857Z",
+          "phone": "",
+          "last_sign_in_at": "2026-08-05T15:37:58.693605284Z",
+          "app_metadata": {
+            "provider": "email",
+            "providers": [
+              "email"
+            ]
+          },
+          "user_metadata": {
+            "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+            "email_verified": true,
+            "phone_verified": false,
+            "sub": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376"
+          },
+          "identities": [
+            {
+              "identity_id": "75345c73-0b8c-4336-88a0-7cb7e9d147bc",
+              "id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+              "user_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+              "identity_data": {
+                "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+                "email_verified": true,
+                "phone_verified": false,
+                "sub": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376"
+              },
+              "provider": "email",
+              "last_sign_in_at": "2026-08-05T15:37:58.687445015Z",
+              "created_at": "2026-08-05T15:37:58.687505Z",
+              "updated_at": "2026-08-05T15:37:58.687505Z",
+              "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com"
+            }
+          ],
+          "created_at": "2026-08-05T15:37:58.684628Z",
+          "updated_at": "2026-08-05T15:37:58.696058Z",
+          "is_anonymous": false
+        }
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:37:58.918Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/user",
+    "method": "GET",
+    "request_body": null,
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+        "email_confirmed_at": "2026-08-05T15:37:58.689978Z",
+        "phone": "",
+        "confirmed_at": "2026-08-05T15:37:58.689978Z",
+        "last_sign_in_at": "2026-08-05T15:37:58.693605Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+          "email_verified": true,
+          "phone_verified": false,
+          "sub": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376"
+        },
+        "identities": [
+          {
+            "identity_id": "75345c73-0b8c-4336-88a0-7cb7e9d147bc",
+            "id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+            "user_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+            "identity_data": {
+              "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-05T15:37:58.687445Z",
+            "created_at": "2026-08-05T15:37:58.687505Z",
+            "updated_at": "2026-08-05T15:37:58.687505Z",
+            "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com"
+          }
+        ],
+        "created_at": "2026-08-05T15:37:58.684628Z",
+        "updated_at": "2026-08-05T15:37:58.696058Z",
+        "is_anonymous": false
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:37:59.022Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/user",
+    "method": "PUT",
+    "request_body": {
+      "data": {
+        "display_name": "QA jain_strict_derived"
+      },
+      "code_challenge": null,
+      "code_challenge_method": null
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+        "email_confirmed_at": "2026-08-05T15:37:58.689978Z",
+        "phone": "",
+        "confirmed_at": "2026-08-05T15:37:58.689978Z",
+        "last_sign_in_at": "2026-08-05T15:37:58.693605Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "display_name": "QA jain_strict_derived",
+          "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+          "email_verified": true,
+          "phone_verified": false,
+          "sub": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376"
+        },
+        "identities": [
+          {
+            "identity_id": "75345c73-0b8c-4336-88a0-7cb7e9d147bc",
+            "id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+            "user_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+            "identity_data": {
+              "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-05T15:37:58.687445Z",
+            "created_at": "2026-08-05T15:37:58.687505Z",
+            "updated_at": "2026-08-05T15:37:58.687505Z",
+            "email": "ghar-persona-jain_strict_derived-msg93zu4-gi5g7j@example.com"
+          }
+        ],
+        "created_at": "2026-08-05T15:37:58.684628Z",
+        "updated_at": "2026-08-05T15:37:58.963669Z",
+        "is_anonymous": false
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:00.024Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "create-id",
+          "question_key": "primary_cook_name",
+          "answer_value": "QA jain_strict_derived"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [],
+        "missing_required_fields": [
+          "home_state",
+          "current_city",
+          "diet_type",
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "507c57c3-112d-4af5-a7b2-ef97c5cbdffc"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:02.715Z",
+    "stage_label": "step1-earners",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "onboarding-step-1",
+          "question_key": "q1_household_type",
+          "answer_value": "couple"
+        },
+        {
+          "screen_id": "onboarding-step-1",
+          "question_key": "q2_working_professionals",
+          "answer_value": 2
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [
+          "q1_household_type",
+          "q2_working_professionals"
+        ],
+        "missing_required_fields": [
+          "home_state",
+          "current_city",
+          "diet_type",
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "99b3d2a1-4ff7-4537-ad54-127ba46f3a98"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:04.332Z",
+    "stage_label": "step2-city",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "onboarding-step-2",
+          "question_key": "home_state",
+          "answer_value": "GJ"
+        },
+        {
+          "screen_id": "onboarding-step-2",
+          "question_key": "current_city",
+          "answer_value": "Ahmedabad"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [],
+        "missing_required_fields": [
+          "diet_type",
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "9cd10955-c9a8-44cb-8ebe-583dcd67a3d5"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:05.405Z",
+    "stage_label": "step3-diet",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "onboarding-step-3",
+          "question_key": "diet_type",
+          "answer_value": "jain"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [],
+        "missing_required_fields": [
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "239ed99d-95e0-4bad-8f16-840720286d70"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:06.496Z",
+    "stage_label": "step4-continue",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [],
+        "missing_required_fields": [
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "e795e731-a43c-4303-b3fb-0edcab1d3e18"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:07.962Z",
+    "stage_label": "step5-filled",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "onboarding-step-5",
+          "question_key": "cook_capability",
+          "answer_value": "intermediate"
+        },
+        {
+          "screen_id": "onboarding-step-5",
+          "question_key": "q13_who_cooks",
+          "answer_value": "self"
+        },
+        {
+          "screen_id": "onboarding-step-5",
+          "question_key": "q14_eat_out_per_week",
+          "answer_value": 1
+        },
+        {
+          "screen_id": "onboarding-step-5",
+          "question_key": "q15_objective",
+          "answer_value": "healthy_living"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+        "profile_exists": true,
+        "profile_created": true,
+        "answers_recorded": [
+          "q13_who_cooks",
+          "q14_eat_out_per_week",
+          "q15_objective"
+        ],
+        "missing_required_fields": [],
+        "members_written": 0,
+        "trace_id": "54396794-36bc-4310-ad5e-5bde84fe4b3c"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:08.804Z",
+    "stage_label": "step5-filled",
+    "endpoint": "/v1/consent",
+    "method": "POST",
+    "request_body": {
+      "profile_id": "ab6e0f26-a4b6-4971-8297-e6e1c6af5376",
+      "consents": [
+        {
+          "consent_type": "personalization",
+          "granted": true
+        },
+        {
+          "consent_type": "analytics",
+          "granted": true
+        },
+        {
+          "consent_type": "push_notifications",
+          "granted": false
+        },
+        {
+          "consent_type": "data_retention",
+          "granted": true
+        }
+      ],
+      "privacy_policy_version": "2026-07-01"
+    },
+    "response": {
+      "status": 201,
+      "body": {
+        "recorded": [
+          {
+            "consent_type": "personalization",
+            "granted": true,
+            "granted_at": "2026-08-05T15:38:08.692416+00:00"
+          },
+          {
+            "consent_type": "analytics",
+            "granted": true,
+            "granted_at": "2026-08-05T15:38:08.692416+00:00"
+          },
+          {
+            "consent_type": "push_notifications",
+            "granted": false,
+            "granted_at": "2026-08-05T15:38:08.692416+00:00"
+          },
+          {
+            "consent_type": "data_retention",
+            "granted": true,
+            "granted_at": "2026-08-05T15:38:08.692416+00:00"
+          }
+        ],
+        "personalization_granted": true,
+        "trace_id": "0c4a9ba8-481b-4f77-bf87-64f656a7c0a7"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:11.350Z",
+    "stage_label": "step5-finish",
+    "endpoint": "/v1/plan",
+    "method": "POST",
+    "request_body": {
+      "surface": "calibration"
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household": "request-household",
+        "kind": "calibration_grid",
+        "slots": {
+          "breakfast": [
+            {
+              "name": "Thepla",
+              "cuisine": "gujarati",
+              "diet": "veg",
+              "meal_class_code": "BF_PLAIN_FLATBREAD_SUBZI",
+              "meal_class_name": "Plain flatbread with sabzi or curd",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 30,
+              "score": 3.124,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/thepla_hero_01_hfidj6"
+            },
+            {
+              "name": "Onigiri",
+              "cuisine": "japanese",
+              "diet": "veg",
+              "meal_class_code": "LD_DAL_RICE_COMFORT",
+              "meal_class_name": "Dal rice comfort",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 15,
+              "score": 0.9979,
+              "cell_role": "planted_negative",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/onigiri_hero_01_hcfcow"
+            },
+            {
+              "name": "Idli",
+              "cuisine": "tamil",
+              "diet": "veg",
+              "meal_class_code": "BF_STEAMED_FERMENTED_LIGHT",
+              "meal_class_name": "Steamed fermented light breakfast",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 30,
+              "score": 2.2765,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/idli_hero_01_lji056"
+            },
+            {
+              "name": "Poee Bread",
+              "cuisine": "goan",
+              "diet": "veg",
+              "meal_class_code": "BF_BREAD_MODERN_FAST",
+              "meal_class_name": "Bread and modern fast breakfast",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 50,
+              "score": 2.6774,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/poee_bread_hero_01_bjrzcn"
+            },
+            {
+              "name": "Vietnamese Coffee",
+              "cuisine": "vietnamese",
+              "diet": "veg",
+              "meal_class_code": "BF_SKIP_MINIMAL",
+              "meal_class_name": "Skipped or minimal breakfast",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 10,
+              "score": 0.8286,
+              "cell_role": "planted_negative",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/vietnamese_coffee_hero_01_cyrgzl"
+            }
+          ],
+          "lunch": [
+            {
+              "name": "Gujarati Dal",
+              "cuisine": "gujarati",
+              "diet": "veg",
+              "meal_class_code": "LD_GUJARATI_THALI",
+              "meal_class_name": "Gujarati thali",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 35,
+              "score": 3.4221,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/gujarati_dal_hero_01_toxz5a"
+            },
+            {
+              "name": "Bhakri",
+              "cuisine": "maharashtrian",
+              "diet": "veg",
+              "meal_class_code": "LD_MILLET_ROTI_THALI",
+              "meal_class_name": "Millet roti thali",
+              "spice_level": 1,
+              "heaviness": 2,
+              "total_mins": 20,
+              "score": 2.4036,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/bhakri_hero_01_pul2hd"
+            },
+            {
+              "name": "Mac and Cheese",
+              "cuisine": "continental",
+              "diet": "veg",
+              "meal_class_code": "LD_PASTA_PIZZA_MODERN",
+              "meal_class_name": "Pasta or pizza modern meal",
+              "spice_level": 1,
+              "heaviness": 3,
+              "total_mins": 30,
+              "score": 0.6868,
+              "cell_role": "planted_negative",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/mac_and_cheese_hero_01_qzlxds"
+            },
+            {
+              "name": "Rumali Roti",
+              "cuisine": "delhi",
+              "diet": "veg",
+              "meal_class_code": "LD_DAL_ROTI_SABZI",
+              "meal_class_name": "Dal roti sabzi plate",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 25,
+              "score": 2.433,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/rumali_roti_hero_01_hws9fq"
+            },
+            {
+              "name": "Margherita Pizza",
+              "cuisine": "italian",
+              "diet": "veg",
+              "meal_class_code": "LD_PASTA_PIZZA_MODERN",
+              "meal_class_name": "Pasta or pizza modern meal",
+              "spice_level": 1,
+              "heaviness": 2,
+              "total_mins": 35,
+              "score": 0.6925,
+              "cell_role": "planted_negative",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/margherita_pizza_hero_01_ktygp8"
+            }
+          ],
+          "dinner": [
+            {
+              "name": "Aamras",
+              "cuisine": "maharashtrian",
+              "diet": "veg",
+              "meal_class_code": "LD_MAHARASHTRIAN_PITLA_BHAKRI",
+              "meal_class_name": "Maharashtrian pitla bhakri",
+              "spice_level": 1,
+              "heaviness": 2,
+              "total_mins": 10,
+              "score": 2.3162,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/aamras_hero_01_kzfien"
+            },
+            {
+              "name": "Mac and Cheese",
+              "cuisine": "continental",
+              "diet": "veg",
+              "meal_class_code": "LD_PASTA_PIZZA_MODERN",
+              "meal_class_name": "Pasta or pizza modern meal",
+              "spice_level": 1,
+              "heaviness": 3,
+              "total_mins": 30,
+              "score": 0.6868,
+              "cell_role": "planted_negative",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/mac_and_cheese_hero_01_qzlxds"
+            },
+            {
+              "name": "Gujarati Dal",
+              "cuisine": "gujarati",
+              "diet": "veg",
+              "meal_class_code": "LD_GUJARATI_THALI",
+              "meal_class_name": "Gujarati thali",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 35,
+              "score": 3.5211,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/gujarati_dal_hero_01_toxz5a"
+            },
+            {
+              "name": "Margherita Pizza",
+              "cuisine": "italian",
+              "diet": "veg",
+              "meal_class_code": "LD_PASTA_PIZZA_MODERN",
+              "meal_class_name": "Pasta or pizza modern meal",
+              "spice_level": 1,
+              "heaviness": 2,
+              "total_mins": 35,
+              "score": 0.6925,
+              "cell_role": "planted_negative",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/margherita_pizza_hero_01_ktygp8"
+            },
+            {
+              "name": "Pao (Goan Bread)",
+              "cuisine": "goan",
+              "diet": "veg",
+              "meal_class_code": "BF_OUTSIDE_CAFE_BRUNCH",
+              "meal_class_name": "Outside or cafe brunch",
+              "spice_level": 1,
+              "heaviness": 1,
+              "total_mins": 55,
+              "score": 2.3078,
+              "cell_role": "expected_positive",
+              "image_url": "https://res.cloudinary.com/dzlqsobol/image/upload/f_auto,q_auto,c_fill,w_800,h_600/pao_goan_bread_hero_01_vwdihv"
+            }
+          ]
+        },
+        "request_id": "8367e537-e3fa-45b8-863d-6c25b9e5593b",
+        "config_version": "Config v1.0",
+        "catalog_version": "sha256:ffad5c55384244e3",
+        "trace_id": "8367e537-e3fa-45b8-863d-6c25b9e5593b"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:13.298Z",
+    "stage_label": "cold-start-like-breakfast",
+    "endpoint": "/v1/feedback",
+    "method": "POST",
+    "request_body": {
+      "request_id": "8367e537-e3fa-45b8-863d-6c25b9e5593b",
+      "event_type": "like",
+      "dish_name": "Thepla",
+      "slot": "breakfast",
+      "detail": {
+        "cell_role": "expected_positive",
+        "tapped": true
+      }
+    },
+    "response": {
+      "status": 201,
+      "body": {
+        "id": "14002e01-9dfd-4983-9b33-c31f74b161e0",
+        "event_type": "like",
+        "recorded_at": "2026-08-05T15:38:12.563976+00:00",
+        "trace_id": "d604e178-3970-494b-84a1-3fa0a085d488"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:20.029Z",
+    "stage_label": "cold-start-like-lunch",
+    "endpoint": "/v1/feedback",
+    "method": "POST",
+    "request_body": {
+      "request_id": "8367e537-e3fa-45b8-863d-6c25b9e5593b",
+      "event_type": "like",
+      "dish_name": "Gujarati Dal",
+      "slot": "lunch",
+      "detail": {
+        "cell_role": "expected_positive",
+        "tapped": true
+      }
+    },
+    "response": {
+      "status": 201,
+      "body": {
+        "id": "00198795-efc8-4c9b-a51a-4b4e15a6c5b2",
+        "event_type": "like",
+        "recorded_at": "2026-08-05T15:38:14.473557+00:00",
+        "trace_id": "879c1d09-2f48-447d-b2da-391cf751bac3"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:21.994Z",
+    "stage_label": "cold-start-like-dinner",
+    "endpoint": "/v1/feedback",
+    "method": "POST",
+    "request_body": {
+      "request_id": "8367e537-e3fa-45b8-863d-6c25b9e5593b",
+      "event_type": "like",
+      "dish_name": "Aamras",
+      "slot": "dinner",
+      "detail": {
+        "cell_role": "expected_positive",
+        "tapped": true
+      }
+    },
+    "response": {
+      "status": 201,
+      "body": {
+        "id": "899c1448-5e5d-4adf-8663-7c215bb4b224",
+        "event_type": "like",
+        "recorded_at": "2026-08-05T15:38:21.264983+00:00",
+        "trace_id": "9ea3ec71-2276-40d1-9dd2-3ca0414122b7"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:23.006Z",
+    "stage_label": "cold-start-like-dinner",
+    "endpoint": "/v1/plan",
+    "method": "POST",
+    "request_body": {
+      "surface": "saved_week"
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "kind": "saved_week",
+        "plan": null,
+        "trace_id": "6540bb06-c9b6-448a-a24d-15913473557b"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:38:24.420Z",
+    "stage_label": "cold-start-like-dinner",
+    "endpoint": "/v1/plan",
+    "method": "POST",
+    "request_body": {
+      "surface": "weekly_plan",
+      "top_classes": 4
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household": "request-household",
+        "kind": "weekly_class_plan",
+        "days": [
+          {
+            "weekday": "Monday",
+            "slots": {
+              "breakfast": [
+                {
+                  "class_code": "BF_FERMENTED_CREPE_PAN",
+                  "class_name": "Fermented pan crepe breakfast",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 15
+                },
+                {
+                  "class_code": "BF_POHA_CHIVDA_LIGHT",
+                  "class_name": "Flattened rice light breakfast",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 3
+                },
+                {
+                  "class_code": "BF_BREAD_MODERN_FAST",
+                  "class_name": "Bread and modern fast breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 5
+                },
+                {
+                  "class_code": "BF_STUFFED_FLATBREAD",
+                  "class_name": "Stuffed flatbread breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 11
+                }
+              ],
+              "lunch": [
+                {
+                  "class_code": "LD_DAL_ROTI_SABZI",
+                  "class_name": "Dal roti sabzi plate",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 26
+                },
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                },
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                },
+                {
+                  "class_code": "LD_OUTSIDE_DELIVERY_INDIAN",
+                  "class_name": "Outside or delivery Indian meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                }
+              ],
+              "dinner": [
+                {
+                  "class_code": "DN_WEEKEND_INDULGENCE",
+                  "class_name": "Weekend indulgence dinner",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "DN_GRILLED_TIKKA_BOWL",
+                  "class_name": "Grilled tikka bowl dinner",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 8
+                },
+                {
+                  "class_code": "LD_DAL_ROTI_SABZI",
+                  "class_name": "Dal roti sabzi plate",
+                  "plan_weight": 0.7,
+                  "preference_contribution": 0,
+                  "dish_count": 26
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                }
+              ]
+            }
+          },
+          {
+            "weekday": "Tuesday",
+            "slots": {
+              "breakfast": [
+                {
+                  "class_code": "BF_POHA_CHIVDA_LIGHT",
+                  "class_name": "Flattened rice light breakfast",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 3
+                },
+                {
+                  "class_code": "BF_BREAD_MODERN_FAST",
+                  "class_name": "Bread and modern fast breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 5
+                },
+                {
+                  "class_code": "BF_STUFFED_FLATBREAD",
+                  "class_name": "Stuffed flatbread breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "BF_PLAIN_FLATBREAD_SUBZI",
+                  "class_name": "Plain flatbread with sabzi or curd",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 12
+                }
+              ],
+              "lunch": [
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                },
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                },
+                {
+                  "class_code": "LD_OUTSIDE_DELIVERY_INDIAN",
+                  "class_name": "Outside or delivery Indian meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "LD_RICE_PULAO_VEG",
+                  "class_name": "Vegetable pulao rice meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 14
+                }
+              ],
+              "dinner": [
+                {
+                  "class_code": "DN_GRILLED_TIKKA_BOWL",
+                  "class_name": "Grilled tikka bowl dinner",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 8
+                },
+                {
+                  "class_code": "LD_DAL_ROTI_SABZI",
+                  "class_name": "Dal roti sabzi plate",
+                  "plan_weight": 0.7,
+                  "preference_contribution": 0,
+                  "dish_count": 26
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                }
+              ]
+            }
+          },
+          {
+            "weekday": "Wednesday",
+            "slots": {
+              "breakfast": [
+                {
+                  "class_code": "BF_BREAD_MODERN_FAST",
+                  "class_name": "Bread and modern fast breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 5
+                },
+                {
+                  "class_code": "BF_STUFFED_FLATBREAD",
+                  "class_name": "Stuffed flatbread breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "BF_PLAIN_FLATBREAD_SUBZI",
+                  "class_name": "Plain flatbread with sabzi or curd",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 12
+                },
+                {
+                  "class_code": "BF_JAIN_BREAKFAST",
+                  "class_name": "Jain no-root breakfast",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0,
+                  "dish_count": 2
+                }
+              ],
+              "lunch": [
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                },
+                {
+                  "class_code": "LD_OUTSIDE_DELIVERY_INDIAN",
+                  "class_name": "Outside or delivery Indian meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "LD_RICE_PULAO_VEG",
+                  "class_name": "Vegetable pulao rice meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 14
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                }
+              ],
+              "dinner": [
+                {
+                  "class_code": "LD_DAL_ROTI_SABZI",
+                  "class_name": "Dal roti sabzi plate",
+                  "plan_weight": 0.7,
+                  "preference_contribution": 0,
+                  "dish_count": 26
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                },
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                }
+              ]
+            }
+          },
+          {
+            "weekday": "Thursday",
+            "slots": {
+              "breakfast": [
+                {
+                  "class_code": "BF_FERMENTED_CREPE_PAN",
+                  "class_name": "Fermented pan crepe breakfast",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 15
+                },
+                {
+                  "class_code": "BF_STUFFED_FLATBREAD",
+                  "class_name": "Stuffed flatbread breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "BF_PLAIN_FLATBREAD_SUBZI",
+                  "class_name": "Plain flatbread with sabzi or curd",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 12
+                },
+                {
+                  "class_code": "BF_JAIN_BREAKFAST",
+                  "class_name": "Jain no-root breakfast",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0,
+                  "dish_count": 2
+                }
+              ],
+              "lunch": [
+                {
+                  "class_code": "LD_DAL_ROTI_SABZI",
+                  "class_name": "Dal roti sabzi plate",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 26
+                },
+                {
+                  "class_code": "LD_OUTSIDE_DELIVERY_INDIAN",
+                  "class_name": "Outside or delivery Indian meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "LD_RICE_PULAO_VEG",
+                  "class_name": "Vegetable pulao rice meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 14
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                }
+              ],
+              "dinner": [
+                {
+                  "class_code": "DN_WEEKEND_INDULGENCE",
+                  "class_name": "Weekend indulgence dinner",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                },
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                }
+              ]
+            }
+          },
+          {
+            "weekday": "Friday",
+            "slots": {
+              "breakfast": [
+                {
+                  "class_code": "BF_POHA_CHIVDA_LIGHT",
+                  "class_name": "Flattened rice light breakfast",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 3
+                },
+                {
+                  "class_code": "BF_STUFFED_FLATBREAD",
+                  "class_name": "Stuffed flatbread breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "BF_PLAIN_FLATBREAD_SUBZI",
+                  "class_name": "Plain flatbread with sabzi or curd",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 12
+                },
+                {
+                  "class_code": "BF_JAIN_BREAKFAST",
+                  "class_name": "Jain no-root breakfast",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0,
+                  "dish_count": 2
+                }
+              ],
+              "lunch": [
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                },
+                {
+                  "class_code": "LD_OUTSIDE_DELIVERY_INDIAN",
+                  "class_name": "Outside or delivery Indian meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "LD_RICE_PULAO_VEG",
+                  "class_name": "Vegetable pulao rice meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 14
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                }
+              ],
+              "dinner": [
+                {
+                  "class_code": "DN_GRILLED_TIKKA_BOWL",
+                  "class_name": "Grilled tikka bowl dinner",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 8
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                },
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                }
+              ]
+            }
+          },
+          {
+            "weekday": "Saturday",
+            "slots": {
+              "breakfast": [
+                {
+                  "class_code": "BF_BREAD_MODERN_FAST",
+                  "class_name": "Bread and modern fast breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 5
+                },
+                {
+                  "class_code": "BF_STUFFED_FLATBREAD",
+                  "class_name": "Stuffed flatbread breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "BF_PLAIN_FLATBREAD_SUBZI",
+                  "class_name": "Plain flatbread with sabzi or curd",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 12
+                },
+                {
+                  "class_code": "BF_JAIN_BREAKFAST",
+                  "class_name": "Jain no-root breakfast",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0,
+                  "dish_count": 2
+                }
+              ],
+              "lunch": [
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                },
+                {
+                  "class_code": "LD_OUTSIDE_DELIVERY_INDIAN",
+                  "class_name": "Outside or delivery Indian meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "LD_RICE_PULAO_VEG",
+                  "class_name": "Vegetable pulao rice meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 14
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                }
+              ],
+              "dinner": [
+                {
+                  "class_code": "LD_DAL_ROTI_SABZI",
+                  "class_name": "Dal roti sabzi plate",
+                  "plan_weight": 0.7,
+                  "preference_contribution": 0,
+                  "dish_count": 26
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                },
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                }
+              ]
+            }
+          },
+          {
+            "weekday": "Sunday",
+            "slots": {
+              "breakfast": [
+                {
+                  "class_code": "BF_FERMENTED_CREPE_PAN",
+                  "class_name": "Fermented pan crepe breakfast",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 15
+                },
+                {
+                  "class_code": "BF_STUFFED_FLATBREAD",
+                  "class_name": "Stuffed flatbread breakfast",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "BF_PLAIN_FLATBREAD_SUBZI",
+                  "class_name": "Plain flatbread with sabzi or curd",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 12
+                },
+                {
+                  "class_code": "BF_JAIN_BREAKFAST",
+                  "class_name": "Jain no-root breakfast",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0,
+                  "dish_count": 2
+                }
+              ],
+              "lunch": [
+                {
+                  "class_code": "LD_DAL_ROTI_SABZI",
+                  "class_name": "Dal roti sabzi plate",
+                  "plan_weight": 1,
+                  "preference_contribution": 0,
+                  "dish_count": 26
+                },
+                {
+                  "class_code": "LD_OUTSIDE_DELIVERY_INDIAN",
+                  "class_name": "Outside or delivery Indian meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "LD_RICE_PULAO_VEG",
+                  "class_name": "Vegetable pulao rice meal",
+                  "plan_weight": 0.76,
+                  "preference_contribution": 0,
+                  "dish_count": 14
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                }
+              ],
+              "dinner": [
+                {
+                  "class_code": "DN_WEEKEND_INDULGENCE",
+                  "class_name": "Weekend indulgence dinner",
+                  "plan_weight": 0.88,
+                  "preference_contribution": 0,
+                  "dish_count": 10
+                },
+                {
+                  "class_code": "LD_GUJARATI_THALI",
+                  "class_name": "Gujarati thali",
+                  "plan_weight": 0.55,
+                  "preference_contribution": 0.07,
+                  "dish_count": 11
+                },
+                {
+                  "class_code": "LD_PANEER_HOME_DRY",
+                  "class_name": "Paneer home-style dry",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 21
+                },
+                {
+                  "class_code": "LD_WEEKEND_SPECIAL_REGIONAL",
+                  "class_name": "Weekend regional special",
+                  "plan_weight": 0.616,
+                  "preference_contribution": 0,
+                  "dish_count": 16
+                }
+              ]
+            }
+          }
+        ],
+        "request_id": "5e86e702-78fa-4931-8506-761c2439c851",
+        "config_version": "Config v1.0",
+        "catalog_version": "sha256:ffad5c55384244e3",
+        "trace_id": "5e86e702-78fa-4931-8506-761c2439c851"
+      }
+    }
+  }
+]

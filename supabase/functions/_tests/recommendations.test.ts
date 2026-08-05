@@ -20,9 +20,11 @@ import {
 import type { AuthClaims, Logger } from "../_shared/mod.ts";
 import { makeRecommendationsHandler, type RecommendationDeps } from "../recommendations/handler.ts";
 import { callRecommendationEngine, type FetchLike } from "../recommendations/re-client.ts";
+import { aggregateMemberAffinities } from "../recommendations/personalization.ts";
 import { validateRequest } from "../recommendations/contract.ts";
 import {
   allergenTokens,
+  applyFestivalContext,
   buildRequest,
   composeHouseholdRaw,
   type HouseholdRaw,
@@ -220,6 +222,32 @@ Deno.test("buildRequest omits exclude_dish_ids when undefined or empty (additive
   assertEquals("exclude_dish_ids" in noArg, false);
   const emptyArg = buildRequest(TEST_HOUSEHOLD, undefined, "req-1", 0, []);
   assertEquals("exclude_dish_ids" in emptyArg, false);
+});
+
+Deno.test("festival calendar mapping adds mode only on governed active dates", () => {
+  const active = applyFestivalContext(
+    { slot: "dinner", active_modes: ["veg_egg"] },
+    { date: "2026-11-08", festivalNames: ["diwali_2026"] },
+  );
+  assertEquals(active.active_modes, ["veg_egg", "festival"]);
+  assertEquals(active.festival_names, ["diwali_2026"]);
+  const ordinary = applyFestivalContext(
+    { slot: "dinner" },
+    { date: "2026-08-05", festivalNames: [] },
+  );
+  assertEquals(ordinary.active_modes, []);
+  assertEquals("festival_names" in ordinary, false);
+});
+
+Deno.test("member fairness aggregates explicit evidence without inventing missing preferences", () => {
+  const aggregate = aggregateMemberAffinities([
+    { profile_id: "member-a", dish_affinity: { Khichdi: 1, Dosa: 0.4 } },
+    { profile_id: "member-b", dish_affinity: { Khichdi: -0.8 } },
+    { profile_id: "member-c", dish_affinity: null },
+  ]);
+  assertEquals(Math.round(aggregate.Dosa * 10), 4);
+  assertEquals(aggregate.Khichdi < 0, true);
+  assertEquals("member-c" in aggregate, false);
 });
 
 // ── 1c. WP-8G exclude_dish_ids wiring ──────────────────────────────────────────────────────────

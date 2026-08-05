@@ -104,6 +104,17 @@ describe("fetchMealEpisodes", () => {
     expect(response.request_id).toBe("request-1");
     expect(response.episodes[0].display_name).toBe("Poha");
     expect(response.episodes[0].components[0].image_url).toBe("https://example.test/poha.jpg");
+    expect(response.episodes[0].predictions).toMatchObject({
+      p_choose: null,
+      p_execute: null,
+      p_regret: null,
+      p_success: null,
+      calibration_status: "compatibility_unscored",
+    });
+    expect(response.episodes[0]).toMatchObject({
+      grammar_code: "SINGLE_PRIMARY",
+      grammar_version: 1,
+    });
   });
 
   it("does not fall back for auth failures", async () => {

@@ -75,6 +75,7 @@ export interface MealEpisodeComponent {
   dish_id: string | null;
   dish_name: string;
   component_role: string;
+  grammar_role: "primary" | "side";
   is_required: boolean;
   image_url?: string | null;
 }
@@ -82,6 +83,8 @@ export interface MealEpisodeComponent {
 export interface MealEpisode {
   episode_hash: string;
   rank: number;
+  grammar_code: string;
+  grammar_version: number;
   plate_form: "pair" | "single" | "standalone";
   display_name: string;
   components: MealEpisodeComponent[];
@@ -101,12 +104,12 @@ export interface MealEpisode {
   cadence_tier: string;
   richness_score: number;
   predictions: {
-    p_choose: number;
-    p_execute: number;
-    p_regret: number;
-    p_success: number;
+    p_choose: number | null;
+    p_execute: number | null;
+    p_regret: number | null;
+    p_success: number | null;
     model_version: string;
-    calibration_status: "rule_baseline_untrained" | "calibrated";
+    calibration_status: "compatibility_unscored" | "rule_baseline_untrained" | "calibrated";
   };
   reasons: string[];
   source_plate_score: number;
@@ -136,23 +139,27 @@ function stableEpisodeHash(slot: Slot, dishName: string, index: number): string 
   return `compat-${(hash >>> 0).toString(16)}`;
 }
 
+/** Converts a legacy dish option into an explicitly unscored compatibility episode.
+ * The adapter preserves display continuity without inventing calibrated success probabilities. */
 function dishToEpisode(dish: PlanDish, slot: Slot, index: number): MealEpisode {
   const activeMinutes = Math.max(0, dish.total_mins ?? 30);
-  const pChoose = Math.max(0.01, Math.min(0.99, dish.score / 5));
   return {
     episode_hash: stableEpisodeHash(slot, dish.name, index),
     rank: index + 1,
+    grammar_code: "SINGLE_PRIMARY",
+    grammar_version: 1,
     plate_form: "single",
     display_name: dish.name,
     components: [{
       dish_id: `dish:${dish.name}`,
       dish_name: dish.name,
       component_role: "hero",
+      grammar_role: "primary",
       is_required: true,
       image_url: dish.image_url,
     }],
     intent: activeMinutes <= 30 ? "quick" : "routine",
-    intent_posterior: activeMinutes <= 30 ? { quick: 0.6, routine: 0.4 } : { routine: 0.7, quick: 0.3 },
+    intent_posterior: {},
     practicality: {
       active_minutes: activeMinutes,
       critical_path_minutes: activeMinutes,
@@ -162,17 +169,17 @@ function dishToEpisode(dish: PlanDish, slot: Slot, index: number): MealEpisode {
       complex_method_count: 0,
       pantry_coverage: null,
       feature_version: "meal-plan-compat-v1",
-      estimation_confidence: 0.35,
+      estimation_confidence: 0,
     },
     cadence_tier: dish.heaviness !== null && dish.heaviness >= 3 ? "occasional" : "regular_rotation",
     richness_score: Math.max(0, Math.min(1, (dish.heaviness ?? 1) / 3)),
     predictions: {
-      p_choose: pChoose,
-      p_execute: activeMinutes <= 35 ? 0.78 : 0.62,
-      p_regret: dish.heaviness !== null && dish.heaviness >= 3 ? 0.28 : 0.16,
-      p_success: pChoose * (activeMinutes <= 35 ? 0.78 : 0.62) * (dish.heaviness !== null && dish.heaviness >= 3 ? 0.72 : 0.84),
+      p_choose: null,
+      p_execute: null,
+      p_regret: null,
+      p_success: null,
       model_version: "meal-plan-compat-v1",
-      calibration_status: "rule_baseline_untrained",
+      calibration_status: "compatibility_unscored",
     },
     reasons: [
       dish.meal_class_name ? `${dish.meal_class_name} class` : `${dish.cuisine} option`,

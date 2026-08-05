@@ -1,0 +1,214 @@
+[
+  {
+    "timestamp_utc": "2026-08-05T15:40:46.329Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/signup",
+    "method": "POST",
+    "request_body": {
+      "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+      "password": "Qa1-msg97l50-rhy5g1-Ghar",
+      "data": {},
+      "gotrue_meta_security": {},
+      "code_challenge": null,
+      "code_challenge_method": null
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "access_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjVhODM1NDQxLTY4ZjYtNDM2Zi04YTEyLTg5YzRjMTE4ZDI5MCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nta3N3YWxxcG1tcW9qd2RtcWJ2LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIzYmYxYTdhNS0zNDUwLTQ4NGEtYjJmNi03OGJhN2QxNjk4NjgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1OTQ4MDQ2LCJpYXQiOjE3ODU5NDQ0NDYsImVtYWlsIjoiZ2hhci1wZXJzb25hLWRpYWJldGljX3Nlbmlvcl9kZXJpdmVkLW1zZzk3bDUwLXJoeTVnMUBleGFtcGxlLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJnaGFyLXBlcnNvbmEtZGlhYmV0aWNfc2VuaW9yX2Rlcml2ZWQtbXNnOTdsNTAtcmh5NWcxQGV4YW1wbGUuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiM2JmMWE3YTUtMzQ1MC00ODRhLWIyZjYtNzhiYTdkMTY5ODY4In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODU5NDQ0NDZ9XSwic2Vzc2lvbl9pZCI6ImQ0YmNiYzkyLTEyYmUtNGExMi05NmJkLTk2Yzk0MDFjMjRjZSIsImlzX2Fub255bW91cyI6ZmFsc2V9.UXbCLp8RueWIJmPV9LvWuW4feYNIJJ0QfShBbqyTcmI5Q3bvR49FPcytIi6IvOcYmL13OqO-3uT3rKiB8lmzlw",
+        "token_type": "bearer",
+        "expires_in": 3600,
+        "expires_at": 1785948046,
+        "refresh_token": "oq3tx7f3nmjf",
+        "user": {
+          "id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+          "aud": "authenticated",
+          "role": "authenticated",
+          "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+          "email_confirmed_at": "2026-08-05T15:40:46.20735221Z",
+          "phone": "",
+          "last_sign_in_at": "2026-08-05T15:40:46.211425382Z",
+          "app_metadata": {
+            "provider": "email",
+            "providers": [
+              "email"
+            ]
+          },
+          "user_metadata": {
+            "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+            "email_verified": true,
+            "phone_verified": false,
+            "sub": "3bf1a7a5-3450-484a-b2f6-78ba7d169868"
+          },
+          "identities": [
+            {
+              "identity_id": "4395eab0-873c-4685-93a5-e2946d4a5193",
+              "id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+              "user_id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+              "identity_data": {
+                "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+                "email_verified": true,
+                "phone_verified": false,
+                "sub": "3bf1a7a5-3450-484a-b2f6-78ba7d169868"
+              },
+              "provider": "email",
+              "last_sign_in_at": "2026-08-05T15:40:46.198486651Z",
+              "created_at": "2026-08-05T15:40:46.198546Z",
+              "updated_at": "2026-08-05T15:40:46.198546Z",
+              "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com"
+            }
+          ],
+          "created_at": "2026-08-05T15:40:46.181738Z",
+          "updated_at": "2026-08-05T15:40:46.217656Z",
+          "is_anonymous": false
+        }
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:40:46.479Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/user",
+    "method": "GET",
+    "request_body": null,
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+        "email_confirmed_at": "2026-08-05T15:40:46.207352Z",
+        "phone": "",
+        "confirmed_at": "2026-08-05T15:40:46.207352Z",
+        "last_sign_in_at": "2026-08-05T15:40:46.211425Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+          "email_verified": true,
+          "phone_verified": false,
+          "sub": "3bf1a7a5-3450-484a-b2f6-78ba7d169868"
+        },
+        "identities": [
+          {
+            "identity_id": "4395eab0-873c-4685-93a5-e2946d4a5193",
+            "id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+            "user_id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+            "identity_data": {
+              "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "3bf1a7a5-3450-484a-b2f6-78ba7d169868"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-05T15:40:46.198486Z",
+            "created_at": "2026-08-05T15:40:46.198546Z",
+            "updated_at": "2026-08-05T15:40:46.198546Z",
+            "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com"
+          }
+        ],
+        "created_at": "2026-08-05T15:40:46.181738Z",
+        "updated_at": "2026-08-05T15:40:46.217656Z",
+        "is_anonymous": false
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:40:46.629Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/user",
+    "method": "PUT",
+    "request_body": {
+      "data": {
+        "display_name": "QA diabetic_senior_derived"
+      },
+      "code_challenge": null,
+      "code_challenge_method": null
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+        "email_confirmed_at": "2026-08-05T15:40:46.207352Z",
+        "phone": "",
+        "confirmed_at": "2026-08-05T15:40:46.207352Z",
+        "last_sign_in_at": "2026-08-05T15:40:46.211425Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "display_name": "QA diabetic_senior_derived",
+          "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+          "email_verified": true,
+          "phone_verified": false,
+          "sub": "3bf1a7a5-3450-484a-b2f6-78ba7d169868"
+        },
+        "identities": [
+          {
+            "identity_id": "4395eab0-873c-4685-93a5-e2946d4a5193",
+            "id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+            "user_id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+            "identity_data": {
+              "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "3bf1a7a5-3450-484a-b2f6-78ba7d169868"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-05T15:40:46.198486Z",
+            "created_at": "2026-08-05T15:40:46.198546Z",
+            "updated_at": "2026-08-05T15:40:46.198546Z",
+            "email": "ghar-persona-diabetic_senior_derived-msg97l50-rhy5g1@example.com"
+          }
+        ],
+        "created_at": "2026-08-05T15:40:46.181738Z",
+        "updated_at": "2026-08-05T15:40:46.567299Z",
+        "is_anonymous": false
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:40:47.777Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "create-id",
+          "question_key": "primary_cook_name",
+          "answer_value": "QA diabetic_senior_derived"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "3bf1a7a5-3450-484a-b2f6-78ba7d169868",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [],
+        "missing_required_fields": [
+          "home_state",
+          "current_city",
+          "diet_type",
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "676b306c-4fef-4074-8ee7-3ad1e049a88a"
+      }
+    }
+  }
+]

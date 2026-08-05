@@ -17,13 +17,20 @@ import json
 import math
 from typing import Any, Iterable
 
-from ghar_re_core import pairing
+from ghar_re_core import episode_grammar, pairing
 
 
 EPISODE_MODEL_VERSION = "episode-practicality-rule-v1"
 INTENT_CODES = (
-    "routine", "quick", "light", "comfort", "indulgent", "discovery",
-    "leftover_use", "festive", "recovery",
+    "routine",
+    "quick",
+    "light",
+    "comfort",
+    "indulgent",
+    "discovery",
+    "leftover_use",
+    "festive",
+    "recovery",
 )
 _RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich", "oily"}
 _COMPLEX_METHODS = {"deep_fried", "baked", "grilled", "dum", "stuffed"}
@@ -83,7 +90,9 @@ def infer_intent(household: dict[str, Any], ctx: dict[str, Any]) -> dict[str, fl
     return {key: round(value / total, 6) for key, value in weights.items()}
 
 
-def _work_features(dishes: Iterable[Any], support: str | None, ctx: dict[str, Any]) -> dict[str, Any]:
+def _work_features(
+    dishes: Iterable[Any], support: str | None, ctx: dict[str, Any]
+) -> dict[str, Any]:
     dishes = list(dishes)
     prep = sum(max(0, int(getattr(dish, "prep_mins", 0) or 0)) for dish in dishes)
     cook = [max(0, int(getattr(dish, "cook_mins", 0) or 0)) for dish in dishes]
@@ -92,9 +101,7 @@ def _work_features(dishes: Iterable[Any], support: str | None, ctx: dict[str, An
     critical_path = prep + (max(cook) if cook else 0)
     active_minutes = prep + round(sum(cook) * 0.35)
     methods = {
-        method
-        for dish in dishes
-        for method in (getattr(dish, "cooking_method", None) or [])
+        method for dish in dishes for method in (getattr(dish, "cooking_method", None) or [])
     }
     all_ingredients = {
         ingredient for dish in dishes for ingredient in getattr(dish, "ingredient_names", [])
@@ -131,21 +138,31 @@ def _richness(dishes: Iterable[Any]) -> float:
 
 
 def _execution_probability(
-    work: dict[str, Any], household: dict[str, Any], ctx: dict[str, Any], familiarity: float,
+    work: dict[str, Any],
+    household: dict[str, Any],
+    ctx: dict[str, Any],
+    familiarity: float,
 ) -> float:
     time_budget = ctx.get("time_budget_minutes")
     time_overrun = 0.0
     if time_budget is not None:
         time_overrun = max(0.0, work["critical_path_minutes"] - float(time_budget)) / 30.0
     capability = household.get("cook_capability") or ctx.get("cook_capability") or "intermediate"
-    skill_adjustment = {"beginner": -0.35, "intermediate": 0.0, "advanced": 0.2}.get(capability, 0.0)
+    skill_adjustment = {"beginner": -0.35, "intermediate": 0.0, "advanced": 0.2}.get(
+        capability, 0.0
+    )
     pantry_adjustment = 0.0
     if work["pantry_coverage"] is not None:
         pantry_adjustment = 0.8 * (work["pantry_coverage"] - 0.5)
     logit = (
-        1.9 + skill_adjustment + 0.65 * familiarity + pantry_adjustment
-        - 0.025 * work["active_minutes"] - 0.18 * max(0, work["vessel_count"] - 2)
-        - 0.25 * work["complex_method_count"] - 0.9 * time_overrun
+        1.9
+        + skill_adjustment
+        + 0.65 * familiarity
+        + pantry_adjustment
+        - 0.025 * work["active_minutes"]
+        - 0.18 * max(0, work["vessel_count"] - 2)
+        - 0.25 * work["complex_method_count"]
+        - 0.9 * time_overrun
     )
     return _sigmoid(logit)
 
@@ -163,7 +180,9 @@ def _cadence_tier(richness: float, work: dict[str, Any], ctx: dict[str, Any]) ->
 
 
 def build_meal_episodes(
-    plates: list[dict[str, Any]], household: dict[str, Any], ctx: dict[str, Any],
+    plates: list[dict[str, Any]],
+    household: dict[str, Any],
+    ctx: dict[str, Any],
 ) -> list[dict[str, Any]]:
     """Project safe plates to versioned episodes and re-rank by predicted successful execution."""
     choose_probs = _softmax([float(plate["score"]) for plate in plates])
@@ -172,27 +191,44 @@ def build_meal_episodes(
     for plate, p_choose in zip(plates, choose_probs, strict=True):
         dishes = _plate_dishes(plate)
         support = plate.get("support")
+        grammar = episode_grammar.grammar_for_plate(plate, ctx.get("slot", "dinner"))
         components = [
             {
                 "dish_id": dish.id,
                 "dish_name": dish.name,
                 "component_role": (
-                    "dry_hero" if plate["form"] == "pair" and dish is plate["dry"]
-                    else "liquid_hero" if plate["form"] == "pair"
+                    "dry_hero"
+                    if plate["form"] == "pair" and dish is plate["dry"]
+                    else "liquid_hero"
+                    if plate["form"] == "pair"
                     else "hero"
                 ),
+                "grammar_role": "primary" if dish_index == 0 else "side",
                 "is_required": True,
             }
-            for dish in dishes
+            for dish_index, dish in enumerate(dishes)
         ]
         if support:
-            components.append({
-                "dish_id": None, "dish_name": support, "component_role": "staple",
-                "is_required": True,
-            })
+            components.append(
+                {
+                    "dish_id": None,
+                    "dish_name": support,
+                    "component_role": "staple",
+                    "grammar_role": "side",
+                    "is_required": True,
+                }
+            )
+        episode_grammar.validate_component_roles(
+            grammar, [component["grammar_role"] for component in components]
+        )
         content = {
             "form": plate["form"],
-            "components": [(c["dish_id"], c["dish_name"], c["component_role"]) for c in components],
+            "grammar_code": grammar["grammar_code"],
+            "grammar_version": grammar["version"],
+            "components": [
+                (c["dish_id"], c["dish_name"], c["component_role"], c["grammar_role"])
+                for c in components
+            ],
             "model_version": EPISODE_MODEL_VERSION,
         }
         episode_hash = hashlib.sha256(
@@ -204,7 +240,9 @@ def build_meal_episodes(
         familiarity = 0.35 if plate.get("experimental") else 0.75
         p_execute = _execution_probability(work, household, ctx, familiarity)
         p_regret = _sigmoid(
-            -2.25 + 0.018 * work["active_minutes"] + 0.65 * richness
+            -2.25
+            + 0.018 * work["active_minutes"]
+            + 0.65 * richness
             + (0.35 if plate.get("experimental") else 0.0)
         )
         p_success = p_choose * p_execute * (1.0 - p_regret)
@@ -216,29 +254,37 @@ def build_meal_episodes(
         ]
         if support:
             reasons.append(f"complete plate with {support}")
-        episodes.append({
-            "episode_hash": episode_hash,
-            "plate_form": plate["form"],
-            "display_name": pairing.plate_label(plate),
-            "components": components,
-            "intent": primary_intent,
-            "intent_posterior": intent,
-            "practicality": work,
-            "cadence_tier": cadence_tier,
-            "richness_score": round(richness, 6),
-            "predictions": {
-                "p_choose": round(p_choose, 6),
-                "p_execute": round(p_execute, 6),
-                "p_regret": round(p_regret, 6),
-                "p_success": round(p_success, 6),
-                "model_version": EPISODE_MODEL_VERSION,
-                "calibration_status": "rule_baseline_untrained",
-            },
-            "reasons": reasons[:3],
-            "source_plate_score": round(float(plate["score"]), 6),
-        })
+        episodes.append(
+            {
+                "episode_hash": episode_hash,
+                "grammar_code": grammar["grammar_code"],
+                "grammar_version": grammar["version"],
+                "plate_form": plate["form"],
+                "display_name": pairing.plate_label(plate),
+                "components": components,
+                "intent": primary_intent,
+                "intent_posterior": intent,
+                "practicality": work,
+                "cadence_tier": cadence_tier,
+                "richness_score": round(richness, 6),
+                "predictions": {
+                    "p_choose": round(p_choose, 6),
+                    "p_execute": round(p_execute, 6),
+                    "p_regret": round(p_regret, 6),
+                    "p_success": round(p_success, 6),
+                    "model_version": EPISODE_MODEL_VERSION,
+                    "calibration_status": "rule_baseline_untrained",
+                },
+                "reasons": reasons[:3],
+                "source_plate_score": round(float(plate["score"]), 6),
+            }
+        )
     episodes.sort(
-        key=lambda item: (item["predictions"]["p_success"], item["source_plate_score"], item["episode_hash"]),
+        key=lambda item: (
+            item["predictions"]["p_success"],
+            item["source_plate_score"],
+            item["episode_hash"],
+        ),
         reverse=True,
     )
     for rank, episode in enumerate(episodes, 1):

@@ -343,7 +343,15 @@ def recommendations(
 # signed + rate-limited like /v1/recommendations. The math/reconciliation lives in
 # ghar_re_core.meal_planner; media (Cloudinary/recipe) is attached in engine.py.
 # =====================================================================================
-def _planning_call(name, fn, payload, request, needs_household=True):
+def _planning_call(
+    name,
+    fn,
+    payload,
+    request,
+    needs_household=True,
+    request_validator=None,
+    response_validator=None,
+):
     """Shared translation wrapper: 503 if not ready, 422 if the required inputs are missing, 500 on
     an engine error, 200 with the planner result otherwise. `fn(payload, catalogue, config)` for the
     household surfaces; a plain `fn(payload)` for the recipe lookup (needs_household=False)."""
@@ -368,14 +376,16 @@ def _planning_call(name, fn, payload, request, needs_household=True):
             },
         )
     try:
+        if request_validator is not None:
+            request_validator(payload)
         result = fn(payload, state.catalogue, state.config) if needs_household else fn(payload)
-    except KeyError as e:
+    except (KeyError, schemas.ContractError) as e:
         state.counters.record("error")
         return JSONResponse(
             status_code=422,
             content={
                 "error": "invalid_request",
-                "detail": f"missing {e}",
+                "detail": f"invalid request: {e}",
                 "request_id": request_id,
             },
         )
@@ -385,11 +395,22 @@ def _planning_call(name, fn, payload, request, needs_household=True):
         return JSONResponse(
             status_code=500, content={"error": "internal_error", "request_id": request_id}
         )
-    state.counters.record("success")
-    log_event(f"{name}.ok", request_id=request_id, outcome="success")
     result["request_id"] = request_id
     result.setdefault("config_version", state.config.versions["config"])
     result.setdefault("catalog_version", (state.bundle or {}).get("bundle_version"))
+    if response_validator is not None:
+        try:
+            response_validator(result)
+        except schemas.ContractError as e:
+            state.counters.record("error")
+            log_event(
+                f"{name}.contract_error", request_id=request_id, outcome="error", error=str(e)
+            )
+            return JSONResponse(
+                status_code=500, content={"error": "internal_error", "request_id": request_id}
+            )
+    state.counters.record("success")
+    log_event(f"{name}.ok", request_id=request_id, outcome="success")
     return result
 
 
@@ -415,7 +436,14 @@ def meal_plan(request: Request, payload: dict = Body(...)):  # noqa: B008
 @app.post("/v1/meal-episodes")
 def meal_episodes(request: Request, payload: dict = Body(...)):  # noqa: B008
     """Complete safe meal episodes ranked by predicted choose, execution and non-regret."""
-    return _planning_call("meal_episodes", engine.plan_meal_episodes, payload, request)
+    return _planning_call(
+        "meal_episodes",
+        engine.plan_meal_episodes,
+        payload,
+        request,
+        request_validator=schemas.validate_meal_episode_request,
+        response_validator=schemas.validate_meal_episode_response,
+    )
 
 
 @app.post("/v1/weekly-plan")

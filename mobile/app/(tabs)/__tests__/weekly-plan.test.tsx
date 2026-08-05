@@ -39,6 +39,8 @@ describe("WeeklyPlan", () => {
         expect(screen.getByTestId(`weekly-plan-${weekday}-${slot}-0`)).toBeTruthy();
       }
     }
+    expect(screen.getByTestId("weekly-plan-period-weekdays")).toBeTruthy();
+    expect(screen.getByTestId("weekly-plan-period-weekend")).toBeTruthy();
     expect(screen.getByTestId("weekly-plan-finalize")).toBeTruthy();
     expect(screen.queryByText("13 – 17 May 2024")).toBeNull();
   });

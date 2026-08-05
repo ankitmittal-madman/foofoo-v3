@@ -1,0 +1,214 @@
+[
+  {
+    "timestamp_utc": "2026-08-05T15:42:51.701Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/signup",
+    "method": "POST",
+    "request_body": {
+      "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+      "password": "Qa1-msg9a9gm-7eqfke-Ghar",
+      "data": {},
+      "gotrue_meta_security": {},
+      "code_challenge": null,
+      "code_challenge_method": null
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "access_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjVhODM1NDQxLTY4ZjYtNDM2Zi04YTEyLTg5YzRjMTE4ZDI5MCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nta3N3YWxxcG1tcW9qd2RtcWJ2LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI4YWY2NTM4OS0xM2EyLTRkMTEtOThjZC1jMzIyMjVhZWRjMjciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1OTQ4MTcxLCJpYXQiOjE3ODU5NDQ1NzEsImVtYWlsIjoiZ2hhci1wZXJzb25hLWVtcHR5X2hvdXNlaG9sZF9kZXJpdmVkLW1zZzlhOWdtLTdlcWZrZUBleGFtcGxlLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJnaGFyLXBlcnNvbmEtZW1wdHlfaG91c2Vob2xkX2Rlcml2ZWQtbXNnOWE5Z20tN2VxZmtlQGV4YW1wbGUuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOGFmNjUzODktMTNhMi00ZDExLTk4Y2QtYzMyMjI1YWVkYzI3In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODU5NDQ1NzF9XSwic2Vzc2lvbl9pZCI6ImE1NjNjOWY1LWU4Y2UtNGE0OC1iMTdiLWYxNTRiMjQwNDQwOSIsImlzX2Fub255bW91cyI6ZmFsc2V9.bOQn4dA0PTtWTrDYULdhdiP6Yk_4toUV8obX5vBIlUpAwWCVJxwui-FhqrPei8uJSVEbh7FuOPX16yeADnt0bg",
+        "token_type": "bearer",
+        "expires_in": 3600,
+        "expires_at": 1785948171,
+        "refresh_token": "tde4ybmvbjnn",
+        "user": {
+          "id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+          "aud": "authenticated",
+          "role": "authenticated",
+          "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+          "email_confirmed_at": "2026-08-05T15:42:51.584553676Z",
+          "phone": "",
+          "last_sign_in_at": "2026-08-05T15:42:51.587995208Z",
+          "app_metadata": {
+            "provider": "email",
+            "providers": [
+              "email"
+            ]
+          },
+          "user_metadata": {
+            "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+            "email_verified": true,
+            "phone_verified": false,
+            "sub": "8af65389-13a2-4d11-98cd-c32225aedc27"
+          },
+          "identities": [
+            {
+              "identity_id": "1cf5f396-be0d-4798-9561-e8580b0b6b23",
+              "id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+              "user_id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+              "identity_data": {
+                "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+                "email_verified": true,
+                "phone_verified": false,
+                "sub": "8af65389-13a2-4d11-98cd-c32225aedc27"
+              },
+              "provider": "email",
+              "last_sign_in_at": "2026-08-05T15:42:51.581091314Z",
+              "created_at": "2026-08-05T15:42:51.581178Z",
+              "updated_at": "2026-08-05T15:42:51.581178Z",
+              "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com"
+            }
+          ],
+          "created_at": "2026-08-05T15:42:51.574381Z",
+          "updated_at": "2026-08-05T15:42:51.602197Z",
+          "is_anonymous": false
+        }
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:42:51.823Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/user",
+    "method": "GET",
+    "request_body": null,
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+        "email_confirmed_at": "2026-08-05T15:42:51.584553Z",
+        "phone": "",
+        "confirmed_at": "2026-08-05T15:42:51.584553Z",
+        "last_sign_in_at": "2026-08-05T15:42:51.587995Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+          "email_verified": true,
+          "phone_verified": false,
+          "sub": "8af65389-13a2-4d11-98cd-c32225aedc27"
+        },
+        "identities": [
+          {
+            "identity_id": "1cf5f396-be0d-4798-9561-e8580b0b6b23",
+            "id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+            "user_id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+            "identity_data": {
+              "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "8af65389-13a2-4d11-98cd-c32225aedc27"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-05T15:42:51.581091Z",
+            "created_at": "2026-08-05T15:42:51.581178Z",
+            "updated_at": "2026-08-05T15:42:51.581178Z",
+            "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com"
+          }
+        ],
+        "created_at": "2026-08-05T15:42:51.574381Z",
+        "updated_at": "2026-08-05T15:42:51.602197Z",
+        "is_anonymous": false
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:42:52.123Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/user",
+    "method": "PUT",
+    "request_body": {
+      "data": {
+        "display_name": "QA empty_household_derived"
+      },
+      "code_challenge": null,
+      "code_challenge_method": null
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+        "email_confirmed_at": "2026-08-05T15:42:51.584553Z",
+        "phone": "",
+        "confirmed_at": "2026-08-05T15:42:51.584553Z",
+        "last_sign_in_at": "2026-08-05T15:42:51.587995Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "display_name": "QA empty_household_derived",
+          "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+          "email_verified": true,
+          "phone_verified": false,
+          "sub": "8af65389-13a2-4d11-98cd-c32225aedc27"
+        },
+        "identities": [
+          {
+            "identity_id": "1cf5f396-be0d-4798-9561-e8580b0b6b23",
+            "id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+            "user_id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+            "identity_data": {
+              "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "8af65389-13a2-4d11-98cd-c32225aedc27"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-05T15:42:51.581091Z",
+            "created_at": "2026-08-05T15:42:51.581178Z",
+            "updated_at": "2026-08-05T15:42:51.581178Z",
+            "email": "ghar-persona-empty_household_derived-msg9a9gm-7eqfke@example.com"
+          }
+        ],
+        "created_at": "2026-08-05T15:42:51.574381Z",
+        "updated_at": "2026-08-05T15:42:52.053736Z",
+        "is_anonymous": false
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:42:53.072Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "create-id",
+          "question_key": "primary_cook_name",
+          "answer_value": "QA empty_household_derived"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "8af65389-13a2-4d11-98cd-c32225aedc27",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [],
+        "missing_required_fields": [
+          "home_state",
+          "current_city",
+          "diet_type",
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "f5c07dba-c474-422e-8ae3-74c355666cd6"
+      }
+    }
+  }
+]

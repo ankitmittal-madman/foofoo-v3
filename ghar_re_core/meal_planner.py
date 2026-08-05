@@ -436,6 +436,7 @@ def search_dishes(
 
 
 _RECENT_WINDOW = 2  # days a class is held back from re-topping the same slot, once it has led
+_MAX_WEEKLY_LEADS_PER_SLOT = 2
 
 
 def weekly_class_plan(household, top_classes=3, catalogue=None, preference_by_dish=None):
@@ -461,6 +462,7 @@ def weekly_class_plan(household, top_classes=3, catalogue=None, preference_by_di
     recent_leaders = {
         slot: [] for slot in MAIN_SLOTS
     }  # slot -> class codes that led on recent days
+    leader_counts = {slot: {} for slot in MAIN_SLOTS}
     for day in WEEK:
         slots = {}
         full_plans = {}
@@ -475,37 +477,110 @@ def weekly_class_plan(household, top_classes=3, catalogue=None, preference_by_di
                 plan.items(),
                 key=lambda item: -(item[1] + 0.35 * class_affinity.get(item[0], 0.0)),
             )
-            held_back = set(recent_leaders[slot])
-            top, deferred = [], []
+            candidates = []
             for code, weight in ranked:
                 if backing.get(code, 0) == 0:  # never offer a class with no dishes to reconcile to
                     continue
-                item = {
-                    "class_code": code,
-                    "class_name": _class_names().get(code, code),
-                    "plan_weight": round(weight, 4),
-                    "preference_contribution": round(
-                        0.35 * class_affinity.get(code, 0.0), 4
+                candidates.append(
+                    {
+                        "class_code": code,
+                        "class_name": _class_names().get(code, code),
+                        "plan_weight": round(weight, 4),
+                        "preference_contribution": round(0.35 * class_affinity.get(code, 0.0), 4),
+                        "dish_count": backing.get(code, 0),
+                    }
+                )
+            held_back = set(recent_leaders[slot])
+            leader = next(
+                (
+                    item
+                    for item in candidates
+                    if item["class_code"] not in held_back
+                    and leader_counts[slot].get(item["class_code"], 0) < _MAX_WEEKLY_LEADS_PER_SLOT
+                ),
+                None,
+            )
+            if leader is None and candidates:
+                # A thin pool can make the two-day holdback impossible. Prefer the least-recent,
+                # least-used candidate rather than blindly repeating the highest-score leader.
+                leader = max(
+                    enumerate(candidates),
+                    key=lambda pair: (
+                        recent_leaders[slot].index(pair[1]["class_code"])
+                        if pair[1]["class_code"] in recent_leaders[slot]
+                        else _RECENT_WINDOW + 1,
+                        -leader_counts[slot].get(pair[1]["class_code"], 0),
+                        -pair[0],
                     ),
-                    "dish_count": backing.get(code, 0),
-                }
-                if code in held_back:
-                    deferred.append(item)  # led recently — only used if the pool runs dry
-                    continue
-                top.append(item)
-                if len(top) >= top_classes:
-                    break
-            for item in deferred:  # pool too thin to fill without repeating — allow it
-                if len(top) >= top_classes:
-                    break
-                top.append(item)
+                )[1]
+            top = [] if leader is None else [leader]
+            top.extend(item for item in candidates if item is not leader)
+            top = top[:top_classes]
             slots[slot] = top
-            recent_leaders[slot] = ([top[0]["class_code"]] if top else []) + recent_leaders[slot]
-            recent_leaders[slot] = recent_leaders[slot][:_RECENT_WINDOW]
         if day in ("Saturday", "Sunday"):
-            _ensure_weekend_special(slots, full_plans, backing, meta, top_classes)
+            _ensure_weekend_special(
+                slots,
+                full_plans,
+                backing,
+                meta,
+                top_classes,
+                recent_leaders,
+                leader_counts,
+            )
+        # Record leaders only after all repair rules have run. Previously the weekend promotion
+        # happened after this bookkeeping, so Sunday's repetition check saw the displaced class
+        # rather than the special class that was actually served at rank one.
+        for slot in MAIN_SLOTS:
+            if not slots[slot]:
+                continue
+            code = slots[slot][0]["class_code"]
+            recent_leaders[slot] = ([code] + recent_leaders[slot])[:_RECENT_WINDOW]
+            leader_counts[slot][code] = leader_counts[slot].get(code, 0) + 1
         days.append({"weekday": day, "slots": slots})
-    return {"household": household.get("label"), "kind": "weekly_class_plan", "days": days}
+    return {
+        "household": household.get("label"),
+        "kind": "weekly_class_plan",
+        "days": days,
+        "constraint_report": _weekly_constraint_report(days),
+    }
+
+
+def _weekly_constraint_report(days):
+    """Describe any residual leader constraints after greedy repair instead of hiding them."""
+    violations = []
+    for slot in MAIN_SLOTS:
+        leaders = [day["slots"][slot][0]["class_code"] for day in days if day["slots"][slot]]
+        for index, code in enumerate(leaders):
+            if code in leaders[max(0, index - _RECENT_WINDOW) : index]:
+                violations.append(
+                    {
+                        "rule": "recent_leader_holdback",
+                        "slot": slot,
+                        "day_index": index,
+                        "class_code": code,
+                    }
+                )
+        for code in set(leaders):
+            if leaders.count(code) > _MAX_WEEKLY_LEADS_PER_SLOT:
+                violations.append(
+                    {
+                        "rule": "weekly_leader_cap",
+                        "slot": slot,
+                        "class_code": code,
+                        "observed": leaders.count(code),
+                        "maximum": _MAX_WEEKLY_LEADS_PER_SLOT,
+                    }
+                )
+    for day_index in (5, 6):
+        if day_index >= len(days):
+            continue
+        if not any(
+            days[day_index]["slots"][slot]
+            and days[day_index]["slots"][slot][0]["class_code"] in CP._WEEKEND_SPECIAL_CLASSES
+            for slot in ("lunch", "dinner")
+        ):
+            violations.append({"rule": "weekend_special_leader", "day_index": day_index})
+    return {"status": "satisfied" if not violations else "degraded", "violations": violations}
 
 
 def _class_preference_affinity(cat, preference_by_dish):
@@ -529,16 +604,17 @@ def _class_preference_affinity(cat, preference_by_dish):
     return {code: totals[code] / counts[code] for code in totals}
 
 
-def _ensure_weekend_special(slots, full_plans, backing, meta, top_classes):
+def _ensure_weekend_special(
+    slots, full_plans, backing, meta, top_classes, recent_leaders, leader_counts
+):
     """If neither lunch nor dinner already leads with a gravy-rich/special class for this weekend
     day, promote the best diet-compatible, dish-backed special class (from the household's OWN
     full class_plan, so diet/Jain/allergen gating is never bypassed) to the front of whichever main
     slot it belongs to. No-op if the household's plan contains no eligible special class at all
     (e.g. every special class was diet-gated out) — never fabricates a class outside the plan."""
     already = any(
-        item["class_code"] in CP._WEEKEND_SPECIAL_CLASSES
+        slots.get(slot) and slots[slot][0]["class_code"] in CP._WEEKEND_SPECIAL_CLASSES
         for slot in ("lunch", "dinner")
-        for item in slots.get(slot, [])
     )
     if already:
         return
@@ -549,11 +625,18 @@ def _ensure_weekend_special(slots, full_plans, backing, meta, top_classes):
                 candidates.append((weight, slot, code))
     if not candidates:
         return
-    weight, slot, code = max(candidates, key=lambda x: x[0])
+    unrepeated = [
+        candidate
+        for candidate in candidates
+        if candidate[2] not in set(recent_leaders[candidate[1]])
+        and leader_counts[candidate[1]].get(candidate[2], 0) < _MAX_WEEKLY_LEADS_PER_SLOT
+    ]
+    weight, slot, code = max(unrepeated or candidates, key=lambda x: x[0])
     promoted = {
         "class_code": code,
         "class_name": _class_names().get(code, code),
         "plan_weight": round(weight, 4),
+        "preference_contribution": 0.0,
         "dish_count": backing.get(code, 0),
     }
     slots[slot] = [promoted] + [i for i in slots.get(slot, []) if i["class_code"] != code]

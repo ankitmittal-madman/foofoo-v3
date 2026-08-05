@@ -51,6 +51,8 @@ def _validator_for(defname: str) -> Draft202012Validator:
 
 _REQUEST = _validator_for("RecommendationRequest")
 _RESPONSE = _validator_for("RecommendationResponse")
+_MEAL_EPISODE_REQUEST = _validator_for("MealEpisodeRequest")
+_MEAL_EPISODE_RESPONSE = _validator_for("MealEpisodeSlateResponse")
 _META = _validator_for("MetaResponse")
 
 
@@ -80,6 +82,16 @@ def validate_response(payload: Any) -> None:
     returned to the caller — the fail-closed check RE-DOC-10 §15 requires (the RE checks its own
     output shape, it never trusts that engine.run() got the wire format right by construction)."""
     _validate(_RESPONSE, payload, "response")
+
+
+def validate_meal_episode_request(payload: Any) -> None:
+    """Validate the canonical complete-meal episode request boundary."""
+    _validate(_MEAL_EPISODE_REQUEST, payload, "meal episode request")
+
+
+def validate_meal_episode_response(payload: Any) -> None:
+    """Validate the canonical complete-meal episode response boundary."""
+    _validate(_MEAL_EPISODE_RESPONSE, payload, "meal episode response")
 
 
 def validate_meta(payload: Any) -> None:

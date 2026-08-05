@@ -10,16 +10,48 @@ export interface OnlineRecommendationState {
   dishFeedbackCounts: Array<{ dish_name: string; served: number; rejected: number }>;
 }
 
+/** Aggregate only explicit member affinities with Nash-style geometric welfare.
+ * Members with no evidence for a dish are omitted; no demographic preference is invented. */
+export function aggregateMemberAffinities(
+  rows: Array<{ profile_id: string; dish_affinity: Record<string, number> | null }>,
+): Record<string, number> {
+  const byDish = new Map<string, number[]>();
+  for (const row of rows) {
+    for (const [dish, raw] of Object.entries(row.dish_affinity ?? {})) {
+      if (!Number.isFinite(raw)) continue;
+      const affinity = Math.max(-1, Math.min(1, raw));
+      byDish.set(dish, [...(byDish.get(dish) ?? []), affinity]);
+    }
+  }
+  const aggregate: Record<string, number> = {};
+  for (const [dish, affinities] of byDish) {
+    const logWelfare = affinities.reduce(
+      (total, affinity) => total + Math.log(Math.max(0.05, 1 + affinity)),
+      0,
+    ) / affinities.length;
+    aggregate[dish] = Math.max(-1, Math.min(1, Math.exp(logWelfare) - 1));
+  }
+  return aggregate;
+}
+
 export async function loadOnlineRecommendationState(
   ctx: RequestContext,
   profileId: string,
 ): Promise<OnlineRecommendationState> {
   const db = createServiceRoleClient(ctx.config);
   try {
+    const membershipRes = await withTimeout(
+      db.from("household_memberships").select("user_id").eq("household_id", profileId)
+        .eq("status", "active"),
+      "personalization.memberships",
+    );
+    if (membershipRes.error) throw membershipRes.error;
+    const memberIds = [...new Set((membershipRes.data ?? []).map((row) => String(row.user_id)))];
+    if (memberIds.length === 0) memberIds.push(profileId);
     const [countRes, neverRes, todayRes, tasteRes, feedbackRes] = await Promise.all([
       withTimeout(
         db.from("feedback_events").select("id", { count: "exact", head: true })
-          .eq("profile_id", profileId),
+          .eq("household_id", profileId),
         "personalization.count",
       ),
       withTimeout(
@@ -33,12 +65,17 @@ export async function loadOnlineRecommendationState(
         "personalization.not_today",
       ),
       withTimeout(
-        db.from("user_taste_vectors").select("dish_affinity").eq("profile_id", profileId)
-          .maybeSingle(),
+        db.from("user_taste_vectors").select("profile_id,dish_affinity").in(
+          "profile_id",
+          memberIds,
+        ),
         "personalization.taste",
       ),
       withTimeout(
-        db.from("feedback_events").select("event_type,dishes(name)").eq("profile_id", profileId)
+        db.from("feedback_events").select("event_type,dishes(name)").eq(
+          "household_id",
+          profileId,
+        )
           .not("dish_id", "is", null).order("created_at", { ascending: false }).limit(500),
         "personalization.feedback",
       ),
@@ -72,7 +109,12 @@ export async function loadOnlineRecommendationState(
     return {
       interactionCount: countRes.count ?? 0,
       excludeDishNames: [...excluded],
-      preferenceByDish: (tasteRes.data?.dish_affinity ?? {}) as Record<string, number>,
+      preferenceByDish: aggregateMemberAffinities(
+        (tasteRes.data ?? []) as Array<{
+          profile_id: string;
+          dish_affinity: Record<string, number> | null;
+        }>,
+      ),
       dishFeedbackCounts: [...counts].map(([name, value]) => ({ dish_name: name, ...value })),
     };
   } catch (error) {

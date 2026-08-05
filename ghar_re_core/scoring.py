@@ -4,6 +4,7 @@ ghar_re.scoring — Hard Filters (Core Spine §S2 PART A) + BASE score (§S2 PAR
 All weights/thresholds come from data/source/*.yaml (via ghar_re.config) and the KB (via
 ghar_re.knowledge). Nothing scoring-related is hardcoded. Section refs are cited inline.
 """
+
 from ghar_re_core.config import CONFIG
 from ghar_re_core import knowledge as K
 from ghar_re_core import catalogue as C
@@ -23,7 +24,7 @@ def pass_diet(dish, theta, ctx):
     veg_day = ctx.get("weekday") in theta["veg_days"]["value"]
     effective = diet
     if "veg_egg" in modes or veg_day:
-        effective = "veg"                     # session tighten (restriction only, upward)
+        effective = "veg"  # session tighten (restriction only, upward)
     if effective == "vegan":
         return dish.vegan_compatible
     if effective == "veg":
@@ -33,7 +34,11 @@ def pass_diet(dish, theta, ctx):
     # non_veg: allow all, minus explicit meat exclusions (Q6 no_beef/no_pork/...)
     excl = theta["meat_exclusions"]["value"]
     if excl:
-        meat_classes = {"no_beef": "beef", "no_pork": "pork", "no_red_meat": {"mutton", "lamb", "beef", "pork"}}
+        meat_classes = {
+            "no_beef": "beef",
+            "no_pork": "pork",
+            "no_red_meat": {"mutton", "lamb", "beef", "pork"},
+        }
         for e in excl:
             banned = meat_classes.get(e)
             if banned:
@@ -129,8 +134,11 @@ def eligibility_funnel(catalogue, theta, ctx, shared_hero=True):
     len([d for d in catalogue if eligible(d, theta, ctx, shared_hero)]) would give."""
     survivors = list(catalogue)  # materialize once — Catalogue is iterable but not sized
     funnel = [{"stage": "catalogue_total", "count": len(survivors)}]
-    stages = [("after_diet_filter", pass_diet), ("after_jain_filter", pass_jain),
-              ("after_allergen_filter", pass_allergen)]
+    stages = [
+        ("after_diet_filter", pass_diet),
+        ("after_jain_filter", pass_jain),
+        ("after_allergen_filter", pass_allergen),
+    ]
     if shared_hero:
         stages.append(("after_weaning_filter", pass_weaning))
     stages.append(("after_fasting_filter", pass_mode_fasting))
@@ -276,14 +284,14 @@ def m_household(dish, theta):
         fit += 0.2
     if dish.spice_level is not None and ceiling:
         headroom = max(0.0, (ceiling - dish.spice_level) / ceiling)  # 1.0 mild, 0.0 at the ceiling
-        fit += vp * headroom * 0.3     # scales with household's own variety pressure, not a step
+        fit += vp * headroom * 0.3  # scales with household's own variety pressure, not a step
     return min(1.0, fit)
 
 
 def m_weather(dish, theta, ctx):
     """§B7 TRANSIENT signed weather term, resolving to the household's OWN regional comfort hero
     (KB §R3). Never a filter. Returns value in [-1, +1]; scaled by W_WEATHER in base()."""
-    wcond = _weather_tag(ctx)                 # 'rainy'/'hot_weather'/'cold_weather'/None
+    wcond = _weather_tag(ctx)  # 'rainy'/'hot_weather'/'cold_weather'/None
     if wcond is None:
         return 0.0
     wa = set(dish.weather_affinity)
@@ -297,7 +305,11 @@ def m_weather(dish, theta, ctx):
     elif wcond == "hot_weather":
         if "hot_weather" in wa or "light" in dish.richness or dish.serving_temp == "chilled":
             val += 0.5
-        if {"deep_fried"} & set(dish.cooking_method) or dish.heaviness == 3 or (dish.spice_level or 0) >= 4:
+        if (
+            {"deep_fried"} & set(dish.cooking_method)
+            or dish.heaviness == 3
+            or (dish.spice_level or 0) >= 4
+        ):
             val -= 0.5
     elif wcond == "cold_weather":
         if "cold_weather" in wa or {"ghee_rich", "buttery", "creamy"} & set(dish.richness):
@@ -306,7 +318,7 @@ def m_weather(dish, theta, ctx):
     # ---- the critical rule: resolve to THIS household's KB §R3 comfort hero, not a generic one.
     hero_names = _comfort_heroes_for(theta, wcond)
     if dish.name in hero_names:
-        val += 0.5                             # zone-specific comfort hero gets the decisive lift
+        val += 0.5  # zone-specific comfort hero gets the decisive lift
     return max(-1.0, min(1.0, val))
 
 
@@ -318,7 +330,7 @@ def prior_boost(dish, theta, ctx):
     zone = theta["region"]["value"]
     slot = ctx["slot"]
     total = 0.0
-    for (z, s, mk, mv, boost, _tags, _ds) in K.PRIOR_ZONE_SLOT:
+    for z, s, mk, mv, boost, _tags, _ds in K.PRIOR_ZONE_SLOT:
         if z != zone or s != slot:
             continue
         if _prior_matches(dish, mk, mv):
@@ -336,6 +348,7 @@ def base(dish, theta, ctx):
     construction. Imported lazily (not at module top) to avoid a circular import: modules_default
     imports scoring's own functions to build its BoundModule wrappers."""
     from ghar_re_core.modules_default import DEFAULT_REGISTRY
+
     total, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="base")
     return total
 
@@ -362,12 +375,17 @@ def gs_indulgence(dish):
     score. Feeds gain_q15() for objectives like 'awesome_taste' that reward indulgence."""
     rich = {"buttery", "creamy", "ghee_rich", "coconut_rich", "oily"}
     fried = {"deep_fried", "shallow_fried", "dum_cooked"}
-    return sum([
-        1.0 if set(dish.richness) & rich else 0.0,
-        1.0 if set(dish.cooking_method) & fried else 0.0,
-        _heaviness_n(dish),
-        _cal_n(dish),
-    ]) / 4.0
+    return (
+        sum(
+            [
+                1.0 if set(dish.richness) & rich else 0.0,
+                1.0 if set(dish.cooking_method) & fried else 0.0,
+                _heaviness_n(dish),
+                _cal_n(dish),
+            ]
+        )
+        / 4.0
+    )
 
 
 def gs_light(dish):
@@ -376,12 +394,17 @@ def gs_light(dish):
     like 'healthy_living' that reward lighter dishes."""
     light = {"light", "plain"}
     lightcook = {"steamed", "boiled", "grilled", "raw", "tempered"}
-    return sum([
-        1.0 if set(dish.richness) & light else 0.0,
-        1.0 if set(dish.cooking_method) & lightcook else 0.0,
-        1 - _cal_n(dish),
-        1 - _heaviness_n(dish),
-    ]) / 4.0
+    return (
+        sum(
+            [
+                1.0 if set(dish.richness) & light else 0.0,
+                1.0 if set(dish.cooking_method) & lightcook else 0.0,
+                1 - _cal_n(dish),
+                1 - _heaviness_n(dish),
+            ]
+        )
+        / 4.0
+    )
 
 
 def gs_protein(dish):
@@ -391,12 +414,19 @@ def gs_protein(dish):
     like 'into_fitness'."""
     # proxy (diet+category) until dish_macro real grams in v2.
     protein_cat = {"dal_lentil", "kebab", "egg_dish"}
-    proxy = 0.6 if (dish.diet in ("non_veg", "egg") or set(dish.dish_category) & protein_cat) else 0.2
-    return sum([
-        1.0 if dish.diet in ("non_veg", "egg") else 0.0,
-        1.0 if set(dish.dish_category) & protein_cat else 0.0,
-        proxy,
-    ]) / 3.0
+    proxy = (
+        0.6 if (dish.diet in ("non_veg", "egg") or set(dish.dish_category) & protein_cat) else 0.2
+    )
+    return (
+        sum(
+            [
+                1.0 if dish.diet in ("non_veg", "egg") else 0.0,
+                1.0 if set(dish.dish_category) & protein_cat else 0.0,
+                proxy,
+            ]
+        )
+        / 3.0
+    )
 
 
 def gain_q15(dish, objective):
@@ -407,10 +437,12 @@ def gain_q15(dish, objective):
     cfg = CONFIG
     obj = objective or cfg.default_objective
     g = cfg.gamma(obj)
-    kappa = cfg.kappa_v1                       # v1 pinned 1.0
-    raw = 1 + kappa * (g["indulgence"] * gs_indulgence(dish)
-                       + g["light"] * gs_light(dish)
-                       + g["protein"] * gs_protein(dish))
+    kappa = cfg.kappa_v1  # v1 pinned 1.0
+    raw = 1 + kappa * (
+        g["indulgence"] * gs_indulgence(dish)
+        + g["light"] * gs_light(dish)
+        + g["protein"] * gs_protein(dish)
+    )
     lo, hi = cfg.gain_bounds
     return max(lo, min(hi, raw))
 
@@ -456,6 +488,7 @@ def score(dish, theta, ctx, objective):
     AND its weight (CONFIG.w_pref, pref_model.yaml) also defaults to 0.0, so `pref_val` is
     unconditionally 0.0 and this call is a byte-for-byte no-op (golden-master proves it)."""
     from ghar_re_core.modules_default import DEFAULT_REGISTRY
+
     cohort_val, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="cohort")
     pref_val, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="pref")
     return base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val + pref_val
@@ -493,10 +526,11 @@ def _comfort_heroes_for(theta, weather_tag):
     region = theta["region"]["value"]
     keys = [k for k in (subzone, region) if k]
     heroes = set()
-    for (zone, weather, name, _verified, _ds) in K.COMFORT_HERO_MAP:
+    for zone, weather, name, _verified, _ds in K.COMFORT_HERO_MAP:
         if weather == kb_weather and zone in keys:
             # resolve the KB hero NAME to the concrete golden dish name (exact match)
             heroes.add(K.COMFORT_HERO_TO_DISH.get(name, name))
+            heroes.update(K.COMFORT_HERO_CATALOGUE_ALIASES.get(name, set()))
     return heroes
 
 
@@ -530,8 +564,14 @@ def _zone_state(zone):
     m_palette() when it needs a concrete state to score local-palette fit against. Defaults to
     Delhi for any unrecognized zone."""
     # representative state for a zone (for local-palette m_palette). Uses KB STATE_ZONE inverse.
-    rep = {"North": "Delhi", "South": "Tamil Nadu", "East": "West Bengal",
-           "West": "Maharashtra", "Central": "Madhya Pradesh", "Northeast": "Assam"}
+    rep = {
+        "North": "Delhi",
+        "South": "Tamil Nadu",
+        "East": "West Bengal",
+        "West": "Maharashtra",
+        "Central": "Madhya Pradesh",
+        "Northeast": "Assam",
+    }
     return rep.get(zone, "Delhi")
 
 
@@ -544,8 +584,11 @@ def _zone_state(zone):
 # already documents for its own trace).
 # =====================================================================================
 _FILTER_CHECKS = [
-    ("diet", pass_diet), ("jain", pass_jain), ("allergen", pass_allergen),
-    ("weaning", pass_weaning), ("fasting", pass_mode_fasting),
+    ("diet", pass_diet),
+    ("jain", pass_jain),
+    ("allergen", pass_allergen),
+    ("weaning", pass_weaning),
+    ("fasting", pass_mode_fasting),
     ("exclude_dish_ids", pass_exclude_dish_ids),
 ]
 
@@ -571,11 +614,16 @@ def explain_dish(dish, theta, ctx, objective, shared_hero=True):
     score()/base() themselves — calls DEFAULT_REGISTRY.combine() and gain_q15()/m_weather()
     directly, the exact same functions those do, so the numbers are identical, not approximated."""
     from ghar_re_core.modules_default import DEFAULT_REGISTRY
+
     eligibility = explain_eligibility(dish, theta, ctx, shared_hero=shared_hero)
     base_total, contributions = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="base")
     base_contributors = [
-        {"module": c.module, "value": round(c.value, 4), "weight": round(c.weight, 4),
-         "weighted": round(c.value * c.weight, 4)}
+        {
+            "module": c.module,
+            "value": round(c.value, 4),
+            "weight": round(c.weight, 4),
+            "weighted": round(c.value * c.weight, 4),
+        }
         for c in contributions
     ]
     q15_gain = gain_q15(dish, objective)

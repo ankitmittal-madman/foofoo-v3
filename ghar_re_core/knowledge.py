@@ -409,10 +409,9 @@ COMFORT_HERO_TO_DISH = {
     # confirmed present in the real 810-dish catalogue (ghar_re_service/data/bundle/catalogue.json)
     # that were simply never wired — same category of mechanical fix as the Pithla-Bhakri spelling
     # correction above (verbatim name match, no domain substitution judgment involved). Entries with
-    # no exact or safely-close catalogue match (Kadhi-Pakora, Bhajiya, Dal-Dhokli, Bajji/Bonda,
-    # Parippu Vada, Pazham Pori, Telebhaja, Thukpa, Momos, Sattu, Aam Panna, Neer Mor, Panta Bhat,
-    # Gajar Halwa, Bajra Bhakri, Pithe) are deliberately left unmapped rather than guessed — same
-    # domain-substitution caution as the Kanda Bhaji case above.
+    # no exact or safely-close catalogue match are deliberately left unmapped rather than guessed
+    # — same domain-substitution caution as the Kanda Bhaji case above. The production coverage
+    # regression test owns the current count so this explanatory comment cannot silently go stale.
     "Samosa": "Samosa",
     "Aloo Paratha": "Aloo Paratha",
     "Vada Pav": "Vada Pav",
@@ -422,6 +421,20 @@ COMFORT_HERO_TO_DISH = {
     "Chaas": "Chaas",
     "Aamras": "Aamras",
     "Nihari": "Nihari",
+    # Orthographic-only aliases confirmed against the current 810-dish catalogue. These do not
+    # substitute a different food; they reconcile punctuation/transliteration variants.
+    "Kadhi-Pakora": "Kadhi Pakora",
+    "Dal-Dhokli": "Dal Dhokli",
+    "Pazham Pori": "Pazhampori",
+    "Gajar Halwa": "Gajar Ka Halwa",
+}
+
+# Additional production-catalogue spellings for heroes whose golden-fixture names must remain
+# stable. Returning both names lets the frozen 39-dish golden sample and the current 810-dish
+# catalogue resolve the same authored hero without rewriting either catalogue.
+COMFORT_HERO_CATALOGUE_ALIASES = {
+    "Pakora": {"Pakora (Mixed Veg)"},
+    "Ven Pongal": {"Pongal (Ven)"},
 }
 
 # Map an engine palette-zone (North/South/East/West/...) + weather tag to the KB §R3 zone key.

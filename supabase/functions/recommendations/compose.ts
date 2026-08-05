@@ -364,6 +364,57 @@ const DEFAULT_CONTEXT = {
   calorie_target: null as number | null,
 };
 
+export interface FestivalContext {
+  date: string;
+  festivalNames: string[];
+}
+
+/** Resolve exact active festival dates from the governed calendar; failures degrade to no mode. */
+export async function loadFestivalContext(
+  ctx: RequestContext,
+  requestedDate?: string,
+): Promise<FestivalContext> {
+  const today = new Date().toISOString().slice(0, 10);
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate ?? "") ? requestedDate! : today;
+  try {
+    const db = createServiceRoleClient(ctx.config);
+    const { data, error } = await withTimeout(
+      db.rpc("active_festivals_on", { p_date: date }),
+      "recommendations.compose.loadFestivalContext",
+    );
+    if (error) throw error;
+    return {
+      date,
+      festivalNames: ((data ?? []) as Array<{ festival_name: unknown }>)
+        .map((row) => String(row.festival_name)).sort(),
+    };
+  } catch (error) {
+    ctx.logger.warn("festival_context.load_failed", {
+      date,
+      detail: error instanceof Error ? error.message : String(error),
+    });
+    return { date, festivalNames: [] };
+  }
+}
+
+/** Add the festival mode only for a date that the governed calendar marks active. */
+export function applyFestivalContext(
+  context: Record<string, unknown>,
+  festival: FestivalContext,
+): Record<string, unknown> {
+  const activeModes = Array.isArray(context.active_modes)
+    ? context.active_modes.filter((mode): mode is string => typeof mode === "string")
+    : [];
+  return {
+    ...context,
+    date: typeof context.date === "string" ? context.date : festival.date,
+    active_modes: festival.festivalNames.length > 0
+      ? [...new Set([...activeModes, "festival"])]
+      : activeModes,
+    ...(festival.festivalNames.length > 0 ? { festival_names: festival.festivalNames } : {}),
+  };
+}
+
 /**
  * Load the household's most recent stored context, if any. Returns undefined when the household
  * has none, or the lookup itself fails — the caller then falls back to DEFAULT_CONTEXT, so a

@@ -90,8 +90,10 @@
 > weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
 > query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
 > pinned container bases, staging/manual-production workflows and
-> mobile CI are implemented. Verification passes: 715 Python tests (27 skipped), 106 Deno tests,
-> 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
+> mobile CI are implemented. The current repository closure adds canonical episode grammars,
+> weekly constraint repair, festival-calendar resolution and explicit-evidence household fairness.
+> Verification passes: 720 Python tests (27 skipped), 108 Deno tests,
+> 31 mobile tests across 15 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
 > run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
 
@@ -106,16 +108,16 @@
 | Seed Data | 90% |
 | Database | 95% |
 | Security | 88% (database advisor remediations live; leaked-password screening needs a paid Supabase plan) |
-| Testing | 78% (backend suites green — 106 Deno + 715 repository Python tests; mobile CI is green, but physical-device coverage remains) |
+| Testing | 80% (backend suites green — 108 Deno + 720 repository Python tests; 31 mobile tests are green, but physical-device coverage remains) |
 | Deployment | 95% (ontology DB/Edge and RE bundle live-verified 2026-08-05; mobile/device release remains) |
 | Frontend (mobile) | 70% |
 | Observability | 60% (scheduled production smoke/issue alerting added; application 500-level webhook destination remains unconfigured) |
 
 ## One-line state per major component
-- **RE core/service:** implemented, repository Python suite green (715 passed, 27 skipped), Fly
+- **RE core/service:** implemented, repository Python suite green (720 passed, 27 skipped), Fly
   image `deployment-01KZ945DR0VDXVEZBG3Y34H6KT` live-healthy with snapshot-v2 bundle
   `sha256:ffad5c55384244e3`.
-- **Edge Functions:** implemented and tested (106 tests); membership-aware authorization is live
+- **Edge Functions:** implemented and tested (108 tests); membership-aware authorization is live
   in `household-access` v2, `recommendations` v17, `plan` v19 and `feedback` v13. The backend
   supports governed invitations, owner transfer and lifecycle history, and enforces distinct
   owner/planner, cook, member and viewer mutation permissions.

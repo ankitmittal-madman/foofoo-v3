@@ -30,7 +30,12 @@ import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 
-import { loadHouseholdRaw, recordHouseholdContext } from "../recommendations/compose.ts";
+import {
+  applyFestivalContext,
+  loadFestivalContext,
+  loadHouseholdRaw,
+  recordHouseholdContext,
+} from "../recommendations/compose.ts";
 import {
   fetchRecentRecommendationEvents,
   fetchRecommendationEvent,
@@ -124,7 +129,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
             String(body.dish_name ?? ""),
           );
           await recordProductEvent(ctx, {
-            profileId: householdId,
+            profileId: claims.userId,
+            householdId,
             eventName: "recommendation_add_to_date",
             properties: {
               slot_date: body.slot_date,
@@ -275,9 +281,15 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       stubbedHousehold = stubbed;
       const online = await loadOnlineRecommendationState(ctx, hid);
       const weather = await loadWeatherContext(ctx, household.q4_current_city);
-      payload.context = {
+      const festival = await loadFestivalContext(
+        ctx,
+        typeof body.date === "string" ? body.date : undefined,
+      );
+      payload.context = applyFestivalContext({
         slot: body.slot,
         weekday: body.weekday,
+        date: body.date,
+        active_modes: Array.isArray(body.active_modes) ? body.active_modes : [],
         interaction_count: online.interactionCount,
         dish_feedback_counts: online.dishFeedbackCounts,
         weather,
@@ -294,7 +306,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           : [],
         discovery_mode: body.discovery_mode === true,
         recovery_mode: body.recovery_mode === true,
-      };
+      }, festival);
       const requestedExclusions = Array.isArray(body.exclude_dish_names)
         ? body.exclude_dish_names
           .filter((name): name is string => typeof name === "string")
@@ -401,7 +413,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           slot: typeof body.slot === "string" ? body.slot : undefined,
         });
         await recordProductEvent(ctx, {
-          profileId: resolvedHouseholdId,
+          profileId: claims.userId,
+          householdId: resolvedHouseholdId,
           eventName: "recommendation_slate_served",
           requestId,
           properties: {

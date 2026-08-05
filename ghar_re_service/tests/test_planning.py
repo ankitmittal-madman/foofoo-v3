@@ -114,6 +114,8 @@ def test_meal_episode_surface_returns_complete_practical_slate(client):
     )
     assert body["config_version"]
     top = body["episodes"][0]
+    assert top["grammar_code"] in {"SINGLE_PRIMARY", "BASE_WITH_SIDES"}
+    assert top["grammar_version"] == 1
     assert top["components"]
     assert top["practicality"]["active_minutes"] >= 0
     assert 0 <= top["predictions"]["p_execute"] <= 1
@@ -122,6 +124,16 @@ def test_meal_episode_surface_returns_complete_practical_slate(client):
         left["predictions"]["p_success"] >= right["predictions"]["p_success"]
         for left, right in zip(body["episodes"], body["episodes"][1:], strict=False)
     )
+
+
+def test_meal_episode_surface_enforces_canonical_request_contract(client):
+    response = _post(
+        client,
+        "/v1/meal-episodes",
+        {"household": _hh(), "context": {"slot": "dinner"}, "count": 9},
+    )
+    assert response.status_code == 422
+    assert response.json()["error"] == "invalid_request"
 
 
 def test_meal_episode_surface_preserves_finalized_class(client):

@@ -8,33 +8,69 @@ Validates that the factorized model (cohort_intel + cohort_class_model.json):
   - applies the City_Migration_Overlay blend (the "MP-in-Mumbai" science),
   - exposes soft sub-cohort membership for explainability.
 """
+
 import csv
 import os
 
 from ghar_re_core import cohort_intel as CI
+from ghar_re_core import knowledge as K
 from ghar_re_core.derivation import derive_theta
 from ghar_re_core.pipeline import make_context
 
 _SRC = os.path.join(os.path.dirname(__file__), "..", "..", "data", "source", "class_first_v1")
 
 
-def _hh(home_state, city, household_type="single", diet="veg", cooks="self",
-        objective="awesome_taste", jain=False):
+def _hh(
+    home_state,
+    city,
+    household_type="single",
+    diet="veg",
+    cooks="self",
+    objective="awesome_taste",
+    jain=False,
+):
     """Minimal valid raw household (fixtures.HOUSEHOLDS shape) for building a theta."""
     return {
-        "id_key": "t", "label": "t", "q1_household_type": household_type,
-        "q2_working_professionals": 1, "q3_home_state": home_state, "q4_current_city": city,
-        "q5_diet": diet, "q6_nonveg_types": [], "q7_veg_days": [], "q8_is_jain": jain,
-        "q9_allergies": [], "q11_conditions": [], "q12_member_ages": [{"role": "self", "age": 33}],
-        "q13_who_cooks": cooks, "q14_eat_out_per_week": 2, "q15_objective": objective,
+        "id_key": "t",
+        "label": "t",
+        "q1_household_type": household_type,
+        "q2_working_professionals": 1,
+        "q3_home_state": home_state,
+        "q4_current_city": city,
+        "q5_diet": diet,
+        "q6_nonveg_types": [],
+        "q7_veg_days": [],
+        "q8_is_jain": jain,
+        "q9_allergies": [],
+        "q11_conditions": [],
+        "q12_member_ages": [{"role": "self", "age": 33}],
+        "q13_who_cooks": cooks,
+        "q14_eat_out_per_week": 2,
+        "q15_objective": objective,
     }
 
 
 # The exact feature set the model was trained on (prepare_cohort_intel.FEATURES). Mirrored here as
 # a contract check: theta_features() must produce exactly these, all non-empty, or the model can't
 # be scored live. Kept in sync with the model artifact's own meta.features below.
-_EXPECTED_FEATURES = {"state_ut", "region_archetype", "city_tier_code", "main_cohort_id",
-                      "lifecycle_stage", "time_pressure", "nonveg_mode"}
+_EXPECTED_FEATURES = {
+    "state_ut",
+    "region_archetype",
+    "city_tier_code",
+    "main_cohort_id",
+    "lifecycle_stage",
+    "time_pressure",
+    "nonveg_mode",
+}
+
+
+def test_household_regions_never_use_dish_provenance_zones():
+    """PanIndia/Global describe dishes, not households, so they must not receive regional priors."""
+    household_regions = set(K.STATE_ZONE.values())
+    assert household_regions
+    assert household_regions.isdisjoint({"PanIndia", "Global"})
+    prior_regions = {row[0] for row in K.PRIOR_ZONE_SLOT}
+    assert household_regions <= prior_regions
 
 
 def test_theta_features_complete_and_recomputable():
@@ -60,7 +96,7 @@ def test_lifecycle_stage_and_time_pressure_derived():
     assert th["lifecycle_stage"]["value"] == "toddler"
     f = CI.theta_features(th)
     assert f["lifecycle_stage"] == "toddler"
-    assert f["time_pressure"] == "high"       # numeric-banded, not the coarse who_cooks→medium
+    assert f["time_pressure"] == "high"  # numeric-banded, not the coarse who_cooks→medium
 
 
 def test_class_affinity_graded_slot_specific_and_bounded():
@@ -68,9 +104,9 @@ def test_class_affinity_graded_slot_specific_and_bounded():
     bf = CI.class_affinity(theta, make_context(slot="breakfast", weekday="Monday"))
     dn = CI.class_affinity(theta, make_context(slot="dinner", weekday="Monday"))
     assert bf and dn
-    assert set(bf) != set(dn)                      # different slots -> different class vocab/plan
+    assert set(bf) != set(dn)  # different slots -> different class vocab/plan
     assert all(0.0 <= v <= 1.0 for v in bf.values())
-    assert max(bf.values()) == 1.0                 # top class normalized to 1.0
+    assert max(bf.values()) == 1.0  # top class normalized to 1.0
     # graded, not binary: more than two distinct non-zero grades exist
     assert len({round(v, 3) for v in bf.values() if v > 0}) > 2
 
@@ -85,7 +121,9 @@ def test_model_reproduces_a_real_cohort_primary_class():
     with open(os.path.join(_SRC, "cohort_matrix.csv"), newline="") as f:
         for r in csv.DictReader(f):
             if r["state_ut"] == "Andhra Pradesh":
-                ap_bf_classes.update(c for c in (r["weekday_breakfast_class_mix"] or "").split("|") if c)
+                ap_bf_classes.update(
+                    c for c in (r["weekday_breakfast_class_mix"] or "").split("|") if c
+                )
     assert ap_bf_classes
     theta = derive_theta(_hh("Andhra Pradesh", "Visakhapatnam"))
     aff = CI.class_affinity(theta, make_context(slot="breakfast", weekday="Monday"))
@@ -105,16 +143,18 @@ def test_migration_overlay_shifts_the_plan():
     """The MP-in-Mumbai science: an MP household living in Mumbai should get a class plan that
     differs from the same MP household living in an MP home city — because the migration overlay
     blends in current-city lifestyle classes. Uses lunch weekday where overlay classes are richest."""
-    home = derive_theta(_hh("Madhya Pradesh", "Indore"))       # home-state resident (non-migrant)
-    migrant = derive_theta(_hh("Madhya Pradesh", "Mumbai"))    # MP-in-Mumbai
+    home = derive_theta(_hh("Madhya Pradesh", "Indore"))  # home-state resident (non-migrant)
+    migrant = derive_theta(_hh("Madhya Pradesh", "Mumbai"))  # MP-in-Mumbai
     assert CI.destination_group(migrant) == "MUMBAI_PUNE"
     assert CI.destination_group(home).startswith("HOME_STATE")
     ctx = make_context(slot="lunch", weekday="Monday")
     aff_home = CI.class_affinity(home, ctx)
     aff_migrant = CI.class_affinity(migrant, ctx)
     # the two plans are not identical — residence changed the blended affinity
-    assert any(abs(aff_home.get(c, 0) - aff_migrant.get(c, 0)) > 1e-6
-               for c in set(aff_home) | set(aff_migrant))
+    assert any(
+        abs(aff_home.get(c, 0) - aff_migrant.get(c, 0)) > 1e-6
+        for c in set(aff_home) | set(aff_migrant)
+    )
 
 
 def test_home_state_2letter_code_is_normalized_end_to_end():
@@ -133,9 +173,13 @@ def test_home_state_2letter_code_is_normalized_end_to_end():
     code = derive_theta(_hh("MP", "Mumbai", household_type="couple_kids"))
     name = derive_theta(_hh("Madhya Pradesh", "Mumbai", household_type="couple_kids"))
     assert code["home_state"]["value"] == "Madhya Pradesh"
-    assert code["region"]["value"] == "Central" and code["region"]["value"] == name["region"]["value"]
+    assert (
+        code["region"]["value"] == "Central" and code["region"]["value"] == name["region"]["value"]
+    )
     ctx = make_context(slot="dinner", weekday="Saturday")
-    assert CI.class_affinity(code, ctx) == CI.class_affinity(name, ctx)  # code == full name, identical
+    assert CI.class_affinity(code, ctx) == CI.class_affinity(
+        name, ctx
+    )  # code == full name, identical
 
 
 def test_cohort_membership_returns_ranked_anchors():
@@ -143,4 +187,4 @@ def test_cohort_membership_returns_ranked_anchors():
     mem = CI.cohort_membership(theta, k=3)
     assert 1 <= len(mem) <= 3
     assert all(0.0 <= m["match"] <= 1.0 for m in mem)
-    assert mem == sorted(mem, key=lambda m: -m["match"])   # ranked best-first
+    assert mem == sorted(mem, key=lambda m: -m["match"])  # ranked best-first

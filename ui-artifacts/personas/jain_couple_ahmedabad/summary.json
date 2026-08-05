@@ -1,73 +1,160 @@
 {
   "key": "jain_couple_ahmedabad",
   "label": "Jain couple, Ahmedabad",
-  "ok": true,
-  "expect_status": 200,
-  "recommendations_status": 200,
+  "test_user_id": "synthetic:jain_couple_ahmedabad",
+  "user_type": "synthetic",
+  "source_persona_id": null,
+  "started_at_utc": "2026-08-05T15:33:25.022Z",
+  "completed_at_utc": "2026-08-05T15:34:18.567Z",
+  "ok": false,
+  "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid^=\"weekly-plan-\"][data-testid$=\"-0\"]').nth(15)\u001b[22m\n\u001b[2m    - locator resolved to <div tabindex=\"0\" data-testid=\"weekly-plan-Saturday-breakfast-0\" class=\"css-g5y9jx r-1loqt21 r-1otgn73 r-1q9bdsx r-rs99b7 r-1uu6nss r-1xjg651 r-1994467 r-15gme9l\">…</div>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+  "feature_results": [
+    {
+      "name": "cold-start calibration renders",
+      "status": "pass",
+      "started_at_utc": "2026-08-05T15:33:36.923Z",
+      "completed_at_utc": "2026-08-05T15:33:39.356Z"
+    },
+    {
+      "name": "cold-start likes generate feedback events",
+      "status": "pass",
+      "started_at_utc": "2026-08-05T15:33:39.356Z",
+      "completed_at_utc": "2026-08-05T15:33:44.718Z"
+    },
+    {
+      "name": "cold-start continues to weekly plan",
+      "status": "pass",
+      "started_at_utc": "2026-08-05T15:33:44.718Z",
+      "completed_at_utc": "2026-08-05T15:33:47.262Z"
+    },
+    {
+      "name": "weekly plan supplies and saves 7x3 classes",
+      "status": "fail",
+      "started_at_utc": "2026-08-05T15:33:47.262Z",
+      "completed_at_utc": "2026-08-05T15:34:18.567Z",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid^=\"weekly-plan-\"][data-testid$=\"-0\"]').nth(15)\u001b[22m\n\u001b[2m    - locator resolved to <div tabindex=\"0\" data-testid=\"weekly-plan-Saturday-breakfast-0\" class=\"css-g5y9jx r-1loqt21 r-1otgn73 r-1q9bdsx r-rs99b7 r-1uu6nss r-1xjg651 r-1994467 r-15gme9l\">…</div>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    }
+  ],
   "steps": [
     {
       "label": "signed-up",
-      "screenshot": "001-signed-up.png"
+      "action": "signed-up",
+      "screenshot": "001-signed-up.png",
+      "timestamp_utc": "2026-08-05T15:33:28.400Z"
     },
     {
       "label": "consent-loaded",
-      "screenshot": "002-consent-loaded.png"
+      "action": "consent-loaded",
+      "screenshot": "002-consent-loaded.png",
+      "timestamp_utc": "2026-08-05T15:33:29.182Z"
     },
     {
       "label": "consent-continue",
-      "screenshot": "003-consent-continue.png"
+      "action": "consent-continue",
+      "screenshot": "003-consent-continue.png",
+      "timestamp_utc": "2026-08-05T15:33:29.334Z"
     },
     {
       "label": "step1-household",
-      "screenshot": "004-step1-household.png"
+      "action": "step1-household",
+      "screenshot": "004-step1-household.png",
+      "timestamp_utc": "2026-08-05T15:33:29.477Z"
     },
     {
       "label": "step1-earners",
-      "screenshot": "005-step1-earners.png"
+      "action": "step1-earners",
+      "screenshot": "005-step1-earners.png",
+      "timestamp_utc": "2026-08-05T15:33:29.820Z"
     },
     {
       "label": "step1-continue",
-      "screenshot": "006-step1-continue.png"
+      "action": "step1-continue",
+      "screenshot": "006-step1-continue.png",
+      "timestamp_utc": "2026-08-05T15:33:30.951Z"
     },
     {
       "label": "step2-state",
-      "screenshot": "007-step2-state.png"
+      "action": "step2-state",
+      "screenshot": "007-step2-state.png",
+      "timestamp_utc": "2026-08-05T15:33:31.605Z"
     },
     {
       "label": "step2-city",
-      "screenshot": "008-step2-city.png"
+      "action": "step2-city",
+      "screenshot": "008-step2-city.png",
+      "timestamp_utc": "2026-08-05T15:33:31.776Z"
     },
     {
       "label": "step2-continue",
-      "screenshot": "009-step2-continue.png"
+      "action": "step2-continue",
+      "screenshot": "009-step2-continue.png",
+      "timestamp_utc": "2026-08-05T15:33:32.891Z"
     },
     {
       "label": "step3-diet",
-      "screenshot": "010-step3-diet.png"
+      "action": "step3-diet",
+      "screenshot": "010-step3-diet.png",
+      "timestamp_utc": "2026-08-05T15:33:33.016Z"
     },
     {
       "label": "step3-continue",
-      "screenshot": "011-step3-continue.png"
+      "action": "step3-continue",
+      "screenshot": "011-step3-continue.png",
+      "timestamp_utc": "2026-08-05T15:33:33.866Z"
     },
     {
       "label": "step4-continue",
-      "screenshot": "012-step4-continue.png"
+      "action": "step4-continue",
+      "screenshot": "012-step4-continue.png",
+      "timestamp_utc": "2026-08-05T15:33:34.707Z"
     },
     {
       "label": "step5-age",
-      "screenshot": "013-step5-age.png"
+      "action": "step5-age",
+      "screenshot": "013-step5-age.png",
+      "timestamp_utc": "2026-08-05T15:33:34.808Z"
     },
     {
       "label": "step5-filled",
-      "screenshot": "014-step5-filled.png"
+      "action": "step5-filled",
+      "screenshot": "014-step5-filled.png",
+      "timestamp_utc": "2026-08-05T15:33:35.085Z"
     },
     {
       "label": "step5-finish",
-      "screenshot": "015-step5-finish.png"
+      "action": "step5-finish",
+      "screenshot": "015-step5-finish.png",
+      "timestamp_utc": "2026-08-05T15:33:36.923Z"
     },
     {
-      "label": "post-onboarding-landing",
-      "screenshot": "016-post-onboarding-landing.png"
+      "label": "cold-start-loaded",
+      "action": "cold-start-loaded",
+      "screenshot": "016-cold-start-loaded.png",
+      "timestamp_utc": "2026-08-05T15:33:39.356Z"
+    },
+    {
+      "label": "cold-start-like-breakfast",
+      "action": "cold-start-like-breakfast",
+      "screenshot": "017-cold-start-like-breakfast.png",
+      "timestamp_utc": "2026-08-05T15:33:41.251Z"
+    },
+    {
+      "label": "cold-start-like-lunch",
+      "action": "cold-start-like-lunch",
+      "screenshot": "018-cold-start-like-lunch.png",
+      "timestamp_utc": "2026-08-05T15:33:43.104Z"
+    },
+    {
+      "label": "cold-start-like-dinner",
+      "action": "cold-start-like-dinner",
+      "screenshot": "019-cold-start-like-dinner.png",
+      "timestamp_utc": "2026-08-05T15:33:44.718Z"
+    },
+    {
+      "label": "weekly-plan-loaded",
+      "action": "weekly-plan-loaded",
+      "screenshot": "020-weekly-plan-loaded.png",
+      "timestamp_utc": "2026-08-05T15:33:47.262Z"
     }
   ]
 }

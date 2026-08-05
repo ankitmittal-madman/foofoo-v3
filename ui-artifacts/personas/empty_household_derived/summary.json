@@ -1,24 +1,32 @@
 {
   "key": "empty_household_derived",
   "label": "Empty household object",
+  "test_user_id": "synthetic:empty_household_derived",
+  "user_type": "synthetic",
+  "source_persona_id": null,
+  "started_at_utc": "2026-08-05T15:42:49.622Z",
+  "completed_at_utc": "2026-08-05T15:43:57.698Z",
   "ok": false,
-  "error": "locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for getByTestId('onboarding-step2-continue')\n",
+  "error": "step1-continue failed after 3 attempts: waitForPath timed out after 20000ms (last url: https://foofoo-v3.vercel.app/step-1)",
+  "feature_results": [],
   "steps": [
     {
       "label": "signed-up",
-      "screenshot": "001-signed-up.png"
+      "action": "signed-up",
+      "screenshot": "001-signed-up.png",
+      "timestamp_utc": "2026-08-05T15:42:53.319Z"
     },
     {
       "label": "consent-loaded",
-      "screenshot": "002-consent-loaded.png"
+      "action": "consent-loaded",
+      "screenshot": "002-consent-loaded.png",
+      "timestamp_utc": "2026-08-05T15:42:54.103Z"
     },
     {
       "label": "consent-continue",
-      "screenshot": "003-consent-continue.png"
-    },
-    {
-      "label": "step1-continue",
-      "screenshot": "004-step1-continue.png"
+      "action": "consent-continue",
+      "screenshot": "003-consent-continue.png",
+      "timestamp_utc": "2026-08-05T15:42:54.322Z"
     }
   ]
 }

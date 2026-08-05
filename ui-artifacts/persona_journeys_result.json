@@ -1,19 +1,26 @@
 {
-  "status": "partial",
-  "url": "http://localhost:8081",
-  "total": 2,
-  "ok": 1,
-  "failed": 1,
+  "status": "fail",
+  "url": "https://foofoo-v3.vercel.app",
+  "total": 100,
+  "ok": 0,
+  "failed": 100,
   "personas": [
     {
       "key": "single_professional_blr",
       "ok": false,
-      "error": "ENOSPC: no space left on device, write"
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid^=\"weekly-plan-\"][data-testid$=\"-0\"]').nth(15)\u001b[22m\n\u001b[2m    - locator resolved to <div tabindex=\"0\" data-testid=\"weekly-plan-Saturday-breakfast-0\" class=\"css-g5y9jx r-1loqt21 r-1otgn73 r-1q9bdsx r-rs99b7 r-1uu6nss r-1xjg651 r-1994467 r-15gme9l\">…</div>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
     },
     {
       "key": "joint_family_elders_delhi",
-      "ok": true,
-      "error": null
-    }
-  ]
-}
+      "ok": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid^=\"weekly-plan-\"][data-testid$=\"-0\"]').nth(15)\u001b[22m\n\u001b[2m    - locator resolved to <div tabindex=\"0\" data-testid=\"weekly-plan-Saturday-breakfast-0\" class=\"css-g5y9jx r-1loqt21 r-1otgn73 r-1q9bdsx r-rs99b7 r-1uu6nss r-1xjg651 r-1994467 r-15gme9l\">…</div>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "key": "jain_couple_ahmedabad",
+      "ok": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid^=\"weekly-plan-\"][data-testid$=\"-0\"]').nth(15)\u001b[22m\n\u001b[2m    - locator resolved to <div tabindex=\"0\" data-testid=\"weekly-plan-Saturday-breakfast-0\" class=\"css-g5y9jx r-1loqt21 r-1otgn73 r-1q9bdsx r-rs99b7 r-1uu6nss r-1xjg651 r-1994467 r-15gme9l\">…</div>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "key": "couple_toddler_pune",
+      "ok": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid^=\"weekly-plan-\"][data-testid$=\"-0\"]').nth(15)\u001b[22m\n\u001b[2m    - locator resolved to <div tabindex=\"0\" data-testid=\"weekly-plan-Saturday-breakfast-0\" class=\"css-g5y9jx r-1loqt21 r-1otgn73 r

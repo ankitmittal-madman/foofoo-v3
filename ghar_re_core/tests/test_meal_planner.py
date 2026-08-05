@@ -9,6 +9,7 @@ Validates the four user-facing surfaces built on the scoring/cohort stack:
 """
 
 from ghar_re_core import meal_planner as MP
+from ghar_re_core import cohort_plan as CP
 from ghar_re_core import knowledge as K
 from ghar_re_core import scoring as S
 from ghar_re_core.catalogue import Catalogue
@@ -104,6 +105,22 @@ def test_weekly_class_plan_shape_and_dish_backed():
             for c in classes:
                 assert c["dish_count"] >= 1  # never offer a class with no dishes
                 assert c["class_name"]
+
+
+def test_weekly_class_plan_repairs_leader_repetition_and_weekend_specials():
+    wk = MP.weekly_class_plan(
+        _hh(q3_home_state="Gujarat", q4_current_city="Ahmedabad"), top_classes=3
+    )
+    for slot in MP.MAIN_SLOTS:
+        leaders = [day["slots"][slot][0]["class_code"] for day in wk["days"]]
+        assert all(leader != leaders[index - 1] for index, leader in enumerate(leaders) if index)
+    for day in wk["days"][-2:]:
+        assert any(
+            day["slots"][slot][0]["class_code"] in CP._WEEKEND_SPECIAL_CLASSES
+            for slot in ("lunch", "dinner")
+        )
+    for violation in wk["constraint_report"]["violations"]:
+        assert violation["rule"] in {"recent_leader_holdback", "weekly_leader_cap"}
 
 
 def test_weekly_class_plan_generalizes_dish_feedback_to_class_ranking():

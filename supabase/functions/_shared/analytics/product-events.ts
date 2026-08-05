@@ -35,7 +35,10 @@ export async function activeAssignments(
 export async function recordProductEvent(
   ctx: RequestContext,
   input: {
+    /** Authenticated person whose analytics consent governs this event. */
     profileId: string;
+    /** Household tenant the product action affected; may differ for a shared-household member. */
+    householdId: string;
     eventName: string;
     requestId?: string;
     dishId?: string | null;
@@ -57,7 +60,7 @@ export async function recordProductEvent(
     const { error } = await withTimeout(
       db.from("product_events").insert({
         profile_id: input.profileId,
-        household_id: input.profileId,
+        household_id: input.householdId,
         event_name: input.eventName,
         request_id: input.requestId ?? null,
         dish_id: input.dishId ?? null,

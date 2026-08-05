@@ -2019,27 +2019,36 @@ Boundaries are transactional where invariants demand it. A lock and selected-slo
 
 ## 59. API surface overview
 
+The deployed v1 API is a Supabase Edge surface. Planning operations intentionally share one
+`plan` endpoint and are selected by the request body's `surface` field; the Edge layer then calls
+the private, HMAC-authenticated RE routes. The table below records the deployed public contract,
+not proposed REST aliases.
+
 | Method | Endpoint | Purpose | Idempotency |
 |---|---|---|---|
-| POST | `/v1/consent` | Append consent decision | required |
-| POST | `/v1/onboarding` | Persist/derive household onboarding | required |
-| POST | `/v1/households` | Create household | required |
-| POST | `/v1/households/{id}/members` | Add/update member | required |
-| POST | `/v1/recommendations` | Generate/read recommendation slate | request ID |
-| GET | `/v1/plan/{household_id}/{week}` | Read persisted plan | n/a |
-| POST | `/v1/plan/refresh` | Refresh unlocked scope | required |
-| POST | `/v1/plan/slots/{id}/lock` | Lock/unlock | required |
-| POST | `/v1/events` | Append interaction/outcome | event key required |
-| GET | `/v1/search` | Constraint-safe dish search | n/a |
-| GET | `/v1/user/export` | Request/read export | request ID |
-| POST | `/v1/user/delete` | Begin deletion | required |
-| GET | `/v1/health` | Liveness/readiness/version | n/a |
+| POST | `/functions/v1/consent` | Append consent decision | required |
+| POST | `/functions/v1/household` | Persist onboarding/household facts | required |
+| POST | `/functions/v1/household-access` | List/select membership; invite, role, ownership and leave operations | operation-specific |
+| POST | `/functions/v1/recommendations` | Generate and persist a recommendation slate | request ID |
+| POST | `/functions/v1/plan` (`surface=saved_week/save_week/lock_slot/add_to_date`) | Read or mutate the persisted plan | mutation-specific |
+| POST | `/functions/v1/plan` (`surface=cold_start/calibration/meal_plan/meal_episodes/weekly_plan/class_dishes/recipe/search`) | Invoke a safe planning surface | request ID |
+| POST | `/functions/v1/feedback` | Append interaction/outcome | event key required |
+| POST | `/functions/v1/user-export` | Request/read export | request ID |
+| POST | `/functions/v1/user-delete` | Begin deletion | required |
+| GET | RE `/healthz`, `/readyz` | Internal compute liveness/readiness | n/a |
 
 All private endpoints validate JWT, household membership, role permission, JSON schema, size, and rate. Error bodies expose stable codes, correlation ID, retryability, and safe user copy—not stack traces.
 
 <!-- PAGEBREAK -->
 
-## 60. Recommendation API specification
+## 60. Target recommendation API specification
+
+This is the episode-first target envelope. Deployed v1 keeps `/recommendations` plate-compatible
+and exposes canonical complete episodes through `POST /functions/v1/plan` with
+`surface=meal_episodes`. That response is schema-validated and includes `grammar_code`,
+`grammar_version`, component grammar roles, practicality, intent posterior and transparent v1 rule
+predictions. Clients must not fabricate calibrated probabilities when using the compatibility
+plate response; unavailable predictions are represented as null/unscored.
 
 ### Request
 

@@ -1,0 +1,285 @@
+[
+  {
+    "timestamp_utc": "2026-08-05T15:43:59.265Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/signup",
+    "method": "POST",
+    "request_body": {
+      "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+      "password": "Qa1-msg9bpzf-4g8wjf-Ghar",
+      "data": {},
+      "gotrue_meta_security": {},
+      "code_challenge": null,
+      "code_challenge_method": null
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "access_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjVhODM1NDQxLTY4ZjYtNDM2Zi04YTEyLTg5YzRjMTE4ZDI5MCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nta3N3YWxxcG1tcW9qd2RtcWJ2LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkOTA2NjU3ZC1lYjcwLTRhYmEtYTJhNy0wODRmN2MxMWVhYzAiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1OTQ4MjM5LCJpYXQiOjE3ODU5NDQ2MzksImVtYWlsIjoiZ2hhci1wZXJzb25hLW1pc3NpbmdfZGlldF9kZXJpdmVkLW1zZzlicHpmLTRnOHdqZkBleGFtcGxlLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJnaGFyLXBlcnNvbmEtbWlzc2luZ19kaWV0X2Rlcml2ZWQtbXNnOWJwemYtNGc4d2pmQGV4YW1wbGUuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiZDkwNjY1N2QtZWI3MC00YWJhLWEyYTctMDg0ZjdjMTFlYWMwIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODU5NDQ2Mzl9XSwic2Vzc2lvbl9pZCI6IjE2MTA4N2Q1LWQ2ZjEtNDVlYS05YmExLTdkYjY5MDA2M2MxOCIsImlzX2Fub255bW91cyI6ZmFsc2V9.PmWDE3qiEO66NWO_X6rCyCtfLzyE4AJMBsfQyPc8I-OQwWcwKdmnDYogHB5FPR5bWJryrNHsfuojymhpbVadNQ",
+        "token_type": "bearer",
+        "expires_in": 3600,
+        "expires_at": 1785948239,
+        "refresh_token": "yvqewqinhnqa",
+        "user": {
+          "id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+          "aud": "authenticated",
+          "role": "authenticated",
+          "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+          "email_confirmed_at": "2026-08-05T15:43:59.164884717Z",
+          "phone": "",
+          "last_sign_in_at": "2026-08-05T15:43:59.171124269Z",
+          "app_metadata": {
+            "provider": "email",
+            "providers": [
+              "email"
+            ]
+          },
+          "user_metadata": {
+            "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+            "email_verified": true,
+            "phone_verified": false,
+            "sub": "d906657d-eb70-4aba-a2a7-084f7c11eac0"
+          },
+          "identities": [
+            {
+              "identity_id": "155b1011-a88f-4665-9c50-83ee595fab57",
+              "id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+              "user_id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+              "identity_data": {
+                "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+                "email_verified": true,
+                "phone_verified": false,
+                "sub": "d906657d-eb70-4aba-a2a7-084f7c11eac0"
+              },
+              "provider": "email",
+              "last_sign_in_at": "2026-08-05T15:43:59.160416536Z",
+              "created_at": "2026-08-05T15:43:59.160501Z",
+              "updated_at": "2026-08-05T15:43:59.160501Z",
+              "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com"
+            }
+          ],
+          "created_at": "2026-08-05T15:43:59.144562Z",
+          "updated_at": "2026-08-05T15:43:59.174748Z",
+          "is_anonymous": false
+        }
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:43:59.406Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/user",
+    "method": "GET",
+    "request_body": null,
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+        "email_confirmed_at": "2026-08-05T15:43:59.164884Z",
+        "phone": "",
+        "confirmed_at": "2026-08-05T15:43:59.164884Z",
+        "last_sign_in_at": "2026-08-05T15:43:59.171124Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+          "email_verified": true,
+          "phone_verified": false,
+          "sub": "d906657d-eb70-4aba-a2a7-084f7c11eac0"
+        },
+        "identities": [
+          {
+            "identity_id": "155b1011-a88f-4665-9c50-83ee595fab57",
+            "id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+            "user_id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+            "identity_data": {
+              "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "d906657d-eb70-4aba-a2a7-084f7c11eac0"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-05T15:43:59.160416Z",
+            "created_at": "2026-08-05T15:43:59.160501Z",
+            "updated_at": "2026-08-05T15:43:59.160501Z",
+            "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com"
+          }
+        ],
+        "created_at": "2026-08-05T15:43:59.144562Z",
+        "updated_at": "2026-08-05T15:43:59.174748Z",
+        "is_anonymous": false
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:43:59.625Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/user",
+    "method": "PUT",
+    "request_body": {
+      "data": {
+        "display_name": "QA missing_diet_derived"
+      },
+      "code_challenge": null,
+      "code_challenge_method": null
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+        "email_confirmed_at": "2026-08-05T15:43:59.164884Z",
+        "phone": "",
+        "confirmed_at": "2026-08-05T15:43:59.164884Z",
+        "last_sign_in_at": "2026-08-05T15:43:59.171124Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "display_name": "QA missing_diet_derived",
+          "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+          "email_verified": true,
+          "phone_verified": false,
+          "sub": "d906657d-eb70-4aba-a2a7-084f7c11eac0"
+        },
+        "identities": [
+          {
+            "identity_id": "155b1011-a88f-4665-9c50-83ee595fab57",
+            "id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+            "user_id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+            "identity_data": {
+              "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "d906657d-eb70-4aba-a2a7-084f7c11eac0"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-05T15:43:59.160416Z",
+            "created_at": "2026-08-05T15:43:59.160501Z",
+            "updated_at": "2026-08-05T15:43:59.160501Z",
+            "email": "ghar-persona-missing_diet_derived-msg9bpzf-4g8wjf@example.com"
+          }
+        ],
+        "created_at": "2026-08-05T15:43:59.144562Z",
+        "updated_at": "2026-08-05T15:43:59.576104Z",
+        "is_anonymous": false
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:44:01.142Z",
+    "stage_label": "journey-start",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "create-id",
+          "question_key": "primary_cook_name",
+          "answer_value": "QA missing_diet_derived"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [],
+        "missing_required_fields": [
+          "home_state",
+          "current_city",
+          "diet_type",
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "ccb48633-dc34-4db9-98ed-6d92f62824a7"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:44:03.508Z",
+    "stage_label": "step1-household",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "onboarding-step-1",
+          "question_key": "q1_household_type",
+          "answer_value": "single"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [
+          "q1_household_type"
+        ],
+        "missing_required_fields": [
+          "home_state",
+          "current_city",
+          "diet_type",
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "036864bf-feb1-4a6b-8eac-7dd3d35b100b"
+      }
+    }
+  },
+  {
+    "timestamp_utc": "2026-08-05T15:44:05.319Z",
+    "stage_label": "step2-continue",
+    "endpoint": "/v1/household",
+    "method": "POST",
+    "request_body": {
+      "screens": [
+        {
+          "screen_id": "onboarding-step-2",
+          "question_key": "home_state",
+          "answer_value": "DL"
+        },
+        {
+          "screen_id": "onboarding-step-2",
+          "question_key": "current_city",
+          "answer_value": "New Delhi"
+        }
+      ],
+      "members": []
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "household_id": "d906657d-eb70-4aba-a2a7-084f7c11eac0",
+        "profile_exists": false,
+        "profile_created": false,
+        "answers_recorded": [],
+        "missing_required_fields": [
+          "diet_type",
+          "cook_capability"
+        ],
+        "members_written": 0,
+        "trace_id": "211c77b7-59cb-4785-8f68-be0609dfd6b8"
+      }
+    }
+  }
+]

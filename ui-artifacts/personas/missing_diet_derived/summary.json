@@ -1,12 +1,62 @@
 {
   "key": "missing_diet_derived",
   "label": "Household missing q5_diet",
+  "test_user_id": "synthetic:missing_diet_derived",
+  "user_type": "synthetic",
+  "source_persona_id": null,
+  "started_at_utc": "2026-08-05T15:43:57.714Z",
+  "completed_at_utc": "2026-08-05T15:45:08.784Z",
   "ok": false,
-  "error": "page.goto: Target page, context or browser has been closed",
+  "error": "step3-continue failed after 3 attempts: waitForPath timed out after 20000ms (last url: https://foofoo-v3.vercel.app/step-3)",
+  "feature_results": [],
   "steps": [
     {
       "label": "signed-up",
-      "screenshot": "001-signed-up.png"
+      "action": "signed-up",
+      "screenshot": "001-signed-up.png",
+      "timestamp_utc": "2026-08-05T15:44:01.352Z"
+    },
+    {
+      "label": "consent-loaded",
+      "action": "consent-loaded",
+      "screenshot": "002-consent-loaded.png",
+      "timestamp_utc": "2026-08-05T15:44:02.181Z"
+    },
+    {
+      "label": "consent-continue",
+      "action": "consent-continue",
+      "screenshot": "003-consent-continue.png",
+      "timestamp_utc": "2026-08-05T15:44:02.402Z"
+    },
+    {
+      "label": "step1-household",
+      "action": "step1-household",
+      "screenshot": "004-step1-household.png",
+      "timestamp_utc": "2026-08-05T15:44:02.522Z"
+    },
+    {
+      "label": "step1-continue",
+      "action": "step1-continue",
+      "screenshot": "005-step1-continue.png",
+      "timestamp_utc": "2026-08-05T15:44:03.649Z"
+    },
+    {
+      "label": "step2-state",
+      "action": "step2-state",
+      "screenshot": "006-step2-state.png",
+      "timestamp_utc": "2026-08-05T15:44:04.321Z"
+    },
+    {
+      "label": "step2-city",
+      "action": "step2-city",
+      "screenshot": "007-step2-city.png",
+      "timestamp_utc": "2026-08-05T15:44:04.515Z"
+    },
+    {
+      "label": "step2-continue",
+      "action": "step2-continue",
+      "screenshot": "008-step2-continue.png",
+      "timestamp_utc": "2026-08-05T15:44:05.430Z"
     }
   ]
 }

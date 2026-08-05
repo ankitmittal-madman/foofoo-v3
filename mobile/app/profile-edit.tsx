@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet } from "react-native";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { fetchProfile } from "@/api/plan";
 import { postHousehold } from "@/api/household";
@@ -35,6 +35,7 @@ const ALLERGENS: ChipOption[] = [
  * upsertHouseholdAnswers/profiles update path before building this).
  */
 export default function ProfileEdit() {
+  const queryClient = useQueryClient();
   const query = useQuery({ queryKey: ["profile"], queryFn: fetchProfile });
   const [diet, setDiet] = useState<string | null>(null);
   const [allergens, setAllergens] = useState<string[]>([]);
@@ -56,7 +57,13 @@ export default function ProfileEdit() {
           answer_value: allergenFlags(allergens),
         },
       ]),
-    onSuccess: () => router.back(),
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["daily-plan"] });
+      queryClient.removeQueries({ queryKey: ["meal-episodes"] });
+      queryClient.removeQueries({ queryKey: ["saved-week"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      router.back();
+    },
   });
 
   if (query.isLoading) {

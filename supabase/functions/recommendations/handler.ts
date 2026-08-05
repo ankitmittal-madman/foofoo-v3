@@ -26,10 +26,12 @@ import type { Handler } from "../_shared/middleware/types.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 
 import {
+  applyFestivalContext,
   buildExcludeDishIds,
   buildRequest,
   countInteractions,
   type HouseholdRaw,
+  loadFestivalContext,
   loadHouseholdRaw,
   loadLatestContext,
   recordHouseholdContext,
@@ -63,6 +65,8 @@ export interface RecommendationDeps {
   buildExcludeDishIdsFn?: typeof buildExcludeDishIds;
   /** WP-14 §3 — injectable so tests never need a live household_context table. */
   loadLatestContextFn?: typeof loadLatestContext;
+  /** Governed date-to-festival mapping, injectable for deterministic tests. */
+  loadFestivalContextFn?: typeof loadFestivalContext;
 }
 
 function plateCount(body: Record<string, unknown>): number {
@@ -81,6 +85,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
   const countInteractionsFn = deps.countInteractionsFn ?? countInteractions;
   const buildExcludeDishIdsFn = deps.buildExcludeDishIdsFn ?? buildExcludeDishIds;
   const loadLatestContextFn = deps.loadLatestContextFn ?? loadLatestContext;
+  const loadFestivalContextFn = deps.loadFestivalContextFn ?? loadFestivalContext;
   const authorizeHousehold = deps.authorizeHousehold;
 
   return async (req, ctx) => {
@@ -152,14 +157,19 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     // returning household with no override gets ITS real recent context instead of always
     // dinner/monsoon/Thursday. Best-effort (loadLatestContextFn never throws — see compose.ts).
     const storedContext = await loadLatestContextFn(ctx, hid);
+    const festival = await loadFestivalContextFn(
+      ctx,
+      typeof contextOverride?.date === "string" ? contextOverride.date : undefined,
+    );
     const payload = buildRequest(
       household,
-      contextOverride,
+      contextOverride ? applyFestivalContext(contextOverride, festival) : undefined,
       requestId,
       interactionCount,
       excludeDishIds,
       storedContext,
     );
+    payload.context = applyFestivalContext(payload.context as Record<string, unknown>, festival);
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext

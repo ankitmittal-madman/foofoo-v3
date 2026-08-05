@@ -18,7 +18,10 @@ def test_intent_is_normalized_and_context_sensitive():
     normal = infer_intent(household, make_context(slot="dinner", weekday="Monday"))
     rushed = infer_intent(
         household,
-        {**make_context(slot="dinner", weekday="Monday", is_raining=True), "time_budget_minutes": 20},
+        {
+            **make_context(slot="dinner", weekday="Monday", is_raining=True),
+            "time_budget_minutes": 20,
+        },
     )
     assert abs(sum(normal.values()) - 1.0) < 1e-5
     assert abs(sum(rushed.values()) - 1.0) < 1e-5
@@ -36,6 +39,13 @@ def test_episode_is_complete_replayable_and_practicality_ranked():
     assert [item["rank"] for item in episodes] == list(range(1, len(episodes) + 1))
     assert len({item["episode_hash"] for item in episodes}) == len(episodes)
     assert all(item["components"] for item in episodes)
+    assert all(item["grammar_code"] in {"SINGLE_PRIMARY", "BASE_WITH_SIDES"} for item in episodes)
+    assert all(item["grammar_version"] == 1 for item in episodes)
+    assert all(
+        component["grammar_role"] in {"primary", "side"}
+        for item in episodes
+        for component in item["components"]
+    )
     assert all(0 <= item["predictions"]["p_success"] <= 1 for item in episodes)
     assert all(item["predictions"]["model_version"] == EPISODE_MODEL_VERSION for item in episodes)
     assert all(item["practicality"]["active_minutes"] >= 0 for item in episodes)

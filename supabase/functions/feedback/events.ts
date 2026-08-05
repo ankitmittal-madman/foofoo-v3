@@ -324,6 +324,7 @@ export async function recordFeedbackEvent(
   });
   await recordProductEvent(ctx, {
     profileId: ev.actorProfileId,
+    householdId: ev.householdId,
     eventName: `recommendation_${ev.eventType}`,
     requestId: ev.requestId,
     dishId,

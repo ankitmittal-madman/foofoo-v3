@@ -20,8 +20,8 @@ export default function TabsLayout() {
     <Tabs initialRouteName="today" screenOptions={{ headerShown: false, tabBarActiveTintColor: palette.purple, tabBarInactiveTintColor: "#777078", tabBarStyle: { height: 76, paddingTop: 7, paddingBottom: 10, borderTopColor: palette.line, backgroundColor: "#FFFCF8" }, tabBarLabelStyle: { fontSize: 10, fontWeight: "600" } }}>
       <Tabs.Screen name="today" options={{ title: t("home"), tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>⌂</Text> }} />
       <Tabs.Screen name="weekly-plan" options={{ title: t("weekly"), tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>▦</Text> }} />
-      <Tabs.Screen name="pantry" options={{ title: t("pantry"), tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>♙</Text> }} />
-      <Tabs.Screen name="chat" options={{ title: t("chat"), tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>◌</Text> }} />
+      <Tabs.Screen name="pantry" options={{ href: null }} />
+      <Tabs.Screen name="chat" options={{ href: null }} />
       <Tabs.Screen name="profile" options={{ title: t("profile"), tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>♙</Text> }} />
       <Tabs.Screen name="search" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />

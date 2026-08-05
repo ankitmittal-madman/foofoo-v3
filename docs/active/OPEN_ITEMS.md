@@ -31,31 +31,23 @@ findings are retained under `docs/archive/`.
 - **Status:** Open. Local Jest/component gates exist; device journeys remain.
 - **Completion:** Verify offline reconnect, queued-feedback flush, and push delivery on native builds.
 
-### Repair the duplicate-card persona selector
-
-- **Area:** Synthetic UI evidence
-- **Status:** The production build/deployment step in workflow 31026168425 passed, but the one-persona
-  journey selected a hidden duplicate `weekly-plan-Saturday-breakfast-0` node and timed out. The
-  focused production health/authentication workflow 31026582073 passed.
-- **Completion:** Make the journey select the visible card (or remove duplicate rendered test IDs),
-  rerun one persona, and retain the successful report artifacts.
-
 ## P2 — Production improvement
 
 - Obtain a personal free data.gov USDA key if higher throughput is needed. The public demo key is
   active only for controlled evaluation: 4/12 sampled Indian dishes matched exactly, 5/12 matched
   the wrong food and 3/12 had no record. Non-exact nutrients are now rejected by policy.
-- Expand comfort-hero mapping beyond 17 of 36 resolved heroes.
-- Populate the regional-prior table for PanIndia and Global zones; 187 of 810 dishes currently
-  receive no regional-prior boost.
+- Curate or ingest catalogue dishes for the 13 comfort heroes that remain absent or ambiguous.
+  Safe exact/orthographic resolution now covers 23 of 36 unique authored heroes (26 of 39 rows);
+  the remaining names require a domain-approved dish or catalogue addition, not a guessed alias.
 - Create/approve a funded Fly staging app and configure `FLY_STAGING_*` variables/secrets. The
   GitHub `Production` environment is now protected by a required reviewer and a main-only custom
   deployment-branch policy.
 - Contract legacy dish/event compatibility tables only after one monitored episode dual-write,
   export/delete and rollback-parity window; no new feature may target those legacy facts.
 - Deploy and operationally verify the remaining client/operational release candidate: mobile
-  search and filters, richer explanations, selective refresh, and remaining CI/deployment
-  workflow changes. Restart-safe user/tenant-scoped query and feedback persistence is deployed.
+  search and filters, richer explanations, selective refresh, episode grammars, festival mapping,
+  household fairness and remaining CI/deployment workflow changes. Rerun the repaired segmented
+  weekly-plan persona journey after deployment. Restart-safe user/tenant-scoped query and feedback persistence is deployed.
   The ontology database, affected Edge
   Functions, cached-weather/MMR-capable RE image and immutable bundle are live.
 - Run production catalogue-scale load/soak tests and revisit Fly.io sizing. The local 810-dish run
@@ -63,7 +55,6 @@ findings are retained under `docs/archive/`.
 
 ## P3 — Product and intelligence evolution
 
-- Add festival-calendar mapping.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
@@ -106,6 +97,26 @@ findings are retained under `docs/archive/`.
   `foofoo-event-partition-horizon` cron job.
 - `recommendations` v17, `plan` v19, and `feedback` v13 are live with household-aware writes; all
   production tenant-continuity validation counts are zero.
+
+## Recently closed in the repository (deployment evidence pending)
+
+- Complete meal episodes now have a canonical request/response schema plus published, versioned
+  `SINGLE_PRIMARY`, `BASE_WITH_SIDES` and `THALI` runtime grammars. The service validates both
+  sides of `/v1/meal-episodes`; mobile compatibility episodes identify themselves as unscored.
+- Weekly plans use formal MMR and explicit repair for recent repeats, per-slot weekly caps and a
+  rank-one weekend special. Thin catalogues return residual constraint violations instead of a
+  false success claim.
+- Festival context is resolved from the governed calendar through migration 075's
+  service-role-only `active_festivals_on(date)` facade; private `re_engine` remains unexposed.
+- Shared-household preference aggregation uses only active members' explicit dish evidence and a
+  Nash-style geometric welfare score. Missing member evidence remains missing rather than being
+  inferred from demographics.
+- `PanIndia` and `Global` are dish provenance zones, not household regions. The household regional
+  prior grid already covers every derivable household zone; adding those rows would invent an
+  invalid household state and counteract the intentional cold-start foreign-dish policy.
+- The weekly-plan persona driver now switches between Weekdays and Weekend before clicking the 21
+  visible choices, eliminating the hidden duplicate-card selector timeout. A production rerun is
+  included in the release-candidate deployment item above.
 
 ## Active implementation documents retained for review
 
