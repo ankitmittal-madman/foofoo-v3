@@ -4,7 +4,7 @@
  * attaches the Supabase JWT). The Edge Function composes the household from the DB, so the client
  * never sends Q1–Q15 here — only the surface + planning params.
  */
-import { ApiError, apiPost } from "./client";
+import { apiPost, type ApiError } from "./client";
 
 /** One dish/meal card the planner returns (image_url + meal class attached server-side). */
 export interface PlanDish {
@@ -189,12 +189,13 @@ function slotOptionsToMealEpisodes(response: SlotOptionsResponse, slot: Slot): M
 }
 
 function shouldFallbackToSlotOptions(error: unknown): boolean {
-  return error instanceof ApiError &&
-    (error.code === "ERR_VALIDATION_FAILED" ||
-      error.status === 400 ||
-      error.status === 404 ||
-      error.status === 422 ||
-      error.status === 503);
+  if (!(error instanceof Error)) return false;
+  const maybeApiError = error as Partial<ApiError>;
+  return maybeApiError.code === "ERR_VALIDATION_FAILED" ||
+    maybeApiError.status === 400 ||
+    maybeApiError.status === 404 ||
+    maybeApiError.status === 422 ||
+    maybeApiError.status === 503;
 }
 
 function fetchSlotOptionsAsMealEpisodes(
