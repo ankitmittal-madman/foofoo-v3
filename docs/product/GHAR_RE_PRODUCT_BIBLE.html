@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Ghar RE Product Bible: product, recommendation engine, data, architecture, current state, and evolution roadmap.">
+  <title>Ghar RE Product Bible</title>
+  <style>
+    :root{--ink:#17211b;--muted:#647067;--paper:#fbfaf6;--panel:#fff;--line:#dfe5dd;--leaf:#186c4b;--leaf2:#dff2e8;--saffron:#d97706;--blue:#2563eb;--red:#b42318;--violet:#6d28d9;--shadow:0 12px 34px rgba(23,33,27,.08);--radius:18px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--leaf)}
+    aside{position:fixed;inset:0 auto 0 0;width:292px;background:#13251c;color:#e9f4ed;padding:24px 18px;overflow:auto;z-index:3}aside h1{font-size:20px;margin:0 0 4px}aside .sub{font-size:12px;color:#aac1b3;margin-bottom:16px}aside input{width:100%;border:1px solid #496055;background:#20362b;color:#fff;border-radius:10px;padding:10px 12px;margin-bottom:14px}nav a{display:block;color:#d9e8df;text-decoration:none;padding:6px 9px;border-radius:8px;font-size:13px}nav a:hover{background:#29483a;color:#fff}main{margin-left:292px;padding:34px 42px 80px;max-width:1500px}.hero{background:linear-gradient(135deg,#143c2b,#1b7652 65%,#d97706);color:white;padding:52px;border-radius:26px;box-shadow:var(--shadow)}.hero h1{font-size:clamp(34px,5vw,68px);line-height:1;margin:0 0 14px;letter-spacing:-.04em}.hero p{max-width:850px;font-size:18px}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:800}.meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.pill,.status{display:inline-block;border-radius:99px;padding:4px 9px;font-size:11px;font-weight:800;letter-spacing:.02em}.hero .pill{background:rgba(255,255,255,.16)}.status.current{background:#dff2e8;color:#11613f}.status.partial{background:#fff0ce;color:#875000}.status.missing{background:#fee4e2;color:#9b1c13}.status.future{background:#e8e6ff;color:#5426a8}.status.evidence{background:#dbeafe;color:#1e40af}.status.analysis{background:#eceff1;color:#3d4742}
+    section{scroll-margin-top:18px;margin-top:52px}h2{font-size:30px;line-height:1.15;margin:0 0 8px;letter-spacing:-.025em}h3{font-size:20px;margin:26px 0 10px}h4{margin:20px 0 6px}.lead{color:var(--muted);font-size:17px;max-width:980px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{grid-column:span 4;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 4px 16px rgba(23,33,27,.03)}.card.wide{grid-column:span 6}.card.full{grid-column:1/-1}.card h3,.card h4{margin-top:0}.kpi{font-size:32px;font-weight:850;color:var(--leaf);line-height:1.1}.caption,.small{font-size:12px;color:var(--muted)}.callout{border-left:5px solid var(--saffron);background:#fff8e9;padding:15px 18px;border-radius:4px 14px 14px 4px;margin:18px 0}.callout.red{border-color:var(--red);background:#fff1f0}.callout.green{border-color:var(--leaf);background:#eef9f3}.flowline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:18px 0}.step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-weight:750}.arrow{color:var(--saffron);font-weight:900}.diagram{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;overflow:auto}.diagram .mermaid{min-width:760px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}table{border-collapse:collapse;width:100%;min-width:720px}th,td{text-align:left;vertical-align:top;padding:11px 12px;border-bottom:1px solid var(--line)}th{background:#edf5f0;color:#244b38;font-size:12px;text-transform:uppercase;letter-spacing:.04em}tr:last-child td{border-bottom:0}.bar{height:9px;background:#e8ece9;border-radius:99px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),#61b489);border-radius:inherit}.score-row{display:grid;grid-template-columns:170px 1fr 46px;gap:12px;align-items:center;margin:10px 0}.score-row .bar{margin:0}code{background:#edf1ee;border-radius:5px;padding:2px 5px;font-size:.9em}pre{white-space:pre-wrap}details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 16px;margin:10px 0}summary{cursor:pointer;font-weight:800;padding:13px 0}details>div{padding:0 0 15px}.source{font-size:12px;color:var(--muted)}.phase{border-top:4px solid var(--leaf)}.phase:nth-child(2){border-color:var(--blue)}.phase:nth-child(3){border-color:var(--violet)}.phase:nth-child(4){border-color:var(--saffron)}.tag-cloud span{display:inline-block;margin:3px;background:#edf5f0;border-radius:6px;padding:3px 7px;font-size:12px}.hidden-search{display:none!important}.footer{margin-top:60px;border-top:1px solid var(--line);padding-top:20px;color:var(--muted)}
+    @media(max-width:980px){aside{position:relative;width:auto;max-height:none}nav{columns:2}main{margin:0;padding:22px}.hero{padding:34px}.card,.card.wide{grid-column:span 6}}
+    @media(max-width:640px){main{padding:14px}.hero{padding:26px}.card,.card.wide{grid-column:1/-1}nav{columns:1}.diagram .mermaid{min-width:650px}.score-row{grid-template-columns:120px 1fr 38px}}
+    @media print{aside{display:none}main{margin:0;max-width:none;padding:0}.hero{color:#000;background:#fff;border:2px solid #333;box-shadow:none}section{break-before:page}.card,details,.diagram{box-shadow:none;break-inside:avoid}details>div{display:block!important}.no-print{display:none}}
+  </style>
+</head>
+<body>
+<aside class="no-print">
+  <h1>Ghar RE</h1><div class="sub">Product Bible · Repository snapshot 05 Aug 2026</div>
+  <input id="search" aria-label="Search sections" placeholder="Search this bible…">
+  <nav id="toc">
+    <a href="#executive">1. Executive summary</a><a href="#vision">2. Product vision</a><a href="#walkthrough">3. Product walkthrough</a><a href="#system">4. System overview</a><a href="#as-is">5. Current product</a><a href="#to-be">6. Future product</a><a href="#lifecycle">7. User lifecycle</a><a href="#engine">8. Recommendation engine</a><a href="#decision-tree">9. Decision tree</a><a href="#database">10. Database</a><a href="#knowledge">11. Food knowledge</a><a href="#seed">12. Seed data</a><a href="#apis">13. APIs</a><a href="#deployment">14. Deployment</a><a href="#maturity">15. Product maturity</a><a href="#evolution">16. Future evolution</a><a href="#review">17. Expert review</a><a href="#data-roadmap">18. Knowledge expansion</a><a href="#appendices">19. Appendices</a>
+  </nav>
+</aside>
+<main>
+  <header class="hero">
+    <div class="eyebrow">The single source of truth</div>
+    <h1>GHAR RE<br>Product Bible</h1>
+    <p>A repository-grounded guide to the product promise, household journey, class-first recommendation engine, food intelligence, data model, deployment, limitations, and next evolution.</p>
+    <div class="meta"><span class="pill">Human + AI readable</span><span class="pill">Visual-first</span><span class="pill">Evidence-led</span><span class="pill">Current vs future separated</span></div>
+  </header>
+
+  <div class="callout"><strong>How to read this.</strong> <span class="status current">CURRENT</span> exists in the present repository or documented deployment; <span class="status partial">PARTIAL</span> works with meaningful limits; <span class="status missing">MISSING</span> is an identified gap; <span class="status future">FUTURE</span> is a recommendation or product direction. “Repository current” and “last documented deployed” are deliberately distinct.</div>
+
+  <section id="executive" class="searchable">
+    <div class="eyebrow">01 · Executive summary</div><h2>The answer to “Aaj khaane mein kya banaye?”</h2>
+    <p class="lead">Ghar RE is an Indian household meal-decision product. It converts household composition, food rules, regional familiarity, goals, context and feedback into a weekly class plan and daily dish choices—without pretending to be a medical service, food-delivery marketplace, calorie diary or social network.</p>
+    <div class="grid">
+      <article class="card"><h3>Problem</h3><p>Daily meal choice is repetitive, negotiated and constrained. Generic recipe search creates more options; Ghar RE aims to make a safe, familiar, useful decision.</p></article>
+      <article class="card"><h3>Primary user</h3><p>The person planning for a household—represented by the Meera persona: 32, Pune, Bhopal roots, partner and children, balancing familiarity, health and time.</p></article>
+      <article class="card"><h3>Core difference</h3><p>Household-first, Indian-context, class-first planning. It chooses a meal pattern before choosing a dish and uses hard safety gates before soft relevance.</p></article>
+      <article class="card"><div class="kpi">810</div><p>catalogue dishes in the immutable runtime bundle</p></article>
+      <article class="card"><div class="kpi">131</div><p>meal classes that create a stable planning vocabulary</p></article>
+      <article class="card"><div class="kpi">0</div><p>active trained preference models; present personalization is bounded and rules-based</p></article>
+    </div>
+    <h3>Product in one flow</h3>
+    <div class="flowline"><span class="step">Household truth</span><span class="arrow">→</span><span class="step">Hard safety filters</span><span class="arrow">→</span><span class="step">Meal-class plan</span><span class="arrow">→</span><span class="step">Dish ranking</span><span class="arrow">→</span><span class="step">Plan & cook</span><span class="arrow">→</span><span class="step">Feedback memory</span></div>
+    <div class="callout green"><strong>Reality today:</strong> a working rules-based planner with immediate dish-level affinity, persistence and suppression. <strong>Long-term direction:</strong> a governed household food-intelligence system with richer nutrition, pantry, seasonal, price, festival and learned-ranking signals.</div>
+  </section>
+
+  <section id="vision" class="searchable">
+    <div class="eyebrow">02 · Product vision</div><h2>Reduce decision fatigue, not human agency</h2>
+    <div class="grid">
+      <article class="card wide"><h3>Mission</h3><p>Make everyday Indian meal planning feel obvious: suitable for the whole household, grounded in familiar food patterns, adaptable to the day, and easy to change.</p></article>
+      <article class="card wide"><h3>Product promise</h3><p>“Give me a plan I can trust, enough alternatives to stay in control, and recommendations that improve when I respond.”</p></article>
+      <article class="card"><h3>Goals</h3><ul><li>Fast, safe meal decisions</li><li>Household-wide usefulness</li><li>Familiarity plus bounded discovery</li><li>Visible reasons and control</li></ul></article>
+      <article class="card"><h3>Non-goals</h3><ul><li>Medical diagnosis or treatment</li><li>Delivery marketplace</li><li>Precise calorie tracking</li><li>Unbounded AI recipe invention</li></ul></article>
+      <article class="card"><h3>Users</h3><ul><li>Family meal planner</li><li>Solo urban professional</li><li>Fitness-oriented solo user</li><li>Future: multi-member collaboration</li></ul></article>
+    </div>
+    <h3>Success contract</h3>
+    <div class="table-wrap"><table><thead><tr><th>Metric</th><th>Product target</th><th>What it proves</th><th>Measurement caution</th></tr></thead><tbody>
+      <tr><td>500 DAU in 90 days</td><td>North-star launch target</td><td>Habit and reach</td><td>Target in product brief, not achieved state</td></tr>
+      <tr><td>Recommendation acceptance</td><td>&gt;40%</td><td>Utility of offered meals</td><td>Define accept/lock/cook consistently</td></tr>
+      <tr><td>Cold-start acceptance</td><td>&gt;25%</td><td>Onboarding signal quality</td><td>Separate first-session from week-one</td></tr>
+      <tr><td>D7 retention</td><td>&gt;30%</td><td>Repeat value</td><td>Cohort by completed onboarding</td></tr>
+      <tr><td>Onboarding completion</td><td>&gt;70%</td><td>Friction is acceptable</td><td>Track step-level abandonment</td></tr>
+      <tr><td>“Never” rate</td><td>&lt;15%</td><td>Safety/relevance failures are bounded</td><td>Low rate is not automatically success</td></tr>
+    </tbody></table></div>
+    <p class="source">Source basis: active product brief and roadmap. These are intended outcomes, not repository-verified business results.</p>
+  </section>
+
+  <section id="walkthrough" class="searchable">
+    <div class="eyebrow">03 · Product walkthrough</div><h2>A new household’s story</h2>
+    <div class="diagram"><pre class="mermaid">flowchart LR
+      A[Anonymous visitor] --> B[Sign up with Supabase Auth]
+      B --> C[Consent gate]
+      C --> D[Describe household]
+      D --> E[Set diet allergies region goals]
+      E --> F[Calibration: 15 safe dishes]
+      F --> G[Weekly plan: 21 class choices]
+      G --> H[Daily view: up to 8 dishes]
+      H --> I{User response}
+      I -->|Like or accept| J[Affinity plus 0.2]
+      I -->|Not for me or Never| K[Affinity minus 0.3]
+      I -->|Not today| L[Suppress until next IST day]
+      J --> M[Next request reranks dishes]
+      K --> M
+      L --> M
+      M --> H</pre></div>
+    <div class="grid">
+      <article class="card"><span class="status missing">MISSING</span><h3>Anonymous recommendation</h3><p>The journey begins at authentication; there is no evidenced guest recommendation mode.</p></article>
+      <article class="card"><span class="status current">CURRENT</span><h3>Onboarding</h3><p>Consent plus household questions establish diet, allergies, region, lifecycle and objective signals.</p></article>
+      <article class="card"><span class="status current">CURRENT</span><h3>Calibration</h3><p>Three meal slots × five dishes: three expected positives and two weak-but-safe candidates.</p></article>
+      <article class="card"><span class="status current">CURRENT</span><h3>Weekly class selection</h3><p>Three meal classes per slot, seven days, three slots. The user finalizes all 21 choices.</p></article>
+      <article class="card"><span class="status partial">PARTIAL</span><h3>Learning</h3><p>Feedback affects dish ranking immediately, but weekly class planning does not yet consume this learned affinity.</p></article>
+      <article class="card"><span class="status future">FUTURE</span><h3>Long-term personalization</h3><p>Member-aware history, pantry, seasonal and learned-ranking signals—only after data and governance gates.</p></article>
+    </div>
+  </section>
+
+  <section id="system" class="searchable">
+    <div class="eyebrow">04 · System overview</div><h2>Two backend layers, one recommendation core</h2>
+    <div class="diagram"><pre class="mermaid">flowchart LR
+      subgraph Client[Experience]
+        APP[Expo React Native app]
+        WEB[Expo web test surface]
+      end
+      subgraph Supabase[Supabase boundary]
+        AUTH[Auth]
+        EDGE[Edge Functions]
+        DB[(Postgres public schema)]
+        JOBS[Cron and notification worker]
+      end
+      subgraph Engine[Fly.io recommendation service]
+        API[FastAPI and HMAC verification]
+        CORE[Rules scoring and planners]
+        BUNDLE[(Immutable 810-dish bundle)]
+        GRAPH[Bounded food graph]
+      end
+      subgraph External[External context]
+        WEATHER[Weather provider and cache]
+        PUSH[OneSignal]
+        ALERT[Telemetry webhook]
+      end
+      APP --> AUTH --> EDGE
+      WEB --> AUTH
+      EDGE <--> DB
+      EDGE -->|signed request| API --> CORE
+      CORE --> BUNDLE
+      CORE --> GRAPH
+      EDGE <--> WEATHER
+      JOBS --> PUSH
+      EDGE -. error events .-> ALERT
+      DB -->|feedback and affinity| EDGE
+      EDGE -->|taste and exclusions| API
+      FUTURE[Future trained preference model] -. governed activation .-> CORE</pre></div>
+    <div class="callout"><strong>Trust boundary:</strong> the client does not directly own recommendation logic. Supabase validates identity/ownership and holds mutable user state; it calls the Fly service with HMAC. The engine ranks an immutable bundle and does not directly query the database.</div>
+    <div class="grid"><article class="card"><h3>Four conceptual layers</h3><ol><li>Meal genome: dish attributes</li><li>Food graph: bounded relations</li><li>Household intelligence: derived profile</li><li>Contextual meal science: slot, weather, objective</li></ol></article><article class="card"><h3>Runtime split</h3><p><strong>Mutable:</strong> users, plans, events, feedback, suppressions.</p><p><strong>Immutable per release:</strong> catalogue, rules, weights, graph bundle.</p></article><article class="card"><h3>Why this shape works</h3><p>Deterministic, inspectable ranking; narrow database access; reproducible releases; future model seam without forcing ML into the current product.</p></article></div>
+  </section>
+
+  <section id="as-is" class="searchable">
+    <div class="eyebrow">05 · Current product — AS IS</div><h2>What the repository actually supports</h2>
+    <div class="table-wrap"><table><thead><tr><th>Capability</th><th>Status</th><th>Current behavior</th><th>Constraint / evidence</th></tr></thead><tbody>
+      <tr><td>Authentication & consent</td><td><span class="status current">CURRENT</span></td><td>Supabase identity, consent records, user export/delete paths</td><td>Legal/store compliance not independently verified</td></tr>
+      <tr><td>Household onboarding</td><td><span class="status current">CURRENT</span></td><td>Five-step answer capture and household derivation</td><td>Profile editing exposes diet/allergy more fully than complete household evolution</td></tr>
+      <tr><td>Class-first weekly plan</td><td><span class="status current">CURRENT</span></td><td>Top three classes for 7 × 3 slots; save, lock and add-to-date</td><td>Class selection does not use learned dish affinity</td></tr>
+      <tr><td>Daily recommendations</td><td><span class="status current">CURRENT</span></td><td>Up to eight ranked choices with explanation contributions</td><td>Depends on service; no fully evidenced safe cached recommendation fallback</td></tr>
+      <tr><td>Search and filters</td><td><span class="status partial">REPO RC</span></td><td>Search/filter APIs and UI in local release candidate</td><td>Not claimed deployed in status dated 04 Aug 2026</td></tr>
+      <tr><td>Immediate personalization</td><td><span class="status current">CURRENT</span></td><td>Affinity +0.2 / −0.3, clamped [−1,1]; Never and Not Today</td><td>Dish-level, bounded, request-to-request—not a trained model</td></tr>
+      <tr><td>Trained preference ML</td><td><span class="status missing">INACTIVE</span></td><td>Feature/training seam and tests exist</td><td><code>s_pref</code> disabled, artifact absent, weight 0</td></tr>
+      <tr><td>Recipes</td><td><span class="status partial">PARTIAL</span></td><td>810 generated recipe records</td><td>Auto-drafted from attributes; not human-verified culinary instructions</td></tr>
+      <tr><td>Nutrition</td><td><span class="status partial">PARTIAL</span></td><td>Calories for all; full macro rows for 50 dishes</td><td>Micronutrients, recipe yields and cooking retention largely absent</td></tr>
+      <tr><td>Food graph</td><td><span class="status partial">BOUNDED</span></td><td>Dish→ingredient and 13 curated dish→dish substitution pairs with provenance</td><td>Not a general persisted knowledge graph</td></tr>
+      <tr><td>Lifecycle add-ons</td><td><span class="status partial">PARTIAL</span></td><td>Compose emits weaning/toddler/child/teen/senior/adult</td><td>Engine expects infant/toddler/school_child/elder; only toddler aligns end-to-end</td></tr>
+      <tr><td>Clinical suitability</td><td><span class="status missing">MISSING</span></td><td>Deliberately absent</td><td>Requires clinical governance and evidence policy</td></tr>
+      <tr><td>Notifications</td><td><span class="status partial">PARTIAL</span></td><td>Worker and OneSignal integration configured</td><td>Physical-device delivery remains a launch test</td></tr>
+    </tbody></table></div>
+    <div class="callout red"><strong>Highest-impact product gap:</strong> calibration and daily feedback create useful dish memory, but that memory does not yet steer the weekly meal-class plan. The product learns locally while its most important planning surface stays cohort-led.</div>
+  </section>
+
+  <section id="to-be" class="searchable">
+    <div class="eyebrow">06 · Future product — TO BE</div><h2>A coherent household food operating system</h2>
+    <div class="diagram"><pre class="mermaid">flowchart LR
+      A[Household members and shared constraints] --> B[Persistent household food memory]
+      C[Pantry price season festival context] --> D[Context model]
+      E[Food ontology nutrition provenance] --> F[Candidate and safety layer]
+      B --> G[Personalized weekly class planner]
+      D --> G
+      F --> G
+      G --> H[Daily dishes recipes and grocery implications]
+      H --> I[Accept swap cook waste feedback]
+      I --> B
+      I --> J[Offline evaluation and governed training]
+      J -. promotion gate .-> G</pre></div>
+    <div class="grid"><article class="card"><h3>One learning loop</h3><p>Use the same feedback memory at class planning, dish ranking and explanations, with surface-specific weights.</p></article><article class="card"><h3>Member-aware planning</h3><p>Represent each member’s hard constraints and soft preferences; explain household compromises rather than collapsing everyone into one opaque profile.</p></article><article class="card"><h3>Resilient daily use</h3><p>Last-known-safe plans, offline-readable recipes, idempotent feedback and transparent degraded mode.</p></article><article class="card"><h3>Operational intelligence</h3><p>Pantry, effort, price and availability signals should improve usefulness without turning the app into an inventory chore.</p></article><article class="card"><h3>Governed health layer</h3><p>Separate wellness guidance from clinical claims; require evidence, review, contraindications, provenance and monitoring.</p></article><article class="card"><h3>Earned ML</h3><p>Train only after sufficient labeled behavior, offline counterfactual evaluation, fairness checks, shadow deployment and rollback.</p></article></div>
+  </section>
+
+  <section id="lifecycle" class="searchable">
+    <div class="eyebrow">07 · User lifecycle</div><h2>States, signals and recovery paths</h2>
+    <div class="diagram"><pre class="mermaid">stateDiagram-v2
+      [*] --> Anonymous
+      Anonymous --> Authenticated: signup
+      Authenticated --> ConsentPending
+      ConsentPending --> Onboarding: consent granted
+      Onboarding --> Calibration: household complete
+      Calibration --> Planning: calibration submitted
+      Planning --> Active: week finalized
+      Active --> Active: view / swap / feedback / search
+      Active --> ReOnboarding: household changes
+      ReOnboarding --> Planning
+      Active --> ExportRequested
+      Active --> DeleteRequested
+      DeleteRequested --> SoftDeleted
+      SoftDeleted --> HardDeleted: retention job
+      HardDeleted --> [*]</pre></div>
+    <div class="table-wrap"><table><thead><tr><th>Moment</th><th>Captured signal</th><th>Immediate effect</th><th>Future desired effect</th></tr></thead><tbody>
+      <tr><td>Onboarding</td><td>household, region, diet, allergies, objective</td><td>hard filters + derived theta + cohort plan</td><td>versioned member profile with change history</td></tr>
+      <tr><td>Calibration</td><td>dish reactions across three slots</td><td>taste affinity for subsequent dish requests</td><td>also influence class priors</td></tr>
+      <tr><td>Weekly selection</td><td>chosen class per slot</td><td>persisted plan</td><td>strong class-level preference evidence</td></tr>
+      <tr><td>Daily feedback</td><td>like, not-for-me, not-today, never</td><td>rerank or suppress</td><td>time-decayed and member-attributed learning</td></tr>
+      <tr><td>Profile change</td><td>diet/allergy edits</td><td>future request constraints</td><td>safe plan invalidation and member reconciliation</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section id="engine" class="searchable">
+    <div class="eyebrow">08 · Recommendation engine deep dive</div><h2>Safety first, class first, dish second</h2>
+    <div class="diagram"><pre class="mermaid">flowchart TD
+      Q[Request: household + slot + context + surface] --> N[Normalize answers and derive theta]
+      N --> C[Load catalogue candidates]
+      C --> H{Hard gates}
+      H -->|fail| X[Exclude with reason]
+      H -->|pass| S[BASE relevance score]
+      S --> O[Multiply by objective GAIN]
+      O --> K[Add decaying cohort class affinity]
+      K --> P[Add preference model term: currently zero]
+      P --> A[Add bounded online dish affinity]
+      A --> U[Apply Never and Not Today suppression]
+      U --> R[Rank and diversity selection]
+      R --> T{Surface}
+      T -->|weekly| W[Top meal classes]
+      T -->|class dishes or daily| D[Up to 8 dishes]
+      T -->|general endpoint| L[Assemble up to 7 compatible plates]
+      W --> E[Explanations and persistence]
+      D --> E
+      L --> E</pre></div>
+    <h3>1. Inputs and derived household state</h3><p>Raw household answers are normalized into a deterministic profile (“theta”): geographic palette, lifecycle, household type, dietary constraints, time pressure, objective and related routing signals. This derived state is computed live; a stored persona ID is not the ranking identity.</p>
+    <h3>2. Hard filters—never traded for relevance</h3>
+    <div class="tag-cloud"><span>vegetarian / non-veg rules</span><span>meat restrictions</span><span>Jain compatibility</span><span>allergens</span><span>weaning rules</span><span>fasting rules</span><span>Never list</span><span>Not Today suppression</span><span>optional calorie lens</span></div>
+    <h3>3. Scoring equation</h3>
+    <div class="callout green"><code>score = BASE(dish, household, context) × GAIN(objective) + w_cohort(n) × S_cohort − w_foreign(n) × S_foreign + w_pref × S_pref</code><br><span class="small">Today <code>S_pref = 0</code>. Daily planning then applies bounded online affinity (implemented as a controlled score multiplier) and selection/diversity logic.</span></div>
+    <div class="grid"><article class="card"><h3>BASE</h3><p>Configured modules cover palette and distance, meal signature, time, household fit, weather/comfort, priors and other frozen-spec signals. Parameters load from YAML; missing values raise instead of being invented.</p></article><article class="card"><h3>GAIN</h3><p>The selected objective—such as taste or healthy living—changes the balance of indulgence, lightness and protein, then clamps the multiplier.</p></article><article class="card"><h3>Cohort</h3><p>A compositional class plan blended with a learned offline frequency model gives graded class affinity. Its weight starts strong and decays with interactions.</p></article><article class="card"><h3>Exploration</h3><p>Epsilon-greedy selection can swap an under-served meal class; default configured epsilon is 0.15, with a code-level safe default of zero if config is absent.</p></article><article class="card"><h3>Pairing</h3><p>The general pipeline may combine dry/liquid dishes using cuisine distance, same-base exclusion, taste balance, protein and duplicate/discovery constraints.</p></article><article class="card"><h3>Explainability</h3><p>Score contributions and exclusion reasons can be exposed; explanations must remain faithful to the actual winning signals.</p></article></div>
+    <details><summary>Seven recommendation surfaces</summary><div><ol><li><strong>Cold start:</strong> initial safe catalogue.</li><li><strong>Calibration:</strong> controlled positive/weak-safe slate.</li><li><strong>Weekly plan:</strong> meal-class options across 21 slots.</li><li><strong>Class dishes:</strong> ranked dishes inside a selected class.</li><li><strong>Daily meal plan:</strong> practical dish choices for the slot.</li><li><strong>Search:</strong> query/filter constrained discovery.</li><li><strong>General recommendations:</strong> full ranking/pairing pipeline.</li></ol></div></details>
+  </section>
+
+  <section id="decision-tree" class="searchable">
+    <div class="eyebrow">09 · Recommendation decision tree</div><h2>What happens to one candidate dish?</h2>
+    <div class="diagram"><pre class="mermaid">flowchart TD
+      A[Candidate dish] --> B{Diet and meat rules pass?}
+      B -->|No| Z[Reject: dietary conflict]
+      B -->|Yes| C{Allergen and lifecycle rules pass?}
+      C -->|No| Y[Reject: safety conflict]
+      C -->|Yes| D{Never listed?}
+      D -->|Yes| X[Reject: explicit exclusion]
+      D -->|No| E{Not Today active?}
+      E -->|Yes| W[Suppress for this IST day]
+      E -->|No| F{Optional calorie lens pass?}
+      F -->|No| V[Reject for this request]
+      F -->|Yes| G[Compute BASE relevance]
+      G --> H[Apply objective gain]
+      H --> I[Add cohort class fit]
+      I --> J[Preference ML adds zero today]
+      J --> K[Apply dish affinity]
+      K --> L{Enough safe candidates?}
+      L -->|No| M[Return explicit constrained result; never relax safety]
+      L -->|Yes| N[Rank and diversify]
+      N --> O[Explain and return]</pre></div>
+    <div class="callout red"><strong>Invariant:</strong> shortage must not silently relax diet, allergy or explicit-exclusion gates. A truthful empty or constrained result is safer than an unsafe “fallback.”</div>
+  </section>
+
+  <section id="database" class="searchable">
+    <div class="eyebrow">10 · Database: current and future</div><h2>Mutable product memory in the public schema</h2>
+    <div class="callout">Legacy <code>re_engine</code> was retired in migration 047 and the unused <code>ghar_re</code> schema in migration 050. Current runtime tables live in <code>public</code>. The recommendation service uses a release bundle; Edge Functions own database access.</div>
+    <div class="diagram"><pre class="mermaid">erDiagram
+      PROFILES ||--o{ CONSENT_RECORDS : grants
+      PROFILES ||--o{ HOUSEHOLD_ANSWERS : supplies
+      PROFILES ||--o{ HOUSEHOLD_MEMBERS : contains
+      PROFILES ||--o{ WEEK_PLANS : owns
+      WEEK_PLANS ||--o{ PLAN_SLOTS : contains
+      DISHES ||--o{ DISH_INGREDIENTS : has
+      INGREDIENTS ||--o{ DISH_INGREDIENTS : used_in
+      DISHES ||--o{ DISH_TAGS : classified_by
+      TAGS ||--o{ DISH_TAGS : labels
+      DISHES ||--o{ RECOMMENDATION_EVENTS : recommended
+      PROFILES ||--o{ RECOMMENDATION_EVENTS : receives
+      RECOMMENDATION_EVENTS ||--o{ FEEDBACK_EVENTS : gets
+      PROFILES ||--o{ USER_TASTE_VECTORS : learns
+      PROFILES ||--o{ NEVER_LIST : excludes
+      PROFILES ||--o{ NOT_TODAY_SUPPRESSION : suppresses
+      PROFILES ||--o{ PRODUCT_EVENTS : emits</pre></div>
+    <h3>Current table families</h3>
+    <div class="grid"><article class="card"><h3>Identity & profile</h3><p><code>profiles</code>, consent records, onboarding sessions, household answers and members.</p></article><article class="card"><h3>Food content</h3><p>dishes, ingredients, dish ingredients, cuisines, tags, dish tags, combos, meal classes and synonyms.</p></article><article class="card"><h3>Plans</h3><p><code>week_plans</code> and <code>plan_slots</code>, including saved status, locks and add-to-date behavior.</p></article><article class="card"><h3>Recommendation memory</h3><p>recommendation/feedback events, taste vectors, user RE state, Never, Not Today and bandit state.</p></article><article class="card"><h3>Context & operations</h3><p>household context, weather cache, experiments, notifications, audit, product and interaction events.</p></article><article class="card"><h3>Deliberately removed</h3><p>Five unused scaffolding tables were dropped in migration 052, reducing false architecture.</p></article></div>
+    <h3>Future data model additions</h3>
+    <div class="diagram"><pre class="mermaid">erDiagram
+      HOUSEHOLDS ||--o{ MEMBER_PROFILES : contains
+      MEMBER_PROFILES ||--o{ MEMBER_CONSTRAINTS : declares
+      HOUSEHOLDS ||--o{ PANTRY_ITEMS : stocks
+      HOUSEHOLDS ||--o{ MEAL_OUTCOMES : records
+      DISHES ||--o{ RECIPE_VERSIONS : implements
+      RECIPE_VERSIONS ||--o{ RECIPE_INGREDIENTS : contains
+      INGREDIENTS ||--o{ NUTRIENT_FACTS : measured_as
+      INGREDIENTS ||--o{ ALLERGEN_ASSERTIONS : governed_by
+      FOOD_ENTITIES ||--o{ FOOD_RELATIONS : source
+      FOOD_ENTITIES ||--o{ FOOD_RELATIONS : target
+      EVIDENCE_SOURCES ||--o{ FOOD_ASSERTIONS : supports
+      MODEL_VERSIONS ||--o{ MODEL_EVALUATIONS : passes
+      MODEL_VERSIONS ||--o{ DECISION_TRACES : explains</pre></div>
+  </section>
+
+  <section id="knowledge" class="searchable">
+    <div class="eyebrow">11 · Food knowledge system</div><h2>Useful ontology, bounded graph, uneven depth</h2>
+    <div class="grid"><article class="card"><h3>Meal genome</h3><p>Each dish carries structured attributes: cuisine/zone, diet, ingredients, time, calories, spice, texture/taste/signature and planning class.</p></article><article class="card"><h3>Taxonomies</h3><p>Ingredient master, cuisine master/groups, 131 meal classes, tags, state/zone normalization and synonyms.</p></article><article class="card"><h3>Food graph</h3><p>In-memory traversal of dish→ingredient and curated substitutions; breadth-first depth bounded 1–6 with provenance.</p></article><article class="card"><h3>Knowledge provenance</h3><p>Several records carry sources or verified/stub flags, but coverage and evidence rigor differ by domain.</p></article><article class="card"><h3>Contextual science</h3><p>Regional priors, comfort heroes, weather rules, cohort class plans and Q15 objective weights influence ranking.</p></article><article class="card"><h3>Missing semantics</h3><p>Recipe yield/retention, robust nutrient provenance, allergen derivatives, festival calendar and clinically governed suitability.</p></article></div>
+    <div class="callout"><strong>Terminology rule:</strong> call the present implementation a <em>bounded food graph</em>, not a comprehensive knowledge graph. A true product knowledge graph needs canonical entities, typed relationships, assertion-level provenance, versioning, contradiction handling and governance.</div>
+  </section>
+
+  <section id="seed" class="searchable">
+    <div class="eyebrow">12 · Current seed data</div><h2>Broad catalogue, narrow scientific depth</h2>
+    <div class="grid"><article class="card"><div class="kpi">810 / 810</div><p>calories, time and spice present</p></article><article class="card"><div class="kpi">50 / 810</div><p>full macro rows (~6%)</p></article><article class="card"><div class="kpi">804 / 810</div><p>image mappings (~99%)</p></article><article class="card"><div class="kpi">198</div><p>ingredient-master rows</p></article><article class="card"><div class="kpi">57</div><p>distinct catalogue cuisine values</p></article><article class="card"><div class="kpi">13</div><p>curated substitution pairs</p></article></div>
+    <div class="table-wrap"><table><thead><tr><th>Dataset</th><th>Observed repository state</th><th>Interpretation</th></tr></thead><tbody>
+      <tr><td>Diet composition</td><td>539 veg · 220 non-veg · 51 egg</td><td>Broad top-level dietary coverage</td></tr>
+      <tr><td>Jain compatibility</td><td>216 dishes flagged</td><td>Useful hard/soft routing; needs assertion provenance</td></tr>
+      <tr><td>Recipes</td><td>810 generated entries</td><td>Coverage is not equivalent to culinary validation</td></tr>
+      <tr><td>Dish-class mapping</td><td>1,500 rows; 125 distinct class codes represented</td><td>Multiple membership and name reconciliation require care</td></tr>
+      <tr><td>Region affinity</td><td>136 records; 187 dishes documented without PanIndia/Global prior boost</td><td>Material cold-start gap</td></tr>
+      <tr><td>Comfort heroes</td><td>17 of 36 resolved heroes documented</td><td>Weather personalization is real but narrow</td></tr>
+      <tr><td>Bundle</td><td><code>sha256:120dcca47213b3bd</code>, source <code>data/source/dishes.xlsx</code></td><td>Release-addressable immutable input</td></tr>
+    </tbody></table></div>
+    <p class="source">Counts are repository snapshot observations. “Documented” counts come from active status/open-items and should be rechecked after future seed releases.</p>
+  </section>
+
+  <section id="apis" class="searchable">
+    <div class="eyebrow">13 · APIs</div><h2>Supabase is the product API; Fly is the ranking API</h2>
+    <div class="grid"><article class="card wide"><h3>Client-facing Edge Functions</h3><p><code>POST /v1/household</code>, <code>/v1/consent</code>, <code>/v1/plan</code>, <code>/v1/feedback</code>, <code>/v1/recommendations</code>, <code>GET /v1/user/export</code>, export status, <code>POST /v1/user/delete</code>, plus internal retention/deletion/notification jobs.</p></article><article class="card wide"><h3>Recommendation service</h3><p><code>GET /healthz</code>, <code>/readyz</code>, <code>/v1/meta</code>; POST recommendations, cold-start, calibration, meal-plan, weekly-plan, class-dishes, recipe and search.</p></article></div>
+    <h3><code>/v1/plan</code> surfaces</h3><div class="tag-cloud"><span>cold_start</span><span>calibration</span><span>meal_plan</span><span>weekly_plan</span><span>class_dishes</span><span>recipe</span><span>search</span><span>saved_week</span><span>save_week</span><span>lock_slot</span><span>add_to_date</span><span>history</span><span>history_detail</span><span>profile</span></div>
+    <div class="diagram"><pre class="mermaid">sequenceDiagram
+      participant U as Mobile user
+      participant E as Supabase Edge
+      participant D as Postgres
+      participant R as Fly RE service
+      U->>E: Authenticated plan request
+      E->>D: Read household, feedback, exclusions
+      D-->>E: Mutable user context
+      E->>R: HMAC-signed recommendation request
+      R->>R: Filter, score, select from bundle
+      R-->>E: Dishes/classes + reasons
+      E->>D: Persist recommendation/plan events
+      E-->>U: Product response
+      U->>E: Feedback with idempotency
+      E->>D: Update events, affinity, suppression</pre></div>
+  </section>
+
+  <section id="deployment" class="searchable">
+    <div class="eyebrow">14 · Deployment and operations</div><h2>Production-shaped, with three launch-critical checks open</h2>
+    <div class="grid"><article class="card"><h3>Recommendation service</h3><p>Multi-stage Docker image pinned to Python 3.11.15 slim-bookworm digest; non-root runtime; Fly app in Mumbai (<code>bom</code>), 512 MB shared CPU, HTTPS, one minimum machine, rolling deploy.</p></article><article class="card"><h3>Supabase</h3><p>Auth, public-schema Postgres, RLS, Edge Functions, scheduled retention/hard-delete and morning-notification work.</p></article><article class="card"><h3>CI/CD</h3><p>Backend Deno checks, Python lint/type/bundle/tests, mobile type/Jest/export, quality gate, manual persona journeys, Fly staging/production workflows and backup/mirror workflows.</p></article></div>
+    <div class="table-wrap"><table><thead><tr><th>State</th><th>Evidence</th><th>Meaning</th></tr></thead><tbody>
+      <tr><td><span class="status current">LAST DOCUMENTED DEPLOYED</span></td><td>Status dated 04 Aug 2026: migration 053, feedback/persistence, workers and associated Edge/RE changes</td><td>Deployment claim belongs to that dated record</td></tr>
+      <tr><td><span class="status partial">LOCAL RELEASE CANDIDATE</span></td><td>Weather cache, search/filter, MMR, richer explanations, bounded graph, migration 054, CI changes</td><td>Implemented/tested locally; not claimed live</td></tr>
+      <tr><td><span class="status evidence">LOCAL LOAD EVIDENCE</span></td><td>810-dish run, 300 requests, concurrency 20, 0 errors, p95 2.03s</td><td>Useful local behavior; not a production soak or SLO</td></tr>
+    </tbody></table></div>
+    <div class="callout red"><strong>Open launch work:</strong> enable Supabase leaked-password protection; configure and test <code>TELEMETRY_WEBHOOK_URL</code>; complete physical-device offline/reconnect, feedback-flush and push-delivery journeys.</div>
+  </section>
+
+  <section id="maturity" class="searchable">
+    <div class="eyebrow">15 · Product maturity</div><h2>Strong deterministic core; developing product intelligence</h2>
+    <p class="lead">This is an independent, directional repository assessment—not a live production measurement. Scores reflect completeness, evidence, operational readiness and known gaps as of the snapshot.</p>
+    <div class="card full">
+      <div class="score-row"><span>Architecture</span><div class="bar"><i style="width:84%"></i></div><strong>84</strong></div>
+      <div class="score-row"><span>RE core</span><div class="bar"><i style="width:82%"></i></div><strong>82</strong></div>
+      <div class="score-row"><span>Database</span><div class="bar"><i style="width:85%"></i></div><strong>85</strong></div>
+      <div class="score-row"><span>Testing</span><div class="bar"><i style="width:82%"></i></div><strong>82</strong></div>
+      <div class="score-row"><span>User journey</span><div class="bar"><i style="width:75%"></i></div><strong>75</strong></div>
+      <div class="score-row"><span>Deployment</span><div class="bar"><i style="width:76%"></i></div><strong>76</strong></div>
+      <div class="score-row"><span>Food ontology</span><div class="bar"><i style="width:62%"></i></div><strong>62</strong></div>
+      <div class="score-row"><span>Scalability evidence</span><div class="bar"><i style="width:67%"></i></div><strong>67</strong></div>
+      <div class="score-row"><span>Observability</span><div class="bar"><i style="width:52%"></i></div><strong>52</strong></div>
+      <div class="score-row"><span>Nutrition depth</span><div class="bar"><i style="width:28%"></i></div><strong>28</strong></div>
+    </div>
+    <div class="callout green"><strong>Maturity verdict:</strong> credible private-beta / controlled-launch engineering, not yet a fully evidenced public-scale food-intelligence platform. The next gains come from closing feedback loops and operational gates—not adding a complex ML model.</div>
+  </section>
+
+  <section id="evolution" class="searchable">
+    <div class="eyebrow">16 · Future evolution</div><h2>Build trust and data before model complexity</h2>
+    <div class="grid"><article class="card phase"><span class="status future">V2 · CLOSE THE LOOP</span><h3>Reliable personalization</h3><ul><li>Feed calibration/feedback into weekly class planning</li><li>Repair lifecycle vocabulary mismatch</li><li>Full household/member editing and plan invalidation</li><li>Safe cached/degraded mode</li><li>Complete launch operations</li></ul></article><article class="card phase"><span class="status future">V3 · DEEPEN KNOWLEDGE</span><h3>Food intelligence</h3><ul><li>Verified recipes, yields and nutrition</li><li>Festival, pantry, season and price</li><li>Typed graph with assertion provenance</li><li>Clinically reviewed health layer</li><li>Outcome and waste signals</li></ul></article><article class="card phase"><span class="status future">V4 · EARN ML</span><h3>Learned ranking</h3><ul><li>Activation threshold and dataset card</li><li>Offline replay and counterfactual evaluation</li><li>Embeddings for retrieval, not safety</li><li>LTR/two-tower candidate ranking</li><li>Shadow, canary and rollback gates</li></ul></article></div>
+    <div class="table-wrap"><table><thead><tr><th>Gate</th><th>Required before advancing</th></tr></thead><tbody><tr><td>V2 → V3</td><td>launch controls green; class/dish feedback semantics defined; decision trace complete; reliable outcome metrics</td></tr><tr><td>V3 → V4</td><td>sufficient real labels; bias/coverage audit; stable ontology IDs; leakage-safe training split; model fallback parity</td></tr><tr><td>Any clinical feature</td><td>named clinical owner, source policy, validation protocol, contraindication model, user-facing scope and incident process</td></tr></tbody></table></div>
+  </section>
+
+  <section id="review" class="searchable">
+    <div class="eyebrow">17 · Independent expert review</div><h2>Evidence, analysis and recommendations kept separate</h2>
+    <div class="table-wrap"><table><thead><tr><th>Lens</th><th>Repository evidence</th><th>Independent analysis</th><th>Recommendation</th></tr></thead><tbody>
+      <tr><td>Product strategy</td><td>Clear Indian household problem and class-first loop</td><td>Differentiation is meaningful if household compromise becomes visible</td><td>Own “decision confidence,” not recipe volume</td></tr>
+      <tr><td>User experience</td><td>21 weekly choices plus daily alternatives</td><td>Control is strong; initial decision load may be high</td><td>Offer guided defaults and progressive weekly commitment</td></tr>
+      <tr><td>Recommendation science</td><td>Deterministic gates, configured scores, cohort decay</td><td>Auditable and appropriate for sparse data</td><td>Measure class acceptance before adding model complexity</td></tr>
+      <tr><td>Personalization</td><td>Dish affinity changes immediately; weekly class plan ignores it</td><td>Fragmented learning weakens the core promise</td><td>Create a unified evidence ledger with class and dish updates</td></tr>
+      <tr><td>Safety</td><td>Diet/allergy/Jain/lifecycle gates; no clinical add-ons</td><td>Conservative boundary is correct</td><td>Keep safety deterministic and independently tested</td></tr>
+      <tr><td>Food science</td><td>All calories; 50 macro-complete; auto-drafted recipes</td><td>Scientific depth is insufficient for strong nutrition claims</td><td>Prioritize recipe yield, portions, provenance and validation</td></tr>
+      <tr><td>Ontology</td><td>Ingredients, cuisines, classes, synonyms, bounded graph</td><td>Good foundations; relations are too narrow for broad reasoning</td><td>Adopt assertion-level provenance and stable canonical IDs</td></tr>
+      <tr><td>Data architecture</td><td>Public schema cleaned; mutable DB separated from bundle</td><td>Separation aids reproducibility but creates synchronization risk</td><td>Record bundle ID on every decision trace</td></tr>
+      <tr><td>Backend architecture</td><td>Edge ownership + HMAC service boundary</td><td>Reasonable modular trust model</td><td>Formalize timeouts, circuit breaker and degraded response contract</td></tr>
+      <tr><td>Mobile engineering</td><td>Expo builds/tests; physical-device tests open</td><td>Core journey evidence is not yet device-complete</td><td>Gate launch on three end-to-end device journeys</td></tr>
+      <tr><td>Security/privacy</td><td>Consent, RLS, export/delete, retention work; leaked-password setting open</td><td>Code controls exist, operational assurance incomplete</td><td>Close advisor finding and run abuse/ownership test suite</td></tr>
+      <tr><td>Operations</td><td>Health checks, CI/CD, webhook code; webhook unconfigured</td><td>Detection is the weakest production pillar</td><td>Define SLOs, alerts, runbooks and ownership before broad launch</td></tr>
+      <tr><td>Growth</td><td>500 DAU / acceptance / D7 targets</td><td>Targets lack an explicit experiment and attribution framework</td><td>Instrument activation: “first useful week accepted”</td></tr>
+      <tr><td>Monetization</td><td>Revenue documents are aspirational</td><td>Premature monetization can distort trust</td><td>Validate retention first; test convenience subscriptions later</td></tr>
+    </tbody></table></div>
+    <h3>Prioritized decisions</h3><ol><li><strong>Before launch:</strong> security advisor, alert delivery, physical-device E2E.</li><li><strong>Next product increment:</strong> connect feedback to class planning and repair member/lifecycle semantics.</li><li><strong>Next data increment:</strong> verify recipes/portions and expand macros with provenance.</li><li><strong>Before ML:</strong> define labels, evaluation, decision tracing, activation and rollback gates.</li></ol>
+  </section>
+
+  <section id="data-roadmap" class="searchable">
+    <div class="eyebrow">18 · Food knowledge expansion roadmap</div><h2>Dataset families, value, sources and architectural fit</h2>
+    <div class="callout red"><strong>Licensing warning:</strong> public availability does not equal permission for product ingestion. ICMR-NIN publications contain reuse restrictions; Open Food Facts has ODbL obligations; LanguaL and GI data need terms review. Maintain a data-rights register before importing.</div>
+    <div class="table-wrap"><table><thead><tr><th>Dataset family</th><th>Why it matters</th><th>Candidate source</th><th>Architecture fit</th><th>Priority / governance</th></tr></thead><tbody>
+      <tr><td>Canonical ingredient identities</td><td>Deduplication and reliable recipes</td><td>Internal curation; FoodOn alignment</td><td><code>food_entities</code> + aliases</td><td>P0 · steward approval</td></tr>
+      <tr><td>Multilingual names & transliteration</td><td>Hindi/regional search and synonym resolution</td><td>Internal linguistic curation; Wikidata as lead only</td><td>locale-scoped alias table</td><td>P0 · human review</td></tr>
+      <tr><td>Recipe ingredients, portions, yield</td><td>Shopping and nutrient calculation</td><td>Licensed recipes + kitchen validation</td><td>versioned recipes and recipe ingredients</td><td>P0 · culinary QA</td></tr>
+      <tr><td>Macronutrients</td><td>Responsible wellness objectives</td><td>ICMR-NIN IFCT; USDA cross-check</td><td>nutrient assertion with basis/unit</td><td>P0 · licensing + provenance</td></tr>
+      <tr><td>Micronutrients</td><td>Lifecycle and dietary adequacy context</td><td>IFCT; FAO/INFOODS standards</td><td>component IDs + measurement method</td><td>P1 · expert review</td></tr>
+      <tr><td>Cooking retention & edible yield</td><td>Raw ingredient values are not served-dish values</td><td>FAO/INFOODS guidance; measured recipes</td><td>transformation factors per method</td><td>P1 · uncertainty bands</td></tr>
+      <tr><td>Allergens & hidden derivatives</td><td>Safety across aliases and compound ingredients</td><td>FSSAI labeling vocabulary; manufacturer labels</td><td>typed allergen assertions</td><td>P0 · never inferred by ML</td></tr>
+      <tr><td>Cross-contact</td><td>Packaged/restaurant risk cannot be captured by ingredients alone</td><td>Manufacturer/operator declarations</td><td>facility/product assertion</td><td>P1 · explicit unknown state</td></tr>
+      <tr><td>Dietary practice rules</td><td>Jain, fasting and community practices are contextual</td><td>community experts + reviewed policy</td><td>rule version + scope + exceptions</td><td>P0 · avoid essentialism</td></tr>
+      <tr><td>GI / GL</td><td>Useful wellness signal when portion-aware</td><td>University of Sydney GI database</td><td>food/portion assertion</td><td>P2 · license and coverage review</td></tr>
+      <tr><td>Lifecycle suitability</td><td>Texture/portion needs differ by age</td><td>Government guidance + clinical review</td><td>member constraint rules</td><td>P1 · clinical governance</td></tr>
+      <tr><td>Health-condition suitability</td><td>Potential value, high harm risk</td><td>ICMR-NIN DGI and clinical guidelines</td><td>separate governed policy service</td><td>P3 · clinical owner required</td></tr>
+      <tr><td>Regional cuisine affinity</td><td>Cold-start familiarity</td><td>Internal research, behavioral evidence</td><td>region↔class/dish assertions</td><td>P0 · fill current gaps</td></tr>
+      <tr><td>Seasonality & availability</td><td>Practical and fresher plans</td><td>AGMARKNET/data.gov.in; local calendars</td><td>ingredient-region-time series</td><td>P1 · freshness monitoring</td></tr>
+      <tr><td>Price</td><td>Budget-aware household plans</td><td>AGMARKNET plus retailer feeds</td><td>market-price facts with timestamp</td><td>P1 · regional uncertainty</td></tr>
+      <tr><td>Pantry shelf life</td><td>Reduce waste and increase actionability</td><td>pack labels + validated internal rules</td><td>ingredient/storage fact</td><td>P2 · conservative ranges</td></tr>
+      <tr><td>Packaged-food/barcode data</td><td>Pantry recognition and label nutrients</td><td>Open Food Facts; brand feeds</td><td>external IDs + attribution</td><td>P2 · ODbL review</td></tr>
+      <tr><td>Cooking method, equipment, effort</td><td>Time pressure is more than total minutes</td><td>recipe QA and telemetry</td><td>recipe process graph</td><td>P0 · user-relevant</td></tr>
+      <tr><td>Sensory profile</td><td>Better substitutions and variety</td><td>culinary experts + structured user feedback</td><td>graded taste/texture vectors</td><td>P1 · separate fact/opinion</td></tr>
+      <tr><td>Pairing & meal composition</td><td>Coherent plates, not isolated dishes</td><td>curated culinary rules + acceptance data</td><td>typed dish/class relations</td><td>P1 · explainable rules</td></tr>
+      <tr><td>Substitutions</td><td>Resilience to pantry and diet limits</td><td>culinary/nutrition review</td><td>directional relation + reason</td><td>P0 · expand beyond 13 safely</td></tr>
+      <tr><td>Festival calendar & fasting</td><td>High-context Indian relevance</td><td>curated regional calendars</td><td>region/date/practice rule</td><td>P1 · yearly versioning</td></tr>
+      <tr><td>Weather comfort mappings</td><td>Contextual delight</td><td>curation + acceptance telemetry</td><td>zone/weather→dish assertion</td><td>P0 · fill 17/36 gap</td></tr>
+      <tr><td>Environmental impact</td><td>Optional sustainability objective</td><td>FAO/LCA datasets where licensed</td><td>ingredient impact ranges</td><td>P3 · uncertainty visible</td></tr>
+      <tr><td>Images & media rights</td><td>Trust, recognition and app quality</td><td>owned/licensed photography</td><td>asset license + expiry metadata</td><td>P0 · rights audit</td></tr>
+      <tr><td>Order/menu availability</td><td>Future cook-or-order continuity</td><td>partner feeds</td><td>external offer mapping</td><td>P3 · freshness/SLA</td></tr>
+      <tr><td>Behavioral outcomes</td><td>Learning needs more than clicks</td><td>consented first-party events</td><td>meal outcome ledger</td><td>P0 · privacy/minimization</td></tr>
+      <tr><td>Evidence & provenance</td><td>Every claim must be auditable</td><td>All upstream sources</td><td>assertion, source, license, version, reviewer</td><td>P0 · platform foundation</td></tr>
+    </tbody></table></div>
+    <h3>Authoritative starting points</h3><ul>
+      <li><a href="https://www.nin.res.in/ebooks/IFCT2017_16122024.pdf">ICMR-NIN Indian Food Composition Tables 2017</a> — Indian nutrient reference; obtain permission/confirm licensing before ingestion.</li>
+      <li><a href="https://nin.res.in/dietaryguidelines/pdfjs/locale/DGI_2024.pdf">ICMR-NIN Dietary Guidelines for Indians 2024</a> — guidance basis, not a direct clinical ruleset; reuse review required.</li>
+      <li><a href="https://www.fao.org/infoods/infoods/standards-guidelines/en/">FAO/INFOODS standards and guidelines</a> — identifiers, food matching, data quality and interchange.</li>
+      <li><a href="https://fdc.nal.usda.gov/data-documentation/">USDA FoodData Central documentation</a> — CC0 nutrient reference and API, less culturally specific than Indian sources.</li>
+      <li><a href="https://www.fssai.gov.in/upload/uploadfiles/files/Comp_Labelling%20Display_Version%20VIII_09_09_2025.pdf">FSSAI Labelling and Display Regulations</a> — regulatory/allergen vocabulary; verify current amendments.</li>
+      <li><a href="https://www.data.gov.in/catalog/current-daily-price-various-commodities-various-markets-mandi">AGMARKNET daily mandi prices</a> — regional time-series price/availability signal.</li>
+      <li><a href="https://foodon.org/">FoodOn</a> — open food ontology for alignment; retain Indian product semantics.</li>
+      <li><a href="https://www.langual.org/langual_downloads.asp">LanguaL downloads</a> — faceted food description; check terms before use.</li>
+      <li><a href="https://glycemicindex.com/about-gi/">University of Sydney Glycemic Index</a> — GI/GL reference with coverage/licensing review.</li>
+      <li><a href="https://openfoodfacts.github.io/documentation/docs/Product-Opener/api/">Open Food Facts API</a> — packaged-food data; observe API version and database-license obligations.</li>
+    </ul>
+  </section>
+
+  <section id="appendices" class="searchable">
+    <div class="eyebrow">19 · Appendices and glossaries</div><h2>Fast reference for humans and AI agents</h2>
+    <details open><summary>A. Critical invariants</summary><div><ol><li>Hard safety gates precede and cannot be overridden by scoring or ML.</li><li>Never invent a missing scoring parameter; configuration absence is an error or safe no-op.</li><li>Distinguish repository implementation, documented deployment and proposed future state.</li><li><code>s_pref</code> is inactive until a reviewed artifact and explicit activation gate exist.</li><li>The current graph is bounded dish/ingredient/substitution traversal, not a universal food graph.</li><li>Record catalogue/bundle and rule/model versions in decision evidence.</li><li>Clinical suitability requires independent governance; nutrition data alone is insufficient.</li></ol></div></details>
+    <details><summary>B. Glossary</summary><div class="table-wrap"><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Meal class</td><td>A stable planning pattern used before choosing a specific dish.</td></tr><tr><td>Theta (θ)</td><td>Derived household representation built from onboarding/context.</td></tr><tr><td>BASE</td><td>Configured relevance score before objective, cohort and preference terms.</td></tr><tr><td>GAIN Q15</td><td>Objective-specific multiplier balancing indulgence, lightness and protein.</td></tr><tr><td>Cohort affinity</td><td>Graded household-to-meal-class prior, strongest at cold start.</td></tr><tr><td>Affinity</td><td>Bounded online user↔dish memory in [−1,1].</td></tr><tr><td>Never</td><td>Persistent explicit exclusion.</td></tr><tr><td>Not Today</td><td>Temporary suppression until the next IST day boundary.</td></tr><tr><td>MMR</td><td>Diversity reranking in the local release candidate.</td></tr><tr><td>Bundle</td><td>Immutable release package of catalogue, mappings and configuration.</td></tr></tbody></table></div></details>
+    <details><summary>C. Repository evidence map</summary><div><ul><li><code>ghar_re_core/</code> — derivation, scoring, planning, cohort intelligence, graph and tests.</li><li><code>ghar_re_service/</code> — FastAPI boundary, bundle and deployment image.</li><li><code>data/source/</code> — canonical configuration, spreadsheet-derived datasets and mappings.</li><li><code>supabase/functions/</code> — client-facing APIs, auth boundary, persistence and workers.</li><li><code>supabase/migrations/</code> — live schema evolution and RLS.</li><li><code>mobile/</code> — Expo product journey.</li><li><code>docs/active/</code> — dated current status, open work, launch blockers and roadmap.</li><li><code>docs/architecture/ghar-re/</code> — frozen core spine, derivations and knowledge-base foundations.</li><li><code>docs/product/</code> and <code>docs/roadmaps/</code> — intended product, users, metrics and future direction.</li></ul></div></details>
+    <details><summary>D. AI-agent context contract</summary><div><p>Before changing recommendation behavior, an agent should identify the relevant hard gate, configuration source, scoring phase, surface, persistence path and tests. It must say whether the change affects repository-only behavior or a deployed system. New food assertions need stable entity IDs, source, license, version, confidence, reviewer and effective dates. New ML must preserve the deterministic fallback.</p></div></details>
+    <details><summary>E. Known ambiguities to resolve</summary><div><ul><li>Unify lifecycle role vocabulary between composition and add-on mapping.</li><li>Define the authoritative acceptance event across class selection, dish lock, cook and order.</li><li>Clarify whether calories represent portion, recipe or generic dish estimates.</li><li>Reconcile 810 bundle dishes with the last documented 802 production database rows.</li><li>Define data licensing decisions for every external food source before ingestion.</li></ul></div></details>
+  </section>
+
+  <footer class="footer"><strong>Document basis:</strong> repository and active product/architecture/operations materials inspected on 05 Aug 2026. External source links are starting points, not automatic ingestion approval. This bible intentionally distinguishes fact, dated deployment evidence, independent analysis and future recommendation.</footer>
+</main>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({startOnLoad:true,theme:'neutral',securityLevel:'strict',flowchart:{curve:'basis'},themeVariables:{primaryColor:'#dff2e8',primaryTextColor:'#17211b',primaryBorderColor:'#186c4b',lineColor:'#647067',fontFamily:'Inter, system-ui, sans-serif'}});
+</script>
+<script>
+  const q=document.getElementById('search');
+  q.addEventListener('input',()=>{const value=q.value.trim().toLowerCase();document.querySelectorAll('.searchable').forEach(s=>s.classList.toggle('hidden-search',value&&!s.innerText.toLowerCase().includes(value)));});
+</script>
+</body>
+</html>
