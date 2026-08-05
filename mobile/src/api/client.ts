@@ -1,5 +1,6 @@
 import { supabase } from "../auth/supabaseClient";
 import { logger } from "../lib/logger";
+import { withActiveHousehold } from "../household/activeHousehold";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "";
 
@@ -100,6 +101,15 @@ export async function apiPost<TResponse>(path: string, body: unknown): Promise<T
   }
 
   return json as TResponse;
+}
+
+/** Adds the signed-in user's selected household to a household-scoped request. Older/solo users
+ * with no stored selection keep the server's compatibility default (their own user ID). */
+export async function householdApiPost<TResponse>(
+  path: string,
+  body: Record<string, unknown>,
+): Promise<TResponse> {
+  return apiPost<TResponse>(path, await withActiveHousehold(body));
 }
 
 /**

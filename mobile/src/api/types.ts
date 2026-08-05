@@ -140,6 +140,7 @@ export type FeedbackEventType =
   | "cooked" | "ordered" | "replaced" | "completed" | "regretted";
 
 export interface FeedbackRequest {
+  household_id?: string;
   /** RecommendationsResponse.request_id — the only recommendation identifier this client is ever
    * given; the backend resolves it to the matching recommendation_events row (feedback/events.ts). */
   request_id: string;

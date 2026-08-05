@@ -31,7 +31,10 @@ import type { FeedbackEventType } from "../_shared/validation/feedback-schema.ts
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 
 export interface FeedbackEventInput {
-  profileId: string;
+  /** Authenticated actor who supplied this feedback. */
+  actorProfileId: string;
+  /** Household whose recommendation/outcome/state is affected. */
+  householdId: string;
   /** RecommendationsResponse.request_id — see module doc for why this, not the DB row's uuid PK. */
   requestId: string;
   eventType: FeedbackEventType;
@@ -67,7 +70,7 @@ async function syncTypedIntelligence(
   if (outcomeType) {
     const episodeHash = typeof ev.detail?.episode_hash === "string" ? ev.detail.episode_hash : null;
     const { data: slateRows, error: slateError } = await withTimeout(
-      db.from("slates").select("id").eq("household_id", ev.profileId).eq(
+      db.from("slates").select("id").eq("household_id", ev.householdId).eq(
         "request_id",
         ev.requestId,
       ).limit(1),
@@ -77,8 +80,8 @@ async function syncTypedIntelligence(
     const { error } = await withTimeout(
       db.from("outcome_events").upsert({
         idempotency_key: eventId,
-        household_id: ev.profileId,
-        profile_id: ev.profileId,
+        household_id: ev.householdId,
+        profile_id: ev.actorProfileId,
         slate_id: slateRows?.[0]?.id ?? null,
         episode_hash: episodeHash,
         outcome_type: outcomeType,
@@ -107,7 +110,7 @@ async function syncTypedIntelligence(
       expiry.setUTCDate(expiry.getUTCDate() + 7);
       const { error } = await withTimeout(
         db.from("pantry_beliefs").upsert({
-          household_id: ev.profileId,
+          household_id: ev.householdId,
           ingredient_id: ingredient.id,
           probability_present: 0.02,
           quantity_range: {},
@@ -128,8 +131,8 @@ async function syncTypedIntelligence(
 
 /**
  * Record one feedback event, after resolving the caller's `request_id` to its
- * recommendation_events row and verifying that row belongs to the calling profile.
- * @throws AppError ERR_RECOMMENDATION_EVENT_NOT_FOUND (404) if request_id matches no row for this profile.
+ * recommendation_events row and verifying that row belongs to the authorized household.
+ * @throws AppError ERR_RECOMMENDATION_EVENT_NOT_FOUND (404) if request_id matches no row for this household.
  * @throws AppError ERROR_CATALOGUE.INTERNAL (500) if a lookup/the insert itself fails (the caller should retry).
  */
 export async function recordFeedbackEvent(
@@ -138,15 +141,14 @@ export async function recordFeedbackEvent(
 ): Promise<FeedbackEventResult> {
   const db = createServiceRoleClient(ctx.config);
 
-  // Scoped to profile_id in the query itself (not just checked after the fact): a request_id
-  // belonging to another profile then looks IDENTICAL to "no such request_id" — no information
-  // disclosure about another profile's recommendation history (DOC-P3-06 §05.1 precedent).
+  // Scope the served request to the authorized household. Actor identity is intentionally
+  // separate so each member's feedback remains attributable without exposing other households.
   const { data: recRows, error: recErr } = await withTimeout(
     db
       .from("recommendation_events")
-      .select("id, profile_id")
+      .select("id, profile_id, household_id")
       .eq("request_id", ev.requestId)
-      .eq("profile_id", ev.profileId)
+      .eq("household_id", ev.householdId)
       .order("created_at", { ascending: false })
       .limit(1),
     "feedback.events.lookup_recommendation_event",
@@ -192,7 +194,7 @@ export async function recordFeedbackEvent(
   // result without applying its affinity delta twice.
   const existingQuery = db.from("feedback_events").select("id,created_at").eq(
     "profile_id",
-    ev.profileId,
+    ev.actorProfileId,
   ).eq("recommendation_event_id", recRow.id).eq("event_type", ev.eventType);
   const { data: existing, error: existingError } = await withTimeout(
     dishId === null
@@ -218,8 +220,8 @@ export async function recordFeedbackEvent(
     db
       .from("feedback_events")
       .insert({
-        profile_id: ev.profileId,
-        household_id: ev.profileId,
+        profile_id: ev.actorProfileId,
+        household_id: ev.householdId,
         recommendation_event_id: recRow.id,
         dish_id: dishId,
         event_type: ev.eventType,
@@ -233,7 +235,8 @@ export async function recordFeedbackEvent(
   );
   if (error) {
     ctx.logger.warn("feedback_event.insert_failed", {
-      profile_id: ev.profileId,
+      profile_id: ev.actorProfileId,
+      household_id: ev.householdId,
       request_id: ev.requestId,
       event_type: ev.eventType,
       detail: error.message,
@@ -248,7 +251,7 @@ export async function recordFeedbackEvent(
     if (ev.eventType === "never") {
       const { error: stateError } = await withTimeout(
         db.from("never_list").upsert({
-          profile_id: ev.profileId,
+          profile_id: ev.householdId,
           dish_id: dishId,
           nevered_at: new Date().toISOString(),
           is_active: true,
@@ -262,7 +265,7 @@ export async function recordFeedbackEvent(
       if (effectiveUntil <= new Date()) effectiveUntil.setUTCDate(effectiveUntil.getUTCDate() + 1);
       const { error: stateError } = await withTimeout(
         db.from("not_today_suppression").upsert({
-          profile_id: ev.profileId,
+          profile_id: ev.householdId,
           dish_id: dishId,
           suppressed_at: new Date().toISOString(),
           effective_until: effectiveUntil.toISOString(),
@@ -280,7 +283,7 @@ export async function recordFeedbackEvent(
       : 0;
     if (delta !== 0) {
       const { data: taste, error: tasteReadError } = await withTimeout(
-        db.from("user_taste_vectors").select("dish_affinity").eq("profile_id", ev.profileId)
+        db.from("user_taste_vectors").select("dish_affinity").eq("profile_id", ev.actorProfileId)
           .maybeSingle(),
         "feedback.events.taste_read",
       );
@@ -291,7 +294,7 @@ export async function recordFeedbackEvent(
       affinities[ev.dishName] = Math.max(-1, Math.min(1, (affinities[ev.dishName] ?? 0) + delta));
       const { error: tasteWriteError } = await withTimeout(
         db.from("user_taste_vectors").upsert({
-          profile_id: ev.profileId,
+          profile_id: ev.actorProfileId,
           dish_affinity: affinities,
           updated_at: new Date().toISOString(),
         }, { onConflict: "profile_id" }),
@@ -313,17 +316,22 @@ export async function recordFeedbackEvent(
 
   ctx.logger.info("feedback_event.recorded", {
     id: inserted.id,
-    profile_id: ev.profileId,
+    profile_id: ev.actorProfileId,
+    household_id: ev.householdId,
     request_id: ev.requestId,
     event_type: ev.eventType,
     dish_resolved: dishResolved,
   });
   await recordProductEvent(ctx, {
-    profileId: ev.profileId,
+    profileId: ev.actorProfileId,
     eventName: `recommendation_${ev.eventType}`,
     requestId: ev.requestId,
     dishId,
-    properties: { slot: ev.slot ?? null, dish_name: ev.dishName ?? null },
+    properties: {
+      household_id: ev.householdId,
+      slot: ev.slot ?? null,
+      dish_name: ev.dishName ?? null,
+    },
   });
 
   return { id: inserted.id as string, createdAt: inserted.created_at as string, dishResolved };

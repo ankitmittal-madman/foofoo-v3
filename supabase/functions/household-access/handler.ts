@@ -9,7 +9,13 @@ import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
-import { acceptInvite, createInvite, listHouseholdAccess, mutateHouseholdAccess } from "./store.ts";
+import {
+  acceptInvite,
+  createInvite,
+  listHouseholdAccess,
+  listUserHouseholds,
+  mutateHouseholdAccess,
+} from "./store.ts";
 
 const INVITABLE_ROLES = ["planner", "cook", "member", "viewer"] as const;
 type InvitableRole = typeof INVITABLE_ROLES[number];
@@ -28,6 +34,7 @@ function invitationToken(): string {
 export interface HouseholdAccessDeps {
   authorize?: HouseholdRoleLookup;
   list?: typeof listHouseholdAccess;
+  listMine?: typeof listUserHouseholds;
   create?: typeof createInvite;
   accept?: typeof acceptInvite;
   mutate?: typeof mutateHouseholdAccess;
@@ -35,6 +42,7 @@ export interface HouseholdAccessDeps {
 
 export function makeHouseholdAccessHandler(deps: HouseholdAccessDeps = {}): Handler {
   const list = deps.list ?? listHouseholdAccess;
+  const listMine = deps.listMine ?? listUserHouseholds;
   const create = deps.create ?? createInvite;
   const accept = deps.accept ?? acceptInvite;
   const mutate = deps.mutate ?? mutateHouseholdAccess;
@@ -48,6 +56,13 @@ export function makeHouseholdAccessHandler(deps: HouseholdAccessDeps = {}): Hand
       throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "invalid JSON body" });
     }
     const action = String(body.action ?? "list");
+
+    if (action === "list_my_households") {
+      return jsonContract(
+        { kind: "household_list", households: await listMine(ctx, claims.userId) },
+        ctx.traceId,
+      );
+    }
 
     if (action === "accept_invite") {
       const token = String(body.token ?? "");

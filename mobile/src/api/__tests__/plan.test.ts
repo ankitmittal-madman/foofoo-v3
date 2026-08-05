@@ -2,6 +2,7 @@ import { ApiError, apiPost } from "../client";
 import { fetchMealEpisodes } from "../plan";
 
 jest.mock("../client", () => {
+  const post = jest.fn();
   class MockApiError extends Error {
     status: number;
     traceId?: string;
@@ -15,7 +16,8 @@ jest.mock("../client", () => {
   }
   return {
     ApiError: MockApiError,
-    apiPost: jest.fn(),
+    apiPost: post,
+    householdApiPost: post,
   };
 });
 

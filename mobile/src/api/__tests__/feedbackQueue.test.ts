@@ -3,6 +3,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ApiError, CLIENT_ERROR_CODES, apiPost } from "../client";
 import { flushFeedbackQueue, postFeedback } from "../feedback";
 
+jest.mock("../../household/activeHousehold", () => ({
+  withActiveHousehold: jest.fn((body) => Promise.resolve(body)),
+}));
+jest.mock("../../auth/supabaseClient", () => ({
+  supabase: { auth: { getSession: jest.fn(() => Promise.resolve({
+    data: { session: { user: { id: "user-1" } } },
+  })) } },
+}));
+
 jest.mock("../client", () => {
   class MockApiError extends Error {
     status: number;

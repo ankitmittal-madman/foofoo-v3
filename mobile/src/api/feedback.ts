@@ -2,8 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ApiError, CLIENT_ERROR_CODES, apiPost } from "./client";
 import type { FeedbackRequest, FeedbackResponse } from "./types";
 import { logger } from "../lib/logger";
+import { withActiveHousehold } from "../household/activeHousehold";
+import { supabase } from "../auth/supabaseClient";
 
-const QUEUE_KEY = "foofoo.feedbackQueue.v1";
+const QUEUE_KEY_PREFIX = "foofoo.feedbackQueue.v2";
 
 interface QueuedFeedback {
   body: FeedbackRequest;
@@ -11,7 +13,9 @@ interface QueuedFeedback {
 }
 
 async function loadQueue(): Promise<QueuedFeedback[]> {
-  const raw = await AsyncStorage.getItem(QUEUE_KEY);
+  const key = await queueKey();
+  if (!key) return [];
+  const raw = await AsyncStorage.getItem(key);
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
@@ -22,8 +26,15 @@ async function loadQueue(): Promise<QueuedFeedback[]> {
 }
 
 async function saveQueue(queue: QueuedFeedback[]): Promise<void> {
-  if (queue.length === 0) await AsyncStorage.removeItem(QUEUE_KEY);
-  else await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+  const key = await queueKey();
+  if (!key) return;
+  if (queue.length === 0) await AsyncStorage.removeItem(key);
+  else await AsyncStorage.setItem(key, JSON.stringify(queue));
+}
+
+async function queueKey(): Promise<string | null> {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user.id ? `${QUEUE_KEY_PREFIX}.${data.session.user.id}` : null;
 }
 
 function isRetryableTransportFailure(error: unknown): boolean {
@@ -61,11 +72,12 @@ export async function flushFeedbackQueue(): Promise<number> {
  * Online dish/class affinities are updated by the backend and loaded on the next plan request.
  * Transport failures are durably queued so kitchen feedback is not lost on poor connectivity.
  */
-export function postFeedback(body: FeedbackRequest): Promise<FeedbackResponse> {
-  return apiPost<FeedbackResponse>("/feedback", body).catch(async (error: unknown) => {
+export async function postFeedback(body: FeedbackRequest): Promise<FeedbackResponse> {
+  const scopedBody = await withActiveHousehold(body as FeedbackRequest & Record<string, unknown>);
+  return apiPost<FeedbackResponse>("/feedback", scopedBody).catch(async (error: unknown) => {
     if (!isRetryableTransportFailure(error)) throw error;
     const queue = await loadQueue();
-    queue.push({ body, queuedAt: new Date().toISOString() });
+    queue.push({ body: scopedBody as FeedbackRequest, queuedAt: new Date().toISOString() });
     await saveQueue(queue);
     logger.info("feedback.queued", { event_type: body.event_type, queue_size: queue.length });
     return {

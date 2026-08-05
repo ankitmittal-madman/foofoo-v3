@@ -16,7 +16,7 @@ import {
 } from "../_shared/mod.ts";
 import type { AuthClaims } from "../_shared/mod.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
-import { makeFeedbackHandler } from "../feedback/handler.ts";
+import { feedbackAllowedRoles, makeFeedbackHandler } from "../feedback/handler.ts";
 import type { FeedbackEventInput, FeedbackEventResult } from "../feedback/events.ts";
 
 const REQUIRED_ENV = {
@@ -135,7 +135,10 @@ function fakeRecordEvent(
 }
 
 function buildPipeline(recordEvent: ReturnType<typeof fakeRecordEvent>) {
-  const handler = makeFeedbackHandler({ recordEvent });
+  const handler = makeFeedbackHandler({
+    recordEvent,
+    authorizeHousehold: () => Promise.resolve("owner"),
+  });
   const verifier = () => Promise.resolve({ userId: USER_ID, role: "authenticated" } as AuthClaims);
   return defineHandler(handler, { middleware: [authenticate(verifier)] });
 }
@@ -166,7 +169,8 @@ Deno.test("POST /v1/feedback happy path returns 201 with contract-shaped body", 
     assertEquals(typeof json.trace_id, "string");
     // profile_id passed to the writer is the JWT user_id, never a client-supplied field —
     // feedback is always about the caller's own recommendation, so there is nothing to spoof.
-    assertEquals(seenInput?.profileId, USER_ID);
+    assertEquals(seenInput?.actorProfileId, USER_ID);
+    assertEquals(seenInput?.householdId, USER_ID);
     assertEquals(seenInput?.requestId, REQUEST_ID);
   });
 });
@@ -239,6 +243,7 @@ Deno.test("POST /v1/feedback returns 401 when unauthenticated", async () => {
       recordEvent: fakeRecordEvent(() => {
         throw new Error("must not be called");
       }),
+      authorizeHousehold: () => Promise.resolve("owner"),
     });
     const pipeline = defineHandler(handler, {
       middleware: [authenticate(() => Promise.reject(new Error("no token")))],
@@ -250,6 +255,84 @@ Deno.test("POST /v1/feedback returns 401 when unauthenticated", async () => {
     });
     const res = await pipeline(req);
     assertEquals(res.status, 401);
+  });
+});
+
+Deno.test("feedback role matrix keeps viewers read-only and plan control owner/planner-only", () => {
+  assertEquals(feedbackAllowedRoles("lock"), ["owner", "planner"]);
+  assertEquals(feedbackAllowedRoles("missing_ingredient"), ["owner", "planner", "cook"]);
+  assertEquals(feedbackAllowedRoles("like"), ["owner", "planner", "cook", "member"]);
+});
+
+Deno.test("POST /v1/feedback forwards a selected household separately from actor identity", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const householdId = "44444444-4444-4444-4444-444444444444";
+    let seenInput: FeedbackEventInput | undefined;
+    const handler = makeFeedbackHandler({
+      authorizeHousehold: (_ctx, selected, actor) => {
+        assertEquals(selected, householdId);
+        assertEquals(actor, USER_ID);
+        return Promise.resolve("member");
+      },
+      recordEvent: (_ctx, input) => {
+        seenInput = input;
+        return Promise.resolve({
+          id: "33333333-3333-3333-3333-333333333333",
+          createdAt: "2026-08-02T00:00:00.000Z",
+          dishResolved: true,
+        });
+      },
+    });
+    const pipeline = defineHandler(handler, {
+      middleware: [authenticate(() =>
+        Promise.resolve({
+          userId: USER_ID,
+          role: "authenticated",
+        } as AuthClaims)
+      )],
+    });
+    const res = await pipeline(
+      new Request("http://localhost/v1/feedback", {
+        method: "POST",
+        headers: { Authorization: "Bearer good", "content-type": "application/json" },
+        body: JSON.stringify(validBody({ household_id: householdId, event_type: "like" })),
+      }),
+    );
+    assertEquals(res.status, 201);
+    assertEquals(seenInput?.actorProfileId, USER_ID);
+    assertEquals(seenInput?.householdId, householdId);
+  });
+});
+
+Deno.test("member cannot perform planner-only feedback actions", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    let recordCalled = false;
+    const handler = makeFeedbackHandler({
+      authorizeHousehold: () => Promise.resolve("member"),
+      recordEvent: () => {
+        recordCalled = true;
+        return Promise.resolve({ id: "x", createdAt: "now", dishResolved: false });
+      },
+    });
+    const pipeline = defineHandler(handler, {
+      middleware: [authenticate(() =>
+        Promise.resolve({
+          userId: USER_ID,
+          role: "authenticated",
+        } as AuthClaims)
+      )],
+    });
+    const res = await pipeline(
+      new Request("http://localhost/v1/feedback", {
+        method: "POST",
+        headers: { Authorization: "Bearer good", "content-type": "application/json" },
+        body: JSON.stringify(validBody({ event_type: "lock" })),
+      }),
+    );
+    assertEquals(res.status, 403);
+    assertEquals(recordCalled, false);
   });
 });
 

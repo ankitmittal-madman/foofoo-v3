@@ -2,9 +2,9 @@
  * POST /v1/feedback — business handler (WP-15).
  *
  * THIN handler, same shape as consent/handler.ts: parse → authorize (the feedback is always
- * about the CALLER's own recommendation, so the JWT user_id IS the profile_id — there is no
- * separate body field to check ownership against, unlike consent/recommendations) → delegate to
- * the DB writer → envelope the response.
+ * about an explicitly selected household recommendation. JWT identity remains the actor while
+ * active membership plus the event-specific role matrix authorizes the household target →
+ * delegate to the DB writer → envelope the response.
  *
  * This is the "instrument real feedback" step WP-14 identified as the actual prerequisite for the
  * Core Spine's `w_pref·S_pref` term (pinned to 0 in v1) — no scoring/ML change here, purely
@@ -12,6 +12,11 @@
  * rows so that history exists to learn from later.
  */
 import { requireAuth } from "../_shared/auth/authorize.ts";
+import {
+  type HouseholdRole,
+  type HouseholdRoleLookup,
+  requireHouseholdRole,
+} from "../_shared/auth/household.ts";
 import { jsonContract } from "../_shared/api/response.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
@@ -25,6 +30,29 @@ import { recordFeedbackEvent } from "./events.ts";
 
 export interface FeedbackDeps {
   recordEvent?: typeof recordFeedbackEvent;
+  authorizeHousehold?: HouseholdRoleLookup;
+}
+
+const PLAN_CONTROL_EVENTS = new Set([
+  "accept",
+  "edit",
+  "swap",
+  "lock",
+  "unlock",
+  "add_to_date",
+  "make_this",
+  "replaced",
+  "never",
+  "not_today",
+]);
+const COOK_EXECUTION_EVENTS = new Set(["cooked", "missing_ingredient"]);
+
+/** Role matrix from the canonical PRD: viewers never write; planners control the shared plan;
+ * cooks may additionally record execution/pantry facts; members may record attributable feedback. */
+export function feedbackAllowedRoles(eventType: string): readonly HouseholdRole[] {
+  if (PLAN_CONTROL_EVENTS.has(eventType)) return ["owner", "planner"];
+  if (COOK_EXECUTION_EVENTS.has(eventType)) return ["owner", "planner", "cook"];
+  return ["owner", "planner", "cook", "member"];
 }
 
 /** Build the POST /v1/feedback handler. */
@@ -49,6 +77,14 @@ export function makeFeedbackHandler(deps: FeedbackDeps = {}): Handler {
     }
 
     const feedbackReq = parseFeedbackRequest(body);
+    const householdId = feedbackReq.householdId ?? claims.userId;
+    await requireHouseholdRole(
+      ctx,
+      claims,
+      householdId,
+      feedbackAllowedRoles(feedbackReq.eventType),
+      deps.authorizeHousehold,
+    );
 
     const requestContext: RequestContext = {
       ...ctx,
@@ -56,7 +92,8 @@ export function makeFeedbackHandler(deps: FeedbackDeps = {}): Handler {
     };
 
     const result = await recordEvent(requestContext, {
-      profileId: claims.userId,
+      actorProfileId: claims.userId,
+      householdId,
       requestId: feedbackReq.requestId,
       eventType: feedbackReq.eventType,
       dishName: feedbackReq.dishName,

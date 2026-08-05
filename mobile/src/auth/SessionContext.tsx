@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState, type PropsWithChildren 
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabaseClient";
 import { identifyOneSignalUser, initializeOneSignal } from "@/notifications/oneSignal";
+import { clearActiveHousehold } from "@/household/activeHousehold";
+import { queryClient } from "@/lib/queryClient";
 
 interface SessionContextValue {
   session: Session | null;
@@ -54,6 +56,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
       return { error: error?.message ?? null };
     },
     signOut: async () => {
+      await clearActiveHousehold();
+      queryClient.clear();
       await supabase.auth.signOut();
     },
   };

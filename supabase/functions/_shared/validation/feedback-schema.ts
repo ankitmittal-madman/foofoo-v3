@@ -39,6 +39,9 @@ export const FEEDBACK_EVENT_TYPES = [
 export type FeedbackEventType = typeof FEEDBACK_EVENT_TYPES[number];
 
 export interface FeedbackRequest {
+  /** Household whose served recommendation is being acted on. Defaults to the caller's
+   * compatibility household for older clients. Actor identity always comes from the JWT. */
+  readonly householdId?: string;
   /** The `request_id` echoed in a POST /v1/recommendations response (RecommendationsResponse.
    * request_id, mobile/src/api/types.ts) — deliberately NOT recommendation_events.id (the DB row's
    * uuid PK), which the client is never given. events.ts resolves this to the matching
@@ -53,6 +56,7 @@ export interface FeedbackRequest {
 }
 
 const feedbackEnvelope = z.object({
+  household_id: z.string().uuid().optional(),
   request_id: z.string().min(1),
   event_type: z.string(),
   dish_name: z.string().min(1).optional(),
@@ -89,6 +93,7 @@ export function parseFeedbackRequest(body: unknown): FeedbackRequest {
   }
 
   return {
+    householdId: parsed.data.household_id,
     requestId: parsed.data.request_id,
     eventType: parsed.data.event_type,
     dishName: parsed.data.dish_name,

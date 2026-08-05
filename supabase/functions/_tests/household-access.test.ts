@@ -73,6 +73,32 @@ Deno.test("shared-household viewer can list memberships without owner audit data
   });
 });
 
+Deno.test("signed-in user can discover every active household without supplying tenant ids", async () => {
+  await withEnv(async () => {
+    let authorizationCalled = false;
+    const res = await pipeline({
+      authorize: () => {
+        authorizationCalled = true;
+        return Promise.resolve(null);
+      },
+      listMine: (_ctx, userId) => {
+        assertEquals(userId, USER_ID);
+        return Promise.resolve([{
+          household_id: HOUSEHOLD_ID,
+          role: "member",
+          joined_at: "2026-08-05T00:00:00Z",
+          name: "Shared home",
+          owner_user_id: "33333333-3333-3333-3333-333333333333",
+        }]);
+      },
+    })(post({ action: "list_my_households" }));
+    assertEquals(res.status, 200);
+    assertEquals(authorizationCalled, false);
+    const body = await res.json();
+    assertEquals(body.households[0].role, "member");
+  });
+});
+
 Deno.test("owner creates a one-time invite while only its hash reaches storage", async () => {
   await withEnv(async () => {
     let storedHash = "";

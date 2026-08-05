@@ -4,7 +4,7 @@
  * attaches the Supabase JWT). The Edge Function composes the household from the DB, so the client
  * never sends Q1–Q15 here — only the surface + planning params.
  */
-import { apiPost, type ApiError } from "./client";
+import { householdApiPost as apiPost, type ApiError } from "./client";
 
 /** One dish/meal card the planner returns (image_url + meal class attached server-side). */
 export interface PlanDish {

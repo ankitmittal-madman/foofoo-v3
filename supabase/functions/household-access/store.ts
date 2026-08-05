@@ -2,6 +2,27 @@ import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { HouseholdRole } from "../_shared/auth/household.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 
+export async function listUserHouseholds(ctx: RequestContext, userId: string) {
+  const db = createServiceRoleClient(ctx.config);
+  const { data: memberships, error } = await db.from("household_memberships")
+    .select("household_id,role_code,status,joined_at")
+    .eq("user_id", userId).eq("status", "active").order("joined_at");
+  if (error) throw error;
+  const householdIds = (memberships ?? []).map((row) => String(row.household_id));
+  if (householdIds.length === 0) return [];
+  const { data: households, error: householdError } = await db.from("households")
+    .select("id,name,owner_user_id,status").in("id", householdIds);
+  if (householdError) throw householdError;
+  const byId = new Map((households ?? []).map((row) => [String(row.id), row]));
+  return (memberships ?? []).map((membership) => ({
+    household_id: membership.household_id,
+    role: membership.role_code,
+    joined_at: membership.joined_at,
+    name: byId.get(String(membership.household_id))?.name ?? "Household",
+    owner_user_id: byId.get(String(membership.household_id))?.owner_user_id ?? null,
+  }));
+}
+
 export async function listHouseholdAccess(
   ctx: RequestContext,
   householdId: string,
