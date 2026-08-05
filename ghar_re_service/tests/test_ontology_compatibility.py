@@ -14,6 +14,9 @@ import os
 from ghar_re_service.scripts import export_bundle
 
 from ghar_re_core import knowledge as K
+from ghar_re_core import meal_planner
+from ghar_re_core.catalogue import Catalogue
+from ghar_re_core.fixtures import DISHES
 
 
 def _class_dir() -> str:
@@ -103,3 +106,14 @@ def test_snapshot_is_part_of_the_versioned_recommendation_bundle(tmp_path):
     rel = "class_first_v1/food_ontology_snapshot.json"
     assert rel in manifest["config_sha256"]
     assert os.path.isfile(tmp_path / "bundle" / "config" / rel)
+
+
+def test_class_backing_cache_cannot_leak_between_catalogue_snapshots():
+    """A bundle promotion and a golden-fixture test may coexist in one worker process."""
+    full = Catalogue(DISHES)
+    one_dish = Catalogue(DISHES[:1])
+    full_counts = meal_planner._class_dish_counts(full)
+    one_counts = meal_planner._class_dish_counts(one_dish)
+    expected = K.dish_to_class_codes(one_dish.dishes[0].name)
+    assert sum(one_counts.values()) == len(expected)
+    assert one_counts != full_counts
