@@ -74,9 +74,7 @@ def test_meal_plan_slot_options(client):
         ("senior", 70, "LD_ELDERLY_SOFT_DIGESTIVE"),
     ],
 )
-def test_meal_plan_addons_accept_live_member_role_vocabulary(
-    client, role, age, expected_class
-):
+def test_meal_plan_addons_accept_live_member_role_vocabulary(client, role, age, expected_class):
     household = _hh()
     household["q12_member_ages"] = [{"role": "adult", "age": 35}, {"role": role, "age": age}]
     r = _post(
