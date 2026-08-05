@@ -44,12 +44,6 @@ findings are retained under `docs/archive/`.
   deployment-branch policy.
 - Contract legacy dish/event compatibility tables only after one monitored episode dual-write,
   export/delete and rollback-parity window; no new feature may target those legacy facts.
-- Deploy and operationally verify the remaining client/operational release candidate: mobile
-  search and filters, richer explanations, selective refresh, episode grammars, festival mapping,
-  household fairness and remaining CI/deployment workflow changes. Rerun the repaired segmented
-  weekly-plan persona journey after deployment. Restart-safe user/tenant-scoped query and feedback persistence is deployed.
-  The ontology database, affected Edge
-  Functions, cached-weather/MMR-capable RE image and immutable bundle are live.
 - Run production catalogue-scale load/soak tests and revisit Fly.io sizing. The local 810-dish run
   is evidence for local behavior only.
 
@@ -87,6 +81,14 @@ findings are retained under `docs/archive/`.
   for viewer. The client discovers/selects memberships, accepts hashed-token invites, exposes
   owner administration and member leave, and scopes plan requests, feedback queues and persisted
   queries by authenticated user/selected household. Commit `323f470` passed backend and mobile CI.
+- The episode/weekly-plan release candidate is fully deployed. All five commit checks passed,
+  Fly workflow `31028623979` is green, `recommendations` v18 and `feedback` v14 are active, and
+  `plan` v19 already matched the release bundle. Production smoke `31032523928` and persona journey
+  `31032523507` passed; the latter deployed Expo web and published HTML, Excel and ZIP evidence.
+- Migration 075 implements the target-schema `food.festivals` and
+  `food.festival_calendar_occurrences` tables with explicit provenance and a service-role-only
+  `active_festivals_on(date)` facade. Production validation 930 passed privacy, authority and
+  active-date result checks; the retired `re_engine` calendar was not resurrected.
 
 - Production migrations 057–059 resolved exposed trigger-function grants, 77 missing leading
   foreign-key indexes, two duplicate indexes, event-partition horizon automation, post-profile
@@ -98,7 +100,7 @@ findings are retained under `docs/archive/`.
 - `recommendations` v17, `plan` v19, and `feedback` v13 are live with household-aware writes; all
   production tenant-continuity validation counts are zero.
 
-## Recently closed in the repository (deployment evidence pending)
+## Recently closed in the repository and production
 
 - Complete meal episodes now have a canonical request/response schema plus published, versioned
   `SINGLE_PRIMARY`, `BASE_WITH_SIDES` and `THALI` runtime grammars. The service validates both
@@ -106,17 +108,17 @@ findings are retained under `docs/archive/`.
 - Weekly plans use formal MMR and explicit repair for recent repeats, per-slot weekly caps and a
   rank-one weekend special. Thin catalogues return residual constraint violations instead of a
   false success claim.
-- Festival context is resolved from the governed calendar through migration 075's
-  service-role-only `active_festivals_on(date)` facade; private `re_engine` remains unexposed.
+- Festival context is resolved from normalized private `food` calendar tables through migration
+  075's service-role-only `active_festivals_on(date)` facade.
 - Shared-household preference aggregation uses only active members' explicit dish evidence and a
   Nash-style geometric welfare score. Missing member evidence remains missing rather than being
   inferred from demographics.
 - `PanIndia` and `Global` are dish provenance zones, not household regions. The household regional
   prior grid already covers every derivable household zone; adding those rows would invent an
   invalid household state and counteract the intentional cold-start foreign-dish policy.
-- The weekly-plan persona driver now switches between Weekdays and Weekend before clicking the 21
-  visible choices, eliminating the hidden duplicate-card selector timeout. A production rerun is
-  included in the release-candidate deployment item above.
+- The weekly-plan persona driver switches between Weekdays and Weekend before clicking the 21
+  visible choices, eliminating the hidden duplicate-card selector timeout. Production runs
+  `31027622263` and `31032523507` passed.
 
 ## Active implementation documents retained for review
 

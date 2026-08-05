@@ -39,8 +39,9 @@
 > meal-episode rendering, feedback, recipes, slate persistence and evidence publication verified.
 > The later polished mobile shell was reconciled with the same server-authoritative 7×3 weekly
 > planner and live episode surface; production workflow `31006023576` passed after deployment.
-> The new RE eligible-set response is committed and tested but its Fly production rollout is
-> waiting for approval in GitHub's protected `Production` environment.
+> The RE eligible-set/episode release is live: Fly workflow `31028623979` passed and
+> `https://ghar-re.fly.dev/readyz` reports ready with immutable bundle
+> `sha256:ffad5c55384244e3`.
 >
 > **Budgeted generative ontology enrichment:** migrations 066–069 and the updated
 > `cron-dish-ontology` worker are live. Groq `openai/gpt-oss-120b` independently processes every
@@ -63,8 +64,8 @@
 > one active owner per household, records membership lifecycle history, supports atomic owner
 > transfer, role change, revoke, leave, invite creation and invite acceptance, and exposes
 > membership-aware RLS. Invite tokens are stored only as SHA-256 hashes. `household-access` v2,
-> `recommendations` v17 and `plan` v19 are live; recommendation reads accept any active role while
-> plan writes require owner or planner. `feedback` v13 separates the authenticated actor from the
+> `recommendations` v18 and `plan` v19 are live; recommendation reads accept any active role while
+> plan writes require owner or planner. `feedback` v14 separates the authenticated actor from the
 > selected household and enforces the complete role matrix: owner/planner control plans; cook can
 > record execution and missing ingredients; members can record attributable preference feedback;
 > viewers are read-only. Production validation and rollback-only role-transition
@@ -73,9 +74,10 @@
 > one-time invite tokens, and supports owner invite, role, transfer and revoke operations plus
 > member leave. Plan requests, feedback, offline feedback queues and persisted query caches are
 > scoped to the authenticated user and selected household. Commit `323f470` passed backend and
-> mobile CI. Workflow 31026168425 successfully promoted its Expo web build to Vercel; its later
-> persona step failed because the driver selected a hidden duplicate Saturday card. Focused
-> production health and Edge authentication workflow 31026582073 passed.
+> mobile CI. The repaired seven-day Home and segmented weekly-plan flows passed production persona
+> workflows `31027622263` and `31032523507`; the latter also redeployed Expo web and published its
+> HTML, Excel and ZIP evidence. Final production health and authentication workflow `31032523928`
+> passed.
 >
 > **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
 > execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
@@ -86,12 +88,14 @@
 > GitHub's `Production` environment now requires review and
 > permits deployments from `main` only.
 >
-> **Remaining local release candidate:** search/filter UI, cached live
+> **Latest production release:** search/filter UI, cached live
 > weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
 > query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
 > pinned container bases, staging/manual-production workflows and
-> mobile CI are implemented. The current repository closure adds canonical episode grammars,
-> weekly constraint repair, festival-calendar resolution and explicit-evidence household fairness.
+> mobile CI are implemented and deployed. The current closure adds canonical episode grammars,
+> weekly constraint repair, normalized `food` festival-calendar resolution and explicit-evidence
+> household fairness. Migration 075 and validation 930 are live; the calendar tables remain private
+> and only the service-role `active_festivals_on(date)` facade is exposed.
 > Verification passes: 720 Python tests (27 skipped), 108 Deno tests,
 > 31 mobile tests across 15 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
@@ -118,7 +122,7 @@
   image `deployment-01KZ945DR0VDXVEZBG3Y34H6KT` live-healthy with snapshot-v2 bundle
   `sha256:ffad5c55384244e3`.
 - **Edge Functions:** implemented and tested (108 tests); membership-aware authorization is live
-  in `household-access` v2, `recommendations` v17, `plan` v19 and `feedback` v13. The backend
+  in `household-access` v2, `recommendations` v18, `plan` v19 and `feedback` v14. The backend
   supports governed invitations, owner transfer and lifecycle history, and enforces distinct
   owner/planner, cook, member and viewer mutation permissions.
 - **Mobile app:** onboarding/cold-start/weekly-plan work; complete meal episodes are live on the
@@ -134,7 +138,8 @@
   a household and active owner membership, all scoped household IDs are non-null, advisor-reported
   missing FK indexes/duplicate indexes are resolved, and partition creation is automated.
   Migration 073 adds membership history and guarantees exactly one active owner; the live
-  validation reports zero invalid households.
+  validation reports zero invalid households. Migration 075 adds private normalized festival
+  identities/occurrences under `food`; validation 930 confirms table privacy and RPC results.
 - **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; a normalized,
   provenance-backed dish enrichment layer and class-bound candidate view are live for all 802
   production dishes;
@@ -142,8 +147,8 @@
   episode coverage. The production relational graph connects dishes, aliases, ingredients,
   classes and catalogue features with provenance. USDA is active only as exact-match provisional
   evidence after a labelled demo-key evaluation showed poor broad Indian-dish matching. Groq
-  low-risk enrichment is live under strict budgets and database field policies;
-  festival mapping and clinically governed health-condition suitability remain absent/pending.
+  low-risk enrichment is live under strict budgets and database field policies. Normalized
+  festival mapping is live; clinically governed health-condition suitability remains pending.
 
 See `docs/active/OPEN_ITEMS.md` for what's actionable, `docs/active/LAUNCH_BLOCKERS.md` for what
 gates a public launch, `docs/active/ROADMAP.md` for sequencing.

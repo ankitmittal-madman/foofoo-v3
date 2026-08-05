@@ -6,6 +6,16 @@
 ## [Unreleased]
 
 ### Deployed
+- Published release commit `2e7324e` after all five workflows passed: backend, mobile,
+  recommendation-engine, quality gate and Fly production deployment. Fly is ready on engine
+  1.0.0/config v1.0 with immutable bundle `sha256:ffad5c55384244e3`.
+- Applied normalized festival migration 075 and passed production validation 930. Governed
+  festival identities and dated occurrences now live privately under `food`; only the
+  service-role `active_festivals_on(date)` facade is exposed. The retired `re_engine` table was
+  not recreated.
+- Deployed `recommendations` v18 and `feedback` v14; `plan` v19 already matched the release
+  bundle. Each endpoint rejects unauthenticated requests. Production smoke `31032523928` and the
+  complete one-persona Vercel/browser/report workflow `31032523507` passed.
 - Deployed `household-access` v2 and `feedback` v13. The former supports unaffiliated-safe
   membership discovery; the latter separates JWT actor identity from selected household tenancy
   and enforces owner/planner/cook/member/viewer feedback permissions.
@@ -13,10 +23,9 @@
   joined households, accept one-time invites, administer roles/invites/ownership, leave a
   household, and carry the selected tenant through plan and feedback APIs. Offline feedback and
   persisted plan caches are user-scoped and cleared on sign-out.
-- Vercel promotion succeeded in workflow 31026168425 and focused production health/authentication
-  workflow 31026582073 passed. The downstream persona evidence remains open because its driver
-  chose a hidden duplicate Saturday card and timed out; this is recorded separately from deploy
-  health rather than reported as a passing journey.
+- The earlier hidden-Saturday persona failure from workflow `31026168425` was repaired with
+  visible weekday/weekend segment selection. Follow-up production runs `31027622263` and
+  `31032523507` passed.
 - Applied and ledgered migration 073. Production now enforces exactly one active household owner,
   records membership lifecycle history, supports atomic transfer/role/revoke/leave/invite flows,
   and applies membership-aware RLS; validations 927–928 pass with zero invalid households.
