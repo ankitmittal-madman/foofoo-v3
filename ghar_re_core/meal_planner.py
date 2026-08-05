@@ -530,17 +530,21 @@ def _ensure_weekend_special(slots, full_plans, backing, meta, top_classes):
 
 
 _DISH_COUNTS = None
+_DISH_COUNTS_CATALOGUE = None
 
 
 def _class_dish_counts(cat):
     """meal_class_code -> number of catalogue dishes mapped to it (cached per catalogue identity)."""
-    global _DISH_COUNTS
-    if _DISH_COUNTS is None:
+    global _DISH_COUNTS, _DISH_COUNTS_CATALOGUE
+    if _DISH_COUNTS is None or _DISH_COUNTS_CATALOGUE is not cat:
         counts: dict = {}
         for d in cat:
             for code in K.dish_to_class_codes(
                 d.name
             ):  # multi-membership: count every class a dish backs
                 counts[code] = counts.get(code, 0) + 1
+        # Publish the count map before its owner. A concurrent request can at worst recompute; it
+        # can never observe a catalogue identity paired with another catalogue's counts.
         _DISH_COUNTS = counts
+        _DISH_COUNTS_CATALOGUE = cat
     return _DISH_COUNTS

@@ -734,11 +734,13 @@ STATE_TO_KB_SUBZONE = {
 # for unscored dishes, not a fabricated boost.
 # ---------------------------------------------------------------------------
 import csv as _csv
+import json as _json
 import os as _os
 
 _DISH_TO_CLASS = None
 _DISH_OVERRIDES = None
 _DISH_TO_CLASSES = None  # dish -> full set of classes (multi-membership; WP-17.1)
+_ONTOLOGY_SNAPSHOT = None
 
 
 def _load_class_first_csv(name):
@@ -754,6 +756,50 @@ def _load_class_first_csv(name):
         return list(_csv.DictReader(f))
 
 
+def _load_ontology_snapshot():
+    """Load the planning-safe ontology projection, or return None during staged rollout.
+
+    The recommendation service consumes an immutable bundle, never live source/AI tables. A
+    missing snapshot deliberately falls back to the legacy CSV path below, so deploying code
+    before migration/seed/bundle promotion cannot remove or alter existing recommendations.
+    Malformed snapshots fail loudly at startup/request warm-up rather than silently changing class
+    membership.
+    """
+    global _ONTOLOGY_SNAPSHOT
+    if _ONTOLOGY_SNAPSHOT is not None:
+        return _ONTOLOGY_SNAPSHOT
+    from ghar_re_core.config import SRC
+
+    path = _os.path.join(SRC, "class_first_v1", "food_ontology_snapshot.json")
+    try:
+        with open(path, encoding="utf-8") as handle:
+            snapshot = _json.load(handle)
+    except FileNotFoundError:
+        return None
+    if snapshot.get("schema_version") != 1 or not isinstance(snapshot.get("dishes"), list):
+        raise ValueError("unsupported or malformed food ontology snapshot")
+    _ONTOLOGY_SNAPSHOT = snapshot
+    return snapshot
+
+
+def _class_maps_from_snapshot(snapshot):
+    """Return primary and multi-membership maps from a validated immutable snapshot."""
+    primary, memberships = {}, {}
+    for dish in snapshot["dishes"]:
+        key = dish["name"].strip().lower()
+        primary_code = dish.get("primary_class_code")
+        if primary_code:
+            primary[key] = primary_code
+        classes = {
+            row["class_code"]
+            for row in dish.get("mappings", [])
+            if row.get("class_code") and row.get("review_status") != "rejected"
+        }
+        if classes:
+            memberships[key] = classes
+    return primary, memberships
+
+
 def dish_to_class_code(dish_name):
     """dish_name -> meal_class_code. Two static, checked-in sources, in precedence order:
       1. the curated Class_Dish_Options_v3 map (case-insensitive EXACT match — authored truth), then
@@ -766,6 +812,16 @@ def dish_to_class_code(dish_name):
     the dish is in neither source (e.g. a brand-new dish added after the last classify run)."""
     global _DISH_TO_CLASS, _DISH_OVERRIDES
     if _DISH_TO_CLASS is None:
+        snapshot = _load_ontology_snapshot()
+        if snapshot is not None:
+            primary, memberships = _class_maps_from_snapshot(snapshot)
+            # Publish all related globals together so concurrent first requests cannot observe a
+            # half-initialized ontology cache. `_DISH_OVERRIDES` stays an empty compatibility map.
+            global _DISH_TO_CLASSES
+            _DISH_OVERRIDES = {}
+            _DISH_TO_CLASSES = memberships
+            _DISH_TO_CLASS = primary
+            return primary.get(dish_name.strip().lower())
         # Build both maps locally and publish them together.  Recommendation
         # requests execute in FastAPI's worker pool; exposing the first empty
         # map before the second exists lets a concurrent cold-start request

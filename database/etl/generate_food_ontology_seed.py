@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CLASS_DIR = ROOT / "data" / "source" / "class_first_v1"
 CATALOGUE = ROOT / "ghar_re_service" / "data" / "bundle" / "catalogue.json"
 OUTPUT = ROOT / "database" / "seeds" / "146_seed_food_ontology.sql"
+SNAPSHOT_OUTPUT = CLASS_DIR / "food_ontology_snapshot.json"
 
 TAXONOMY_FIELDS = (
     "cuisine",
@@ -48,13 +49,137 @@ def _slots(slot_group: str) -> list[str]:
     }[slot_group]
 
 
-def build_seed() -> str:
-    """Return idempotent SQL derived exclusively from checked-in research sources."""
+def load_sources() -> tuple[
+    list[dict[str, str]],
+    list[dict[str, str]],
+    list[dict[str, str]],
+    list[dict[str, object]],
+]:
+    """Load the three checked-in sources shared by the SQL and recommendation snapshot."""
     with (CLASS_DIR / "meal_class_master.csv").open(encoding="utf-8", newline="") as handle:
         classes = list(csv.DictReader(handle))
     with (CLASS_DIR / "dish_class_map.csv").open(encoding="utf-8", newline="") as handle:
         mappings = list(csv.DictReader(handle))
+    with (CLASS_DIR / "class_dish_options.csv").open(encoding="utf-8", newline="") as handle:
+        curated = list(csv.DictReader(handle))
     catalogue = json.loads(CATALOGUE.read_text(encoding="utf-8"))
+    return classes, mappings, curated, catalogue
+
+
+def normalized_mappings(
+    mappings: list[dict[str, str]], curated: list[dict[str, str]]
+) -> list[dict[str, object]]:
+    """Union full-coverage classifications with legacy curated membership without duplicates."""
+    rows: list[dict[str, object]] = [
+        {
+            "dish_name": row["dish_name"],
+            "meal_class_code": row["meal_class_code"],
+            "slot_group": row["slot_group"],
+            "method": row["method"],
+            "confidence": float(row["confidence"]),
+            "source": "class_first_v1/dish_class_map.csv",
+        }
+        for row in mappings
+    ]
+    seen = {(str(row["dish_name"]).strip().casefold(), str(row["meal_class_code"])) for row in rows}
+    for row in curated:
+        key = (row["dish_name"].strip().casefold(), row["meal_class_code"])
+        if key in seen:
+            continue
+        rows.append(
+            {
+                "dish_name": row["dish_name"],
+                "meal_class_code": row["meal_class_code"],
+                "slot_group": row["slot_group"],
+                "method": "curated_exact",
+                "confidence": 1.0,
+                "source": "class_first_v1/class_dish_options.csv",
+            }
+        )
+        seen.add(key)
+    return rows
+
+
+def build_snapshot(
+    classes: list[dict[str, str]],
+    mappings: list[dict[str, str]],
+    curated: list[dict[str, str]],
+    catalogue: list[dict[str, object]],
+) -> dict[str, object]:
+    """Build the immutable ontology projection consumed by the current recommender.
+
+    This deliberately contains only planning-safe class membership metadata. Raw source evidence,
+    AI candidates and review history remain in Postgres and can never enter the scoring process by
+    being copied into the runtime bundle. Primary selection matches the legacy lookup exactly:
+    curated rows win, then the first non-secondary class-first mapping.
+    """
+    role_by_class = {row["meal_class_code"]: row["planning_role_v3"] for row in classes}
+    curated_primary: dict[str, str] = {}
+    for row in curated:
+        curated_primary.setdefault(row["dish_name"].strip().casefold(), row["meal_class_code"])
+
+    rows_by_dish: dict[str, list[dict[str, object]]] = {}
+    first_mapping: dict[str, str] = {}
+    for row in normalized_mappings(mappings, curated):
+        key = str(row["dish_name"]).strip().casefold()
+        first_mapping.setdefault(key, str(row["meal_class_code"]))
+        confidence = float(row["confidence"])
+        rows_by_dish.setdefault(key, []).append(
+            {
+                "class_code": row["meal_class_code"],
+                "slot_group": row["slot_group"],
+                "planning_role": role_by_class[row["meal_class_code"]],
+                "method": row["method"],
+                "confidence": confidence,
+                "review_status": "accepted" if confidence >= 0.75 else "provisional",
+                "source": row["source"],
+            }
+        )
+
+    dishes = []
+    for dish in catalogue:
+        name = str(dish["name"])
+        key = name.strip().casefold()
+        primary = curated_primary.get(key) or first_mapping.get(key)
+        dishes.append(
+            {
+                "name": name,
+                "primary_class_code": primary,
+                "mappings": rows_by_dish.get(key, []),
+            }
+        )
+    catalogue_keys = {str(dish["name"]).strip().casefold() for dish in catalogue}
+    promoted_mapping_count = sum(len(rows_by_dish.get(key, [])) for key in catalogue_keys)
+    return {
+        "schema_version": 1,
+        "source": [
+            "class_first_v1/dish_class_map.csv",
+            "class_first_v1/class_dish_options.csv",
+        ],
+        "promotion_mode": "immutable_bundle",
+        "dish_count": len(dishes),
+        "source_mapping_count": len(mappings),
+        "mapping_count": promoted_mapping_count,
+        "unmatched_source_dishes": sorted(
+            {
+                row["dish_name"]
+                for row in mappings
+                if row["dish_name"].strip().casefold() not in catalogue_keys
+            }
+        ),
+        "dishes": dishes,
+    }
+
+
+def build_seed(
+    classes: list[dict[str, str]] | None = None,
+    mappings: list[dict[str, str]] | None = None,
+    curated: list[dict[str, str]] | None = None,
+    catalogue: list[dict[str, object]] | None = None,
+) -> str:
+    """Return idempotent SQL derived exclusively from checked-in research sources."""
+    if classes is None or mappings is None or curated is None or catalogue is None:
+        classes, mappings, curated, catalogue = load_sources()
 
     families = sorted({row["class_family_code"] for row in classes if row["class_family_code"]})
     family_payload = [
@@ -74,8 +199,8 @@ def build_seed() -> str:
 
     mapping_payload: list[dict[str, object]] = []
     role_by_class = {row["meal_class_code"]: row["planning_role_v3"] for row in classes}
-    for row in mappings:
-        planning_role = role_by_class[row["meal_class_code"]]
+    for row in normalized_mappings(mappings, curated):
+        planning_role = role_by_class[str(row["meal_class_code"])]
         item_role = {
             "MAIN_PRIMARY": "primary",
             "ADDON_ONLY_NOT_PRIMARY": "addon",
@@ -90,6 +215,7 @@ def build_seed() -> str:
                     "role": item_role,
                     "method": row["method"],
                     "confidence": float(row["confidence"]),
+                    "source": row["source"],
                 }
             )
 
@@ -127,14 +253,14 @@ FROM rows WHERE c.class_code = rows.code;
 
 WITH rows AS (
   SELECT * FROM jsonb_to_recordset($json${_json_literal(mapping_payload)}$json$::jsonb)
-    AS x(dish text, class text, slot text, role text, method text, confidence numeric)
+    AS x(dish text, class text, slot text, role text, method text, confidence numeric, source text)
 )
 INSERT INTO public.dish_meal_class_mappings (
   dish_id, class_code, slot, item_role, confidence, source_name, classification_method,
   source_type, review_status
 )
 SELECT d.id, rows.class, rows.slot, rows.role, rows.confidence,
-       'class_first_v1/dish_class_map.csv', rows.method, 'internal_research',
+       rows.source, rows.method, 'internal_research',
        CASE WHEN rows.confidence >= 0.75 THEN 'accepted' ELSE 'provisional' END
 FROM rows JOIN public.dishes d ON d.name = rows.dish
 JOIN public.meal_classes c ON c.class_code = rows.class
@@ -205,9 +331,18 @@ WHERE j.dish_id = d.id AND j.status NOT IN ('failed','complete');
 
 
 def main() -> None:
-    """Write the checked-in SQL seed used by clean-room and production migrations."""
-    OUTPUT.write_text(build_seed(), encoding="utf-8")
+    """Write the SQL seed and the recommendation-compatible immutable ontology projection."""
+    classes, mappings, curated, catalogue = load_sources()
+    OUTPUT.write_text(build_seed(classes, mappings, curated, catalogue), encoding="utf-8")
+    SNAPSHOT_OUTPUT.write_text(
+        json.dumps(
+            build_snapshot(classes, mappings, curated, catalogue), ensure_ascii=False, indent=2
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     print(f"wrote {OUTPUT.relative_to(ROOT)}")
+    print(f"wrote {SNAPSHOT_OUTPUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

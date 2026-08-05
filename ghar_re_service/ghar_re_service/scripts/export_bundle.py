@@ -93,6 +93,10 @@ CLASS_FIRST_FILES = (
     # WP-16 additions:
     "cohort_class_model.json",  # trained factorized class-affinity model (the "intelligence")
     "dish_class_map.csv",  # WP-17 nutritionist/chef dish->class map — full 810/810 coverage
+    # Normalized, planning-safe projection generated with database seed 146. Runtime class lookup
+    # prefers this snapshot and falls back to the two legacy CSVs, allowing a zero-downtime rollout
+    # while keeping raw evidence and provisional AI output out of the recommendation process.
+    "food_ontology_snapshot.json",
     "migration_overlay.csv",  # City_Migration_Overlay_v3 (home/local/national blend)
     "state_profile.csv",  # state -> region_archetype (a model feature) + class pools
     "nonveg_logic.csv",  # per-state nonveg/egg cadence (reference)
