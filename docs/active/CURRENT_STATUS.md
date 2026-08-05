@@ -15,16 +15,25 @@
 > **Production ontology/recommendation release:** migrations 054, 055 and 056 plus seed 146 are
 > live on `cmkswalqpmmqojwdmqbv`. All 802 production dishes are mapped to usable meal classes:
 > 547 are enriched and 255 are explicitly in review, with no pending enrichment jobs. The
-> `dish-ontology` v1, `plan` v9 and `feedback` v6 Edge Functions are active. Fly.io release v124
+> The ontology rollout initially activated `dish-ontology` v1, `plan` v9 and `feedback` v6;
+> current Edge versions are recorded in the production-hardening block below. Fly.io release v125
 > is healthy on both checks and serves immutable RE bundle `sha256:3d4cf579d1cf2565`. The legacy
 > CSV fallback remains enabled for one monitored rollback window. Unknown-dish AI promotion is
 > still disabled pending the Section 8 model/safety decisions in the ontology architecture.
+>
+> **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
+> execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
+> automate a six-month event-partition horizon; provision a household and owner membership for
+> every new profile; backfill existing tenant IDs; and enforce non-null household ownership on the
+> five household-scoped fact/context tables. `recommendations` v11, `plan` v10 and `feedback` v7
+> are live with household-aware writes. GitHub's `Production` environment now requires review and
+> permits deployments from `main` only.
 >
 > **Remaining local release candidate:** search/filter UI, cached live
 > weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
 > query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
 > pinned container bases, staging/manual-production workflows and
-> mobile CI are implemented. Verification passes: 712 Python tests (27 skipped), 85 Deno tests,
+> mobile CI are implemented. Verification passes: 715 Python tests (27 skipped), 85 Deno tests,
 > 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
 > run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
@@ -36,27 +45,30 @@
 | Backend (Edge Functions) | 90% |
 | Recommendation Engine | 85% |
 | Food Ontology | 75% |
-| Knowledge Graph | 0% (no graph structure exists — flat lookup tables only) |
+| Knowledge Graph | 25% (bounded local dish/ingredient/substitution traversal with provenance; not yet broad or production-governed) |
 | Seed Data | 90% |
 | Database | 95% |
-| Security | 80% |
-| Testing | 75% (backend suites green — 85 Deno + 712 repository Python tests; mobile has infra but no physical-device coverage yet) |
+| Security | 88% (database advisor remediations live; leaked-password screening needs a paid Supabase plan) |
+| Testing | 75% (backend suites green — 85 Deno + 715 repository Python tests; mobile has infra but no physical-device coverage yet) |
 | Deployment | 95% (ontology DB/Edge and RE bundle live-verified 2026-08-05; mobile/device release remains) |
 | Frontend (mobile) | 70% |
-| Observability | 45% (webhook alerting sink wired to every 500-level error path; no webhook URL configured yet) |
+| Observability | 60% (scheduled production smoke/issue alerting added; application 500-level webhook destination remains unconfigured) |
 
 ## One-line state per major component
-- **RE core/service:** implemented, repository Python suite green (712 passed, 27 skipped), Fly
-  release v124 live-healthy with bundle `sha256:3d4cf579d1cf2565`.
-- **Edge Functions:** implemented and tested (85 tests); auth/ownership model correct;
-  `dish-ontology` v1, `plan` v9 and `feedback` v6 deployed 2026-08-05.
+- **RE core/service:** implemented, repository Python suite green (715 passed, 27 skipped), Fly
+  release v125 live-healthy with bundle `sha256:3d4cf579d1cf2565`.
+- **Edge Functions:** implemented and tested (85 tests); current single-owner authorization model
+  is enforced; `dish-ontology` v1, `recommendations` v11, `plan` v10 and `feedback` v7 deployed
+  2026-08-05. Explicit membership/role authorization is still required before shared-household
+  collaboration is enabled.
 - **Mobile app:** onboarding/cold-start/weekly-plan work; explanation, history, profile-edit, and
   DPDP export/delete UI added 2026-08-04 (P0-2/P0-4/P1-2/P1-3/P1-4); jest infra stood up with 9
   pure-logic tests; Expo SDK 53 + OneSignal SDK integration passes typecheck, Expo Doctor, and an
   Android production bundle export; no component-render or physical-device tests yet (P1-5 partial).
-- **Database:** real production data (802 dishes, 33 real users, 126+ recommendation events), RLS
-  correct; the `household_context` write gap (P0-1) is fixed and deployed — new requests now
-  persist correctly.
+- **Database:** real production data (802 dishes, 77 profiles at the 2026-08-05 continuity audit),
+  RLS enabled; household context writes and tenant continuity are fixed and live. All profiles have
+  a household and active owner membership, all scoped household IDs are non-null, advisor-reported
+  missing FK indexes/duplicate indexes are resolved, and partition creation is automated.
 - **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; a normalized,
   provenance-backed dish enrichment layer and class-bound candidate view are live for all 802
   production dishes;
@@ -67,4 +79,3 @@
 
 See `docs/active/OPEN_ITEMS.md` for what's actionable, `docs/active/LAUNCH_BLOCKERS.md` for what
 gates a public launch, `docs/active/ROADMAP.md` for sequencing.
-</content>

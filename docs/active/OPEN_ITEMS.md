@@ -8,16 +8,22 @@ findings are retained under `docs/archive/`.
 ### Enable Supabase leaked-password protection
 
 - **Area:** Security
-- **Status:** Open; explicitly deferred by Founder instruction dated 2026-08-04.
-- **Evidence:** Supabase Auth advisor reported the setting disabled.
-- **Completion:** Enable it in the Supabase dashboard and verify the advisor clears.
+- **Status:** Blocked by the current Supabase plan, not by repository work.
+- **Evidence:** The Auth setting remains disabled. A verified Management API attempt to enable
+  `password_hibp_enabled` on 2026-08-05 returned HTTP 402; Supabase exposes the Have I Been Pwned
+  check on Pro plans and above.
+- **Completion:** Approve a Supabase plan upgrade, enable the setting, and verify the advisor clears.
 
 ### Configure and verify alert delivery
 
 - **Area:** Observability
-- **Status:** Open operational configuration.
-- **Evidence:** The webhook sink is implemented, but `TELEMETRY_WEBHOOK_URL` is not configured.
-- **Completion:** Configure a real destination and verify a controlled 500-level event arrives.
+- **Status:** Partially complete; repository-owned production smoke alerting is implemented, while
+  application 500-level webhook delivery still needs a destination.
+- **Evidence:** `.github/workflows/production-smoke.yml` checks Fly health/readiness/metadata and
+  Edge authentication boundaries every 15 minutes, opening or updating a GitHub issue on failure
+  and closing it after recovery. `TELEMETRY_WEBHOOK_URL` is not configured.
+- **Completion:** Configure an approved real webhook destination and verify a controlled 500-level
+  event arrives. The smoke monitor is complementary and does not prove application-error delivery.
 
 ### Complete physical-device E2E coverage
 
@@ -33,15 +39,20 @@ findings are retained under `docs/archive/`.
   receive no regional-prior boost.
 - Monitor the ontology-aware Fly release and legacy CSV compatibility fallback for one verified
   rollout window; remove the fallback only after parity and rollback evidence remain clean.
-- Configure `FLY_STAGING_*` variables/secrets and a protected `production` environment.
+- Create/approve a funded Fly staging app and configure `FLY_STAGING_*` variables/secrets. The
+  GitHub `Production` environment is now protected by a required reviewer and a main-only custom
+  deployment-branch policy.
 - Archive dead `re_engine`-era ETL and validation scripts that target retired schemas.
-- Resolve unindexed-foreign-key and duplicate-index advisor findings.
 - Deploy and operationally verify the remaining client/operational release candidate: mobile
   search and filters, richer explanations, selective refresh, restart-safe query/feedback
   persistence, and CI/deployment workflow changes. The ontology database, affected Edge
   Functions, cached-weather/MMR-capable RE image and immutable bundle are live.
 - Run production catalogue-scale load/soak tests and revisit Fly.io sizing. The local 810-dish run
   is evidence for local behavior only.
+- Replace the current one-profile/one-household compatibility authorization rule with explicit
+  membership/role checks before enabling multi-user shared households or invitations. Migration
+  059 guarantees tenant continuity for the current product model; it does not by itself launch
+  shared-household collaboration.
 
 ## P3 — Product and intelligence evolution
 
@@ -51,6 +62,18 @@ findings are retained under `docs/archive/`.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
 - Approve the unknown-dish AI policy: model/data residency, confidence thresholds, safety-field
   treatment, multi-label limits, reviewer workflow and training-data consent.
+
+## Recently closed with live evidence
+
+- Production migrations 057–059 resolved exposed trigger-function grants, 77 missing leading
+  foreign-key indexes, two duplicate indexes, event-partition horizon automation, post-profile
+  household provisioning, tenant backfill, and non-null household ownership on scoped facts.
+- The production advisor audit now reports zero unindexed foreign keys and zero duplicate indexes;
+  all six trigger-only functions audited in migration 057 have zero client execute grants.
+- Event partitions are present through the six-month horizon and are maintained monthly by the
+  `foofoo-event-partition-horizon` cron job.
+- `recommendations` v11, `plan` v10, and `feedback` v7 are live with household-aware writes; all
+  production tenant-continuity validation counts are zero.
 
 ## Active implementation documents retained for review
 

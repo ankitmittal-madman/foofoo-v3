@@ -438,7 +438,7 @@ def search_dishes(
 _RECENT_WINDOW = 2  # days a class is held back from re-topping the same slot, once it has led
 
 
-def weekly_class_plan(household, top_classes=3, catalogue=None):
+def weekly_class_plan(household, top_classes=3, catalogue=None, preference_by_dish=None):
     """Surface 3 — the weekly class plan: for each day × main slot, the top-`top_classes` meal
     CLASSES (from the compositional cohort plan) for the user to select and finalize. Selecting a
     class then drives dishes_for_class (surface 4) for that day/slot. Also reports, per class, how
@@ -455,6 +455,7 @@ def weekly_class_plan(household, top_classes=3, catalogue=None):
     cat = catalogue or Catalogue()
     theta, _ = _theta_obj(household)
     backing = _class_dish_counts(cat)
+    class_affinity = _class_preference_affinity(cat, preference_by_dish)
     meta = CP._class_meta()
     days = []
     recent_leaders = {
@@ -467,7 +468,13 @@ def weekly_class_plan(household, top_classes=3, catalogue=None):
             ctx = make_context(slot=slot, weekday=day)
             plan = CP.class_plan(theta, ctx)
             full_plans[slot] = plan
-            ranked = sorted(plan.items(), key=lambda x: -x[1])
+            # Generalize explicit dish feedback to the meal-class choice surface. The bounded
+            # contribution uses the same 0.35 ceiling as dish re-ranking: it can resolve close
+            # class choices but cannot override the household/cohort plan or any hard filter.
+            ranked = sorted(
+                plan.items(),
+                key=lambda item: -(item[1] + 0.35 * class_affinity.get(item[0], 0.0)),
+            )
             held_back = set(recent_leaders[slot])
             top, deferred = [], []
             for code, weight in ranked:
@@ -477,6 +484,9 @@ def weekly_class_plan(household, top_classes=3, catalogue=None):
                     "class_code": code,
                     "class_name": _class_names().get(code, code),
                     "plan_weight": round(weight, 4),
+                    "preference_contribution": round(
+                        0.35 * class_affinity.get(code, 0.0), 4
+                    ),
                     "dish_count": backing.get(code, 0),
                 }
                 if code in held_back:
@@ -496,6 +506,27 @@ def weekly_class_plan(household, top_classes=3, catalogue=None):
             _ensure_weekend_special(slots, full_plans, backing, meta, top_classes)
         days.append({"weekday": day, "slots": slots})
     return {"household": household.get("label"), "kind": "weekly_class_plan", "days": days}
+
+
+def _class_preference_affinity(cat, preference_by_dish):
+    """Return a bounded mean observed affinity for each class.
+
+    Only dishes with explicit online state contribute. Multi-membership dishes teach every class
+    they genuinely back; unknown catalogue names are ignored. Averaging prevents a class with many
+    dishes from winning merely because it has more catalogue rows.
+    """
+    if not preference_by_dish:
+        return {}
+    totals, counts = {}, {}
+    for dish in cat:
+        if dish.name not in preference_by_dish:
+            continue
+        affinity = float(preference_by_dish.get(dish.name, 0.0) or 0.0)
+        affinity = max(-1.0, min(1.0, affinity))
+        for code in K.dish_to_class_codes(dish.name):
+            totals[code] = totals.get(code, 0.0) + affinity
+            counts[code] = counts.get(code, 0) + 1
+    return {code: totals[code] / counts[code] for code in totals}
 
 
 def _ensure_weekend_special(slots, full_plans, backing, meta, top_classes):

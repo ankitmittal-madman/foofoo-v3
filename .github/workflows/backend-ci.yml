@@ -16,7 +16,7 @@ on:
 
 jobs:
   # RE-DOC-10 §14: neither side's suite is allowed to merge unless the contract itself is sound —
-  # well-formed, and still the SINGLE file both sides read (no silently-forked local copy).
+  # well-formed, with the deployable Edge mirror byte-identical to the canonical contract.
   # Duplicated from re-ci.yml (GitHub Actions has no cheap way to share a job across separate
   # workflow files without a reusable-workflow indirection Phase E doesn't need yet) — keep the two
   # copies in sync if the check itself changes.
@@ -26,20 +26,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Schema is well-formed JSON
         run: python3 -c "import json; json.load(open('contracts/ghar-re-v1.schema.json')); print('contracts/ghar-re-v1.schema.json OK')"
-      - name: Exactly one schema file in the repo (single source of truth)
+      - name: Edge runtime contract mirror matches the canonical source
         run: |
-          count=$(find . -name "ghar-re-v1.schema.json" -not -path "./.git/*" | wc -l)
-          if [ "$count" -ne 1 ]; then
-            echo "expected exactly 1 copy of ghar-re-v1.schema.json, found $count:"
-            find . -name "ghar-re-v1.schema.json" -not -path "./.git/*"
-            exit 1
-          fi
-      - name: Both sides reference the shared file, not a stale local copy
+          cmp contracts/ghar-re-v1.schema.json \
+            supabase/functions/_shared/contracts/ghar-re-v1.schema.json
+      - name: Both runtimes reference their governed contract path
         run: |
           grep -q "contracts/ghar-re-v1.schema.json" ghar_re_service/ghar_re_service/schemas.py \
             || { echo "ghar_re_service/schemas.py no longer references the shared schema path"; exit 1; }
-          grep -q "contracts/ghar-re-v1.schema.json" supabase/functions/recommendations/contract.ts \
-            || { echo "supabase/functions/recommendations/contract.ts no longer references the shared schema path"; exit 1; }
+          grep -q "_shared/contracts/ghar-re-v1.schema.json" supabase/functions/recommendations/contract.ts \
+            || { echo "recommendations/contract.ts no longer references the deployable mirror"; exit 1; }
 
   verify:
     needs: contract-check

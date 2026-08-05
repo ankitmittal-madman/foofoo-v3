@@ -175,9 +175,18 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
             "lunch": "LD_CHILD_MILD_PLATE",
             "dinner": "LD_CHILD_MILD_PLATE",
         },
+        # `recommendations/compose.ts` emits the live household-member vocabulary below. Keep the
+        # historical core aliases too so fixtures and older callers remain compatible.
+        "weaning": {
+            "breakfast": "BF_INFANT_6M_SOFT",
+            "lunch": "LD_CHILD_MILD_PLATE",
+            "dinner": "LD_CHILD_MILD_PLATE",
+        },
         "toddler": {"lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
         "school_child": {"lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
+        "child": {"lunch": "LD_CHILD_MILD_PLATE", "dinner": "LD_CHILD_MILD_PLATE"},
         "elder": {"lunch": "LD_ELDERLY_SOFT_DIGESTIVE", "dinner": "LD_ELDERLY_SOFT_DIGESTIVE"},
+        "senior": {"lunch": "LD_ELDERLY_SOFT_DIGESTIVE", "dinner": "LD_ELDERLY_SOFT_DIGESTIVE"},
     }
     addons = []
     for index, member in enumerate(hh.get("q12_member_ages") or []):
@@ -217,7 +226,10 @@ def plan_weekly(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     """Surface 3: the weekly class plan (7 days × slots, top-3 dish-backed classes each)."""
     hh = build_household_dict(request["household"])
     return planner.weekly_class_plan(
-        hh, top_classes=int(request.get("top_classes", 3)), catalogue=catalogue
+        hh,
+        top_classes=int(request.get("top_classes", 3)),
+        catalogue=catalogue,
+        preference_by_dish=request.get("preference_by_dish") or {},
     )
 
 

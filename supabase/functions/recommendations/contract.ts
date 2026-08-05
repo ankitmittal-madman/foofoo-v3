@@ -1,15 +1,17 @@
 /**
  * Contract validation for POST /v1/recommendations (Phase C).
  *
- * The SINGLE source of truth is `contracts/ghar-re-v1.schema.json` (Phase A) — imported directly,
- * NOT re-declared here (RE-DOC-10 §15, RE-DOC-11 §5). The Edge Function validates its OUTGOING
+ * The source of truth is `contracts/ghar-re-v1.schema.json` (Phase A). Edge deployment sandboxes
+ * function files under `supabase/functions`, so CI enforces that the generated runtime mirror
+ * imported below is byte-identical to that canonical file (RE-DOC-10 §15, RE-DOC-11 §5).
+ * The Edge Function validates its OUTGOING
  * payload before calling the RE, and (defensively) the RE's response before passing it through.
  *
  * Uses Ajv (2020-12) in non-strict mode so the schema's `x-*` annotation keywords and open
  * `additionalProperties:true` (the additive/open compatibility rule, RE-DOC-11 §5) are honored.
  */
 import Ajv2020 from "ajv/dist/2020.js";
-import contract from "../../../contracts/ghar-re-v1.schema.json" with { type: "json" };
+import contract from "../_shared/contracts/ghar-re-v1.schema.json" with { type: "json" };
 
 // deno-lint-ignore no-explicit-any
 const ajv = new (Ajv2020 as any)({ strict: false, allErrors: true });

@@ -38,6 +38,7 @@ Deno.test("buildShownNotTappedRows: N served dishes across plates produce exactl
   assertEquals(rows.length, 3);
   for (const row of rows) {
     assertEquals(row.profile_id, "profile-1");
+    assertEquals(row.household_id, "profile-1");
     assertEquals(row.recommendation_event_id, "rec-event-1");
     assertEquals(row.event_type, "shown_not_tapped");
     assertEquals(row.data_source, "real");

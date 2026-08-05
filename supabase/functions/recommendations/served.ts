@@ -56,6 +56,7 @@ export async function resolveDishIdsByName(
 /** One row ready to insert into public.feedback_events for a served-but-not-yet-acted-on dish. */
 export interface ShownNotTappedRow {
   profile_id: string;
+  household_id: string;
   recommendation_event_id: string;
   dish_id: string | null;
   event_type: "shown_not_tapped";
@@ -81,6 +82,7 @@ export function buildShownNotTappedRows(
 ): ShownNotTappedRow[] {
   return served.map((s) => ({
     profile_id: profileId,
+    household_id: profileId,
     recommendation_event_id: recommendationEventId,
     dish_id: dishIds.get(s.dishName) ?? null,
     event_type: "shown_not_tapped" as const,

@@ -1,0 +1,107 @@
+name: production-smoke
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: production-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      RE_BASE_URL: https://ghar-re.fly.dev
+      EDGE_BASE_URL: https://cmkswalqpmmqojwdmqbv.supabase.co/functions/v1
+      ALERT_TITLE: "[Production Alert] FooFoo smoke monitor failing"
+    steps:
+      - name: Verify production health and authentication boundaries
+        id: probes
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          expect_status() {
+            expected="$1"
+            method="$2"
+            url="$3"
+            body="$4"
+            curl_args=(
+              --silent --show-error --location --retry 3 --retry-all-errors
+              --connect-timeout 5 --max-time 15 --output /tmp/foofoo-smoke-body
+              --write-out '%{http_code}' --request "$method"
+            )
+            if [ -n "$body" ]; then
+              curl_args+=(--header 'content-type: application/json' --data "$body")
+            fi
+            actual="$(curl "${curl_args[@]}" "$url")"
+            if [ "$actual" != "$expected" ]; then
+              echo "Expected HTTP $expected from $url, received $actual"
+              sed -n '1,40p' /tmp/foofoo-smoke-body
+              return 1
+            fi
+          }
+
+          expect_status 200 GET "$RE_BASE_URL/healthz" ""
+          expect_status 200 GET "$RE_BASE_URL/readyz" ""
+          expect_status 200 GET "$RE_BASE_URL/v1/meta" ""
+          expect_status 401 POST "$EDGE_BASE_URL/plan" '{}'
+          expect_status 401 POST "$EDGE_BASE_URL/feedback" '{}'
+          expect_status 401 POST "$EDGE_BASE_URL/dish-ontology" '{}'
+
+      - name: Open or update the production alert
+        if: steps.probes.outcome == 'failure'
+        uses: actions/github-script@v7
+        env:
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            const title = process.env.ALERT_TITLE;
+            const { owner, repo } = context.repo;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: "open", per_page: 100,
+            });
+            const existing = issues.find((issue) => !issue.pull_request && issue.title === title);
+            const body = [
+              "The scheduled production smoke test failed.",
+              "",
+              `Run: ${process.env.WORKFLOW_URL}`,
+              `Observed: ${new Date().toISOString()}`,
+              "",
+              "Checks cover Fly health/readiness/metadata and unauthenticated rejection by plan, feedback, and dish-ontology Edge Functions.",
+            ].join("\n");
+            if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({ owner, repo, title, body });
+            }
+
+      - name: Close a recovered production alert
+        if: steps.probes.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = process.env.ALERT_TITLE;
+            const { owner, repo } = context.repo;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: "open", per_page: 100,
+            });
+            for (const issue of issues.filter((item) => !item.pull_request && item.title === title)) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: `Recovered at ${new Date().toISOString()}. All production smoke probes pass.`,
+              });
+              await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: "closed" });
+            }
+
+      - name: Fail the workflow when probes failed
+        if: steps.probes.outcome == 'failure'
+        run: exit 1

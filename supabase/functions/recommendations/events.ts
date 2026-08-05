@@ -77,6 +77,7 @@ export async function recordRecommendationEvent(
     const { data, error } = await withTimeout(
       db.from("recommendation_events").insert({
         profile_id: ev.householdId,
+        household_id: ev.householdId,
         request_id: ev.requestId,
         slot: ev.slot ?? null,
         outcome: ev.outcome,

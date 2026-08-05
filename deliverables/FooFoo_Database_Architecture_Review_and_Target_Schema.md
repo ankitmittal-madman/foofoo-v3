@@ -12,9 +12,9 @@
 This review uses the following precedence:
 
 1. `deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md` is the target product, recommendation, food-intelligence, and database specification.
-2. `database/migrations/001...054`, current Edge Functions, recommendation-service code, and mobile API contracts define the as-is implementation.
+2. `database/migrations/001...056`, seed `146`, current Edge Functions, recommendation-service code, mobile API contracts, and the active Food Ontology architecture define the as-is implementation.
 3. `docs/active/CURRENT_STATUS.md`, `OPEN_ITEMS.md`, and `LAUNCH_BLOCKERS.md` distinguish deployed behavior from local release-candidate behavior.
-4. `docs/architecture/[ACTIVE]_DOC-P3-04_Data_Architecture_ERD_v1.3.md` supplies historical rationale, but migrations 046, 047, 050, 052, and 053 supersede important parts of that document. In particular, the current database no longer has `re_engine` or `ghar_re` schemas.
+4. `docs/architecture/[ACTIVE]_DOC-P3-04_Data_Architecture_ERD_v1.3.md` supplies historical rationale, but migrations 046–056 supersede important parts. The broad legacy `re_engine` was dropped and a smaller target-aligned `re_engine` was recreated by 055; `ghar_re` remains absent.
 
 No production row counts, runtime consumers, or product behaviors are asserted unless evidenced by those sources. Target-state additions not present today are marked `PROPOSED`.
 
@@ -59,15 +59,19 @@ Every target table and important field is assigned one or more source-of-truth c
 
 ### 2.1 What the database does today
 
-The current system is a production-shaped, profile-scoped Supabase/PostgreSQL database. It stores:
+The current system is a production Supabase/PostgreSQL database in an expand-only transition from profile scope to household/episode scope. It stores:
 
 - authenticated profiles, consent, onboarding answers, household-member records, and request context;
 - a normalized dish/ingredient/tag/cuisine/class catalogue with ingredient-driven safety derivation;
 - weekly class/dish plans, locks, add-ons, and local/server plan persistence;
 - recommendation request snapshots, dish/plate JSON payloads, feedback, explicit Never and Not Today state, taste-vector JSON, and bandit parameters;
 - append-only interaction/suggestion logs, product events, audit records, weather cache, experiments, notification devices/jobs, and a daily KPI view.
+- live household tenants, memberships and invites with backfilled household IDs on major facts;
+- live plate-grammar, recipe, meal-episode, pantry, leftover, slate/item and outcome foundations;
+- a live provenance-backed Food Ontology staging/assertion/current-value pipeline and class-bound candidate view;
+- initial private `re_engine`, `ml`, and `ops` control-plane tables.
 
-Migrations 046–052 deliberately simplified the architecture: the unused `re_engine` and `ghar_re` schemas were dropped, six live RE-state tables were rehomed to `public`, and five unconsumed operations tables were removed. The live recommendation service reads an immutable bundled catalogue/config rather than connecting directly to PostgreSQL. Edge Functions own database access and compose requests for that service.
+Migrations 046–052 deliberately simplified the architecture; migration 055 then reintroduced only the private schemas and entities required by the final product direction, and migration 056 added the Food Ontology ingestion gate. The live recommendation service reads immutable generated ontology/catalogue/config snapshots rather than connecting directly to PostgreSQL. Edge Functions own database access and compose signed requests for that service. The remaining problem is not absence of foundations but incomplete normalization, immutable version closure, runtime adoption and legacy retirement.
 
 ### 2.2 What the target database must do
 
@@ -88,27 +92,28 @@ The target database must become a household-scoped decision-memory platform. It 
 
 | Priority | Gap | Consequence | Required response |
 |---|---|---|---|
-| P0 | Profile is treated as household | Cannot safely support shared households, roles, invitations, member attribution, or household fairness | Introduce `households`, `household_memberships`, household-scoped FKs, and membership-based RLS |
-| P0 | Recommendation exposure is split across `recommendation_events`, `suggestion_logs`, `interaction_events`, `feedback_events`, and `product_events` | Ambiguous lineage and incomplete labels; duplicated semantics | Introduce canonical `slates`, `slate_items`, `interaction_events`, and `outcome_events`; retire/bridge legacy facts |
-| P0 | No meal-episode or plate-grammar persistence | Product cannot reproduce or learn from the actual complete meal offered | Add `food.plate_grammars`, `meal_episodes`, components, recipes, operations, workload, and cadence |
+| P0 | Household foundation exists but legacy profile ownership remains | Cross-path tenancy can drift and shared-household behavior is incomplete | Finish household backfill, constraints, membership history/role semantics, membership-based RLS and legacy-key contraction |
+| P0 | Canonical slate/outcome foundations coexist with five legacy event paths | Ambiguous lineage and incomplete labels remain until runtime dual-write and reconciliation finish | Add request/run/snapshot grain, canonical ingest envelope and bridge/retire legacy facts |
+| P0 | Meal-episode/grammar tables exist but served runtime remains dish/class-first | Product cannot yet reproduce or learn from a complete immutable episode | Populate governed recipes/episodes, add exact snapshot closure and move serving contracts after safety parity |
 | P0 | No exact selection propensity or complete eligible-set trace | Biased learning and no trustworthy counterfactual evaluation | Log policy, propensity, ordered slate, candidate-set hash, and candidate decision stages |
 | P1 | No explicit execution/regret outcome model data | “Accepted” can be mistaken for “success” | Capture cooked/ordered/replaced/enjoyed/regretted outcomes and censoring windows |
-| P1 | Pantry, leftovers, effort, and kitchen capacity are absent | Recommendations optimize inspiration more than executability | Add pantry belief, leftover lot, equipment, cook profile, recipe DAG, and workload features |
-| P1 | Member preference and fairness state are absent | Household minorities and planner burden cannot be measured | Add member vectors, attributable events, presence, fairness debt, and cook welfare state |
-| P1 | Content provenance is selective | Safety, nutrition, graph, and AI enrichment cannot be governed consistently | Add source, version, confidence, review, lineage, and immutable catalog-publish records |
-| P1 | RE/config state was moved into `public` | Service-role protection works, but trust boundaries are less legible and public schema is overloaded | Reintroduce private logical schemas or document/verify an equivalent least-privilege model |
-| P2 | No feature/model registry or immutable training snapshots | Learned ranking cannot be reproduced, promoted, or rolled back safely | Add `ml` metadata tables and object-store artifact/checksum contracts |
+| P1 | Pantry, leftovers and workload foundations exist; equipment/DAG/evidence closure is incomplete | Executability can be inconsistently scored | Normalize equipment and operation edges; add evidence/checkpoints and safe-window policy |
+| P1 | Cadence/fairness state exists but member vectors and attributable events are incomplete | Household minorities and planner burden cannot be measured reliably | Add separated declared/behavioral member vectors, presence and member-attributed outcomes |
+| P1 | Ontology provenance is strong for dish taxonomy but selective elsewhere | Safety, nutrition, recipes, graph and AI enrichment cannot share one publish contract | Normalize source versions/run inputs; add assertion evidence and immutable catalog manifests |
+| P1 | Private schemas are live but initial tables are underspecified | Trust boundaries are clearer but replay and control-plane guarantees remain incomplete | Complete least-privilege roles, runs/traces, deployments, datasets and audit controls |
+| P2 | Feature/model registry headers exist; immutable feature history/training snapshots/deployments do not | Learned ranking cannot be reproduced, promoted, or rolled back safely | Complete `ml` history, dataset manifest, deployment and parity contracts |
 | P2 | Partition lifecycle is only partially automated | Append-only parents can reject writes when future partitions are absent | Automate partition creation, default quarantine partitions, monitoring, and archival |
 
 ## 3. Current-state database analysis
 
 ### 3.1 Current schema topology
 
-The repository schema through migration 054 consists of approximately 38 `public` base tables plus rolling partitions and Supabase-managed `auth`; active status evidence says production is deployed through migration 053 and 054 still requires application/live verification. Historical `re_engine` was dropped by migration 047; historical `ghar_re` was dropped by migration 050. Recommendation reference/config data primarily lives in versioned files bundled with the Python service. Counts are based on surviving migration state, not raw `CREATE TABLE` statements, and must be reconciled against `pg_catalog` before migration execution.
+The repository schema through deployed migration 059 consists of approximately 57 `public` base tables and 20 private `food`/`re_engine`/`ml`/`ops` base tables, plus rolling partitions and Supabase-managed `auth`. Active status evidence dated 2026-08-05 says migrations 054–059 and ontology seed 146 are live. Migrations 057–059 respectively harden trigger-helper privileges/FK indexes, automate a six-month-ahead horizon for current `interaction_events`/`suggestion_logs`, and enforce non-null household continuity on five major fact/context roots with new-profile provisioning. Validations 911–913 and live advisor/cron/data checks passed: zero audited client trigger grants, missing leading FK indexes, duplicate indexes, missing horizon partitions, tenant orphans, and null scoped household IDs. Migration 058 does not yet implement target-family default quarantine, late-row repair, archival or retention drops; migration 059 does not replace owner duplication, membership history or composite tenant FKs. Historical `re_engine` was dropped by migration 047 and intentionally reintroduced with a smaller target-aligned surface in migration 055; historical `ghar_re` remains dropped. The live recommendation service still reads an immutable generated ontology/catalog bundle rather than connecting directly to PostgreSQL. Counts are derived from surviving migration state and must be confirmed against `pg_catalog` as a release check.
 
 | Current domain | Current tables | State |
 |---|---|---|
 | Identity and consent | `profiles`, `household_members`, `onboarding_sessions`, `household_answers`, `consent_records` | Present; profile-scoped |
+| Household tenancy | `households`, `household_memberships`, `household_invites`; `household_id` added to major facts | Live expand-only foundation; legacy profile ownership remains during transition |
 | Context | `household_context`, `context_log`, `weather_cache` | Present; overlapping context representations |
 | Food master | `re_states`, `dishes`, `ingredients`, `dish_ingredients`, `tags`, `dish_tags`, `cuisines`, `meal_classes`, `dish_combos`, `dish_combo_items`, `dish_name_synonyms` | Strong dish-level foundation; `re_states` rehomed by migration 046 |
 | Plans | `week_plans`, `plan_slots`, `addon_slots` | Present; class/dish atomicity |
@@ -116,6 +121,10 @@ The repository schema through migration 054 consists of approximately 38 `public
 | Online RE state | `user_re_state`, `user_taste_vectors`, `never_list`, `not_today_suppression`, `re_dish_bandit_state` | Present in `public`, service-role managed |
 | Operations | `audit_log`, `derivation_conflicts`, `experiments`, `notification_devices`, `notification_jobs` | Present; several producers/controls incomplete |
 | Derived analytics | `recommendation_kpis_daily` view | Present; acceptance-oriented and dish-oriented |
+| Episode/food foundation | `food.plate_grammars`, `grammar_component_rules`, `recipes`, `recipe_steps`, `recipe_ingredients`, `meal_episodes`, `meal_episode_components`, `episode_workload_features`, `episode_cadence` | Live schema foundation; data population/runtime use remain partial |
+| Canonical exposure/outcome | `slates`, `slate_items`, `outcome_events`, `pantry_beliefs`, `leftover_lots` | Live target precursors; request/run/snapshot grain and full event envelope remain incomplete |
+| Private intelligence/control | `re_engine.intent_state`, `household_cadence_state`, `member_fairness_state`; `ml.feature_definitions`, `model_registry`, `experiment_assignments`; `ops.data_sources`, `ai_generation_runs`, `coverage_gap_log`, `safety_gate_log` | Live foundations; several required lineage/version/control relations remain absent |
+| Food Ontology enrichment | `meal_class_families`, `taxonomy_terms`, `taxonomy_term_aliases`, `dish_submissions`, `food_source_records`, `dish_enrichment_jobs`, `dish_taxonomy_assertions`, `dish_taxonomy_current`, `dish_meal_class_mappings`, `dish_constraints`, `dish_regional_affinities` | Live with seed 146; 802 production dishes mapped, 547 enriched and 255 deliberately in review |
 
 ### 3.2 Current table inventory and assessment
 
@@ -157,6 +166,21 @@ The repository schema through migration 054 consists of approximately 38 `public
 | `notification_jobs` | Operations | Scheduled push work and retry state | `CURRENT`: needs delivery attempts/receipts and partition/retention policy |
 | `audit_log` | Operations | Internal actor/action/resource audit | `CURRENT/PARTIAL`: verify append-only enforcement, correlation, before/after hashes, and retention |
 | `recommendation_kpis_daily` | Analytics view | Daily active profiles, dishes shown, positive/Never rates | `PARTIAL`: measures acceptance, not choose-execute-no-regret household success |
+
+Migration 055/056 additions are already live and therefore are not merely target proposals:
+
+| Table group | Current implementation | Required correction or completion |
+|---|---|---|
+| `households`, `household_memberships`, `household_invites` | Expand-only tenant root, owner user column, composite membership PK | Make membership history rejoin-safe; choose active owner membership as authority; complete non-null tenant backfill and remove legacy profile ownership only after parity |
+| `food.plate_grammars`, `food.grammar_component_rules` | Version integer plus arrays/JSON for slots, intents, roles and allowed classes | Preserve as compatibility input; normalize role/class/slot relations and publish exact immutable grammar versions before episode serving |
+| `food.recipes`, `recipe_steps`, `recipe_ingredients` | Recipe versions exist; equipment and predecessor relations are arrays; ingredients reference mutable public masters | Add normalized equipment/DAG edges, exact ingredient-assertion versions, publish gates, and copy-on-write release membership |
+| `food.meal_episodes`, components, workload, cadence | Episode identity and workload foundation exists | Add immutable served snapshot/version closure, member adaptations, exact recipe/component versions, grammar-slot validity and final safety evidence |
+| `public.slates`, `slate_items` | One household/request slate, rank-keyed items, per-item selection propensity and JSON trace | Add request/run grain, per-slot refresh sequence, stable item ID, episode/snapshot XOR, ordered-policy propensity semantics and transactional persistence |
+| `public.outcome_events` | Idempotent outcome header with coarse JSON value | Add canonical event envelope, item/rank linkage, normalized eater/substitution/missing-ingredient children, consent basis and partition-ready keys |
+| `public.pantry_beliefs`, `leftover_lots` | Basic online state/inventory | Add evidence lineage, quantity domains, episode snapshot source, safe-window policy and idempotent update checkpoints |
+| `re_engine`, `ml`, `ops` migration-055 tables | Private schemas and initial state/control records restored | Add feature history/snapshots, request/run/candidate stages, model deployments/datasets, experiment definitions/variants, normalized lineage, catalog releases and auditable activation |
+| Ontology staging/assertion tables from 056 | Strong one-way intake, raw source records, append assertions, guarded current pointers and class mappings | Restrict public provisional evidence, normalize data-source registry, add field policy/risk tiers, immutable acceptance decisions and exact release manifests |
+| `dish_candidates_by_class` | Runtime class-bound view includes both `enriched` and `review`, excluding only rejected mappings | Primary-eligible runtime view must require accepted safety/class assertions; review rows may appear only in an explicitly degraded, labeled fallback path |
 
 ### 3.3 Current relationships
 
@@ -381,10 +405,10 @@ The compact rows define the decision-grade logical grain and critical columns. B
 | `household_kitchen_equipment` | Available kitchen capacity; `APP` `PROPOSED` | `household_id`; `equipment_code`; `quantity smallint CHECK >0`; `is_available`; `last_confirmed_at`; `MUT`; `PK(household_id,equipment_code)` | Active equipment partial index; 1:N; lifetime; read-heavy practicality path |
 | `household_geography_history` | Canonical home/current geography and migration context; `APP` `PROPOSED` | `id`; `household_id`; `geography_role_code CHECK(home_identity,current_residence)`; `region_id`; `city_name`; `city_tier_code`; `country_code char(2)`; `residence_started_on date NULL`; `source_answer_id NULL`; `SCD2`; `MUT` | GiST non-overlap by household/role; current region/city-tier indexes; 1:N history; lifetime; routing/context reads |
 | `household_schedule_windows` | Effective cooking/meal availability instead of opaque answer JSON; `APP` `PROPOSED` | `id`; `household_id`; `day_type_code`; `meal_slot_code`; `available_from time NULL`; `meal_deadline time NULL`; `max_active_minutes integer NULL CHECK >=0`; `preferred_cook_member_id NULL`; `source_answer_id NULL`; `SCD2`; `MUT` | Current household/day/slot unique; 1:N; lifetime; practicality-hot reads |
-| `onboarding_sessions` | Raw onboarding answer/event trail; `APP` | `id`; `idempotency_key text UNIQUE`; `household_id`; `profile_id`; `session_id uuid`; `screen_id`; `question_key`; `answer_value jsonb`; `is_skipped`; `answered_at`; `received_at`; `schema_version`; `created_at`; immutable; retry returns the prior row | `(household_id,answered_at desc)`, unique `(session_id,screen_id,question_key,idempotency_key)`; 1:N; approved behavioral retention; append-only |
+| `onboarding_sessions` | Raw onboarding answer/event trail; `APP` | `id`; `idempotency_key text UNIQUE`; `household_id`; `profile_id`; `session_id uuid`; `screen_id`; `question_key`; `answer_value jsonb`; `is_skipped`; `answered_at`; `received_at`; `schema_version`; `created_at`; immutable; retry returns the prior row | `(household_id,answered_at desc)`, unique `(session_id,screen_id,question_key,idempotency_key)`; 1:N; 24 months or earlier account erasure; append-only |
 | `household_answers` | Effective current and historical answers; `APP` | `id`; `household_id`; `answer_key`; `answer_value jsonb`; `answer_schema_version`; `source_session_id`; `confidence`; `SCD2`; `created_at`; unique one current answer/key | GiST non-overlap by household/key; current partial index; 1:N; household lifetime; mixed read/write |
-| `consent_records` | Immutable consent decisions; `APP` | `FACT` except `idempotency_key` optional server-generated; `profile_id`; `household_id NULL`; `consent_type_code`; `is_granted`; `policy_version`; `purpose_codes text[]`; `ip_address_hash`; `user_agent_hash`; `revokes_consent_id NULL FK self` | `(profile_id,consent_type_code,occurred_at desc)`; append-only; legal schedule; write-heavy at changes |
-| `privacy_requests` | Export/delete workflow; `APP` | `id`; `profile_id`; `household_id NULL`; `request_type_code`; `request_status`; `requested_at`; `verified_at`; `completed_at`; `artifact_uri`; `artifact_expires_at`; `error_code`; `MUT`; unique one active/type/profile | Partial active index; 1:N; retain minimum statutory audit metadata; workflow writes |
+| `consent_records` | Immutable consent decisions; `APP` | `FACT` with required client key or deterministic server-generated `idempotency_key`; `profile_id`; `household_id NULL`; `consent_type_code`; `is_granted`; `policy_version`; `purpose_codes text[]`; `ip_address_hash`; `user_agent_hash`; `revokes_consent_id NULL FK self` | `(profile_id,consent_type_code,occurred_at desc)`; append-only; 7 years after terminal state; write-heavy at changes |
+| `privacy_requests` | Export/delete workflow; `APP` | `id`; `profile_id`; `household_id NULL`; `request_type_code`; `request_status`; `requested_at`; `verified_at`; `completed_at`; `artifact_uri`; `artifact_expires_at`; `error_code`; `MUT`; unique one active/type/profile | Partial active index; 1:N; artifact expires in 7 days and minimal request proof retains 7 years; workflow writes |
 
 ### 7.2 Food master, recipes, and knowledge (`food`)
 
@@ -392,6 +416,17 @@ The compact rows define the decision-grade logical grain and critical columns. B
 |---|---|---|---|
 | `catalog_versions` | Immutable catalog release; `APP` from governed content | `id`; `catalog_version text UNIQUE`; `status CHECK(draft,validated,active,retired)`; `content_checksum`; `published_at`; `published_by`; `rollback_of_id`; `source_snapshot_uri`; `created_at`; activated rows immutable | Unique one active via partial index; permanent; read-heavy pointer |
 | `catalog_version_items` | Immutable release manifest to exact content-version rows; `APP/HYB` `PROPOSED` | `catalog_version_id`; `entity_type_code`; `stable_entity_id`; `content_version_id`; `content_checksum`; `publish_status`; PK catalog/entity/stable ID; no updates after activation | Content-version reverse index; very high; permanent; build/read-heavy |
+| `meal_class_families` | Current 056 planning-class hierarchy; `EXT/HYB` | `family_code PK`; `display_name`; `parent_family_code NULL FK self`; `is_active`; add `PROV`/version on next publish evolution | Parent/active indexes; low; permanent; read-heavy |
+| `taxonomy_terms` | Current 056 governed cross-domain term identity; `HYB` | `id`; `dimension`; `code`; `display_name`; `parent_id NULL`; `external_uri NULL`; `is_active`; add definition, `PROV`, `SCD2`; unique current dimension/code | Dimension/parent/current code; medium; permanent; ontology reads |
+| `taxonomy_term_aliases` | Current 056 localized/regional aliases; `HYB` | `term_id`; `alias`; `language`; `region`; `data_source_id`; `source_locator`; `confidence`; `PROV`; SCD2; current uniqueness term/alias/language/region | Normalized alias search and term reverse indexes; M:N; permanent; search-heavy |
+| `dish_submissions` | Current 056 user-owned unknown-dish staging; `APP` | `id`; `submitted_by`; `entered_name`; `submitted_metadata`; `canonical_dish_id NULL`; `submission_status`; `idempotency_key`; `consent_basis`; `created_at`; `updated_at`; never recommendation-eligible directly | Owner/status/time and idempotency; delete with account unless separately consented research evidence; workflow writes |
+| `ontology_field_policies` | Versioned promotion/risk policy implementing Section 14; `APP/EXT` `PROPOSED` | `policy_version`; `field_key`; `risk_tier`; `required_source_types`; `auto_select_threshold NULL`; `human_review_count`; `is_safety_field`; `is_primary_required`; `effective_from`; `approved_by`; `checksum`; PK policy/field | One active policy pointer; permanent; publish-hot reads |
+| `dish_taxonomy_assertions` | Current 056 append-only per-field evidence, evolved under `food`; `HYB` | `id`; exactly one `dish_id`/`submission_id`; `field_key`; exactly one typed value/term; `confidence`; `source_type`; normalized evidence relations; model/run link when AI; `review_status`; `created_at`; immutable after insert; supersession by new assertion | Subject/field/confidence and review queue indexes; high; permanent versions; workflow/read-heavy |
+| `dish_taxonomy_current` | Current 056 selected assertion pointer; `APP/HYB` | `dish_id`; `field_key`; `assertion_id`; `field_policy_version`; `selected_at`; `selected_by`; `review_decision_id`; PK dish/field; assertion must match subject/field and satisfy policy | Assertion unique and dish/field lookup; 1:1 current pointer; permanent decision history elsewhere; read-heavy |
+| `ontology_review_decisions` | Immutable review/adjudication evidence; `APP` `PROPOSED` | `id`; `assertion_id`; `risk_tier`; `reviewer_profile_id`; `decision_code`; `reason_code`; `evidence_note`; `occurred_at`; `policy_version`; `supersedes_decision_id NULL`; immutable | Assertion/time and reviewer/time; 1:N; permanent with catalog evidence; append-only |
+| `dish_meal_class_mappings` | Current 056 normalized dish/class/slot/role assertion; `HYB` | `dish_id`; `meal_class_id` or stable `class_code`; `slot_code`; `item_role_code`; `confidence`; `classification_method`; normalized provenance/AI run; `review_status`; `valid_from/to`; PK exact version; partial current uniqueness | Class/slot/role/eligibility score and reverse dish indexes; M:N; permanent; candidate-hot |
+| `dish_constraints` | Current 056 filterable suitability assertion; `HYB` | `dish_id`; `constraint_term_id`; `suitability_code`; `confidence`; normalized evidence; `review_status`; `SCD2`; safety fields follow no-auto-clear policy | Current constraint/dish and reverse constraint indexes; M:N; permanent; safety-hot |
+| `dish_regional_affinities` | Current 056 regional evidence; `HYB` | `dish_id`; `region_id`; `affinity_score`; `confidence`; normalized evidence; `review_status`; `SCD2` | Current region/affinity and dish indexes; M:N; permanent; retrieval reads |
 | `regions` | Geographic/cultural hierarchy; `EXT` | `id`; `region_code`; `name`; `region_type_code`; `parent_region_id self FK`; `country_code char(2)`; `PROV`; `SCD2`; never globally unique code plus SCD2 | `(parent_region_id)`, unique `(region_code) WHERE is_current`; low cardinality; permanent; read-heavy |
 | `cuisines` | Cuisine hierarchy; `EXT` | `id`; `cuisine_code`; `name`; `parent_cuisine_id`; `primary_region_id`; `PROV`; `SCD2` | Parent/region indexes; unique `(cuisine_code) WHERE is_current`; low cardinality; permanent; read-heavy |
 | `dishes` | Canonical dish identity; `HYB` | `id`; `dish_code UNIQUE`; `parent_dish_id`; `canonical_name`; `description`; `meal_occasions text[]`; `total_time_minutes`; `active_time_minutes`; `difficulty_code`; derived `diet_type_code`, `is_jain`, `allergen_mask`; `genome_vector`; `popularity_score`; `photo_url`; `catalog_status`; `catalog_version_id`; `PROV`; `MUT` | Active/occasion/diet/parent indexes; canonical name search; high master; permanent/deactivate; read-heavy |
@@ -438,6 +473,8 @@ Safety authority is intentionally one-way. `recipe_ingredients` for the exact re
 
 Catalog activation is copy-on-write. Stable conceptual identities never mutate historical content: publish creates new content/assertion version IDs, and `catalog_version_items` freezes the exact set. Mutable draft rows are never referenced by a served run. A run's `catalog_version_id` therefore resolves every episode, recipe, ingredient safety assertion, grammar, and label to an exact immutable row.
 
+The migration-056 `dish_candidates_by_class` view is transitional. Replace it with two security-invoker views built only from one active catalog manifest: `dish_candidates_primary_eligible` requires accepted class/slot/role mapping, complete reviewed safety closure and normal ontology policy; `dish_candidates_degraded_review` additionally permits qualifying non-safety review assertions but retains the same complete safety closure and emits `is_degraded=true`, reason and confidence. Raw source records, pending submissions, rejected assertions and AI-only safety claims appear in neither view.
+
 ### 7.3 Plans, slates, context, events, pantry, and notifications (`public`)
 
 | Table | Purpose / class | Proposed columns, keys, and constraints | Indexes / cardinality / retention / workload |
@@ -452,9 +489,9 @@ Catalog activation is copy-on-write. Stable conceptual identities never mutate h
 | `context_snapshot_members` | Members believed present/participating; `APP/USE` `PROPOSED` | `context_snapshot_id`; `household_member_id`; `presence_role_code`; `source_event_id NULL`; `confidence`; PK snapshot/member/role | Member reverse index; M:N; parent retention; append-only |
 | `slates` | One immutable ordered result for one request attempt, meal slot, and refresh sequence; `APP` | `id`; `household_id`; `recommendation_run_id FK`; `request_id`; `plan_slot_id NULL`; `plan_date`; `meal_slot_code`; `refresh_sequence smallint`; `surface_code`; `eligible_set_hash`; `context_snapshot_id`; `household_snapshot_hash`; `intent_posterior jsonb`; `ordered_slate_propensity NULL`; `created_at`; `expires_at`; `is_degraded`; `degraded_reason_code`; unique `(recommendation_run_id,plan_date,meal_slot_code,refresh_sequence)`. Engine/model/config/catalog/feature/policy versions are inherited immutably from the run. | `(household_id,created_at desc)`, request/run/slot; request 1:N runs, run 1:N slates, slate 1:N items; trace retention; append-only |
 | `slate_items` | Ordered exposed recommendation units; `APP` | `slate_id`; `item_id uuid`; `episode_id NULL`; `episode_snapshot_id NULL`; explicit XOR check; `rank smallint CHECK >0`; `point_score`; `rerank_score`; `generator_codes text[]`; `reason_tags text[]`; `conditional_rank_propensity numeric CHECK (0,1]`; `marginal_inclusion_propensity NULL`; `p_choose`; `p_execute`; `p_regret`; `p_success`; `predicted_work jsonb`; `is_safety_passed`; `created_at`; PK `(slate_id,item_id)`, unique `(slate_id,rank)` | Episode/snapshot reverse index; 1:N; trace retention; append-only/read-heavy. The product of sequential conditional rank propensities must match header ordered-slate propensity within tolerance; deterministic policies record 1. |
-| `interaction_events` | Canonical raw exposure/action event; `USE` | Partitioned `FACT` with `PK(id,occurred_at)`; `actor_profile_id`; `household_id`; `member_id NULL`; `session_id`; `request_id`; `slate_id`; `item_id`; `episode_id NULL`; `dish_id NULL`; `recipe_id NULL`; `component_role_code NULL`; `rank NULL`; `surface_code`; `event_name`; `visibility_duration_ms`; `reason_code`; `experiment_assignments jsonb`; `properties jsonb`; `consent_basis`; `model_version`; global event/idempotency uniqueness through `event_ingest_keys` | Monthly partition on `occurred_at`; `(household_id,occurred_at desc)`, `(slate_id,item_id)`, BRIN time; high-volume append-only; raw 13–25 months recommended, then delete/anonymize per policy |
+| `interaction_events` | Canonical raw exposure/action event; `USE` | Partitioned `FACT` with `PK(id,occurred_at)`; `actor_profile_id`; `household_id`; `member_id NULL`; `session_id`; `request_id`; `slate_id`; `item_id`; `episode_id NULL`; `dish_id NULL`; `recipe_id NULL`; `component_role_code NULL`; `rank NULL`; `surface_code`; `event_name`; `visibility_duration_ms`; `reason_code`; `experiment_assignments jsonb`; `properties jsonb`; `consent_basis`; `model_version`; global event/idempotency uniqueness through `event_ingest_keys` | Monthly partition on `occurred_at`; `(household_id,occurred_at desc)`, `(slate_id,item_id)`, BRIN time; high-volume append-only; raw 24 months then purge/anonymize per policy |
 | `event_ingest_keys` | Cross-partition event idempotency; `APP` `PROPOSED` | `idempotency_key text PK`; `event_id uuid UNIQUE`; `event_table_code`; `event_month date`; `received_at`; immutable; inserted atomically with event | PK and event ID; 1:1 event; same retention as raw event; append-only |
-| `outcome_events` | Execution/enjoyment/regret truth; `USE` | Partitioned `FACT` with `PK(id,occurred_at)`; `actor_profile_id`; `household_id`; `plan_slot_id`; `slate_id NULL`; `item_id NULL`; `episode_id NULL`; `episode_snapshot_id NULL`; `outcome_type_code`; `outcome_value jsonb`; `actual_component_snapshot jsonb`; `actual_duration_minutes`; `cook_member_id NULL`; `member_attribution_confidence`; `leftover_result jsonb`; `reason_code`; `source_code`; `confidence`; `consent_basis`; substitutions, missing ingredients, and eaters are normalized in child fact tables | Monthly partition; household/time, plan slot, episode; append-only; raw 13–25 months recommended |
+| `outcome_events` | Execution/enjoyment/regret truth; `USE` | Partitioned `FACT` with `PK(id,occurred_at)`; `actor_profile_id`; `household_id`; `plan_slot_id`; `slate_id NULL`; `item_id NULL`; `episode_id NULL`; `episode_snapshot_id NULL`; `outcome_type_code`; `outcome_value jsonb`; `actual_component_snapshot jsonb`; `actual_duration_minutes`; `cook_member_id NULL`; `member_attribution_confidence`; `leftover_result jsonb`; `reason_code`; `source_code`; `confidence`; `consent_basis`; substitutions, missing ingredients, and eaters are normalized in child fact tables | Monthly partition; household/time, plan slot, episode; append-only; raw 24 months |
 | `outcome_event_members` | Eater/cook attribution for an outcome; `USE` `PROPOSED` | `outcome_event_id`; `outcome_occurred_at`; `household_member_id`; `participation_role_code`; `rating_value NULL`; `attribution_confidence`; composite FK to event; PK event/time/member/role | Member/time reverse index; M:N; parent retention; append-only |
 | `outcome_event_ingredient_changes` | Actual substitutions and missing ingredients; `USE` `PROPOSED` | `outcome_event_id`; `outcome_occurred_at`; `change_type_code CHECK(substitution,missing,added)`; `from_ingredient_id NULL`; `to_ingredient_id NULL`; `quantity`; `unit_code`; `reason_code`; composite FK to event | Event/type and ingredient reverse indexes; 1:N; parent retention; append-only |
 | `pantry_beliefs` | Probabilistic online ingredient availability; `USE-derived` | `household_id`; `ingredient_id`; `probability_present`; `quantity_min`; `quantity_max`; `unit_code`; `last_evidence_at`; `evidence_type_code`; `expires_at`; `DERIVED`; PK household/ingredient/feature version or current table + history | Current `(household_id,expires_at)`; M:N; expire stale rows; update-heavy derived state |
@@ -464,7 +501,7 @@ Catalog activation is copy-on-write. Stable conceptual identities never mutate h
 | `grocery_item_plan_slots` | Ingredient demand lineage to plan slots; `APP` `PROPOSED` | `household_id`; `grocery_list_item_id`; `plan_slot_id`; `quantity_contribution`; `unit_code`; composite tenant FKs; PK item/slot | Plan-slot reverse index; M:N; plan retention; read-heavy |
 | `notification_devices` | User push endpoint; `APP` | `id`; `profile_id`; `provider_code`; `device_external_id`; `platform_code`; `timezone`; `is_active`; `last_seen_at`; `MUT`; unique provider/device | Profile active index; 1:N; purge 90 days after inactive/account deletion; write-light |
 | `notification_preferences` | Household/user notification policy; `APP` `PROPOSED` | `profile_id`; `household_id`; `notification_type_code`; `is_enabled`; `local_delivery_time`; `quiet_hours`; `consent_record_id`; `MUT`; PK profile/household/type | Due preference index; M:N; lifetime; read-heavy scheduler |
-| `notification_jobs` | Scheduled delivery work; `APP` | `id`; `household_id`; `profile_id`; `job_date`; `notification_type_code`; `scheduled_for`; `payload jsonb`; `job_status`; `attempt_count`; `provider_message_id`; `last_error_code`; timestamps; unique household/profile/date/type | Partial due `(scheduled_for) WHERE status IN ('pending','failed')`; monthly partition if large; 90–180 days; write-heavy queue |
+| `notification_jobs` | Scheduled delivery work; `APP` | `id`; `household_id`; `profile_id`; `job_date`; `notification_type_code`; `scheduled_for`; `payload jsonb`; `job_status`; `attempt_count`; `provider_message_id`; `last_error_code`; timestamps; unique household/profile/date/type | Partial due `(scheduled_for) WHERE status IN ('pending','failed')`; monthly partition if large; 180 days; write-heavy queue |
 | `notification_deliveries` | Attempt/receipt history; `APP/USE` `PROPOSED` | `id`; `household_id`; `notification_job_id`; `notification_device_id`; `attempt_no`; `provider_message_id text`; `delivery_status`; `attempted_at`; `delivered_at`; `opened_at`; `error_code`; composite tenant FK; immutable | Job/attempt unique, provider message; 1:N; 13 months; append-only |
 
 ### 7.4 Recommendation state, configuration, and traces (`re_engine`)
@@ -493,8 +530,8 @@ Catalog activation is copy-on-write. Stable conceptual identities never mutate h
 | `variety_rule_configs` | Versioned cadence/diversity rules; `EXT/APP` | `config_version`; `rule_code`; `dimension_code`; `window_code`; `cap`; `override_conditions jsonb`; `created_at`; PK version/rule | Version/rule; permanent; read-heavy |
 | `context_multiplier_configs` | Versioned context-tag effects; `EXT/APP` | `config_version`; `context_code`; `tag_id`; `multiplier`; `confidence`; `created_at`; PK version/context/tag | Context/version; permanent; read-heavy |
 | `engine_versions` | Runtime engine artifact/control pointer; `APP` | `version PK`; `artifact_uri`; `artifact_checksum`; `code_commit`; `compatible_catalog_versions`; `engine_status`; `activated_at`; `approved_by`; `rollback_of_version`; `created_at` | One champion partial unique; permanent; read-heavy |
-| `recommendation_runs` | One immutable decision execution attempt; authoritative version envelope inherited by slates; `APP` `PROPOSED` | `id`; `request_id uuid FK public.recommendation_requests(request_id)`; `attempt_no smallint`; `household_id`; `context_snapshot_id`; `household_snapshot_hash`; `intent_state_hash`; `engine_version`; `model_version`; `config_version`; `catalog_version_id`; `feature_set_version`; `policy_version`; `randomization_seed`; `run_status`; `candidate_count`; `safe_candidate_count`; `latency_ms`; `fallback_code`; `trace_uri NULL`; `trace_checksum`; `created_at`; unique `(request_id,attempt_no)` | Request and `(household_id,created_at desc)`; 13–25 months; append-only; slates do not duplicate mutable version authority |
-| `recommendation_candidates` | One candidate identity/header per run; `APP` `PROPOSED` | `recommendation_run_id`; `run_month date`; `candidate_item_hash`; `episode_id NULL`; `episode_snapshot_id NULL`; `feature_snapshot_id`; `generator_scores jsonb`; `created_at`; XOR episode reference; PK `(recommendation_run_id,candidate_item_hash,run_month)` | Monthly partition by `run_month`; run/candidate; 90–180d plus archive; append-only/high volume |
+| `recommendation_runs` | One immutable decision execution attempt; authoritative version envelope inherited by slates; `APP` `PROPOSED` | `id`; `request_id uuid FK public.recommendation_requests(request_id)`; `attempt_no smallint`; `household_id`; `context_snapshot_id`; `household_snapshot_hash`; `intent_state_hash`; `engine_version`; `model_version`; `config_version`; `catalog_version_id`; `feature_set_version`; `policy_version`; `randomization_seed`; `run_status`; `candidate_count`; `safe_candidate_count`; `latency_ms`; `fallback_code`; `trace_uri NULL`; `trace_checksum`; `created_at`; unique `(request_id,attempt_no)` | Request and `(household_id,created_at desc)`; 24 months; append-only; slates do not duplicate mutable version authority |
+| `recommendation_candidates` | One candidate identity/header per run; `APP` `PROPOSED` | `recommendation_run_id`; `run_month date`; `candidate_item_hash`; `episode_id NULL`; `episode_snapshot_id NULL`; `feature_snapshot_id`; `generator_scores jsonb`; `created_at`; XOR episode reference; PK `(recommendation_run_id,candidate_item_hash,run_month)` | Monthly partition by `run_month`; run/candidate; 180 days hot plus non-PII encrypted archive to 24 months; append-only/high volume |
 | `recommendation_candidate_stages` | Ordered filter/score/rerank/gate replay evidence; `APP` `PROPOSED` | `recommendation_run_id`; `run_month`; `candidate_item_hash`; `stage_sequence smallint`; `stage_code`; `is_eligible`; `reason_codes text[]`; `score_contributions jsonb`; `point_score NULL`; `household_utility NULL`; `rerank_delta NULL`; `rank_after_stage NULL`; `safety_gate_result NULL`; `created_at`; composite FK to candidate; PK `(recommendation_run_id,candidate_item_hash,run_month,stage_sequence)` | Monthly partition; run/stage/rank; 1:N stages per candidate; same retention; append-only/high volume |
 
 ### 7.5 Feature store, models, experiments, and analytics metadata (`ml`)
@@ -502,7 +539,7 @@ Catalog activation is copy-on-write. Stable conceptual identities never mutate h
 | Table | Purpose / class | Proposed columns, keys, and constraints | Indexes / cardinality / retention / workload |
 |---|---|---|---|
 | `feature_definitions` | Governed feature contract; `APP` | `id`; `feature_name`; `feature_version`; `entity_type_code`; `data_type_code`; `owner`; `expression_uri`; `null_policy`; `valid_range jsonb`; `online_source`; `offline_source`; `freshness_sla_seconds`; `feature_status`; `checksum`; timestamps; unique name/version | Active name pointer; permanent; read-heavy |
-| `feature_values` | Point-in-time online/offline feature evidence; `USE-derived` | `entity_type_code`; `entity_id`; `feature_definition_id`; typed value columns (`numeric_value`, `text_value`, `boolean_value`, `json_value`, `vector_value`) with exactly-one check; `as_of`; `expires_at`; `source_event_watermark`; `created_at`; PK includes entity/feature/as_of | Monthly partition by `as_of`; current lookup `(entity_type,entity_id,feature_definition_id,as_of desc)`; raw feature history 13–25m; write-heavy |
+| `feature_values` | Point-in-time online/offline feature evidence; `USE-derived` | `entity_type_code`; `entity_id`; `feature_definition_id`; typed value columns (`numeric_value`, `text_value`, `boolean_value`, `json_value`, `vector_value`) with exactly-one check; `as_of`; `expires_at`; `source_event_watermark`; `created_at`; PK includes entity/feature/as_of | Monthly partition by `as_of`; current lookup `(entity_type,entity_id,feature_definition_id,as_of desc)`; raw feature history 24 months; write-heavy |
 | `feature_snapshots` | Immutable set used for one run; `APP/USE-derived` `PROPOSED` | `id`; `household_id`; `feature_set_version`; `as_of`; `snapshot_hash UNIQUE`; `snapshot_uri` or compact `values jsonb`; `source_watermarks jsonb`; `created_at` | Hash/household time; trace retention; append-only |
 | `training_datasets` | Immutable consent-filtered dataset manifest; `APP` `PROPOSED` | `id`; `dataset_name`; `dataset_version`; `manifest_uri`; `manifest_checksum`; `event_time_start/end`; `catalog_version`; `feature_versions jsonb`; `consent_filter_version`; `row_count`; `label_distribution jsonb`; `slice_summary jsonb`; `created_by`; `created_at`; unique name/version | Permanent metadata; read-heavy |
 | `model_registry` | Model artifact and evaluation record; `APP` from training | `id`; `model_name`; `model_version`; `training_dataset_id`; `artifact_uri`; `artifact_checksum`; `code_commit`; `environment_lock_uri`; `feature_set_version`; `compatible_catalog_versions`; `metrics jsonb`; `slice_metrics jsonb`; `calibration_metrics jsonb`; `safety_results jsonb`; `model_stage`; `owner`; `approved_by`; timestamps; unique name/version | Stage/name; permanent; read-heavy |
@@ -518,6 +555,8 @@ Catalog activation is copy-on-write. Stable conceptual identities never mutate h
 | Table | Purpose / class | Proposed columns, keys, and constraints | Indexes / cardinality / retention / workload |
 |---|---|---|---|
 | `data_sources` | Immutable external retrieval/license version; `EXT` | `id`; `source_code`; `source_version`; `owner_name`; `license_code`; `license_uri`; `source_uri`; `retrieved_at`; `content_checksum`; `permitted_uses`; `redistribution_policy`; `expires_at`; `created_at`; unique `(source_code,source_version)` and checksum | Code/version/checksum; permanent; read-heavy |
+| `food_source_records` | Current 056 immutable raw provider landing, moved from client-visible `public` to `ops`; `EXT` | `id`; `provider_code`; `provider_record_id text NULL`; exactly one `dish_id`/`submission_id`; `query_text`; `source_url`; encrypted/object-backed `source_payload`; `payload_checksum`; `data_source_id`; `fetched_at`; `license_policy_version`; immutable | Subject/provider/time and checksum; retain by license/purpose, default 24 months; append-only/restricted |
+| `dish_enrichment_jobs` | Current 056 retryable ontology workflow, moved to `ops`; `APP` | `id`; exactly one `dish_id`/`submission_id`; `job_status`; normalized missing-field children or codes; `attempt_count`; `next_attempt_at`; `lease_expires_at`; `locked_by`; `last_error_code`; `created_at`; `updated_at`; one active job/subject | Partial due/lease and subject active uniqueness; 180 days after terminal; queue writes |
 | `ai_generation_runs` | AI lineage root; `AI` | `id`; `model_provider`; `model_name`; `model_version`; `prompt_version`; `parameters jsonb`; `input_checksum`; `output_artifact_uri`; `output_checksum`; `validator_version`; `validator_result jsonb`; `reviewer_profile_id`; `run_status`; timestamps | Model/prompt/status/time; permanent metadata; append/workflow |
 | `ai_generation_run_inputs` | Normalized AI input lineage; `AI/EXT` `PROPOSED` | `ai_generation_run_id`; `input_sequence`; `data_source_id NULL`; `input_artifact_uri NULL`; `input_checksum`; `purpose_code`; check exactly one source/pointer; PK run/sequence | Source and run indexes; 1:N; permanent metadata; append-only |
 | `assertion_sources` | Many-source evidence for governed assertions; `EXT/HYB` `PROPOSED` | `assertion_type_code`; `assertion_id`; `data_source_id`; `evidence_role_code`; `source_locator`; `evidence_checksum`; `created_at`; PK assertion/source/role | Source and assertion indexes; M:N; permanent with assertion |
@@ -525,10 +564,10 @@ Catalog activation is copy-on-write. Stable conceptual identities never mutate h
 | `content_review_tasks` | Human validation queue for AI/external assertions; `APP` `PROPOSED` | `id`; `assertion_type_code`; `assertion_id`; `assertion_path`; `proposed_origin`; `risk_tier`; `review_status`; `assigned_reviewer_id`; `decision_code`; `decision_reason`; timestamps; unique active assertion task; evidence joins through normalized lineage tables | Status/risk/assignee; retain permanently with published evidence; workflow writes |
 | `catalog_publish_runs` | Immutable release build evidence; `APP` `PROPOSED` | `id`; `catalog_version_id`; `input_change_set_uri`; `validation_report_uri`; `row_counts jsonb`; `safety_results jsonb`; `publish_status`; `started_at`; `completed_at`; `approved_by`; `rollback_of_id`; `error_code` | Catalog/status; permanent; append/workflow |
 | `etl_job_runs` | Backfill/ETL execution lineage; `APP` | `id`; `job_name`; `run_id UNIQUE`; `input_versions jsonb`; `output_versions jsonb`; `started_at`; `completed_at`; `row_counts jsonb`; `job_status`; `error_code`; `error_detail_redacted`; `code_commit`; `retry_of_id` | Job/time/status; 2 years or permanent for catalog/model jobs; append-heavy |
-| `safety_gate_log` | Exact safety gate evidence; `APP` | `id`; `occurred_at`; `request_id`; `slate_id`; `candidate_item_hash`; `episode_id`; `gate_code`; `gate_result`; `reason_code`; `recipe_version_map jsonb`; `safety_closure_version`; `safety_closure_checksum`; `evidence jsonb`; `catalog_version`; `model_version`; immutable; `PK(id,occurred_at)` | Monthly partition by occurred_at; request/slate/gate and failures partial; 25 months; append-heavy |
-| `coverage_gap_log` | Candidate/content coverage failures; `APP` | `id`; `occurred_at`; `request_id`; `household_pseudonym`; `region_id`; `meal_class_id`; `constraints_hash`; `candidate_counts jsonb`; `fallback_code`; `catalog_version`; `PK(id,occurred_at)` | Monthly partition by occurred_at; region/class/time; 25 months then aggregate; append-heavy |
-| `audit_log` | Privileged change/control audit; `APP` | `id`; `occurred_at`; `chain_partition_code`; `chain_sequence bigint`; `previous_entry_hash`; `entry_hash`; `signature_key_version`; `entry_signature`; `actor_type_code`; `actor_id`; `action_code`; `resource_type_code`; `resource_id`; `before_hash`; `after_hash`; `correlation_id`; `ip_hash`; immutable via revoke/update trigger and external hash-anchor job; `PK(id,occurred_at)` | Quarterly partition; unique chain partition/sequence; actor/time, resource/time, correlation; 7 years or approved policy; append-only |
-| `dead_letter_events` | Failed event/job quarantine without excess PII; `APP` `PROPOSED` | `id`; `source_queue`; `event_id`; `household_pseudonym`; `error_code`; `payload_pointer`; `payload_checksum`; `first_failed_at`; `last_failed_at`; `attempt_count`; `resolution_status`; `resolved_at`; `resolved_by`; `MUT` | Active failure/queue/time; 90–180 days after resolution; write-heavy |
+| `safety_gate_log` | Exact safety gate evidence; `APP` | `id`; `occurred_at`; `request_id`; `slate_id`; `candidate_item_hash`; `episode_id`; `gate_code`; `gate_result`; `reason_code`; `recipe_version_map jsonb`; `safety_closure_version`; `safety_closure_checksum`; `evidence jsonb`; `catalog_version`; `model_version`; immutable; `PK(id,occurred_at)` | Monthly partition by occurred_at; request/slate/gate and failures partial; 24 months; append-heavy |
+| `coverage_gap_log` | Candidate/content coverage failures; `APP` | `id`; `occurred_at`; `request_id`; `household_pseudonym`; `region_id`; `meal_class_id`; `constraints_hash`; `candidate_counts jsonb`; `fallback_code`; `catalog_version`; `PK(id,occurred_at)` | Monthly partition by occurred_at; region/class/time; 24 months then aggregate; append-heavy |
+| `audit_log` | Privileged change/control audit; `APP` | `id`; `occurred_at`; `chain_partition_code`; `chain_sequence bigint`; `previous_entry_hash`; `entry_hash`; `signature_key_version`; `entry_signature`; `actor_type_code`; `actor_id`; `action_code`; `resource_type_code`; `resource_id`; `before_hash`; `after_hash`; `correlation_id`; `ip_hash`; immutable via revoke/update trigger and external hash-anchor job; `PK(id,occurred_at)` | Quarterly partition; unique chain partition/sequence; actor/time, resource/time, correlation; 7 years; append-only |
+| `dead_letter_events` | Failed event/job quarantine without excess PII; `APP` `PROPOSED` | `id`; `source_queue`; `event_id`; `household_pseudonym`; `error_code`; `payload_pointer`; `payload_checksum`; `first_failed_at`; `last_failed_at`; `attempt_count`; `resolution_status`; `resolved_at`; `resolved_by`; `MUT` | Active failure/queue/time; 180 days after resolution; write-heavy |
 
 ### 7.7 Research corpus (`research`, optional private schema)
 
@@ -538,7 +577,7 @@ The Product Bible requires an Indian Home Meal Panel and recipe-execution studie
 |---|---|---|---|
 | `research.studies` | Study protocol; `APP/EXT` | `id PK`, `study_code UNIQUE`, `protocol_version`, `purpose_text`, `sampling_frame jsonb`, `consent_policy_version`, `starts_at`, `ends_at`, `owner`, `study_status`, `ethics_review_uri`, `privacy_review_uri` | Status/time; low cardinality; permanent protocol metadata; read-heavy |
 | `research.participants` | Pseudonymous household participation; `APP` | `study_id FK`, `participant_id uuid`, `household_token text`, `consent_record_id`, `sampling_dimensions jsonb`, `enrolled_at`, `withdrawn_at`; PK study/participant; no direct analytics identity | Token/study; 1:N; delete/withdraw per study consent; restricted mixed workload |
-| `research.meal_diaries` | Planned-versus-actual episode observation; `USE` | `id PK`, `study_id`, `participant_id`, `occurred_at`, `meal_slot_code`, `planned_episode_hash`, `actual_components jsonb`, `portions jsonb`, `cook_effort jsonb`, `pantry_evidence jsonb`, `leftover_result jsonb`, `eater_tokens text[]`, `satisfaction jsonb`, `media_uri`; immutable | Monthly participant/time; 1:N; study-approved retention; append-only |
+| `research.meal_diaries` | Planned-versus-actual episode observation; `USE` | `id PK`, `study_id`, `participant_id`, `occurred_at`, `meal_slot_code`, `planned_episode_hash`, `actual_components jsonb`, `portions jsonb`, `cook_effort jsonb`, `pantry_evidence jsonb`, `leftover_result jsonb`, `eater_tokens text[]`, `satisfaction jsonb`, `media_uri`; immutable | Monthly participant/time; 1:N; raw media 90 days, structured consented record per study up to 24 months; append-only |
 | `research.annotation_batches` | Annotation protocol/version; `APP` | `id PK`, `corpus_version`, `handbook_version`, `task_type_code`, `sampling_method_code`, `required_reviewers`, `agreement_threshold`, `batch_status`, timestamps | Status/corpus; 1:N study/corpus; permanent metadata; workflow writes |
 | `research.annotations` | Individual reviewer assertion; `APP/EXT` | `id PK`, `batch_id`, `item_id`, `annotator_token`, `labels jsonb`, `confidence`, `submitted_at`; immutable; unique batch/item/annotator | Batch/item; M:N; permanent evidence; append-only |
 | `research.annotation_adjudications` | Dispute resolution; `APP/EXT` | `id PK`, `batch_id`, `item_id`, `conflicting_annotation_ids`, `adjudicator_token`, `decision jsonb`, `rationale_text`, `resolved_at`; immutable | Batch/item; 0:N; permanent evidence; append-only |
@@ -631,7 +670,8 @@ erDiagram
   HOUSEHOLDS ||--o{ LEFTOVER_LOTS : owns
   HOUSEHOLD_MEMBERS ||--|| MEMBER_FAIRNESS_STATE : accrues
 
-  RECOMMENDATION_RUNS ||--o{ RECOMMENDATION_CANDIDATE_DECISIONS : traces
+  RECOMMENDATION_RUNS ||--o{ RECOMMENDATION_CANDIDATES : considers
+  RECOMMENDATION_CANDIDATES ||--o{ RECOMMENDATION_CANDIDATE_STAGES : traces
   RECOMMENDATION_REQUESTS ||--o{ RECOMMENDATION_RUNS : attempts
   RECOMMENDATION_RUNS ||--o{ SLATES : emits_per_slot
   FEATURE_SNAPSHOTS ||--o{ RECOMMENDATION_RUNS : supplies
@@ -774,8 +814,8 @@ Create indexes from evidenced access paths and validate with `EXPLAIN (ANALYZE, 
 | Membership authorization | `household_memberships(profile_id, household_id) WHERE status='active'`; unique active owner per household |
 | Active members/constraints | `household_members(household_id) WHERE is_active`; current constraint/allergen indexes by member/code |
 | Current SCD fact | Partial btree on natural key `WHERE is_current`; GiST exclusion on natural key + effective range |
-| Weekly plan | Unique active `(household_id, week_start_date)`; slot unique `(week_plan_id, plan_date, meal_slot_code)` |
-| Slates | `slates(household_id,created_at desc)`; unique `request_id`; `slate_items(slate_id,rank)` |
+| Weekly plan | Separate at-most-one draft and at-most-one finalized partial uniques per `(household_id, week_start_date)`; slot unique `(week_plan_id, plan_date, meal_slot_code)` |
+| Slates | `slates(household_id,created_at desc)`; unique run/date/slot/refresh sequence; `slate_items(slate_id,rank)` |
 | Events | `(household_id,occurred_at desc)`, `(slate_id,item_id)`, `(plan_slot_id,occurred_at)`; BRIN on partition time for scans |
 | Never/suppressions | Partial unique active exclusion; `(household_id,entity_type_code,entity_id,expires_at)` |
 | Candidate retrieval | `(meal_class_id,region_id,eligibility_status,base_weight desc)`; active episode/grammar/slot indexes |
@@ -794,7 +834,7 @@ Do not create a vector index until vector dimension, distance metric, row volume
 | `interaction_events`, `outcome_events` | `occurred_at` | Monthly range | Create three months ahead; default quarantine partition; event-time late-arrival routing |
 | `feature_values` | `as_of` | Monthly range | Detach/archive expired history; keep compact current-value projection separately if needed |
 | `recommendation_candidates`, `recommendation_candidate_stages` | `run_month` | Monthly range | High-volume detail; derive from run creation month and include it in every partitioned PK/FK |
-| `safety_gate_log`, `coverage_gap_log` | `created_at` | Monthly range | Preserve failure partitions longer than success detail if policy allows |
+| `safety_gate_log`, `coverage_gap_log` | `occurred_at` | Monthly range | Preserve failure partitions for the full 24-month trace period; successful candidate-stage detail may contract after 180 days |
 | `notification_jobs/deliveries` | `scheduled_for`/`attempted_at` | Monthly after volume threshold | Avoid partitioning prematurely at low scale |
 | `audit_log` | `occurred_at` | Quarterly/yearly | Retention normally longer and lookup volume lower |
 
@@ -820,14 +860,14 @@ Partition operations are production functionality:
 - Catalog and model activations use advisory locks or a serializable control transaction to enforce one active pointer.
 - All timestamps are UTC; household timezone is stored separately for presentation and slot/date interpretation.
 
-### 10.4 Recommended retention matrix
+### 10.4 Binding baseline retention matrix
 
-Final periods require privacy/legal approval. These are engineering defaults, not legal conclusions.
+These are the architecture defaults resolved in Section 14. Privacy/legal review may shorten them; extension requires a documented lawful basis, policy version and hold/release controls.
 
 | Data | Online retention | Archive/erasure behavior |
 |---|---|---|
 | Profile/household/plan state | Account/household lifetime | Delete through verified privacy workflow; bounded tombstone only where required |
-| Consent/privacy request history | Approved statutory period | Immutable minimal proof; remove unnecessary IP/user-agent hashes earlier |
+| Consent/privacy request history | 7 years after terminal state, unless applicable law requires less/more | Immutable minimal proof; remove unnecessary IP/user-agent hashes after 180 days |
 | Raw interactions/outcomes | 24 months | Consent-filtered pseudonymous training snapshots may outlive raw rows only under approved basis |
 | Recommendation/slate headers | 24 months | Delete personal linkage on erasure; retain non-identifying aggregate metrics |
 | Candidate-level trace detail | 180 days hot | Encrypted object archive up to 24 months if needed for replay; shorter for non-selected candidates |
@@ -837,8 +877,9 @@ Final periods require privacy/legal approval. These are engineering defaults, no
 | Notification jobs/delivery | 180 days | Provider identifiers erased with profile |
 | Weather cache | Provider TTL + small operational margin | No personal retention; key by coarse geocode/city |
 | Catalog/source/model/config metadata | Permanent/versioned | Deactivate or supersede; never rewrite historical meaning |
-| AI run/content review lineage | Permanent for published content | Purge rejected raw outputs according to license/security policy |
-| Audit/security records | 3–7 years based on approved policy | Minimize PII, hash identifiers, legal hold exception |
+| AI run/content review lineage | Permanent for published content | Purge rejected/unpublished raw outputs after 180 days unless an active review/hold applies |
+| Research raw media | 90 days | Earlier withdrawal deletion; derived consented annotations follow study policy without direct identity |
+| Audit/security records | 7 years | Minimize PII, hash identifiers, legal hold exception |
 | Analytics aggregates | Indefinite if irreversibly anonymized | Re-identification tests and minimum cohort thresholds |
 
 ## 11. Data governance, provenance, security, and audit
@@ -956,8 +997,16 @@ The current export implementation omits several newer tables, and current hard d
 | `never_list`, `not_today_suppression` | Re-key by household/entity, link source event where known, preserve original timestamps |
 | `user_taste_vectors.dish_affinity jsonb` | Resolve names to stable dish IDs; retain unresolved entries in a reconciliation quarantine, not under null IDs |
 | `user_re_state`, `re_dish_bandit_state` | Migrate only if evidence/consumers exist; otherwise initialize target derived state from raw facts/priors |
+| PRD `re_engine.re_cohorts`, `re_personas`, `re_routing_rules`, `re_class_dish_options`, `re_weekly_class_plans`, `re_cohort_class_priors` | Implement as target `cohorts`, `personas`, `routing_rules`, `class_dish_options`, `weekly_class_priors`, `cohort_class_priors`; the schema already conveys ownership, so the redundant `re_` prefix is intentionally removed |
+| PRD `re_engine.scoring_config`, `weight_ladder_config`, `event_weights`, `variety_rules`, `context_multipliers` | Implement as plural target `scoring_configs`, `weight_ladder_configs`, `event_weight_configs`, `variety_rule_configs`, `context_multiplier_configs`; immutable version sets preserve the PRD semantics |
 | `experiments` and assignment JSON | Expand definition; materialize stable household assignments; preserve historical variant snapshot in events |
 | `notification_devices/jobs` | Re-key identity correctly, add preferences/delivery attempts, preserve provider IDs through privacy inventory |
+| Migration-055 `households`/memberships | Keep and harden; migrate owner authority to active membership, add rejoin history and complete tenant constraints before dropping legacy ownership |
+| Migration-055 `food.*` episode/recipe tables | Keep as expand foundation; normalize arrays/relationships, add exact immutable content versions/catalog manifest and enforce publish gates |
+| Migration-055 `slates`/`slate_items`/`outcome_events` | Keep as compatibility generation; expand to request→run→per-slot-refresh slate grain, stable item IDs, full event envelope and correct propensity semantics |
+| Migration-055 private `re_engine`/`ml`/`ops` tables | Keep namespaces; evolve tables through expand migrations, never destructive in-place reinterpretation |
+| Migration-056 ontology staging/assertions/current/mappings | Keep one-way ingestion gate; add field policy/risk tier, normalized source/run lineage, immutable review decisions and split normal/degraded candidate views |
+| `dish_candidates_by_class` | Replace as runtime authority with `dish_candidates_primary_eligible`; retain a separate explicit degraded-review view for labeled fallback only |
 | Dropped ops scaffolding | Reintroduce only alongside a tested producer, consumer/dashboard, retention rule, and runbook |
 | `recommendation_kpis_daily` | Keep as compatibility metric; add choose/execute/no-regret household-success marts |
 
@@ -965,10 +1014,10 @@ The current export implementation omits several newer tables, and current hard d
 
 All migrations follow expand → dual-write/backfill → validate → read cutover → contract. No phase silently fabricates missing historical values.
 
-### Phase 0 — Stabilize the current database
+### Phase 0 — Stabilize the current database (`IN PROGRESS`; migrations 054–059 live)
 
-1. Apply and live-verify migration 054.
-2. Enable explicit RLS/grants for `experiments`; remove dependence on the production-only auto-RLS overlay.
+1. Preserve live verification evidence for migrations 054–059 and seed 146; validations 911–913, the advisor checks, named cron/run ledger and tenant backfill counts are complete. Make `pg_catalog` drift checks part of every release.
+2. Verify explicit RLS/grants for every current and ontology table on a clean rebuild; remove dependence on any production-only overlay.
 3. Fix member allergen validation to the current bit range and change allergen union to exact recomputation on insert/update/delete/deactivation while retaining conservative safety during reconciliation.
 4. Make weekly plan finalization and all slot writes transactional; validate exactly the allowed seven days × active slots before final status.
 5. Add a durable unique request identity and make recommendation persistence required for feedback-bearing surfaces.
@@ -980,30 +1029,31 @@ All migrations follow expand → dual-write/backfill → validate → read cutov
 
 **Exit gate:** no known privacy omission, cross-account cache exposure, partial finalized plan, expired partition window, or unprotected clean-rebuild table.
 
-### Phase 1 — Establish household tenancy
+### Phase 1 — Establish household tenancy (`EXPANDED LIVE`; cutover/contract pending)
 
-1. Create `households`, `household_memberships`, invites, normalized constraints/allergens, cook profiles, and equipment.
-2. Backfill one household and owner membership per current profile.
-3. Add nullable `household_id` to every tenant table and populate from current `profile_id`.
-4. Deploy membership-based RLS helpers and compare policies in shadow tests.
-5. Update APIs to require household context and actor membership while compatibility endpoints still accept legacy equality.
-6. Make `household_id` non-null, switch unique constraints, and eventually remove profile-as-tenant assumptions.
+1. Keep the live `households`, memberships, invites and one-owner backfill from migration 055; deploy/verify release-candidate 059 so future profiles provision their compatibility household and the five covered roots become non-null.
+2. Add membership surrogate history, exactly-one-active-owner enforcement, owner-transfer RPC and the Section 14 role matrix.
+3. Add normalized constraints/allergens, cook profiles, equipment, geography and schedule history.
+4. Complete `household_id` population on every tenant root/child; add composite tenant FKs and membership-based RLS helpers.
+5. Update every API/cache/idempotency key to require household context while compatibility endpoints still bridge legacy equality.
+6. Make tenant keys non-null, switch uniqueness, prove parity, then contract profile-as-tenant columns and policies.
 
-**Exit gate:** adversarial RLS tests prove no cross-household reads/writes for owner, admin, planner, viewer, expired member, and invited non-member.
+**Exit gate:** adversarial RLS tests prove no cross-household reads/writes for owner, planner, cook, member, viewer, revoked member and invited non-member; owner transfer and leave/rejoin history pass.
 
-### Phase 2 — Canonical IDs, catalog versions, and provenance
+### Phase 2 — Canonical IDs, Food Ontology, catalog versions, and provenance (`ONTOLOGY LIVE`; immutable publish completion pending)
 
-1. Create `food` and `ops` schemas, source registry, catalog versions, governed name/assertion tables, and publish workflow.
-2. Assign stable dish/ingredient/recipe/class IDs and reconcile the Python bundle to those IDs.
-3. Add recipes, exact recipe ingredients, operation DAG, nutrition assertions, and reviewed provenance.
-4. Produce a signed immutable bundle from the active catalog version; service metadata reports checksum/version.
-5. Replace mutable-name reconciliation in APIs/events.
+1. Retain the live migration-056 intake→source→assertion→current→mapping pipeline and immutable generated ontology snapshot.
+2. Normalize source versions, AI run inputs, assertion evidence, review decisions, field policies and catalog-release manifests.
+3. Assign/reconcile stable dish, ingredient, recipe, class, taxonomy-term and episode version IDs across database and bundle.
+4. Normalize recipe equipment/operation DAG, nutrient assertions, substitutions, availability, festival and reviewed safety provenance.
+5. Split normal primary eligibility from degraded review fallback and enforce the Section 14 promotion/multi-label policy in a publish RPC.
+6. Replace remaining mutable-name reconciliation in APIs/events; remove the legacy CSV fallback after its monitored parity window.
 
 **Exit gate:** DB and bundle have identical ID/count/checksum manifests; every eligible item has complete safety ingredients and source/review status.
 
-### Phase 3 — Canonical requests, slates, events, and outcomes
+### Phase 3 — Canonical requests, slates, events, and outcomes (`HEADERS LIVE`; runtime adoption pending)
 
-1. Create recommendation requests, household/context snapshots, slates/items, event ingest keys, interactions, and outcomes.
+1. Keep live slate/item/outcome headers; add recommendation requests, runs, household/context/feature snapshots, per-slot refresh grain, event ingest keys and candidate stages.
 2. Dual-write current recommendation/feedback flows and compare counts/IDs.
 3. Require render acknowledgement for exposure; distinguish fetched/rendered/visible.
 4. Add exact plan-slot-to-slate-item/episode linkage and transactional selection/lock.
@@ -1012,11 +1062,11 @@ All migrations follow expand → dual-write/backfill → validate → read cutov
 
 **Exit gate:** 99.9%+ request→slate→event linkage, zero duplicate idempotency effects, exact replay metadata, and no name-keyed IDs.
 
-### Phase 4 — Meal episodes and practicality v1
+### Phase 4 — Meal episodes and practicality v1 (`SCHEMA LIVE`; governed content/runtime adoption pending)
 
-1. Publish plate grammars and normalized component rules.
-2. Create curated episodes/components and immutable snapshot support for ephemeral bundles.
-3. Add kitchen equipment, cook profiles, recipe operations, workload features, pantry belief, leftovers, and cadence priors.
+1. Publish plate grammars and normalized component rules through immutable catalog manifests.
+2. Populate curated episodes/components and add immutable served snapshots for ephemeral bundles.
+3. Complete kitchen equipment, cook profiles, normalized recipe operations, workload evidence, pantry checkpoints, leftover lineage and cadence priors around the live foundation tables.
 4. Switch Today/Week contracts from dish items to episode items while preserving component-level recipe links.
 5. Add post-rank exact-version safety gates and live safety/coverage producers.
 
@@ -1046,27 +1096,39 @@ All migrations follow expand → dual-write/backfill → validate → read cutov
 
 Add two-tower retrieval, broader graph retrieval, pantry/leftover optimization, beam/MIP weekly solving, sequence models, and constrained policy optimization only after sufficient catalog quality, linked outcomes, and experiment evidence. These are not database-foundation prerequisites.
 
-## 14. Risks and open questions
+## 14. Resolved architecture decisions and residual delivery risks
 
-| Topic | Risk/open decision | Recommendation |
+The following are binding defaults for schema and service implementation. A future change requires a versioned architecture decision record, migration impact assessment and owner approval; it is not an implementation-time choice.
+
+| Topic | Binding decision | Enforced by / acceptance evidence |
 |---|---|---|
-| DB ownership | Current RE has zero DB connections; final sequence implies private DB reads/writes | Prefer Edge-owned DB access with signed snapshots first; approve narrow `re_runtime` functions only if measured latency requires |
-| Household roles | Owner/admin/planner/viewer behavior is not fully specified | Product must define invitation, transfer, removal, minor/dependent, and emergency safety-edit semantics before RLS freeze |
-| Episode v1 timing | PRD makes episodes v1 while one schema note calls richer `food` v3 | Treat episode identity/components/snapshot as v1; defer advanced graph and learned assembly, not the backbone |
-| Outcome truth | Silence after a meal is ambiguous | Keep censored; define attribution windows and explicit success events before model labels |
-| Safety data | Unknown ingredients/variants can be treated inconsistently across bundle and DB | One catalog version and exact recipe-component closure; unknown high-risk facts exclude |
-| Allergen mask | Bitmask is fast but opaque and vocabulary growth caused drift | Make normalized allergen relations authoritative; keep mask only as versioned derived cache |
-| Member age/conditions | Exact ages may be unnecessary sensitive data | Prefer age bands/birth year and effective-dated constraints; collect exact age only with a documented need |
-| Provenance | URL fields alone do not prove license, version, or permitted use | Central source registry plus assertion-level source/review and immutable landing checksum |
-| JSONB traces | Fully normalized traces are costly; pure JSON is hard to query | Normalize identity/rank/filter/outcome facts; store bulky immutable trace payload in object storage with checksum/URI |
-| Feature store | PostgreSQL EAV feature history can become expensive | Keep compact online current state in Postgres; export history to warehouse/object store when volume grows |
-| Privacy vs reproducibility | Hard deletion can break exact replay | Retain non-identifying content/model snapshots; delete tenant payload/linkage; document which replays become intentionally unavailable |
-| Research corpus | Meal diaries/photos carry high privacy risk | Separate schema/project, explicit study consent, pseudonyms, restricted media, short retention, withdrawal workflow |
-| Experimentation | Existing assignment is ephemeral JSON | Persist household assignment and policy version; prohibit user-level reassignment inside a shared household |
-| Clinical scope | Conditions exist but governed suitability is absent | Store user constraint only; do not publish clinical recommendation claims until evidence/review policy is approved |
-| Analytics location | OLTP cannot become the training warehouse | CDC/pseudonymous warehouse; keep only operational marts and online features in PostgreSQL |
-| Direct PostgREST writes | Some current `FOR ALL` policies may permit bypass of Edge validation if grants exist | Revoke direct mutation; expose validated RPC/API paths and server-only event inserts |
-| Retention | Exact periods are not ratified | Obtain privacy/legal sign-off before physical partition-drop automation |
+| Database ownership | Edge/API owns PostgreSQL credentials, tenant authorization, snapshot construction and the transaction that persists run/slate/trace results. The Python RE receives signed immutable payloads and no database credential. | Separate Edge credential; HMAC payload; deny network/database secret to RE; integration test proving a returned result is not exposed until persistence commits |
+| Household roles | Canonical roles are `owner`, `planner`, `cook`, `member`, `viewer`. Owner manages members/roles, consent-scope settings and transfer; planner edits plans/locks; cook records execution and pantry; member records own feedback; viewer is read-only. Exactly one active owner exists. Dependents are `household_members`, never authorization memberships. | Role matrix tests in API and RLS; owner transfer transaction; last owner cannot leave/revoke; leave/rejoin creates membership history |
+| Emergency safety edits | Any active adult authorization member may submit a stricter allergy/diet block; only owner or the affected linked user may relax it, after reauthentication and audit. | Server RPC, step-up auth for relaxation, immutable before/after audit, immediate snapshot/cache invalidation |
+| Episode delivery | Episode identity, exact components/recipes and immutable served snapshot are v1 requirements. Advanced graph retrieval and learned episode assembly remain later phases. | No production episode response without snapshot hash, exact catalog manifest and safety closure; dish-only path remains a labeled compatibility route until contraction |
+| Outcome truth | Missing follow-up is censored, never negative. Choice/lock is immediate; cook/order/replace attribution window is plan-slot time through +36 hours; completion/enjoyment through +48 hours; regret through +72 hours; later explicit events remain facts but are excluded from default model labels unless a versioned label policy includes them. | Versioned label-policy table/config; event-time tests; training datasets report censored counts and label-policy version |
+| Safety authority | Exact selected recipe-version ingredients plus versioned ingredient/allergen/derivative assertions are authoritative. Dish masks are conservative prefilters only. Unknown, conflicting, optional-but-possible or unreviewed high-risk safety facts block eligibility. | Catalog manifest, closure checksum, pre/post gate logs, coverage task on block; bundle/DB safety parity test |
+| Allergen representation | Normalized allergen relations are canonical. The integer mask remains a generated cache with an explicit vocabulary version and is never directly authored by client/AI. | Trigger/job derivation, parity constraint/test, cache rebuild on vocabulary change |
+| Member sensitive data | Store age band and optional birth year, not exact DOB. Conditions are user-declared constraints, encrypted/restricted and excluded from explanations/analytics. No latent clinical or religious identity inference is permitted. | Column-level grants, pseudonymous marts, redaction tests and privacy export/delete coverage |
+| Food Ontology promotion | External records and model outputs are evidence only. A canonical dish enters a normal primary pool only when canonical identity and required non-safety fields are selected, at least one slot/class mapping is accepted, and every safety field is deterministically or human verified. `review` rows may be used only in a named degraded fallback when safety is complete; the response must expose the fallback and confidence. | Replace broad candidate view with `primary_eligible` and `degraded_review` views; publish function checks field-policy table and safety completion |
+| Ontology confidence | Non-safety assertion: `>=0.90` may be auto-selected as provisional when the source policy permits; `0.70–0.899999` requires human review before normal eligibility; `<0.70` is not eligible. Safety/religious/clinical/nutrient quantities never auto-clear regardless of confidence. Accepted human/canonical truth can be replaced only by a new accepted human decision with equal-or-stronger cited evidence. | Versioned `ontology_field_policies`; guarded publish RPC; database checks and review tests |
+| Multi-label classes | Per dish and slot: exactly one accepted primary class; at most two accepted secondary primary-pool classes; add-on/combo mappings are unlimited only within their explicit planning role and never enter the primary pool. | Partial unique/indexed publish constraint plus deferred count trigger; add-on role guard; bundle parity test |
+| Unknown-dish AI | Disabled for production promotion until an approved processor has DPA/DPIA, permitted region/residency, no training on submitted data by default, retention limit and incident terms. Even after enablement, AI writes assertions only and never safety truth or publish pointers. | Feature flag default off; approved-provider registry; prompt/input/output lineage; no AI role grants on current/publish tables |
+| Reviewer operations | Safety/high-risk assertions: two-person review with one qualified publisher, 24-hour target and no auto-expiry into eligibility. Other provisional assertions: one reviewer, 3-business-day target. Corrected user submissions may enter training only under explicit research/training consent. | Review task risk tier, assignee/decision history, SLA metrics, consent-filtered dataset build |
+| Catalog immutability | Draft content is mutable; published content is copy-on-write. Every active bundle/catalog release has an immutable manifest of exact assertion/recipe/grammar/episode versions and checksums. Runtime never reads raw staging or mutable current pointers without a release manifest. | `catalog_versions` plus manifest, one active pointer, checksum verification and replay test |
+| Trace storage | Normalize request/run/slate/item/stage/safety/outcome identity and query-critical values. Store bulky immutable traces in object storage with URI/checksum; never store PII in the trace blob. | Relational FK tests, object checksum verification, trace retention/deletion job |
+| Feature storage | PostgreSQL stores current online state, feature definitions and request snapshots. High-volume history and training rows go to consent-filtered object/warehouse datasets; null is distinct from zero. | Online/offline parity tests, watermarks, immutable dataset manifest and feature-definition version |
+| Privacy versus replay | On erasure, delete tenant linkage/payload, device tokens, raw/derived personal state and object artifacts. Retain only non-identifying catalog/model/config artifacts and aggregated metrics; personal replay is intentionally unavailable afterward. | Generated privacy inventory, deletion tombstone/audit, artifact purge verification |
+| Research corpus | Research data uses a separate restricted schema/project, explicit study consent and purpose, pseudonymous linkage, encrypted media, 90-day raw-media default and withdrawal deletion. It never joins production analytics by direct identity. | Study protocol/privacy review, access audit, retention job and withdrawal test |
+| Experimentation | Assignment unit is household. Assignment is persisted and immutable per experiment/version; variant must belong to experiment; one control; allocations total one. Reassignment requires a new assignment version. | Composite FK, allocation validation, assignment hash and experiment audit |
+| Clinical scope | Store declared exclusions/needs only. Clinical suitability and therapeutic claims are disabled until a separately approved evidence taxonomy, clinical reviewer role and regulatory policy exist. | No clinical publish vocabulary/route in normal catalog; hard feature flag and content lint |
+| Analytics location | CDC/export sends pseudonymous facts to the warehouse/object store. PostgreSQL holds operational marts and online features only. | No training scans on OLTP; workload guardrails and warehouse freshness checks |
+| Direct client mutation | Clients cannot directly mutate household permissions, safety constraints, plans, raw events, ontology assertions/current pointers, models or configs. All such writes use validated RPC/API paths; event facts are server-insert-only and immutable. | Revoked table grants, narrow policies, API authorization tests and clean-rebuild RLS validation |
+| Retention | Architecture baseline is the Section 10.4 matrix: raw behavior/traces 24 months, detailed candidate stages 180 days plus non-PII archive, notifications/DLQ 180 days, audit 7 years, raw research media 90 days, account/consent per purpose and deletion workflow. Privacy/legal may shorten a class; extension requires recorded lawful basis and policy version. | Partition/drop schedule, legal-policy version, hold mechanism, purge metrics and restore test |
+| Festival context | A festival calendar may provide external context only. It never infers a household's religion or observance; participation is user-declared or treated as low-weight regional context. | Versioned festival source, context provenance, explanation/redaction test |
+| Graph scope | Only bounded, typed, provenance-backed dish/ingredient/substitution edges may affect retrieval. No graph edge affects safety unless backed by reviewed ingredient safety assertions; unconstrained graph expansion is prohibited. | Edge-type allowlist, depth/degree caps, provenance and safety-gate tests |
+
+Residual delivery risks are operational rather than architectural: production DDL must be deployed expand/migrate/contract; legacy dual-write must reconcile before retirement; ontology review capacity must meet the stated SLA; physical-device offline/push testing, alert destination configuration and production load/soak evidence remain release activities outside the logical schema.
 
 ## 15. Acceptance and definition of done
 
@@ -1081,21 +1143,51 @@ The target database foundation is complete when:
 - exposure, choice, execution, enjoyment, and regret are separate immutable facts;
 - raw-event replay deterministically rebuilds online preference/cadence/fairness/pantry state;
 - all AI-assisted content is draft-by-default and published evidence is attributable;
+- normal candidate views contain only policy-compliant accepted class mappings and complete reviewed safety closure; degraded review fallback is separately named and observable;
+- unknown-dish AI cannot promote content or receive production input until the Section 14 processor/control gates pass;
 - catalog, config, model, feature, experiment, and logging-policy versions are immutable and rollback-capable;
 - privacy export/delete tests automatically cover every personal table, derived state, cache, and artifact;
 - future partitions, retention, backfills, dead letters, data freshness, and safety/coverage gaps are monitored;
 - migration/RLS/trigger/query-plan/rollback tests pass on a clean rebuild and production-scale fixture;
 - current legacy event/context tables have an explicit migrated, retained-for-expiry, or dropped disposition—no parallel ambiguous source remains.
 
-## 16. Evidence register
+## 16. Issue-closure register
+
+| Reviewed issue family | Resolution in this specification |
+|---|---|
+| Logical versus executable schema | Section 7 is explicitly a deterministic logical catalog; executable DDL requires the defined per-column physical dictionary and may not infer FK targets |
+| Current/proposed conflation | Section 3 is rebased through deployed 056; Section 7 defines deterministic `CURRENT—ALTER/MIGRATE`, `PROPOSED—CREATE` and `CURRENT—RETIRE/CONSOLIDATE` status |
+| Invalid SCD2 uniqueness | Stable identity/current partial uniqueness and exact version IDs are defined in Section 4.4; published release manifests freeze versions |
+| Invalid partitioned PK/uniqueness | `FACT` distinguishes unpartitioned and composite partition keys; global idempotency is owned by `event_ingest_keys` |
+| Tenant/RLS drift | Household root, composite tenant FKs, canonical helper signature, role matrix and child-table policy rules are fixed in Sections 4.2, 7.1, 11.3 and 14 |
+| Request/run/slate/plan cycles | Request 1:N run 1:N per-slot/refresh slate is fixed; plan slots select slate items and retain slate history without a nullable cycle |
+| Owner duplication and membership history | Active owner membership is authoritative; membership has a surrogate history row and leave/rejoin semantics |
+| Weak provenance/AI lineage | Normalized data sources, run inputs, assertion sources, AI-run links, review decisions and catalog manifests replace singleton IDs/arrays |
+| Missing geography/schedule/context masters | Effective geography/schedule, festival, weather, availability, equipment, allergen and unit tables are included with field provenance |
+| Dish/recipe safety ambiguity | Exact recipe-version closure is authoritative; dish masks are derived prefilters; unknown/conflicting high-risk data blocks |
+| Referential arrays/JSON | Relationally significant equipment, DAG, grammar classes, outcome members/ingredients and grocery-slot sources are normalized; JSON is snapshot-only |
+| Column origin ambiguity | Section 6 defines column-family authority; mixed ontology/vector/context records carry field-level origin and separate declared/behavioral evidence |
+| Candidate-stage collision | Candidate header and ordered stage facts are separate with stage sequence in the key |
+| Catalog replay failure | Copy-on-write content plus immutable catalog-version manifest and exact version-aware FKs replace live mutable pointers |
+| RLS/audit inconsistency | One RLS helper signature, separate `USING`/`WITH CHECK`, revoked direct mutation and tamper-evident audit-chain fields are specified |
+| Plan lifecycle ambiguity | Revision number, lifecycle checks, partial active uniqueness and atomic finalize/supersede behavior are defined |
+| Context/onboarding/idempotency gaps | Context has per-field provenance and normalized relations; onboarding/event ingest has durable idempotency and receipt time |
+| Propensity/experiment ambiguity | Sequential conditional rank propensity, ordered-slate propensity, policy seed/version and enforceable household experiment assignment are defined |
+| Episode/reference XOR ambiguity | Slate items and selected plan slots require exactly one published episode or immutable snapshot with composite tenant FKs |
+| RE database boundary | V1 is fixed as Edge/API-owned DB access with signed snapshots; direct RE DB access is not an alternative in this architecture |
+| Food Ontology policy gaps | Section 14 fixes confidence bands, safety exclusions, multi-label limits, review SLA, AI-off default, release eligibility and degraded fallback behavior |
+| Migration 055/056 mismatch | Sections 2, 3, 12 and 13 distinguish live foundations from required hardening/runtime adoption; no live table is mislabeled absent |
+
+## 17. Evidence register
 
 Key repository evidence used for this review:
 
 - Final product object and engine mathematics: `deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md`, Sections 2 and 47A–47R.
 - Expected database/provenance/security model: the same document, Sections 62–77.
 - Current deployed/local status: `docs/active/CURRENT_STATUS.md`, `OPEN_ITEMS.md`, and `LAUNCH_BLOCKERS.md`.
-- Current relational schema: `database/migrations/001_extensions_and_schema_setup.sql` through `054_optimize_user_owned_rls_policies.sql`.
-- Schema retirement: migrations 046, 047, 050, 051, and 052.
+- Current relational schema: deployed `database/migrations/001_extensions_and_schema_setup.sql` through `056_food_ontology_enrichment.sql`, plus seed `146_seed_food_ontology.sql` and validation `910_food_ontology_enrichment_validation.sql`; local migrations 057–059 and validations 911–913 are release-candidate evidence only.
+- Schema retirement and reintroduction: migrations 046, 047, 050, 051, 052, and target-aligned private-schema foundation 055.
+- Food Ontology contract and live rollout: `docs/architecture/[ACTIVE]_Food_Ontology_and_Meal_Taxonomy_Architecture_v1.0.md` and `docs/active/CURRENT_STATUS.md`.
 - Current P0 loop: migration 053 plus `supabase/functions/recommendations`, `plan`, and `feedback`.
 - Current recommendation service and bundled data boundary: `ghar_re_core` and `ghar_re_service`.
 - Current mobile flows: `mobile/app/(onboarding)`, `cold-start.tsx`, `(tabs)/today.tsx`, `(tabs)/weekly-plan.tsx`, and `mobile/src/api`.

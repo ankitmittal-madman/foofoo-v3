@@ -496,6 +496,7 @@ export async function recordHouseholdContext(
     const { error } = await withTimeout(
       db.from("household_context").insert({
         profile_id: profileId,
+        household_id: profileId,
         slot: context.slot ?? null,
         season: context.season ?? null,
         weekday: context.weekday ?? null,

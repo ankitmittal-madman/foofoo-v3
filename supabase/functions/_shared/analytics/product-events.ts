@@ -57,6 +57,7 @@ export async function recordProductEvent(
     const { error } = await withTimeout(
       db.from("product_events").insert({
         profile_id: input.profileId,
+        household_id: input.profileId,
         event_name: input.eventName,
         request_id: input.requestId ?? null,
         dish_id: input.dishId ?? null,

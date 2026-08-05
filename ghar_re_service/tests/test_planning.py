@@ -67,6 +67,29 @@ def test_meal_plan_slot_options(client):
     assert r.json()["options"][0]["explanation"]["top_contributors"]
 
 
+@pytest.mark.parametrize(
+    ("role", "age", "expected_class"),
+    [
+        ("child", 9, "LD_CHILD_MILD_PLATE"),
+        ("senior", 70, "LD_ELDERLY_SOFT_DIGESTIVE"),
+    ],
+)
+def test_meal_plan_addons_accept_live_member_role_vocabulary(
+    client, role, age, expected_class
+):
+    household = _hh()
+    household["q12_member_ages"] = [{"role": "adult", "age": 35}, {"role": role, "age": age}]
+    r = _post(
+        client,
+        "/v1/meal-plan",
+        {"household": household, "slot": "dinner", "count": 8},
+    )
+    assert r.status_code == 200
+    addon = next(item for item in r.json()["addons"] if item["member_role"] == role)
+    assert addon["class_code"] == expected_class
+    assert addon["dish"]
+
+
 def test_meal_episode_surface_returns_complete_practical_slate(client):
     r = _post(
         client,
@@ -166,6 +189,12 @@ def test_weekly_plan_shape(client):
     days = r.json()["days"]
     assert len(days) == 7
     assert all(set(d["slots"]) == {"breakfast", "lunch", "dinner"} for d in days)
+    assert all(
+        "preference_contribution" in meal_class
+        for day in days
+        for classes in day["slots"].values()
+        for meal_class in classes
+    )
 
 
 def test_class_dishes_reconciliation(client):

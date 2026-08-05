@@ -6,6 +6,15 @@
 ## [Unreleased]
 
 ### Deployed
+- Deployed Fly.io release v125 with weekly class-affinity learning and corrected live-vocabulary
+  life-stage add-ons. Both machine checks and `/healthz`, `/readyz`, `/v1/meta` pass; the governed
+  data bundle remains `sha256:3d4cf579d1cf2565`.
+- Production Supabase received migrations 057–059. Live validation reports zero exposed audited
+  trigger-function grants, zero missing leading foreign-key indexes, zero duplicate indexes, a
+  complete automated six-month event-partition horizon, zero profiles without households/active
+  owner memberships, and zero null household IDs in scoped fact/context tables.
+- Deployed `recommendations` v11, `plan` v10 and `feedback` v7 with explicit household IDs on all
+  affected dual writes. Fly health/readiness/metadata and Edge unauthenticated-boundary probes pass.
 - Production Supabase received migrations 054, 055 and 056 plus deterministic ontology seed 146.
   Validation preserved all 802 canonical dishes and produced usable meal-class mappings for all
   of them: 547 enriched and 255 review-routed, with no pending jobs.
@@ -15,6 +24,20 @@
   `/readyz` and `/v1/meta` passed after the rolling release.
 
 ### Fixed
+- Made the Edge recommendation contract deployable without schema drift: the runtime mirror lives
+  inside the Supabase function bundle, and both backend workflows reject any byte-level difference
+  from the canonical root contract.
+- Added database-enforced profile-to-household continuity and tenant attribution. New profiles are
+  provisioned transactionally; historical gaps were reconciled before household columns became
+  non-null.
+- Added monthly event-partition maintenance with an auditable run ledger and a rolling six-month
+  horizon. Removed advisor-reported duplicate indexes and added missing leading FK indexes.
+- Weekly class planning now generalizes explicit dish affinities into a bounded, explainable class
+  contribution, closing the gap where daily ranking learned but the next weekly plan did not.
+- Life-stage add-ons now accept the live household-member vocabulary (`weaning`, `child`,
+  `senior`) in addition to historical core aliases.
+- Protected the GitHub `Production` environment with a required reviewer and main-only deployment
+  branch policy.
 - The ontology layer now feeds the current recommendation engine through a deterministic,
   content-hashed `food_ontology_snapshot.json` bundled at build time. Runtime lookup preserves the
   existing class-first primary/multi-membership contract and falls back to legacy CSVs for staged
@@ -35,6 +58,8 @@
   first time with the fix already in place.
 
 ### Added
+- Scheduled production smoke monitoring for Fly health/readiness/metadata and Edge authentication
+  boundaries. Failures open or update one GitHub issue; recovery closes it.
 - A database-enforced food ontology and meal-taxonomy ingestion gate: normalized evidence,
   confidence/provenance, class-role safeguards, review queues and class-bound candidate views;
   deterministic research ETL/seed/validation; and an authenticated `dish-ontology` Edge Function

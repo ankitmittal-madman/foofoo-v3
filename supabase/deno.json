@@ -19,7 +19,8 @@
     "indentWidth": 2,
     "semiColons": true,
     "singleQuote": false,
-    "include": ["functions/"]
+    "include": ["functions/"],
+    "exclude": ["functions/_shared/contracts/"]
   },
   "lint": {
     "include": ["functions/"],

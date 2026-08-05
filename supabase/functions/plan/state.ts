@@ -46,6 +46,7 @@ export async function saveWeek(
   const { data: plan, error: planError } = await withTimeout(
     db.from("week_plans").upsert({
       profile_id: profileId,
+      household_id: profileId,
       week_start_date: weekStart,
       re_version: "ghar-re-v1",
       status: finalize ? "finalized" : "draft",
@@ -165,6 +166,7 @@ export async function addDishToDate(
   const { data: plan, error: planError } = await withTimeout(
     db.from("week_plans").upsert({
       profile_id: profileId,
+      household_id: profileId,
       week_start_date: weekStart,
       re_version: "ghar-re-v1",
       status: "draft",

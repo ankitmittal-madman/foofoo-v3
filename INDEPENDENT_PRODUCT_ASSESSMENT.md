@@ -72,7 +72,8 @@ This is real personalization, but it is a **bounded rule-based re-ranking loop**
 
 - Anonymous users cannot receive recommendations.
 - There is no active trained ML preference model or automated training/deployment loop.
-- The weekly **meal-class** plan does not use dish-level affinities; personalization is strongest when ranking dishes inside a class or meal slot.
+- The weekly **meal-class** plan now aggregates bounded explicit dish affinity into class ranking,
+  so repeated likes/dislikes can change both the weekly class choice and dish order within a class.
 - Users can edit only diet and allergies after onboarding; there is no complete household/member evolution UI.
 - Time itself does not produce learning. A month of no feedback gives essentially the same memory as day one.
 - Engine failure has a clear retryable error, but there is no safe cached recommendation set to show offline or during an outage.
@@ -308,7 +309,9 @@ flowchart LR
 - The app's primary planning journey returns **meal classes and individual dishes**, not the separate seven-plate response built by the engine's legacy/general recommendation surface.
 - Dish affinity affects daily/class dish ranking. The weekly class generator currently receives the household but not the online dish-affinity state.
 - Beginner cooking skill influences the cold-start top-dish surface, but the current mobile cold-start route uses the separate calibration grid.
-- Life-stage add-on rules are coded, but the current stored-role vocabulary aligns end to end only for the toddler role; the other add-on role names do not match the roles produced from stored household members. Clinical-condition add-ons are not implemented.
+- Life-stage add-on rules accept both the live stored-role vocabulary (`weaning`, `child`,
+  `senior`) and the historical core aliases. Clinical-condition add-ons remain intentionally
+  unimplemented pending clinical governance.
 
 ## 6. Data journey
 
@@ -416,9 +419,9 @@ Legend: **Fully implemented** = reachable end-to-end product path; **Partially i
 | Onboarding resume | Partially implemented | `mobile/src/onboarding/OnboardingContext.tsx` | Device-local resume exists; there is no cross-device server draft/resume model. |
 | Household profile storage | Fully implemented | `supabase/functions/household/handler.ts`; `household/store.ts` | Incremental answers and final profile are stored. |
 | Cold-start calibration | Partially implemented | `mobile/app/cold-start.tsx`; `ghar_re_core/calibration.py` | Fifteen safe calibration dishes and Likes work; deselection/negative calibration does not. |
-| Weekly class recommendations | Partially implemented | `ghar_re_core/meal_planner.py:441-499`; `engine.py:203-208` | Class planning and anti-repetition work, but online dish affinity is not consumed. |
+| Weekly class recommendations | Fully implemented for rule-based personalization | `ghar_re_core/meal_planner.py`; `engine.py` | Class planning, anti-repetition, and a bounded mean observed dish-affinity contribution work end to end. |
 | Weekly plan persistence | Fully implemented | `mobile/app/(tabs)/weekly-plan.tsx:39-48`; `supabase/functions/plan/state.ts` | Finalized 21-slot plan is stored server-side with device fallback. |
-| Daily dish recommendations | Partially implemented | `mobile/app/(tabs)/today.tsx`; `engine.py:142-200` | Date/slot options, class reconciliation, refresh, and explanations are reachable. The life-stage add-on vocabulary is only aligned for toddlers. |
+| Daily dish recommendations | Fully implemented for current rule model | `mobile/app/(tabs)/today.tsx`; `engine.py` | Date/slot options, class reconciliation, refresh, explanations, and live-vocabulary life-stage add-ons are reachable. |
 | Food safety filters | Fully implemented for modeled allergens/rules | `ghar_re_core/scoring.py:17-155` | Diet, Jain, modeled allergen, weaning, fasting, and exclusion checks are enforced. Cross-contamination cannot be inferred from this catalogue. |
 | Live weather context | Partially implemented | `supabase/functions/_shared/services/weather.ts`; `plan/handler.ts:237-245` | Live provider plus cache exists when configured; recommendation still works without it. |
 | Feedback capture | Fully implemented | `today.tsx:287-315`; `feedback/events.ts` | Like, dislike, Not today, and Never are recorded. |
@@ -437,16 +440,13 @@ Legend: **Fully implemented** = reachable end-to-end product path; **Partially i
 1. **Complete household evolution journey**  
    The recommendation inputs can represent household members, city, cook, objective, and conditions, but the current Settings UI only edits diet and allergies. Product data will become stale as a family moves, has a child, adds an elder, changes cooks, or changes goals.
 
-2. **Weekly plan learning gap**  
-   Dish feedback changes daily dish ranking, but the weekly meal-class generator does not consume online dish affinity. A user can repeatedly dislike dishes from a class while that class remains highly ranked in the next weekly plan.
-
-3. **No trained long-term model**  
+2. **No trained long-term model**
    The system stores the data needed for future training, and training code exists, but the live preference term is off. Current learning is dish-specific and bounded; it does not generalize strongly from “likes this dish” to ingredients, cuisines, textures, or patterns beyond the fixed rules.
 
-4. **No safe availability fallback**  
+3. **No safe availability fallback**
    The current failure behavior is honest and safety-conscious, but the user gets no plan during an engine outage. A per-household last-known-safe recommendation cache is not implemented.
 
-5. **Calibration signal is one-sided**  
+4. **Calibration signal is one-sided**
    The grid intentionally includes weak-fit dishes, but the mobile screen sends only Like events. Unliking a previously tapped dish does not reverse it, and ignoring a dish is not treated as a negative signal.
 
 ### Other confirmed gaps
@@ -456,7 +456,6 @@ Legend: **Fully implemented** = reachable end-to-end product path; **Partially i
 - No explicit user controls for fasting mode or calorie target in the main mobile journey, despite engine support.
 - No preference decay, season-aware taste history, or time-of-day behavioral learning.
 - No clinical-condition-specific add-on logic; this is explicitly held back for clinical review.
-- Life-stage add-on rules use `infant`, `school_child`, and `elder`, while stored member composition produces `weaning`, `child`, and `senior`; only `toddler` currently aligns end to end.
 - Some onboarding answers are intentionally lossy or collect-only: Jain exclusions and discovery intent do not have full independent destinations; broad age bands become a limited member/lifecycle approximation.
 - The “Why this?” UI exposes a technical score and factors, but not a concise product explanation such as “because you prefer quick Maharashtrian dinners and liked Poha.”
 

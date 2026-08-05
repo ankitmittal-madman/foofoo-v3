@@ -106,6 +106,33 @@ def test_weekly_class_plan_shape_and_dish_backed():
                 assert c["class_name"]
 
 
+def test_weekly_class_plan_generalizes_dish_feedback_to_class_ranking():
+    hh = _hh()
+    cat = Catalogue()
+    baseline = MP.weekly_class_plan(hh, top_classes=3, catalogue=cat)
+    dinner = baseline["days"][0]["slots"]["dinner"]
+    # The first two child classes intentionally share the same dish backing, so use the first
+    # independently backed class to prove that observed dish affinity can change class order.
+    leading, target = dinner[0]["class_code"], dinner[2]["class_code"]
+    preferences = {}
+    for dish in cat:
+        classes = K.dish_to_class_codes(dish.name)
+        if target in classes and leading not in classes:
+            preferences[dish.name] = 1.0
+        elif leading in classes and target not in classes:
+            preferences[dish.name] = -1.0
+
+    personalized = MP.weekly_class_plan(
+        hh, top_classes=3, catalogue=cat, preference_by_dish=preferences
+    )
+    personalized_dinner = personalized["days"][0]["slots"]["dinner"]
+
+    personalized_codes = [item["class_code"] for item in personalized_dinner]
+    assert personalized_codes.index(target) < [item["class_code"] for item in dinner].index(target)
+    leading_view = next(item for item in personalized_dinner if item["class_code"] == leading)
+    assert leading_view["preference_contribution"] < 0
+
+
 def test_dishes_for_class_reconciliation_contract():
     """The core WP-18 guarantee: dishes shown for a finalized class belong ONLY to that class."""
     hh = _hh()
