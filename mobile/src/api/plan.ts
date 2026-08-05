@@ -300,7 +300,7 @@ export function fetchMealEpisodes(
     recovery_mode?: boolean;
   } = {},
 ): Promise<MealEpisodeResponse> {
-  if (process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES !== "true") {
+  if (process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES === "false") {
     return fetchSlotOptionsAsMealEpisodes(slot, opts);
   }
 

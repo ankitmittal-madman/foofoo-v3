@@ -6,6 +6,29 @@
 ## [Unreleased]
 
 ### Deployed
+- Production Supabase received migrations 060–064 and comprehensive seed 147. The live catalogue
+  now has normalized recipes, meal episodes, ontology graph edges, nutrition assertions,
+  constraints and regional affinities for all 802 canonical dishes, plus scheduled ten-minute
+  enrichment and daily reconciliation jobs.
+- Deployed the `cron-dish-ontology`, `dish-ontology`, `plan`, `research-panel` and
+  `research-annotations` Edge Functions. The first controlled enrichment batch completed 20/20
+  jobs; FoodOn evidence succeeded while USDA FoodData Central returned HTTP 403 for the configured
+  credential and remains isolated as a provider-level failure.
+
+### Added
+- A mobile missing-dish submission flow with conservative evidence-based promotion, and normalized
+  food graph, nutrition, recipe, meal-episode, ML-control, replay, outcome, research-panel and
+  annotation foundations.
+- Canonical food-intelligence architecture v2.0 and PRD/database traceability updates; superseded
+  PRD, technical-architecture and ontology documents were moved to the historical archive.
+
+### Changed
+- Complete meal episodes are now the default mobile planning surface. Published catalogue episode
+  identity, ordered slate items, predictions and selection propensity are persisted for replay and
+  outcome learning while the established dish/class recommendation path remains a compatibility
+  fallback.
+
+### Deployed (earlier)
 - Deployed Fly.io release v125 with weekly class-affinity learning and corrected live-vocabulary
   life-stage add-ons. Both machine checks and `/healthz`, `/readyz`, `/v1/meta` pass; the governed
   data bundle remains `sha256:3d4cf579d1cf2565`.

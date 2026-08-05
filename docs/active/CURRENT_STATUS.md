@@ -21,6 +21,16 @@
 > CSV fallback remains enabled for one monitored rollback window. Unknown-dish AI promotion is
 > still disabled pending the Section 8 model/safety decisions in the ontology architecture.
 >
+> **Food-intelligence/episode completion release:** migrations 060–064 and seed 147 are live.
+> They add the leased enrichment worker and schedules, generic ontology graph, nutrient
+> assertions, complete catalogue constraints/regions/recipes/episodes, safe exact-match unknown
+> dish promotion, catalogue episode resolution, replay, ML/catalog controls, and research and
+> annotation operations. `dish-ontology`, `cron-dish-ontology`, `plan`, `research-panel`, and
+> `research-annotations` were deployed. A controlled 20-dish pass completed with zero worker
+> failures; FoodOn returned evidence, while USDA returned HTTP 403 for the configured key. Mobile
+> meal episodes are now default-on with compatibility fallback, and the missing-dish submission
+> screen is implemented locally pending the next mobile binary/web release.
+>
 > **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
 > execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
 > automate a six-month event-partition horizon; provision a household and owner membership for
@@ -72,9 +82,10 @@
 - **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; a normalized,
   provenance-backed dish enrichment layer and class-bound candidate view are live for all 802
   production dishes;
-  region/nutrition/comfort-hero/substitution real but narrow. A local bounded graph
-  traversal/provenance layer now connects dishes, ingredients and curated substitutions; broader
-  ontology review, festival mapping and clinically governed health-condition suitability remain
+  every production dish now has constraint, regional, nutrition-estimate, recipe and published
+  episode coverage. The production relational graph connects dishes, aliases, ingredients,
+  classes and catalogue features with provenance. USDA validation is blocked by its rejecting
+  credential; festival mapping and clinically governed health-condition suitability remain
   absent/pending.
 
 See `docs/active/OPEN_ITEMS.md` for what's actionable, `docs/active/LAUNCH_BLOCKERS.md` for what

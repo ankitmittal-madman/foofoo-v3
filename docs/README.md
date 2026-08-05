@@ -4,6 +4,14 @@ This is the repository documentation entry point. Read [`CLAUDE.md`](../CLAUDE.m
 
 Primary current-state sources are under `active/`. Archived material is evidence only and must not be used as primary implementation guidance.
 
+## Canonical build guidance
+
+- [`deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md`](<../deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md>) — product, recommendation, food-intelligence and engineering requirements.
+- [`deliverables/FooFoo_Database_Architecture_Review_and_Target_Schema.md`](<../deliverables/FooFoo_Database_Architecture_Review_and_Target_Schema.md>) — current/target database model and transition rules.
+- [`docs/architecture/[ACTIVE]_Food_Intelligence_and_Meal_Episode_Architecture_v2.0.md`](<architecture/[ACTIVE]_Food_Intelligence_and_Meal_Episode_Architecture_v2.0.md>) — deployed ontology, enrichment, episode, research and learning architecture.
+
+When a historical document conflicts with these sources, the three documents above govern unless a later ratified decision explicitly supersedes them.
+
 ## Product
 
 - [`docs/product/[ACTIVE]_DOC-01_Product_Brief_v1.1.docx`](<product/[ACTIVE]_DOC-01_Product_Brief_v1.1.docx>)
@@ -17,11 +25,9 @@ Primary current-state sources are under `active/`. Archived material is evidence
 
 - [`docs/architecture/[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md`](<architecture/[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md>)
 - [`docs/architecture/[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md`](<architecture/[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md>)
-- [`docs/architecture/[ACTIVE]_Food_Ontology_and_Meal_Taxonomy_Architecture_v1.0.md`](<architecture/[ACTIVE]_Food_Ontology_and_Meal_Taxonomy_Architecture_v1.0.md>)
-- [`docs/architecture/[ACTIVE]_DOC-04_PRD_v1.1.docx`](<architecture/[ACTIVE]_DOC-04_PRD_v1.1.docx>)
+- [`docs/architecture/[ACTIVE]_Food_Intelligence_and_Meal_Episode_Architecture_v2.0.md`](<architecture/[ACTIVE]_Food_Intelligence_and_Meal_Episode_Architecture_v2.0.md>)
 - [`docs/architecture/[ACTIVE]_DOC-05_Information_Architecture_v1.2.docx`](<architecture/[ACTIVE]_DOC-05_Information_Architecture_v1.2.docx>)
 - [`docs/architecture/[ACTIVE]_DOC-06_UX_Design_System_v1.1.docx`](<architecture/[ACTIVE]_DOC-06_UX_Design_System_v1.1.docx>)
-- [`docs/architecture/[ACTIVE]_DOC-10_Technical_Architecture_v1.0.docx`](<architecture/[ACTIVE]_DOC-10_Technical_Architecture_v1.0.docx>)
 - [`docs/architecture/[ACTIVE]_DOC-P3-02_Conceptual_Domain_Model_v1.1.md`](<architecture/[ACTIVE]_DOC-P3-02_Conceptual_Domain_Model_v1.1.md>)
 - [`docs/architecture/[ACTIVE]_DOC-P3-03A_Logic_Governance_Matrix_v1.0.md`](<architecture/[ACTIVE]_DOC-P3-03A_Logic_Governance_Matrix_v1.0.md>)
 - [`docs/architecture/[ACTIVE]_DOC-P3-07_Security_Architecture_v1.2.md`](<architecture/[ACTIVE]_DOC-P3-07_Security_Architecture_v1.2.md>)
@@ -144,7 +150,7 @@ Primary current-state sources are under `active/`. Archived material is evidence
 - [`docs/governance/[ACTIVE]_DOC-P3-09_Knowledge_Integration_Governance_v1.3.md`](<governance/[ACTIVE]_DOC-P3-09_Knowledge_Integration_Governance_v1.3.md>)
 - [`docs/governance/[ACTIVE]_DOC-P3-10_Seed_Data_Integration_Framework_v1.1.md`](<governance/[ACTIVE]_DOC-P3-10_Seed_Data_Integration_Framework_v1.1.md>)
 - [`docs/governance/[ACTIVE]_DOC-P3-12_Governance_Improvement_Backlog_v1.4.md`](<governance/[ACTIVE]_DOC-P3-12_Governance_Improvement_Backlog_v1.4.md>)
-- [`docs/governance/[ACTIVE]_Documentation_Classification_Register_v1.0.md`](<governance/[ACTIVE]_Documentation_Classification_Register_v1.0.md>)
+- [`docs/governance/[ACTIVE]_Documentation_Classification_Register_v1.1.md`](<governance/[ACTIVE]_Documentation_Classification_Register_v1.1.md>)
 - [`docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md`](<governance/[ACTIVE]_Founder_Decision_Register_v1.0.md>)
 - [`docs/governance/[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`](<governance/[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md>)
 - [`docs/governance/[ACTIVE]_IDR-001_WP5_Sequence_Reconciliation_v1.0.md`](<governance/[ACTIVE]_IDR-001_WP5_Sequence_Reconciliation_v1.0.md>)

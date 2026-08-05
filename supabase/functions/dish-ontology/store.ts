@@ -4,6 +4,12 @@ import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
 import type { ResearchRecord } from "./research.ts";
 import { sha256Json } from "./research.ts";
+import { normalizeFoodOn, normalizeUsda } from "./normalization.ts";
+
+export interface StoredResearchRecord {
+  id: string;
+  record: ResearchRecord;
+}
 
 export interface DishSubmissionInput {
   enteredName: string;
@@ -95,6 +101,117 @@ export async function storeResearchRecords(
   if (error) throw error;
 }
 
+/** Persist external evidence for exactly one canonical dish or staged submission. */
+export async function storeResearchRecordsForSubject(
+  ctx: RequestContext,
+  subject: {
+    dishId: string | null;
+    submissionId: string | null;
+    query: string;
+    records: ResearchRecord[];
+  },
+): Promise<StoredResearchRecord[]> {
+  if ((subject.dishId === null) === (subject.submissionId === null)) {
+    throw new Error("exactly_one_enrichment_subject_required");
+  }
+  if (subject.records.length === 0) return [];
+  const db = createServiceRoleClient(ctx.config);
+  const rows = await Promise.all(subject.records.map(async (record) => ({
+    provider: record.provider,
+    provider_record_id: record.providerRecordId,
+    dish_id: subject.dishId,
+    submission_id: subject.submissionId,
+    query_text: subject.query,
+    source_url: record.sourceUrl,
+    source_payload: record.payload,
+    payload_sha256: await sha256Json(record.payload),
+  })));
+  const { data, error } = await withTimeout(
+    db.from("food_source_records").insert(rows).select("id, provider, provider_record_id"),
+    "dishOntology.storeResearchRecordsForSubject",
+  );
+  if (error) throw error;
+  return (data ?? []).map((row, index) => ({ id: String(row.id), record: subject.records[index] }));
+}
+
+/** Promote normalized external evidence into provisional graph/nutrition assertions. */
+export async function promoteExternalEvidence(
+  ctx: RequestContext,
+  dishId: string,
+  stored: StoredResearchRecord[],
+): Promise<{ ontologyTerms: number; nutrients: number }> {
+  const db = createServiceRoleClient(ctx.config);
+  let ontologyTerms = 0;
+  let nutrients = 0;
+  for (const item of stored) {
+    const foodOn = normalizeFoodOn(item.record);
+    if (foodOn) {
+      const { data: term, error: termError } = await withTimeout(
+        db.from("taxonomy_terms").upsert({
+          dimension: "external_food_term",
+          code: foodOn.code,
+          display_name: foodOn.label,
+          external_uri: foodOn.iri,
+        }, { onConflict: "dimension,code" }).select("id").single(),
+        "dishOntology.promoteFoodOnTerm",
+      );
+      if (termError) throw termError;
+      if (foodOn.aliases.length) {
+        const { error: aliasError } = await withTimeout(
+          db.from("taxonomy_term_aliases").upsert(
+            foodOn.aliases.map((alias) => ({
+              term_id: term.id,
+              alias,
+              language: "en",
+              source_name: "foodon_ols",
+              source_url: foodOn.iri,
+              confidence: foodOn.confidence,
+            })),
+            { onConflict: "term_id,alias,language" },
+          ),
+          "dishOntology.promoteFoodOnAliases",
+        );
+        if (aliasError) throw aliasError;
+      }
+      const { error: assertionError } = await withTimeout(
+        db.from("dish_taxonomy_assertions").insert({
+          dish_id: dishId,
+          field_key: "external_food_term",
+          term_id: term.id,
+          confidence: foodOn.confidence,
+          source_name: "foodon_ols",
+          source_type: "external_api",
+          source_record_id: item.id,
+          source_url: foodOn.iri,
+          review_status: "provisional",
+        }),
+        "dishOntology.promoteFoodOnAssertion",
+      );
+      if (assertionError) throw assertionError;
+      ontologyTerms++;
+    }
+
+    for (const nutrient of normalizeUsda(item.record)) {
+      const { error: assertionError } = await withTimeout(
+        db.rpc("record_external_nutrient_assertion", {
+          p_dish_id: dishId,
+          p_nutrient_code: nutrient.code,
+          p_display_name: nutrient.displayName,
+          p_unit_code: nutrient.unit,
+          p_expected_value: nutrient.value,
+          p_serving_basis: nutrient.servingBasis,
+          p_source_record_id: item.id,
+          p_confidence: nutrient.confidence,
+        }),
+        "dishOntology.promoteUsdaAssertion",
+      );
+      if (assertionError) throw assertionError;
+      nutrients++;
+    }
+  }
+  return { ontologyTerms, nutrients };
+}
+
 /** Mark a submission ready for the configured AI/review stage after external lookup finishes. */
 export async function markResearchComplete(
   ctx: RequestContext,
@@ -117,6 +234,20 @@ export async function markResearchComplete(
   ]);
   if (submissionResult.error) throw submissionResult.error;
   if (jobResult.error) throw jobResult.error;
+}
+
+/** Atomically promote an exact-match submission only when database safety prerequisites pass. */
+export async function autoPromoteSubmission(
+  ctx: RequestContext,
+  submissionId: string,
+): Promise<string | null> {
+  const db = createServiceRoleClient(ctx.config);
+  const { data, error } = await withTimeout(
+    db.rpc("promote_submission_if_safe", { p_submission_id: submissionId }),
+    "dishOntology.autoPromoteSubmission",
+  );
+  if (error) throw error;
+  return data ? String(data) : null;
 }
 
 /** Fetch the canonical meal-class hierarchy and planning-role metadata. */

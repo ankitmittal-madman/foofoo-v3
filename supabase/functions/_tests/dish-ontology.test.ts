@@ -6,6 +6,7 @@ import {
   researchDish,
   searchFoodOn,
 } from "../dish-ontology/research.ts";
+import { normalizeFoodOn, normalizeUsda } from "../dish-ontology/normalization.ts";
 
 Deno.test("food-name normalization is Unicode-aware and whitespace-stable", () => {
   assertEquals(normalizeFoodName("  Kanda   Poha "), "kanda poha");
@@ -44,4 +45,44 @@ Deno.test("one provider failure yields partial research instead of throwing", as
   const result = await researchDish("Poha", "test-key", fetcher);
   assertEquals(result.records.length, 1);
   assertEquals(result.failedProviders, ["foodon_ols"]);
+});
+
+Deno.test("FoodOn evidence normalizes identifier and aliases as provisional facts", () => {
+  const term = normalizeFoodOn({
+    provider: "foodon_ols",
+    providerRecordId: "http://purl.obolibrary.org/obo/FOODON_123",
+    sourceUrl: "https://example.test",
+    confidence: 0.8,
+    payload: {
+      response: {
+        docs: [{
+          label: "Flattened rice dish",
+          iri: "http://purl.obolibrary.org/obo/FOODON_123",
+          synonym: ["Poha", "Aval upma"],
+        }],
+      },
+    },
+  });
+  assertEquals(term?.code, "FOODON_FOODON_123");
+  assertEquals(term?.aliases, ["Poha", "Aval upma"]);
+});
+
+Deno.test("USDA evidence normalizes only supported macros with units", () => {
+  const nutrients = normalizeUsda({
+    provider: "usda_fdc",
+    providerRecordId: "42",
+    sourceUrl: "https://fdc.nal.usda.gov/",
+    confidence: 0.7,
+    payload: {
+      foods: [{
+        foodNutrients: [
+          { nutrientName: "Energy", unitName: "KCAL", value: 130 },
+          { nutrientName: "Protein", unitName: "G", value: 4.2 },
+          { nutrientName: "Sodium, Na", unitName: "MG", value: 100 },
+        ],
+      }],
+    },
+  });
+  assertEquals(nutrients.map((item) => item.code), ["energy_kcal", "protein_g"]);
+  assertEquals(nutrients[0].servingBasis, "100 g");
 });

@@ -33,7 +33,8 @@ findings are retained under `docs/archive/`.
 
 ## P2 — Production improvement
 
-- Expand nutrition data beyond 50 of 810 dishes.
+- Replace or activate `USDA_FOODDATA_API_KEY` (the controlled worker evaluation returned HTTP
+  403), run `ops.requeue_external_provider('usda_fdc')`, and evaluate Indian-dish match quality.
 - Expand comfort-hero mapping beyond 17 of 36 resolved heroes.
 - Populate the regional-prior table for PanIndia and Global zones; 187 of 810 dishes currently
   receive no regional-prior boost.
@@ -42,7 +43,8 @@ findings are retained under `docs/archive/`.
 - Create/approve a funded Fly staging app and configure `FLY_STAGING_*` variables/secrets. The
   GitHub `Production` environment is now protected by a required reviewer and a main-only custom
   deployment-branch policy.
-- Archive dead `re_engine`-era ETL and validation scripts that target retired schemas.
+- Contract legacy dish/event compatibility tables only after one monitored episode dual-write,
+  export/delete and rollback-parity window; no new feature may target those legacy facts.
 - Deploy and operationally verify the remaining client/operational release candidate: mobile
   search and filters, richer explanations, selective refresh, restart-safe query/feedback
   persistence, and CI/deployment workflow changes. The ontology database, affected Edge
@@ -60,7 +62,7 @@ findings are retained under `docs/archive/`.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
-- Approve the unknown-dish AI policy: model/data residency, confidence thresholds, safety-field
+- Approve the unknown-dish generative-AI policy: provider/model/data residency, confidence thresholds, safety-field
   treatment, multi-label limits, reviewer workflow and training-data consent.
 
 ## Recently closed with live evidence

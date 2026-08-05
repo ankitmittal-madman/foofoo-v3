@@ -6,7 +6,11 @@
 
 **Date:** 5 August 2026
 
-**Status:** Authoritative product and build specification
+**Version:** 1.1
+
+**Status:** Canonical product and build specification
+
+**Implementation baseline:** migrations 055–064 and seed 147; reconciled 5 August 2026
 
 **Audience:** Founders, Product, Design, Data Science, Food Science, Engineering, Growth, Operations
 
@@ -653,7 +657,7 @@ Removing a member starts a review before deleting member-linked preference evide
 | Cost | model and infra cost per WSMD tracked; LLM never on synchronous ranking hot path |
 | Freshness | catalog publishing SLA and feature staleness indicators |
 
-**Current-state note (repository, 4 Aug 2026):** deployed P0 backend and mobile core exist; local release candidate includes search/filter, weather, explanations, MMR, offline evaluation, and a bounded graph layer. The current status reports a physical-device push-delivery test and broader food-knowledge depth as remaining work. These are verification claims from active internal documents, not independently re-audited in this PRD.
+**Current-state note (repository, 5 Aug 2026):** complete-meal episode serving is the mobile default with a compatibility fallback; canonical slates, item propensities, typed outcomes and replay are active. Migrations 060–064 operate the ontology queue, graph, nutrients, research/annotation control plane and safe unknown-dish promotion. Seed 147 populates all 802 production dishes with constraints, regional affinities, nutrition estimates, recipes and published single-primary episodes, plus curated composite episodes. FoodOn enrichment is live. USDA integration is deployed but its configured production key returned HTTP 403 in the controlled evaluation and must be replaced or activated before USDA assertions can populate. Generative unknown-dish classification remains gated on the provider/data-residency and safety decisions in Section 82A.
 
 <!-- PAGEBREAK -->
 
@@ -2575,6 +2579,34 @@ Decisions must update requirements, event schemas, golden tests, and data defini
 
 <!-- PAGEBREAK -->
 
+## 82A. Implementation traceability baseline — 5 August 2026
+
+This table distinguishes implemented product infrastructure from remaining external or evidence gates. It overrides earlier current-state language in this document; target requirements remain unchanged.
+
+| PRD capability | Production implementation | State / release meaning |
+|---|---|---|
+| Complete meal episode | `food.plate_grammars`, recipes, episodes/components, workload/cadence; `/plan` episode surface is mobile-default | Active with dish/class compatibility fallback |
+| Ontology graph | Generic typed nodes/edges populated for dishes, aliases, ingredients, classes and catalogue features | Active; human review depth remains ongoing |
+| Nutrition assertions | Source-linked `food.nutrient_assertions`; internal catalogue estimates cover every production dish | Active/provisional; USDA key currently returns 403 |
+| Constraints and region | Three constraint assertions per production dish and state/cuisine affinities | Active/provisional; clinical claims remain excluded |
+| Dish aliases/ingredients/recipes/classes | Normalized aliases, ingredient links, class mappings and one draft recipe per production dish | Active; AI-draft recipes are not certified recipes |
+| Background enrichment | Durable leased queue, ten-minute worker, daily reconciliation and 90-day refresh | Active; all canonical dishes queued for at least one pass |
+| Unknown-dish mobile intake | Authenticated staging API and mobile form | Active |
+| Unknown-dish auto-promotion | Exact external name + entirely known safety ingredients | Active conservative rule; generative promotion awaiting decision |
+| Slates/propensity/replay/outcomes | Ordered slate/item persistence, exact deterministic propensity, typed outcomes and replay RPC | Active |
+| ML/control plane | Versioned features, rule-baseline registry, experiments, source/catalog/publish/review tables | Active baseline; no trained production model claimed |
+| Research panel | Private studies/participants/diaries plus authenticated enrolled-participant API | Operational infrastructure; recruitment not claimed |
+| Annotation system | Versioned batches/items, leased claims, multi-review labels and service-only API | Active infrastructure |
+| Legacy contraction | Canonical episode facts dual-written while active dish/class contracts remain | Compatibility phase; destructive retirement waits for observed parity |
+
+### Decisions required from the Founder
+
+1. Choose the generative provider/model and acceptable data-processing region for user-submitted food text.
+2. Ratify confidence thresholds, multi-label class limits, reviewer SLA and whether reviewed corrections may be training data.
+3. Replace or activate `USDA_FOODDATA_API_KEY`; after correction, operations will call `ops.requeue_external_provider('usda_fdc')` and rerun the labelled evaluation.
+
+<!-- PAGEBREAK -->
+
 ## 83. Definition of done
 
 This PRD is implemented when:
@@ -2648,4 +2680,4 @@ Recommendation-system research: [Netflix recommender system](https://doi.org/10.
 
 ---
 
-**End of FooFoo Comprehensive PRD and Intelligence Bibles v1.0**
+**End of FooFoo Comprehensive PRD and Intelligence Bibles v1.1**

@@ -22,6 +22,7 @@ interface EpisodeResult {
   predictions: EpisodePrediction;
   intent_posterior?: Record<string, number>;
   practicality?: Record<string, unknown>;
+  components?: Array<{ dish_id?: string | null }>;
 }
 
 function hex(bytes: ArrayBuffer): string {
@@ -71,9 +72,34 @@ export async function recordMealEpisodeSlate(
     });
   }
 
+  const dishIds = [
+    ...new Set(
+      input.episodes.flatMap((episode) =>
+        (episode.components ?? []).map((component) => component.dish_id).filter(
+          (value): value is string => typeof value === "string" && /^[0-9a-f-]{36}$/i.test(value),
+        )
+      ),
+    ),
+  ];
+  const episodeByDish = new Map<string, string>();
+  if (dishIds.length) {
+    const { data: catalogEpisodes, error: episodeError } = await withTimeout(
+      db.rpc("resolve_catalog_episode_ids", { p_dish_ids: dishIds }),
+      "plan.episodes.resolve_catalog_ids",
+    );
+    if (episodeError) {
+      throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: episodeError.message });
+    }
+    for (const row of catalogEpisodes ?? []) {
+      episodeByDish.set(String(row.dish_id), String(row.episode_id));
+    }
+  }
+
   const rows = input.episodes.map((episode, index) => ({
     slate_id: slate.id,
     episode_hash: episode.episode_hash,
+    episode_id: (episode.components ?? []).map((component) => component.dish_id)
+      .map((dishId) => dishId ? episodeByDish.get(dishId) : undefined).find(Boolean) ?? null,
     rank: episode.rank || index + 1,
     point_score: episode.source_plate_score,
     rerank_score: episode.predictions.p_success,

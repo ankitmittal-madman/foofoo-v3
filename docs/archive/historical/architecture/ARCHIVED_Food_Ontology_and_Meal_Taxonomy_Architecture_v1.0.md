@@ -1,10 +1,10 @@
 # Food Ontology and Meal Taxonomy Architecture
 
-**Status:** ACTIVE
+**Status:** ARCHIVED
 **Version:** 1.0
 **Date:** 2026-08-05
-**Placement:** `docs/architecture/`
-**Supersedes:** None
+**Placement:** `docs/archive/historical/architecture/`
+**Superseded by:** Food Intelligence and Meal Episode Architecture v2.0
 **Dependencies:** Canonical Planning Model v1.0; migrations 008, 009, 021, 051, 056; seed 146
 
 ## Executive Summary

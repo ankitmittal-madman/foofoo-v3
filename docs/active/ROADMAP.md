@@ -10,11 +10,11 @@ Only future work is listed here. Evidence and acceptance detail are in `OPEN_ITE
 
 ## P2 — Production improvement
 
-4. Expand nutrition coverage beyond 50 of 810 dishes.
+4. Repair the USDA credential, requeue missing USDA enrichment, and complete labelled match evaluation.
 5. Expand comfort-hero coverage beyond 17 of 36 resolved heroes.
 6. Populate regional priors for PanIndia and Global zones.
 7. Approve/create a Fly staging app and configure its secrets; production protection is complete.
-8. Archive dead `re_engine`-era ETL and validation scripts.
+8. Contract legacy compatibility facts only after episode dual-write/replay/privacy parity evidence.
 9. Deploy and operationally verify the remaining mobile/operational release candidate.
 10. Run production load/soak testing and revisit Fly.io sizing.
 11. Monitor the ontology-aware production release and legacy fallback for one verified rollout
@@ -23,7 +23,7 @@ Only future work is listed here. Evidence and acceptance detail are in `OPEN_ITE
 
 ## P3 — Product and intelligence evolution
 
-13. Approve and activate the unknown-dish AI classification policy.
+13. Choose a provider/model and approve the unknown-dish generative classification policy.
 14. Add festival-calendar mapping.
 15. Add clinically governed health-condition suitability.
 16. Activate preference personalization after a real training threshold is met.

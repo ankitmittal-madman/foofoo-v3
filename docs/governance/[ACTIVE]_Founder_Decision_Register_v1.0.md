@@ -257,7 +257,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 **Ratified approach (2026-07-17):** do not seed `re_cohort_class_priors`. Rely on the existing neutral-0.50 fallback (RE-04) instead of a seeded lookup table. Verified in code, not assumed: `cohortPrior(rawPrior, cfg)` in `supabase/functions/_shared/services/re/scoring.ts` returns `rawPrior ?? cfg.neutralCohortPrior`, unit-tested directly (`cohortPrior(null, CFG) === 0.50`, `_tests/re_core.test.ts`). **Caveat disclosed, not glossed over:** the concrete Supabase adapter implementing `CohortPriorRepository` (which would call `this.d.cohortPriors.getPrior(...)` in `engine.ts` against the live, empty `re_cohort_class_priors` table) does not exist yet in `supabase/functions/_shared/services/adapters/supabase-stores.ts` — only `WeekPlanStore`, `OnboardingStore`, `PlanSlotStore`, and `EligibleUsersStore` are built there. So the neutral-fallback logic is correct and proven at the unit level, but nothing in production is calling it yet (the adapter and the `/v1/onboarding`/`/v1/recommendations` endpoints that would trigger it are both still unbuilt, per WP-8E's own carried tech debt). Personalization ramping (Day-1 swipe-blend) is tracked separately as part of the cold-start plumbing task, not this one.
 
 ### FD-08 — Reconcile DOC-01 vs DOC-04 MVP scope (grocery list)
-- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/product/[ACTIVE]_DOC-01_Product_Brief_v1.1.docx` line 107, vs. `docs/architecture/[ACTIVE]_DOC-04_PRD_v1.1.docx` Change Notice
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/product/[ACTIVE]_DOC-01_Product_Brief_v1.1.docx` line 107, vs. `docs/archive/historical/architecture/ARCHIVED_DOC-04_PRD_v1.1.docx` Change Notice
 - **Context:** DOC-01 line 107 reads, verbatim (confirmed by direct grep this session): *"Grocery list auto-generated from plan | – | Core — cannot defer."* DOC-04 v1.1's Change Notice moves this feature out of MVP scope.
 - **Problem Statement:** Two frozen documents disagree on whether this is in-scope for MVP.
 - **Alternatives Considered:** Not separately enumerated — this is a direct factual conflict between two documents, not a menu of options.
@@ -275,7 +275,7 @@ Full 24-field format applied. Where a field has no recorded content in any prima
 - **Source Evidence:** `grep -a -n -i "grocery" "docs/product/[ACTIVE]_DOC-01_Product_Brief_v1.1.docx"` (this session, line 107).
 
 ### FD-09 — Refresh the stale "locked" environment map in DOC-10 §10
-- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/architecture/[ACTIVE]_DOC-10_Technical_Architecture_v1.0.docx` §10
+- **Status:** Ratified (2026-07-16, claude.ai Founder decision-closing session; see `[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`) · **Origin:** `docs/archive/historical/architecture/ARCHIVED_DOC-10_Technical_Architecture_v1.0.docx` §10
 - **Context:** DOC-10 §10 references a superseded Supabase project ref and GitHub org, contradicted by the repository's own recovery record.
 - **Problem Statement:** An engineer following DOC-10 literally would connect to the wrong infrastructure.
 - **Alternatives Considered:** Not applicable — this is a factual refresh, not a design choice.

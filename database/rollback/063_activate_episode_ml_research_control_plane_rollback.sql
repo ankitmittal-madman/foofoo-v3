@@ -1,0 +1,10 @@
+DROP VIEW IF EXISTS ops.enrichment_quality_daily;
+DELETE FROM ops.catalog_versions WHERE version_code='food-intelligence-v1';
+DELETE FROM ops.data_sources WHERE source_code IN ('foofoo_catalogue_v1','foofoo_recipes_v1','foodon_ols','usda_fdc');
+DELETE FROM ml.model_registry WHERE model_name='episode_success' AND model_version='episode-practicality-rule-v1';
+DELETE FROM ml.feature_definitions WHERE feature_version='v1' AND feature_name IN ('episode_active_minutes','episode_richness','household_cadence_debt','selection_propensity');
+DROP FUNCTION IF EXISTS research.claim_annotation_items(uuid,text,integer);
+ALTER TABLE research.annotations DROP COLUMN IF EXISTS annotation_item_id;
+DROP TABLE IF EXISTS research.annotation_items;
+DROP FUNCTION IF EXISTS public.replay_recommendation_slate(uuid);
+DROP FUNCTION IF EXISTS public.resolve_catalog_episode_ids(uuid[]);

@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS research.annotations;
+DROP TABLE IF EXISTS research.annotation_batches;
+DROP TABLE IF EXISTS research.meal_diaries;
+DROP TABLE IF EXISTS research.participants;
+DROP TABLE IF EXISTS research.studies;
+DROP TABLE IF EXISTS ops.catalog_publish_runs;
+DROP TABLE IF EXISTS ops.catalog_versions;
+DROP TABLE IF EXISTS ops.content_review_tasks;
+DROP TABLE IF EXISTS food.nutrient_assertions;
+DROP TABLE IF EXISTS food.nutrients;
+DROP TABLE IF EXISTS food.ontology_edges;
+DROP TABLE IF EXISTS food.ontology_nodes;
+DROP SCHEMA IF EXISTS research;

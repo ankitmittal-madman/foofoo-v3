@@ -7,12 +7,13 @@ import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
 import { normalizeFoodName, researchDish } from "./research.ts";
 import {
+  autoPromoteSubmission,
   createSubmission,
   fetchCandidates,
   fetchMealClasses,
   loadSubmissionStatus,
   markResearchComplete,
-  storeResearchRecords,
+  storeResearchRecordsForSubject,
   updateSubmission,
 } from "./store.ts";
 
@@ -48,14 +49,32 @@ async function enrichSubmission(
   ctx: Parameters<Handler>[1],
   submissionId: string,
   enteredName: string,
-): Promise<{ evidence_count: number; failed_providers: string[]; next_status: string }> {
+): Promise<{
+  evidence_count: number;
+  failed_providers: string[];
+  next_status: string;
+  canonical_dish_id: string | null;
+}> {
   const research = await researchDish(enteredName, ctx.config.usdaFoodDataApiKey);
-  await storeResearchRecords(ctx, submissionId, enteredName, research.records);
-  await markResearchComplete(ctx, submissionId, research.records.length > 0);
+  await storeResearchRecordsForSubject(ctx, {
+    submissionId,
+    dishId: null,
+    query: enteredName,
+    records: research.records,
+  });
+  const canonicalDishId = research.records.length
+    ? await autoPromoteSubmission(ctx, submissionId)
+    : null;
+  if (!canonicalDishId) {
+    await markResearchComplete(ctx, submissionId, research.records.length > 0);
+  }
   return {
     evidence_count: research.records.length,
     failed_providers: research.failedProviders,
-    next_status: research.records.length > 0 ? "pending_ai" : "review",
+    next_status: canonicalDishId
+      ? "resolved"
+      : (research.records.length > 0 ? "pending_ai" : "review"),
+    canonical_dish_id: canonicalDishId,
   };
 }
 

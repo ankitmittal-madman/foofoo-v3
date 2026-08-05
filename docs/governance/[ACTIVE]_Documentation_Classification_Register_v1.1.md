@@ -1,10 +1,10 @@
 # Documentation Classification Register
 
 **Status:** ACTIVE — repository documentation governance source of truth
-**Version:** v1.0
-**Date:** 2026-08-04
+**Version:** v1.1
+**Date:** 2026-08-05
 **Placement:** `docs/governance/`
-**Supersedes:** the partial audit-only restructure from commit `8147d0a`
+**Supersedes:** v1.0 and the partial audit-only restructure from commit `8147d0a`
 
 ## Executive Summary
 
@@ -16,10 +16,10 @@ Documents retained conservatively because their completion or continuing purpose
 
 | Category | Meaning | Count |
 |---|---|---:|
-| A | Foundation documents kept active | 132 |
+| A | Foundation documents kept active | 133 |
 | B | Living operational documents kept active | 23 |
 | C | Historical implementation documents archived | 200 |
-| D | Superseded, duplicate, or obsolete documents archived | 19 |
+| D | Superseded, duplicate, or obsolete documents archived | 22 |
 
 ## Method and scope
 
@@ -64,10 +64,11 @@ Documents retained conservatively because their completion or continuing purpose
 - `docs/architecture/[ACTIVE]_Canonical_Planning_Model_v1.0.md`
 - `docs/architecture/[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md`
 - `docs/architecture/[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md`
-- `docs/architecture/[ACTIVE]_DOC-04_PRD_v1.1.docx`
+- `deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md`
+- `deliverables/FooFoo_Database_Architecture_Review_and_Target_Schema.md`
+- `docs/architecture/[ACTIVE]_Food_Intelligence_and_Meal_Episode_Architecture_v2.0.md`
 - `docs/architecture/[ACTIVE]_DOC-05_Information_Architecture_v1.2.docx`
 - `docs/architecture/[ACTIVE]_DOC-06_UX_Design_System_v1.1.docx`
-- `docs/architecture/[ACTIVE]_DOC-10_Technical_Architecture_v1.0.docx`
 - `docs/architecture/[ACTIVE]_DOC-P3-02_Conceptual_Domain_Model_v1.1.md`
 - `docs/architecture/[ACTIVE]_DOC-P3-03_Business_Logic_Specification_v1.0.md`
 - `docs/architecture/[ACTIVE]_DOC-P3-03A_Logic_Governance_Matrix_v1.0.md`
@@ -106,7 +107,7 @@ Documents retained conservatively because their completion or continuing purpose
 - `docs/governance/[ACTIVE]_DOC-P3-09_Knowledge_Integration_Governance_v1.3.md`
 - `docs/governance/[ACTIVE]_DOC-P3-10_Seed_Data_Integration_Framework_v1.1.md`
 - `docs/governance/[ACTIVE]_DOC-P3-12_Governance_Improvement_Backlog_v1.4.md`
-- `docs/governance/[ACTIVE]_Documentation_Classification_Register_v1.0.md`
+- `docs/governance/[ACTIVE]_Documentation_Classification_Register_v1.1.md`
 - `docs/governance/[ACTIVE]_Founder_Decision_Register_v1.0.md`
 - `docs/governance/[ACTIVE]_Founder_Ratification_Certificate_2026-07-16_v1.0.md`
 - `docs/governance/[ACTIVE]_IDR-001_WP5_Sequence_Reconciliation_v1.0.md`
@@ -394,6 +395,9 @@ Documents retained conservatively because their completion or continuing purpose
 
 ## Category D — Superseded, duplicate, or obsolete documents archived
 
+- `docs/archive/historical/architecture/ARCHIVED_DOC-04_PRD_v1.1.docx`
+- `docs/archive/historical/architecture/ARCHIVED_DOC-10_Technical_Architecture_v1.0.docx`
+- `docs/archive/historical/architecture/ARCHIVED_Food_Ontology_and_Meal_Taxonomy_Architecture_v1.0.md`
 - `docs/archive/audits/re_audit_archive/ARCHIVED_01_requirement_traceability.md`
 - `docs/archive/audits/re_audit_archive/ARCHIVED_02_algorithm_coverage.md`
 - `docs/archive/audits/re_audit_archive/ARCHIVED_03_meal_genome_audit.md`

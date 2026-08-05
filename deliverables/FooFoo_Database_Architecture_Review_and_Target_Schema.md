@@ -2,8 +2,13 @@
 
 **Document type:** As-is assessment, target logical model, and migration blueprint
 **Audience:** Engineering, data, recommendation/ML, product, privacy, and operations leadership
-**Repository snapshot:** `main` at `2ab25c5`, 5 August 2026
-**Status vocabulary:** `CURRENT` means evidenced in migrations/runtime code; `PARTIAL` means a usable but insufficient implementation; `PROPOSED` means required by the final product definition but not currently implemented.
+**Version:** 1.1
+
+**Repository baseline:** migrations 001–064, seed 147, and deployed Edge functions on 5 August 2026
+
+**Status:** Canonical current/target database architecture
+
+**Status vocabulary:** `CURRENT` means evidenced in deployed migrations/runtime code; `PARTIAL` means a usable but insufficient implementation; `PROPOSED` means required by the final product definition but not currently implemented. Section 2A is the authoritative implementation delta when older inventory prose refers to the pre-060 baseline.
 
 ## 1. Assumptions and scope
 
@@ -12,7 +17,7 @@
 This review uses the following precedence:
 
 1. `deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md` is the target product, recommendation, food-intelligence, and database specification.
-2. `database/migrations/001...056`, seed `146`, current Edge Functions, recommendation-service code, mobile API contracts, and the active Food Ontology architecture define the as-is implementation.
+2. `database/migrations/001...064`, seeds `146...147`, current Edge Functions, recommendation-service code, mobile API contracts, and Food Intelligence and Meal Episode Architecture v2.0 define the as-is implementation.
 3. `docs/active/CURRENT_STATUS.md`, `OPEN_ITEMS.md`, and `LAUNCH_BLOCKERS.md` distinguish deployed behavior from local release-candidate behavior.
 4. `docs/architecture/[ACTIVE]_DOC-P3-04_Data_Architecture_ERD_v1.3.md` supplies historical rationale, but migrations 046–056 supersede important parts. The broad legacy `re_engine` was dropped and a smaller target-aligned `re_engine` was recreated by 055; `ghar_re` remains absent.
 
@@ -103,6 +108,25 @@ The target database must become a household-scoped decision-memory platform. It 
 | P1 | Private schemas are live but initial tables are underspecified | Trust boundaries are clearer but replay and control-plane guarantees remain incomplete | Complete least-privilege roles, runs/traces, deployments, datasets and audit controls |
 | P2 | Feature/model registry headers exist; immutable feature history/training snapshots/deployments do not | Learned ranking cannot be reproduced, promoted, or rolled back safely | Complete `ml` history, dataset manifest, deployment and parity contracts |
 | P2 | Partition lifecycle is only partially automated | Append-only parents can reject writes when future partitions are absent | Automate partition creation, default quarantine partitions, monitoring, and archival |
+
+### 2A. Reconciled implementation delta — migrations 060–064 and seed 147
+
+The following items moved from absent/scaffolded to deployed after the original review snapshot:
+
+| Earlier gap | Reconciled current implementation | Remaining boundary |
+|---|---|---|
+| Empty recipe/grammar/episode tables | 802 recipes, recipe steps/known ingredients, three published grammars/rules, 802 single-primary plus curated combo episodes, components, workloads and cadence | Recipes are provisional drafts, not professionally tested |
+| No generic graph | `food.ontology_nodes` and `food.ontology_edges`, populated for dishes, aliases, ingredients, meal classes and feature terms | Review/festival depth remains iterative |
+| No nutrient assertions | `food.nutrients` and source-linked `nutrient_assertions`; catalogue estimates cover all production dishes | USDA provider key returned 403; external assertions pending credential repair |
+| Empty constraints/regions | Governed constraint and regional-affinity rows populated for every production dish | Health-condition suitability remains out of scope |
+| Empty ML/control tables | Active feature definitions, registered rule-baseline model, source registry, catalog version, content review and publish controls | No trained model is represented as production-ready |
+| No worker/cron | Leased skip-locked queue, service-only Edge worker, ten-minute execution, daily reconciliation, one-time all-dish backfill and 90-day refresh | Provider quality monitoring remains operational work |
+| No user-dish mobile flow | Authenticated staging API and mobile submission screen | Generative classification awaits a provider/safety decision |
+| Dish-first final object | Meal-episode surface is the client default; canonical slate items resolve catalogue episode IDs | Compatibility fallback remains for rollback |
+| No full replay/outcome/propensity path | Ordered slates/items, deterministic propensity, typed outcomes and replay function are active | Counterfactual learning waits for randomized exposure and volume |
+| No research/annotation operations | Private studies/participants/diaries, annotation batches/items/labels, participant API and service-only annotation API | Representative-panel recruitment is not claimed |
+
+Legacy dish/class and event contracts are retained as explicit compatibility bridges because the user required no break to the current recommender. They are no longer the target for new product behavior. Contraction requires observed dual-write parity, privacy/export coverage and a rollback window; this is a governed release gate, not unfinished schema discovery.
 
 ## 3. Current-state database analysis
 
@@ -1187,7 +1211,7 @@ Key repository evidence used for this review:
 - Current deployed/local status: `docs/active/CURRENT_STATUS.md`, `OPEN_ITEMS.md`, and `LAUNCH_BLOCKERS.md`.
 - Current relational schema: deployed `database/migrations/001_extensions_and_schema_setup.sql` through `056_food_ontology_enrichment.sql`, plus seed `146_seed_food_ontology.sql` and validation `910_food_ontology_enrichment_validation.sql`; local migrations 057–059 and validations 911–913 are release-candidate evidence only.
 - Schema retirement and reintroduction: migrations 046, 047, 050, 051, 052, and target-aligned private-schema foundation 055.
-- Food Ontology contract and live rollout: `docs/architecture/[ACTIVE]_Food_Ontology_and_Meal_Taxonomy_Architecture_v1.0.md` and `docs/active/CURRENT_STATUS.md`.
+- Food intelligence/episode contract and live rollout: `docs/architecture/[ACTIVE]_Food_Intelligence_and_Meal_Episode_Architecture_v2.0.md` and `docs/active/CURRENT_STATUS.md`.
 - Current P0 loop: migration 053 plus `supabase/functions/recommendations`, `plan`, and `feedback`.
 - Current recommendation service and bundled data boundary: `ghar_re_core` and `ghar_re_service`.
 - Current mobile flows: `mobile/app/(onboarding)`, `cold-start.tsx`, `(tabs)/today.tsx`, `(tabs)/weekly-plan.tsx`, and `mobile/src/api`.
