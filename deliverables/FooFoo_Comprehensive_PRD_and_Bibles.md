@@ -657,7 +657,7 @@ Removing a member starts a review before deleting member-linked preference evide
 | Cost | model and infra cost per WSMD tracked; LLM never on synchronous ranking hot path |
 | Freshness | catalog publishing SLA and feature staleness indicators |
 
-**Current-state note (repository, 5 Aug 2026):** complete-meal episode serving is the mobile default with a compatibility fallback; canonical slates, item propensities, typed outcomes and replay are active. Migrations 060–065 operate the ontology queue, graph, nutrients, research/annotation control plane, safe unknown-dish promotion, complete relationship provenance and the consolidated ontology read model. Seed 147 populates all 802 production dishes with constraints, regional affinities, nutrition estimates, recipes and published single-primary episodes, plus curated composite episodes. FoodOn enrichment is live. USDA integration is deployed but its configured production key returned HTTP 403 in the controlled evaluation and must be replaced or activated before USDA assertions can populate. Migrations 066–069 activate an independent, budgeted Groq backfill for low-risk canonical-dish aliases, taxonomy tags and regional affinity; user-submitted text and every safety-sensitive field remain outside that generative path.
+**Current-state note (repository, 5 Aug 2026):** complete-meal episode serving is the mobile default with a compatibility fallback; canonical slates, item propensities, typed outcomes and replay are active. Migrations 060–072 operate the ontology queue, graph, nutrients, research/annotation control plane, safe unknown-dish promotion, complete relationship provenance, consolidated ontology read model, controlled provider evaluation, normalized recommendation lineage and database-enforced AI field policy. Seed 147 populates all 802 production dishes with constraints, regional affinities, nutrition estimates, recipes and published single-primary episodes, plus curated composite episodes. FoodOn enrichment is live. USDA's free demo key is active only for exact-name provisional evidence after a 12-dish evaluation found four exact matches, five wrong-food matches and three no-record results. Migrations 066–069 activate an independent, budgeted Groq backfill for low-risk canonical-dish aliases, taxonomy tags and regional affinity; user-submitted text and every safety-sensitive field remain outside that generative path.
 
 <!-- PAGEBREAK -->
 
@@ -2587,7 +2587,7 @@ This table distinguishes implemented product infrastructure from remaining exter
 |---|---|---|
 | Complete meal episode | `food.plate_grammars`, recipes, episodes/components, workload/cadence; `/plan` episode surface is mobile-default | Active with dish/class compatibility fallback |
 | Ontology graph | Generic typed nodes/edges populated for dishes, aliases, ingredients, classes and catalogue features | Active; human review depth remains ongoing |
-| Nutrition assertions | Source-linked `food.nutrient_assertions`; internal catalogue estimates cover every production dish | Active/provisional; USDA key currently returns 403 |
+| Nutrition assertions | Source-linked `food.nutrient_assertions`; internal estimates cover every dish; USDA demo-key evidence requires exact normalized names | Active/provisional; controlled sample was 4 exact / 5 wrong / 3 absent, so non-exact assertions are rejected |
 | Constraints and region | Three constraint assertions per production dish and state/cuisine affinities | Active/provisional; clinical claims remain excluded |
 | Dish aliases/ingredients/recipes/classes | Normalized aliases, ingredient links, class mappings and one draft recipe per production dish | Active; AI-draft recipes are not certified recipes |
 | Governed ontology read | Authenticated `ontology_record` resolves a canonical ID/name and returns aliases, ingredients, classes, field assertions, constraints, regions, nutrition, recipes, episodes, graph relations and evidence metadata | Active; raw external payloads remain private staging evidence |
@@ -2595,16 +2595,16 @@ This table distinguishes implemented product infrastructure from remaining exter
 | Unknown-dish mobile intake | Authenticated staging API and mobile form | Active |
 | Unknown-dish auto-promotion | Exact external name + entirely known safety ingredients | Active conservative rule; generative AI currently enriches canonical catalogue dishes only, not user text |
 | Budgeted AI ontology enrichment | Groq candidates >=0.65; allowlisted low-risk facts publish >=0.80; 800 requests/160k tokens daily | Active scheduled backfill with retries, provenance and deterministic guards; safety fields excluded |
-| Slates/propensity/replay/outcomes | Ordered slate/item persistence, exact deterministic propensity, typed outcomes and replay RPC | Active |
+| Slates/propensity/replay/outcomes | Ordered slate/item persistence, exact deterministic propensity, typed outcomes and replay RPC; normalized request/context/feature/run/candidate/stage lineage | Active; 53 historical slates backfilled without inventing unavailable scores |
 | ML/control plane | Versioned features, rule-baseline registry, experiments, source/catalog/publish/review tables | Active baseline; no trained production model claimed |
 | Research panel | Private studies/participants/diaries plus authenticated enrolled-participant API | Operational infrastructure; recruitment not claimed |
 | Annotation system | Versioned batches/items, leased claims, multi-review labels and service-only API | Active infrastructure |
-| Legacy contraction | Canonical episode facts dual-written while active dish/class contracts remain | Compatibility phase; destructive retirement waits for observed parity |
+| Legacy contraction | Canonical episode facts dual-written; snapshot v2 preserves all 1,599 class lookups without runtime mapping CSVs | Class CSV runtime dependency retired locally; event-table contraction still waits for observed parity |
 
 ### Decisions required from the Founder
 
 1. Decide whether user-submitted or corrected food text may later be sent to a generative provider or retained for training under explicit consent. Current generative processing is catalogue-name-only and does not train on submissions.
-2. Replace or activate `USDA_FOODDATA_API_KEY`; after correction, operations will call `ops.requeue_external_provider('usda_fdc')` and rerun the labelled evaluation.
+2. Obtain a personal free USDA key only if the demo key's throughput is insufficient for further controlled evaluations; exact-name gating remains mandatory.
 
 <!-- PAGEBREAK -->
 

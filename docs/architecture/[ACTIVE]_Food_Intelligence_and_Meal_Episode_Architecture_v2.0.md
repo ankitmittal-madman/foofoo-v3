@@ -5,7 +5,7 @@
 **Date:** 2026-08-05
 **Placement:** `docs/architecture/`
 **Supersedes:** Food Ontology and Meal Taxonomy Architecture v1.0; the food/episode implementation portions of DOC-10 Technical Architecture v1.0
-**Dependencies:** Comprehensive PRD and Intelligence Bibles v1.1; Database Architecture Review and Target Schema v1.1; migrations 055–065; seeds 146–147
+**Dependencies:** Comprehensive PRD and Intelligence Bibles v1.1; Database Architecture Review and Target Schema v1.1; migrations 055–072; seeds 146–147
 
 ## Executive Summary
 
@@ -15,9 +15,9 @@ This document, the comprehensive PRD, and the database target review are the imp
 
 ## 1. Production Baseline
 
-The production baseline on 5 August 2026 is migrations 055–065, seed 147, `dish-ontology`, `cron-dish-ontology`, `plan`, `research-panel`, and `research-annotations` Edge Functions. The catalogue contains 802 production dishes plus governed composite episodes. Every production dish has a background enrichment job and a published single-primary episode. The mobile episode client is on by default with a compatibility fallback. Migration 065 completes relationship-level provenance for aliases, ingredients, classes, constraints, regions and nutrition, and exposes a service-only consolidated ontology record through the authenticated Edge API.
+The production baseline on 5 August 2026 is migrations 055–072, seed 147, `dish-ontology`, `cron-dish-ontology`, `plan`, `research-panel`, and `research-annotations` Edge Functions. The catalogue contains 802 production dishes plus governed composite episodes. Every production dish has a background enrichment job and a published single-primary episode. The mobile episode client is on by default with a compatibility fallback. Migrations 065 and 070–072 complete relationship/source/AI provenance, controlled provider evaluation, database-enforced AI field policy and normalized recommendation request/run/candidate lineage.
 
-The first full external pass completed for all 802 canonical dishes with zero failed or pending jobs. FoodOn returned usable evidence for 104 dishes. USDA FoodData Central returned HTTP 403 for the configured key on every attempted lookup; catalogue nutrition remains available, but USDA-derived assertions will not appear until the credential is activated/replaced and `ops.requeue_external_provider('usda_fdc')` is run.
+The first full external pass completed for all 802 canonical dishes with zero failed or pending jobs. FoodOn returned usable evidence for 104 dishes. USDA's free public demo key was evaluated against 12 Indian dishes: four exact matches, five semantic mismatches and three no-record cases. Only exact normalized names at record confidence `>=0.90` can now retain provisional USDA nutrients; migration 070 records the labelled evaluation and removed mismatched provisional assertions without deleting raw evidence.
 
 ## 2. Bounded Contexts and Ownership
 
@@ -36,7 +36,7 @@ The first full external pass completed for all 802 canonical dishes with zero fa
 
 The worker runs every ten minutes and claims rows with `FOR UPDATE SKIP LOCKED`. Daily reconciliation creates missing jobs, releases expired leases, and reopens due 90-day refreshes. All canonical dishes were reopened once by migration 060 so each receives at least one external pass. Provider repair is explicit and idempotent through `ops.requeue_external_provider`.
 
-Accepted assertions are never overwritten by lower-confidence automation. External matches stay provisional. USDA values are stored as source-linked nutrient assertions rather than replacing catalogue estimates.
+Accepted assertions are never overwritten by lower-confidence automation. External matches stay provisional. Exact-only USDA values are stored as source-linked nutrient assertions rather than replacing catalogue estimates; non-exact results remain raw evidence only.
 
 ## 4. Unknown-Dish Policy
 
@@ -72,7 +72,7 @@ The planning hierarchy remains class-first:
 
 `household → constraints → intent/class plan → class-bound dishes → plate grammar/components → episode safety/practicality → episode rank → slate → outcome`.
 
-`POST /plan { surface: "meal_episodes" }` is the default mobile request. The Edge layer persists `slates` and ordered `slate_items` before returning success. Each item stores rank, rule score, rerank score, exact logging propensity, prediction heads, reasons, generator codes, decision trace, runtime episode hash, and, when resolvable, the canonical catalogue episode ID.
+`POST /plan { surface: "meal_episodes" }` is the default mobile request. The Edge layer persists `slates` and ordered `slate_items` before returning success. It also atomically records normalized recommendation requests, context/feature snapshots, runs, all eligible candidates and per-candidate stage evidence. Each shown item stores rank, scores, propensity, prediction heads, reasons, generator codes, decision trace, runtime episode hash, and, when resolvable, the canonical catalogue episode ID.
 
 Feedback dual-writes typed outcomes for chosen, locked, cooked, ordered, replaced, completed, and regretted actions. `replay_recommendation_slate` returns the immutable slate, ordered items, and linked outcomes. The current production ranker is explicitly registered as an untrained rule baseline; learned promotion requires offline/replay evidence and calibration.
 
@@ -90,7 +90,7 @@ Feedback dual-writes typed outcomes for chosen, locked, cooked, ordered, replace
 ## 8. External Evidence Strategy
 
 - FoodOn via EMBL-EBI OLS4: active for identifiers and synonyms; no key.
-- USDA FoodData Central: adapter and normalization active; production key currently receives HTTP 403 and requires owner action.
+- USDA FoodData Central: free demo-key adapter active for controlled exact-only provisional evidence; broad Indian-dish coverage and free-tier rate limits are inadequate for canonical authority.
 - Open Food Facts: reserve for packaged products/barcodes, not household dish truth.
 - Recipe websites and academic datasets: import only when licensing and provenance permit; never scrape into runtime truth by default.
 - Internal catalogue and research package: deterministic seed evidence with named source versions.
@@ -105,7 +105,7 @@ Annotation batches pin corpus and handbook versions, required reviewers and agre
 
 ## 10. Compatibility and Legacy Disposition
 
-Compatibility is deliberate: dish/class planning and `recommendation_events` remain because active clients and feedback resolution use them. Episode slates/outcomes are the canonical new facts and are dual-written. Legacy relations may be contracted only after one observed production window proves complete episode exposure/outcome linkage, export/delete coverage, and rollback. This avoids breaking the current recommender while preventing new design work from targeting legacy tables.
+Compatibility is deliberate: dish/class planning and `recommendation_events` remain because active clients and feedback resolution use them. Episode slates/outcomes and normalized request/run/candidate lineage are the canonical new facts and are dual-written. Runtime class lookup has moved to snapshot v2, which embeds all 1,599 canonical and compatibility names; the two legacy mapping CSVs remain offline ETL inputs but are removed from the next recommendation bundle. Event-table contraction still waits for exposure/outcome, export/delete and rollback parity.
 
 ## 11. Verification and Rollback
 
@@ -116,7 +116,7 @@ The rollback order is clients/functions, schedules, seed/content, then schema. P
 ## 12. Open Decisions
 
 1. Decide whether corrected user submissions may be retained as model-training data under explicit consent; current Groq processing is limited to canonical catalogue names.
-2. Replace or activate the USDA credential, then run the provider requeue and labelled match-quality evaluation.
+2. Obtain a personal free USDA key only if higher controlled-evaluation throughput is required; never relax the exact-match guard.
 3. Add health-condition suitability only after clinical evidence and governance approval.
 
 ## 13. Critical Self-Review
@@ -125,7 +125,7 @@ The rollback order is clients/functions, schedules, seed/content, then schema. P
 - A recipe row for every dish closes product coverage, but the draft recipe set must not be presented as professionally tested.
 - Selection propensity is exact for the current deterministic inclusion policy (`1`); it becomes non-trivial only when randomized/exploration policies are activated.
 - The research system is operational infrastructure, not evidence that a representative household panel has been recruited.
-- USDA failure is external and visible; the system intentionally does not fabricate USDA nutrition on a 403.
+- USDA coverage limitations are measured and visible; the system rejects semantic near-matches and never treats provider absence as fabricated nutrition.
 
 ## 14. Versioning and Placement
 

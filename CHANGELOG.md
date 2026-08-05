@@ -6,6 +6,11 @@
 ## [Unreleased]
 
 ### Deployed
+- Applied migrations 070–072 and redeployed `cron-dish-ontology` and `plan`: controlled external
+  provider evaluation, exact-only USDA nutrients, normalized recommendation request/run/candidate
+  lineage, and database-enforced Groq field/AI assertion policy are live.
+- Evaluated USDA's free demo key on 12 Indian dishes (4 exact, 5 wrong-food matches, 3 no record),
+  retained 16 exact-match provisional nutrients and removed mismatched provisional assertions.
 - Activated budgeted Groq ontology enrichment in production with migrations 066–069 and the
   scheduled `cron-dish-ontology` worker. `openai/gpt-oss-120b` retains low-risk candidates at
   confidence 0.65 and directly publishes allowlisted aliases/tags/regions at 0.80, under atomic
@@ -29,6 +34,9 @@
 - Deployed `dish-ontology` v5 and `plan` v13; both continue to reject unauthenticated requests.
 
 ### Added
+- Ontology snapshot v2 contains every one of 1,599 canonical/compatibility class lookup names and
+  multi-class memberships. The recommendation runtime now uses only that immutable snapshot;
+  legacy mapping CSVs are offline ETL inputs and are omitted from the rebuilt bundle.
 - Field-level source, derivation, model, confidence, review and verification metadata for dish
   ingredients, aliases, class mappings, constraints, regional affinities and nutrient assertions.
 - Full eligible-set, household-snapshot and episode-response evidence in slate decision traces so

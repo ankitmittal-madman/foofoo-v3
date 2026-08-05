@@ -73,6 +73,10 @@ export function normalizeFoodOn(record: ResearchRecord): ExternalFoodTerm | null
 /** Extract the four recommendation-safe macro values from the leading USDA result. */
 export function normalizeUsda(record: ResearchRecord): ExternalNutrient[] {
   if (record.provider !== "usda_fdc") return [];
+  // Search results are not composition authority unless the provider label is an exact normalized
+  // match. This blocks cases such as "Poha" resolving to cape gooseberries or "Butter Chicken"
+  // resolving to clarified butter. Exact matches remain provisional evidence, never product truth.
+  if (record.confidence < 0.9) return [];
   const foods = Array.isArray(record.payload.foods)
     ? record.payload.foods as Record<string, unknown>[]
     : [];

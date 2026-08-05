@@ -33,13 +33,14 @@ findings are retained under `docs/archive/`.
 
 ## P2 — Production improvement
 
-- Replace or activate `USDA_FOODDATA_API_KEY` (the controlled worker evaluation returned HTTP
-  403), run `ops.requeue_external_provider('usda_fdc')`, and evaluate Indian-dish match quality.
+- Obtain a personal free data.gov USDA key if higher throughput is needed. The public demo key is
+  active only for controlled evaluation: 4/12 sampled Indian dishes matched exactly, 5/12 matched
+  the wrong food and 3/12 had no record. Non-exact nutrients are now rejected by policy.
 - Expand comfort-hero mapping beyond 17 of 36 resolved heroes.
 - Populate the regional-prior table for PanIndia and Global zones; 187 of 810 dishes currently
   receive no regional-prior boost.
-- Monitor the ontology-aware Fly release and legacy CSV compatibility fallback for one verified
-  rollout window; remove the fallback only after parity and rollback evidence remain clean.
+- Approve and verify the Fly release carrying ontology snapshot v2. Local parity covers all 1,599
+  runtime lookup names and the bundle no longer includes either legacy class-mapping CSV.
 - Create/approve a funded Fly staging app and configure `FLY_STAGING_*` variables/secrets. The
   GitHub `Production` environment is now protected by a required reviewer and a main-only custom
   deployment-branch policy.
@@ -71,6 +72,13 @@ findings are retained under `docs/archive/`.
   low-risk publication threshold 0.80, and daily limits of 800 requests/160,000 tokens. Migrations
   066–069 and the scheduled worker provide independent retries, atomic budget accounting,
   provenance, and deterministic alias/region guards without a routine human-review bottleneck.
+- USDA controlled evaluation is complete and durable: migration 070 records labelled runs/items,
+  and exact-name confidence `>=0.90` is required before provisional nutrients can be retained.
+- Recommendation lineage normalization is live through migration 071: all existing slates are
+  linked to request/context/feature/run/candidate/stage facts without fabricating unavailable
+  historical scores.
+- Migration 072 makes AI field authority a database policy and normalizes AI generation inputs,
+  assertion sources, AI-run links and immutable review decisions.
 
 - Production migrations 057–059 resolved exposed trigger-function grants, 77 missing leading
   foreign-key indexes, two duplicate indexes, event-partition horizon automation, post-profile

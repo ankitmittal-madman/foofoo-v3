@@ -17,8 +17,9 @@
 > 547 are enriched and 255 are explicitly in review, with no pending enrichment jobs. The
 > The ontology rollout initially activated `dish-ontology` v1, `plan` v9 and `feedback` v6;
 > current Edge versions are recorded in the production-hardening block below. Fly.io release v125
-> is healthy on both checks and serves immutable RE bundle `sha256:3d4cf579d1cf2565`. The legacy
-> CSV fallback remains enabled for one monitored rollback window.
+> is healthy on both checks and serves immutable RE bundle `sha256:3d4cf579d1cf2565`. Snapshot v2
+> now preserves all 1,599 canonical/compatibility class lookups; the next Fly release removes both
+> legacy class-mapping CSVs from the runtime bundle without changing lookup behavior.
 >
 > **Food-intelligence/episode completion release:** migrations 060–065 and seed 147 are live.
 > They add the leased enrichment worker and schedules, generic ontology graph, nutrient
@@ -26,8 +27,10 @@
 > dish promotion, catalogue episode resolution, replay, ML/catalog controls, and research and
 > annotation operations. `dish-ontology`, `cron-dish-ontology`, `plan`, `research-panel`, and
 > `research-annotations` were deployed. The first full external pass completed for all 802 dishes
-> with zero failed or pending jobs; FoodOn matched 104 dishes, while USDA returned HTTP 403 for
-> every attempted lookup with the configured key. Mobile
+> with zero failed or pending jobs; FoodOn matched 104 dishes. A controlled 12-dish USDA demo-key
+> evaluation produced four exact matches, five unsafe non-exact matches and three no-record cases.
+> Migration 070 and the worker now retain nutrient assertions only for exact normalized USDA
+> names; 16 provisional exact-match assertions survived the cleanup. Mobile
 > meal episodes are now default-on with compatibility fallback, and the missing-dish submission
 > screen is implemented. Migration 065 adds complete assertion/relationship provenance and the
 > authenticated consolidated ontology-record API. The production Expo web build is live at
@@ -47,6 +50,13 @@
 > 160,000 tokens. At the latest verification, 11/802 dishes were complete, 791 pending, with zero
 > failed rows; 12 requests used 12,665 tokens and no tokens remained reserved. The ten-minute
 > schedule continues the backfill automatically and defers cleanly at the daily token cap.
+>
+> **Normalized policy and recommendation lineage:** migrations 070–072 are live. USDA evaluation
+> runs/items are durable, Groq field policies and immutable review/AI assertion lineage are
+> database-enforced, and recommendation requests, contexts, feature snapshots, runs, candidates
+> and candidate stages are normalized. The production backfill contains 53 linked slates/runs,
+> 192 candidates and 192 stage records, with no unlinked slate. `plan` and
+> `cron-dish-ontology` were redeployed against these contracts.
 >
 > **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
 > execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
@@ -71,7 +81,7 @@
 | Architecture | 80% |
 | Backend (Edge Functions) | 90% |
 | Recommendation Engine | 85% |
-| Food Ontology | 90% (production graph/read API, full catalogue coverage and governed Groq backfill live; USDA remains an external gate) |
+| Food Ontology | 92% (production graph/read API, full coverage and governed Groq backfill live; USDA exact-only controlled use active) |
 | Knowledge Graph | 70% (normalized production graph with provenance; subjective/festival/substitution breadth remains iterative) |
 | Seed Data | 90% |
 | Database | 95% |
@@ -84,7 +94,7 @@
 ## One-line state per major component
 - **RE core/service:** implemented, repository Python suite green (715 passed, 27 skipped), Fly
   release v125 live-healthy with bundle `sha256:3d4cf579d1cf2565`.
-- **Edge Functions:** implemented and tested (93 tests); current single-owner authorization model
+- **Edge Functions:** implemented and tested (94 tests); current single-owner authorization model
   is enforced; `dish-ontology` v5, `recommendations` v11, `plan` v13 and `feedback` v7 deployed
   2026-08-05. Explicit membership/role authorization is still required before shared-household
   collaboration is enabled.
@@ -103,8 +113,9 @@
   production dishes;
   every production dish now has constraint, regional, nutrition-estimate, recipe and published
   episode coverage. The production relational graph connects dishes, aliases, ingredients,
-  classes and catalogue features with provenance. USDA validation is blocked by its rejecting
-  credential. Groq low-risk enrichment is live under strict budgets and field allowlists;
+  classes and catalogue features with provenance. USDA is active only as exact-match provisional
+  evidence after a labelled demo-key evaluation showed poor broad Indian-dish matching. Groq
+  low-risk enrichment is live under strict budgets and database field policies;
   festival mapping and clinically governed health-condition suitability remain absent/pending.
 
 See `docs/active/OPEN_ITEMS.md` for what's actionable, `docs/active/LAUNCH_BLOCKERS.md` for what

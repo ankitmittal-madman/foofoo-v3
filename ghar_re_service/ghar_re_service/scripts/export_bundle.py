@@ -88,14 +88,12 @@ CONFIG_FILES = (
 # and knowledge.py for what each file does.
 CLASS_FIRST_FILES = (
     "meal_class_master.csv",
-    "class_dish_options.csv",
     "cohort_matrix.csv",
     # WP-16 additions:
     "cohort_class_model.json",  # trained factorized class-affinity model (the "intelligence")
-    "dish_class_map.csv",  # WP-17 nutritionist/chef dish->class map — full 810/810 coverage
     # Normalized, planning-safe projection generated with database seed 146. Runtime class lookup
-    # prefers this snapshot and falls back to the two legacy CSVs, allowing a zero-downtime rollout
-    # while keeping raw evidence and provisional AI output out of the recommendation process.
+    # uses only this v2 snapshot. The retired class lookup CSVs remain offline ETL inputs and are
+    # intentionally no longer baked into the production recommendation bundle.
     "food_ontology_snapshot.json",
     "migration_overlay.csv",  # City_Migration_Overlay_v3 (home/local/national blend)
     "state_profile.csv",  # state -> region_archetype (a model feature) + class pools

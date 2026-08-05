@@ -330,12 +330,16 @@ export function makePlanHandler(): Handler {
             ? episodeBody.catalog_version
             : null,
           policyCode: String(episodeBody.policy_code ?? "episode_success_rule_v1"),
+          latencyMs,
           eligibleEpisodeHashes: Array.isArray(episodeBody.eligible_episode_hashes)
             ? episodeBody.eligible_episode_hashes.filter((value): value is string =>
               typeof value === "string"
             )
             : [],
           householdSnapshot: payload.household as Record<string, unknown>,
+          requestContext: payload.context && typeof payload.context === "object"
+            ? payload.context as Record<string, unknown>
+            : {},
           episodes: Array.isArray(episodeBody.episodes)
             ? episodeBody.episodes as Parameters<typeof recordMealEpisodeSlate>[1]["episodes"]
             : [],

@@ -73,7 +73,7 @@ Deno.test("USDA evidence normalizes only supported macros with units", () => {
     provider: "usda_fdc",
     providerRecordId: "42",
     sourceUrl: "https://fdc.nal.usda.gov/",
-    confidence: 0.7,
+    confidence: 0.9,
     payload: {
       foods: [{
         foodNutrients: [
@@ -86,6 +86,22 @@ Deno.test("USDA evidence normalizes only supported macros with units", () => {
   });
   assertEquals(nutrients.map((item) => item.code), ["energy_kcal", "protein_g"]);
   assertEquals(nutrients[0].servingBasis, "100 g");
+});
+
+Deno.test("USDA nutrition is rejected when the top search result is not an exact dish match", () => {
+  const nutrients = normalizeUsda({
+    provider: "usda_fdc",
+    providerRecordId: "171314",
+    sourceUrl: "https://fdc.nal.usda.gov/",
+    confidence: 0.45,
+    payload: {
+      foods: [{
+        description: "Butter, Clarified butter (ghee)",
+        foodNutrients: [{ nutrientName: "Energy", unitName: "KCAL", value: 876 }],
+      }],
+    },
+  });
+  assertEquals(nutrients, []);
 });
 
 Deno.test("Groq parsing accepts structured low-risk ontology fields and records token usage", async () => {

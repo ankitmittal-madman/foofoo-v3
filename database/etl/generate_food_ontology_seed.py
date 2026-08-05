@@ -150,8 +150,30 @@ def build_snapshot(
         )
     catalogue_keys = {str(dish["name"]).strip().casefold() for dish in catalogue}
     promoted_mapping_count = sum(len(rows_by_dish.get(key, [])) for key in catalogue_keys)
+    # The historical curated files also contain fixture names, aliases and composed meal labels
+    # that are intentionally not canonical catalogue dishes.  Snapshot v2 carries those exact
+    # lookup entries so the runtime no longer needs the source CSVs while preserving every class
+    # lookup and multi-membership result byte-for-byte.
+    lookup_names: dict[str, str] = {}
+    for row in [*curated, *mappings]:
+        key = row["dish_name"].strip().casefold()
+        lookup_names.setdefault(key, row["dish_name"].strip())
+    catalogue_names = {
+        str(dish["name"]).strip().casefold(): str(dish["name"]) for dish in catalogue
+    }
+    lookup_entries = []
+    for key in sorted(set(rows_by_dish) - catalogue_keys):
+        primary = curated_primary.get(key) or first_mapping.get(key)
+        lookup_entries.append(
+            {
+                "name": catalogue_names.get(key, lookup_names[key]),
+                "canonical_dish": catalogue_names.get(key),
+                "primary_class_code": primary,
+                "mappings": rows_by_dish[key],
+            }
+        )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "source": [
             "class_first_v1/dish_class_map.csv",
             "class_first_v1/class_dish_options.csv",
@@ -160,6 +182,8 @@ def build_snapshot(
         "dish_count": len(dishes),
         "source_mapping_count": len(mappings),
         "mapping_count": promoted_mapping_count,
+        "lookup_entry_count": len(lookup_entries),
+        "runtime_lookup_count": len(set(rows_by_dish) | catalogue_keys),
         "unmatched_source_dishes": sorted(
             {
                 row["dish_name"]
@@ -168,6 +192,7 @@ def build_snapshot(
             }
         ),
         "dishes": dishes,
+        "lookup_entries": lookup_entries,
     }
 
 

@@ -733,7 +733,6 @@ STATE_TO_KB_SUBZONE = {
 # exactly 0.0 — the same "absent term contributes nothing" pattern base()'s W_SIG already uses
 # for unscored dishes, not a fabricated boost.
 # ---------------------------------------------------------------------------
-import csv as _csv
 import json as _json
 import os as _os
 
@@ -743,27 +742,13 @@ _DISH_TO_CLASSES = None  # dish -> full set of classes (multi-membership; WP-17.
 _ONTOLOGY_SNAPSHOT = None
 
 
-def _load_class_first_csv(name):
-    """Read an extracted class-first CSV from class_first_v1/ underneath ghar_re_core.config.SRC —
-    the SAME config-directory seam every other runtime config file uses (respects
-    GHAR_RE_CONFIG_DIR, so it resolves correctly from both a checked-out repo and the service's
-    baked bundle; see RE-DOC-10 §8 / config.py on why a path relative to this file would break in a
-    container). Callers cache into a module-level global so the file is parsed once per process."""
-    from ghar_re_core.config import SRC
-
-    path = _os.path.join(SRC, "class_first_v1", name)
-    with open(path, newline="") as f:
-        return list(_csv.DictReader(f))
-
-
 def _load_ontology_snapshot():
-    """Load the planning-safe ontology projection, or return None during staged rollout.
+    """Load the planning-safe ontology projection used for every runtime class lookup.
 
     The recommendation service consumes an immutable bundle, never live source/AI tables. A
-    missing snapshot deliberately falls back to the legacy CSV path below, so deploying code
-    before migration/seed/bundle promotion cannot remove or alter existing recommendations.
-    Malformed snapshots fail loudly at startup/request warm-up rather than silently changing class
-    membership.
+    missing or malformed snapshot fails loudly at startup/request warm-up rather than silently
+    changing class membership. Snapshot v2 includes canonical dishes plus all compatibility aliases
+    and fixture/composed-meal lookup names, so runtime CSV fallback is no longer necessary.
     """
     global _ONTOLOGY_SNAPSHOT
     if _ONTOLOGY_SNAPSHOT is not None:
@@ -771,12 +756,9 @@ def _load_ontology_snapshot():
     from ghar_re_core.config import SRC
 
     path = _os.path.join(SRC, "class_first_v1", "food_ontology_snapshot.json")
-    try:
-        with open(path, encoding="utf-8") as handle:
-            snapshot = _json.load(handle)
-    except FileNotFoundError:
-        return None
-    if snapshot.get("schema_version") != 1 or not isinstance(snapshot.get("dishes"), list):
+    with open(path, encoding="utf-8") as handle:
+        snapshot = _json.load(handle)
+    if snapshot.get("schema_version") != 2 or not isinstance(snapshot.get("lookup_entries"), list):
         raise ValueError("unsupported or malformed food ontology snapshot")
     _ONTOLOGY_SNAPSHOT = snapshot
     return snapshot
@@ -785,7 +767,7 @@ def _load_ontology_snapshot():
 def _class_maps_from_snapshot(snapshot):
     """Return primary and multi-membership maps from a validated immutable snapshot."""
     primary, memberships = {}, {}
-    for dish in snapshot["dishes"]:
+    for dish in [*snapshot["dishes"], *snapshot["lookup_entries"]]:
         key = dish["name"].strip().lower()
         primary_code = dish.get("primary_class_code")
         if primary_code:
@@ -801,7 +783,7 @@ def _class_maps_from_snapshot(snapshot):
 
 
 def dish_to_class_code(dish_name):
-    """dish_name -> meal_class_code. Two static, checked-in sources, in precedence order:
+    """dish_name -> meal_class_code. The immutable ontology snapshot preserves this precedence:
       1. the curated Class_Dish_Options_v3 map (case-insensitive EXACT match — authored truth), then
       2. dish_class_map.csv — WP-17's full-coverage nutritionist/chef classification: EVERY
          catalogue dish assigned its best meal class offline (classify_dishes.py), each row tagged
@@ -810,51 +792,15 @@ def dish_to_class_code(dish_name):
     Still NO fuzzy matching at RUNTIME — both are static lookups over a reviewed, checked-in file, so
     the classification is a deterministic offline artifact, never a live guess. Returns None only if
     the dish is in neither source (e.g. a brand-new dish added after the last classify run)."""
-    global _DISH_TO_CLASS, _DISH_OVERRIDES
+    global _DISH_TO_CLASS, _DISH_OVERRIDES, _DISH_TO_CLASSES
     if _DISH_TO_CLASS is None:
         snapshot = _load_ontology_snapshot()
-        if snapshot is not None:
-            primary, memberships = _class_maps_from_snapshot(snapshot)
-            # Preserve legacy-only fixture and alias entries during the staged migration. The
-            # normalized snapshot covers the 810 production catalogue dishes; the legacy files
-            # also contain a small number of test/reference names. Dropping those would change
-            # golden-master scoring even though no production dish changed.
-            legacy_primary, legacy_memberships = {}, {}
-            for row in _load_class_first_csv("class_dish_options.csv"):
-                key = row["dish_name"].strip().lower()
-                legacy_primary.setdefault(key, row["meal_class_code"])
-                legacy_memberships.setdefault(key, set()).add(row["meal_class_code"])
-            for row in _load_class_first_csv("dish_class_map.csv"):
-                key = row["dish_name"].strip().lower()
-                legacy_primary.setdefault(key, row["meal_class_code"])
-                legacy_memberships.setdefault(key, set()).add(row["meal_class_code"])
-            for key, code in legacy_primary.items():
-                primary.setdefault(key, code)
-            for key, codes in legacy_memberships.items():
-                memberships.setdefault(key, set()).update(codes)
-            # Publish all related globals together so concurrent first requests cannot observe a
-            # half-initialized ontology cache. `_DISH_OVERRIDES` stays an empty compatibility map.
-            global _DISH_TO_CLASSES
-            _DISH_OVERRIDES = {}
-            _DISH_TO_CLASSES = memberships
-            _DISH_TO_CLASS = primary
-            return primary.get(dish_name.strip().lower())
-        # Build both maps locally and publish them together.  Recommendation
-        # requests execute in FastAPI's worker pool; exposing the first empty
-        # map before the second exists lets a concurrent cold-start request
-        # reach ``_DISH_OVERRIDES.get`` while that global is still None.
-        dish_to_class = {}
-        for r in _load_class_first_csv("class_dish_options.csv"):
-            dish_to_class.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
-        dish_overrides = {}
-        try:
-            for r in _load_class_first_csv("dish_class_map.csv"):
-                if r["meal_class_code"]:
-                    dish_overrides.setdefault(r["dish_name"].strip().lower(), r["meal_class_code"])
-        except FileNotFoundError:
-            pass  # map is optional; exact curated map still works without it
-        _DISH_OVERRIDES = dish_overrides
-        _DISH_TO_CLASS = dish_to_class
+        primary, memberships = _class_maps_from_snapshot(snapshot)
+        # Publish all related globals together so concurrent first requests cannot observe a
+        # half-initialized ontology cache. `_DISH_OVERRIDES` stays an empty compatibility map.
+        _DISH_OVERRIDES = {}
+        _DISH_TO_CLASSES = memberships
+        _DISH_TO_CLASS = primary
     key = dish_name.strip().lower()
     return _DISH_TO_CLASS.get(key) or _DISH_OVERRIDES.get(key)
 
@@ -870,16 +816,5 @@ def dish_to_class_codes(dish_name):
     Returns a possibly-empty frozenset (never None)."""
     global _DISH_TO_CLASS, _DISH_OVERRIDES, _DISH_TO_CLASSES
     if _DISH_TO_CLASSES is None:
-        dish_to_class_code(dish_name)  # ensure the two static sources are parsed into the globals
-        _DISH_TO_CLASSES = {}
-        for k, c in (_DISH_TO_CLASS or {}).items():
-            _DISH_TO_CLASSES.setdefault(k, set()).add(c)
-        try:
-            for r in _load_class_first_csv("dish_class_map.csv"):
-                if r["meal_class_code"]:
-                    _DISH_TO_CLASSES.setdefault(r["dish_name"].strip().lower(), set()).add(
-                        r["meal_class_code"]
-                    )
-        except FileNotFoundError:
-            pass
+        dish_to_class_code(dish_name)  # atomically loads both maps from the snapshot
     return frozenset(_DISH_TO_CLASSES.get(dish_name.strip().lower(), ()))

@@ -63,8 +63,10 @@ export async function recordMealEpisodeSlate(
     configVersion: string;
     catalogVersion?: string | null;
     policyCode: string;
+    latencyMs: number;
     eligibleEpisodeHashes: string[];
     householdSnapshot: Record<string, unknown>;
+    requestContext: Record<string, unknown>;
     episodes: EpisodeResult[];
   },
 ): Promise<string> {
@@ -154,5 +156,70 @@ export async function recordMealEpisodeSlate(
     "plan.episodes.items_upsert",
   );
   if (itemError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: itemError.message });
+
+  const rowByHash = new Map(rows.map((row) => [row.episode_hash, row]));
+  const lineageCandidates = [...new Set(eligibleHashes)].map((episodeHash) => {
+    const row = rowByHash.get(episodeHash);
+    return {
+      candidate_item_hash: episodeHash,
+      episode_id: row?.episode_id ?? null,
+      generator_codes: row?.generator_codes ?? ["eligible_set"],
+      generator_scores: row
+        ? {
+          point_score: row.point_score,
+          rerank_score: row.rerank_score,
+          predicted_choose: row.predicted_choose,
+          predicted_execute: row.predicted_execute,
+          predicted_regret: row.predicted_regret,
+          selection_propensity: row.selection_propensity,
+        }
+        : {},
+      reason_codes: row?.reason_tags ?? [],
+      rank: row?.rank ?? null,
+    };
+  });
+  const context = {
+    ...input.requestContext,
+    slot: input.slot ?? input.requestContext.slot ?? null,
+    weekday: input.weekday ?? input.requestContext.weekday ?? null,
+    class_code: input.classCode ?? null,
+  };
+  const contextHash = await snapshotHash(context);
+  const featureHash = await snapshotHash(lineageCandidates);
+  const traceChecksum = await snapshotHash({
+    request_id: input.requestId,
+    eligible_set_hash: hash,
+    household_snapshot_hash: householdHash,
+    context_snapshot_hash: contextHash,
+    feature_snapshot_hash: featureHash,
+  });
+  const { error: lineageError } = await withTimeout(
+    db.rpc("record_episode_recommendation_lineage", {
+      p_payload: {
+        request_id: input.requestId,
+        household_id: input.householdId,
+        slate_id: slate.id,
+        surface: "today_meal_episode",
+        meal_slot_code: input.slot ?? null,
+        context,
+        context_snapshot_hash: contextHash,
+        household_snapshot_hash: householdHash,
+        feature_set_version: "episode-online-v1",
+        feature_snapshot_hash: featureHash,
+        engine_version: input.modelVersion,
+        model_version: input.modelVersion,
+        config_version: input.configVersion,
+        catalog_version: input.catalogVersion ?? null,
+        policy_version: input.policyCode,
+        latency_ms: input.latencyMs,
+        trace_checksum: traceChecksum,
+        candidates: lineageCandidates,
+      },
+    }),
+    "plan.episodes.normalized_lineage",
+  );
+  if (lineageError) {
+    throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: lineageError.message });
+  }
   return slate.id as string;
 }

@@ -37,10 +37,12 @@ def _snapshot() -> dict:
 
 def test_snapshot_covers_every_runtime_dish_and_preserves_source_gaps():
     snapshot = _snapshot()
-    assert snapshot["schema_version"] == 1
+    assert snapshot["schema_version"] == 2
     assert snapshot["dish_count"] == 810
     assert snapshot["source_mapping_count"] == 1500
     assert snapshot["mapping_count"] == 1516
+    assert snapshot["lookup_entry_count"] == 789
+    assert snapshot["runtime_lookup_count"] == 1599
     assert snapshot["unmatched_source_dishes"] == [
         "Lauki Khichdi",
         "Moong Dal Khichdi",
@@ -65,9 +67,9 @@ def test_snapshot_is_exactly_backward_compatible_with_legacy_class_lookup():
         first_mapping.setdefault(key, row["meal_class_code"])
         legacy_memberships.setdefault(key, set()).add(row["meal_class_code"])
 
-    for dish in snapshot["dishes"]:
+    for dish in [*snapshot["dishes"], *snapshot["lookup_entries"]]:
         key = dish["name"].strip().lower()
-        assert primary[key] == curated.get(key, first_mapping[key])
+        assert primary[key] == (curated.get(key) or first_mapping[key])
         assert memberships[key] == legacy_memberships[key]
 
 
@@ -97,8 +99,7 @@ def test_runtime_lookup_uses_snapshot_without_changing_class_first_contract():
         assert K.dish_to_class_codes(name) == frozenset(
             row["class_code"] for row in dish["mappings"]
         )
-    # Legacy-only reference names remain available until their canonical entity-resolution
-    # decision is reviewed; this is the compatibility fallback that protects golden fixtures.
+    # Legacy-only reference names remain available from snapshot v2 without runtime CSV fallback.
     assert K.dish_to_class_code("Roti") is not None
     assert K.dish_to_class_codes("Roti")
 
@@ -110,6 +111,8 @@ def test_snapshot_is_part_of_the_versioned_recommendation_bundle(tmp_path):
     rel = "class_first_v1/food_ontology_snapshot.json"
     assert rel in manifest["config_sha256"]
     assert os.path.isfile(tmp_path / "bundle" / "config" / rel)
+    assert "class_first_v1/class_dish_options.csv" not in manifest["config_sha256"]
+    assert "class_first_v1/dish_class_map.csv" not in manifest["config_sha256"]
 
 
 def test_class_backing_cache_cannot_leak_between_catalogue_snapshots():
