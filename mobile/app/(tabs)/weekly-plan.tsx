@@ -1,154 +1,37 @@
-import { useEffect, useState } from "react";
-import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet } from "react-native";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
-import { fetchSavedWeek, fetchWeeklyPlan, savedWeekSelections, saveWeekPlan } from "@/api/plan";
-import type { WeeklyClass, WeeklyPlanResponse } from "@/api/plan";
-import { describeApiError } from "@/api/errorMessages";
-import type { SlotName } from "@/lib/weeklyPlanStore";
-import { saveWeeklyPlan, type FinalizedWeek } from "@/lib/weeklyPlanStore";
+import { useI18n, type MessageKey } from "@/i18n";
+import { FButton, Segmented, Toast, palette } from "@/ui/foofoo";
 
-const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
+const FOOD = require("../../assets/images/poha-idli-fruit.png");
+const classes: { key: MessageKey; intent: MessageKey; options: string[] }[] = [
+  { key: "breakfast", intent: "lightStart", options: ["Poha, Idli & Fruit Bowl", "Upma, Dhokla & Fruit", "Besan Chilla & Fruits", "Oats Upma & Banana"] },
+  { key: "lunch", intent: "balanced", options: ["Dal, Rice, Sabzi & Salad", "Rajma Rice & Cabbage", "Chole, Rice & Kachumber", "Moong Dal Khichdi & Curd"] },
+  { key: "snacks", intent: "refreshing", options: ["Sprouts Chaat", "Roasted Makhana", "Fruit Chaat", "Buttermilk & Nuts"] },
+  { key: "dinner", intent: "satisfying", options: ["Veg Khichdi & Kadhi", "Moong Dal Cheela", "Vegetable Soup & Toast", "Phulka, Sabzi & Curd"] },
+];
 
-/**
- * WP-18 surface 3 — the weekly class plan. For each day and slot, shows the top-3 meal CLASSES
- * (already filtered server-side to classes with at least one backing dish — see meal_planner.
- * weekly_class_plan's dish_count) and lets the user pick one per day/slot, then finalize.
- *
- * Finalizing writes the selection to weeklyPlanStore (device-local for now) and moves to the Home
- * tab (today's plan), which reconciles that day's dishes to ONLY the finalized class — the WP-18
- * guarantee. Relocated into the (tabs) group as the second, persistent "Week Plan" tab per the
- * Founder's restructuring request — previously this screen was reachable only mid-flow via
- * cold-start -> weekly-plan -> daily-plan; the route path itself ("/weekly-plan") is unchanged
- * since expo-router strips the "(tabs)" group segment from the URL, so cold-start.tsx's existing
- * router.push("/weekly-plan") still resolves here unmodified.
- */
 export default function WeeklyPlan() {
-  const queryClient = useQueryClient();
-  const query = useQuery<WeeklyPlanResponse>({
-    queryKey: ["weekly-plan"],
-    queryFn: () => fetchWeeklyPlan(3),
-  });
-  const [selected, setSelected] = useState<FinalizedWeek>({});
-  const saved = useQuery({ queryKey: ["saved-week"], queryFn: () => fetchSavedWeek() });
-
-  useEffect(() => {
-    if (saved.data?.plan) setSelected(savedWeekSelections(saved.data));
-  }, [saved.data]);
-
-  const finalize = useMutation({
-    mutationFn: async (plan: FinalizedWeek) => {
-      await saveWeekPlan(plan, true);
-      await saveWeeklyPlan(plan); // offline read-through cache; server remains authoritative
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["saved-week"] }),
-        queryClient.invalidateQueries({ queryKey: ["daily-plan"] }),
-      ]);
-    },
-    onSuccess: () => router.replace("/today"),
-  });
-
-  function choose(weekday: string, slot: SlotName, classCode: string) {
-    setSelected((prev) => ({ ...prev, [weekday]: { ...prev[weekday], [slot]: classCode } }));
-  }
-
-  if (query.isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator />
-      </View>
-    );
-  }
-
-  if (query.isError) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.error}>{describeApiError(query.error)}</Text>
-        <Pressable style={styles.button} onPress={() => query.refetch()}>
-          <Text style={styles.buttonText}>Retry</Text>
-        </Pressable>
-      </View>
-    );
-  }
-
-  const days = query.data?.days ?? [];
-  const totalSlots = days.length * SLOTS.length;
-  const chosenCount = Object.values(selected).reduce((n, s) => n + Object.keys(s).length, 0);
-
-  return (
-    <ScrollView testID="weekly-plan-screen" contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Your weekly plan</Text>
-      <Text style={styles.subheader}>Pick a meal class for each slot, then finalize.</Text>
-      {days.map((day: WeeklyPlanResponse["days"][number]) => (
-        <View key={day.weekday} style={styles.dayBlock}>
-          <Text style={styles.dayTitle}>{day.weekday}</Text>
-          {SLOTS.map((slot) => (
-            <View key={slot} style={styles.slotRow}>
-              <Text style={styles.slotLabel}>{slot}</Text>
-              <View style={styles.chipRow}>
-                {(day.slots[slot] ?? []).map((c: WeeklyClass, index: number) => {
-                  const isChosen = selected[day.weekday]?.[slot] === c.class_code;
-                  return (
-                    <Pressable
-                      testID={`weekly-plan-${day.weekday}-${slot}-${index}`}
-                      key={c.class_code}
-                      style={[styles.chip, isChosen && styles.chipChosen]}
-                      onPress={() => choose(day.weekday, slot, c.class_code)}
-                    >
-                      <Text style={[styles.chipText, isChosen && styles.chipTextChosen]}>
-                        {c.class_name}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-                {(day.slots[slot] ?? []).length === 0 ? (
-                  <Text style={styles.noClasses}>No options for this slot</Text>
-                ) : null}
-              </View>
-            </View>
-          ))}
-        </View>
-      ))}
-      <Pressable
-        testID="weekly-plan-finalize"
-        style={[styles.button, chosenCount !== totalSlots && styles.buttonDisabled]}
-        disabled={chosenCount !== totalSlots || finalize.isPending}
-        onPress={() => finalize.mutate(selected)}
-      >
-        <Text style={styles.buttonText}>
-          {finalize.isPending
-            ? "Saving..."
-            : `Finalize plan (${chosenCount}/${totalSlots} chosen)`}
-        </Text>
-      </Pressable>
-      {finalize.isError ? <Text style={styles.error}>Couldn't save your plan — try again.</Text> : null}
-    </ScrollView>
-  );
+  const { t } = useI18n();
+  const [period, setPeriod] = useState(t("weekdays"));
+  const [day, setDay] = useState(1);
+  const [selected, setSelected] = useState([0, 0, 0, 0]);
+  const [locked, setLocked] = useState([true, true, false, false]);
+  const [toast, setToast] = useState("");
+  const days = period === t("weekdays") ? ["Mon\n13", "Tue\n14", "Wed\n15", "Thu\n16", "Fri\n17"] : ["Sat\n18", "Sun\n19"];
+  const flash = (x: string) => { setToast(x); setTimeout(() => setToast(""), 1800); };
+  return <View style={s.screen} testID="weekly-plan-screen"><ScrollView contentContainerStyle={s.page} showsVerticalScrollIndicator={false}>
+    <View style={s.header}><Pressable onPress={() => router.back()}><Text style={s.back}>‹</Text></Pressable><Text style={s.title}>{t("weeklyTitle")}</Text><Pressable onPress={() => flash("Only unlocked meals were refreshed")}><Text style={s.refresh}>↻</Text></Pressable></View>
+    <Segmented options={[t("weekdays"), t("weekend")]} value={period} onChange={(v) => { setPeriod(v); setDay(0); }} />
+    <View style={s.range}><Text style={s.rangeText}>{period === t("weekdays") ? "13 – 17 May 2024" : "18 – 19 May 2024"}</Text></View>
+    <View style={s.days}>{days.map((x, i) => <Pressable key={x} style={[s.day, day === i && s.dayActive]} onPress={() => setDay(i)}><Text style={[s.dayText, day === i && s.dayTextActive]}>{x}</Text></Pressable>)}</View>
+    <View style={s.legend}><Text style={s.legendText}>{t("mealClasses")}</Text><Text style={s.selected}>● {t("selected")}</Text></View>
+    {classes.map((group, groupIndex) => <View style={s.group} key={group.key}><View style={s.groupHead}><View><Text style={s.groupTitle}>{t(group.key)}</Text><Text style={s.intent}>{t(group.intent)}</Text></View><Pressable onPress={() => setLocked((old) => old.map((v, i) => i === groupIndex ? !v : v))}><Text style={[s.lock, locked[groupIndex] && s.locked]}>{locked[groupIndex] ? "▣" : "▢"}</Text></Pressable></View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.options}>{group.options.map((name, i) => <Pressable testID={`weekly-plan-${groupIndex}-${i}`} key={name} style={[s.option, selected[groupIndex] === i && s.optionActive]} onPress={() => setSelected((old) => old.map((v, k) => k === groupIndex ? i : v))} onLongPress={() => router.push({ pathname: "/meal-detail", params: { meal: name } })}><View><Image source={FOOD} style={s.food} /><View style={[s.number, selected[groupIndex] === i && s.numberActive]}><Text style={s.numberText}>{i + 1}</Text></View>{selected[groupIndex] === i ? <View style={s.check}><Text style={s.checkText}>✓</Text></View> : null}</View><Text numberOfLines={2} style={s.optionName}>{name}</Text></Pressable>)}</ScrollView>
+    </View>)}
+    <FButton label={t("copyPlan")} onPress={() => flash("Tuesday’s plan copied successfully")} />
+  </ScrollView><Toast visible={!!toast} text={toast} /></View>;
 }
 
-const styles = StyleSheet.create({
-  container: { padding: 24, gap: 14 },
-  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
-  header: { fontSize: 24, fontWeight: "600" },
-  subheader: { color: "#6B6B6B", marginBottom: 4 },
-  dayBlock: { borderTopWidth: 1, borderTopColor: "#EEE", paddingTop: 10, gap: 8 },
-  dayTitle: { fontSize: 16, fontWeight: "700" },
-  slotRow: { gap: 6 },
-  slotLabel: { fontSize: 13, color: "#6B6B6B", textTransform: "capitalize" },
-  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: {
-    borderWidth: 1,
-    borderColor: "#1F7A3F",
-    borderRadius: 16,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  chipChosen: { backgroundColor: "#1F7A3F" },
-  chipText: { color: "#1F7A3F", fontSize: 12 },
-  chipTextChosen: { color: "white" },
-  noClasses: { color: "#B8860B", fontSize: 12 },
-  button: { backgroundColor: "#1F7A3F", borderRadius: 8, padding: 14, alignItems: "center", marginTop: 8 },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: "white", fontWeight: "600" },
-  error: { color: "#C0392B", textAlign: "center" },
-});
+const s = StyleSheet.create({ screen: { flex: 1, backgroundColor: palette.bg }, page: { padding: 18, paddingBottom: 110 }, header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 15 }, back: { fontSize: 34, color: palette.ink }, title: { fontSize: 18, fontWeight: "800", color: palette.ink }, refresh: { fontSize: 22 }, range: { alignItems: "center", paddingVertical: 16 }, rangeText: { fontWeight: "700", color: palette.ink }, days: { flexDirection: "row", justifyContent: "space-between", marginBottom: 16 }, day: { minWidth: 47, paddingVertical: 9, borderRadius: 10, alignItems: "center" }, dayActive: { backgroundColor: palette.purple }, dayText: { textAlign: "center", fontSize: 12, lineHeight: 18, color: palette.ink }, dayTextActive: { color: "white", fontWeight: "700" }, legend: { flexDirection: "row", justifyContent: "space-between", paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: palette.line }, legendText: { fontSize: 11, color: palette.muted, fontWeight: "700" }, selected: { fontSize: 11, color: palette.green }, group: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: palette.line }, groupHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 9 }, groupTitle: { fontSize: 15, fontWeight: "800", color: palette.ink }, intent: { fontSize: 11, color: palette.muted, marginTop: 2 }, lock: { color: palette.muted, fontSize: 20 }, locked: { color: palette.green }, options: { gap: 9, paddingRight: 8 }, option: { width: 98, padding: 5, borderRadius: 12, borderWidth: 1, borderColor: "transparent", backgroundColor: palette.beige }, optionActive: { borderColor: palette.green, backgroundColor: "#F7FFF9" }, food: { width: 86, height: 59, borderRadius: 9 }, number: { position: "absolute", left: 3, top: 3, width: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center", backgroundColor: "#2B2926" }, numberActive: { backgroundColor: palette.green }, numberText: { color: "white", fontSize: 10, fontWeight: "800" }, check: { position: "absolute", right: 3, top: 3, width: 18, height: 18, borderRadius: 9, backgroundColor: palette.green, alignItems: "center", justifyContent: "center" }, checkText: { color: "white", fontSize: 11 }, optionName: { textAlign: "center", fontSize: 9, lineHeight: 12, color: palette.ink, marginTop: 5 }, });

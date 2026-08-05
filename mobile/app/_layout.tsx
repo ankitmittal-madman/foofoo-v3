@@ -11,6 +11,7 @@ import { SessionProvider } from "@/auth/SessionContext";
 import { queryClient, restoreQueryCache, startQueryCachePersistence } from "@/lib/queryClient";
 import { flushFeedbackQueue } from "@/api/feedback";
 import { ThemeProvider, useTheme } from "@/theme";
+import { I18nProvider } from "@/i18n";
 
 // Ghar theme + brand fonts (Fraunces/Mukta) ported from scareme21-create/NewFoo's root
 // layout — held the native splash until fonts are ready, so the first frame never
@@ -57,9 +58,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <ThemeProvider>
-          <RootNavigator />
-        </ThemeProvider>
+        <I18nProvider><ThemeProvider><RootNavigator /></ThemeProvider></I18nProvider>
       </SessionProvider>
     </QueryClientProvider>
   );
