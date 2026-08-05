@@ -5,6 +5,15 @@
 
 ## [Unreleased]
 
+### Deployed
+- Production Supabase received migrations 054, 055 and 056 plus deterministic ontology seed 146.
+  Validation preserved all 802 canonical dishes and produced usable meal-class mappings for all
+  of them: 547 enriched and 255 review-routed, with no pending jobs.
+- Deployed `dish-ontology` v1, `plan` v9 and `feedback` v6. Unauthenticated smoke tests return
+  401 and the ontology CORS preflight returns 204.
+- Deployed Fly.io release v124 with ontology-aware bundle `sha256:3d4cf579d1cf2565`; `/healthz`,
+  `/readyz` and `/v1/meta` passed after the rolling release.
+
 ### Fixed
 - The ontology layer now feeds the current recommendation engine through a deterministic,
   content-hashed `food_ontology_snapshot.json` bundled at build time. Runtime lookup preserves the

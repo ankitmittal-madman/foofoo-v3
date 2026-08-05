@@ -19,6 +19,15 @@ The existing deterministic `classify_dishes.py` research output is retained and 
 new normalized mapping tables. New unknown dishes use external research first and then stop at
 `pending_ai` or `review` until the model policy described in Section 8 is approved.
 
+### Production release status — 2026-08-05
+
+Migrations 054, 055 and 056 and seed 146 are live on Supabase project
+`cmkswalqpmmqojwdmqbv`. The production catalogue retained all 802 dishes; every dish has a usable
+meal-class mapping, 547 are `enriched`, and 255 are deliberately routed to `review`. The
+`dish-ontology` v1, `plan` v9 and `feedback` v6 Edge Functions are active. Fly.io release v124 is
+healthy and serves immutable bundle `sha256:3d4cf579d1cf2565`. The compatibility fallback remains
+enabled for the monitored rollout window, and unknown-dish AI promotion remains disabled.
+
 ## 1. Architecture Plan
 
 The subsystem follows one direction:
@@ -166,7 +175,7 @@ as the canonical source for household dishes or meal classes.
 No evaluated external source provides FooFoo's required class-first meal taxonomy. FooFoo should
 own that ontology and use external APIs as evidence enrichers, never as the planner's class truth.
 
-## 6. Migration and ETL Plan
+## 6. Migration, ETL and Rollout Runbook
 
 1. Apply migration `056_food_ontology_enrichment.sql` after the concurrent `055` migration.
 2. Run `database/etl/generate_food_ontology_seed.py`; CI should fail if its checked-in seed diff

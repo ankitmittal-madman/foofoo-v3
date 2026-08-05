@@ -31,16 +31,15 @@ findings are retained under `docs/archive/`.
 - Expand comfort-hero mapping beyond 17 of 36 resolved heroes.
 - Populate the regional-prior table for PanIndia and Global zones; 187 of 810 dishes currently
   receive no regional-prior boost.
-- Apply and live-verify migration 054, including its RLS-policy performance change and rollback.
-- Apply the concurrent migration 055, then migration 056 and seed 146; deploy and live-verify the
-  `dish-ontology` Edge Function and rebuilt ontology-aware RE bundle before routing user-added
-  dishes through it. Retain the compatibility fallback for one verified rollout window.
+- Monitor the ontology-aware Fly release and legacy CSV compatibility fallback for one verified
+  rollout window; remove the fallback only after parity and rollback evidence remain clean.
 - Configure `FLY_STAGING_*` variables/secrets and a protected `production` environment.
 - Archive dead `re_engine`-era ETL and validation scripts that target retired schemas.
 - Resolve unindexed-foreign-key and duplicate-index advisor findings.
-- Deploy and operationally verify the local release candidate: cached weather context, search and
-  filters, richer explanations, selective refresh, restart-safe query/feedback persistence, MMR
-  reranking, offline evaluation, bounded graph traversal, migration 054, and CI/deployment changes.
+- Deploy and operationally verify the remaining client/operational release candidate: mobile
+  search and filters, richer explanations, selective refresh, restart-safe query/feedback
+  persistence, and CI/deployment workflow changes. The ontology database, affected Edge
+  Functions, cached-weather/MMR-capable RE image and immutable bundle are live.
 - Run production catalogue-scale load/soak tests and revisit Fly.io sizing. The local 810-dish run
   is evidence for local behavior only.
 

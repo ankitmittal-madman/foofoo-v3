@@ -12,42 +12,44 @@
 > Expo Doctor (18/18), Android bundle export and Vercel web export pass. OneSignal server
 > credentials are configured; a physical-device native build remains the final push-delivery test.
 
-> **Local release candidate (not yet claimed deployed):** search/filter UI and API, cached live
+> **Production ontology/recommendation release:** migrations 054, 055 and 056 plus seed 146 are
+> live on `cmkswalqpmmqojwdmqbv`. All 802 production dishes are mapped to usable meal classes:
+> 547 are enriched and 255 are explicitly in review, with no pending enrichment jobs. The
+> `dish-ontology` v1, `plan` v9 and `feedback` v6 Edge Functions are active. Fly.io release v124
+> is healthy on both checks and serves immutable RE bundle `sha256:3d4cf579d1cf2565`. The legacy
+> CSV fallback remains enabled for one monitored rollback window. Unknown-dish AI promotion is
+> still disabled pending the Section 8 model/safety decisions in the ontology architecture.
+>
+> **Remaining local release candidate:** search/filter UI, cached live
 > weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
 > query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
-> migration 054 RLS optimization, pinned container bases, staging/manual-production workflows and
+> pinned container bases, staging/manual-production workflows and
 > mobile CI are implemented. Verification passes: 712 Python tests (27 skipped), 85 Deno tests,
 > 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
 > run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
-> A normalized food-ontology ingestion gate is also implemented locally in migration 056 + seed
-> 146: all 810 bundled dishes have deterministic per-field evidence and class mappings; future
-> canonical dish writes are queued at the database boundary; user dishes stage through a new
-> authenticated Edge Function with FoodOn and optional USDA research. It is not deployed, and
-> unknown-dish AI promotion remains disabled pending model/safety policy approval. A deterministic
-> planning-safe ontology snapshot is now part of the versioned RE bundle and preserves current
-> primary/multi-class lookup exactly; the legacy CSV fallback protects staged rollout and rollback.
 
 | Dimension | % |
 |---|---|
 | Overall Production Readiness | ~78% |
 | Architecture | 80% |
 | Backend (Edge Functions) | 90% |
-| Recommendation Engine | 80% |
-| Food Ontology | 60% |
+| Recommendation Engine | 85% |
+| Food Ontology | 75% |
 | Knowledge Graph | 0% (no graph structure exists — flat lookup tables only) |
 | Seed Data | 90% |
-| Database | 90% |
+| Database | 95% |
 | Security | 80% |
 | Testing | 75% (backend suites green — 85 Deno + 712 repository Python tests; mobile has infra but no physical-device coverage yet) |
-| Deployment | 90% (live-verified healthy; `household`/`plan` redeployed 2026-08-04 with this session's fixes) |
+| Deployment | 95% (ontology DB/Edge and RE bundle live-verified 2026-08-05; mobile/device release remains) |
 | Frontend (mobile) | 70% |
 | Observability | 45% (webhook alerting sink wired to every 500-level error path; no webhook URL configured yet) |
 
 ## One-line state per major component
-- **RE core/service:** implemented, repository Python suite green (712 passed, 27 skipped), deployed, live-healthy.
+- **RE core/service:** implemented, repository Python suite green (712 passed, 27 skipped), Fly
+  release v124 live-healthy with bundle `sha256:3d4cf579d1cf2565`.
 - **Edge Functions:** implemented and tested (85 tests); auth/ownership model correct;
-  `household` and `plan` redeployed 2026-08-04 with the P0-1/P0-4/P1-3/P1-4/P1-7 fixes.
+  `dish-ontology` v1, `plan` v9 and `feedback` v6 deployed 2026-08-05.
 - **Mobile app:** onboarding/cold-start/weekly-plan work; explanation, history, profile-edit, and
   DPDP export/delete UI added 2026-08-04 (P0-2/P0-4/P1-2/P1-3/P1-4); jest infra stood up with 9
   pure-logic tests; Expo SDK 53 + OneSignal SDK integration passes typecheck, Expo Doctor, and an
@@ -56,7 +58,8 @@
   correct; the `household_context` write gap (P0-1) is fixed and deployed — new requests now
   persist correctly.
 - **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; a normalized,
-  provenance-backed dish enrichment layer and class-bound candidate view are implemented locally;
+  provenance-backed dish enrichment layer and class-bound candidate view are live for all 802
+  production dishes;
   region/nutrition/comfort-hero/substitution real but narrow. A local bounded graph
   traversal/provenance layer now connects dishes, ingredients and curated substitutions; broader
   ontology review, festival mapping and clinically governed health-condition suitability remain
