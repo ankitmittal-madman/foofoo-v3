@@ -1,263 +1,54 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, Share, StyleSheet, Text, View } from "react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-
 import { describeApiError } from "@/api/errorMessages";
 import { postFeedback } from "@/api/feedback";
 import { fetchMealEpisodes, setPlanSlotLock } from "@/api/plan";
 import type { MealEpisode, Slot } from "@/api/plan";
 import type { FeedbackEventType } from "@/api/types";
+import { useI18n } from "@/i18n";
+import { palette, Skeleton } from "@/ui/foofoo";
 
-interface Props {
-  slot: Slot;
-  weekday: string;
-  slotDate: string;
-  classCode?: string;
-  initiallyLocked: boolean;
-  refreshNonce: number;
-}
+const FOOD = require("../../assets/images/poha-idli-fruit.png");
+interface Props { slot: Slot; weekday: string; slotDate: string; classCode?: string; initiallyLocked: boolean; refreshNonce: number }
 
-/** The PRD's atomic recommendation surface: one complete meal, with bounded alternatives. */
-export function MealEpisodeSection({
-  slot,
-  weekday,
-  slotDate,
-  classCode,
-  initiallyLocked,
-  refreshNonce,
-}: Props) {
-  const [locked, setLocked] = useState(initiallyLocked);
-  const [showAlternatives, setShowAlternatives] = useState(false);
+export function MealEpisodeSection({ slot, weekday, slotDate, classCode, initiallyLocked, refreshNonce }: Props) {
+  const { t } = useI18n(); const [locked, setLocked] = useState(initiallyLocked); const [showAlternatives, setShowAlternatives] = useState(false);
   const effectiveRefresh = locked ? 0 : refreshNonce;
-  const query = useQuery({
-    queryKey: ["meal-episodes", slotDate, classCode ?? null, effectiveRefresh],
-    queryFn: () => fetchMealEpisodes(slot, {
-      weekday,
-      class_code: classCode,
-      count: 4,
-    }),
-  });
-  const lock = useMutation({
-    mutationFn: (nextLocked: boolean) => setPlanSlotLock(weekday, slot, nextLocked, slotDate),
-    onSuccess: (_data, nextLocked) => setLocked(nextLocked),
-  });
-
+  const query = useQuery({ queryKey: ["meal-episodes", slotDate, classCode ?? null, effectiveRefresh], queryFn: () => fetchMealEpisodes(slot, { weekday, class_code: classCode, count: 4 }) });
+  const lock = useMutation({ mutationFn: (next: boolean) => setPlanSlotLock(weekday, slot, next, slotDate), onSuccess: (_data, next) => setLocked(next) });
   useEffect(() => setLocked(initiallyLocked), [initiallyLocked]);
 
-  if (query.isLoading) {
-    return <View style={styles.section}><Text style={styles.slot}>{slot}</Text><ActivityIndicator /></View>;
-  }
-  if (query.isError) {
-    return (
-      <View style={styles.section}>
-        <Text style={styles.slot}>{slot}</Text>
-        <Text style={styles.error}>{describeApiError(query.error)}</Text>
-        <Pressable style={styles.secondaryButton} onPress={() => query.refetch()}>
-          <Text style={styles.secondaryText}>Try again</Text>
-        </Pressable>
-      </View>
-    );
-  }
+  if (query.isLoading) return <View style={styles.section}><View style={styles.slotHeader}><Text style={styles.slot}>{t(slot)}</Text></View><Skeleton height={310} /></View>;
+  if (query.isError) return <View style={styles.section}><Text style={styles.slot}>{t(slot)}</Text><View style={styles.errorCard}><Text style={styles.error}>!  {describeApiError(query.error)}</Text><Pressable style={styles.retry} onPress={() => query.refetch()}><Text style={styles.retryText}>{t("tryAgain")}</Text></Pressable></View></View>;
 
-  const episodes = query.data?.episodes ?? [];
-  const primary = episodes[0];
-  return (
-    <View style={styles.section} testID={`episode-section-${slot}`}>
-      <View style={styles.slotHeader}>
-        <Text style={styles.slot}>{slot}</Text>
-        <Text style={styles.confidence}>
-          {primary?.predictions.calibration_status === "calibrated" ? "Strong fit" : "Safe starting point"}
-        </Text>
-      </View>
-      {primary ? (
-        <>
-          <EpisodeCard
-            episode={primary}
-            requestId={query.data?.request_id}
-            slot={slot}
-            onMakeThis={() => {
-              if (classCode && !locked) lock.mutate(true);
-            }}
-            onReasonedReplacement={() => query.refetch()}
-          />
-          <View style={styles.actionRow}>
-            <Pressable
-              testID={`episode-${slot}-alternatives`}
-              style={styles.primaryButton}
-              onPress={() => setShowAlternatives((value) => !value)}
-              accessibilityRole="button"
-            >
-              <Text style={styles.primaryText}>
-                {showAlternatives ? "Hide alternatives" : `Show ${Math.min(3, episodes.length - 1)} alternatives`}
-              </Text>
-            </Pressable>
-            {classCode ? (
-              <Pressable
-                testID={`episode-${slot}-lock`}
-                style={[styles.secondaryButton, locked && styles.locked]}
-                disabled={lock.isPending}
-                onPress={() => lock.mutate(!locked)}
-              >
-                <Text style={styles.secondaryText}>{locked ? "Locked" : "Lock"}</Text>
-              </Pressable>
-            ) : null}
-          </View>
-          {showAlternatives
-            ? episodes.slice(1, 4).map((episode) => (
-              <EpisodeCard
-                compact
-                key={episode.episode_hash}
-                episode={episode}
-                requestId={query.data?.request_id}
-                slot={slot}
-                onReasonedReplacement={() => query.refetch()}
-              />
-            ))
-            : null}
-        </>
-      ) : <Text style={styles.error}>No safe complete meal is available for this slot.</Text>}
-    </View>
-  );
+  const episodes = query.data?.episodes ?? []; const primary = episodes[0];
+  return <View style={styles.section} testID={`episode-section-${slot}`}><View style={styles.slotHeader}><View><Text style={styles.slot}>{t(slot)}</Text><Text style={styles.slotIntent}>{slot === "breakfast" ? t("lightStart") : slot === "lunch" ? t("balanced") : t("satisfying")}</Text></View><View style={[styles.fitPill, { flexDirection: "row", gap: 4 }]}><Text style={styles.fitText}>●</Text><Text style={styles.fitText}>{primary?.predictions.calibration_status === "calibrated" ? t("strongFit") : t("safeStart")}</Text></View></View>
+    {primary ? <><EpisodeCard episode={primary} requestId={query.data?.request_id} slot={slot} onMakeThis={() => { if (classCode && !locked) lock.mutate(true); }} onReasonedReplacement={() => query.refetch()} />
+      <View style={styles.controlRow}><Pressable testID={`episode-${slot}-alternatives`} style={({ pressed }) => [styles.alternativeButton, pressed && styles.pressed]} onPress={() => setShowAlternatives((v) => !v)}><Text style={styles.alternativeText}>{showAlternatives ? t("hideAlternatives") : t("showAlternatives")}</Text><Text style={styles.chevron}>{showAlternatives ? "⌃" : "⌄"}</Text></Pressable>{classCode ? <Pressable testID={`episode-${slot}-lock`} style={[styles.lockButton, locked && styles.locked]} disabled={lock.isPending} onPress={() => lock.mutate(!locked)}><Text style={[styles.lockText, locked && styles.lockTextActive]}>{locked ? "▣" : "▢"} {locked ? t("locked") : t("lock")}</Text></Pressable> : null}</View>
+      {showAlternatives ? <View style={styles.alternatives}>{episodes.slice(1, 4).map((episode) => <EpisodeCard compact key={episode.episode_hash} episode={episode} requestId={query.data?.request_id} slot={slot} onReasonedReplacement={() => query.refetch()} />)}</View> : null}</> : <View style={styles.errorCard}><Text style={styles.error}>{t("noSafeMeal")}</Text></View>}
+  </View>;
 }
 
-function EpisodeCard({
-  episode,
-  requestId,
-  slot,
-  compact = false,
-  onMakeThis,
-  onReasonedReplacement,
-}: {
-  episode: MealEpisode;
-  requestId?: string;
-  slot: Slot;
-  compact?: boolean;
-  onMakeThis?: () => void;
-  onReasonedReplacement: () => void;
-}) {
-  const [askReason, setAskReason] = useState(false);
-  const primaryDish = episode.components.find((component) => component.dish_id !== null);
-  const feedback = useMutation({
-    mutationFn: (input: { eventType: FeedbackEventType; detail?: Record<string, unknown> }) => {
-      if (!requestId) return Promise.reject(new Error("no request_id on this episode slate"));
-      return postFeedback({
-        request_id: requestId,
-        event_type: input.eventType,
-        dish_name: primaryDish?.dish_name,
-        slot,
-        detail: { episode_hash: episode.episode_hash, ...input.detail },
-      });
-    },
-  });
+function EpisodeCard({ episode, requestId, slot, compact = false, onMakeThis, onReasonedReplacement }: { episode: MealEpisode; requestId?: string; slot: Slot; compact?: boolean; onMakeThis?: () => void; onReasonedReplacement: () => void }) {
+  const { t } = useI18n(); const [askReason, setAskReason] = useState(false); const [saved, setSaved] = useState(false); const primaryDish = episode.components.find((x) => x.dish_id !== null);
+  const feedback = useMutation({ mutationFn: (input: { eventType: FeedbackEventType; detail?: Record<string, unknown> }) => { if (!requestId) return Promise.reject(new Error("no request_id on this episode slate")); return postFeedback({ request_id: requestId, event_type: input.eventType, dish_name: primaryDish?.dish_name, slot, detail: { episode_hash: episode.episode_hash, ...input.detail } }); } });
+  const replace = (eventType: FeedbackEventType) => feedback.mutate({ eventType }, { onSuccess: onReasonedReplacement });
+  const detail = () => router.push({ pathname: "/meal-detail", params: { meal: episode.display_name, slot } });
 
-  function replace(eventType: FeedbackEventType) {
-    feedback.mutate({ eventType }, { onSuccess: onReasonedReplacement });
-  }
-
-  return (
-    <View
-      style={[styles.card, compact && styles.compactCard]}
-      testID={compact ? undefined : `episode-${slot}-primary`}
-    >
-      {primaryDish?.image_url ? <Image source={{ uri: primaryDish.image_url }} style={styles.image} /> : null}
-      <Text style={styles.intent}>{episode.intent.replaceAll("_", " ")}</Text>
-      <Text style={styles.mealName}>{episode.display_name}</Text>
-      <Text style={styles.components}>
-        {episode.components.map((component) => component.dish_name).join(" + ")}
-      </Text>
-      <Text style={styles.practicality}>
-        {episode.practicality.active_minutes} active min · {episode.practicality.burner_peak} burner
-        {episode.practicality.burner_peak === 1 ? "" : "s"} · {episode.practicality.vessel_count} vessels
-      </Text>
-      {episode.reasons.slice(0, compact ? 1 : 3).map((reason) => (
-        <Text key={reason} style={styles.reason}>• {reason}</Text>
-      ))}
-      {!compact ? (
-        <View style={styles.actionRow}>
-          <Pressable
-            testID={`episode-${slot}-make-this`}
-            style={styles.primaryButton}
-            disabled={feedback.isPending || !requestId}
-            onPress={() => feedback.mutate({ eventType: "make_this" }, { onSuccess: onMakeThis })}
-          >
-            <Text style={styles.primaryText}>Make this</Text>
-          </Pressable>
-          <Pressable
-            testID={`episode-${slot}-not-today`}
-            style={styles.secondaryButton}
-            onPress={() => setAskReason((value) => !value)}
-          >
-            <Text style={styles.secondaryText}>Not today</Text>
-          </Pressable>
-        </View>
-      ) : null}
-      {askReason ? (
-        <View style={styles.reasonRow}>
-          <Pressable
-            testID={`episode-${slot}-reason-too-much-work`}
-            style={styles.reasonButton}
-            onPress={() => replace("too_much_work")}
-          >
-            <Text style={styles.reasonButtonText}>Too much work</Text>
-          </Pressable>
-          <Pressable
-            testID={`episode-${slot}-reason-missing-ingredient`}
-            style={styles.reasonButton}
-            onPress={() => replace("missing_ingredient")}
-          >
-            <Text style={styles.reasonButtonText}>Missing item</Text>
-          </Pressable>
-          <Pressable
-            testID={`episode-${slot}-reason-member-objection`}
-            style={styles.reasonButton}
-            onPress={() => replace("member_objection")}
-          >
-            <Text style={styles.reasonButtonText}>Member objected</Text>
-          </Pressable>
-          <Pressable
-            testID={`episode-${slot}-reason-different-mood`}
-            style={styles.reasonButton}
-            onPress={() => replace("not_today")}
-          >
-            <Text style={styles.reasonButtonText}>Different mood</Text>
-          </Pressable>
-        </View>
-      ) : null}
-      {primaryDish ? (
-        <Pressable
-          testID={`episode-${slot}-recipe`}
-          onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: primaryDish.dish_name } })}
-        >
-          <Text style={styles.recipeLink}>View cooking details</Text>
-        </Pressable>
-      ) : null}
+  return <View style={[styles.card, compact && styles.compactCard]} testID={compact ? undefined : `episode-${slot}-primary`}>
+    <View style={styles.imageWrap}><Image source={primaryDish?.image_url ? { uri: primaryDish.image_url } : FOOD} style={[styles.image, compact && styles.compactImage]} /><View style={styles.photoShade} /><View style={styles.intentPill}><Text style={styles.intent}>{episode.intent.replaceAll("_", " ")}</Text></View>{!compact ? <Pressable accessibilityLabel={saved ? t("saved") : t("save")} onPress={() => setSaved(!saved)} style={styles.floatingSave}><Text style={[styles.heart, saved && styles.heartSaved]}>{saved ? "♥" : "♡"}</Text></Pressable> : null}<View style={styles.photoCopy}><Text numberOfLines={2} style={[styles.mealName, compact && styles.compactMealName]}>{episode.display_name}</Text>{!compact ? <Text numberOfLines={2} style={styles.components}>{episode.components.map((x) => x.dish_name).join(" + ")}</Text> : null}</View></View>
+    <View style={styles.cardBody}><Text style={styles.practicality}>{episode.practicality.active_minutes} active min · {episode.practicality.burner_peak} burner{episode.practicality.burner_peak === 1 ? "" : "s"} · {episode.practicality.vessel_count} vessels</Text>{episode.reasons.slice(0, compact ? 1 : 2).map((reason) => <Text key={reason} numberOfLines={1} style={styles.reason}>✓  {reason}</Text>)}
+      {!compact ? <><View style={styles.socialRow}><Social icon={saved ? "♥" : "♡"} label={saved ? t("saved") : t("save")} onPress={() => setSaved(!saved)} active={saved} /><Social testID={`episode-${slot}-not-today`} icon="×" label={t("notToday")} onPress={() => setAskReason(!askReason)} /><Social icon="↗" label={t("share")} onPress={() => Share.share({ message: `${episode.display_name} · FooFoo` })} /><Social icon="ⓘ" label={t("details")} onPress={detail} /></View>
+        <Pressable testID={`episode-${slot}-make-this`} disabled={feedback.isPending || !requestId} style={({ pressed }) => [styles.makeButton, pressed && styles.pressed, (!requestId || feedback.isPending) && styles.disabled]} onPress={() => feedback.mutate({ eventType: "make_this" }, { onSuccess: onMakeThis })}><Text style={styles.makeText}>＋ {t("makeThis")}</Text></Pressable></> : <Pressable style={styles.swapButton} onPress={() => replace("not_today")}><Text style={styles.swapText}>↻ {t("selectThis")}</Text></Pressable>}
+      {askReason ? <View style={styles.reasonRow}><Reason testID={`episode-${slot}-reason-too-much-work`} label={t("tooMuchWork")} onPress={() => replace("too_much_work")} /><Reason testID={`episode-${slot}-reason-missing-ingredient`} label={t("missingItem")} onPress={() => replace("missing_ingredient")} /><Reason testID={`episode-${slot}-reason-member-objection`} label={t("memberObjected")} onPress={() => replace("member_objection")} /><Reason testID={`episode-${slot}-reason-different-mood`} label={t("differentMood")} onPress={() => replace("not_today")} /></View> : null}
+      {primaryDish ? <Pressable testID={`episode-${slot}-recipe`} onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: primaryDish.dish_name } })}><Text style={styles.recipeLink}>{t("cookingDetails")}  ›</Text></Pressable> : null}
     </View>
-  );
+  </View>;
 }
 
-const styles = StyleSheet.create({
-  section: { gap: 10, borderTopWidth: 1, borderTopColor: "#E9E4D8", paddingTop: 14 },
-  slotHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  slot: { fontSize: 19, fontWeight: "700", textTransform: "capitalize" },
-  confidence: { color: "#5C6B55", fontSize: 12 },
-  card: { borderWidth: 1, borderColor: "#DED8CB", borderRadius: 14, padding: 14, gap: 7, backgroundColor: "#FFFCF5" },
-  compactCard: { backgroundColor: "white", padding: 11 },
-  image: { width: "100%", height: 130, borderRadius: 10, backgroundColor: "#EEE" },
-  intent: { color: "#8A5A21", fontSize: 12, fontWeight: "700", textTransform: "capitalize" },
-  mealName: { fontSize: 18, fontWeight: "700" },
-  components: { fontSize: 13, color: "#444" },
-  practicality: { fontSize: 12, color: "#5C6B55", fontWeight: "600" },
-  reason: { fontSize: 12, color: "#666" },
-  actionRow: { flexDirection: "row", gap: 8 },
-  primaryButton: { flex: 1, backgroundColor: "#1F7A3F", borderRadius: 8, padding: 10, alignItems: "center" },
-  primaryText: { color: "white", fontWeight: "700", fontSize: 12 },
-  secondaryButton: { borderWidth: 1, borderColor: "#1F7A3F", borderRadius: 8, padding: 10, alignItems: "center" },
-  secondaryText: { color: "#1F7A3F", fontWeight: "700", fontSize: 12 },
-  locked: { backgroundColor: "#EAF4ED" },
-  reasonRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  reasonButton: { borderWidth: 1, borderColor: "#D8D1C4", borderRadius: 14, paddingVertical: 6, paddingHorizontal: 9 },
-  reasonButtonText: { fontSize: 11, color: "#555" },
-  recipeLink: { color: "#4A6FA5", fontSize: 12, fontWeight: "600" },
-  error: { color: "#C0392B" },
-});
+function Social({ icon, label, onPress, active, testID }: { icon: string; label: string; onPress: () => void; active?: boolean; testID?: string }) { return <Pressable testID={testID} style={({ pressed }) => [styles.social, pressed && styles.socialPressed]} onPress={onPress}><Text style={[styles.socialIcon, active && { color: palette.red }]}>{icon}</Text><Text numberOfLines={1} style={styles.socialLabel}>{label}</Text></Pressable>; }
+function Reason({ label, onPress, testID }: { label: string; onPress: () => void; testID: string }) { return <Pressable testID={testID} style={styles.reasonButton} onPress={onPress}><Text style={styles.reasonButtonText}>{label}</Text></Pressable>; }
+
+const styles = StyleSheet.create({ section: { gap: 10 }, slotHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" }, slot: { fontSize: 19, fontWeight: "800", color: palette.ink }, slotIntent: { color: palette.muted, fontSize: 11, marginTop: 2 }, fitPill: { borderRadius: 12, backgroundColor: "#EAF9F0", paddingHorizontal: 9, paddingVertical: 5 }, fitText: { color: "#17894E", fontSize: 9, fontWeight: "700" }, card: { borderWidth: 1, borderColor: palette.line, borderRadius: 20, overflow: "hidden", backgroundColor: palette.surface, shadowColor: "#372C25", shadowOpacity: .1, shadowRadius: 15, shadowOffset: { width: 0, height: 7 }, elevation: 4 }, compactCard: { borderRadius: 16, shadowOpacity: .04 }, imageWrap: { height: 280, justifyContent: "flex-end" }, compactImage: { height: 142 }, image: { ...StyleSheet.absoluteFillObject, width: "100%", height: "100%", backgroundColor: palette.beige }, photoShade: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(24,18,15,.25)" }, intentPill: { position: "absolute", left: 14, top: 14, paddingHorizontal: 9, paddingVertical: 5, borderRadius: 7, backgroundColor: palette.amber }, intent: { color: "white", fontSize: 10, fontWeight: "800", textTransform: "capitalize" }, floatingSave: { position: "absolute", right: 13, top: 13, width: 42, height: 42, borderRadius: 21, backgroundColor: "#FFFD", alignItems: "center", justifyContent: "center" }, heart: { fontSize: 23, color: palette.ink }, heartSaved: { color: palette.red }, photoCopy: { padding: 16 }, mealName: { color: "white", fontSize: 23, lineHeight: 28, fontWeight: "800", textShadowColor: "#0006", textShadowRadius: 6 }, compactMealName: { fontSize: 17, lineHeight: 21 }, components: { color: "#FFF", fontSize: 12, marginTop: 5, textShadowColor: "#0008", textShadowRadius: 4 }, cardBody: { padding: 14, gap: 8 }, practicality: { fontSize: 11, color: palette.green, fontWeight: "800" }, reason: { fontSize: 11, color: palette.muted }, socialRow: { flexDirection: "row", justifyContent: "space-between", paddingTop: 5 }, social: { flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", gap: 2, borderRadius: 10 }, socialPressed: { backgroundColor: palette.beige }, socialIcon: { fontSize: 20, color: palette.ink }, socialLabel: { fontSize: 9, color: palette.muted, maxWidth: "95%" }, makeButton: { minHeight: 48, borderRadius: 13, backgroundColor: palette.purple, alignItems: "center", justifyContent: "center" }, makeText: { color: "white", fontWeight: "800", fontSize: 13 }, pressed: { opacity: .78, transform: [{ scale: .99 }] }, disabled: { opacity: .45 }, reasonRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, paddingTop: 3 }, reasonButton: { borderWidth: 1, borderColor: palette.line, backgroundColor: palette.beige, borderRadius: 16, paddingVertical: 7, paddingHorizontal: 10 }, reasonButtonText: { fontSize: 10, color: palette.ink }, recipeLink: { color: palette.purple, fontSize: 11, fontWeight: "700", textAlign: "center", paddingVertical: 3 }, controlRow: { flexDirection: "row", gap: 8 }, alternativeButton: { flex: 1, minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderWidth: 1, borderColor: palette.line, backgroundColor: palette.surface, borderRadius: 13 }, alternativeText: { color: palette.purple, fontWeight: "700", fontSize: 11 }, chevron: { color: palette.purple }, lockButton: { minHeight: 44, paddingHorizontal: 13, borderRadius: 13, borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center", backgroundColor: palette.surface }, locked: { borderColor: palette.green, backgroundColor: "#EAF9F0" }, lockText: { color: palette.muted, fontSize: 11, fontWeight: "700" }, lockTextActive: { color: palette.green }, alternatives: { gap: 10 }, swapButton: { borderRadius: 10, borderWidth: 1, borderColor: palette.purple, minHeight: 38, alignItems: "center", justifyContent: "center" }, swapText: { color: palette.purple, fontWeight: "700", fontSize: 11 }, errorCard: { padding: 18, borderRadius: 14, backgroundColor: "#FFF1F1", gap: 10 }, error: { color: palette.red, fontSize: 12 }, retry: { alignSelf: "flex-start", paddingHorizontal: 13, paddingVertical: 8, borderRadius: 10, backgroundColor: palette.red }, retryText: { color: "white", fontWeight: "700" } });

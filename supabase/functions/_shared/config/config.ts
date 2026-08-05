@@ -28,6 +28,13 @@ export interface AppConfig {
   readonly openWeatherMapApiKey: string | null;
   /** Optional USDA FoodData Central key; external enrichment still uses keyless FoodOn if absent. */
   readonly usdaFoodDataApiKey: string | null;
+  /** Optional Groq key. When absent, deterministic/external enrichment continues without AI. */
+  readonly groqApiKey: string | null;
+  readonly groqModel: string;
+  readonly aiDailyRequestBudget: number;
+  readonly aiDailyTokenBudget: number;
+  readonly aiMinUsableConfidence: number;
+  readonly aiDirectPublishConfidence: number;
 }
 
 /** Dev-only defaults for the Ghar RE service. NEVER used in staging/production (guarded below). */
@@ -56,6 +63,11 @@ function normalizeEnv(raw: string | null): Environment {
     default:
       return "local";
   }
+}
+
+function boundedNumber(raw: string | null, fallback: number, min: number, max: number): number {
+  const value = Number(raw);
+  return Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
 }
 
 /**
@@ -96,6 +108,32 @@ export function loadConfig(): AppConfig {
     oneSignalAppId: read(ENV_VARS.ONESIGNAL_APP_ID),
     openWeatherMapApiKey: read(ENV_VARS.OPENWEATHERMAP_API_KEY),
     usdaFoodDataApiKey: read(ENV_VARS.USDA_FOODDATA_API_KEY),
+    groqApiKey: read(ENV_VARS.GROQ_API_KEY),
+    groqModel: read(ENV_VARS.GROQ_MODEL) ?? "openai/gpt-oss-120b",
+    aiDailyRequestBudget: boundedNumber(
+      read(ENV_VARS.AI_FREE_DAILY_REQUEST_BUDGET),
+      800,
+      1,
+      10_000,
+    ),
+    aiDailyTokenBudget: boundedNumber(
+      read(ENV_VARS.AI_FREE_DAILY_TOKEN_BUDGET),
+      160_000,
+      1_000,
+      10_000_000,
+    ),
+    aiMinUsableConfidence: boundedNumber(
+      read(ENV_VARS.AI_MIN_USABLE_CONFIDENCE),
+      0.65,
+      0.5,
+      1,
+    ),
+    aiDirectPublishConfidence: boundedNumber(
+      read(ENV_VARS.AI_DIRECT_PUBLISH_CONFIDENCE),
+      0.8,
+      0.5,
+      1,
+    ),
   });
 }
 

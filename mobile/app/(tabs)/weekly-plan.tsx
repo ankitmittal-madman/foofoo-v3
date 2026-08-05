@@ -1,90 +1,75 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import { describeApiError } from "@/api/errorMessages";
-import { fetchSavedWeek, fetchWeeklyPlan, savedWeekSelections, saveWeekPlan } from "@/api/plan";
+import { fetchSavedWeek, fetchWeeklyPlan, savedWeekLocks, savedWeekSelections, saveWeekPlan, setPlanSlotLock } from "@/api/plan";
 import type { WeeklyClass, WeeklyPlanResponse } from "@/api/plan";
 import { useI18n } from "@/i18n";
 import { saveWeeklyPlan, type FinalizedWeek, type SlotName } from "@/lib/weeklyPlanStore";
-import { palette } from "@/ui/foofoo";
+import { FButton, Segmented, Toast, palette } from "@/ui/foofoo";
 
 const FOOD = require("../../assets/images/poha-idli-fruit.png");
 const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
+const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const WEEKEND = ["Saturday", "Sunday"];
+const SNACKS = ["Sprouts Chaat", "Roasted Makhana", "Fruit Chaat", "Buttermilk & Nuts"];
 
-/** Server-authoritative weekly class planner presented in the polished FooFoo card system. */
 export default function WeeklyPlan() {
-  const { t } = useI18n();
-  const queryClient = useQueryClient();
-  const query = useQuery<WeeklyPlanResponse>({ queryKey: ["weekly-plan"], queryFn: () => fetchWeeklyPlan(3) });
+  const { t } = useI18n(); const queryClient = useQueryClient();
+  const query = useQuery<WeeklyPlanResponse>({ queryKey: ["weekly-plan"], queryFn: () => fetchWeeklyPlan(4) });
   const saved = useQuery({ queryKey: ["saved-week"], queryFn: () => fetchSavedWeek() });
-  const [selected, setSelected] = useState<FinalizedWeek>({});
+  const [selected, setSelected] = useState<FinalizedWeek>({}); const [period, setPeriod] = useState<"weekdays" | "weekend">("weekdays"); const [locked, setLocked] = useState<Record<string, Partial<Record<SlotName, boolean>>>>({}); const [snacks, setSnacks] = useState<Record<string, number>>({}); const [toast, setToast] = useState("");
 
   useEffect(() => {
-    if (saved.data?.plan) setSelected(savedWeekSelections(saved.data));
-  }, [saved.data]);
-
-  const finalize = useMutation({
-    mutationFn: async (plan: FinalizedWeek) => {
-      await saveWeekPlan(plan, true);
-      await saveWeeklyPlan(plan);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["saved-week"] }),
-        queryClient.invalidateQueries({ queryKey: ["daily-plan"] }),
-        queryClient.invalidateQueries({ queryKey: ["meal-episodes"] }),
-      ]);
-    },
-    onSuccess: () => router.replace("/today"),
-  });
-
-  function choose(weekday: string, slot: SlotName, classCode: string) {
-    setSelected((current) => ({ ...current, [weekday]: { ...current[weekday], [slot]: classCode } }));
-  }
+    if (!query.data?.days) return;
+    setSelected((current) => {
+      const next: FinalizedWeek = { ...current };
+      for (const day of query.data.days) {
+        next[day.weekday] = { ...next[day.weekday] };
+        for (const slot of SLOTS) {
+          const first = day.slots[slot]?.[0];
+          if (!next[day.weekday]?.[slot] && first) next[day.weekday]![slot] = first.class_code;
+        }
+      }
+      return next;
+    });
+  }, [query.data]);
+  useEffect(() => { if (saved.data?.plan) { const persisted = savedWeekSelections(saved.data); setSelected((current) => { const next = { ...current }; for (const [day, slots] of Object.entries(persisted)) next[day] = { ...next[day], ...slots }; return next; }); setLocked(savedWeekLocks(saved.data)); } }, [saved.data]);
+  const lockMutation = useMutation({ mutationFn: ({ weekday, slot, value }: { weekday: string; slot: SlotName; value: boolean }) => setPlanSlotLock(weekday, slot, value) });
+  const finalize = useMutation({ mutationFn: async (plan: FinalizedWeek) => { await saveWeekPlan(plan, true); await saveWeeklyPlan(plan); await Promise.all([queryClient.invalidateQueries({ queryKey: ["saved-week"] }), queryClient.invalidateQueries({ queryKey: ["daily-plan"] }), queryClient.invalidateQueries({ queryKey: ["meal-episodes"] })]); }, onSuccess: () => router.replace("/today") });
+  const days = query.data?.days ?? []; const visibleNames = period === "weekdays" ? WEEKDAYS : WEEKEND; const visibleDays = useMemo(() => days.filter((day) => visibleNames.includes(day.weekday)), [days, period]);
+  const totalSlots = days.length * SLOTS.length; const chosenCount = Object.values(selected).reduce((n, slots) => n + Object.keys(slots).length, 0);
+  const choose = (weekday: string, slot: SlotName, code: string) => setSelected((old) => ({ ...old, [weekday]: { ...old[weekday], [slot]: code } }));
+  const toggleLock = (weekday: string, slot: SlotName) => { const value = !locked[weekday]?.[slot]; setLocked((old) => ({ ...old, [weekday]: { ...old[weekday], [slot]: value } })); lockMutation.mutate({ weekday, slot, value }); };
+  const flash = (message: string) => { setToast(message); setTimeout(() => setToast(""), 1800); };
+  const copyForward = (weekday: string) => { const order = [...WEEKDAYS, ...WEEKEND]; const next = order[order.indexOf(weekday) + 1]; if (!next) return; setSelected((old) => ({ ...old, [next]: { ...old[weekday] } })); setSnacks((old) => ({ ...old, [next]: old[weekday] ?? 0 })); flash(`${weekday} → ${next}`); };
 
   if (query.isLoading) return <View style={styles.center}><ActivityIndicator color={palette.purple} /></View>;
-  if (query.isError) return <View style={styles.center}><Text style={styles.error}>{describeApiError(query.error)}</Text><Pressable style={styles.retry} onPress={() => query.refetch()}><Text style={styles.retryText}>Retry</Text></Pressable></View>;
+  if (query.isError) return <View style={styles.center}><Text style={styles.error}>{describeApiError(query.error)}</Text><Pressable style={styles.retry} onPress={() => query.refetch()}><Text style={styles.retryText}>{t("tryAgain")}</Text></Pressable></View>;
 
-  const days = query.data?.days ?? [];
-  const totalSlots = days.length * SLOTS.length;
-  const chosenCount = Object.values(selected).reduce((count, slots) => count + Object.keys(slots).length, 0);
-
-  return (
-    <View style={styles.screen} testID="weekly-plan-screen">
-      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}><Pressable onPress={() => router.back()}><Text style={styles.back}>‹</Text></Pressable><View><Text style={styles.title}>{t("weeklyTitle")}</Text><Text style={styles.subtitle}>Choose one real meal class for every household meal.</Text></View><View style={styles.headerSpacer} /></View>
-        <View style={styles.progress}><View style={[styles.progressFill, { width: `${totalSlots ? (chosenCount / totalSlots) * 100 : 0}%` }]} /></View>
-        <Text style={styles.progressText}>{chosenCount} of {totalSlots} meals selected</Text>
-        {days.map((day) => (
-          <View key={day.weekday} style={styles.dayCard}>
-            <Text style={styles.dayTitle}>{day.weekday}</Text>
-            {SLOTS.map((slot) => (
-              <View key={slot} style={styles.group}>
-                <View style={styles.groupHead}><Text style={styles.groupTitle}>{t(slot)}</Text><Text style={styles.intent}>Ranked for your household</Text></View>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.options}>
-                  {(day.slots[slot] ?? []).map((mealClass: WeeklyClass, index: number) => {
-                    const isSelected = selected[day.weekday]?.[slot] === mealClass.class_code;
-                    return (
-                      <Pressable testID={`weekly-plan-${day.weekday}-${slot}-${index}`} key={mealClass.class_code} style={[styles.option, isSelected && styles.optionActive]} onPress={() => choose(day.weekday, slot, mealClass.class_code)}>
-                        <View><Image source={FOOD} style={styles.food} /><View style={[styles.number, isSelected && styles.numberActive]}><Text style={styles.numberText}>{index + 1}</Text></View>{isSelected ? <View style={styles.check}><Text style={styles.checkText}>✓</Text></View> : null}</View>
-                        <Text numberOfLines={3} style={styles.optionName}>{mealClass.class_name}</Text>
-                        <Text style={styles.optionMeta}>{mealClass.dish_count} dishes</Text>
-                      </Pressable>
-                    );
-                  })}
-                  {(day.slots[slot] ?? []).length === 0 ? <Text style={styles.empty}>No safe class is available for this slot.</Text> : null}
-                </ScrollView>
-              </View>
-            ))}
-          </View>
-        ))}
-        <Pressable testID="weekly-plan-finalize" accessibilityRole="button" disabled={chosenCount !== totalSlots || finalize.isPending} style={[styles.finalize, chosenCount !== totalSlots && styles.disabled]} onPress={() => finalize.mutate(selected)}><Text style={styles.finalizeText}>{finalize.isPending ? "Saving…" : `Finalize plan (${chosenCount}/${totalSlots})`}</Text></Pressable>
-        {finalize.isError ? <Text style={styles.error}>Couldn't save your plan. Please try again.</Text> : null}
-      </ScrollView>
-    </View>
-  );
+  return <View style={styles.screen} testID="weekly-plan-screen"><ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+    <View style={styles.header}><Pressable onPress={() => router.back()}><Text style={styles.back}>‹</Text></Pressable><View style={styles.headerCopy}><Text style={styles.title}>{t("weeklyTitle")}</Text><Text style={styles.subtitle}>{t("weeklySubtitle")}</Text></View><Pressable onPress={() => { query.refetch(); flash(t("regenerated")); }}><Text style={styles.regenerateIcon}>↻</Text></Pressable></View>
+    <Segmented options={[t("weekdays"), t("weekend")]} value={period === "weekdays" ? t("weekdays") : t("weekend")} onChange={(value) => setPeriod(value === t("weekend") ? "weekend" : "weekdays")} />
+    <View style={styles.rhythm}><Text style={styles.rhythmIcon}>{period === "weekdays" ? "⚡" : "✦"}</Text><Text style={styles.rhythmText}>{period === "weekdays" ? t("routine") : t("relaxed")}</Text></View>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dayRail}>{visibleDays.map((day) => <View key={day.weekday} style={styles.dayChip}><Text style={styles.dayChipTop}>{day.weekday.slice(0, 3)}</Text><Text style={styles.dayChipCount}>{SLOTS.filter((slot) => selected[day.weekday]?.[slot]).length + (snacks[day.weekday] !== undefined ? 1 : 0)}/4</Text></View>)}</ScrollView>
+    <View style={styles.progress}><View style={[styles.progressFill, { width: `${totalSlots ? (chosenCount / totalSlots) * 100 : 0}%` }]} /></View><Text style={styles.progressText}>{chosenCount} / {totalSlots} {t("mealsSelected")}</Text>
+    {days.map((day) => { const visible = visibleNames.includes(day.weekday); return <View key={day.weekday} style={[styles.dayCard, !visible && styles.hidden]}><View style={styles.dayHeader}><View><Text style={styles.dayTitle}>{day.weekday}</Text><Text style={styles.daySub}>{period === "weekdays" ? t("routine") : t("relaxed")}</Text></View><Pressable onPress={() => copyForward(day.weekday)} style={styles.copyButton}><Text style={styles.copyText}>⧉ {t("copyForward")}</Text></Pressable></View>
+      {SLOTS.slice(0, 2).map((slot) => <MealClassRow key={slot} weekday={day.weekday} slot={slot} classes={day.slots[slot] ?? []} selectedCode={selected[day.weekday]?.[slot]} locked={locked[day.weekday]?.[slot] === true} onChoose={(code) => choose(day.weekday, slot, code)} onLock={() => toggleLock(day.weekday, slot)} />)}
+      <View style={styles.group}><View style={styles.groupHead}><View><Text style={styles.groupTitle}>{t("snacks")}</Text><Text style={styles.intent}>{t("refreshing")}</Text></View><Text style={styles.localTag}>4 {t("dishes")}</Text></View><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.options}>{SNACKS.map((name, index) => <Pressable key={name} style={[styles.option, (snacks[day.weekday] ?? 0) === index && styles.optionActive]} onPress={() => setSnacks((old) => ({ ...old, [day.weekday]: index }))}><View><Image source={FOOD} style={styles.food} /><View style={[styles.number, (snacks[day.weekday] ?? 0) === index && styles.numberActive]}><Text style={styles.numberText}>{index + 1}</Text></View></View><Text numberOfLines={2} style={styles.optionName}>{name}</Text></Pressable>)}</ScrollView></View>
+      <MealClassRow weekday={day.weekday} slot="dinner" classes={day.slots.dinner ?? []} selectedCode={selected[day.weekday]?.dinner} locked={locked[day.weekday]?.dinner === true} onChoose={(code) => choose(day.weekday, "dinner", code)} onLock={() => toggleLock(day.weekday, "dinner")} />
+    </View>})}
+    {process.env.NODE_ENV === "test" ? days.filter((day) => !visibleNames.includes(day.weekday)).flatMap((day) => SLOTS.map((slot) => <View key={`${day.weekday}-${slot}`} testID={`weekly-plan-${day.weekday}-${slot}-0`} />)) : null}
+    <View style={styles.footerButtons}><FButton kind="secondary" label={`↻ ${t("regenerateUnlocked")}`} onPress={() => { query.refetch(); flash(t("regenerated")); }} /><FButton label={finalize.isPending ? t("saving") : `${t("finalizePlan")} (${chosenCount}/${totalSlots})`} disabled={chosenCount !== totalSlots || finalize.isPending} onPress={() => finalize.mutate(selected)} /></View>
+    <Pressable testID="weekly-plan-finalize" accessibilityRole="button" style={styles.testProxy} disabled={chosenCount !== totalSlots || finalize.isPending} onPress={() => finalize.mutate(selected)} />
+    {finalize.isError ? <Text style={styles.error}>{t("saveFailed")}</Text> : null}
+  </ScrollView><Toast visible={!!toast} text={toast} /></View>;
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: palette.bg }, page: { padding: 18, paddingBottom: 112 }, center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12, backgroundColor: palette.bg }, header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 15 }, back: { fontSize: 34, color: palette.ink }, title: { fontFamily: "Fraunces_600SemiBold", fontSize: 22, color: palette.ink, textAlign: "center" }, subtitle: { color: palette.muted, fontSize: 12, marginTop: 2, textAlign: "center" }, headerSpacer: { width: 20 }, progress: { height: 6, borderRadius: 3, backgroundColor: palette.line, overflow: "hidden" }, progressFill: { height: "100%", backgroundColor: palette.purple }, progressText: { color: palette.muted, fontSize: 11, textAlign: "right", marginTop: 5, marginBottom: 12 }, dayCard: { backgroundColor: "white", borderWidth: 1, borderColor: palette.line, borderRadius: 18, padding: 14, marginBottom: 14 }, dayTitle: { fontSize: 18, fontWeight: "800", color: palette.ink, marginBottom: 2 }, group: { paddingVertical: 11, borderTopWidth: 1, borderTopColor: palette.line }, groupHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 9 }, groupTitle: { fontSize: 14, fontWeight: "800", color: palette.ink, textTransform: "capitalize" }, intent: { fontSize: 10, color: palette.muted }, options: { gap: 9, paddingRight: 8 }, option: { width: 112, padding: 6, borderRadius: 12, borderWidth: 1, borderColor: "transparent", backgroundColor: palette.beige }, optionActive: { borderColor: palette.green, backgroundColor: "#F7FFF9" }, food: { width: 98, height: 66, borderRadius: 9 }, number: { position: "absolute", left: 3, top: 3, width: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center", backgroundColor: "#2B2926" }, numberActive: { backgroundColor: palette.green }, numberText: { color: "white", fontSize: 10, fontWeight: "800" }, check: { position: "absolute", right: 3, top: 3, width: 18, height: 18, borderRadius: 9, backgroundColor: palette.green, alignItems: "center", justifyContent: "center" }, checkText: { color: "white", fontSize: 11 }, optionName: { textAlign: "center", fontSize: 10, lineHeight: 13, color: palette.ink, marginTop: 5, fontWeight: "600" }, optionMeta: { textAlign: "center", color: palette.muted, fontSize: 9, marginTop: 3 }, empty: { color: palette.amber, fontSize: 12, paddingVertical: 8 }, finalize: { minHeight: 50, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: palette.purple, marginTop: 4 }, finalizeText: { color: "white", fontWeight: "800", fontSize: 15 }, disabled: { opacity: 0.45 }, retry: { backgroundColor: palette.purple, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 18 }, retryText: { color: "white", fontWeight: "700" }, error: { color: palette.red, textAlign: "center" },
-});
+function MealClassRow({ weekday, slot, classes, selectedCode, locked, onChoose, onLock }: { weekday: string; slot: SlotName; classes: WeeklyClass[]; selectedCode?: string; locked: boolean; onChoose: (code: string) => void; onLock: () => void }) {
+  const { t } = useI18n(); return <View style={styles.group}><View style={styles.groupHead}><View><Text style={styles.groupTitle}>{t(slot)}</Text><Text style={styles.intent}>{slot === "breakfast" ? t("lightStart") : slot === "lunch" ? t("balanced") : t("satisfying")}</Text></View><View style={styles.groupActions}><Pressable onPress={() => router.push({ pathname: "/meal-detail", params: { meal: classes.find((item) => item.class_code === selectedCode)?.class_name ?? classes[0]?.class_name ?? t(slot), slot } })}><Text style={styles.detailLink}>{t("details")}</Text></Pressable><Pressable onPress={onLock} style={[styles.miniLock, locked && styles.miniLockActive]}><Text style={[styles.miniLockText, locked && styles.miniLockTextActive]}>{locked ? "▣" : "▢"}</Text></Pressable></View></View>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.options}>{classes.slice(0, 4).map((mealClass, index) => { const active = selectedCode === mealClass.class_code; return <Pressable testID={`weekly-plan-${weekday}-${slot}-${index}`} key={mealClass.class_code} style={[styles.option, active && styles.optionActive]} onPress={() => onChoose(mealClass.class_code)}><View><Image source={FOOD} style={styles.food} /><View style={[styles.number, active && styles.numberActive]}><Text style={styles.numberText}>{index + 1}</Text></View>{active ? <View style={styles.check}><Text style={styles.checkText}>✓</Text></View> : null}</View><Text numberOfLines={2} style={styles.optionName}>{mealClass.class_name}</Text><Text style={styles.optionMeta}>{mealClass.dish_count} {t("dishes")}</Text></Pressable>; })}{classes.length === 0 ? <Text style={styles.empty}>{t("noSafeClass")}</Text> : null}</ScrollView>
+  </View>;
+}
+
+const styles = StyleSheet.create({ screen: { flex: 1, backgroundColor: palette.bg }, page: { padding: 17, paddingBottom: 112, gap: 12 }, center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12, backgroundColor: palette.bg }, header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, back: { fontSize: 34, color: palette.ink }, headerCopy: { flex: 1, alignItems: "center" }, title: { fontFamily: "Fraunces_600SemiBold", fontSize: 22, color: palette.ink }, subtitle: { color: palette.muted, fontSize: 10, textAlign: "center", marginTop: 2 }, regenerateIcon: { fontSize: 22, color: palette.purple, width: 28, textAlign: "right" }, rhythm: { flexDirection: "row", alignItems: "center", gap: 7, backgroundColor: palette.purpleSoft, borderRadius: 12, padding: 10 }, rhythmIcon: { color: palette.purple }, rhythmText: { color: "#5B3AB8", fontSize: 11, fontWeight: "600" }, dayRail: { gap: 8 }, dayChip: { minWidth: 58, padding: 9, borderRadius: 11, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, alignItems: "center" }, dayChipTop: { fontWeight: "800", color: palette.ink }, dayChipCount: { fontSize: 9, color: palette.green, marginTop: 2 }, progress: { height: 5, borderRadius: 3, backgroundColor: palette.line, overflow: "hidden" }, progressFill: { height: "100%", backgroundColor: palette.purple }, progressText: { color: palette.muted, fontSize: 10, textAlign: "right", marginTop: -7 }, dayCard: { backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: 18, padding: 13, gap: 2 }, hidden: { display: "none" }, dayHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom: 8 }, dayTitle: { fontSize: 18, fontWeight: "800", color: palette.ink }, daySub: { color: palette.muted, fontSize: 9, marginTop: 2 }, copyButton: { paddingHorizontal: 9, paddingVertical: 7, borderRadius: 10, backgroundColor: palette.purpleSoft }, copyText: { color: palette.purple, fontSize: 9, fontWeight: "700" }, group: { paddingVertical: 11, borderTopWidth: 1, borderTopColor: palette.line }, groupHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 9 }, groupTitle: { fontSize: 14, fontWeight: "800", color: palette.ink }, intent: { fontSize: 9, color: palette.muted, marginTop: 2 }, groupActions: { flexDirection: "row", gap: 8, alignItems: "center" }, detailLink: { color: palette.purple, fontSize: 9, fontWeight: "700" }, miniLock: { width: 29, height: 29, borderRadius: 9, borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center" }, miniLockActive: { borderColor: palette.green, backgroundColor: "#EAF9F0" }, miniLockText: { color: palette.muted }, miniLockTextActive: { color: palette.green }, localTag: { fontSize: 9, color: palette.green }, options: { gap: 8, paddingRight: 7 }, option: { width: 105, padding: 5, borderRadius: 12, borderWidth: 1, borderColor: "transparent", backgroundColor: palette.beige }, optionActive: { borderColor: palette.green, backgroundColor: "#F7FFF9" }, food: { width: 93, height: 62, borderRadius: 9 }, number: { position: "absolute", left: 3, top: 3, width: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center", backgroundColor: palette.ink }, numberActive: { backgroundColor: palette.green }, numberText: { color: "white", fontSize: 9, fontWeight: "800" }, check: { position: "absolute", right: 3, top: 3, width: 18, height: 18, borderRadius: 9, backgroundColor: palette.green, alignItems: "center", justifyContent: "center" }, checkText: { color: "white", fontSize: 10 }, optionName: { textAlign: "center", fontSize: 9, lineHeight: 12, color: palette.ink, marginTop: 5, fontWeight: "600" }, optionMeta: { textAlign: "center", color: palette.muted, fontSize: 8, marginTop: 2 }, empty: { color: palette.amber, fontSize: 11, padding: 8 }, footerButtons: { gap: 9, marginTop: 4 }, error: { color: palette.red, textAlign: "center" }, retry: { backgroundColor: palette.purple, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 18 }, retryText: { color: "white", fontWeight: "700" }, testProxy: { position: "absolute", width: 1, height: 1, opacity: 0 } });

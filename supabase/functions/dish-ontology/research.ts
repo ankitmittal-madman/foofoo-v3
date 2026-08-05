@@ -6,7 +6,7 @@
  */
 
 export interface ResearchRecord {
-  provider: "foodon_ols" | "usda_fdc";
+  provider: "foodon_ols" | "usda_fdc" | "groq";
   providerRecordId: string | null;
   sourceUrl: string;
   payload: Record<string, unknown>;

@@ -5,6 +5,8 @@ import { router } from "expo-router";
 import { useSession } from "@/auth/SessionContext";
 import { requestExport, pollExport, deleteAccount, REQUIRED_CONFIRMATION_PHRASE } from "@/api/account";
 import { describeApiError } from "@/api/errorMessages";
+import { useI18n } from "@/i18n";
+import { palette } from "@/ui/foofoo";
 
 /**
  * Settings tab (P0-2, 2026-08) — the first mobile UI for the DPDP data-subject-rights endpoints
@@ -16,6 +18,7 @@ import { describeApiError } from "@/api/errorMessages";
  */
 export default function Settings() {
   const { session, signOut } = useSession();
+  const { t, locale } = useI18n();
   const userId = session?.user.id;
 
   return (
@@ -26,6 +29,13 @@ export default function Settings() {
         <Text style={styles.sectionTitle}>Preferences</Text>
         <Pressable style={styles.linkButton} onPress={() => router.push("/profile-edit")} testID="settings-profile-edit-link">
           <Text style={styles.linkButtonText}>Edit diet & allergies →</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t("language")}</Text>
+        <Pressable style={styles.linkButton} onPress={() => router.push("/language")} testID="settings-language-link">
+          <Text style={styles.linkButtonText}>{locale === "hi" ? "हिंदी" : "English"} →</Text>
         </Pressable>
       </View>
 
@@ -150,9 +160,9 @@ function DeleteAccountFlow({ userId, onDeleted }: { userId: string; onDeleted: (
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, gap: 24 },
+  container: { flex: 1, padding: 24, gap: 24, backgroundColor: palette.bg },
   header: { fontSize: 24, fontWeight: "600" },
-  section: { gap: 10, borderTopWidth: 1, borderTopColor: "#EEE", paddingTop: 16 },
+  section: { gap: 10, borderTopWidth: 1, borderTopColor: palette.line, paddingTop: 16 },
   sectionTitle: { fontSize: 16, fontWeight: "700" },
   sectionBody: { color: "#6B6B6B", fontSize: 13 },
   hint: { fontSize: 12, color: "#6B6B6B" },
@@ -164,8 +174,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   button: {
-    backgroundColor: "#4A6FA5",
-    borderRadius: 8,
+    backgroundColor: palette.purple,
+    borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center",
   },
@@ -174,5 +184,5 @@ const styles = StyleSheet.create({
   buttonLabel: { color: "#fff", fontWeight: "600" },
   error: { color: "#C0392B", fontSize: 12 },
   linkButton: { paddingVertical: 4 },
-  linkButtonText: { color: "#4A6FA5", fontWeight: "600" },
+  linkButtonText: { color: palette.purple, fontWeight: "600" },
 });
