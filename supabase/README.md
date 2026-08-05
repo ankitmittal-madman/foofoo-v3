@@ -29,7 +29,8 @@ supabase start        # local Postgres+Auth+Functions (applies ../database migra
 
 ## Environment (DOC-P3-08 §Env; secrets server-side only, DOC-P3-07 §14)
 Required: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
-Optional: `SUPABASE_DB_URL`, `OPENWEATHERMAP_API_KEY`, `ONESIGNAL_REST_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `FOOFOO_ENV`, `LOG_LEVEL`.
+Optional: `SUPABASE_DB_URL`, `OPENWEATHERMAP_API_KEY`, `USDA_FOODDATA_API_KEY`,
+`ONESIGNAL_REST_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `FOOFOO_ENV`, `LOG_LEVEL`.
 
 ## Deploy discipline
 Edge Functions deploy via Supabase CLI under the same numbered-migration discipline as the schema

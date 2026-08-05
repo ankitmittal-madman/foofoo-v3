@@ -22,6 +22,7 @@ export const ENV_VARS = {
   SUPABASE_SERVICE_ROLE_KEY: { key: "SUPABASE_SERVICE_ROLE_KEY", required: true, secret: true },
   SUPABASE_DB_URL: { key: "SUPABASE_DB_URL", required: false, secret: true },
   OPENWEATHERMAP_API_KEY: { key: "OPENWEATHERMAP_API_KEY", required: false, secret: true },
+  USDA_FOODDATA_API_KEY: { key: "USDA_FOODDATA_API_KEY", required: false, secret: true },
   ONESIGNAL_REST_API_KEY: { key: "ONESIGNAL_REST_API_KEY", required: false, secret: true },
   ONESIGNAL_APP_ID: { key: "ONESIGNAL_APP_ID", required: false, secret: false },
   CLOUDINARY_CLOUD_NAME: { key: "CLOUDINARY_CLOUD_NAME", required: false, secret: false },

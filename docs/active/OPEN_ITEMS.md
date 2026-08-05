@@ -32,6 +32,8 @@ findings are retained under `docs/archive/`.
 - Populate the regional-prior table for PanIndia and Global zones; 187 of 810 dishes currently
   receive no regional-prior boost.
 - Apply and live-verify migration 054, including its RLS-policy performance change and rollback.
+- Apply the concurrent migration 055, then migration 056 and seed 146; deploy and live-verify the
+  `dish-ontology` Edge Function before routing user-added dishes through it.
 - Configure `FLY_STAGING_*` variables/secrets and a protected `production` environment.
 - Archive dead `re_engine`-era ETL and validation scripts that target retired schemas.
 - Resolve unindexed-foreign-key and duplicate-index advisor findings.
@@ -47,6 +49,8 @@ findings are retained under `docs/archive/`.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
+- Approve the unknown-dish AI policy: model/data residency, confidence thresholds, safety-field
+  treatment, multi-label limits, reviewer workflow and training-data consent.
 
 ## Active implementation documents retained for review
 

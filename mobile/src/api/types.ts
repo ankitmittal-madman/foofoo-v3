@@ -135,7 +135,9 @@ export interface RecommendationsResponse {
 
 export type FeedbackEventType =
   | "accept" | "edit" | "swap" | "like" | "dislike" | "shown_not_tapped"
-  | "never" | "not_today" | "lock" | "unlock" | "add_to_date";
+  | "never" | "not_today" | "lock" | "unlock" | "add_to_date"
+  | "make_this" | "too_much_work" | "missing_ingredient" | "member_objection"
+  | "cooked" | "ordered" | "replaced" | "completed" | "regretted";
 
 export interface FeedbackRequest {
   /** RecommendationsResponse.request_id — the only recommendation identifier this client is ever

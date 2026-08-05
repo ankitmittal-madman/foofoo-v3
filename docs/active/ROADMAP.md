@@ -19,10 +19,12 @@ Only future work is listed here. Evidence and acceptance detail are in `OPEN_ITE
 10. Resolve unindexed-foreign-key and duplicate-index findings.
 11. Deploy and operationally verify the local release candidate.
 12. Run production load/soak testing and revisit Fly.io sizing.
+13. Apply/live-verify migration 056 + seed 146 and deploy the dish-ontology Edge Function.
 
 ## P3 — Product and intelligence evolution
 
-13. Add festival-calendar mapping.
-14. Add clinically governed health-condition suitability.
-15. Activate preference personalization after a real training threshold is met.
-16. Expand and safety-review the bounded food graph.
+14. Approve and activate the unknown-dish AI classification policy.
+15. Add festival-calendar mapping.
+16. Add clinically governed health-condition suitability.
+17. Activate preference personalization after a real training threshold is met.
+18. Expand and safety-review the bounded food graph.

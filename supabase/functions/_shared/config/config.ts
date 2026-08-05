@@ -26,6 +26,8 @@ export interface AppConfig {
   readonly oneSignalRestApiKey: string | null;
   readonly oneSignalAppId: string | null;
   readonly openWeatherMapApiKey: string | null;
+  /** Optional USDA FoodData Central key; external enrichment still uses keyless FoodOn if absent. */
+  readonly usdaFoodDataApiKey: string | null;
 }
 
 /** Dev-only defaults for the Ghar RE service. NEVER used in staging/production (guarded below). */
@@ -93,6 +95,7 @@ export function loadConfig(): AppConfig {
     oneSignalRestApiKey: read(ENV_VARS.ONESIGNAL_REST_API_KEY),
     oneSignalAppId: read(ENV_VARS.ONESIGNAL_APP_ID),
     openWeatherMapApiKey: read(ENV_VARS.OPENWEATHERMAP_API_KEY),
+    usdaFoodDataApiKey: read(ENV_VARS.USDA_FOODDATA_API_KEY),
   });
 }
 

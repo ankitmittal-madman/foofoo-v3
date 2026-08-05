@@ -71,6 +71,56 @@ export interface SlotOptionsResponse {
   addons?: PlanAddon[];
 }
 
+export interface MealEpisodeComponent {
+  dish_id: string | null;
+  dish_name: string;
+  component_role: string;
+  is_required: boolean;
+  image_url?: string | null;
+}
+
+export interface MealEpisode {
+  episode_hash: string;
+  rank: number;
+  plate_form: "pair" | "single" | "standalone";
+  display_name: string;
+  components: MealEpisodeComponent[];
+  intent: string;
+  intent_posterior: Record<string, number>;
+  practicality: {
+    active_minutes: number;
+    critical_path_minutes: number;
+    vessel_count: number;
+    burner_peak: number;
+    ingredient_count: number;
+    complex_method_count: number;
+    pantry_coverage: number | null;
+    feature_version: string;
+    estimation_confidence: number;
+  };
+  cadence_tier: string;
+  richness_score: number;
+  predictions: {
+    p_choose: number;
+    p_execute: number;
+    p_regret: number;
+    p_success: number;
+    model_version: string;
+    calibration_status: "rule_baseline_untrained" | "calibrated";
+  };
+  reasons: string[];
+  source_plate_score: number;
+}
+
+export interface MealEpisodeResponse {
+  kind: "meal_episode_slate";
+  slot: string;
+  episodes: MealEpisode[];
+  model_version: string;
+  warnings: string[];
+  request_id?: string;
+}
+
 export interface WeeklyClass {
   class_code: string;
   class_name: string;
@@ -132,6 +182,23 @@ export function fetchSlotOptions(
   } = {},
 ): Promise<SlotOptionsResponse> {
   return apiPost<SlotOptionsResponse>("/plan", { surface: "meal_plan", slot, ...opts });
+}
+
+/** Complete-meal recommendation surface. Class code preserves a finalized weekly-plan choice. */
+export function fetchMealEpisodes(
+  slot: Slot,
+  opts: {
+    weekday?: string;
+    class_code?: string;
+    count?: number;
+    time_budget_minutes?: number;
+    pantry_ingredient_names?: string[];
+    leftover_dish_names?: string[];
+    discovery_mode?: boolean;
+    recovery_mode?: boolean;
+  } = {},
+): Promise<MealEpisodeResponse> {
+  return apiPost<MealEpisodeResponse>("/plan", { surface: "meal_episodes", slot, ...opts });
 }
 
 export type WeekSelections = Record<string, Partial<Record<Slot, string>>>;

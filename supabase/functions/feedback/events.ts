@@ -46,6 +46,86 @@ export interface FeedbackEventResult {
   dishResolved: boolean;
 }
 
+const OUTCOME_BY_FEEDBACK: Partial<Record<FeedbackEventType, string>> = {
+  make_this: "chosen",
+  lock: "locked",
+  cooked: "cooked",
+  ordered: "ordered",
+  replaced: "replaced",
+  completed: "completed",
+  regretted: "regretted",
+};
+
+async function syncTypedIntelligence(
+  ctx: RequestContext,
+  db: ReturnType<typeof createServiceRoleClient>,
+  ev: FeedbackEventInput,
+  eventId: string,
+  occurredAt: string,
+): Promise<void> {
+  const outcomeType = OUTCOME_BY_FEEDBACK[ev.eventType];
+  if (outcomeType) {
+    const episodeHash = typeof ev.detail?.episode_hash === "string" ? ev.detail.episode_hash : null;
+    const { data: slateRows, error: slateError } = await withTimeout(
+      db.from("slates").select("id").eq("household_id", ev.profileId).eq(
+        "request_id",
+        ev.requestId,
+      ).limit(1),
+      "feedback.events.slate_lookup",
+    );
+    if (slateError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: slateError.message });
+    const { error } = await withTimeout(
+      db.from("outcome_events").upsert({
+        idempotency_key: eventId,
+        household_id: ev.profileId,
+        profile_id: ev.profileId,
+        slate_id: slateRows?.[0]?.id ?? null,
+        episode_hash: episodeHash,
+        outcome_type: outcomeType,
+        value: ev.detail ?? {},
+        source: "explicit",
+        confidence: 1,
+        occurred_at: occurredAt,
+        schema_version: "1",
+      }, { onConflict: "idempotency_key" }),
+      "feedback.events.outcome_upsert",
+    );
+    if (error) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: error.message });
+  }
+
+  // Missing-item evidence updates pantry state only when the user/client identifies the exact
+  // ingredient. A generic rejection must never guess which ingredient was absent.
+  if (ev.eventType === "missing_ingredient" && typeof ev.detail?.ingredient_name === "string") {
+    const ingredientName = ev.detail.ingredient_name.trim();
+    const { data: ingredient, error: lookupError } = await withTimeout(
+      db.from("ingredients").select("id").eq("name", ingredientName).maybeSingle(),
+      "feedback.events.ingredient_lookup",
+    );
+    if (lookupError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: lookupError.message });
+    if (ingredient) {
+      const expiry = new Date();
+      expiry.setUTCDate(expiry.getUTCDate() + 7);
+      const { error } = await withTimeout(
+        db.from("pantry_beliefs").upsert({
+          household_id: ev.profileId,
+          ingredient_id: ingredient.id,
+          probability_present: 0.02,
+          quantity_range: {},
+          last_evidence_at: occurredAt,
+          evidence_type: "explicit_missing_ingredient",
+          expires_at: expiry.toISOString(),
+          feature_version: "pantry-belief-v1",
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "household_id,ingredient_id" }),
+        "feedback.events.pantry_upsert",
+      );
+      if (error) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: error.message });
+    } else {
+      ctx.logger.warn("feedback_event.ingredient_not_found", { ingredient_name: ingredientName });
+    }
+  }
+}
+
 /**
  * Record one feedback event, after resolving the caller's `request_id` to its
  * recommendation_events row and verifying that row belongs to the calling profile.
@@ -124,6 +204,13 @@ export async function recordFeedbackEvent(
     throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: existingError.message });
   }
   if (existing) {
+    await syncTypedIntelligence(
+      ctx,
+      db,
+      ev,
+      existing.id as string,
+      existing.created_at as string,
+    );
     return { id: existing.id as string, createdAt: existing.created_at as string, dishResolved };
   }
 
@@ -132,6 +219,7 @@ export async function recordFeedbackEvent(
       .from("feedback_events")
       .insert({
         profile_id: ev.profileId,
+        household_id: ev.profileId,
         recommendation_event_id: recRow.id,
         dish_id: dishId,
         event_type: ev.eventType,
@@ -214,6 +302,14 @@ export async function recordFeedbackEvent(
       }
     }
   }
+
+  await syncTypedIntelligence(
+    ctx,
+    db,
+    ev,
+    inserted.id as string,
+    inserted.created_at as string,
+  );
 
   ctx.logger.info("feedback_event.recorded", {
     id: inserted.id,

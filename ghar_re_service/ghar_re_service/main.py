@@ -51,6 +51,7 @@ SIGNED_PATHS = frozenset(
         "/v1/class-dishes",
         "/v1/recipe",
         "/v1/search",
+        "/v1/meal-episodes",
     }
 )
 
@@ -130,6 +131,7 @@ RATE_LIMITED_PATHS = frozenset(
         "/v1/class-dishes",
         "/v1/recipe",
         "/v1/search",
+        "/v1/meal-episodes",
     }
 )
 
@@ -406,6 +408,12 @@ def calibration(request: Request, payload: dict = Body(...)):  # noqa: B008
 def meal_plan(request: Request, payload: dict = Body(...)):  # noqa: B008
     """WP-18 surface 2: a slot's 4–5 dish options (pass class_code to reconcile to one class)."""
     return _planning_call("meal_plan", engine.plan_slot, payload, request)
+
+
+@app.post("/v1/meal-episodes")
+def meal_episodes(request: Request, payload: dict = Body(...)):  # noqa: B008
+    """Complete safe meal episodes ranked by predicted choose, execution and non-regret."""
+    return _planning_call("meal_episodes", engine.plan_meal_episodes, payload, request)
 
 
 @app.post("/v1/weekly-plan")

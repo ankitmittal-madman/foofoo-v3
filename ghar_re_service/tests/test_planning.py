@@ -67,6 +67,58 @@ def test_meal_plan_slot_options(client):
     assert r.json()["options"][0]["explanation"]["top_contributors"]
 
 
+def test_meal_episode_surface_returns_complete_practical_slate(client):
+    r = _post(
+        client,
+        "/v1/meal-episodes",
+        {
+            "household": _hh(),
+            "context": {
+                "slot": "dinner",
+                "weekday": "Monday",
+                "time_budget_minutes": 35,
+                "pantry_ingredient_names": ["rice", "salt", "onion"],
+            },
+            "count": 4,
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["kind"] == "meal_episode_slate"
+    assert 1 <= len(body["episodes"]) <= 4
+    top = body["episodes"][0]
+    assert top["components"]
+    assert top["practicality"]["active_minutes"] >= 0
+    assert 0 <= top["predictions"]["p_execute"] <= 1
+    assert top["predictions"]["calibration_status"] == "rule_baseline_untrained"
+    assert all(
+        left["predictions"]["p_success"] >= right["predictions"]["p_success"]
+        for left, right in zip(body["episodes"], body["episodes"][1:], strict=False)
+    )
+
+
+def test_meal_episode_surface_preserves_finalized_class(client):
+    weekly = _post(client, "/v1/weekly-plan", {"household": _hh()}).json()
+    class_code = weekly["days"][0]["slots"]["dinner"][0]["class_code"]
+    response = _post(
+        client,
+        "/v1/meal-episodes",
+        {
+            "household": _hh(),
+            "class_code": class_code,
+            "context": {"slot": "dinner", "weekday": "Monday"},
+            "count": 3,
+        },
+    )
+    assert response.status_code == 200
+    from ghar_re_core import knowledge as K
+
+    for episode in response.json()["episodes"]:
+        for component in episode["components"]:
+            if component["dish_id"] is not None:
+                assert class_code in K.dish_to_class_codes(component["dish_name"])
+
+
 def test_search_is_filtered_ranked_and_safety_aware(client):
     r = _post(
         client,

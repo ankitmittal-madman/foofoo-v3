@@ -16,6 +16,7 @@ import uuid
 from typing import Any
 
 from ghar_re_core import calibration as calib
+from ghar_re_core import meal_episode
 from ghar_re_core import meal_planner as planner
 from ghar_re_core import pipeline as core_pipeline
 from ghar_re_core import scoring as S
@@ -70,6 +71,18 @@ def build_context(ctx: dict[str, Any], exclude_dish_ids: list[str] | None = None
     core_ctx["interaction_count"] = max(0, int(ctx.get("interaction_count", 0) or 0))
     feedback_counts = ctx.get("dish_feedback_counts")
     core_ctx["dish_feedback_counts"] = feedback_counts if isinstance(feedback_counts, list) else []
+    # Episode/practicality inputs are additive v1 context. They do not alter hard eligibility;
+    # ghar_re_core.meal_episode consumes them only after the safe plate pool has been formed.
+    if ctx.get("time_budget_minutes") is not None:
+        core_ctx["time_budget_minutes"] = max(0, int(ctx["time_budget_minutes"]))
+    core_ctx["pantry_ingredient_names"] = [
+        value for value in (ctx.get("pantry_ingredient_names") or []) if isinstance(value, str)
+    ][:250]
+    core_ctx["leftover_dish_names"] = [
+        value for value in (ctx.get("leftover_dish_names") or []) if isinstance(value, str)
+    ][:50]
+    core_ctx["discovery_mode"] = bool(ctx.get("discovery_mode", False))
+    core_ctx["recovery_mode"] = bool(ctx.get("recovery_mode", False))
     return core_ctx
 
 
@@ -243,6 +256,46 @@ def plan_search(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     )
     _with_images(res["options"])
     return res
+
+
+def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
+    """Return complete, safe meal episodes ranked by choose × execute × no-regret.
+
+    The core meal-episode module owns all intent/practicality mathematics. This service function
+    only translates request context, attaches media, and serializes the result.
+    """
+    household = build_household_dict(request["household"])
+    raw_context = request.get("context") or {
+        "slot": request.get("slot", "dinner"),
+        "weekday": request.get("weekday", "Monday"),
+    }
+    context = build_context(raw_context)
+    count = max(1, min(int(request.get("count", 4)), 8))
+    class_code = request.get("class_code")
+    if isinstance(class_code, str) and class_code:
+        episodes = meal_episode.build_class_meal_episodes(
+            household,
+            context,
+            class_code,
+            catalogue,
+            count=count,
+            exclude_dish_names=request.get("exclude_dish_names") or [],
+            preference_by_dish=request.get("preference_by_dish") or {},
+        )
+    else:
+        result = core_pipeline.recommend(household, context, catalogue)
+        episodes = meal_episode.build_meal_episodes(result["plates"], household, context)[:count]
+    for episode in episodes:
+        for component in episode["components"]:
+            if component["dish_id"] is not None:
+                component["image_url"] = media.image_url(component["dish_name"])
+    return {
+        "kind": "meal_episode_slate",
+        "slot": context["slot"],
+        "episodes": episodes,
+        "model_version": meal_episode.EPISODE_MODEL_VERSION,
+        "warnings": [] if episodes else ["no safe meal episode could be formed"],
+    }
 
 
 def recipe_detail(request: dict[str, Any]) -> dict[str, Any]:

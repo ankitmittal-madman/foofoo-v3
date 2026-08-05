@@ -17,6 +17,7 @@ Primary current-state sources are under `active/`. Archived material is evidence
 
 - [`docs/architecture/[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md`](<architecture/[ACTIVE]_Canonical_Planning_Semantics_Architecture_v1.0.md>)
 - [`docs/architecture/[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md`](<architecture/[ACTIVE]_Canonical_RE_Architecture_Final_Review_v1.0.md>)
+- [`docs/architecture/[ACTIVE]_Food_Ontology_and_Meal_Taxonomy_Architecture_v1.0.md`](<architecture/[ACTIVE]_Food_Ontology_and_Meal_Taxonomy_Architecture_v1.0.md>)
 - [`docs/architecture/[ACTIVE]_DOC-04_PRD_v1.1.docx`](<architecture/[ACTIVE]_DOC-04_PRD_v1.1.docx>)
 - [`docs/architecture/[ACTIVE]_DOC-05_Information_Architecture_v1.2.docx`](<architecture/[ACTIVE]_DOC-05_Information_Architecture_v1.2.docx>)
 - [`docs/architecture/[ACTIVE]_DOC-06_UX_Design_System_v1.1.docx`](<architecture/[ACTIVE]_DOC-06_UX_Design_System_v1.1.docx>)
@@ -413,8 +414,8 @@ Primary current-state sources are under `active/`. Archived material is evidence
 
 ## Index integrity
 
-- Documents indexed exactly once: 374.
-- Category A: 132.
+- Documents indexed exactly once: 375.
+- Category A: 133.
 - Category B: 23.
 - Category C: 200.
 - Category D: 19.

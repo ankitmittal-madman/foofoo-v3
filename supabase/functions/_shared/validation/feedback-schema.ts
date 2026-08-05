@@ -25,6 +25,15 @@ export const FEEDBACK_EVENT_TYPES = [
   "lock",
   "unlock",
   "add_to_date",
+  "make_this",
+  "too_much_work",
+  "missing_ingredient",
+  "member_objection",
+  "cooked",
+  "ordered",
+  "replaced",
+  "completed",
+  "regretted",
 ] as const;
 
 export type FeedbackEventType = typeof FEEDBACK_EVENT_TYPES[number];

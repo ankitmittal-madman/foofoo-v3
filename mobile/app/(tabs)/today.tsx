@@ -15,6 +15,7 @@ import { describeApiError } from "@/api/errorMessages";
 import { loadWeeklyPlan, type FinalizedWeek, type SlotName } from "@/lib/weeklyPlanStore";
 import type { PlanAddon, PlanDish, SlotOptionsResponse } from "@/api/plan";
 import type { FeedbackEventType } from "@/api/types";
+import { MealEpisodeSection } from "@/components/MealEpisodeSection";
 
 const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -116,7 +117,7 @@ export default function Home() {
         <Text style={styles.refreshButtonText}>Refresh unlocked meals</Text>
       </Pressable>
       {SLOTS.map((slot) => (
-        <SlotSection
+        <MealEpisodeSection
           key={slot}
           slot={slot}
           weekday={weekday}

@@ -21,6 +21,10 @@
   first time with the fix already in place.
 
 ### Added
+- A database-enforced food ontology and meal-taxonomy ingestion gate: normalized evidence,
+  confidence/provenance, class-role safeguards, review queues and class-bound candidate views;
+  deterministic research ETL/seed/validation; and an authenticated `dish-ontology` Edge Function
+  that stages user dishes and queries FoodOn plus optional USDA FoodData Central evidence.
 - `CHANGELOG.md` (this file) — initialised by the `install-logging-infrastructure` skill.
 - Lightweight client logger `mobile/src/lib/logger.ts` (Expo/React Native, AsyncStorage-backed,
   hot-path friendly) — replaces the bare `console.warn` in `mobile/src/auth/supabaseClient.ts`.

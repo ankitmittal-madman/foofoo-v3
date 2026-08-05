@@ -161,7 +161,16 @@ export const UserJourney = {
       | "not_today"
       | "lock"
       | "unlock"
-      | "add_to_date",
+      | "add_to_date"
+      | "make_this"
+      | "too_much_work"
+      | "missing_ingredient"
+      | "member_objection"
+      | "cooked"
+      | "ordered"
+      | "replaced"
+      | "completed"
+      | "regretted",
     dishResolved: boolean,
   ): void {
     const verb: Record<typeof eventType, string> = {
@@ -176,6 +185,15 @@ export const UserJourney = {
       lock: "locked a meal slot",
       unlock: "unlocked a meal slot",
       add_to_date: "added a dish to another date",
+      make_this: "chose to make the complete meal",
+      too_much_work: "asked for an easier meal",
+      missing_ingredient: "reported a missing ingredient",
+      member_objection: "reported that a household member objected",
+      cooked: "confirmed the meal was cooked",
+      ordered: "chose to order the meal",
+      replaced: "replaced an earlier choice",
+      completed: "completed the meal",
+      regretted: "reported regret after choosing the meal",
     };
     const narrative = `Household ${verb[eventType]}` +
       (dishResolved ? "." : " (dish not yet matched to the catalogue — recorded anyway).");

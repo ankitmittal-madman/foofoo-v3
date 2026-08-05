@@ -20,6 +20,11 @@
 > 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
 > run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
+> A normalized food-ontology ingestion gate is also implemented locally in migration 056 + seed
+> 146: all 810 bundled dishes have deterministic per-field evidence and class mappings; future
+> canonical dish writes are queued at the database boundary; user dishes stage through a new
+> authenticated Edge Function with FoodOn and optional USDA research. It is not deployed, and
+> unknown-dish AI promotion remains disabled pending model/safety policy approval.
 
 | Dimension | % |
 |---|---|
@@ -48,7 +53,8 @@
 - **Database:** real production data (802 dishes, 33 real users, 126+ recommendation events), RLS
   correct; the `household_context` write gap (P0-1) is fixed and deployed — new requests now
   persist correctly.
-- **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete;
+- **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; a normalized,
+  provenance-backed dish enrichment layer and class-bound candidate view are implemented locally;
   region/nutrition/comfort-hero/substitution real but narrow. A local bounded graph
   traversal/provenance layer now connects dishes, ingredients and curated substitutions; broader
   ontology review, festival mapping and clinically governed health-condition suitability remain
