@@ -41,6 +41,7 @@
  */
 
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -48,7 +49,7 @@ import { execFileSync } from "node:child_process";
 import { personaToOnboardingAnswers, isSplitAge } from "./personaToOnboardingAnswers.mjs";
 
 const url = process.env.GHAR_WEB_URL;
-const outDir = process.env.GHAR_UI_OUT || path.join(process.cwd(), "ui-artifacts");
+const outDir = process.env.GHAR_UI_OUT || path.join(os.tmpdir(), "foofoo-ui-artifacts");
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
 /** Write the run summary JSON and exit with the given code (matches run_ui.mjs's finish()). */

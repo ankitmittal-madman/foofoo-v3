@@ -39,3 +39,8 @@ supabase/.branches/
 
 # npm-installed dependency trees — regenerated via `npm install`, never checked in.
 node_modules/
+
+# Generated UI evidence is uploaded by CI or kept in the system temporary directory.
+# Neither the legacy artifact root nor a repository-local temporary directory is source.
+/ui-artifacts/
+/tmp/

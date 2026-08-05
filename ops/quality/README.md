@@ -52,6 +52,12 @@ export GHAR_WEB_URL=http://localhost:8081  # enables Phase 9-11 (expo start --we
 # install Deno                         # enables Phase 6 edge-function tests
 ```
 
+When `GHAR_UI_OUT` is omitted, standalone UI drivers write generated evidence to the system
+temporary directory (`/tmp/foofoo-ui-artifacts` on Linux) instead of the repository. CI sets
+`GHAR_UI_OUT` explicitly, packages the evidence into Excel/ZIP files, and retains the uploaded
+GitHub Actions artifact for 90 days. Generated `ui-artifacts/` and repository-local `tmp/`
+directories are ignored by Git.
+
 ## Run in GitHub Actions and download Excel
 
 For the complete UI persona flow, open **GitHub → Actions → persona-journeys → Run workflow**.

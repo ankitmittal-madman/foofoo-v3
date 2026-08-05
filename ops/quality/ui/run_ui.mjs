@@ -19,11 +19,12 @@
  */
 
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const url = process.env.GHAR_WEB_URL;
-const outDir = process.env.GHAR_UI_OUT || path.join(process.cwd(), "ui-artifacts");
+const outDir = process.env.GHAR_UI_OUT || path.join(os.tmpdir(), "foofoo-ui-artifacts");
 fs.mkdirSync(outDir, { recursive: true });
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
