@@ -31,7 +31,11 @@
 > every attempted lookup with the configured key. Mobile
 > meal episodes are now default-on with compatibility fallback, and the missing-dish submission
 > screen is implemented. Migration 065 adds complete assertion/relationship provenance and the
-> authenticated consolidated ontology-record API; the production web build remains a release step.
+> authenticated consolidated ontology-record API. The production Expo web build is live at
+> `https://foofoo-v3.vercel.app`; the post-deploy persona journey passed on 2026-08-05 with
+> meal-episode rendering, feedback, recipes, slate persistence and evidence publication verified.
+> The new RE eligible-set response is committed and tested but its Fly production rollout is
+> waiting for approval in GitHub's protected `Production` environment.
 >
 > **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
 > execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
@@ -73,7 +77,9 @@
   is enforced; `dish-ontology` v5, `recommendations` v11, `plan` v13 and `feedback` v7 deployed
   2026-08-05. Explicit membership/role authorization is still required before shared-household
   collaboration is enabled.
-- **Mobile app:** onboarding/cold-start/weekly-plan work; explanation, history, profile-edit, and
+- **Mobile app:** onboarding/cold-start/weekly-plan work; complete meal episodes are live on the
+  production web client and passed the post-deploy persona journey; explanation, history,
+  profile-edit, and
   DPDP export/delete UI added 2026-08-04 (P0-2/P0-4/P1-2/P1-3/P1-4); jest infra stood up with 9
   pure-logic tests; Expo SDK 53 + OneSignal SDK integration passes typecheck, Expo Doctor, and an
   Android production bundle export; no component-render or physical-device tests yet (P1-5 partial).

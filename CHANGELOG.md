@@ -6,6 +6,9 @@
 ## [Unreleased]
 
 ### Deployed
+- Published commit `c6321f2` to the production Vercel site and passed the one-persona post-deploy
+  journey, including weekly-plan finalization, complete episode rendering, reasoned feedback,
+  recipe navigation, slate persistence and validated report artifacts.
 - Completed the first external-enrichment attempt for all 802 production dishes with zero pending
   or failed jobs. FoodOn matched 104 dishes; USDA remained isolated at HTTP 403 for the configured
   credential.
@@ -62,6 +65,9 @@
   `/readyz` and `/v1/meta` passed after the rolling release.
 
 ### Fixed
+- Reconciled the production persona driver with the meal-episode-first UI contract. Stable episode
+  test hooks now cover primary meals, alternatives, locks, reasoned rejection, make-this feedback
+  and recipe navigation instead of waiting for retired dish-card selectors.
 - Made the Edge recommendation contract deployable without schema drift: the runtime mirror lives
   inside the Supabase function bundle, and both backend workflows reject any byte-level difference
   from the canonical root contract.
