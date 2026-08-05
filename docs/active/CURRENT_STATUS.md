@@ -18,8 +18,7 @@
 > The ontology rollout initially activated `dish-ontology` v1, `plan` v9 and `feedback` v6;
 > current Edge versions are recorded in the production-hardening block below. Fly.io release v125
 > is healthy on both checks and serves immutable RE bundle `sha256:3d4cf579d1cf2565`. The legacy
-> CSV fallback remains enabled for one monitored rollback window. Unknown-dish AI promotion is
-> still disabled pending the Section 8 model/safety decisions in the ontology architecture.
+> CSV fallback remains enabled for one monitored rollback window.
 >
 > **Food-intelligence/episode completion release:** migrations 060–065 and seed 147 are live.
 > They add the leased enrichment worker and schedules, generic ontology graph, nutrient
@@ -39,6 +38,16 @@
 > The new RE eligible-set response is committed and tested but its Fly production rollout is
 > waiting for approval in GitHub's protected `Production` environment.
 >
+> **Budgeted generative ontology enrichment:** migrations 066–069 and the updated
+> `cron-dish-ontology` worker are live. Groq `openai/gpt-oss-120b` independently processes every
+> canonical dish, retains candidates at confidence `>=0.65`, and directly publishes only aliases,
+> low-risk taxonomy tags and regional affinity at `>=0.80`. Deterministic alias/region guards and
+> database field allowlists exclude allergens, religious or clinical suitability, nutrition,
+> ingredients and other safety-sensitive claims. Atomic UTC-day limits are 800 requests and
+> 160,000 tokens. At the latest verification, 11/802 dishes were complete, 791 pending, with zero
+> failed rows; 12 requests used 12,665 tokens and no tokens remained reserved. The ten-minute
+> schedule continues the backfill automatically and defers cleanly at the daily token cap.
+>
 > **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
 > execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
 > automate a six-month event-partition horizon; provision a household and owner membership for
@@ -51,7 +60,7 @@
 > weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
 > query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
 > pinned container bases, staging/manual-production workflows and
-> mobile CI are implemented. Verification passes: 715 Python tests (27 skipped), 85 Deno tests,
+> mobile CI are implemented. Verification passes: 715 Python tests (27 skipped), 93 Deno tests,
 > 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
 > run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
@@ -62,12 +71,12 @@
 | Architecture | 80% |
 | Backend (Edge Functions) | 90% |
 | Recommendation Engine | 85% |
-| Food Ontology | 88% (production graph/read API and full catalogue coverage; USDA and generative policy remain external gates) |
+| Food Ontology | 90% (production graph/read API, full catalogue coverage and governed Groq backfill live; USDA remains an external gate) |
 | Knowledge Graph | 70% (normalized production graph with provenance; subjective/festival/substitution breadth remains iterative) |
 | Seed Data | 90% |
 | Database | 95% |
 | Security | 88% (database advisor remediations live; leaked-password screening needs a paid Supabase plan) |
-| Testing | 75% (backend suites green — 85 Deno + 715 repository Python tests; mobile has infra but no physical-device coverage yet) |
+| Testing | 75% (backend suites green — 93 Deno + 715 repository Python tests; mobile has infra but no physical-device coverage yet) |
 | Deployment | 95% (ontology DB/Edge and RE bundle live-verified 2026-08-05; mobile/device release remains) |
 | Frontend (mobile) | 70% |
 | Observability | 60% (scheduled production smoke/issue alerting added; application 500-level webhook destination remains unconfigured) |
@@ -75,7 +84,7 @@
 ## One-line state per major component
 - **RE core/service:** implemented, repository Python suite green (715 passed, 27 skipped), Fly
   release v125 live-healthy with bundle `sha256:3d4cf579d1cf2565`.
-- **Edge Functions:** implemented and tested (89 tests); current single-owner authorization model
+- **Edge Functions:** implemented and tested (93 tests); current single-owner authorization model
   is enforced; `dish-ontology` v5, `recommendations` v11, `plan` v13 and `feedback` v7 deployed
   2026-08-05. Explicit membership/role authorization is still required before shared-household
   collaboration is enabled.
@@ -95,8 +104,8 @@
   every production dish now has constraint, regional, nutrition-estimate, recipe and published
   episode coverage. The production relational graph connects dishes, aliases, ingredients,
   classes and catalogue features with provenance. USDA validation is blocked by its rejecting
-  credential; festival mapping and clinically governed health-condition suitability remain
-  absent/pending.
+  credential. Groq low-risk enrichment is live under strict budgets and field allowlists;
+  festival mapping and clinically governed health-condition suitability remain absent/pending.
 
 See `docs/active/OPEN_ITEMS.md` for what's actionable, `docs/active/LAUNCH_BLOCKERS.md` for what
 gates a public launch, `docs/active/ROADMAP.md` for sequencing.

@@ -1,0 +1,11 @@
+DROP TRIGGER IF EXISTS dishes_queue_ai_ontology_enrichment ON public.dishes;
+DROP FUNCTION IF EXISTS ops.enqueue_ai_dish_enrichment();
+DROP FUNCTION IF EXISTS ops.claim_ai_dish_enrichment(text,integer);
+DROP FUNCTION IF EXISTS ops.reserve_ai_provider_budget(text,integer,bigint,bigint);
+DROP FUNCTION IF EXISTS ops.settle_ai_provider_budget(text,bigint,bigint);
+DROP FUNCTION IF EXISTS ops.finish_ai_dish_enrichment(uuid,text,text,text,text);
+DROP FUNCTION IF EXISTS public.record_ai_low_risk_enrichment(uuid,uuid,text,jsonb,numeric,numeric);
+DROP TABLE IF EXISTS ops.ai_dish_enrichment_state;
+DROP TABLE IF EXISTS ops.ai_provider_usage_daily;
+DELETE FROM ml.model_registry WHERE model_name='dish_ontology' AND model_version='openai/gpt-oss-120b';
+DELETE FROM ops.data_sources WHERE source_code='groq_free';

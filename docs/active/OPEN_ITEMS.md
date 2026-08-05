@@ -62,10 +62,15 @@ findings are retained under `docs/archive/`.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
-- Approve the unknown-dish generative-AI policy: provider/model/data residency, confidence thresholds, safety-field
-  treatment, multi-label limits, reviewer workflow and training-data consent.
+- Monitor Groq free-tier ontology backfill completion and sample low-risk alias/tag/region quality;
+  keep safety-sensitive fields excluded regardless of model confidence.
 
 ## Recently closed with live evidence
+
+- Founder AI policy is active: Groq `openai/gpt-oss-120b`, candidate threshold 0.65, direct
+  low-risk publication threshold 0.80, and daily limits of 800 requests/160,000 tokens. Migrations
+  066–069 and the scheduled worker provide independent retries, atomic budget accounting,
+  provenance, and deterministic alias/region guards without a routine human-review bottleneck.
 
 - Production migrations 057–059 resolved exposed trigger-function grants, 77 missing leading
   foreign-key indexes, two duplicate indexes, event-partition horizon automation, post-profile

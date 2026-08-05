@@ -55,6 +55,30 @@ Deno.test("config loads when required env is present", () => {
     assertEquals(cfg.environment, "staging");
     assertEquals(cfg.isProduction, false);
     assertEquals(cfg.supabaseUrl, "http://localhost:54321");
+    assertEquals(cfg.groqModel, "openai/gpt-oss-120b");
+    assertEquals(cfg.aiDailyRequestBudget, 800);
+    assertEquals(cfg.aiDailyTokenBudget, 160_000);
+    assertEquals(cfg.aiMinUsableConfidence, 0.65);
+    assertEquals(cfg.aiDirectPublishConfidence, 0.8);
+  });
+});
+
+Deno.test("AI configuration clamps operator values to governed bounds", () => {
+  withEnv({
+    ...REQUIRED_ENV,
+    GROQ_MODEL: "test/model",
+    AI_FREE_DAILY_REQUEST_BUDGET: "0",
+    AI_FREE_DAILY_TOKEN_BUDGET: "999999999",
+    AI_MIN_USABLE_CONFIDENCE: "0.1",
+    AI_DIRECT_PUBLISH_CONFIDENCE: "4",
+  }, () => {
+    resetConfigCacheForTests();
+    const cfg = loadConfig();
+    assertEquals(cfg.groqModel, "test/model");
+    assertEquals(cfg.aiDailyRequestBudget, 1);
+    assertEquals(cfg.aiDailyTokenBudget, 10_000_000);
+    assertEquals(cfg.aiMinUsableConfidence, 0.5);
+    assertEquals(cfg.aiDirectPublishConfidence, 1);
   });
 });
 

@@ -10,6 +10,7 @@ import {
 } from "../_shared/middleware/index.ts";
 import { researchDish } from "../dish-ontology/research.ts";
 import { promoteExternalEvidence, storeResearchRecordsForSubject } from "../dish-ontology/store.ts";
+import { generateGroqDishEnrichment } from "../dish-ontology/ai.ts";
 
 const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
   async (_req, ctx) => {
@@ -85,8 +86,146 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
         }).eq("id", job.job_id).eq("locked_by", workerId);
       }
     }
+
+    let aiClaimed = 0;
+    let aiComplete = 0;
+    let aiFailed = 0;
+    let aiBudgetDeferred = 0;
+    let aiCandidates = 0;
+    let aiPublished = 0;
+    let aiTokens = 0;
+    if (ctx.config.groqApiKey) {
+      const aiWorkerId = `groq:${ctx.traceId}`;
+      const { data: aiJobs, error: aiClaimError } = await db.rpc(
+        "claim_ai_dish_enrichment",
+        { p_worker_id: aiWorkerId, p_batch_size: 2 },
+      );
+      if (aiClaimError) throw aiClaimError;
+      aiClaimed = aiJobs?.length ?? 0;
+      for (const aiJob of aiJobs ?? []) {
+        // The prompt is ~600 tokens and GPT-OSS may use reasoning tokens. Reserve the full
+        // request envelope atomically; settlement replaces it with actual provider usage.
+        const reservedTokens = 2_000;
+        let budgetReserved = false;
+        try {
+          const { data: reserved, error: reserveError } = await db.rpc(
+            "reserve_ai_provider_budget",
+            {
+              p_provider: "groq",
+              p_request_limit: ctx.config.aiDailyRequestBudget,
+              p_token_limit: ctx.config.aiDailyTokenBudget,
+              p_reserve_tokens: reservedTokens,
+            },
+          );
+          if (reserveError) throw reserveError;
+          budgetReserved = reserved === true;
+          if (!budgetReserved) {
+            aiBudgetDeferred++;
+            await db.rpc("finish_ai_dish_enrichment", {
+              p_dish_id: aiJob.dish_id,
+              p_worker_id: aiWorkerId,
+              p_model_name: ctx.config.groqModel,
+              p_status: "budget_deferred",
+              p_error: "daily_free_tier_budget_exhausted",
+            });
+            continue;
+          }
+
+          const generated = await generateGroqDishEnrichment(
+            String(aiJob.query_text),
+            ctx.config.groqApiKey,
+            ctx.config.groqModel,
+          );
+          aiTokens += generated.usage.totalTokens;
+          const stored = await storeResearchRecordsForSubject(ctx, {
+            dishId: String(aiJob.dish_id),
+            submissionId: null,
+            query: String(aiJob.query_text),
+            records: [generated.record],
+          });
+          if (!stored[0]) throw new Error("groq_source_record_missing");
+          const { data: promotion, error: promotionError } = await db.rpc(
+            "record_ai_low_risk_enrichment",
+            {
+              p_dish_id: aiJob.dish_id,
+              p_source_record_id: stored[0].id,
+              p_model: ctx.config.groqModel,
+              p_payload: generated.enrichment,
+              p_min_confidence: ctx.config.aiMinUsableConfidence,
+              p_direct_confidence: ctx.config.aiDirectPublishConfidence,
+            },
+          );
+          if (promotionError) throw promotionError;
+          const counts = promotion && typeof promotion === "object"
+            ? promotion as Record<string, unknown>
+            : {};
+          aiCandidates += Number(counts.candidates ?? 0);
+          aiPublished += Number(counts.published ?? 0);
+          const { error: settleError } = await db.rpc(
+            "settle_ai_provider_budget",
+            {
+              p_provider: "groq",
+              p_reserved_tokens: reservedTokens,
+              p_actual_tokens: generated.usage.totalTokens,
+            },
+          );
+          if (settleError) throw settleError;
+          budgetReserved = false;
+          const { error: finishError } = await db.rpc(
+            "finish_ai_dish_enrichment",
+            {
+              p_dish_id: aiJob.dish_id,
+              p_worker_id: aiWorkerId,
+              p_model_name: ctx.config.groqModel,
+              p_status: "complete",
+              p_error: null,
+            },
+          );
+          if (finishError) throw finishError;
+          aiComplete++;
+        } catch (error) {
+          aiFailed++;
+          const errorCode = error instanceof Error
+            ? error.message.slice(0, 120)
+            : "groq_worker_error";
+          providerFailures[`groq:${errorCode}`] = (providerFailures[`groq:${errorCode}`] ?? 0) + 1;
+          await db.rpc("finish_ai_dish_enrichment", {
+            p_dish_id: aiJob.dish_id,
+            p_worker_id: aiWorkerId,
+            p_model_name: ctx.config.groqModel,
+            p_status: "failed",
+            p_error: errorCode,
+          });
+        } finally {
+          if (budgetReserved) {
+            await db.rpc("settle_ai_provider_budget", {
+              p_provider: "groq",
+              p_reserved_tokens: reservedTokens,
+              p_actual_tokens: 0,
+            });
+          }
+        }
+      }
+    }
     return jsonOk(
-      { claimed: jobs?.length ?? 0, complete, failed, ontologyTerms, nutrients, providerFailures },
+      {
+        claimed: jobs?.length ?? 0,
+        complete,
+        failed,
+        ontologyTerms,
+        nutrients,
+        providerFailures,
+        ai: {
+          claimed: aiClaimed,
+          complete: aiComplete,
+          failed: aiFailed,
+          budget_deferred: aiBudgetDeferred,
+          candidates: aiCandidates,
+          published: aiPublished,
+          tokens: aiTokens,
+          model: ctx.config.groqApiKey ? ctx.config.groqModel : null,
+        },
+      },
       ctx.traceId,
     );
   },

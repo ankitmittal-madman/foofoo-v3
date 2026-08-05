@@ -47,7 +47,16 @@ Conservative automatic promotion is active when both conditions hold:
 1. FoodOn or USDA produces an exact normalized name match.
 2. Every submitted ingredient already exists in the safety-governed ingredient catalogue.
 
-This promotion creates a canonical draft with provisional aliases and derived ingredient safety. It does not invent unknown ingredients, clear allergens, or create unreviewed class mappings. Generative classification remains pending until a model/provider, regional data-processing posture, confidence thresholds, and reviewer/training-consent policy are approved.
+This promotion creates a canonical draft with provisional aliases and derived ingredient safety. It does not invent unknown ingredients, clear allergens, or create unreviewed class mappings.
+
+Groq `openai/gpt-oss-120b` is active for canonical-dish enrichment only. Output at confidence
+`>=0.65` is retained as traceable evidence; aliases, allowlisted low-risk taxonomy dimensions and
+regional affinity may publish at `>=0.80`. The model contract cannot express ingredients,
+nutrition, allergens, medical or religious suitability, vegetarian status or alcohol claims.
+Database guards independently reject canonical/component aliases and normalize known regional
+codes. Atomic UTC-day limits are 800 requests and 160,000 tokens; exhausted work becomes
+`budget_deferred` and resumes automatically. The stored Hugging Face token is an unused fallback,
+not a second production provider.
 
 ## 5. Canonical Ontology
 
@@ -106,11 +115,9 @@ The rollback order is clients/functions, schedules, seed/content, then schema. P
 
 ## 12. Open Decisions
 
-1. Select the generative provider/model and allowed processing region for user-entered food metadata.
-2. Ratify auto-promotion thresholds, class multi-label caps, and the human-review SLA.
-3. Decide whether corrected user submissions may be retained as model-training data under explicit consent.
-4. Replace or activate the USDA credential, then run the provider requeue and labelled match-quality evaluation.
-5. Add health-condition suitability only after clinical evidence and governance approval.
+1. Decide whether corrected user submissions may be retained as model-training data under explicit consent; current Groq processing is limited to canonical catalogue names.
+2. Replace or activate the USDA credential, then run the provider requeue and labelled match-quality evaluation.
+3. Add health-condition suitability only after clinical evidence and governance approval.
 
 ## 13. Critical Self-Review
 

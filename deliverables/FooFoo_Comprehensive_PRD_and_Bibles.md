@@ -657,7 +657,7 @@ Removing a member starts a review before deleting member-linked preference evide
 | Cost | model and infra cost per WSMD tracked; LLM never on synchronous ranking hot path |
 | Freshness | catalog publishing SLA and feature staleness indicators |
 
-**Current-state note (repository, 5 Aug 2026):** complete-meal episode serving is the mobile default with a compatibility fallback; canonical slates, item propensities, typed outcomes and replay are active. Migrations 060–065 operate the ontology queue, graph, nutrients, research/annotation control plane, safe unknown-dish promotion, complete relationship provenance and the consolidated ontology read model. Seed 147 populates all 802 production dishes with constraints, regional affinities, nutrition estimates, recipes and published single-primary episodes, plus curated composite episodes. FoodOn enrichment is live. USDA integration is deployed but its configured production key returned HTTP 403 in the controlled evaluation and must be replaced or activated before USDA assertions can populate. Generative unknown-dish classification remains gated on the provider/data-residency and safety decisions in Section 82A.
+**Current-state note (repository, 5 Aug 2026):** complete-meal episode serving is the mobile default with a compatibility fallback; canonical slates, item propensities, typed outcomes and replay are active. Migrations 060–065 operate the ontology queue, graph, nutrients, research/annotation control plane, safe unknown-dish promotion, complete relationship provenance and the consolidated ontology read model. Seed 147 populates all 802 production dishes with constraints, regional affinities, nutrition estimates, recipes and published single-primary episodes, plus curated composite episodes. FoodOn enrichment is live. USDA integration is deployed but its configured production key returned HTTP 403 in the controlled evaluation and must be replaced or activated before USDA assertions can populate. Migrations 066–069 activate an independent, budgeted Groq backfill for low-risk canonical-dish aliases, taxonomy tags and regional affinity; user-submitted text and every safety-sensitive field remain outside that generative path.
 
 <!-- PAGEBREAK -->
 
@@ -1966,7 +1966,7 @@ flowchart LR
   I --> J[Monitor user outcomes and conflicts]
 ```
 
-AI may create aliases, draft descriptions, candidate tags, image briefs, and low-risk relationship proposals. It may not autonomously publish allergen status, religious suitability, clinical claims, or nutrient values without trusted evidence. Each AI assertion records model, prompt/template, inputs, timestamp, confidence, validator, and reviewer state.
+AI may create aliases, draft descriptions, candidate tags, image briefs, and low-risk relationship proposals. Production canonical-dish enrichment uses Groq `openai/gpt-oss-120b`. Candidates at confidence `>=0.65` are retained with provenance; only aliases, allowlisted contextual/taxonomy tags and regional affinities at `>=0.80` may publish automatically. A structured-output contract plus a database field allowlist makes ingredients, allergen status, religious suitability, clinical claims, nutrition, vegetarian status and alcohol claims unpublishable through this path. Deterministic gates reject canonical/component aliases and normalize governed region codes. Atomic UTC-day controls cap the worker at 800 requests and 160,000 tokens; deferred rows resume on the scheduled worker without human intervention. Each AI assertion records model, inputs, timestamp, confidence and validator state. `HF_TOKEN` is retained only as a future fallback; Hugging Face is not an active production provider.
 
 Raw source data remains immutable and license-tagged. Canonicalization is reproducible. Conflicts create a review task rather than silent last-write-wins behavior.
 
@@ -2593,7 +2593,8 @@ This table distinguishes implemented product infrastructure from remaining exter
 | Governed ontology read | Authenticated `ontology_record` resolves a canonical ID/name and returns aliases, ingredients, classes, field assertions, constraints, regions, nutrition, recipes, episodes, graph relations and evidence metadata | Active; raw external payloads remain private staging evidence |
 | Background enrichment | Durable leased queue, ten-minute worker, daily reconciliation and 90-day refresh | Active; all 802 canonical dishes completed their first external pass with zero failed/pending jobs |
 | Unknown-dish mobile intake | Authenticated staging API and mobile form | Active |
-| Unknown-dish auto-promotion | Exact external name + entirely known safety ingredients | Active conservative rule; generative promotion awaiting decision |
+| Unknown-dish auto-promotion | Exact external name + entirely known safety ingredients | Active conservative rule; generative AI currently enriches canonical catalogue dishes only, not user text |
+| Budgeted AI ontology enrichment | Groq candidates >=0.65; allowlisted low-risk facts publish >=0.80; 800 requests/160k tokens daily | Active scheduled backfill with retries, provenance and deterministic guards; safety fields excluded |
 | Slates/propensity/replay/outcomes | Ordered slate/item persistence, exact deterministic propensity, typed outcomes and replay RPC | Active |
 | ML/control plane | Versioned features, rule-baseline registry, experiments, source/catalog/publish/review tables | Active baseline; no trained production model claimed |
 | Research panel | Private studies/participants/diaries plus authenticated enrolled-participant API | Operational infrastructure; recruitment not claimed |
@@ -2602,9 +2603,8 @@ This table distinguishes implemented product infrastructure from remaining exter
 
 ### Decisions required from the Founder
 
-1. Choose the generative provider/model and acceptable data-processing region for user-submitted food text.
-2. Ratify confidence thresholds, multi-label class limits, reviewer SLA and whether reviewed corrections may be training data.
-3. Replace or activate `USDA_FOODDATA_API_KEY`; after correction, operations will call `ops.requeue_external_provider('usda_fdc')` and rerun the labelled evaluation.
+1. Decide whether user-submitted or corrected food text may later be sent to a generative provider or retained for training under explicit consent. Current generative processing is catalogue-name-only and does not train on submissions.
+2. Replace or activate `USDA_FOODDATA_API_KEY`; after correction, operations will call `ops.requeue_external_provider('usda_fdc')` and rerun the labelled evaluation.
 
 <!-- PAGEBREAK -->
 

@@ -6,6 +6,17 @@
 ## [Unreleased]
 
 ### Deployed
+- Activated budgeted Groq ontology enrichment in production with migrations 066–069 and the
+  scheduled `cron-dish-ontology` worker. `openai/gpt-oss-120b` retains low-risk candidates at
+  confidence 0.65 and directly publishes allowlisted aliases/tags/regions at 0.80, under atomic
+  UTC-day limits of 800 requests and 160,000 tokens. The controlled run completed 9 catalogue
+  dishes with zero failed rows and 10,535 tokens used; the remaining backfill continues every ten
+  minutes and automatically defers at the free-tier cap. Latest verification reached 11/802
+  complete with zero failed rows, 12 requests and 12,665 tokens used.
+- Added independent per-dish AI retry state, provider usage reservations/settlement, service-role
+  RPC facades, complete model/source provenance, and deterministic guards against canonical or
+  component aliases and non-canonical regional shorthand. Safety-sensitive fields are absent from
+  both the model schema and database promotion function.
 - Published commit `c6321f2` to the production Vercel site and passed the one-persona post-deploy
   journey, including weekly-plan finalization, complete episode rendering, reasoned feedback,
   recipe navigation, slate persistence and validated report artifacts.

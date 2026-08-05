@@ -66,6 +66,7 @@ function normalizeEnv(raw: string | null): Environment {
 }
 
 function boundedNumber(raw: string | null, fallback: number, min: number, max: number): number {
+  if (raw === null || raw.trim() === "") return fallback;
   const value = Number(raw);
   return Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
 }

@@ -5,6 +5,7 @@
  * are promoted only by the database-governed confidence policy.
  */
 import type { FetchLike, ResearchRecord } from "./research.ts";
+import { normalizeFoodName } from "./research.ts";
 
 export interface GroqUsage {
   promptTokens: number;
@@ -17,13 +18,22 @@ export interface GroqDishEnrichment {
     name: string;
     language: string;
     region: string | null;
-    alias_type: "regional_name" | "common_name" | "transliteration" | "english_gloss" |
-      "spelling_variant";
+    alias_type:
+      | "regional_name"
+      | "common_name"
+      | "transliteration"
+      | "english_gloss"
+      | "spelling_variant";
     confidence: number;
   }>;
   taxonomy: Array<{
-    dimension: "cooking_method" | "spice_level" | "heaviness" | "texture" | "richness" |
-      "weather_affinity";
+    dimension:
+      | "cooking_method"
+      | "spice_level"
+      | "heaviness"
+      | "texture"
+      | "richness"
+      | "weather_affinity";
     code: string;
     label: string;
     confidence: number;
@@ -126,6 +136,69 @@ function numberOrZero(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) ? Math.max(0, value) : 0;
 }
 
+const REGION_CODE_ALIASES: Record<string, string> = {
+  in_rajasthan: "rajasthan",
+  in_punjab: "punjab",
+  in_maharashtra: "maharashtra",
+  in_gujarat: "gujarat",
+  in_kerala: "kerala",
+  in_karnataka: "karnataka",
+  in_tamil_nadu: "tamil_nadu",
+  in_west_bengal: "west_bengal",
+  in_uttar_pradesh: "uttar_pradesh",
+  in_north_india: "north_india",
+  in_south_india: "south_india",
+  in_east_india: "east_india",
+  in_west_india: "west_india",
+  india_hyderabad: "hyderabad",
+  india_delhi: "delhi",
+  india_goa: "goa",
+  it: "italy",
+};
+
+/** Reject deterministic alias errors and normalize provider-specific region shorthand. */
+export function sanitizeGroqEnrichment(
+  dishName: string,
+  enrichment: GroqDishEnrichment,
+): GroqDishEnrichment {
+  const canonical = normalizeFoodName(dishName);
+  const canonicalWords = canonical.split(" ");
+  const aliasSeen = new Set<string>();
+  const aliases = (Array.isArray(enrichment.aliases) ? enrichment.aliases : []).filter((alias) => {
+    const normalized = normalizeFoodName(alias.name);
+    if (!normalized || normalized === canonical || aliasSeen.has(normalized)) return false;
+    if (
+      canonicalWords.length > 1 && !normalized.includes(" ") && canonicalWords.includes(normalized)
+    ) {
+      return false;
+    }
+    aliasSeen.add(normalized);
+    return true;
+  });
+  const taxonomySeen = new Set<string>();
+  const taxonomy = (Array.isArray(enrichment.taxonomy) ? enrichment.taxonomy : []).filter(
+    (item) => {
+      const key = `${item.dimension}:${item.code}`;
+      if (taxonomySeen.has(key)) return false;
+      taxonomySeen.add(key);
+      return true;
+    },
+  );
+  const regionSeen = new Set<string>();
+  const regionalAffinities =
+    (Array.isArray(enrichment.regional_affinities) ? enrichment.regional_affinities : []).map((
+      item,
+    ) => ({
+      ...item,
+      region_code: REGION_CODE_ALIASES[item.region_code] ?? item.region_code,
+    })).filter((item) => {
+      if (regionSeen.has(item.region_code)) return false;
+      regionSeen.add(item.region_code);
+      return true;
+    });
+  return { aliases, taxonomy, regional_affinities: regionalAffinities };
+}
+
 /** Generate structured, non-safety ontology candidates for one canonical dish. */
 export async function generateGroqDishEnrichment(
   dishName: string,
@@ -147,7 +220,8 @@ export async function generateGroqDishEnrichment(
       body: JSON.stringify({
         model,
         temperature: 0,
-        max_completion_tokens: 700,
+        max_completion_tokens: 1_200,
+        reasoning_effort: "low",
         messages: [
           {
             role: "system",
@@ -163,9 +237,24 @@ export async function generateGroqDishEnrichment(
       }),
       signal: controller.signal,
     });
-    if (!response.ok) throw new Error(`groq_http_${response.status}`);
+    if (!response.ok) {
+      let providerCode = "provider_error";
+      try {
+        const errorPayload = await response.json() as Record<string, unknown>;
+        const error = errorPayload.error as Record<string, unknown> | undefined;
+        const candidate = typeof error?.code === "string"
+          ? error.code
+          : (typeof error?.type === "string" ? error.type : "provider_error");
+        providerCode = candidate.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 50);
+      } catch {
+        // Never retain provider bodies; only a bounded machine-readable code is diagnostic-safe.
+      }
+      throw new Error(`groq_http_${response.status}:${providerCode}`);
+    }
     const payload = await response.json() as Record<string, unknown>;
-    const choices = Array.isArray(payload.choices) ? payload.choices as Record<string, unknown>[] : [];
+    const choices = Array.isArray(payload.choices)
+      ? payload.choices as Record<string, unknown>[]
+      : [];
     const message = choices[0]?.message as Record<string, unknown> | undefined;
     const content = typeof message?.content === "string" ? message.content : "";
     if (!content) throw new Error("groq_empty_content");
@@ -175,6 +264,7 @@ export async function generateGroqDishEnrichment(
     } catch {
       throw new Error("groq_invalid_json");
     }
+    const sanitized = sanitizeGroqEnrichment(dishName, enrichment);
     const usagePayload = payload.usage as Record<string, unknown> | undefined;
     const usage = {
       promptTokens: numberOrZero(usagePayload?.prompt_tokens),
@@ -182,16 +272,14 @@ export async function generateGroqDishEnrichment(
       totalTokens: numberOrZero(usagePayload?.total_tokens),
     };
     const confidences = [
-      ...(Array.isArray(enrichment.aliases) ? enrichment.aliases : []).map((item) => item.confidence),
-      ...(Array.isArray(enrichment.taxonomy) ? enrichment.taxonomy : []).map((item) => item.confidence),
-      ...(Array.isArray(enrichment.regional_affinities) ? enrichment.regional_affinities : []).map(
-        (item) => item.confidence,
-      ),
+      ...sanitized.aliases.map((item) => item.confidence),
+      ...sanitized.taxonomy.map((item) => item.confidence),
+      ...sanitized.regional_affinities.map((item) => item.confidence),
     ].filter((value) => typeof value === "number" && Number.isFinite(value));
     const confidence = confidences.length ? Math.max(...confidences) : 0;
     const responseId = typeof payload.id === "string" ? payload.id : null;
     return {
-      enrichment,
+      enrichment: sanitized,
       usage,
       responseId,
       model,
@@ -200,7 +288,7 @@ export async function generateGroqDishEnrichment(
         providerRecordId: responseId,
         sourceUrl: "https://console.groq.com/docs/models",
         confidence,
-        payload: { model, enrichment, usage },
+        payload: { model, raw_enrichment: enrichment, enrichment: sanitized, usage },
       },
     };
   } finally {
