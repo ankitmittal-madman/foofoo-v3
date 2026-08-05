@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 
-import { SlotSection } from "../today";
+import Home, { SlotSection } from "../today";
 
 const mockRefetch = jest.fn();
 const mockDishResponse = {
@@ -31,7 +31,8 @@ const mockDishResponse = {
   ],
 };
 
-jest.mock("expo-router", () => ({ router: { push: jest.fn() } }));
+jest.mock("expo-router", () => ({ router: { push: jest.fn() }, useFocusEffect: jest.fn((callback) => callback()) }));
+jest.mock("@/i18n", () => ({ useI18n: () => ({ t: (key: string) => key }) }));
 jest.mock("@tanstack/react-query", () => ({
   useQuery: jest.fn(() => ({
     data: mockDishResponse,
@@ -66,6 +67,15 @@ jest.mock("@/api/plan", () => ({
 }));
 
 describe("Today", () => {
+  it("renders live complete-meal sections for all three daily slots", () => {
+    render(<Home />);
+
+    expect(screen.getByTestId("episode-section-breakfast")).toBeTruthy();
+    expect(screen.getByTestId("episode-section-lunch")).toBeTruthy();
+    expect(screen.getByTestId("episode-section-dinner")).toBeTruthy();
+    expect(screen.getByTestId("home-refresh")).toBeTruthy();
+  });
+
   it("renders persisted lock state and rich scoring reasons", () => {
     const view = render(
       <SlotSection

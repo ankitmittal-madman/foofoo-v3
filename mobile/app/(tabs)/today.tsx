@@ -1,30 +1,73 @@
-import { useState } from "react";
-import { Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { router } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { fetchClassDishes, fetchSlotOptions, setPlanSlotLock } from "@/api/plan";
+import {
+  fetchClassDishes,
+  fetchSavedWeek,
+  fetchSlotOptions,
+  savedWeekLocks,
+  savedWeekSelections,
+  setPlanSlotLock,
+} from "@/api/plan";
 import { postFeedback } from "@/api/feedback";
 import type { PlanDish } from "@/api/plan";
 import type { FeedbackEventType } from "@/api/types";
-import type { SlotName } from "@/lib/weeklyPlanStore";
-import { palette, Toast } from "@/ui/foofoo";
+import { loadWeeklyPlan, type FinalizedWeek, type SlotName } from "@/lib/weeklyPlanStore";
+import { palette } from "@/ui/foofoo";
 import { useI18n } from "@/i18n";
+import { MealEpisodeSection } from "@/components/MealEpisodeSection";
 
-const HERO = require("../../assets/images/poha-idli-fruit.png");
-const meals = [
-  { key: "breakfast", title: "Poha, Idli & Fruit Bowl", time: "7:30 AM", caption: "Light · Balanced · Quick to make" },
-  { key: "lunch", title: "Dal, Rice, Sabzi & Salad", time: "1:30 PM", caption: "Wholesome · Homely · Protein-rich" },
-  { key: "dinner", title: "Veg Khichdi & Kadhi", time: "8:00 PM", caption: "Comforting · Light · Family favourite" },
-] as const;
+const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+function isoLocalDate(value: Date): string {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function upcomingDates(): string[] {
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date();
+    date.setHours(12, 0, 0, 0);
+    date.setDate(date.getDate() + index);
+    return isoLocalDate(date);
+  });
+}
 
 export default function Home() {
   const { t } = useI18n();
-  const [active, setActive] = useState(0);
-  const [liked, setLiked] = useState(false);
-  const [toast, setToast] = useState("");
-  const meal = meals[active];
-  const flash = (message: string) => { setToast(message); setTimeout(() => setToast(""), 1800); };
-  const next = () => setActive((active + 1) % meals.length);
+  const dates = useRef(upcomingDates()).current;
+  const today = dates[0];
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [offlinePlan, setOfflinePlan] = useState<FinalizedWeek | null>(null);
+  const [refreshNonce, setRefreshNonce] = useState(0);
+  const weekday = WEEKDAYS[new Date(`${selectedDate}T12:00:00`).getDay()];
+  const saved = useQuery({
+    queryKey: ["saved-week", selectedDate],
+    queryFn: () => fetchSavedWeek(selectedDate),
+    staleTime: 0,
+  });
+
+  useEffect(() => {
+    loadWeeklyPlan().then(setOfflinePlan).catch(() => setOfflinePlan(null));
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    saved.refetch();
+  }, [selectedDate]));
+
+  const serverPlan = savedWeekSelections(saved.data);
+  const plan = Object.keys(serverPlan).length > 0
+    ? serverPlan
+    : selectedDate === today ? offlinePlan : null;
+  const locks = savedWeekLocks(saved.data);
+
+  if (saved.isLoading && !offlinePlan) {
+    return <View style={styles.center}><ActivityIndicator color={palette.purple} /></View>;
+  }
 
   return (
     <View style={styles.screen} testID="home-screen">
@@ -32,33 +75,21 @@ export default function Home() {
         <View style={styles.brandRow}><View><Text style={styles.brand}>FooFoo<Text style={styles.brandMark}>♡</Text></Text><Text style={styles.tagline}>AI Meal Decision Platform{`\n`}for your household</Text></View><Pressable onPress={() => router.push("/notifications")} style={styles.topIcon}><Text>♧</Text><View style={styles.dot} /></Pressable></View>
         <Text style={styles.greeting}>{t("greeting")}</Text><Text style={styles.question}>{t("question")}</Text>
         <View style={styles.insight}><Text style={styles.insightIcon}>✦</Text><Text style={styles.insightText}>{t("insight")}</Text></View>
-
-        <View style={styles.heroCard}>
-          <ImageBackground source={HERO} style={styles.hero} imageStyle={styles.heroImage}>
-            <View style={styles.heroShade} />
-            <View style={styles.mealBadge}><Text style={styles.mealBadgeText}>{t(meal.key)}</Text></View>
-            <View style={styles.heroCopy}><Text style={styles.heroTitle}>{meal.title}</Text><Text style={styles.heroCaption}>{meal.caption}</Text></View>
-            <View style={styles.counter}><Text style={styles.counterText}>{active + 1} / 3</Text><View style={styles.counterBar}><View style={[styles.counterFill, { width: `${((active + 1) / 3) * 100}%` }]} /></View></View>
-          </ImageBackground>
-          <View style={styles.socialRail}>
-            <Action icon={liked ? "♥" : "♡"} label={t("like")} active={liked} onPress={() => setLiked(!liked)} />
-            <Action icon="×" label={t("skip")} onPress={next} />
-            <Action icon="↗" label={t("share")} onPress={() => flash("Plan shared with your household")} />
-            <Action icon="ⓘ" label={t("details")} onPress={() => router.push({ pathname: "/meal-detail", params: { meal: meal.title } })} />
-          </View>
-        </View>
-        <Pressable style={styles.addButton} onPress={() => flash(t("added"))}><Text style={styles.addButtonText}>＋ {t("addPlan")}</Text></Pressable>
-
         <View style={styles.sectionHead}><Text style={styles.sectionTitle}>{t("todayPlan")}</Text><Pressable onPress={() => router.push("/weekly-plan")}><Text style={styles.viewAll}>{t("viewAll")}  ›</Text></Pressable></View>
-        <View style={styles.summaryRow}>{meals.map((item, index) => <Pressable key={item.key} style={[styles.summaryCard, active === index && styles.summaryActive]} onPress={() => setActive(index)}><Image source={HERO} style={styles.summaryImage} /><Text style={styles.summarySlot}>{t(item.key)}</Text><Text style={styles.summaryTime}>{item.time}</Text></Pressable>)}</View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dateRow}>
+          {dates.map((date) => {
+            const active = date === selectedDate;
+            const parsed = new Date(`${date}T12:00:00`);
+            return <Pressable testID={`home-date-${date}`} key={date} accessibilityRole="button" accessibilityState={{ selected: active }} style={[styles.dateChip, active && styles.dateChipActive]} onPress={() => setSelectedDate(date)}><Text style={[styles.dateWeekday, active && styles.dateTextActive]}>{parsed.toLocaleDateString(undefined, { weekday: "short" })}</Text><Text style={[styles.dateDay, active && styles.dateTextActive]}>{parsed.getDate()}</Text></Pressable>;
+          })}
+        </ScrollView>
+        <View style={styles.planActions}><Text style={styles.selectedDate}>{new Date(`${selectedDate}T12:00:00`).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}</Text><Pressable testID="home-refresh" style={styles.refreshButton} onPress={() => setRefreshNonce((value) => value + 1)}><Text style={styles.refreshText}>↻ Refresh</Text></Pressable></View>
+        <View style={styles.episodeList}>
+          {SLOTS.map((slot) => <MealEpisodeSection key={slot} slot={slot} weekday={weekday} slotDate={selectedDate} classCode={plan?.[weekday]?.[slot]} initiallyLocked={locks[weekday]?.[slot] === true} refreshNonce={refreshNonce} />)}
+        </View>
       </ScrollView>
-      <Toast visible={!!toast} text={toast} />
     </View>
   );
-}
-
-function Action({ icon, label, onPress, active }: { icon: string; label: string; onPress: () => void; active?: boolean }) {
-  return <View style={styles.actionWrap}><Pressable onPress={onPress} style={[styles.action, active && styles.actionActive]}><Text style={[styles.actionIcon, active && { color: palette.red }]}>{icon}</Text></Pressable><Text style={styles.actionLabel}>{label}</Text></View>;
 }
 
 /** Compatibility surface for API-backed recommendation tests and progressive rollout. */
@@ -74,5 +105,5 @@ export function SlotSection({ slot, weekday, slotDate, classCode, initiallyLocke
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: palette.bg }, page: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 112 }, brandRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }, brand: { fontFamily: "Fraunces_600SemiBold", fontSize: 30, color: "#EC315A" }, brandMark: { fontSize: 17 }, tagline: { fontSize: 11, lineHeight: 15, color: palette.ink, marginTop: 3 }, topIcon: { width: 42, height: 42, borderRadius: 21, backgroundColor: "white", borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center" }, dot: { position: "absolute", right: 7, top: 6, width: 7, height: 7, borderRadius: 4, backgroundColor: palette.red }, greeting: { fontFamily: "Mukta_600SemiBold", fontSize: 22, color: palette.ink }, question: { color: palette.muted, fontSize: 15, marginTop: -2 }, insight: { flexDirection: "row", gap: 8, backgroundColor: palette.purpleSoft, borderRadius: 12, padding: 11, marginTop: 13, marginBottom: 16 }, insightIcon: { color: palette.purple }, insightText: { color: "#603190", flex: 1, fontSize: 12 }, heroCard: { height: 370, marginRight: 34, borderRadius: 21, backgroundColor: "white", shadowColor: "#3D2C1F", shadowOpacity: .18, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 6 }, hero: { flex: 1 }, heroImage: { borderRadius: 21 }, heroShade: { ...StyleSheet.absoluteFillObject, borderRadius: 21, backgroundColor: "rgba(26,17,14,.33)" }, mealBadge: { position: "absolute", top: 18, left: 16, backgroundColor: palette.amber, borderRadius: 6, paddingHorizontal: 9, paddingVertical: 5 }, mealBadgeText: { color: "white", fontSize: 11, fontWeight: "700" }, heroCopy: { position: "absolute", left: 18, right: 18, top: 80 }, heroTitle: { color: "white", fontSize: 24, lineHeight: 27, fontWeight: "800", width: "72%" }, heroCaption: { color: "white", fontSize: 13, lineHeight: 18, marginTop: 12, width: "65%" }, counter: { position: "absolute", left: 18, bottom: 18 }, counterText: { color: "white", fontWeight: "700" }, counterBar: { width: 64, height: 4, backgroundColor: "#FFFFFF66", borderRadius: 3, marginTop: 8 }, counterFill: { height: 4, borderRadius: 3, backgroundColor: "#B66DF3" }, socialRail: { position: "absolute", right: -40, top: 35, gap: 14 }, actionWrap: { alignItems: "center" }, action: { width: 47, height: 47, borderRadius: 15, backgroundColor: "white", borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOpacity: .08, shadowRadius: 8, elevation: 3 }, actionActive: { backgroundColor: "#FFF3F5", borderColor: "#F2B8C2" }, actionIcon: { fontSize: 24 }, actionLabel: { fontSize: 9, backgroundColor: "white", paddingHorizontal: 5, color: palette.muted, marginTop: -3 }, addButton: { alignSelf: "flex-start", marginTop: 14, marginLeft: 2, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: palette.purpleSoft }, addButtonText: { color: palette.purple, fontWeight: "700", fontSize: 12 }, sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 22, marginBottom: 11 }, sectionTitle: { fontWeight: "800", color: palette.ink, fontSize: 16, textTransform: "capitalize" }, viewAll: { color: palette.purple, fontWeight: "600", fontSize: 13 }, summaryRow: { flexDirection: "row", gap: 9 }, summaryCard: { flex: 1, alignItems: "center", padding: 9, borderRadius: 13, backgroundColor: "white", borderWidth: 1, borderColor: palette.line }, summaryActive: { borderColor: palette.purple }, summaryImage: { width: 45, height: 45, borderRadius: 23 }, summarySlot: { fontSize: 11, fontWeight: "700", marginTop: 7, textAlign: "center" }, summaryTime: { fontSize: 10, color: palette.muted, marginTop: 4 }, legacy: { margin: 20, padding: 16, backgroundColor: "white", gap: 8 }, legacyDish: { fontSize: 16, fontWeight: "700" },
+  screen: { flex: 1, backgroundColor: palette.bg }, center: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.bg }, page: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 112 }, brandRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }, brand: { fontFamily: "Fraunces_600SemiBold", fontSize: 30, color: "#EC315A" }, brandMark: { fontSize: 17 }, tagline: { fontSize: 11, lineHeight: 15, color: palette.ink, marginTop: 3 }, topIcon: { width: 42, height: 42, borderRadius: 21, backgroundColor: "white", borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center" }, dot: { position: "absolute", right: 7, top: 6, width: 7, height: 7, borderRadius: 4, backgroundColor: palette.red }, greeting: { fontFamily: "Mukta_600SemiBold", fontSize: 22, color: palette.ink }, question: { color: palette.muted, fontSize: 15, marginTop: -2 }, insight: { flexDirection: "row", gap: 8, backgroundColor: palette.purpleSoft, borderRadius: 12, padding: 11, marginTop: 13, marginBottom: 4 }, insightIcon: { color: palette.purple }, insightText: { color: "#603190", flex: 1, fontSize: 12 }, sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 22, marginBottom: 11 }, sectionTitle: { fontWeight: "800", color: palette.ink, fontSize: 18 }, viewAll: { color: palette.purple, fontWeight: "600", fontSize: 13 }, dateRow: { gap: 8, paddingBottom: 12 }, dateChip: { minWidth: 50, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 12, alignItems: "center", backgroundColor: "white", borderWidth: 1, borderColor: palette.line }, dateChipActive: { backgroundColor: palette.purple, borderColor: palette.purple }, dateWeekday: { fontSize: 11, color: palette.muted }, dateDay: { fontSize: 16, fontWeight: "800", color: palette.ink, marginTop: 2 }, dateTextActive: { color: "white" }, planActions: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }, selectedDate: { color: palette.ink, fontWeight: "700", fontSize: 13 }, refreshButton: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 16, backgroundColor: palette.purpleSoft }, refreshText: { color: palette.purple, fontWeight: "700", fontSize: 12 }, episodeList: { gap: 20 }, legacy: { margin: 20, padding: 16, backgroundColor: "white", gap: 8 }, legacyDish: { fontSize: 16, fontWeight: "700" },
 });
