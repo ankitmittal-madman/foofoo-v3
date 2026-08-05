@@ -19,7 +19,8 @@ Only future work is listed here. Evidence and acceptance detail are in `OPEN_ITE
 10. Resolve unindexed-foreign-key and duplicate-index findings.
 11. Deploy and operationally verify the local release candidate.
 12. Run production load/soak testing and revisit Fly.io sizing.
-13. Apply/live-verify migration 056 + seed 146 and deploy the dish-ontology Edge Function.
+13. Apply/live-verify migration 056 + seed 146, deploy the dish-ontology Edge Function and promote
+    the versioned ontology-aware RE bundle with legacy-fallback monitoring.
 
 ## P3 — Product and intelligence evolution
 

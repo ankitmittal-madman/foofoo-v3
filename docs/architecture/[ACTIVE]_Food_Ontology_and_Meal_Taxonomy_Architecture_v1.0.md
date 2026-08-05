@@ -108,7 +108,24 @@ pipe-separated production string.
 These endpoints remain the recommendation source of truth. The new API must not reimplement
 ranking or weekly planning.
 
-### 4.2 New authenticated API
+### 4.2 Recommendation compatibility bridge
+
+The active Python RE remains an immutable, startup-loaded service. Seed generation now also emits
+`food_ontology_snapshot.json`, a planning-safe projection containing canonical dish identity,
+primary class, all class memberships, planning roles, confidence, review status and provenance.
+The bundle exporter includes that file in its content hash, and `ghar_re_core.knowledge` prefers
+the snapshot for class lookup.
+
+This is deliberately a build-time promotion boundary, not a per-request database dependency:
+
+`reviewed ontology → generated snapshot → versioned RE bundle → existing class-first scoring`
+
+During rollout, the legacy class CSVs remain a fallback for an older bundle and for the small set
+of reference/fixture names outside the 810-dish production catalogue. Compatibility tests prove
+the snapshot produces the same primary and multi-class memberships for every current catalogue
+dish. Raw external records, AI candidates and rejected assertions are never bundled.
+
+### 4.3 New authenticated API
 
 `POST /v1/dish-ontology` multiplexes:
 
@@ -159,10 +176,11 @@ own that ontology and use external APIs as evidence enrichers, never as the plan
 5. Inspect `dish_ontology_coverage` and `dish_taxonomy_review_queue`; resolve low-confidence
    classes before expanding candidate-view use.
 6. Deploy the `dish-ontology` Edge Function and configure a server-only USDA key if desired.
-7. Shadow-read `dish_candidates_by_class` against the bundled classifier before switching the
-   existing RE catalogue provider to a database-backed snapshot.
-8. After parity, export the normalized database snapshot into the immutable RE bundle at deploy
-   time. Do not add live database calls inside scoring math.
+7. Generate and verify `food_ontology_snapshot.json`; the bundle version changes whenever this
+   promoted projection changes.
+8. Deploy the rebuilt immutable RE bundle. Do not add live database calls inside scoring math.
+9. Retain the legacy CSV fallback for one rollout window; remove it only after deployed parity and
+   rollback verification.
 
 Rollback uses `056_food_ontology_enrichment_rollback.sql`. It removes only the new enrichment
 structures and columns; canonical dish rows survive. Roll back the Edge Function before the
@@ -183,6 +201,9 @@ schema so old code never calls missing tables.
   before ranking and that an empty safe pool returns a named empty state.
 - External failure: timeout FoodOn while USDA succeeds; preserve USDA evidence and return partial.
 - ETL determinism: run the generator twice and compare the seed hash.
+- Recommendation compatibility: prove snapshot and legacy primary/multi-class lookup parity for
+  all 810 dishes, golden-master outputs remain unchanged, and catalogue-specific class-count
+  caches cannot leak across bundle versions.
 - RLS: user A can read their submission/job; user B cannot. Raw submissions are never public.
 
 ## 8. ML/AI Decisions Required
@@ -210,8 +231,9 @@ decisions are approved:
   labelled evaluation. Exact-name confidence is capped below canonical/human confidence.
 - Seed 146 is large because it contains an auditable snapshot of all per-field source assertions.
   A future bulk loader may compress deployment transport, but must preserve deterministic hashes.
-- The live Python RE still consumes an immutable bundle. The candidate view is ready for shadow
-  parity testing, not silently made the live scoring source in this change.
+- The Python RE consumes the planning-safe ontology projection through its immutable bundle;
+  external evidence and database review state stay outside request-time scoring. The checked-in
+  legacy fallback remains intentionally active for rollback and non-production fixture names.
 - Clinical health-condition suitability remains outside this subsystem until appropriate clinical
   governance exists.
 

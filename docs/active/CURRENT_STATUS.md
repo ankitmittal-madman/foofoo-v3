@@ -1,6 +1,6 @@
 # Current Status
 
-**As of:** 2026-08-04. Source: `docs/archive/audits/re_audit_v2/` (fresh clean-room audit, live-verified where noted). This file states current state only — no history. See `docs/archive/audits/` for how these numbers were derived.
+**As of:** 2026-08-05. Source: `docs/archive/audits/re_audit_v2/` (fresh clean-room audit, live-verified where noted). This file states current state only — no history. See `docs/archive/audits/` for how these numbers were derived.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,
@@ -16,7 +16,7 @@
 > weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
 > query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
 > migration 054 RLS optimization, pinned container bases, staging/manual-production workflows and
-> mobile CI are implemented. Verification passes: 699 Python tests (27 skipped), 80 Deno tests,
+> mobile CI are implemented. Verification passes: 712 Python tests (27 skipped), 85 Deno tests,
 > 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
 > run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
@@ -24,7 +24,9 @@
 > 146: all 810 bundled dishes have deterministic per-field evidence and class mappings; future
 > canonical dish writes are queued at the database boundary; user dishes stage through a new
 > authenticated Edge Function with FoodOn and optional USDA research. It is not deployed, and
-> unknown-dish AI promotion remains disabled pending model/safety policy approval.
+> unknown-dish AI promotion remains disabled pending model/safety policy approval. A deterministic
+> planning-safe ontology snapshot is now part of the versioned RE bundle and preserves current
+> primary/multi-class lookup exactly; the legacy CSV fallback protects staged rollout and rollback.
 
 | Dimension | % |
 |---|---|
@@ -37,14 +39,14 @@
 | Seed Data | 90% |
 | Database | 90% |
 | Security | 80% |
-| Testing | 75% (backend 100% green — 79 Deno + 190 Python tests; mobile has infra + 9 pure-logic tests, no component-render tests yet) |
+| Testing | 75% (backend suites green — 85 Deno + 712 repository Python tests; mobile has infra but no physical-device coverage yet) |
 | Deployment | 90% (live-verified healthy; `household`/`plan` redeployed 2026-08-04 with this session's fixes) |
 | Frontend (mobile) | 70% |
 | Observability | 45% (webhook alerting sink wired to every 500-level error path; no webhook URL configured yet) |
 
 ## One-line state per major component
-- **RE core/service:** implemented, tested (190 tests passing), deployed, live-healthy.
-- **Edge Functions:** all 9 implemented and tested (79 tests); auth/ownership model correct;
+- **RE core/service:** implemented, repository Python suite green (712 passed, 27 skipped), deployed, live-healthy.
+- **Edge Functions:** implemented and tested (85 tests); auth/ownership model correct;
   `household` and `plan` redeployed 2026-08-04 with the P0-1/P0-4/P1-3/P1-4/P1-7 fixes.
 - **Mobile app:** onboarding/cold-start/weekly-plan work; explanation, history, profile-edit, and
   DPDP export/delete UI added 2026-08-04 (P0-2/P0-4/P1-2/P1-3/P1-4); jest infra stood up with 9

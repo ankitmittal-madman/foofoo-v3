@@ -4,7 +4,7 @@
  * attaches the Supabase JWT). The Edge Function composes the household from the DB, so the client
  * never sends Q1–Q15 here — only the surface + planning params.
  */
-import { apiPost } from "./client";
+import { ApiError, apiPost } from "./client";
 
 /** One dish/meal card the planner returns (image_url + meal class attached server-side). */
 export interface PlanDish {
@@ -121,6 +121,78 @@ export interface MealEpisodeResponse {
   request_id?: string;
 }
 
+function stableEpisodeHash(slot: Slot, dishName: string, index: number): string {
+  const input = `${slot}:${dishName}:${index}`;
+  let hash = 2166136261;
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `compat-${(hash >>> 0).toString(16)}`;
+}
+
+function dishToEpisode(dish: PlanDish, slot: Slot, index: number): MealEpisode {
+  const activeMinutes = Math.max(0, dish.total_mins ?? 30);
+  const pChoose = Math.max(0.01, Math.min(0.99, dish.score / 5));
+  return {
+    episode_hash: stableEpisodeHash(slot, dish.name, index),
+    rank: index + 1,
+    plate_form: "single",
+    display_name: dish.name,
+    components: [{
+      dish_id: `dish:${dish.name}`,
+      dish_name: dish.name,
+      component_role: "hero",
+      is_required: true,
+      image_url: dish.image_url,
+    }],
+    intent: activeMinutes <= 30 ? "quick" : "routine",
+    intent_posterior: activeMinutes <= 30 ? { quick: 0.6, routine: 0.4 } : { routine: 0.7, quick: 0.3 },
+    practicality: {
+      active_minutes: activeMinutes,
+      critical_path_minutes: activeMinutes,
+      vessel_count: 1,
+      burner_peak: 1,
+      ingredient_count: 0,
+      complex_method_count: 0,
+      pantry_coverage: null,
+      feature_version: "meal-plan-compat-v1",
+      estimation_confidence: 0.35,
+    },
+    cadence_tier: dish.heaviness !== null && dish.heaviness >= 3 ? "occasional" : "regular_rotation",
+    richness_score: Math.max(0, Math.min(1, (dish.heaviness ?? 1) / 3)),
+    predictions: {
+      p_choose: pChoose,
+      p_execute: activeMinutes <= 35 ? 0.78 : 0.62,
+      p_regret: dish.heaviness !== null && dish.heaviness >= 3 ? 0.28 : 0.16,
+      p_success: pChoose * (activeMinutes <= 35 ? 0.78 : 0.62) * (dish.heaviness !== null && dish.heaviness >= 3 ? 0.72 : 0.84),
+      model_version: "meal-plan-compat-v1",
+      calibration_status: "rule_baseline_untrained",
+    },
+    reasons: [
+      dish.meal_class_name ? `${dish.meal_class_name} class` : `${dish.cuisine} option`,
+      `about ${activeMinutes} active minutes`,
+    ],
+    source_plate_score: dish.score,
+  };
+}
+
+function slotOptionsToMealEpisodes(response: SlotOptionsResponse, slot: Slot): MealEpisodeResponse {
+  return {
+    kind: "meal_episode_slate",
+    slot,
+    episodes: response.options.map((dish, index) => dishToEpisode(dish, slot, index)),
+    model_version: "meal-plan-compat-v1",
+    warnings: ["complete meal episodes surface unavailable; showing dish options"],
+    request_id: response.request_id,
+  };
+}
+
+function shouldFallbackToSlotOptions(error: unknown): boolean {
+  return error instanceof ApiError &&
+    (error.code === "ERR_VALIDATION_FAILED" || error.status === 503 || error.status === 404);
+}
+
 export interface WeeklyClass {
   class_code: string;
   class_name: string;
@@ -198,7 +270,26 @@ export function fetchMealEpisodes(
     recovery_mode?: boolean;
   } = {},
 ): Promise<MealEpisodeResponse> {
-  return apiPost<MealEpisodeResponse>("/plan", { surface: "meal_episodes", slot, ...opts });
+  return apiPost<MealEpisodeResponse>("/plan", { surface: "meal_episodes", slot, ...opts })
+    .catch(async (error: unknown) => {
+      if (!shouldFallbackToSlotOptions(error)) throw error;
+      const count = typeof opts.count === "number" ? opts.count : 4;
+      const response = await apiPost<SlotOptionsResponse>("/plan", opts.class_code
+        ? {
+          surface: "class_dishes",
+          slot,
+          class_code: opts.class_code,
+          weekday: opts.weekday,
+          count,
+        }
+        : {
+          surface: "meal_plan",
+          slot,
+          weekday: opts.weekday,
+          count,
+        });
+      return slotOptionsToMealEpisodes(response, slot);
+    });
 }
 
 export type WeekSelections = Record<string, Partial<Record<Slot, string>>>;

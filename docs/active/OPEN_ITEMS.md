@@ -33,7 +33,8 @@ findings are retained under `docs/archive/`.
   receive no regional-prior boost.
 - Apply and live-verify migration 054, including its RLS-policy performance change and rollback.
 - Apply the concurrent migration 055, then migration 056 and seed 146; deploy and live-verify the
-  `dish-ontology` Edge Function before routing user-added dishes through it.
+  `dish-ontology` Edge Function and rebuilt ontology-aware RE bundle before routing user-added
+  dishes through it. Retain the compatibility fallback for one verified rollout window.
 - Configure `FLY_STAGING_*` variables/secrets and a protected `production` environment.
 - Archive dead `re_engine`-era ETL and validation scripts that target retired schemas.
 - Resolve unindexed-foreign-key and duplicate-index advisor findings.

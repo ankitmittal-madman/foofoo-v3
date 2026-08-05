@@ -199,6 +199,9 @@ def build_seed(
 
     mapping_payload: list[dict[str, object]] = []
     role_by_class = {row["meal_class_code"]: row["planning_role_v3"] for row in classes}
+    canonical_name_by_key = {
+        str(dish["name"]).strip().casefold(): str(dish["name"]) for dish in catalogue
+    }
     for row in normalized_mappings(mappings, curated):
         planning_role = role_by_class[str(row["meal_class_code"])]
         item_role = {
@@ -209,7 +212,9 @@ def build_seed(
         for slot in _slots(row["slot_group"]):
             mapping_payload.append(
                 {
-                    "dish": row["dish_name"],
+                    "dish": canonical_name_by_key.get(
+                        str(row["dish_name"]).strip().casefold(), row["dish_name"]
+                    ),
                     "class": row["meal_class_code"],
                     "slot": slot,
                     "role": item_role,

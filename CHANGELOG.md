@@ -6,6 +6,11 @@
 ## [Unreleased]
 
 ### Fixed
+- The ontology layer now feeds the current recommendation engine through a deterministic,
+  content-hashed `food_ontology_snapshot.json` bundled at build time. Runtime lookup preserves the
+  existing class-first primary/multi-membership contract and falls back to legacy CSVs for staged
+  rollout and non-catalogue fixtures. The class-backing cache is now scoped to its catalogue
+  instance, preventing one bundle/test catalogue from contaminating another.
 - **Root-caused the "nobody completes onboarding" gap**: live Edge Function logs showed a real
   test signup hitting `household` from a browser (Expo web) and getting a wall of
   `OPTIONS | 401`. The platform gateway's `verify_jwt` check runs on the CORS preflight too,

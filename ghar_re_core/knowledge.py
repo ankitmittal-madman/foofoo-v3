@@ -815,6 +815,23 @@ def dish_to_class_code(dish_name):
         snapshot = _load_ontology_snapshot()
         if snapshot is not None:
             primary, memberships = _class_maps_from_snapshot(snapshot)
+            # Preserve legacy-only fixture and alias entries during the staged migration. The
+            # normalized snapshot covers the 810 production catalogue dishes; the legacy files
+            # also contain a small number of test/reference names. Dropping those would change
+            # golden-master scoring even though no production dish changed.
+            legacy_primary, legacy_memberships = {}, {}
+            for row in _load_class_first_csv("class_dish_options.csv"):
+                key = row["dish_name"].strip().lower()
+                legacy_primary.setdefault(key, row["meal_class_code"])
+                legacy_memberships.setdefault(key, set()).add(row["meal_class_code"])
+            for row in _load_class_first_csv("dish_class_map.csv"):
+                key = row["dish_name"].strip().lower()
+                legacy_primary.setdefault(key, row["meal_class_code"])
+                legacy_memberships.setdefault(key, set()).add(row["meal_class_code"])
+            for key, code in legacy_primary.items():
+                primary.setdefault(key, code)
+            for key, codes in legacy_memberships.items():
+                memberships.setdefault(key, set()).update(codes)
             # Publish all related globals together so concurrent first requests cannot observe a
             # half-initialized ontology cache. `_DISH_OVERRIDES` stays an empty compatibility map.
             global _DISH_TO_CLASSES

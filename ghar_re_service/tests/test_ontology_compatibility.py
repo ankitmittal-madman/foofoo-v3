@@ -97,6 +97,10 @@ def test_runtime_lookup_uses_snapshot_without_changing_class_first_contract():
         assert K.dish_to_class_codes(name) == frozenset(
             row["class_code"] for row in dish["mappings"]
         )
+    # Legacy-only reference names remain available until their canonical entity-resolution
+    # decision is reviewed; this is the compatibility fallback that protects golden fixtures.
+    assert K.dish_to_class_code("Roti") is not None
+    assert K.dish_to_class_codes("Roti")
 
 
 def test_snapshot_is_part_of_the_versioned_recommendation_bundle(tmp_path):
