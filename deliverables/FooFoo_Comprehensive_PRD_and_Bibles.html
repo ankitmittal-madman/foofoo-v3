@@ -43,11 +43,15 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 </style>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 </head><body><main><h1 class="">FOOFOO</h1>
-<h2 class="">Comprehensive Product Requirements Document &amp; Intelligence Bibles</h2>
-<p><strong>Version:</strong> 1.0 <strong>Date:</strong> 5 August 2026 <strong>Status:</strong> Product and engineering baseline for review <strong>Audience:</strong> Founders, Product, Design, Data Science, Food Science, Engineering, Growth, Operations <strong>Scope:</strong> India-first, globally extensible AI meal-decision platform</p>
-<blockquote><strong>Product promise:</strong> Foofoo removes the recurring cognitive burden of “Aaj khaane mein kya banaye?” by producing a safe, culturally fluent, household-aware plan that people can trust, change, cook, or order.</blockquote>
-<p>This document is deliberately one integrated artifact. Part I is the complete PRD. Part II is the <strong>FooFoo Recommendation Engine Bible</strong>. Part III is the <strong>Food Intelligence Bible</strong>. Part IV is the <strong>Engineering &amp; Architecture Bible</strong>, including the expected database schema, data provenance, APIs, MLOps, and the exact retrieval path used to recommend meals to one household.</p>
-<p><strong>Source rule.</strong> The active Product, Architecture, Research, Roadmap, Visual, and current-status documents in the repository were used. <code>docs/archive/**</code>, <code>database/archive/**</code>, <code>docs/governance/**</code>, and documents whose principal purpose is governance were excluded. Where an active design and live implementation differ, the difference is labelled <strong>target</strong>, <strong>current</strong>, or <strong>decision required</strong>.</p>
+<h2 class="">Final Product Definition, Recommendation Mathematics &amp; Intelligence Bibles</h2>
+<p><strong>Document state:</strong> FINAL — replaces the prior document in place</p>
+<p><strong>Date:</strong> 5 August 2026</p>
+<p><strong>Status:</strong> Authoritative product and build specification</p>
+<p><strong>Audience:</strong> Founders, Product, Design, Data Science, Food Science, Engineering, Growth, Operations</p>
+<p><strong>Scope:</strong> India-first, globally extensible AI meal-decision platform</p>
+<blockquote><strong>Product promise:</strong> Foofoo predicts the complete meal a household will genuinely want and realistically make now—so accurately that the first reaction is, “Yes, that is exactly what I wanted to eat.”</blockquote>
+<p>This document is deliberately one integrated build artifact. Part I defines the real consumer product. Part II is the <strong>FooFoo Recommendation Engine Bible</strong>, including the full mathematical spine. Part III is the <strong>Food Intelligence Bible</strong>. Part IV is the <strong>Engineering &amp; Architecture Bible</strong>, including database provenance, APIs, MLOps, and the exact retrieval path used to predict one household meal. It is detailed enough for an AI coding system and human teams to build the intended surface and internal behavior without inventing missing product logic.</p>
+<p><strong>Independence rule.</strong> The active Product, Architecture, Research, Roadmap, Visual, current-status documents, both supplied product briefs, current primary research, and official Indian dietary/household datasets were used. <code>docs/archive/**</code>, <code>database/archive/**</code>, <code>docs/governance/**</code>, and documents whose principal purpose is governance were excluded. The current codebase is evidence—not a design constraint. This specification says what the product should be even when that is more demanding than today’s implementation.</p>
 <div class="page-break"></div>
 <h1 class="">Document map</h1>
 <div class=table-wrap><table><thead><tr><th>Part</th><th>Purpose</th><th>Primary reader</th></tr></thead><tbody><tr><td>I. Product PRD</td><td>Vision, market, users, psychology, journeys, UX, screens, growth, GTM, revenue, metrics</td><td>Product, Design, Growth</td></tr><tr><td>II. Recommendation Engine Bible</td><td>Candidate generation, scoring, ranking, cold start, household aggregation, learning, experimentation</td><td>Data Science, ML, Product</td></tr><tr><td>III. Food Intelligence Bible</td><td>Meal Genome, ontology, graph, nutrition, regional and temporal intelligence</td><td>Food Science, Data, ML</td></tr><tr><td>IV. Engineering &amp; Architecture Bible</td><td>Platform, services, APIs, events, database, provenance, infrastructure, MLOps, security</td><td>Engineering, Data Platform, SRE</td></tr><tr><td>V. Delivery plan</td><td>v1→v5 roadmap, acceptance criteria, risks, decision log</td><td>Leadership, PMO</td></tr></tbody></table></div>
@@ -68,7 +72,25 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <p><strong>North-star metric:</strong> Weekly Successful Meal Decisions (WSMD): distinct planned meal slots per household that are accepted or locked and subsequently marked cooked, ordered, or implicitly confirmed without a replacement.</p>
 <p><strong>MVP guardrails:</strong> zero known hard-constraint violations; p95 cached plan load under 1 second on a budget Android device; p95 fresh recommendation under 3 seconds; no child or health-condition claim presented as medical advice; deletion/export paths available; degraded mode returns a previously safe plan.</p>
 <div class="page-break"></div>
-<h2 class="">2. Problem definition and jobs to be done</h2>
+<h2 class="">2. Final product decision: predict a meal episode, not a dish</h2>
+<p>The previous framing—rank dishes inside meal classes—is necessary but insufficient. The final atomic recommendation object is a <strong>Meal Episode</strong>:</p>
+<p><code>MealEpisode = shared_plate + member_adaptations + cooking_plan + ingredient_plan + occasion_context + predicted_outcome</code>.</p>
+<p>A weekday episode may be <code>phulka + lauki-chana dal sabzi + curd</code>, produced in 32 active minutes with two burners and ingredients already typical for the household. A Sunday episode may be <code>rajma + rice + kachumber</code>, and a celebratory episode may contain a richer hero, side, and dessert. These are not equivalent “three recipe” recommendations. They occupy different positions in the household’s cadence, effort budget, appetite state, and cultural grammar.</p>
+<h3 class="">What the engine must predict</h3>
+<ol>
+<li><strong>Latent meal intent:</strong> comfort, routine, light, indulgent, quick, leftover-recovery, festive, discovery, or health-supporting.</li>
+<li><strong>Plate structure:</strong> staple, main, pulse/protein, vegetable, accompaniment, beverage/dessert only when appropriate.</li>
+<li><strong>Household agreement:</strong> whether every applicable member can safely eat it and the likely utility for each member.</li>
+<li><strong>Execution probability:</strong> whether the actual cook can and will make it given time, effort, equipment, pantry likelihood, and fatigue.</li>
+<li><strong>Outcome:</strong> select, lock, cook/order, finish, repeat, replace, or regret.</li>
+</ol>
+<p>The primary rank target is therefore not click-through rate. It is:</p>
+<p><code>P(the household chooses and completes this meal episode without regretted replacement | household, context, history, exposure)</code>.</p>
+<h3 class="">Product hierarchy</h3>
+<p><code>meal intent → plate grammar → bundle candidates → hard safety → practicality → member utilities → household utility → weekly cadence → slate → explanation → outcome learning</code>.</p>
+<p>This hierarchy prevents restaurant-rich recommendations from dominating ordinary home food. Richness, number of components, novelty, and effort are learned frequencies with explicit cadence constraints. “Everyday” is a first-class food attribute, not the absence of “special.”</p>
+<div class="page-break"></div>
+<h2 class="">2.1 Problem definition and jobs to be done</h2>
 <p>Meal choice is a repeated constrained-optimization problem disguised as a simple question. An Indian household may decide breakfast, lunch, tiffin, snack, and dinner while balancing taste, availability, preparation time, cook skill, freshness, multiple diets, fasting, weather, leftovers, and the memory of recent meals. The decision maker typically optimizes this mentally with incomplete information and absorbs the social cost of a poor choice.</p>
 <h3 class="">Functional jobs</h3>
 <ol>
@@ -108,6 +130,14 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <div class=table-wrap><table><thead><tr><th>Segment</th><th>Core tension</th><th>Product wedge</th><th>Monetization likelihood</th></tr></thead><tbody><tr><td>Dual-income families</td><td>Time + coordination</td><td>Ready-made household plan</td><td>Medium–high</td></tr><tr><td>Primary homemakers</td><td>Invisible mental load</td><td>Relief + variety + recognition</td><td>Medium</td></tr><tr><td>Solo professionals</td><td>Delivery default + waste</td><td>Quick single-serve plan</td><td>Medium</td></tr><tr><td>Fitness/health-aware adults</td><td>Indian relevance gap</td><td>Goal-aware planning</td><td>High, with safe scope</td></tr><tr><td>Joint families</td><td>Conflicting needs</td><td>Base meal + member add-ons</td><td>Medium–high</td></tr><tr><td>Students/shared flats</td><td>Budget + beginner skill</td><td>Cheap, easy, social plan</td><td>Low ARPU, high referrals</td></tr><tr><td>Migrant households</td><td>Identity + local exposure</td><td>Home/current-city blend</td><td>Medium</td></tr></tbody></table></div>
 <p>Repository market numbers such as TAM, SAM, and competitor revenue are treated as internal hypotheses because commercial research values can change and may use incompatible definitions. The board-ready sizing model should be bottoms-up: reachable households × activation × retained planning households × paid conversion × ARPU.</p>
 <p>Sources: <a href="https://www.trai.gov.in/">TRAI dashboard</a>, <a href="https://www.npci.org.in/product/upi/product-statistics">NPCI UPI statistics</a>, <a href="https://www.who.int/india/health-topics/healthy-diet">WHO India healthy diet</a>.</p>
+<div class="page-break"></div>
+<h2 class="">4.1 Research synthesis: how Indian households actually eat</h2>
+<p>The product must resist three biases in digital food data: recipe websites overrepresent novelty, delivery catalogs overrepresent restaurant food, and engagement feeds overrepresent visually rich dishes. None is a reliable prior for Tuesday dinner at home.</p>
+<h3 class="">Evidence translated into product requirements</h3>
+<div class=table-wrap><table><thead><tr><th>Research observation</th><th>Product consequence</th></tr></thead><tbody><tr><td>India’s official Time Use Survey measures food/meal preparation inside substantial unpaid domestic work, with women still carrying disproportionate time</td><td>Optimize decision and execution burden; planner/cook welfare is part of household utility</td></tr><tr><td>NINA-DISH found a predominant three-meal pattern, but foods and nutrient contributors varied by region and demographics; rice/roti may appear across meal occasions</td><td>Learn household rhythms; never impose Western meal-slot assumptions</td></tr><tr><td>Indian dietary assessment needs meal-time, food-preparer, recipe, portion, and regional information</td><td>Store meal episodes, cook, components, portions, and locale—not only dish IDs</td></tr><tr><td>Eastern India research documents multi-dish gastronomic sequences and rice-centered combinations</td><td>Plate grammar and component ordering are culturally meaningful</td></tr><tr><td>ICMR-NIN 2024 recommends dietary diversity across food groups</td><td>Optimize balance over days/weeks, not by making every plate artificially “perfect”</td></tr><tr><td>HCES explicitly records meals eaten at home; consumption varies by region and household</td><td>Home-meal frequency and spend are segmentation variables, not universal assumptions</td></tr></tbody></table></div>
+<h3 class="">Research program before broad launch</h3>
+<p>Foofoo must operate its own longitudinal Indian Home Meal Panel: at least 1,000 consented households across region, household type, income proxy, diet, cook arrangement, and city tier. For 8–12 weeks, collect lightweight photo-assisted meal diaries, planned-versus-actual meals, components, cook effort, pantry availability, leftovers, eating members, and satisfaction. Use trained food annotators; audit inter-rater agreement; publish sampling limitations. Repository seeds bootstrap the product but do not substitute for representative behavioral research.</p>
+<p>Primary sources: <a href="https://www.mospi.gov.in/sites/default/files/publication_reports/TUS_Report_2024_28.03.2025F.pdf">India Time Use Survey 2024</a>, <a href="https://nin.res.in/dietaryguidelines/pdfjs/locale/DGI_2024.pdf">ICMR-NIN Dietary Guidelines 2024</a>, <a href="https://microdata.gov.in/NADA/index.php/catalog/237/variable/F2/V54?name=Meals_At_Home">HCES 2023–24 meals-at-home variable</a>, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5652307/">NINA-DISH study</a>, <a href="https://www.wfp.org/publications/wfp-india-who-eats-when-what-and-how-much">WFP intra-household consumption research</a>.</p>
 <div class="page-break"></div>
 <h2 class="">5. Market research — global</h2>
 <p>Globally, Foofoo sits between recipe discovery, grocery planning, calorie tracking, meal kits, food delivery, and general-purpose AI assistants. Every adjacency validates a piece of demand, but none necessarily owns the household decision graph.</p>
@@ -170,6 +200,8 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 </ol>
 <h3 class="">Household psychology</h3>
 <p>A planner, eater, shopper, and cook may be different people. Preferences therefore carry roles and confidence. A child’s dislike affects acceptance; a cook’s time constraint affects feasibility; an allergy affects safety; a guest preference affects one context. Treating all signals as identical votes creates bad plans.</p>
+<h3 class="">“It read my mind” without manipulation</h3>
+<p>The desired feeling comes from anticipation and memory, not dark patterns. Foofoo earns it by predicting the latent intent, recalling the household cadence, accounting for the cook’s real burden, and surfacing a complete plate before the user articulates it. The product must never exploit hunger, hide sponsorship, manufacture urgency, or make sensitive inferences visible. Users can inspect and correct the model: familiar/novel balance, effort, regional blend, member scope, and Never list. A correction improves the next decision immediately.</p>
 <h3 class="">Healthy engagement</h3>
 <p>The habit loop is cue → ready plan → small correction → completed meal → quiet learning. Streaks should reward useful outcomes (“four planned dinners completed”) without shaming missed days. Notifications are configurable and capped. Foofoo should celebrate regained time and household alignment, not calories avoided.</p>
 <div class="page-break"></div>
@@ -276,6 +308,15 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <h3 class="">Copy principles</h3>
 <p>Concise, household-aware, and nonjudgmental. “Not right for today?” beats “Reject.” “Because it is quick and your family often likes similar meals” beats “92% match.” Safety explanations name the constraint; personalization explanations never reveal another member’s sensitive health data.</p>
 <div class="page-break"></div>
+<h2 class="">16.1 The recommendation surface is the product</h2>
+<p>The Today screen must not look like a recipe feed. It opens with one <strong>complete recommended meal episode</strong> and at most three reasons. The household can act without opening detail.</p>
+<h3 class="">Episode card anatomy</h3>
+<div class=table-wrap><table><thead><tr><th>Layer</th><th>Example</th><th>Why it exists</th></tr></thead><tbody><tr><td>Intent line</td><td>“Simple weekday dinner”</td><td>Sets the expected richness/effort</td></tr><tr><td>Complete plate</td><td>“Tori chana dal sabzi + phulka + curd”</td><td>Prevents ambiguity about the actual meal</td></tr><tr><td>Practicality</td><td>“28 active min · 2 burners · mostly pantry staples”</td><td>Predicts execution, not inspiration</td></tr><tr><td>Household fit</td><td>“Mild base; chilli tadka separately”</td><td>Shows a real compromise</td></tr><tr><td>Cadence reason</td><td>“Comforting, but lighter than yesterday”</td><td>Demonstrates memory</td></tr><tr><td>Confidence</td><td>“Strong fit” or “Safe starting point”</td><td>Calibrated, never theatrical</td></tr><tr><td>Actions</td><td><code>Make this</code>, <code>Show 3 alternatives</code>, <code>Not today</code>, overflow <code>Never</code></td><td>Clear intelligence-bearing choices</td></tr></tbody></table></div>
+<p>“Show alternatives” first asks what is wrong when useful: too much work, not in the mood, missing ingredient, member objection, too similar, or something else. This one-tap reason is more informative than a generic swipe and immediately conditions the replacement slate.</p>
+<h3 class="">Interaction contract</h3>
+<p>Every visible action produces a typed event and an immediate product consequence. “Make this” locks the episode and opens cooking orchestration; “Not today” suppresses the intent/dish with reason-dependent decay; “missing ingredient” updates pantry belief without changing taste; “too much work” updates contextual effort tolerance, not permanent dish preference; “member objection” assigns evidence to the correct member when consent and identity permit.</p>
+<p>The product must never force users to train it. Silent acceptance, plan persistence, substitution, abandonment, and the actual meal are learned passively with appropriate uncertainty.</p>
+<div class="page-break"></div>
 <h2 class="">17. Screen specification — access and consent</h2>
 <div class=table-wrap><table><thead><tr><th>ID</th><th>Screen</th><th>Required elements</th><th>Primary action</th><th>States / acceptance</th></tr></thead><tbody><tr><td>AU-01</td><td>Splash/restore</td><td>Logo, local session restore, health probe</td><td>Automatic</td><td>Cached route &lt;2s; no blocking animation</td></tr><tr><td>AU-02</td><td>Welcome</td><td>Promise, food imagery, sign in/create</td><td>Create account</td><td>Value understood without carousel</td></tr><tr><td>AU-03</td><td>Sign up</td><td>Email, password, age gate, terms links</td><td>Continue</td><td>Inline validation; no sensitive food data yet</td></tr><tr><td>AU-04</td><td>Sign in</td><td>Email/password, reset</td><td>Sign in</td><td>Generic auth errors; rate-limited</td></tr><tr><td>AU-05</td><td>Reset password</td><td>Email and confirmation</td><td>Send link</td><td>Does not expose account existence</td></tr><tr><td>CO-01</td><td>Consent</td><td>Essential personalization, analytics, notifications, retention controls</td><td>Save choices</td><td>Granular, versioned, optional items off by default where required</td></tr><tr><td>CO-02</td><td>Privacy summary</td><td>Plain-language purposes, export/delete links</td><td>Continue</td><td>Accessible before consent</td></tr></tbody></table></div>
 <p><strong>Analytics:</strong> <code>welcome_viewed</code>, <code>signup_started</code>, <code>signup_completed</code>, <code>signin_failed</code>, <code>consent_viewed</code>, <code>consent_changed</code> with policy version. Never put email, names, health conditions, or free text in analytics properties.</p>
@@ -289,8 +330,8 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <p>Onboarding uses progressive disclosure. The engine records source (<code>explicit_onboarding</code>) and confidence for every derived attribute. Skipped answers reduce confidence and widen exploration; they never create false precision.</p>
 <div class="page-break"></div>
 <h2 class="">20. Screen specification — Today and alternatives</h2>
-<div class=table-wrap><table><thead><tr><th>ID</th><th>Screen</th><th>Required elements</th><th>Actions</th><th>Edge states</th></tr></thead><tbody><tr><td>P-01</td><td>Today</td><td>Date, meal slots, selected dish/combo, add-ons, explanation chip</td><td>Lock, swap, detail, add-to-date</td><td>Cached/offline banner; partial slots</td></tr><tr><td>P-02</td><td>Alternative carousel</td><td>8 candidates, image, time, fit tags, position</td><td>Accept, next, not today, never</td><td>Exhausted slate → broaden intent</td></tr><tr><td>P-03</td><td>Dish detail</td><td>Components, time, difficulty, region, nutrition range, allergens, why</td><td>Recipe, lock, add to date, order</td><td>Missing recipe; data-confidence badge</td></tr><tr><td>P-04</td><td>Explanation sheet</td><td>Top positive reasons, trade-off, safety confirmation</td><td>Feedback on reason</td><td>Never show raw weights or sensitive member condition</td></tr><tr><td>P-05</td><td>Lock confirmation</td><td>Slot and selection</td><td>Lock/unlock</td><td>Concurrent update handled</td></tr><tr><td>P-06</td><td>Never confirmation</td><td>Dish, consequence, undo route</td><td>Confirm Never</td><td>Distinguish from Not Today</td></tr></tbody></table></div>
-<p>The eight-option slate is stable for a decision session so analytics can reconstruct exposure. Reopening a slate does not reshuffle unless the user explicitly refreshes.</p>
+<div class=table-wrap><table><thead><tr><th>ID</th><th>Screen</th><th>Required elements</th><th>Actions</th><th>Edge states</th></tr></thead><tbody><tr><td>P-01</td><td>Today</td><td>Date, meal slots, complete selected episode, member adaptations, effort, explanation</td><td>Make this, alternatives, detail, add-to-date</td><td>Cached/offline banner; partial slots</td></tr><tr><td>P-02</td><td>Alternative carousel</td><td>3 visible meaningfully distinct episodes; up to 8 fetched; plate, active time, effort, fit tags</td><td>Accept, reasoned reject, not today, never</td><td>Exhausted slate → ask intent/constraint</td></tr><tr><td>P-03</td><td>Meal detail</td><td>Complete plate, component recipes, critical-path plan, servings, region, nutrition range, allergens, why</td><td>Start cooking, lock, add to date, order</td><td>Missing recipe; data-confidence badge</td></tr><tr><td>P-04</td><td>Explanation sheet</td><td>Top positive reasons, trade-off, safety confirmation</td><td>Feedback on reason</td><td>Never show raw weights or sensitive member condition</td></tr><tr><td>P-05</td><td>Lock confirmation</td><td>Slot and selection</td><td>Lock/unlock</td><td>Concurrent update handled</td></tr><tr><td>P-06</td><td>Never confirmation</td><td>Dish, consequence, undo route</td><td>Confirm Never</td><td>Distinguish from Not Today</td></tr></tbody></table></div>
+<p>The pre-fetched eight-option slate is stable for a decision session, but only one recommendation and three alternatives are initially exposed. Analytics distinguishes fetched, rendered, and actually visible items. Reopening does not reshuffle unless the user explicitly refreshes.</p>
 <div class="page-break"></div>
 <h2 class="">21. Screen specification — Week, search, and action</h2>
 <div class=table-wrap><table><thead><tr><th>ID</th><th>Screen</th><th>Required elements</th><th>Actions</th><th>Acceptance</th></tr></thead><tbody><tr><td>W-01</td><td>Week plan</td><td>7-day grid/list, slot statuses, locks</td><td>Edit slot, refresh unlocked, share</td><td>Locked items preserved</td></tr><tr><td>W-02</td><td>Selective refresh</td><td>Scope summary and reason</td><td>Refresh</td><td>Shows what will/not change</td></tr><tr><td>W-03</td><td>Add to date</td><td>Calendar, slot, replace/add behavior</td><td>Confirm</td><td>Conflict explicit</td></tr><tr><td>S-01</td><td>Search</td><td>Query, recent intent, filters</td><td>Open/add</td><td>Results &lt;500ms target</td></tr><tr><td>S-02</td><td>Filters</td><td>Diet-safe fixed, cuisine, time, difficulty, meal role</td><td>Apply</td><td>Cannot disable hard constraints</td></tr><tr><td>R-01</td><td>Recipe</td><td>Ingredients, steps, servings, substitutions, timers</td><td>Start cooking</td><td>Offline after first load</td></tr><tr><td>O-01</td><td>Cook or order</td><td>Recipe path, partner deep links, transparent sponsorship</td><td>Choose</td><td>Commercial content labelled</td></tr></tbody></table></div>
@@ -301,7 +342,7 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <p>Removing a member starts a review before deleting member-linked preference evidence. Household administrators cannot see another adult’s sensitive condition unless that person chooses to share it; the recommender may use a privacy-preserving “constraint applies” flag.</p>
 <div class="page-break"></div>
 <h2 class="">23. Functional requirements</h2>
-<div class=table-wrap><table><thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Acceptance evidence</th></tr></thead><tbody><tr><td>FR-01</td><td>Generate a 7-day, multi-slot household plan</td><td>P0</td><td>Contract + golden personas</td></tr><tr><td>FR-02</td><td>Enforce diet, allergen, religious, occasion, Never constraints twice</td><td>P0</td><td>Zero-row safety queries</td></tr><tr><td>FR-03</td><td>Return 8 stable alternatives per eligible slot</td><td>P0</td><td>Deterministic session test</td></tr><tr><td>FR-04</td><td>Lock selections across refresh</td><td>P0</td><td>Concurrency test</td></tr><tr><td>FR-05</td><td>Process Not Today with time decay and Never persistently</td><td>P0</td><td>State transition tests</td></tr><tr><td>FR-06</td><td>Learn from exposure, action, and outcome events</td><td>P0</td><td>Feature update trace</td></tr><tr><td>FR-07</td><td>Generate base meal plus member add-ons</td><td>P1</td><td>Joint-family fixtures</td></tr><tr><td>FR-08</td><td>Search and add a safe dish to a date</td><td>P1</td><td>UI/API integration</td></tr><tr><td>FR-09</td><td>Explain each recommendation from actual contributions</td><td>P1</td><td>Trace-to-copy test</td></tr><tr><td>FR-10</td><td>Build a grocery list from committed plan</td><td>P1</td><td>Unit conversion tests</td></tr><tr><td>FR-11</td><td>Offline-display cached plan and queue feedback</td><td>P1</td><td>Airplane-mode journey</td></tr><tr><td>FR-12</td><td>Export and delete user data</td><td>P0</td><td>End-to-end compliance test</td></tr><tr><td>FR-13</td><td>Support model/config version and experiment assignment</td><td>P0</td><td>Decision trace</td></tr><tr><td>FR-14</td><td>Provide cook/order routes without paid-rank contamination</td><td>P2</td><td>Marketplace policy test</td></tr></tbody></table></div>
+<div class=table-wrap><table><thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Acceptance evidence</th></tr></thead><tbody><tr><td>FR-01</td><td>Generate a 7-day, multi-slot household plan of complete, culturally valid meal episodes</td><td>P0</td><td>Contract + golden personas</td></tr><tr><td>FR-02</td><td>Enforce diet, allergen, religious, occasion, Never constraints twice</td><td>P0</td><td>Zero-row safety queries</td></tr><tr><td>FR-03</td><td>Rank one episode and three distinct visible alternatives; pre-fetch up to eight stable options</td><td>P0</td><td>Deterministic exposure/session test</td></tr><tr><td>FR-04</td><td>Lock selections across refresh</td><td>P0</td><td>Concurrency test</td></tr><tr><td>FR-05</td><td>Process Not Today with time decay and Never persistently</td><td>P0</td><td>State transition tests</td></tr><tr><td>FR-06</td><td>Learn typed taste, intent, effort, pantry, cadence, member, and outcome evidence from every exposure/action</td><td>P0</td><td>Raw-event-to-feature trace</td></tr><tr><td>FR-07</td><td>Generate a shared plate plus safe member adaptations while minimizing extra cooking burden</td><td>P0</td><td>Joint-family workload fixtures</td></tr><tr><td>FR-08</td><td>Search and add a safe dish to a date</td><td>P1</td><td>UI/API integration</td></tr><tr><td>FR-09</td><td>Explain each recommendation from actual contributions</td><td>P1</td><td>Trace-to-copy test</td></tr><tr><td>FR-10</td><td>Build a grocery list from committed plan</td><td>P1</td><td>Unit conversion tests</td></tr><tr><td>FR-11</td><td>Offline-display cached plan and queue feedback</td><td>P1</td><td>Airplane-mode journey</td></tr><tr><td>FR-12</td><td>Export and delete user data</td><td>P0</td><td>End-to-end compliance test</td></tr><tr><td>FR-13</td><td>Support model/config version and experiment assignment</td><td>P0</td><td>Decision trace</td></tr><tr><td>FR-14</td><td>Provide cook/order routes without paid-rank contamination</td><td>P2</td><td>Marketplace policy test</td></tr></tbody></table></div>
 <div class="page-break"></div>
 <h2 class="">24. Non-functional requirements</h2>
 <div class=table-wrap><table><thead><tr><th>Domain</th><th>Target</th></tr></thead><tbody><tr><td>Safety</td><td>Zero known hard-constraint violations; gate blocks the slate, not just the item</td></tr><tr><td>Availability</td><td>99.9% monthly for plan read; safe cached fallback during RE outage</td></tr><tr><td>Latency</td><td>cached today p95 &lt;1s; fresh plan p95 &lt;3s; server recommendation p95 &lt;800ms target</td></tr><tr><td>Scale</td><td>horizontal stateless APIs; partition high-volume events; 10× demand headroom before redesign</td></tr><tr><td>Privacy</td><td>data minimization, purpose-bound consent, export/delete, no PII in analytics</td></tr><tr><td>Security</td><td>JWT validation, household ownership checks, RLS, private RE schema, secret rotation</td></tr><tr><td>Accessibility</td><td>WCAG 2.2 AA and screen-reader-complete primary journeys</td></tr><tr><td>Reliability</td><td>idempotent mutations and events; retries bounded; dead-letter visibility</td></tr><tr><td>Explainability</td><td>every result stores candidate set, filters, signal contributions, version, rank</td></tr><tr><td>Reproducibility</td><td>offline replay within numerical tolerance using trace snapshot</td></tr><tr><td>Cost</td><td>model and infra cost per WSMD tracked; LLM never on synchronous ranking hot path</td></tr><tr><td>Freshness</td><td>catalog publishing SLA and feature staleness indicators</td></tr></tbody></table></div>
@@ -399,7 +440,7 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <p>Potential future revenue includes retailer affiliate fees, order referral, branded but transparent recipe placements, appliance integrations, employee wellness, and B2B recommendation APIs. Each requires a conflict-of-interest review.</p>
 <div class="page-break"></div>
 <h2 class="">30. Product roadmap and future vision</h2>
-<div class=table-wrap><table><thead><tr><th>Version</th><th>Product promise</th><th>Intelligence</th><th>Data/Platform</th></tr></thead><tbody><tr><td>v1</td><td>Safe plan that is better than deciding alone</td><td>Rules, cohort/class priors, content match, MMR</td><td>Canonical catalog, events, traces</td></tr><tr><td>v2</td><td>Learns an individual and household</td><td>Taste vectors, decay, contextual bandit</td><td>Feature store, experiments, quality dashboards</td></tr><tr><td>v3</td><td>Plans composition and groceries</td><td>Knowledge-graph retrieval, leftovers, substitution</td><td>Graph projections, inventory/retail adapters</td></tr><tr><td>v4</td><td>Anticipates context and long-term balance</td><td>Sequence models, constrained weekly optimization</td><td>Online/offline feature parity, shadow deploys</td></tr><tr><td>v5</td><td>Food operating system</td><td>Multi-objective policy, federated/causal learning where justified</td><td>Multi-region, locale packs, partner platform</td></tr></tbody></table></div>
+<div class=table-wrap><table><thead><tr><th>Version</th><th>Product promise</th><th>Intelligence</th><th>Data/Platform</th></tr></thead><tbody><tr><td>v1</td><td>Safe, practical complete meal episodes</td><td>Plate grammars, cohort/class priors, explicit practicality, rule ranker, MMR</td><td>Canonical catalog, episode bundles, raw events, complete traces</td></tr><tr><td>v2</td><td>Learns each household and member</td><td>Separate choose/execute/regret models, taste vectors, cadence and fairness state</td><td>Near-real-time feature store, calibrated experiments</td></tr><tr><td>v3</td><td>Understands pantry, leftovers, and similar households</td><td>Two-tower retrieval, GBDT/LTR, hierarchical cold start, graph substitution</td><td>Food graph projections, workload DAGs, inventory adapters</td></tr><tr><td>v4</td><td>Anticipates latent intent and whole-week consequences</td><td>Sequence intent model, CP-SAT/MIP planning, constrained bandit</td><td>Online/offline parity, counterfactual evaluation, shadow models</td></tr><tr><td>v5</td><td>Household food operating system</td><td>Long-horizon multi-objective policy with causal safeguards</td><td>Multi-region locale packs, partner platform, privacy-preserving learning where justified</td></tr></tbody></table></div>
 <p><strong>Future vision:</strong> Foofoo becomes a private household food memory. It understands what people enjoy, can safely eat, can realistically make, already have, recently consumed, and may need tomorrow. It coordinates cooking, shopping, ordering, appliances, and health services without allowing any partner to own or distort the household’s preferences.</p>
 <p>The sequence is intentionally trust-first. A beautiful graph or sophisticated model has no value if the household’s first week contains implausible meals.</p>
 <div class="page-break"></div>
@@ -644,6 +685,279 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 </ul>
 <p>Alerts link to traces, model version, deploy, and catalog publish. Rollback changes the active model/config pointer; it does not require a mobile release. A kill switch disables learned ranking and serves safe priors. Safety incidents trigger candidate quarantine and trace preservation.</p>
 <div class="page-break"></div>
+<h1 class="">47A. Final mathematical specification — notation and decision object</h1>
+<p>For household <code>h</code>, member set <code>M_h</code>, decision time <code>t</code>, slot <code>s</code>, and context <code>c_t</code>, the engine ranks meal episodes <code>e∈E</code>. An episode contains components <code>D_e</code>, recipe variants <code>R_e</code>, member adaptations <code>A_e</code>, predicted work plan <code>W_e</code>, and pantry requirements <code>I_e</code>.</p>
+<h3 class="">Core notation</h3>
+<div class=table-wrap><table><thead><tr><th>Symbol</th><th>Meaning</th></tr></thead><tbody><tr><td><code>x_h,t</code></td><td>household state known before the decision</td></tr><tr><td><code>z_h,t</code></td><td>latent appetite/intent state</td></tr><tr><td><code>g_e</code></td><td>structured episode genome</td></tr><tr><td><code>v_h</code>, <code>v_m</code></td><td>household and member taste vectors</td></tr><tr><td><code>q(e,h,t)</code></td><td>hard eligibility indicator</td></tr><tr><td><code>p_choose</code></td><td>probability episode is chosen/locked</td></tr><tr><td><code>p_execute</code></td><td>probability it is actually cooked or intentionally ordered</td></tr><tr><td><code>p_enjoy,m</code></td><td>member-level enjoyment probability</td></tr><tr><td><code>p_regret</code></td><td>probability of replacement, complaint, or strong negative outcome</td></tr><tr><td><code>C_work</code></td><td>cook workload cost</td></tr><tr><td><code>C_repeat</code></td><td>temporal repetition/cadence cost</td></tr><tr><td><code>B_balance</code></td><td>multi-day food-group and variety benefit</td></tr><tr><td><code>π_0</code>, <code>π</code></td><td>logging and candidate policies</td></tr></tbody></table></div>
+<p>The optimization target is conditional expected successful completion:</p>
+<p><code>P_success(e)=P(choose e) · P(execute e | choose) · P(no regret | execute)</code>.</p>
+<p>This factorization is product-critical. A rich dish may have high <code>P(choose)</code> and low <code>P(execute)</code> on a weekday. A practical but disliked plate can have the reverse. Foofoo must rank the joint outcome.</p>
+<div class="page-break"></div>
+<h1 class="">47B. Latent appetite and intent inference</h1>
+<p>Users rarely declare the real momentary intent. “Healthy” may be a long-term goal while tonight’s latent state is tired-and-comfort-seeking. Represent the intent state:</p>
+<p><code>z_t ∈ {routine, quick, light, comfort, indulgent, discovery, leftover_use, festive, recovery}</code>.</p>
+<p>A Bayesian state model computes:</p>
+<p><code>P(z_t | x_t, a_&lt;t) ∝ P(x_t | z_t) Σ_z P(z_t | z_{t-1}) P(z_{t-1} | history)</code>.</p>
+<p>Inputs include day/slot, elapsed time since last meal, weekday, recent richness, recent order-out, weather, household schedule, planning lead time, pantry belief, active user, and response patterns in the current session. The prior is household- and region-specific; the posterior updates after each action.</p>
+<h3 class="">Intent evidence examples</h3>
+<div class=table-wrap><table><thead><tr><th>Observation</th><th>Likely update</th><th>What must not happen</th></tr></thead><tbody><tr><td>Repeatedly rejects &gt;35-minute plates at 8pm</td><td>increase <code>quick</code>; lower current effort tolerance</td><td>permanently mark those dishes disliked</td></tr><tr><td>Opens app early Sunday and browses details</td><td>increase <code>discovery</code> or <code>indulgent</code></td><td>apply weekday quick prior</td></tr><tr><td>Ordered out after accepting a laborious plan</td><td>reduce execution probability for similar workload/context</td><td>treat order as food dislike</td></tr><tr><td>Selects khichdi after two rich days</td><td>increase <code>light/recovery</code> and cadence sensitivity</td><td>assume permanent khichdi preference</td></tr><tr><td>Festival mode confirmed</td><td>set <code>festive</code>, then apply observance eligibility</td><td>infer religious identity from calendar alone</td></tr></tbody></table></div>
+<p>v1 implements a transparent multinomial model; v3 may use a sequence model. The intent posterior is stored in the decision trace, but user copy remains human: “Looks like a quick, comforting dinner fits tonight.”</p>
+<div class="page-break"></div>
+<h1 class="">47C. Event semantics — every action is intelligence, not every action is taste</h1>
+<p>Each event updates one or more latent dimensions with explicit attribution and uncertainty. Let an event produce evidence vector <code>δ_j</code> over <code>taste</code>, <code>intent</code>, <code>effort</code>, <code>pantry</code>, <code>member</code>, <code>cadence</code>, and <code>quality</code>.</p>
+<div class=table-wrap><table><thead><tr><th>Event/action</th><th>Primary evidence</th><th>Typical strength</th><th>Required context</th></tr></thead><tbody><tr><td>Impression</td><td>exposure only</td><td>0 taste</td><td>rank, visibility, dwell eligibility</td></tr><tr><td>Quick swipe past</td><td>weak momentary negative</td><td>low</td><td>position, velocity, alternatives</td></tr><tr><td>Open detail</td><td>curiosity/consideration</td><td>low positive</td><td>dwell and subsequent action</td></tr><tr><td>Make this / lock</td><td>choice</td><td>high positive</td><td>full slate and propensity</td></tr><tr><td>Cook completed</td><td>execution truth</td><td>very high positive</td><td>actual recipe/substitutions/time</td></tr><tr><td>Ate/enjoyed</td><td>outcome utility</td><td>highest</td><td>member attribution/confidence</td></tr><tr><td>Not today: mood</td><td>intent suppression</td><td>strong, short half-life</td><td>reason and context</td></tr><tr><td>Not today: too much work</td><td>effort model</td><td>strong contextual</td><td>available time/cook</td></tr><tr><td>Missing ingredient</td><td>pantry belief</td><td>strong, fast-decaying</td><td>ingredient and shopping outcome</td></tr><tr><td>Never</td><td>hard household/member exclusion</td><td>deterministic until restore</td><td>scope and actor</td></tr><tr><td>Swap component</td><td>component/plate preference</td><td>medium-high</td><td>before/after bundle</td></tr><tr><td>Ordered another cuisine</td><td>intent and preference</td><td>contextual positive for actual choice</td><td>category/dish if known</td></tr><tr><td>Plan ignored</td><td>ambiguous</td><td>low negative execution</td><td>app open, notification, meal window</td></tr><tr><td>Repeat manually</td><td>comfort/favorite</td><td>high positive</td><td>cadence and member set</td></tr></tbody></table></div>
+<p>Update only if the event was causally possible: an unexposed item gets no negative label. Missing outcomes remain censored, not failures. Offline queues preserve original occurrence order and identifiers.</p>
+<div class="page-break"></div>
+<h1 class="">47D. Hierarchical cold-start prior</h1>
+<p>Each household parameter vector has a hierarchical prior rather than a fixed persona:</p>
+<p><code>θ_h ~ Normal(μ_h, Σ_h)</code></p>
+<p><code>μ_h = μ_global + u_region + u_household_type + u_diet + u_cook_skill + u_city_tier + u_meal_slot</code>.</p>
+<p>Shrinkage lets sparse segments borrow strength without pretending they are identical. Prior variance reflects evidence quality; a narrow expert prior is permitted only when grounded in representative research. Onboarding observations <code>y_1…y_n</code> update the posterior:</p>
+<p><code>p(θ_h | y) ∝ p(y | θ_h) p(θ_h)</code>.</p>
+<p>For a Beta-Bernoulli class affinity example:</p>
+<p><code>α_h,k = α_cohort,k + weighted_positive_k</code></p>
+<p><code>β_h,k = β_cohort,k + weighted_negative_k</code></p>
+<p><code>E[p_h,k]=(α_h,k)/(α_h,k+β_h,k)</code>.</p>
+<p>Effective evidence is discounted for correlated actions. Ten rapid swipes in one onboarding batch do not equal ten independent cooked outcomes. Confidence is:</p>
+<p><code>ρ_h = 1 - exp(-N_eff / τ)</code>, capped by profile completeness, calibration, and contradiction penalties.</p>
+<p>Cold-start exit is per feature family. The engine may be mature on spice and breakfast class, but uncertain on seafood or weekend indulgence.</p>
+<div class="page-break"></div>
+<h1 class="">47E. Meal-episode candidate generation</h1>
+<p>Candidate generation is grammar-constrained bundle construction, not a Cartesian product of dishes.</p>
+<div class="diagram"><div class="mermaid">flowchart LR
+  A[Intent posterior] --&gt; B[Select plate grammar]
+  B --&gt; C[Retrieve shared base candidates]
+  C --&gt; D[Attach compatible staple and sides]
+  D --&gt; E[Generate member adaptations]
+  E --&gt; F[Choose executable recipe variants]
+  F --&gt; G[Hard safety and kitchen feasibility]
+  G --&gt; H[Deduplicate and score episodes]</div></div>
+<h3 class="">Retrieval channels</h3>
+<ol>
+<li>Household repeated episodes and controlled variants.</li>
+<li>Exact meal-class and regional-grammar catalog.</li>
+<li>Genome nearest neighbors to prior successes.</li>
+<li>Component substitution and pairing graph.</li>
+<li>Similar-household collaborative retrieval after minimum support.</li>
+<li>Pantry/leftover compatible episodes.</li>
+<li>Context/season/festival retrieval.</li>
+<li>High-quality underexposed episodes for safe exploration.</li>
+</ol>
+<p>Each channel returns a source score and calibrated reliability. A beam search assembles bundles:</p>
+<p><code>Beam_{j+1}=Top_B {partial ⊕ component : grammar_valid ∧ constraints_possible}</code>.</p>
+<p>Prune on unsafe ingredients, incompatible plate roles, impossible equipment, excessive work, duplicate functional roles, and implausible regional combinations. Store the generator path for attribution.</p>
+<div class="page-break"></div>
+<h1 class="">47F. Practicality intelligence and execution model</h1>
+<p>Practicality is predicted from the actual cooking episode. Define workload features:</p>
+<ul>
+<li>active preparation minutes, passive minutes, critical-path minutes;</li>
+<li>burner/pressure-cooker/oven occupancy and parallelizability;</li>
+<li>number of vessels and cleanup load;</li>
+<li>distinct ingredients, uncommon ingredients, and prep operations;</li>
+<li>recipe familiarity and cook skill gap;</li>
+<li>pantry probability and shopping detour;</li>
+<li>batchability, leftover value, and reuse of existing prep;</li>
+<li>number and complexity of member adaptations;</li>
+<li>time of request, meal deadline, cook identity, fatigue proxy, and weekday.</li>
+</ul>
+<p>Critical-path time is computed on the recipe DAG, not summed naïvely:</p>
+<p><code>T_critical = max_path Σ operation_duration</code>, subject to equipment capacity.</p>
+<p>Work cost:</p>
+<p><code>C_work = β1 T_active + β2 T_critical + β3 Vessels + β4 RareIngredients + β5 SkillGap + β6 ShoppingRisk + β7 AdaptationLoad - β8 PrepReuse - β9 LeftoverValue</code>.</p>
+<p>Execution probability:</p>
+<p><code>p_execute = σ(b0 + b_h + b_slot + γ^T context - C_work + Familiarity + PlanLeadTime)</code>.</p>
+<h3 class="">Cadence tiers</h3>
+<p>Every episode has a learned/curated tier: <code>daily_staple</code>, <code>regular_rotation</code>, <code>weekly_rich</code>, <code>occasional</code>, <code>festive</code>. Tier is household-conditional. A paneer gravy may be regular for one family and occasional for another. Weekly rich-episode caps are soft unless the user declares otherwise; a hidden state tracks richness debt and recent cooking load.</p>
+<p>This model is a release-gated product component. If <code>p_execute</code> is missing or uncalibrated, the engine must remain conservative.</p>
+<div class="page-break"></div>
+<h1 class="">47G. Member-level preference and enjoyment models</h1>
+<p>For member <code>m</code>, episode <code>e</code>, and context <code>t</code>:</p>
+<p><code>η_m,e,t = b_m + b_e + v_m^T W g_e + f_explicit + f_recency + f_context + f_component + f_social</code></p>
+<p><code>p_enjoy,m(e,t)=σ(η_m,e,t)</code>.</p>
+<p><code>v_m</code> contains separate subspaces for class, main ingredient, texture, spice, flavor, method, regional affinity, serving format, richness, and novelty. Member vectors update only from attributable evidence; household choices with unknown speaker update the shared vector with lower confidence.</p>
+<h3 class="">Explicit versus revealed preference</h3>
+<p>Let <code>θ_declared</code> and <code>θ_behavior</code> remain separate. Combine them by evidence-dependent reliability:</p>
+<p><code>θ_effective = (1-ρ_behavior) θ_declared + ρ_behavior θ_behavior</code>.</p>
+<p>Contradiction is retained as a useful feature. A user who declares “healthy” but repeatedly chooses familiar rich food has a goal-behavior gap; the product should serve achievable compromises, not silently discard the goal or shame the behavior.</p>
+<h3 class="">Component utility</h3>
+<p>Episode utility is not the mean of dish utilities:</p>
+<p><code>u_m(e)=Σ_d a_role(d)u_m(d)+Σ_{d_i,d_j} interaction_m(d_i,d_j)-portion_mismatch-adaptation_cost</code>.</p>
+<p>This captures that dal may be liked with rice but not with a particular roti/sabzi combination, and that an accepted mild base plus optional chilli can outperform a compromised average spice level.</p>
+<div class="page-break"></div>
+<h1 class="">47H. Household aggregation and fairness</h1>
+<p>Safety uses intersection; preference uses fair aggregation. Define normalized member utility <code>ũ_m∈[ε,1]</code>. Use an asymmetric Nash social welfare score:</p>
+<p><code>U_Nash(e)=Σ_m ω_m log(ũ_m(e))</code>.</p>
+<p>The logarithm penalizes very low member utility and avoids the tyranny of the average. Role weights <code>ω_m</code> reflect context—not human worth: cook feasibility, eater presence, temporary occasion ownership, and evidence confidence. They sum to one and are audited.</p>
+<p>Add a planner/cook welfare term and longitudinal fairness debt:</p>
+<p><code>U_house(e)=U_Nash(e)+λ_cook u_cook(e)+λ_f Σ_m debt_m · ũ_m(e)-λ_complex C_adapt(e)</code>.</p>
+<p>Fairness debt updates after completed meals:</p>
+<p><code>debt_m,t+1 = clip(κ debt_m,t + target_share - realized_satisfaction_m,t, 0, d_max)</code>.</p>
+<p>This gives a repeatedly underserved member more influence later without violating safety or making every meal a unanimous vote. For children, preference is smoothed and policy can require exposure to variety; for a planner, burden counts explicitly.</p>
+<h3 class="">Decision modes</h3>
+<ul>
+<li><strong>Autopilot:</strong> use fair utility and learned household policy.</li>
+<li><strong>Vote:</strong> actual votes condition the posterior; unresolved ties use planner-declared rule.</li>
+<li><strong>Occasion owner:</strong> temporarily increase one member/context weight.</li>
+<li><strong>Split plate:</strong> shared base plus adaptations when joint utility is poor.</li>
+<li><strong>No common safe episode:</strong> explain and propose explicitly separate meals.</li>
+</ul>
+<div class="page-break"></div>
+<h1 class="">47I. Full pre-rank utility equation</h1>
+<p>Only episodes with <code>q(e,h,t)=1</code> enter scoring. Define standardized features and probabilities:</p>
+<p><code>R_base = α1 logit(p_choose) + α2 logit(p_execute) + α3 U_house</code></p>
+<p><code>R_quality = α4 CatalogConfidence + α5 RecipeReliability + α6 Availability</code></p>
+<p><code>R_long = α7 BalanceBenefit + α8 LeftoverValue + α9 LearningValue</code></p>
+<p><code>C = α10 WorkCost + α11 RepeatCost + α12 RichnessDebt + α13 PantryRisk + α14 RegretRisk</code></p>
+<p><code>Score_raw(e)=R_base + R_quality + R_long - C</code>.</p>
+<p>The business objective cannot multiply unrelated uncalibrated scores. Probability components are calibrated and transformed to log-odds; bounded policy terms remain separately normalized. Weights are versioned by maturity and learned using multi-task training plus constrained online tuning.</p>
+<p>Final probability head:</p>
+<p><code>p_success = σ(b + w^T φ_e,h,t)</code></p>
+<p>where labels require choice plus execution and no strong regret within the attribution window. Rank primarily by expected successful decision:</p>
+<p><code>Value(e)=p_success · V_complete - p_regret · C_regret - p_safety_uncertainty · C_safety</code>.</p>
+<p><code>C_safety</code> is effectively infinite for known violations; uncertain high-risk data is filtered before score.</p>
+<div class="page-break"></div>
+<h1 class="">47J. Training objectives</h1>
+<p>A multi-task model shares representations but predicts distinct outcomes:</p>
+<ul>
+<li><code>ŷ_choose</code>, <code>ŷ_execute</code>, <code>ŷ_enjoy_member</code>, <code>ŷ_regret</code>, <code>ŷ_time_to_decide</code>, <code>ŷ_order_out</code>.</li>
+</ul>
+<p>Total loss:</p>
+<p><code>L = Σ_k λ_k L_k + λ_rank L_pair/list + λ_cal L_calibration + λ_fair L_fair + λ_reg ||Θ||²</code>.</p>
+<p>Binary heads use weighted log loss with censoring masks. Ranking uses LambdaRank/ListNet or pairwise loss only within truly exposed choice sets. Execution prediction conditions on selection. Member enjoyment uses observed attribution plus weak household labels with smaller weights.</p>
+<h3 class="">Positive and negative labels</h3>
+<div class=table-wrap><table><thead><tr><th>Outcome</th><th>Label treatment</th></tr></thead><tbody><tr><td>Shown, not inspected</td><td>exposure, not negative taste</td></tr><tr><td>Accepted then cooked</td><td>strong success</td></tr><tr><td>Accepted then replaced</td><td>choice positive, execution/regret negative</td></tr><tr><td>Rejected for missing item</td><td>pantry negative, neutral taste</td></tr><tr><td>Rejected as too rich</td><td>current intent/cadence negative</td></tr><tr><td>Never</td><td>hard exclusion plus strong explicit taste signal at specified scope</td></tr><tr><td>No response</td><td>censored unless reliable meal-window evidence exists</td></tr></tbody></table></div>
+<p>Propensity weighting corrects position/exposure bias:</p>
+<p><code>L_IPS = Σ_i min(w_max, π_target(a_i|x_i)/π_0(a_i|x_i)) · ℓ_i</code>.</p>
+<p>Doubly robust estimators combine propensity and outcome models to reduce variance.</p>
+<div class="page-break"></div>
+<h1 class="">47K. Slate construction, diversity, and calibration</h1>
+<p>The user sees a small slate of meal episodes, not the top <code>K</code> near-duplicates. Greedy selection maximizes:</p>
+<p><code>J(S)=Σ_{e∈S} Score(e) - λ_sim Σ_{i&lt;j} Sim(e_i,e_j) + λ_cov Coverage(S) - λ_choice ChoiceComplexity(S)</code>.</p>
+<p>Similarity includes plate grammar, main ingredients, method, flavor, richness, work profile, and regional family. The first alternative should answer a plausible objection to the first choice: lighter, quicker, different base, or different cuisine—not cosmetic variation.</p>
+<p>Calibrate the slate to household historical distribution without freezing it. If <code>p_h(k)</code> is the preferred distribution over attribute family <code>k</code> and <code>q_S(k)</code> is the slate distribution, calibration cost can use Jensen–Shannon divergence:</p>
+<p><code>C_cal(S)=JS(p_h || q_S)</code>.</p>
+<p>Blend personal calibration with deliberate exploration and weekly balance. Accuracy-only ranking can crowd out secondary interests; calibrated recommendation research motivates preserving the user’s genuine mix. Reference: <a href="https://doi.org/10.1145/3240323.3240372">Steck, Calibrated Recommendations</a>.</p>
+<h3 class="">Slate size</h3>
+<p>Default is one recommendation plus three meaningfully distinct alternatives. Eight may be pre-fetched for continued browsing, but showing eight at once recreates decision fatigue. Stable item IDs/ranks and selection propensities are logged.</p>
+<div class="page-break"></div>
+<h1 class="">47L. Weekly meal-plan optimization</h1>
+<p>Let <code>x_e,s∈{0,1}</code> select episode <code>e</code> for slot <code>s</code>. Let <code>y_i,d</code> indicate ingredient <code>i</code> is required on day <code>d</code>; <code>l_k,d</code> tracks leftovers; locked slots are fixed.</p>
+<p><code>maximize Σ_s,e x_e,s Value(e,s)</code></p>
+<p><code>+ λ_balance WeeklyFoodGroupCoverage</code></p>
+<p><code>+ λ_reuse IngredientReuse + λ_leftover LeftoverUtility</code></p>
+<p><code>- λ_repeat Repetition - λ_work WorkVariance - λ_rich RichnessViolation - λ_waste WasteRisk</code>.</p>
+<p>Subject to:</p>
+<ul>
+<li>exactly one episode per active slot;</li>
+<li>hard safety and observance;</li>
+<li>plate-grammar validity;</li>
+<li>daily/weekly effort budgets;</li>
+<li>equipment and cook availability;</li>
+<li>max/min cadence by richness, main ingredient, class, technique;</li>
+<li>leftovers consumed only after generated and within safety window;</li>
+<li>nutrition ranges only when data confidence permits;</li>
+<li>locked episode equality constraints.</li>
+</ul>
+<h3 class="">Solver evolution</h3>
+<p>v1 uses greedy placement with repair; v2 uses beam search across days; v3 uses mixed-integer programming or CP-SAT for households opting into pantry/weekly optimization. The solver emits violated soft constraints and trade-off costs for traceability.</p>
+<div class="page-break"></div>
+<h1 class="">47M. Cadence and “ordinary food” model</h1>
+<p>The engine maintains a household meal-rhythm state over rolling windows:</p>
+<p><code>r_t = {richness, fried_count, outside_food, one_pot_count, dal_count, veg_count, main_ingredient, cuisine, active_minutes, leftovers}</code>.</p>
+<p>An episode receives cadence cost:</p>
+<p><code>C_cadence(e)=Σ_k λ_k max(0, projected_k(e)-upper_h,k) + μ_k max(0, lower_h,k-projected_k(e))</code>.</p>
+<p>Bounds are learned from the household and softly regularized toward research/region priors. This supports ordinary rotations such as simple sabzi-roti, dal-rice, curd rice, khichdi, idli/chutney, leftovers, or a one-pot meal without treating them as inferior content.</p>
+<h3 class="">Richness model</h3>
+<p>Richness is multidimensional: oil/fat band, dairy/nut gravy, frying, sugar, component count, restaurant association, preparation burden, and household perception. A single “calorie” field is not enough. <code>richness_household(e)</code> is learned from explicit comparisons and behavior; the catalog provides a prior.</p>
+<h3 class="">Familiarity-novelty budget</h3>
+<p><code>NoveltyBudget_t = base_h + weekend_boost + exploration_preference - recent_novelty - uncertainty_penalty</code>.</p>
+<p>The best default usually contains a familiar anchor and at most one novel dimension. New ingredient + new cuisine + new technique + high effort in one episode is disallowed unless explicitly requested.</p>
+<div class="page-break"></div>
+<h1 class="">47N. Online exploration and contextual bandits</h1>
+<p>Exploration is information acquisition inside the safe, practical pool. For candidate <code>e</code>, Thompson Sampling draws:</p>
+<p><code>θ_e ~ Posterior(reward | context_bucket)</code>.</p>
+<p>Use a constrained score:</p>
+<p><code>Score_TS(e)=Score_raw(e)+ε_h,t · UncertaintySample(e)</code></p>
+<p>subject to a minimum predicted-success floor, work budget, fairness floor, and novelty budget. <code>ε</code> falls when the household is tired, time-poor, new, or risk-averse and rises in explicit discovery mode.</p>
+<p>Reward is not a click:</p>
+<p><code>r = 0.25 choose + 0.45 execute + 0.30 no_regret + member_satisfaction - burden/regret penalties</code>.</p>
+<p>Exact coefficients are learned/tested and logged by version. Randomized exposure stores the selection propensity. Never and safety rules remain outside the bandit.</p>
+<p>Before bandits affect production, evaluate with replay, inverse propensity scoring, self-normalized IPS, and doubly robust estimators. Slate interactions require sequence-aware evaluation; see <a href="https://arxiv.org/abs/2007.12986">McInerney et al., Counterfactual Evaluation of Slate Recommendations</a> and <a href="https://research.google/pubs/slateq-a-tractable-decomposition-for-reinforcement-learning-with-recommendation-sets/">Google SlateQ</a>.</p>
+<div class="page-break"></div>
+<h1 class="">47O. Confidence, calibration, and abstention</h1>
+<p>Confidence is the probability that displayed fit claims are reliable, not model score magnitude.</p>
+<p><code>Conf(e)=Calibrated(p_success) · DataCoverage(e) · FeatureFreshness · CohortSupport · (1-ShiftRisk)</code>.</p>
+<p>Evaluate reliability diagrams and Expected Calibration Error:</p>
+<p><code>ECE=Σ_b |B_b|/n · |accuracy(B_b)-confidence(B_b)|</code>.</p>
+<p>Calibrate by meal slot, cold/mature state, household type, diet, and catalog confidence using isotonic or Platt scaling. A “strong fit” label may appear only when empirical success frequency matches the range.</p>
+<h3 class="">Abstention policy</h3>
+<ul>
+<li>Missing/uncertain safety truth: exclude candidate.</li>
+<li>Low catalog/recipe confidence: exclude from first rank; allow reviewed discovery only.</li>
+<li>Low personalization confidence: use safe regional/routine priors and say “a safe starting point.”</li>
+<li>No practical common meal: recommend explicit split plan or ask one high-information question.</li>
+<li>Severe distribution shift: serve cached or conservative policy and alert operations.</li>
+</ul>
+<p>The engine never fills a slot merely to avoid an empty state.</p>
+<div class="page-break"></div>
+<h1 class="">47P. Causal learning and feedback-loop control</h1>
+<p>The system’s policy determines exposure, so observed behavior is not i.i.d. Popular items get shown and accumulate more positives. Control this by:</p>
+<ol>
+<li>logging the complete eligible choice set and position;</li>
+<li>recording logging-policy propensity for randomized choices;</li>
+<li>maintaining a small safe exploration bucket;</li>
+<li>training with IPS/doubly robust objectives;</li>
+<li>reporting outcomes on a persistent randomized holdout;</li>
+<li>monitoring exposure concentration and catalog starvation;</li>
+<li>distinguishing content quality from accumulated popularity.</li>
+</ol>
+<h3 class="">Causal questions the platform must answer</h3>
+<ul>
+<li>Did weather improve the choice, or did the model merely show different dishes?</li>
+<li>Did voting improve completion or only add friction?</li>
+<li>Did a “healthy” explanation change selection without increasing regret?</li>
+<li>Does grocery availability improve execution after controlling for user intent?</li>
+<li>Does novelty cause retention or occur because already-engaged users request it?</li>
+</ul>
+<p>No observational dashboard may claim causal lift. Experiments are household-randomized; network spillovers are assessed for shared households. Exposure-bias research shows why the recommender’s own history can narrow diversity without these controls: <a href="https://arxiv.org/abs/2001.04832">Khenissi &amp; Nasraoui</a>, <a href="https://research.google/pubs/attribute-based-propensity-for-unbiased-learning-in-recommender-systems-algorithm-and-case-studies/">Google attribute-based propensity</a>.</p>
+<div class="page-break"></div>
+<h1 class="">47Q. End-to-end inference pseudocode</h1>
+<pre class="code text"><code>recommend(household_id, slots, now, refresh_scope):
+  authorize caller and load immutable household snapshot
+  context       = assemble_context(now, location, schedule, pantry_belief)
+  latent_intent = infer_intent(snapshot, context, recent_events)
+  grammars      = plan_plate_grammars(slots, latent_intent, cadence_state)
+
+  for slot in unlocked(slots):
+    partials   = retrieve_shared_bases(grammars[slot], snapshot, context)
+    episodes   = beam_complete_plates(partials, food_graph, member_adaptations)
+    eligible   = hard_filter(episodes, exact_ingredients, observance, never_list)
+    practical  = filter_min_execution_probability(eligible, cook_context)
+    features   = hydrate_batch(practical, household, members, context, history)
+
+    for episode in practical:
+      episode.member_utilities = predict_member_enjoyment(features)
+      episode.household_value  = fair_aggregate(episode.member_utilities)
+      episode.p_choose         = choose_model(features)
+      episode.p_execute        = execution_model(features)
+      episode.p_regret         = regret_model(features)
+      episode.score            = full_value_equation(episode, cadence, balance)
+
+    slate = constrained_diversity_rerank(practical)
+    safety_gate_exact_versions(slate)
+    persist_candidates_features_scores_propensities_and_versions(slate)
+
+  plan = optimize_across_slots_and_locked_week(slates)
+  persist_plan_atomically(plan)
+  return grounded_explanations(plan)</code></pre>
+<p>Every named function has input/output schemas, deterministic tests, latency metrics, and a fallback. LLM calls are absent from the ranking hot path.</p>
+<div class="page-break"></div>
+<h1 class="">47R. Model promotion criteria</h1>
+<p>No model ships because an offline aggregate improved. Promotion requires:</p>
+<div class=table-wrap><table><thead><tr><th>Layer</th><th>Required evidence</th></tr></thead><tbody><tr><td>Eligibility</td><td>zero known safety violations; catalog uncertainty policy passes</td></tr><tr><td>Retrieval</td><td>Recall@K on completed episodes; coverage by region/diet/slot</td></tr><tr><td>Rank</td><td>NDCG and calibration for choose/execute/regret, all critical slices</td></tr><tr><td>Practicality</td><td>execution calibration; workload error and “too much work” reduction</td></tr><tr><td>Household</td><td>minimum-member utility and fairness-debt behavior</td></tr><tr><td>Cadence</td><td>rich/ordinary frequency, repetition, ingredient/method balance</td></tr><tr><td>Counterfactual</td><td>IPS/DR estimate with adequate effective sample size</td></tr><tr><td>Shadow</td><td>no unexpected score/coverage/latency drift</td></tr><tr><td>Online</td><td>WSMD lift with safety, regret, fairness, latency, and retention guardrails</td></tr></tbody></table></div>
+<p>The core metric becomes <strong>Household Meal Success Rate</strong>: eligible meal episodes chosen and executed without regretted replacement divided by valid decision opportunities. WSMD is its weekly volume form.</p>
+<p>Long-term value is measured over 4–8 weeks: reduced decision time, sustained execution, acceptable variety, and retention. Slate-RL or sequence optimization is deferred until randomized logs, simulator validation, and safe off-policy evaluation exist. Netflix’s published work supports a system of multiple algorithms evaluated with offline evidence and A/B tests rather than one mythical model; Spotify and YouTube describe two-stage retrieval/ranking and behavior-informed taste. Sources: <a href="https://doi.org/10.1145/2843948">Netflix recommender system</a>, <a href="https://engineering.atspotify.com/2021/11/the-rise-and-lessons-learned-of-ml-models-to-personalize-content-on-home-part-i">Spotify Home personalization</a>, <a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/">YouTube two-stage recommender</a>.</p>
+<div class="page-break"></div>
 <h1 class="part-title">Part III — Food Intelligence Bible</h1>
 <h2 class="">48. Food intelligence architecture</h2>
 <p>Food intelligence separates canonical facts, culturally contingent knowledge, derived signals, and user evidence.</p>
@@ -690,6 +1004,32 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <li>Accompaniment and composition role</li>
 </ol>
 <p>Each dimension stores value, confidence, provenance, derivation method, reviewer, and version. A dish vector is rebuilt on publish; user taste vectors are updated from interactions. Safety attributes stay outside the similarity vector so a close match can never override eligibility.</p>
+<div class="page-break"></div>
+<h2 class="">50A. Indian plate grammar and meal-episode ontology</h2>
+<p>A culturally valid meal is a typed composition, not an unordered set. Define a grammar:</p>
+<p><code>Episode → SharedBase + RequiredComponents + OptionalComponents + MemberAdaptations</code>.</p>
+<p>Examples of grammar families—not universal templates—include:</p>
+<div class=table-wrap><table><thead><tr><th>Grammar</th><th>Typical structure</th><th>Practical cadence</th></tr></thead><tbody><tr><td>North weekday roti meal</td><td>roti + dry/semi-dry sabzi; optional dal/curd/salad</td><td>ordinary, low–medium burden</td></tr><tr><td>North rice-pulse meal</td><td>rice + dal/rajma/chole + simple accompaniment</td><td>ordinary/comfort; pulse cooking considered</td></tr><tr><td>South tiffin</td><td>idli/dosa/upma/pongal + chutney/sambar as appropriate</td><td>breakfast/dinner; batter state matters</td></tr><tr><td>South rice meal</td><td>rice + sambar/rasam/kootu/poriyal/curd in locally plausible subsets</td><td>lunch; component count varies by day</td></tr><tr><td>West one-pot</td><td>khichdi/pulao/varan-rice styles + curd/pickle/papad</td><td>quick/comfort</td></tr><tr><td>East rice sequence</td><td>rice + vegetable/pulse/fish components in culturally plausible order</td><td>lunch/dinner; sequence/context matters</td></tr><tr><td>Millet/bread regional meal</td><td>local millet bread + vegetable/pulse accompaniment</td><td>seasonal/region-specific</td></tr><tr><td>Leftover transformation</td><td>prior component → paratha, fried rice, cutlet, wrap, or refreshed plate</td><td>waste reduction; safety window required</td></tr><tr><td>Split-base household</td><td>shared staple/veg + optional protein or member side</td><td>mixed diet/goal households</td></tr></tbody></table></div>
+<p>Grammar rules have locale, household support, meal slot, component cardinality, required/optional roles, compatible classes, burden prior, source, confidence, and reviewer. The engine never generalizes one region’s “complete meal” to India.</p>
+<h3 class="">Episode Genome</h3>
+<p>In addition to dish genomes, an episode stores component synergy, number of active preparations, workload DAG, ingredient overlap, color/texture/flavor balance, serving sequence, leftover graph, shared-versus-member coverage, and observed household completion. Episode similarity is distinct from dish similarity.</p>
+<div class="page-break"></div>
+<h2 class="">50B. Food-research and catalog program</h2>
+<p>The recommendation moat requires an evidence pipeline, not a large scraped recipe set.</p>
+<h3 class="">Corpus layers</h3>
+<ol>
+<li><strong>Canonical ingredients and composition:</strong> ICMR-NIN Indian Food Composition Tables and other licensed/trusted sources.</li>
+<li><strong>Regional meal diaries:</strong> consented household panel with meal photos, components, portions, time, context, and outcome.</li>
+<li><strong>Expert grammar elicitation:</strong> regional home cooks, food historians, dietitians, and culinary researchers; multiple reviewers per region.</li>
+<li><strong>Recipe execution studies:</strong> observe active/passive time, equipment contention, substitutions, cleanup, and beginner failure.</li>
+<li><strong>Behavioral logs:</strong> actual exposures, plans, swaps, cooks, orders, repeats, member response.</li>
+<li><strong>Availability layer:</strong> seasonal/local market and retailer data where licensed.</li>
+</ol>
+<h3 class="">Sampling requirements</h3>
+<p>Stratify by state/culinary region, rural/urban and city tier, income proxy, religion/diet, household size, age composition, migrant status, primary cook arrangement, working schedule, and weekday/weekend/festival. Do not label a food “popular in region” from recipe-page frequency. Report coverage and confidence; preserve within-region heterogeneity.</p>
+<h3 class="">Annotation reliability</h3>
+<p>Each subjective field has a handbook and paired annotation. Use Cohen’s kappa or Krippendorff’s alpha for categorical labels and intraclass correlation for continuous ratings. Low agreement becomes a distribution or disputed assertion, not a forced truth. AI suggestions enter the same review queue and never count as independent evidence.</p>
+<p>Reference sources: <a href="https://www.nin.res.in/ebooks/IFCT2017_16122024.pdf">ICMR-NIN Indian Food Composition Tables</a>, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5652307/">NINA-DISH regional meal assessment</a>, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7937786/">Eastern India food-choice study</a>, and <a href="https://arxiv.org/abs/1505.00890">Indian regional food pairing analysis</a>.</p>
 <div class="page-break"></div>
 <h2 class="">51. Food knowledge graph</h2>
 <h3 class="">Node types</h3>
@@ -811,18 +1151,29 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
   &quot;model_version&quot;: &quot;re-v2.3.0&quot;,
   &quot;catalog_version&quot;: &quot;food-2026-08-05.1&quot;,
   &quot;slots&quot;: [{
-    &quot;slot_id&quot;: &quot;uuid&quot;, &quot;meal_slot&quot;: &quot;dinner&quot;, &quot;selected_dish_id&quot;: &quot;uuid&quot;,
-    &quot;alternatives&quot;: [{&quot;dish_id&quot;: &quot;uuid&quot;, &quot;rank&quot;: 1, &quot;reason_tags&quot;: [&quot;quick&quot;, &quot;familiar&quot;, &quot;variety&quot;]}],
-    &quot;locked&quot;: false, &quot;addon_slots&quot;: []
+    &quot;slot_id&quot;: &quot;uuid&quot;, &quot;meal_slot&quot;: &quot;dinner&quot;,
+    &quot;selected_episode&quot;: {
+      &quot;episode_id&quot;: &quot;uuid&quot;, &quot;intent&quot;: &quot;routine&quot;,
+      &quot;components&quot;: [{&quot;dish_id&quot;: &quot;uuid&quot;, &quot;role&quot;: &quot;shared_main&quot;}],
+      &quot;member_adaptations&quot;: [],
+      &quot;practicality&quot;: {&quot;active_minutes&quot;: 28, &quot;critical_path_minutes&quot;: 34, &quot;effort_band&quot;: &quot;ordinary&quot;},
+      &quot;success_probability&quot;: 0.74,
+      &quot;confidence_band&quot;: &quot;strong_fit&quot;
+    },
+    &quot;alternatives&quot;: [{&quot;episode_id&quot;: &quot;uuid&quot;, &quot;rank&quot;: 1, &quot;reason_tags&quot;: [&quot;quicker&quot;, &quot;familiar&quot;, &quot;lighter_than_yesterday&quot;]}],
+    &quot;locked&quot;: false
   }],
   &quot;degraded&quot;: false,
   &quot;correlation_id&quot;: &quot;uuid&quot;
 }</code></pre>
-<p>Responses never expose raw private features or member conditions. <code>409</code> signals optimistic-lock conflict; <code>422</code> signals no safe coverage with an actionable code; <code>429</code> includes retry-after; <code>503</code> identifies cached-fallback eligibility.</p>
+<p>Responses never expose raw private features or member conditions. The server persists the full candidate/score trace but returns only calibrated consumer fields. <code>409</code> signals optimistic-lock conflict; <code>422</code> signals no safe coverage with an actionable code; <code>429</code> includes retry-after; <code>503</code> identifies cached-fallback eligibility.</p>
 <div class="page-break"></div>
 <h2 class="">61. Event tracking specification</h2>
 <h3 class="">Canonical envelope</h3>
 <p><code>event_id</code>, <code>idempotency_key</code>, <code>event_name</code>, <code>occurred_at</code>, <code>received_at</code>, <code>user_id</code>, <code>household_id</code>, <code>session_id</code>, <code>request_id</code>, <code>slate_id</code>, <code>item_id</code>, <code>rank</code>, <code>surface</code>, <code>schema_version</code>, <code>model_version</code>, <code>experiment_assignments</code>, <code>properties</code>, <code>consent_basis</code>.</p>
+<p>For recommendation intelligence, <code>item_id</code> is an <code>episode_id/episode_hash</code>; component actions also carry <code>dish_id</code>, <code>recipe_id</code>, and <code>component_role</code>. The immutable exposure record stores <code>eligible_set_hash</code>, full ordered slate, logging propensity, visibility duration, intent posterior, context hash, household snapshot hash, catalog/config/feature versions, selected cook, predicted work, and choose/execute/regret probabilities. Outcome events store actual components, substitutions, time, missing ingredients, cook identity, eater set, leftover result, member attribution confidence, and reason taxonomy where supplied.</p>
+<h3 class="">Attribution rule</h3>
+<p>The ingest service never converts raw events directly into a single score. It emits raw facts; versioned feature jobs interpret them. This allows the team to correct semantics later without corrupting history. For example, <code>dish_ordered</code> can mean the recommendation succeeded via commerce, the cooking plan failed, or the household chose unrelated food. The payload must preserve which occurred.</p>
 <h3 class="">Core event taxonomy</h3>
 <div class=table-wrap><table><thead><tr><th>Domain</th><th>Events</th></tr></thead><tbody><tr><td>Lifecycle</td><td><code>app_opened</code>, <code>onboarding_started/completed</code>, <code>plan_viewed</code></td></tr><tr><td>Exposure</td><td><code>slate_exposed</code>, <code>dish_impression</code>, <code>explanation_viewed</code></td></tr><tr><td>Preference</td><td><code>dish_accepted</code>, <code>dish_swiped_past</code>, <code>dish_not_today</code>, <code>dish_never</code>, <code>never_restored</code></td></tr><tr><td>Planning</td><td><code>slot_locked/unlocked</code>, <code>slot_refreshed</code>, <code>dish_added_to_date</code>, <code>plan_shared</code></td></tr><tr><td>Outcome</td><td><code>recipe_started/completed</code>, <code>dish_cooked</code>, <code>dish_ordered</code>, <code>dish_replaced</code>, <code>dish_rated</code></td></tr><tr><td>Household</td><td><code>member_added/updated/removed</code>, <code>invite_sent/accepted</code></td></tr><tr><td>Reliability</td><td><code>fallback_served</code>, <code>offline_queue_flushed</code>, <code>safety_gate_blocked</code></td></tr><tr><td>Privacy</td><td><code>consent_changed</code>, <code>export_requested/completed</code>, <code>deletion_requested/completed</code></td></tr></tbody></table></div>
 <p>Events are append-only. Server timestamps preserve receipt order; device timestamps preserve user order. Duplicate keys return success without double learning.</p>
@@ -844,6 +1195,10 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <h2 class="">65. Expected DB schema — recipes, nutrition, graph</h2>
 <div class=table-wrap><table><thead><tr><th>Table <code>[class]</code></th><th>Expected columns</th></tr></thead><tbody><tr><td><code>public.recipes [MIX]</code></td><td><code>id</code>, <code>dish_id</code>, <code>locale</code>, <code>title</code>, <code>servings</code>, <code>total_time_minutes</code>, <code>active_time_minutes</code>, <code>difficulty_code</code>, <code>equipment_codes[]</code>, <code>instructions_status</code>, provenance/review/version columns</td></tr><tr><td><code>public.recipe_steps [MIX]</code></td><td><code>id</code>, <code>recipe_id</code>, <code>step_number</code>, <code>instruction</code>, <code>duration_seconds</code>, <code>equipment_code</code>, <code>media_url</code>, provenance columns</td></tr><tr><td><code>public.recipe_ingredients [MIX]</code></td><td><code>recipe_id</code>, <code>ingredient_id</code>, <code>quantity</code>, <code>unit_code</code>, <code>preparation</code>, <code>is_optional</code>, <code>substitution_group_id</code></td></tr><tr><td><code>food.nutrients [EXT]</code></td><td><code>id</code>, <code>nutrient_code</code>, <code>name</code>, <code>unit</code>, <code>upper_lower_semantics</code>, source/version</td></tr><tr><td><code>food.nutrient_assertions [MIX]</code></td><td><code>id</code>, <code>subject_type</code>, <code>subject_id</code>, <code>nutrient_id</code>, <code>min_value</code>, <code>expected_value</code>, <code>max_value</code>, <code>serving_basis</code>, <code>method</code>, <code>confidence</code>, source/review/version</td></tr><tr><td><code>food.ontology_nodes [MIX]</code></td><td><code>id</code>, <code>node_type</code>, <code>canonical_entity_id</code>, <code>label</code>, <code>locale</code>, <code>status</code>, provenance</td></tr><tr><td><code>food.ontology_edges [MIX]</code></td><td><code>id</code>, <code>subject_node_id</code>, <code>predicate_code</code>, <code>object_node_id</code>, <code>scope_region_id</code>, <code>weight</code>, <code>confidence</code>, <code>effective_from/to</code>, provenance/review</td></tr><tr><td><code>food.substitutions [MIX]</code></td><td><code>id</code>, <code>from_ingredient_id</code>, <code>to_ingredient_id</code>, <code>function_code</code>, <code>recipe_context</code>, <code>ratio</code>, <code>adjustment_text</code>, <code>constraint_delta</code>, confidence/provenance</td></tr><tr><td><code>food.dish_combos [MIX]</code></td><td><code>id</code>, <code>name</code>, <code>meal_slot</code>, <code>region_id</code>, <code>status</code>, provenance</td></tr><tr><td><code>food.dish_combo_items [MIX]</code></td><td><code>combo_id</code>, <code>dish_id</code>, <code>component_role</code>, <code>is_required</code>, <code>sequence</code>, <code>portion_ratio</code></td></tr></tbody></table></div>
 <p>The <code>food</code> schema is proposed for the richer v3 ontology; the current repository uses <code>public</code> plus private RE tables and a bounded relational graph.</p>
+<div class="page-break"></div>
+<h2 class="">65A. Expected DB schema — meal episodes, grammar, and practicality</h2>
+<div class=table-wrap><table><thead><tr><th>Table <code>[class]</code></th><th>Expected columns</th></tr></thead><tbody><tr><td><code>food.plate_grammars [MIX]</code></td><td><code>id</code>, <code>grammar_code</code>, <code>locale_scope</code>, <code>meal_slots[]</code>, <code>intent_codes[]</code>, <code>required_roles jsonb</code>, <code>optional_roles jsonb</code>, <code>burden_prior</code>, <code>source_id</code>, <code>confidence</code>, <code>review_status</code>, version/timestamps</td></tr><tr><td><code>food.grammar_component_rules [MIX]</code></td><td><code>id</code>, <code>grammar_id</code>, <code>component_role</code>, <code>allowed_class_ids[]</code>, <code>min_count</code>, <code>max_count</code>, <code>compatibility_expression</code>, <code>sequence</code>, provenance</td></tr><tr><td><code>food.meal_episodes [MIX]</code></td><td><code>id</code>, <code>episode_code</code>, <code>grammar_id</code>, <code>shared_base_dish_id</code>, <code>episode_genome_vector</code>, <code>richness_prior</code>, <code>effort_prior</code>, <code>catalog_status</code>, provenance/review/version</td></tr><tr><td><code>food.meal_episode_components [MIX]</code></td><td><code>episode_id</code>, <code>dish_id</code>, <code>recipe_id</code>, <code>component_role</code>, <code>is_required</code>, <code>portion_relation</code>, <code>sequence</code>, <code>adaptation_scope</code>, provenance</td></tr><tr><td><code>food.recipe_operations [MIX]</code></td><td><code>id</code>, <code>recipe_id</code>, <code>operation_code</code>, <code>duration_seconds</code>, <code>active_seconds</code>, <code>equipment_code</code>, <code>predecessor_ids[]</code>, <code>parallel_group</code>, <code>skill_level</code>, provenance</td></tr><tr><td><code>food.episode_workload_features [MIX]</code></td><td><code>episode_id</code>, <code>recipe_variant_hash</code>, <code>active_minutes</code>, <code>critical_path_minutes</code>, <code>vessel_count</code>, <code>burner_peak</code>, <code>ingredient_count</code>, <code>rare_ingredient_count</code>, <code>cleanup_score</code>, <code>batchability</code>, <code>leftover_value</code>, <code>feature_version</code></td></tr><tr><td><code>food.episode_cadence [MIX]</code></td><td><code>episode_id</code>, <code>region_id</code>, <code>household_type</code>, <code>cadence_tier</code>, <code>frequency_prior</code>, <code>richness_dimensions jsonb</code>, <code>source_id</code>, <code>confidence</code></td></tr><tr><td><code>public.pantry_beliefs [USE]</code></td><td><code>household_id</code>, <code>ingredient_id</code>, <code>probability_present</code>, <code>quantity_range</code>, <code>last_evidence_at</code>, <code>evidence_type</code>, <code>expires_at</code>, <code>feature_version</code></td></tr><tr><td><code>public.leftover_lots [APP/USE]</code></td><td><code>id</code>, <code>household_id</code>, <code>source_plan_slot_id</code>, <code>dish_id</code>, <code>estimated_servings</code>, <code>created_at</code>, <code>safe_until</code>, <code>status</code>, <code>confidence</code></td></tr><tr><td><code>re_engine.household_cadence_state [USE]</code></td><td><code>household_id</code>, rolling-window counts/recencies, <code>richness_debt</code>, <code>effort_debt</code>, <code>novelty_budget</code>, <code>ordinary_meal_ratio</code>, <code>updated_at</code>, <code>feature_version</code></td></tr><tr><td><code>re_engine.member_fairness_state [USE]</code></td><td><code>household_id</code>, <code>member_id</code>, <code>satisfaction_debt</code>, <code>evidence_count</code>, <code>last_served_at</code>, <code>updated_at</code>, <code>policy_version</code></td></tr><tr><td><code>re_engine.intent_state [USE]</code></td><td><code>household_id</code>, <code>meal_slot</code>, <code>state_probabilities jsonb</code>, <code>inference_time</code>, <code>context_hash</code>, <code>model_version</code></td></tr></tbody></table></div>
+<p>Precomputed episode rows are curated high-quality bundles; the engine may also assemble ephemeral episodes. An ephemeral bundle receives a content-addressed <code>episode_hash</code>, exact component versions, and a stored snapshot so events remain replayable after catalog evolution.</p>
 <div class="page-break"></div>
 <h2 class="">66. Expected DB schema — plans and interactions</h2>
 <div class=table-wrap><table><thead><tr><th>Table <code>[class]</code></th><th>Expected columns</th></tr></thead><tbody><tr><td><code>public.week_plans [APP]</code></td><td><code>id</code>, <code>household_id</code>, <code>week_start_date</code>, <code>status</code>, <code>generation_request_id</code>, <code>model_version</code>, <code>catalog_version</code>, <code>experiment_snapshot</code>, timestamps, <code>version</code></td></tr><tr><td><code>public.plan_slots [APP]</code></td><td><code>id</code>, <code>week_plan_id</code>, <code>plan_date</code>, <code>meal_slot_code</code>, <code>selected_dish_id</code>, <code>selected_combo_id</code>, <code>slate_id</code>, <code>status</code>, <code>is_locked</code>, <code>locked_by</code>, <code>locked_at</code>, <code>context_snapshot_id</code>, <code>version</code>, timestamps</td></tr><tr><td><code>public.addon_slots [APP]</code></td><td><code>id</code>, <code>plan_slot_id</code>, <code>household_member_id</code>, <code>addon_class_id</code>, <code>selected_dish_id</code>, <code>reason_code</code>, <code>status</code>, timestamps</td></tr><tr><td><code>public.slates [APP]</code></td><td><code>id</code>, <code>request_id</code>, <code>plan_slot_id</code>, <code>surface</code>, <code>model_version</code>, <code>config_version</code>, <code>created_at</code>, <code>expires_at</code></td></tr><tr><td><code>public.slate_items [APP]</code></td><td><code>slate_id</code>, <code>dish_id</code>, <code>rank</code>, <code>point_score</code>, <code>rerank_score</code>, <code>generator_codes[]</code>, <code>reason_tags[]</code>, <code>selection_propensity</code></td></tr><tr><td><code>public.interaction_events [USE]</code></td><td><code>id</code>, <code>idempotency_key</code>, <code>event_name</code>, <code>user_id</code>, <code>household_id</code>, <code>slate_id</code>, <code>dish_id</code>, <code>rank</code>, <code>surface</code>, <code>occurred_at</code>, <code>received_at</code>, <code>schema_version</code>, <code>properties</code>, <code>consent_basis</code></td></tr><tr><td><code>public.outcome_events [USE]</code></td><td><code>id</code>, <code>plan_slot_id</code>, <code>dish_id</code>, <code>outcome_type</code>, <code>value</code>, <code>occurred_at</code>, <code>source</code>, <code>confidence</code></td></tr><tr><td><code>public.suggestion_logs [USE]</code></td><td><code>id</code>, <code>request_id</code>, <code>household_id</code>, <code>slot</code>, <code>candidate_counts</code>, <code>selected_ids</code>, <code>model/config/catalog versions</code>, <code>latency_ms</code>, <code>degraded</code>, <code>created_at</code></td></tr><tr><td><code>public.context_log [APP]</code></td><td><code>id</code>, <code>request_id</code>, <code>household_id</code>, <code>weather_code</code>, <code>season_code</code>, <code>festival_ids[]</code>, <code>day_type</code>, <code>time_budget</code>, <code>snapshot_hash</code>, <code>created_at</code></td></tr></tbody></table></div>
@@ -1055,9 +1410,10 @@ body > main > h1:first-child + h2 { font-size: 21pt; border: 0; max-width: 150mm
 <li>Engineering: Technical Architecture, Backend Foundation, Service/Edge Function spec, Integration/Infrastructure, Deployment Topology, Extensibility Review.</li>
 <li>Research: active canonicalization, mapping, gap-analysis, discovery, and pipeline packages excluding the governance evaluation package.</li>
 <li>Roadmap/current state: active product roadmap, RE intelligence roadmap draft, current status, open items, and launch blockers.</li>
-<li>User attachment: “Detailed Plan for an AI-Powered Meal Planning App.”</li>
+<li>User attachments: “Detailed Plan for an AI-Powered Meal Planning App” and “Ghar RE / Foofoo Meal Planning Product Bible.”</li>
 </ul>
-<p>External current context: <a href="https://www.trai.gov.in/">TRAI</a>, <a href="https://www.npci.org.in/product/upi/product-statistics">NPCI UPI statistics</a>, <a href="https://www.who.int/india/health-topics/healthy-diet">WHO India healthy diet</a>, <a href="https://www.who.int/news-room/fact-sheets/detail/healthy-diet">WHO healthy diet fact sheet</a>.</p>
+<p>External Indian food/household evidence: <a href="https://www.mospi.gov.in/sites/default/files/publication_reports/TUS_Report_2024_28.03.2025F.pdf">India Time Use Survey 2024</a>, <a href="https://microdata.gov.in/NADA/index.php/catalog/237">HCES 2023–24</a>, <a href="https://nin.res.in/dietaryguidelines/pdfjs/locale/DGI_2024.pdf">ICMR-NIN Dietary Guidelines 2024</a>, <a href="https://www.nin.res.in/ebooks/IFCT2017_16122024.pdf">Indian Food Composition Tables</a>, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5652307/">NINA-DISH</a>, <a href="https://www.wfp.org/publications/wfp-india-who-eats-when-what-and-how-much">WFP intra-household consumption</a>, <a href="https://www.trai.gov.in/">TRAI</a>, <a href="https://www.npci.org.in/product/upi/product-statistics">NPCI UPI statistics</a>, and <a href="https://www.who.int/india/health-topics/healthy-diet">WHO India healthy diet</a>.</p>
+<p>Recommendation-system research: <a href="https://doi.org/10.1145/2843948">Netflix recommender system</a>, <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39">Netflix foundation model for personalization</a>, <a href="https://engineering.atspotify.com/2021/11/the-rise-and-lessons-learned-of-ml-models-to-personalize-content-on-home-part-i">Spotify two-stage Home personalization</a>, <a href="https://www.spotify.com/uk/safetyandprivacy/understanding-recommendations">Spotify recommendation controls</a>, <a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/">YouTube candidate generation and ranking</a>, <a href="https://research.google/pubs/slateq-a-tractable-decomposition-for-reinforcement-learning-with-recommendation-sets/">SlateQ</a>, <a href="https://proceedings.neurips.cc/paper/2017/hash/5352696a9ca3397beb79f116f3a33991-Abstract.html">off-policy slate evaluation</a>, <a href="https://arxiv.org/abs/2007.12986">sequential counterfactual slate evaluation</a>, <a href="https://doi.org/10.1145/3240323.3240372">calibrated recommendations</a>, and <a href="https://arxiv.org/abs/2105.14423">fair package recommendation</a>.</p>
 <div class="page-break"></div>
 <h1 class="">Appendix B — Requirement-to-system traceability</h1>
 <div class=table-wrap><table><thead><tr><th>Product need</th><th>UX</th><th>Service</th><th>Data</th><th>Model/evidence</th></tr></thead><tbody><tr><td>Ready plan</td><td>Today/Week</td><td>Planning + RE</td><td>plans, slots, slates</td><td>class plan + ranker</td></tr><tr><td>Safe household meal</td><td>Onboarding/Profile</td><td>Household + Catalog + RE</td><td>members, ingredients, constraints</td><td>filters + post-gate</td></tr><tr><td>Alternatives</td><td>Carousel</td><td>Recommendation</td><td>slate items/events</td><td>MMR and exposure policy</td></tr><tr><td>Temporary rejection</td><td>Not Today action</td><td>Feedback</td><td>suppression</td><td>decay penalty</td></tr><tr><td>Permanent exclusion</td><td>Never confirm/list</td><td>Feedback/Profile</td><td>never list</td><td>hard anti-join</td></tr><tr><td>Member adaptation</td><td>Household/add-on card</td><td>Planning</td><td>add-on slots</td><td>bundle optimizer</td></tr><tr><td>Useful why</td><td>Explanation sheet</td><td>Trace/Explanation</td><td>decision trace</td><td>contribution selection</td></tr><tr><td>Learn outcomes</td><td>Cook/order/rating</td><td>Event ingest</td><td>outcome events/features</td><td>decay, rank training</td></tr><tr><td>Groceries</td><td>Grocery tab</td><td>Plan-to-basket</td><td>recipes/ingredients</td><td>consolidation/substitution</td></tr><tr><td>Privacy control</td><td>Privacy screen</td><td>Privacy worker</td><td>consent/requests/audit</td><td>consent-filtered learning</td></tr></tbody></table></div>
