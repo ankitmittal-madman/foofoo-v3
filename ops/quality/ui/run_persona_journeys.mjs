@@ -53,9 +53,16 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 
 /** Write the run summary JSON and exit with the given code (matches run_ui.mjs's finish()). */
 function finish(summary, code = 0) {
-  fs.mkdirSync(outDir, { recursive: true });
-  fs.writeFileSync(path.join(outDir, "persona_journeys_result.json"), JSON.stringify(summary, null, 2));
-  console.log(JSON.stringify(summary, null, 2));
+  const serialized = JSON.stringify(summary, null, 2);
+  // Emit the result first so an exhausted artifact filesystem cannot mask the journey outcome.
+  console.log(serialized);
+  try {
+    fs.mkdirSync(outDir, { recursive: true });
+    fs.writeFileSync(path.join(outDir, "persona_journeys_result.json"), serialized);
+  } catch (error) {
+    console.error(`Could not write persona journey result to ${outDir}: ${String(error)}`);
+    code = 1;
+  }
   process.exit(code);
 }
 
@@ -514,7 +521,29 @@ async function runPersona(browser, persona) {
         const choices = page.locator('[data-testid^="weekly-plan-"][data-testid$="-0"]');
         const count = await choices.count();
         if (count !== 21) throw new Error(`weekly plan rendered ${count}/21 first-choice class controls`);
-        for (let index = 0; index < count; index += 1) await choices.nth(index).click();
+
+        // The screen deliberately keeps weekend cards mounted but hidden while the Weekdays
+        // segment is active (and vice versa). Clicking a positional list of all 21 controls
+        // therefore stalls on Saturday even though the locator exists in the DOM. Exercise the
+        // controls through the same two visible segments a user sees instead.
+        for (const weekday of ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]) {
+          for (const slot of ["breakfast", "lunch", "dinner"]) {
+            await page.getByTestId(`weekly-plan-${weekday}-${slot}-0`).click();
+          }
+        }
+        const weekendTab = page.getByTestId("weekly-plan-period-weekend");
+        if (await weekendTab.count()) {
+          await weekendTab.click();
+        } else {
+          // Backward compatibility for deployed builds predating the stable tab test ID.
+          await page.getByText(/^(Weekend|वीकेंड)$/).click();
+        }
+        await page.getByTestId("weekly-plan-Saturday-breakfast-0").waitFor({ state: "visible", timeout: 10000 });
+        for (const weekday of ["Saturday", "Sunday"]) {
+          for (const slot of ["breakfast", "lunch", "dinner"]) {
+            await page.getByTestId(`weekly-plan-${weekday}-${slot}-0`).click();
+          }
+        }
         await recordStep("weekly-plan-21-slots-selected");
         await clickWithApi(page, page.getByTestId("weekly-plan-finalize"), "plan", 45000);
         await waitForPath(page, (u) => u.pathname.endsWith("/today"), 20000);
