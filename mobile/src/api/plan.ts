@@ -190,7 +190,36 @@ function slotOptionsToMealEpisodes(response: SlotOptionsResponse, slot: Slot): M
 
 function shouldFallbackToSlotOptions(error: unknown): boolean {
   return error instanceof ApiError &&
-    (error.code === "ERR_VALIDATION_FAILED" || error.status === 503 || error.status === 404);
+    (error.code === "ERR_VALIDATION_FAILED" ||
+      error.status === 400 ||
+      error.status === 404 ||
+      error.status === 422 ||
+      error.status === 503);
+}
+
+function fetchSlotOptionsAsMealEpisodes(
+  slot: Slot,
+  opts: {
+    weekday?: string;
+    class_code?: string;
+    count?: number;
+  } = {},
+): Promise<MealEpisodeResponse> {
+  const count = typeof opts.count === "number" ? opts.count : 4;
+  return apiPost<SlotOptionsResponse>("/plan", opts.class_code
+    ? {
+      surface: "class_dishes",
+      slot,
+      class_code: opts.class_code,
+      weekday: opts.weekday,
+      count,
+    }
+    : {
+      surface: "meal_plan",
+      slot,
+      weekday: opts.weekday,
+      count,
+    }).then((response) => slotOptionsToMealEpisodes(response, slot));
 }
 
 export interface WeeklyClass {
@@ -270,25 +299,14 @@ export function fetchMealEpisodes(
     recovery_mode?: boolean;
   } = {},
 ): Promise<MealEpisodeResponse> {
+  if (process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES !== "true") {
+    return fetchSlotOptionsAsMealEpisodes(slot, opts);
+  }
+
   return apiPost<MealEpisodeResponse>("/plan", { surface: "meal_episodes", slot, ...opts })
     .catch(async (error: unknown) => {
       if (!shouldFallbackToSlotOptions(error)) throw error;
-      const count = typeof opts.count === "number" ? opts.count : 4;
-      const response = await apiPost<SlotOptionsResponse>("/plan", opts.class_code
-        ? {
-          surface: "class_dishes",
-          slot,
-          class_code: opts.class_code,
-          weekday: opts.weekday,
-          count,
-        }
-        : {
-          surface: "meal_plan",
-          slot,
-          weekday: opts.weekday,
-          count,
-        });
-      return slotOptionsToMealEpisodes(response, slot);
+      return fetchSlotOptionsAsMealEpisodes(slot, opts);
     });
 }
 

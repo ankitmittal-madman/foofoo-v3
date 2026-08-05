@@ -22,11 +22,59 @@ jest.mock("../client", () => {
 const mockedPost = apiPost as jest.MockedFunction<typeof apiPost>;
 
 describe("fetchMealEpisodes", () => {
-  beforeEach(() => mockedPost.mockReset());
+  const previousFlag = process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES;
 
-  it("falls back to slot options when the meal episode surface is unavailable", async () => {
+  beforeEach(() => {
+    mockedPost.mockReset();
+    delete process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES;
+  });
+
+  afterEach(() => {
+    if (previousFlag === undefined) {
+      delete process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES;
+    } else {
+      process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES = previousFlag;
+    }
+  });
+
+  it("uses stable slot options by default", async () => {
+    mockedPost.mockResolvedValueOnce({
+      slot: "breakfast",
+      weekday: "Wednesday",
+      class_code: null,
+      count: 1,
+      request_id: "request-1",
+      options: [{
+        name: "Poha",
+        cuisine: "Maharashtrian",
+        diet: "veg",
+        meal_class_code: "BF_POHA",
+        meal_class_name: "Poha",
+        spice_level: 1,
+        heaviness: 1,
+        total_mins: 20,
+        score: 4,
+        image_url: "https://example.test/poha.jpg",
+      }],
+    });
+
+    const response = await fetchMealEpisodes("breakfast", { weekday: "Wednesday", count: 1 });
+
+    expect(mockedPost).toHaveBeenCalledTimes(1);
+    expect(mockedPost).toHaveBeenCalledWith("/plan", {
+      surface: "meal_plan",
+      slot: "breakfast",
+      weekday: "Wednesday",
+      count: 1,
+    });
+    expect(response.kind).toBe("meal_episode_slate");
+    expect(response.episodes[0].display_name).toBe("Poha");
+  });
+
+  it("falls back to slot options when the opted-in meal episode surface returns a bad request", async () => {
+    process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES = "true";
     mockedPost
-      .mockRejectedValueOnce(new ApiError("unknown surface", 422, undefined, "ERR_VALIDATION_FAILED"))
+      .mockRejectedValueOnce(new ApiError("Bad Request", 400))
       .mockResolvedValueOnce({
         slot: "breakfast",
         weekday: "Wednesday",
@@ -68,6 +116,7 @@ describe("fetchMealEpisodes", () => {
   });
 
   it("does not fall back for auth failures", async () => {
+    process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES = "true";
     mockedPost.mockRejectedValueOnce(new ApiError("expired", 401, undefined, "ERR_UNAUTHENTICATED"));
 
     await expect(fetchMealEpisodes("lunch")).rejects.toThrow("expired");
