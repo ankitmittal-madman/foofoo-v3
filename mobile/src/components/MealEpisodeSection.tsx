@@ -83,6 +83,7 @@ export function MealEpisodeSection({
           />
           <View style={styles.actionRow}>
             <Pressable
+              testID={`episode-${slot}-alternatives`}
               style={styles.primaryButton}
               onPress={() => setShowAlternatives((value) => !value)}
               accessibilityRole="button"
@@ -93,6 +94,7 @@ export function MealEpisodeSection({
             </Pressable>
             {classCode ? (
               <Pressable
+                testID={`episode-${slot}-lock`}
                 style={[styles.secondaryButton, locked && styles.locked]}
                 disabled={lock.isPending}
                 onPress={() => lock.mutate(!locked)}
@@ -154,7 +156,10 @@ function EpisodeCard({
   }
 
   return (
-    <View style={[styles.card, compact && styles.compactCard]}>
+    <View
+      style={[styles.card, compact && styles.compactCard]}
+      testID={compact ? undefined : `episode-${slot}-primary`}
+    >
       {primaryDish?.image_url ? <Image source={{ uri: primaryDish.image_url }} style={styles.image} /> : null}
       <Text style={styles.intent}>{episode.intent.replaceAll("_", " ")}</Text>
       <Text style={styles.mealName}>{episode.display_name}</Text>
@@ -171,35 +176,59 @@ function EpisodeCard({
       {!compact ? (
         <View style={styles.actionRow}>
           <Pressable
+            testID={`episode-${slot}-make-this`}
             style={styles.primaryButton}
             disabled={feedback.isPending || !requestId}
             onPress={() => feedback.mutate({ eventType: "make_this" }, { onSuccess: onMakeThis })}
           >
             <Text style={styles.primaryText}>Make this</Text>
           </Pressable>
-          <Pressable style={styles.secondaryButton} onPress={() => setAskReason((value) => !value)}>
+          <Pressable
+            testID={`episode-${slot}-not-today`}
+            style={styles.secondaryButton}
+            onPress={() => setAskReason((value) => !value)}
+          >
             <Text style={styles.secondaryText}>Not today</Text>
           </Pressable>
         </View>
       ) : null}
       {askReason ? (
         <View style={styles.reasonRow}>
-          <Pressable style={styles.reasonButton} onPress={() => replace("too_much_work")}>
+          <Pressable
+            testID={`episode-${slot}-reason-too-much-work`}
+            style={styles.reasonButton}
+            onPress={() => replace("too_much_work")}
+          >
             <Text style={styles.reasonButtonText}>Too much work</Text>
           </Pressable>
-          <Pressable style={styles.reasonButton} onPress={() => replace("missing_ingredient")}>
+          <Pressable
+            testID={`episode-${slot}-reason-missing-ingredient`}
+            style={styles.reasonButton}
+            onPress={() => replace("missing_ingredient")}
+          >
             <Text style={styles.reasonButtonText}>Missing item</Text>
           </Pressable>
-          <Pressable style={styles.reasonButton} onPress={() => replace("member_objection")}>
+          <Pressable
+            testID={`episode-${slot}-reason-member-objection`}
+            style={styles.reasonButton}
+            onPress={() => replace("member_objection")}
+          >
             <Text style={styles.reasonButtonText}>Member objected</Text>
           </Pressable>
-          <Pressable style={styles.reasonButton} onPress={() => replace("not_today")}>
+          <Pressable
+            testID={`episode-${slot}-reason-different-mood`}
+            style={styles.reasonButton}
+            onPress={() => replace("not_today")}
+          >
             <Text style={styles.reasonButtonText}>Different mood</Text>
           </Pressable>
         </View>
       ) : null}
       {primaryDish ? (
-        <Pressable onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: primaryDish.dish_name } })}>
+        <Pressable
+          testID={`episode-${slot}-recipe`}
+          onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: primaryDish.dish_name } })}
+        >
           <Text style={styles.recipeLink}>View cooking details</Text>
         </Pressable>
       ) : null}

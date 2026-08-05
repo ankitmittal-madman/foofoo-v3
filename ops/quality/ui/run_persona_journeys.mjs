@@ -519,33 +519,33 @@ async function runPersona(browser, persona) {
         await clickWithApi(page, page.getByTestId("weekly-plan-finalize"), "plan", 45000);
         await waitForPath(page, (u) => u.pathname.endsWith("/today"), 20000);
         await waitForSurface(page, "home-screen");
-        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
+        await page.getByTestId("episode-breakfast-primary").waitFor({ state: "visible", timeout: 45000 });
         await recordStep("home-meal-plan-loaded");
       });
-      await feature("home explanation and feedback event types", async () => {
+      await feature("meal episode explanation and feedback event types", async () => {
         await page.goto(new URL("/today", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
         await waitForSurface(page, "home-screen");
-        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
-        await page.getByTestId("home-breakfast-why-0").click();
-        await recordStep("home-why-this-opened");
+        await page.getByTestId("episode-breakfast-primary").waitFor({ state: "visible", timeout: 45000 });
         const feedbackActions = [
-          ["breakfast", "like", 0],
-          ["breakfast", "dislike", 1],
-          ["lunch", "not-today", 0],
-          ["dinner", "never", 0],
+          ["breakfast", "too-much-work"],
+          ["lunch", "missing-ingredient"],
+          ["dinner", "member-objection"],
         ];
-        for (const [slot, event, index] of feedbackActions) {
-          const control = page.getByTestId(`home-${slot}-${event}-${index}`);
-          if (!(await control.count())) throw new Error(`missing home ${event} control`);
+        for (const [slot, reason] of feedbackActions) {
+          await page.getByTestId(`episode-${slot}-not-today`).click();
+          const control = page.getByTestId(`episode-${slot}-reason-${reason}`);
+          if (!(await control.count())) throw new Error(`missing ${slot} episode reason control: ${reason}`);
           await clickWithApi(page, control, "feedback");
-          await recordStep(`home-feedback-${event}`);
+          await recordStep(`episode-feedback-${reason}`);
         }
+        await clickWithApi(page, page.getByTestId("episode-breakfast-make-this"), "feedback");
+        await recordStep("episode-make-this");
       }, { continueOnFailure: true });
       await feature("home lock refresh and next-date recommendations", async () => {
         await page.goto(new URL("/today", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
         await waitForSurface(page, "home-screen");
-        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
-        await clickWithApi(page, page.getByTestId("home-breakfast-lock"), "plan");
+        await page.getByTestId("episode-breakfast-primary").waitFor({ state: "visible", timeout: 45000 });
+        await clickWithApi(page, page.getByTestId("episode-breakfast-lock"), "plan");
         await recordStep("home-breakfast-locked");
         await clickWithApi(page, page.getByTestId("home-refresh"), "plan", 45000);
         await page.waitForTimeout(750);
@@ -559,25 +559,20 @@ async function runPersona(browser, persona) {
       await feature("recipe details render", async () => {
         await page.goto(new URL("/today", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
         await waitForSurface(page, "home-screen");
-        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
-        await page.getByTestId("home-breakfast-dish-0").click();
+        await page.getByTestId("episode-breakfast-primary").waitFor({ state: "visible", timeout: 45000 });
+        await page.getByTestId("episode-breakfast-recipe").click();
         await waitForSurface(page, "recipe-screen");
         await recordStep("recipe-detail-loaded");
         await page.getByTestId("recipe-back").click();
         await waitForSurface(page, "home-screen");
       }, { continueOnFailure: true });
-      await feature("dish can be assigned to a dated plan", async () => {
+      await feature("meal episode alternatives render", async () => {
         await page.goto(new URL("/today", url).toString(), { waitUntil: "networkidle", timeout: 30000 });
         await waitForSurface(page, "home-screen");
-        await page.getByTestId("home-breakfast-dish-0").waitFor({ state: "visible", timeout: 45000 });
-        const choose = page.getByTestId("home-breakfast-choose-date-0");
-        if (!(await choose.count())) throw new Error("dated-plan control missing from recommended dish");
-        await choose.click();
-        await waitForSurface(page, "add-to-date-screen");
-        await recordStep("add-to-date-loaded");
-        await clickWithApi(page, page.getByTestId("add-to-date-submit"), "plan");
-        await waitForSurface(page, "home-screen");
-        await recordStep("dish-added-to-date");
+        await page.getByTestId("episode-breakfast-primary").waitFor({ state: "visible", timeout: 45000 });
+        await page.getByTestId("episode-breakfast-alternatives").click();
+        await page.getByText(/Hide alternatives/).waitFor({ state: "visible", timeout: 5000 });
+        await recordStep("episode-alternatives-opened");
       }, { continueOnFailure: true });
       await feature("safe dish search and search recipe", async () => {
         await page.goto(new URL("/search", url).toString(), { waitUntil: "networkidle", timeout: 30000 });

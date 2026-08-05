@@ -80,9 +80,12 @@ describe("MealEpisodeSection", () => {
     expect(screen.getByText("Tori chana dal + Phulka")).toBeTruthy();
     expect(screen.getByText("28 active min · 1 burner · 2 vessels")).toBeTruthy();
     expect(screen.getByText("Safe starting point")).toBeTruthy();
-    fireEvent.press(screen.getByText("Not today"));
-    expect(screen.getByText("Too much work")).toBeTruthy();
-    fireEvent.press(screen.getByText("Too much work"));
+    expect(screen.getByTestId("episode-dinner-primary")).toBeTruthy();
+    expect(screen.getByTestId("episode-dinner-make-this")).toBeTruthy();
+    expect(screen.getByTestId("episode-dinner-recipe")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("episode-dinner-not-today"));
+    expect(screen.getByTestId("episode-dinner-reason-too-much-work")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("episode-dinner-reason-too-much-work"));
     await waitFor(() => expect(mockMutate).toHaveBeenCalled());
   });
 });
