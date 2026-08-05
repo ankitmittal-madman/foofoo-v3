@@ -76,6 +76,12 @@ describe("Today", () => {
     expect(screen.getByTestId("episode-section-lunch")).toBeTruthy();
     expect(screen.getByTestId("episode-section-dinner")).toBeTruthy();
     expect(screen.getByTestId("home-refresh")).toBeTruthy();
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const localDate = (value: Date) => `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+    expect(screen.getByTestId(`home-date-${localDate(today)}`)).toBeTruthy();
+    expect(screen.getByTestId(`home-date-${localDate(tomorrow)}`)).toBeTruthy();
   });
 
   it("renders persisted lock state and rich scoring reasons", () => {
