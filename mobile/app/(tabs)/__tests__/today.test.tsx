@@ -44,7 +44,7 @@ jest.mock("@tanstack/react-query", () => ({
 }));
 jest.mock("@/api/errorMessages", () => ({ describeApiError: () => "Request failed" }));
 jest.mock("@/api/feedback", () => ({ postFeedback: jest.fn() }));
-jest.mock("@/lib/weeklyPlanStore", () => ({ loadWeeklyPlan: jest.fn().mockResolvedValue({}) }));
+jest.mock("@/lib/weeklyPlanStore", () => ({ loadWeeklyPlan: jest.fn(() => new Promise(() => {})) }));
 jest.mock("@/api/plan", () => ({
   fetchClassDishes: jest.fn(),
   fetchSavedWeek: jest.fn().mockResolvedValue({}),
@@ -67,6 +67,8 @@ jest.mock("@/api/plan", () => ({
 }));
 
 describe("Today", () => {
+  beforeEach(() => mockRefetch.mockClear());
+
   it("renders live complete-meal sections for all three daily slots", () => {
     render(<Home />);
 
