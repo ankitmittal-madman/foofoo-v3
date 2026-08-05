@@ -761,7 +761,9 @@ There are currently two divergent serving paths. Mobile uses `/plan`, which load
 - “served” currently means returned by the RE, not fetched/rendered/visible on device;
 - the `/plan` result shape does not feed the exposure flattener expected by automatic `shown_not_tapped` logic;
 - raw feedback insertion and Never/Not Today/taste updates are not atomic or repairable on retry;
-- mobile query/plan/feedback caches are not scoped by signed-in user/household and are not all cleared on auth change;
+- `CLOSED 2026-08-05`: mobile plan/feedback requests carry the selected household; persisted plan
+  queries and offline feedback queues are scoped by authenticated user, and sign-out clears active
+  household and query memory;
 - member allergen request validation still uses the older 7-bit ceiling while the database added fish/mustard bits;
 - the current member allergen-union trigger is conservative/monotonic rather than an exact recomputation after member deletion/deactivation.
 
@@ -1071,17 +1073,20 @@ All migrations follow expand → dual-write/backfill → validate → read cutov
 4. Make weekly plan finalization and all slot writes transactional; validate exactly the allowed seven days × active slots before final status.
 5. Add a durable unique request identity and make recommendation persistence required for feedback-bearing surfaces.
 6. Repair event ingest so raw event and immediate consequence use a transaction/outbox; retries repair incomplete derived state.
-7. Scope and clear mobile caches/feedback queues by auth user and household.
+7. `DONE`: scope and clear mobile caches/feedback queues by auth user and selected household.
 8. Expand export/delete/retention coverage to every current personal table and `auth.users`; add automated coverage tests.
 9. Prove automated future partition creation and alerting.
 10. Remove the stale `supabase/migrations` path or make one canonical migration mechanism unambiguous.
 
 **Exit gate:** no known privacy omission, cross-account cache exposure, partial finalized plan, expired partition window, or unprotected clean-rebuild table.
 
-### Phase 1 — Establish household tenancy (`ROLE BACKEND LIVE`; UX/cutover/contract pending)
+### Phase 1 — Establish household tenancy (`ROLE BACKEND + MOBILE UX LIVE`; cutover/contract pending)
 
 1. Keep the live `households`, memberships, invites and one-owner backfill from migration 055; deploy/verify release-candidate 059 so future profiles provision their compatibility household and the five covered roots become non-null.
-2. `LIVE/PARTIAL`: migration 073 adds membership event history, exactly-one-active-owner enforcement, owner-transfer/role/invite/leave RPCs and owner/planner plan authorization. Finish cook/member mutations and mobile collaboration UX.
+2. `LIVE`: migration 073 adds membership event history, exactly-one-active-owner enforcement,
+   owner-transfer/role/invite/leave RPCs and owner/planner plan authorization. `household-access` v2,
+   `feedback` v13 and the mobile household surface complete discovery/selection, invitation and
+   administration UX plus the owner/planner/cook/member/viewer feedback matrix.
 3. Add normalized constraints/allergens, cook profiles, equipment, geography and schedule history.
 4. Complete `household_id` population on every tenant root/child; add composite tenant FKs and membership-based RLS helpers.
 5. Update every API/cache/idempotency key to require household context while compatibility endpoints still bridge legacy equality.

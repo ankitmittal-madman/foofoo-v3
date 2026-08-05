@@ -59,29 +59,38 @@
 > 192 candidates and 192 stage records, with no unlinked slate. `plan` and
 > `cron-dish-ontology` were redeployed against these contracts.
 >
-> **Shared-household authorization foundation:** migrations 073–074 are live and ledgered. They enforce
+> **Shared-household collaboration:** migrations 073–074 are live and ledgered. They enforce
 > one active owner per household, records membership lifecycle history, supports atomic owner
 > transfer, role change, revoke, leave, invite creation and invite acceptance, and exposes
-> membership-aware RLS. Invite tokens are stored only as SHA-256 hashes. `household-access` v1,
+> membership-aware RLS. Invite tokens are stored only as SHA-256 hashes. `household-access` v2,
 > `recommendations` v17 and `plan` v19 are live; recommendation reads accept any active role while
-> plan writes require owner or planner. Production validation and rollback-only role-transition
+> plan writes require owner or planner. `feedback` v13 separates the authenticated actor from the
+> selected household and enforces the complete role matrix: owner/planner control plans; cook can
+> record execution and missing ingredients; members can record attributable preference feedback;
+> viewers are read-only. Production validation and rollback-only role-transition
 > smoke tests and an authenticated cross-user anti-probing validation passed with zero invalid
-> households. Mobile invitation/role-management UX and the
-> remaining cook/member mutation matrix are still future work.
+> households. The mobile household screen now discovers and selects joined households, accepts
+> one-time invite tokens, and supports owner invite, role, transfer and revoke operations plus
+> member leave. Plan requests, feedback, offline feedback queues and persisted query caches are
+> scoped to the authenticated user and selected household. Commit `323f470` passed backend and
+> mobile CI. Workflow 31026168425 successfully promoted its Expo web build to Vercel; its later
+> persona step failed because the driver selected a hidden duplicate Saturday card. Focused
+> production health and Edge authentication workflow 31026582073 passed.
 >
 > **Production hardening:** migrations 057–059 are live. They close all audited trigger-function
 > execute grants, all 77 missing leading foreign-key indexes and both duplicate-index findings;
 > automate a six-month event-partition horizon; provision a household and owner membership for
 > every new profile; backfill existing tenant IDs; and enforce non-null household ownership on the
-> five household-scoped fact/context tables. `recommendations` v11, `plan` v13 and `feedback` v7
-> are live with household-aware writes. GitHub's `Production` environment now requires review and
+> five household-scoped fact/context tables. The initial hardening release used
+> `recommendations` v11, `plan` v13 and `feedback` v7; current versions are recorded above.
+> GitHub's `Production` environment now requires review and
 > permits deployments from `main` only.
 >
 > **Remaining local release candidate:** search/filter UI, cached live
 > weather context, richer explanation contributions, lock-aware selective refresh, restart-safe
 > query/feedback persistence, MMR reranking, offline ranking evaluation, a bounded food graph,
 > pinned container bases, staging/manual-production workflows and
-> mobile CI are implemented. Verification passes: 715 Python tests (27 skipped), 102 Deno tests,
+> mobile CI are implemented. Verification passes: 715 Python tests (27 skipped), 106 Deno tests,
 > 16 mobile tests across 8 suites, Python/Deno/mobile type checks and an Expo web export. A full
 > 810-dish local load
 > run completed 300 requests at concurrency 20 with 0 errors and p95 2.03s.
@@ -97,7 +106,7 @@
 | Seed Data | 90% |
 | Database | 95% |
 | Security | 88% (database advisor remediations live; leaked-password screening needs a paid Supabase plan) |
-| Testing | 75% (backend suites green — 102 Deno + 715 repository Python tests; mobile has infra but no physical-device coverage yet) |
+| Testing | 78% (backend suites green — 106 Deno + 715 repository Python tests; mobile CI is green, but physical-device coverage remains) |
 | Deployment | 95% (ontology DB/Edge and RE bundle live-verified 2026-08-05; mobile/device release remains) |
 | Frontend (mobile) | 70% |
 | Observability | 60% (scheduled production smoke/issue alerting added; application 500-level webhook destination remains unconfigured) |
@@ -106,12 +115,14 @@
 - **RE core/service:** implemented, repository Python suite green (715 passed, 27 skipped), Fly
   image `deployment-01KZ945DR0VDXVEZBG3Y34H6KT` live-healthy with snapshot-v2 bundle
   `sha256:ffad5c55384244e3`.
-- **Edge Functions:** implemented and tested (102 tests); membership-aware authorization is live
-  in `household-access` v1, `recommendations` v17 and `plan` v19. The backend supports governed
-  invitations, owner transfer and lifecycle history; mobile collaboration UX and the complete
-  cook/member permission matrix are not yet enabled.
+- **Edge Functions:** implemented and tested (106 tests); membership-aware authorization is live
+  in `household-access` v2, `recommendations` v17, `plan` v19 and `feedback` v13. The backend
+  supports governed invitations, owner transfer and lifecycle history, and enforces distinct
+  owner/planner, cook, member and viewer mutation permissions.
 - **Mobile app:** onboarding/cold-start/weekly-plan work; complete meal episodes are live on the
-  production web client and passed the post-deploy persona journey; explanation, history,
+  production web client; shared-household discovery, selection, invite acceptance, owner
+  administration and member leave are active. Plan/feedback traffic and offline persistence are
+  tenant- and user-scoped. Explanation, history,
   profile-edit, and
   DPDP export/delete UI added 2026-08-04 (P0-2/P0-4/P1-2/P1-3/P1-4); jest infra stood up with 9
   pure-logic tests; Expo SDK 53 + OneSignal SDK integration passes typecheck, Expo Doctor, and an

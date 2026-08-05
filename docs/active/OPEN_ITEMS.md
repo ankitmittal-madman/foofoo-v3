@@ -31,6 +31,15 @@ findings are retained under `docs/archive/`.
 - **Status:** Open. Local Jest/component gates exist; device journeys remain.
 - **Completion:** Verify offline reconnect, queued-feedback flush, and push delivery on native builds.
 
+### Repair the duplicate-card persona selector
+
+- **Area:** Synthetic UI evidence
+- **Status:** The production build/deployment step in workflow 31026168425 passed, but the one-persona
+  journey selected a hidden duplicate `weekly-plan-Saturday-breakfast-0` node and timed out. The
+  focused production health/authentication workflow 31026582073 passed.
+- **Completion:** Make the journey select the visible card (or remove duplicate rendered test IDs),
+  rerun one persona, and retain the successful report artifacts.
+
 ## P2 — Production improvement
 
 - Obtain a personal free data.gov USDA key if higher throughput is needed. The public demo key is
@@ -45,16 +54,12 @@ findings are retained under `docs/archive/`.
 - Contract legacy dish/event compatibility tables only after one monitored episode dual-write,
   export/delete and rollback-parity window; no new feature may target those legacy facts.
 - Deploy and operationally verify the remaining client/operational release candidate: mobile
-  search and filters, richer explanations, selective refresh, restart-safe query/feedback
-  persistence, and CI/deployment workflow changes. The ontology database, affected Edge
+  search and filters, richer explanations, selective refresh, and remaining CI/deployment
+  workflow changes. Restart-safe user/tenant-scoped query and feedback persistence is deployed.
+  The ontology database, affected Edge
   Functions, cached-weather/MMR-capable RE image and immutable bundle are live.
 - Run production catalogue-scale load/soak tests and revisit Fly.io sizing. The local 810-dish run
   is evidence for local behavior only.
-- Build the mobile invitation/member-management UX and complete the cook/member mutation matrix
-  before enabling shared-household collaboration broadly. Migration 073 and the
-  `household-access` API now provide membership history, hashed one-time invitations, role
-  changes, revocation, leave/rejoin and atomic owner transfer; recommendations and plan already
-  authorize active memberships instead of relying on user ID = household ID.
 
 ## P3 — Product and intelligence evolution
 
@@ -81,10 +86,16 @@ findings are retained under `docs/archive/`.
 - Production workflow 31013721486 deployed snapshot v2 and passed `/readyz`; the live Fly image no
   longer contains either legacy class-mapping CSV, while parity covers all 1,599 lookup names.
 - Migrations 073–074 are live and ledgered with exactly-one-owner enforcement, membership lifecycle
-  history, membership-based RLS and service-only permission RPCs. `household-access` v1,
+  history, membership-based RLS and service-only permission RPCs. `household-access` v2,
   `recommendations` v17 and `plan` v19 are active; validation 927 and the rollback-only owner
   transfer/revoke smoke 928 and authenticated anti-probing validation 929 passed, and all
   production households have exactly one active owner.
+- Shared-household mobile collaboration and the complete feedback mutation matrix are active.
+  `feedback` v13 authorizes plan controls for owner/planner, execution and pantry evidence for
+  owner/planner/cook, attributable preference feedback for owner/planner/cook/member, and no writes
+  for viewer. The client discovers/selects memberships, accepts hashed-token invites, exposes
+  owner administration and member leave, and scopes plan requests, feedback queues and persisted
+  queries by authenticated user/selected household. Commit `323f470` passed backend and mobile CI.
 
 - Production migrations 057–059 resolved exposed trigger-function grants, 77 missing leading
   foreign-key indexes, two duplicate indexes, event-partition horizon automation, post-profile
@@ -93,7 +104,7 @@ findings are retained under `docs/archive/`.
   all six trigger-only functions audited in migration 057 have zero client execute grants.
 - Event partitions are present through the six-month horizon and are maintained monthly by the
   `foofoo-event-partition-horizon` cron job.
-- `recommendations` v17, `plan` v19, and `feedback` v7 are live with household-aware writes; all
+- `recommendations` v17, `plan` v19, and `feedback` v13 are live with household-aware writes; all
   production tenant-continuity validation counts are zero.
 
 ## Active implementation documents retained for review

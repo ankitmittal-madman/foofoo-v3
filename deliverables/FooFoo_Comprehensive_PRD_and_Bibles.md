@@ -2585,7 +2585,8 @@ This table distinguishes implemented product infrastructure from remaining exter
 
 | PRD capability | Production implementation | State / release meaning |
 |---|---|---|
-| Household permissions | Migrations 073–074 membership history, exactly-one-owner constraint, hashed invites, atomic owner/role/revoke/leave/accept RPCs, JWT-safe role lookup and membership-aware recommendation/plan authorization | Backend active; mobile collaboration UX and the remaining cook/member mutation matrix are pending before broad enablement |
+| Household permissions | Migrations 073–074 membership history, exactly-one-owner constraint, hashed invites, atomic owner/role/revoke/leave/accept RPCs, JWT-safe role lookup and membership-aware recommendation/plan/feedback authorization; mobile membership discovery/selection, invite acceptance, owner administration and member leave | Active end to end; owner/planner control plans, cook records execution/pantry evidence, member records attributable feedback, and viewer is read-only |
+| Tenant-safe mobile state | Selected household is stored per authenticated user; plan calls and feedback carry it explicitly; feedback queues and persisted plan caches are user-scoped and cleared on sign-out | Active; physical-device reconnect testing remains a launch-readiness gate |
 | Complete meal episode | `food.plate_grammars`, recipes, episodes/components, workload/cadence; `/plan` episode surface is mobile-default | Active with dish/class compatibility fallback |
 | Ontology graph | Generic typed nodes/edges populated for dishes, aliases, ingredients, classes and catalogue features | Active; human review depth remains ongoing |
 | Nutrition assertions | Source-linked `food.nutrient_assertions`; internal estimates cover every dish; USDA demo-key evidence requires exact normalized names | Active/provisional; controlled sample was 4 exact / 5 wrong / 3 absent, so non-exact assertions are rejected |

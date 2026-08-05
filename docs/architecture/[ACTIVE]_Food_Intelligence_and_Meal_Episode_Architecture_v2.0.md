@@ -15,7 +15,7 @@ This document, the comprehensive PRD, and the database target review are the imp
 
 ## 1. Production Baseline
 
-The production baseline on 5 August 2026 is migrations 055–074, seed 147, `dish-ontology`, `cron-dish-ontology`, `household-access`, `recommendations`, `plan`, `research-panel`, and `research-annotations` Edge Functions. The catalogue contains 802 production dishes plus governed composite episodes. Every production dish has a background enrichment job and a published single-primary episode. The mobile episode client is on by default with a compatibility fallback. Migrations 065 and 070–072 complete relationship/source/AI provenance, controlled provider evaluation, database-enforced AI field policy and normalized recommendation request/run/candidate lineage. Migrations 073–074 make active household membership, rather than profile/household ID equality, the authorization basis for recommendations and plans and bind cross-user service access to JWT role rather than function-owner identity.
+The production baseline on 5 August 2026 is migrations 055–074, seed 147, `dish-ontology`, `cron-dish-ontology`, `household-access`, `recommendations`, `plan`, `feedback`, `research-panel`, and `research-annotations` Edge Functions. The catalogue contains 802 production dishes plus governed composite episodes. Every production dish has a background enrichment job and a published single-primary episode. The mobile episode client is on by default with a compatibility fallback. Migrations 065 and 070–072 complete relationship/source/AI provenance, controlled provider evaluation, database-enforced AI field policy and normalized recommendation request/run/candidate lineage. Migrations 073–074 make active household membership, rather than profile/household ID equality, the authorization basis for recommendations, plans and feedback and bind cross-user service access to JWT role rather than function-owner identity. The mobile household surface and user/tenant-scoped persistence make that boundary selectable and usable end to end.
 
 The first full external pass completed for all 802 canonical dishes with zero failed or pending jobs. FoodOn returned usable evidence for 104 dishes. USDA's free public demo key was evaluated against 12 Indian dishes: four exact matches, five semantic mismatches and three no-record cases. Only exact normalized names at record confidence `>=0.90` can now retain provisional USDA nutrients; migration 070 records the labelled evaluation and removed mismatched provisional assertions without deleting raw evidence.
 
@@ -95,9 +95,12 @@ Canonical authorization roles are `owner`, `planner`, `cook`, `member`, and `vie
 073 records membership lifecycle events and uses a deferred invariant plus an atomic transfer RPC
 to guarantee exactly one active owner. Invite secrets are returned once and only their SHA-256
 hashes are stored. RLS permits active members to read household/membership data; owner-only server
-paths manage invitations and roles. Recommendations are readable by every active role, while plan
-mutations currently require owner or planner. Mobile collaboration UX and cook/member-specific
-mutations remain explicitly outside the deployed surface until their role-matrix tests exist.
+paths manage invitations and roles. Recommendations are readable by every active role. Plan
+controls require owner/planner; cooked and missing-ingredient evidence permits owner/planner/cook;
+ordinary attributable feedback permits owner/planner/cook/member; viewer is read-only. The API
+always derives the actor from the JWT and authorizes the separately selected household before any
+service-role write. The mobile client exposes membership discovery/selection, invite acceptance,
+owner administration and member leave and scopes plan/feedback persistence to user and household.
 
 ## 8. External Evidence Strategy
 

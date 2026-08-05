@@ -6,6 +6,17 @@
 ## [Unreleased]
 
 ### Deployed
+- Deployed `household-access` v2 and `feedback` v13. The former supports unaffiliated-safe
+  membership discovery; the latter separates JWT actor identity from selected household tenancy
+  and enforces owner/planner/cook/member/viewer feedback permissions.
+- Published commit `323f470` after green backend and mobile CI. Mobile users can discover/select
+  joined households, accept one-time invites, administer roles/invites/ownership, leave a
+  household, and carry the selected tenant through plan and feedback APIs. Offline feedback and
+  persisted plan caches are user-scoped and cleared on sign-out.
+- Vercel promotion succeeded in workflow 31026168425 and focused production health/authentication
+  workflow 31026582073 passed. The downstream persona evidence remains open because its driver
+  chose a hidden duplicate Saturday card and timed out; this is recorded separately from deploy
+  health rather than reported as a passing journey.
 - Applied and ledgered migration 073. Production now enforces exactly one active household owner,
   records membership lifecycle history, supports atomic transfer/role/revoke/leave/invite flows,
   and applies membership-aware RLS; validations 927–928 pass with zero invalid households.
