@@ -189,7 +189,7 @@ function slotOptionsToMealEpisodes(response: SlotOptionsResponse, slot: Slot): M
 }
 
 function shouldFallbackToSlotOptions(error: unknown): boolean {
-  if (!(error instanceof Error)) return false;
+  if (!error || typeof error !== "object") return false;
   const maybeApiError = error as Partial<ApiError>;
   return maybeApiError.code === "ERR_VALIDATION_FAILED" ||
     maybeApiError.status === 400 ||
