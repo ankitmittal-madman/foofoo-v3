@@ -117,14 +117,26 @@ class NullExternalOntologyAdapter:
             )
         chosen = [c for c in candidates if c["display_name"].lower() == best]
         if hint_slot:
-            slot_narrowed = [c for c in chosen if c["slot"] == hint_slot]
+            # meal_classes.slot is text[] (migration 026) — psycopg2 returns it as a Python list,
+            # so this must be a membership test, not equality, or the narrowing silently never
+            # matches and `chosen` falls through to whatever fuzzy-matched first.
+            slot_narrowed = [c for c in chosen if hint_slot in (c["slot"] or [])]
             if slot_narrowed:
                 chosen = slot_narrowed
         pick = chosen[0]
+        # dish_meal_class_mappings.slot (migration 056) is a single text value constrained to
+        # ('breakfast','lunch','dinner','snack') — take the first entry of the class's slot array
+        # (never the class_code itself, which is a free-form label like 'BF_FASTING_PHALAHARI'
+        # and is not a valid slot value).
+        pick_slots = pick["slot"] or []
+        matched_slot = pick_slots[0] if pick_slots else None
         return OntologyMatch(
             matched=True, canonical_id=pick["class_code"], canonical_label=pick["display_name"],
             match_method="local_fuzzy", confidence=round(min(score, 0.85), 3),
-            raw_response={"input": raw_course, "method": "difflib_fuzzy", "matched_class": pick["class_code"]},
+            raw_response={
+                "input": raw_course, "method": "difflib_fuzzy", "matched_class": pick["class_code"],
+                "matched_slot": matched_slot,
+            },
         )
 
     def match_diet(self, raw_diet: str) -> OntologyMatch:

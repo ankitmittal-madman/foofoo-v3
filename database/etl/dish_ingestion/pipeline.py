@@ -30,6 +30,8 @@ logger = logging.getLogger("dish_ingestion.pipeline")
 BATCH_SIZE = 200
 REGION_CODE_ALIASES = {"north", "south", "east", "west", "northeast", "pan_indian"}
 DEFAULT_IMAGE_DELAY_SECONDS = 3  # ported from the reference Pollinations script's own default
+# dish_meal_class_mappings.slot CHECK constraint (migration 056) — the only values Postgres accepts.
+VALID_MEAL_SLOTS = {"breakfast", "lunch", "dinner", "snack"}
 
 
 class ImageContext:
@@ -289,6 +291,15 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
     dish_id: str | None = None
     status = decision.outcome
 
+    # A savepoint per row, not just the whole-batch transaction: without it, a CheckViolation (or
+    # any other DB error) partway through this row leaves the connection in
+    # InFailedSqlTransaction, and the insert_row_error() call in the except block below would
+    # itself fail with the same error — silently swallowing the real failure and killing the rest
+    # of the batch. Rolling back to the savepoint on error restores a usable transaction so the
+    # error can actually be recorded and the batch can continue.
+    savepoint = f"row_{row.srno}"
+    cur.execute(f"SAVEPOINT {savepoint}")
+
     try:
         if decision.outcome == "matched_existing" and decision.target_key:
             dish_id = db.get_dish_id_by_name(cur, decision.target_key)
@@ -317,11 +328,15 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
 
         # meal-class mapping (rule 4: only existing classes; low/no-confidence -> review queue)
         if o.class_match and o.class_match.matched and dish_id:
-            # slot is embedded in canonical_id lookup via raw_response; recompute defensively
-            slot = o.class_match.raw_response.get("matched_class", "").split("_")[0] if o.class_match.raw_response else None
+            # dish_meal_class_mappings_slot_check only accepts breakfast/lunch/dinner/snack —
+            # take the real slot the ontology adapter resolved from meal_classes.slot, never a
+            # substring of the class_code (that produced invalid values like 'BF').
+            slot = o.class_match.raw_response.get("matched_slot") if o.class_match.raw_response else None
+            if slot not in VALID_MEAL_SLOTS:
+                slot = "lunch"
             if o.class_match.confidence >= 0.6:
                 db.insert_meal_class_mapping(
-                    cur, dish_id, o.class_match.canonical_id, slot or "lunch",
+                    cur, dish_id, o.class_match.canonical_id, slot,
                     o.class_match.confidence, "csv_import_ontology_fallback", o.class_match.match_method, "rules",
                 )
                 confidence_buckets[_confidence_bucket(o.class_match.confidence)] += 1
@@ -394,7 +409,14 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
         else:
             counters[status] += 1
 
+        cur.execute(f"RELEASE SAVEPOINT {savepoint}")
+
     except Exception as exc:
         logger.exception("row srno=%s failed during persist", row.srno)
+        # Restores the transaction to a usable state (see the SAVEPOINT comment above) so this
+        # error can actually be written, instead of raising InFailedSqlTransaction on top of the
+        # original error and losing both.
+        cur.execute(f"ROLLBACK TO SAVEPOINT {savepoint}")
         db.insert_row_error(cur, source_row_id, "persist", "unhandled_exception", str(exc))
+        cur.execute(f"RELEASE SAVEPOINT {savepoint}")
         counters["errored"] += 1
