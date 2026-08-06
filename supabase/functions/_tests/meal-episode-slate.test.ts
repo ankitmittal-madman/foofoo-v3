@@ -3,9 +3,11 @@ import {
   eligibleSetHash,
   extractDishCandidateItems,
   extractDishSlateItems,
+  recordDishRecommendationSlate,
   snapshotHash,
   stripPrivateCandidateLineage,
 } from "../plan/episodes.ts";
+import type { RequestContext } from "../_shared/types/context.ts";
 
 Deno.test("eligible episode hash includes the full deterministic set independent of order", async () => {
   assertEquals(await eligibleSetHash(["b", "a", "c"]), await eligibleSetHash(["c", "b", "a"]));
@@ -65,4 +67,46 @@ Deno.test("calibration slate preserves each cell slot in one globally ordered sl
     ["Dal", "lunch"],
     ["Khichdi", "dinner"],
   ]);
+});
+
+Deno.test("calibration remains available when optional slate persistence fails", async () => {
+  const warnings: Array<{ message: string; fields?: Record<string, unknown> }> = [];
+  const logger = {
+    debug: () => {},
+    info: () => {},
+    warn: (message: string, fields?: Record<string, unknown>) => {
+      warnings.push({ message, fields });
+    },
+    error: () => {},
+    child: () => logger,
+  };
+  const ctx = { logger } as unknown as RequestContext;
+
+  const slateId = await recordDishRecommendationSlate(
+    ctx,
+    {
+      householdId: "11111111-1111-1111-1111-111111111111",
+      requestId: "calibration-request",
+      surface: "calibration",
+      modelVersion: "test",
+      configVersion: "test",
+      policyCode: "test",
+      latencyMs: 1,
+      householdSnapshot: {},
+      requestContext: {},
+      response: { slots: {} },
+    },
+    () => Promise.reject(new Error("lineage RPC is not deployed")),
+  );
+
+  assertEquals(slateId, undefined);
+  assertEquals(warnings, [{
+    message: "plan.dishes.persist_failed",
+    fields: {
+      request_id: "calibration-request",
+      household_id: "11111111-1111-1111-1111-111111111111",
+      surface: "calibration",
+      detail: "lineage RPC is not deployed",
+    },
+  }]);
 });
