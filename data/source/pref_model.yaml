@@ -9,6 +9,10 @@ generated_from: Phase 3 (Recommendation Engine build) — s_pref ScoringModule s
 # enabled: master switch. False = s_pref always returns value=0.0, confidence=1.0 (see
 # preference.py). CODE-LEVEL SAFETY DEFAULT (config.py pref_model_enabled) is also False if this
 # key or this file is ever missing — never silently guessed on.
+# mode is the lifecycle control. shadow loads and evaluates a governed artifact but contributes
+# exactly zero to ranking; active requires a positive w_pref. disabled loads no artifact.
+mode: disabled
+# Legacy compatibility for older readers. New code derives enabled from mode.
 enabled: false
 
 # model_artifact_path: relative to this config directory. When enabled, export_bundle includes the

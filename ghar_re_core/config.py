@@ -224,11 +224,23 @@ class Config:
 
     # --- s_pref ScoringModule stub (pref_model.yaml <- Phase 3, not fit, not shipped) ---
     @property
+    def pref_model_mode(self):
+        """Governed lifecycle state: disabled, shadow (score-only), or active (rank-affecting).
+
+        Invalid/missing values fail closed to disabled. The legacy enabled flag remains readable
+        for older bundles that predate the explicit lifecycle state.
+        """
+        mode = (self.pref or {}).get("mode")
+        if mode in {"disabled", "shadow", "active"}:
+            return mode
+        return "active" if bool((self.pref or {}).get("enabled", False)) else "disabled"
+
+    @property
     def pref_model_enabled(self):
         """Master switch for ghar_re_core.preference.s_pref. CODE-LEVEL SAFETY DEFAULT is False
         if pref_model.yaml or this key is ever missing — s_pref must never silently turn itself
         on (Task 3 rule)."""
-        return bool((self.pref or {}).get("enabled", False))
+        return self.pref_model_mode == "active"
 
     @property
     def pref_model_artifact_path(self):

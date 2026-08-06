@@ -209,15 +209,19 @@ def build_bundle(source_dir: str, out_dir: str) -> dict:
         config_hashes[rel] = _sha256_bytes(raw)
         config_payload[rel] = raw.decode("utf-8")
 
-    # A learned model is optional while disabled. Once enabled, however, its immutable bytes are
-    # part of the same content-addressed bundle as the config that activates it; shipping one
-    # without the other would make a rollout non-reproducible or fail only after deployment.
+    # A learned model is optional only while disabled. Shadow and active modes both load it, so
+    # its immutable bytes must be part of the same content-addressed bundle as the lifecycle
+    # config; shipping one without the other would invalidate online evaluation provenance.
     pref_config = yaml.safe_load(config_payload["pref_model.yaml"]) or {}
-    if pref_config.get("enabled") is True:
+    pref_mode = pref_config.get("mode")
+    model_required = pref_mode in {"shadow", "active"} or (
+        pref_mode is None and pref_config.get("enabled") is True
+    )
+    if model_required:
         artifact_rel = pref_config.get("model_artifact_path")
         if not isinstance(artifact_rel, str) or not artifact_rel.strip():
             raise FileNotFoundError(
-                "pref_model.yaml enables preference scoring without model_artifact_path"
+                "pref_model.yaml loads preference scoring without model_artifact_path"
             )
         artifact_rel = os.path.normpath(artifact_rel.strip())
         if (
@@ -229,9 +233,7 @@ def build_bundle(source_dir: str, out_dir: str) -> dict:
         artifact_source = os.path.realpath(os.path.join(source_dir, artifact_rel))
         source_root = os.path.realpath(source_dir) + os.sep
         if not artifact_source.startswith(source_root) or not os.path.isfile(artifact_source):
-            raise FileNotFoundError(
-                f"enabled preference artifact missing from source tree: {artifact_rel}"
-            )
+            raise FileNotFoundError(f"preference artifact missing from source tree: {artifact_rel}")
         with open(artifact_source, "rb") as fh:
             artifact_bytes = fh.read()
         binary_payload[artifact_rel] = artifact_bytes

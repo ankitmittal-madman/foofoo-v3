@@ -13,6 +13,7 @@ import os
 import tempfile
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -76,6 +77,27 @@ def fetch_readiness(connection: Any) -> ReadinessSnapshot:
         return ReadinessSnapshot.from_mapping(row)
 
 
+def fetch_shadow_evaluation(connection: Any) -> list[dict[str, Any]]:
+    """Return aggregate online shadow evidence; never household-level observations."""
+    with connection.cursor() as cursor:
+        cursor.execute("select * from ml.preference_shadow_evaluation()")
+        rows = cursor.fetchall()
+        if not rows:
+            return []
+        if isinstance(rows[0], Mapping):
+            mapped = [dict(row) for row in rows]
+        else:
+            columns = [item[0] for item in cursor.description]
+            mapped = [dict(zip(columns, row, strict=True)) for row in rows]
+        return [
+            {
+                key: float(value) if isinstance(value, Decimal) else value
+                for key, value in row.items()
+            }
+            for row in mapped
+        ]
+
+
 def export_rows(connection: Any, destination: Path) -> int:
     """Stream exact-attribution rows to an ephemeral JSONL file without loading all into RAM."""
     count = 0
@@ -111,6 +133,7 @@ def run(
     result: dict[str, Any] = {
         "status": "not_ready",
         "readiness": asdict(readiness),
+        "shadow_evaluation": fetch_shadow_evaluation(connection),
         "thresholds": {
             "min_real_events": CONFIG.pref_training_min_events,
             "min_households": CONFIG.pref_training_min_households,

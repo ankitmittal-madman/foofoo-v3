@@ -149,18 +149,24 @@ def configure_preference_model(config: object) -> core_model.ModelArtifactProvid
     """Install the configured learned-preference provider, failing closed when activation is
     requested but incomplete. Disabled deployments explicitly reset to the null provider so test
     reloads and rolling workers cannot retain a stale model from an earlier configuration."""
-    enabled = bool(getattr(config, "pref_model_enabled", False))
+    mode = getattr(config, "pref_model_mode", None)
+    if mode not in {"disabled", "shadow", "active"}:
+        mode = "active" if bool(getattr(config, "pref_model_enabled", False)) else "disabled"
     provider: core_model.ModelArtifactProvider
-    if not enabled:
+    if mode == "disabled":
         provider = core_model.NullModelArtifactProvider()
         provider.load()
         core_model.set_active_model(provider)
         return provider
 
     weight = float(getattr(config, "w_pref", 0.0))
-    if not 0 < weight <= 1:
+    if mode == "active" and not 0 < weight <= 1:
         raise RuntimeError(
-            "Preference model is enabled but w_pref is not in (0, 1]; refusing a silent no-op"
+            "Preference model is active but w_pref is not in (0, 1]; refusing a silent no-op"
+        )
+    if mode == "shadow" and weight != 0:
+        raise RuntimeError(
+            "Preference model shadow mode requires w_pref=0 to guarantee no rank impact"
         )
     configured_path = (
         os.environ.get(PREFERENCE_MODEL_PATH_VAR)
@@ -230,7 +236,11 @@ def startup(state: AppState) -> AppState:
     # no startup wiring, so flipping pref_model.yaml could never activate the trained model.
     preference_provider = configure_preference_model(state.config)
     preference_artifact = preference_provider.artifact
-    state.preference_model_status = "active" if preference_artifact is not None else "disabled"
+    state.preference_model_status = (
+        getattr(state.config, "pref_model_mode", "active")
+        if preference_artifact is not None
+        else "disabled"
+    )
     metadata = getattr(preference_artifact, "metadata", {}) if preference_artifact else {}
     state.preference_model_version = (
         metadata.get("model_version") if isinstance(metadata, dict) else None
