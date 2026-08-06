@@ -20,7 +20,10 @@ import {
 import type { AuthClaims, Logger } from "../_shared/mod.ts";
 import { makeRecommendationsHandler, type RecommendationDeps } from "../recommendations/handler.ts";
 import { callRecommendationEngine, type FetchLike } from "../recommendations/re-client.ts";
-import { aggregateMemberAffinities } from "../recommendations/personalization.ts";
+import {
+  aggregateMemberAffinities,
+  type OnlineRecommendationState,
+} from "../recommendations/personalization.ts";
 import { validateRequest } from "../recommendations/contract.ts";
 import {
   allergenTokens,
@@ -91,6 +94,16 @@ const TEST_HOUSEHOLD: HouseholdRaw = {
 const loadTestHousehold = () =>
   Promise.resolve({ household: TEST_HOUSEHOLD, householdId: USER_ID, stubbed: false });
 
+const EMPTY_ONLINE_STATE: OnlineRecommendationState = {
+  interactionCount: 0,
+  excludeDishNames: [],
+  preferenceByDish: {},
+  dishFeedbackCounts: [],
+  recentExposureDishNames: [],
+  noveltyBudget: 0.15,
+  richnessDebt: 0,
+};
+
 /** A no-op Logger for the re-client tests. */
 function fakeLogger(): Logger {
   const l: Logger = {
@@ -140,6 +153,7 @@ function fakeReResponse(requestId: string) {
 function pipeline(deps: RecommendationDeps) {
   const handler = makeRecommendationsHandler({
     authorizeHousehold: () => Promise.resolve("owner"),
+    loadOnlineStateFn: () => Promise.resolve(EMPTY_ONLINE_STATE),
     ...deps,
   });
   const verifier = () => Promise.resolve({ userId: USER_ID, role: "authenticated" } as AuthClaims);
@@ -163,7 +177,6 @@ Deno.test("POST /v1/recommendations success passes RE plates[]/contributions[] t
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
       recordContext: () => Promise.resolve(),
-      countInteractionsFn: () => Promise.resolve(0),
       callRe: (_payload, requestId) => {
         called++;
         return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
@@ -194,7 +207,7 @@ Deno.test("POST /v1/recommendations merges interaction_count into the outgoing R
         recordedContext = context;
         return Promise.resolve();
       },
-      countInteractionsFn: () => Promise.resolve(7),
+      loadOnlineStateFn: () => Promise.resolve({ ...EMPTY_ONLINE_STATE, interactionCount: 7 }),
       callRe: (payload, requestId) => {
         sentPayload = payload;
         return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
@@ -208,6 +221,51 @@ Deno.test("POST /v1/recommendations merges interaction_count into the outgoing R
     // this is what makes household_context a true historical record of what a request actually
     // used, not a separately-derived approximation of it.
     assertEquals(recordedContext, sentContext);
+  });
+});
+
+Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls to the RE", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    let sentPayload: Record<string, unknown> | undefined;
+    const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      loadOnlineStateFn: () =>
+        Promise.resolve({
+          interactionCount: 11,
+          excludeDishNames: ["Paneer Bhurji"],
+          preferenceByDish: { "Indori Poha": 0.8 },
+          dishFeedbackCounts: [{ dish_name: "Indori Poha", served: 3, rejected: 0 }],
+          recentExposureDishNames: ["Dal Bafla"],
+          noveltyBudget: 0.42,
+          richnessDebt: 0.35,
+        }),
+      callRe: (payload, requestId) => {
+        sentPayload = payload;
+        return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
+      },
+    };
+    const res = await pipeline(deps)(post({
+      refresh_generation: 3.9,
+      exclude_dish_names: ["Sabudana Khichdi", "Paneer Bhurji"],
+    }));
+    assertEquals(res.status, 200);
+    assertEquals(sentPayload?.exclude_dish_names, [
+      "Paneer Bhurji",
+      "Dal Bafla",
+      "Sabudana Khichdi",
+    ]);
+    assertEquals(sentPayload?.preference_by_dish, { "Indori Poha": 0.8 });
+    const sentContext = sentPayload?.context as Record<string, unknown>;
+    assertEquals(sentContext.interaction_count, 11);
+    assertEquals(sentContext.dish_feedback_counts, [
+      { dish_name: "Indori Poha", served: 3, rejected: 0 },
+    ]);
+    assertEquals(sentContext.novelty_budget, 0.42);
+    assertEquals(sentContext.richness_debt, 0.35);
+    assertEquals(sentContext.refresh_generation, 3);
   });
 });
 
@@ -259,7 +317,6 @@ Deno.test("POST /v1/recommendations sends exclude_dish_ids built from recent rec
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
       recordContext: () => Promise.resolve(),
-      countInteractionsFn: () => Promise.resolve(0),
       buildExcludeDishIdsFn: () => Promise.resolve(["md5:Onion Pakora", "md5:Chole"]),
       callRe: (payload, requestId) => {
         sentPayload = payload;
@@ -280,7 +337,6 @@ Deno.test("POST /v1/recommendations omits exclude_dish_ids entirely when the hou
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
       recordContext: () => Promise.resolve(),
-      countInteractionsFn: () => Promise.resolve(0),
       buildExcludeDishIdsFn: () => Promise.resolve([]),
       callRe: (payload, requestId) => {
         sentPayload = payload;
@@ -302,7 +358,6 @@ Deno.test("POST /v1/recommendations timeout returns a retryable error, not a gue
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
       recordContext: () => Promise.resolve(),
-      countInteractionsFn: () => Promise.resolve(0),
       callRe: () => {
         called++;
         return Promise.resolve({
@@ -391,7 +446,6 @@ Deno.test("malformed composed payload is rejected before the RE is called (400, 
         Promise.resolve({ household: invalidHousehold, householdId: "stub", stubbed: true }),
       recordEvent: () => Promise.resolve(),
       recordContext: () => Promise.resolve(),
-      countInteractionsFn: () => Promise.resolve(0),
       callRe: () => {
         called++;
         return Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse("x") });
@@ -425,7 +479,6 @@ Deno.test("household_id owned by another user is rejected before loadHousehold/c
         return Promise.resolve();
       },
       recordContext: () => Promise.resolve(),
-      countInteractionsFn: () => Promise.resolve(0),
       callRe: (_payload, requestId) => {
         reCalled++;
         return Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) });
@@ -453,7 +506,6 @@ Deno.test("household_id equal to the caller's own id is allowed through", async 
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
       recordContext: () => Promise.resolve(),
-      countInteractionsFn: () => Promise.resolve(0),
       callRe: (_payload, requestId) =>
         Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) }),
     };
@@ -469,7 +521,6 @@ Deno.test("omitting household_id defaults to the caller's own id and is allowed 
       loadHousehold: loadTestHousehold,
       recordEvent: () => Promise.resolve(),
       recordContext: () => Promise.resolve(),
-      countInteractionsFn: () => Promise.resolve(0),
       callRe: (_payload, requestId) =>
         Promise.resolve({ ok: true as const, status: 200, body: fakeReResponse(requestId) }),
     };
