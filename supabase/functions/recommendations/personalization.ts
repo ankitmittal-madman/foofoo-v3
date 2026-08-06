@@ -155,7 +155,14 @@ export async function loadOnlineRecommendationState(
     }
     return {
       interactionCount: countRes.count ?? 0,
-      excludeDishNames: [...excluded],
+      // Exposure fatigue belongs in the existing exclusion contract so every deployed plan
+      // handler version consumes it without requiring a synchronized handler rollout.
+      excludeDishNames: [
+        ...new Set([
+          ...excluded,
+          ...(exposureRes.data ?? []).flatMap((row) => extractExposureDishNames(row.plates)),
+        ]),
+      ].slice(0, 50),
       preferenceByDish: aggregateMemberAffinities(
         (tasteRes.data ?? []) as Array<{
           profile_id: string;
