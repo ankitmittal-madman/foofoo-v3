@@ -37,7 +37,12 @@ RUN pip install --no-cache-dir \
       "fastapi==0.139.2" \
       "uvicorn==0.51.0" \
       "jsonschema==4.26.0" \
-      "PyYAML==6.0.1"
+      "PyYAML==6.0.1" \
+      "joblib==1.5.3" \
+      "numpy==2.4.6" \
+      "scipy==1.18.0" \
+      "scikit-learn==1.9.0" \
+      "threadpoolctl==3.6.0"
 
 # Now the two first-party packages. --no-deps because every dependency is already pinned and
 # installed above; without it, pip would be free to resolve the >= ranges in pyproject.toml and

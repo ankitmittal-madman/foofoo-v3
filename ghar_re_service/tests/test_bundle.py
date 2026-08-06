@@ -13,6 +13,7 @@ import os
 import shutil
 
 import pytest
+import yaml
 from ghar_re_service.scripts import export_bundle
 
 from ghar_re_core import config as core_config
@@ -76,6 +77,36 @@ def test_missing_config_file_fails_loudly(tmp_path):
     (partial / "filters.yaml").unlink()
     with pytest.raises(FileNotFoundError, match="filters.yaml"):
         export_bundle.build_bundle(str(partial), str(tmp_path / "out"))
+
+
+def test_enabled_preference_artifact_is_bundled_and_content_addressed(tmp_path):
+    source = _copy_source_tree(tmp_path)
+    model_rel = "models/preference-v1.joblib"
+    model_path = source / model_rel
+    model_path.parent.mkdir(parents=True)
+    model_path.write_bytes(b"governed-model-bytes")
+    pref_path = source / "pref_model.yaml"
+    pref = yaml.safe_load(pref_path.read_text())
+    pref.update({"enabled": True, "w_pref": 0.2, "model_artifact_path": model_rel})
+    pref_path.write_text(yaml.safe_dump(pref, sort_keys=False))
+
+    out = tmp_path / "bundle-with-model"
+    manifest = export_bundle.build_bundle(str(source), str(out))
+
+    assert (out / "config" / model_rel).read_bytes() == b"governed-model-bytes"
+    assert model_rel in manifest["config_sha256"]
+
+
+def test_enabled_preference_artifact_cannot_escape_source_tree(tmp_path):
+    source = _copy_source_tree(tmp_path)
+    pref_path = source / "pref_model.yaml"
+    pref = yaml.safe_load(pref_path.read_text())
+    pref.update({"enabled": True, "w_pref": 0.2, "model_artifact_path": "../outside.joblib"})
+    pref_path.write_text(yaml.safe_dump(pref, sort_keys=False))
+    (tmp_path / "outside.joblib").write_bytes(b"must-not-be-bundled")
+
+    with pytest.raises(ValueError, match="inside data/source"):
+        export_bundle.build_bundle(str(source), str(tmp_path / "out"))
 
 
 def test_bundle_catalogue_matches_build_catalogue_output(built):

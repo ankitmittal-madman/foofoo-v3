@@ -232,6 +232,11 @@ def meta():
         # Which immutable snapshot is actually serving (RE-DOC-10 §8). None when running from repo
         # files rather than a baked image — that distinction is exactly what this field is for.
         "bundle_version": (state.bundle or {}).get("bundle_version"),
+        "preference_model": {
+            "status": state.preference_model_status,
+            "model_version": state.preference_model_version,
+            "weight": state.config.w_pref if state.config else 0.0,
+        },
         "metrics": state.counters.as_dict(),
     }
     schemas.validate_meta(body)

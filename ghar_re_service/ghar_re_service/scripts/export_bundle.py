@@ -46,6 +46,8 @@ import shutil
 import sys
 from datetime import UTC, datetime
 
+import yaml
+
 from ghar_re_service.scripts import build_catalogue as BC
 
 # The config layer the ENGINE reads at runtime. Deliberately an explicit allow-list, not a
@@ -194,6 +196,7 @@ def build_bundle(source_dir: str, out_dir: str) -> dict:
 
     config_hashes: dict[str, str] = {}
     config_payload: dict[str, str] = {}
+    binary_payload: dict[str, bytes] = {}
     for name in CONFIG_FILES:
         with open(os.path.join(source_dir, name), "rb") as fh:
             raw = fh.read()
@@ -205,6 +208,34 @@ def build_bundle(source_dir: str, out_dir: str) -> dict:
             raw = fh.read()
         config_hashes[rel] = _sha256_bytes(raw)
         config_payload[rel] = raw.decode("utf-8")
+
+    # A learned model is optional while disabled. Once enabled, however, its immutable bytes are
+    # part of the same content-addressed bundle as the config that activates it; shipping one
+    # without the other would make a rollout non-reproducible or fail only after deployment.
+    pref_config = yaml.safe_load(config_payload["pref_model.yaml"]) or {}
+    if pref_config.get("enabled") is True:
+        artifact_rel = pref_config.get("model_artifact_path")
+        if not isinstance(artifact_rel, str) or not artifact_rel.strip():
+            raise FileNotFoundError(
+                "pref_model.yaml enables preference scoring without model_artifact_path"
+            )
+        artifact_rel = os.path.normpath(artifact_rel.strip())
+        if (
+            os.path.isabs(artifact_rel)
+            or artifact_rel == ".."
+            or artifact_rel.startswith(f"..{os.sep}")
+        ):
+            raise ValueError("model_artifact_path must stay inside data/source")
+        artifact_source = os.path.realpath(os.path.join(source_dir, artifact_rel))
+        source_root = os.path.realpath(source_dir) + os.sep
+        if not artifact_source.startswith(source_root) or not os.path.isfile(artifact_source):
+            raise FileNotFoundError(
+                f"enabled preference artifact missing from source tree: {artifact_rel}"
+            )
+        with open(artifact_source, "rb") as fh:
+            artifact_bytes = fh.read()
+        binary_payload[artifact_rel] = artifact_bytes
+        config_hashes[artifact_rel] = _sha256_bytes(artifact_bytes)
 
     catalogue_hash = _sha256_bytes(_canonical(catalogue))
 
@@ -243,8 +274,14 @@ def build_bundle(source_dir: str, out_dir: str) -> dict:
     with open(os.path.join(tmp_dir, "catalogue.json"), "w") as fh:
         json.dump(catalogue, fh, sort_keys=True, separators=(",", ":"), default=str)
     for name, text in config_payload.items():
+        os.makedirs(os.path.dirname(os.path.join(tmp_dir, "config", name)), exist_ok=True)
         with open(os.path.join(tmp_dir, "config", name), "w") as fh:
             fh.write(text)
+    for name, raw in binary_payload.items():
+        target = os.path.join(tmp_dir, "config", name)
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        with open(target, "wb") as fh:
+            fh.write(raw)
     with open(os.path.join(tmp_dir, "manifest.json"), "w") as fh:
         json.dump(manifest, fh, indent=2, sort_keys=True)
         fh.write("\n")

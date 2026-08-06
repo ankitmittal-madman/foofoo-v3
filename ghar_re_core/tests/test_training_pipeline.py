@@ -6,6 +6,7 @@ produces a loadable artifact, never that any particular model is good, and never
 production feedback_events (0 rows exist). Also covers the insufficient-data / non-real-data
 refusal guard, which must never silently "fit anyway".
 """
+
 import json
 
 import pytest
@@ -31,13 +32,15 @@ def _rows(event_types, data_source="real"):
     with a distinct real catalogue dish so build_labeled_dataset has real Dish objects to resolve."""
     rows = []
     for i, event_type in enumerate(event_types):
-        rows.append({
-            "household": HOUSEHOLD,
-            "ctx": {"slot": "dinner", "season": "transitional"},
-            "dish_name": _DISH_NAMES[i % len(_DISH_NAMES)],
-            "event_type": event_type,
-            "data_source": data_source,
-        })
+        rows.append(
+            {
+                "household": HOUSEHOLD,
+                "ctx": {"slot": "dinner", "season": "transitional"},
+                "dish_name": _DISH_NAMES[i % len(_DISH_NAMES)],
+                "event_type": event_type,
+                "data_source": data_source,
+            }
+        )
     return rows
 
 
@@ -57,13 +60,14 @@ def test_non_real_data_source_excluded():
     assert labeled == []
 
 
-def test_accept_and_like_label_one_dislike_labels_zero():
-    rows = _rows(["accept", "like", "dislike"])
+def test_explicit_positive_and_negative_signals_have_consistent_labels():
+    positives = ["accept", "like", "make_this", "cooked", "completed"]
+    negatives = ["dislike", "never", "regretted"]
+    rows = _rows(positives + negatives)
     labeled = build_labeled_dataset(iter(rows))
     by_event = {r.event_type: r.label for r in labeled}
-    assert by_event["accept"] == 1
-    assert by_event["like"] == 1
-    assert by_event["dislike"] == 0
+    assert all(by_event[event] == 1 for event in positives)
+    assert all(by_event[event] == 0 for event in negatives)
 
 
 def test_unknown_dish_name_skipped_not_fabricated():
@@ -108,13 +112,13 @@ def test_readiness_gate_refuses_below_min_households():
         check_training_readiness(labeled, min_events=1, min_households=500)
 
 
-def test_readiness_gate_skips_household_check_when_export_carries_no_household_id():
-    """An export shape with no household_id anywhere is a data-shape gap, not itself evidence of
-    low household diversity — only min_events gates in that case (see the function's docstring)."""
+def test_readiness_gate_refuses_when_export_carries_no_household_id():
+    """Missing provenance cannot prove household diversity or leakage-free evaluation."""
     rows = _rows((["accept", "like"] * 3) + (["dislike"] * 3))
     labeled = build_labeled_dataset(iter(rows))
     assert all(r.household_id is None for r in labeled)
-    check_training_readiness(labeled, min_events=1, min_households=500)  # does not raise
+    with pytest.raises(InsufficientDataError, match="no household_id"):
+        check_training_readiness(labeled, min_events=1, min_households=500)
 
 
 def test_readiness_gate_passes_when_both_thresholds_met():
@@ -175,12 +179,42 @@ def test_train_end_to_end_on_fixture_dataset_produces_loadable_artifact(tmp_path
     assert 0.0 <= report["holdout_accuracy"] <= 1.0
 
     import joblib
+
     artifact = joblib.load(out_path)
     assert "model" in artifact and "vectorizer" in artifact
+    assert artifact["metadata"]["artifact_schema_version"] == "preference-artifact-v1"
+    assert artifact["metadata"]["model_version"].startswith("sha256:")
     # The loaded model can score a fresh feature dict without raising.
     x = artifact["vectorizer"].transform([rows and _fixture_features()])
     proba = artifact["model"].predict_proba(x)
     assert proba.shape[1] == 2
+
+    # The exact artifact written by training must also satisfy the live inference provider's
+    # feature-dict contract; this catches writer/reader drift before an activation deploy.
+    from ghar_re_core.model_provider import FileModelArtifactProvider
+
+    provider = FileModelArtifactProvider(str(out_path))
+    loaded = provider.load()
+    assert loaded is not None
+    assert 0.0 <= loaded.predict_proba(_fixture_features()) <= 1.0
+    assert loaded.metadata["model_version"] == artifact["metadata"]["model_version"]
+
+
+def test_training_holdout_is_household_isolated_when_provenance_exists(tmp_path):
+    rows = []
+    for index in range(20):
+        pair = _rows(["accept", "dislike"])
+        rows.extend(dict(row, household_id=f"hh-{index}") for row in pair)
+    export_path = tmp_path / "grouped-export.jsonl"
+    export_path.write_text("\n".join(json.dumps(row) for row in rows))
+    out_path = tmp_path / "grouped-artifact.joblib"
+
+    report = train(str(export_path), str(out_path), skip_readiness_gate=True)
+
+    assert report["split_strategy"] == "household_group_holdout"
+    assert report["train_households"] > 0
+    assert report["holdout_households"] > 0
+    assert report["household_overlap"] == 0
 
 
 def test_train_default_path_blocks_the_same_fixture_on_density_not_just_structure(tmp_path):

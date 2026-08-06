@@ -26,6 +26,63 @@ interface EpisodeResult {
   [key: string]: unknown;
 }
 
+export interface DishSlateItem {
+  name: string;
+  score: number;
+  slot?: string;
+  mealClassCode?: string | null;
+  reasons: string[];
+  snapshot: Record<string, unknown>;
+}
+
+/** Normalize every dish-bearing planning response into one ordered learning slate.
+ * Calibration uses a global rank while preserving each cell's own meal slot. */
+export function extractDishSlateItems(
+  surface: string,
+  response: Record<string, unknown>,
+): DishSlateItem[] {
+  const located: Array<{ value: unknown; slot?: string }> = [];
+  if (surface === "calibration") {
+    const slots = response.slots && typeof response.slots === "object"
+      ? response.slots as Record<string, unknown>
+      : {};
+    for (const [slot, values] of Object.entries(slots)) {
+      if (Array.isArray(values)) {
+        located.push(...values.map((value) => ({ value, slot })));
+      }
+    }
+  } else {
+    const values = surface === "cold_start" ? response.dishes : response.options;
+    if (Array.isArray(values)) located.push(...values.map((value) => ({ value })));
+  }
+
+  return located.flatMap(({ value, slot }) => {
+    if (!value || typeof value !== "object") return [];
+    const dish = value as Record<string, unknown>;
+    const name = typeof dish.name === "string" ? dish.name.trim() : "";
+    const score = typeof dish.score === "number" ? dish.score : Number.NaN;
+    if (!name || !Number.isFinite(score)) return [];
+    const explanation = dish.explanation && typeof dish.explanation === "object"
+      ? dish.explanation as Record<string, unknown>
+      : {};
+    const top = Array.isArray(explanation.top_contributors)
+      ? explanation.top_contributors as Array<Record<string, unknown>>
+      : [];
+    const reasons = top.map((item) => item.module).filter(
+      (item): item is string => typeof item === "string",
+    );
+    if (typeof dish.meal_class_name === "string") reasons.push(dish.meal_class_name);
+    return [{
+      name,
+      score,
+      slot: slot ?? (typeof dish.slot === "string" ? dish.slot : undefined),
+      mealClassCode: typeof dish.meal_class_code === "string" ? dish.meal_class_code : null,
+      reasons: [...new Set(reasons)],
+      snapshot: dish,
+    }];
+  });
+}
+
 function hex(bytes: ArrayBuffer): string {
   return [...new Uint8Array(bytes)].map((value) => value.toString(16).padStart(2, "0")).join("");
 }
@@ -49,6 +106,146 @@ function stableJson(value: unknown): string {
 
 export async function snapshotHash(value: unknown): Promise<string> {
   return hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(stableJson(value))));
+}
+
+/** Persist the dish-card surfaces used by onboarding and the landing page with the same normalized
+ * request/run/candidate lineage as meal episodes. This closes the learning blind spot where the
+ * UI's primary surfaces emitted feedback_events but no slate or feature snapshot to attribute the
+ * feedback to. No probabilities are invented: deterministic inclusion is logged as propensity 1,
+ * while uncalibrated prediction columns stay null. */
+export async function recordDishRecommendationSlate(
+  ctx: RequestContext,
+  input: {
+    householdId: string;
+    requestId: string;
+    surface: "cold_start" | "calibration" | "meal_plan" | "class_dishes";
+    modelVersion: string;
+    configVersion: string;
+    catalogVersion?: string | null;
+    policyCode: string;
+    latencyMs: number;
+    householdSnapshot: Record<string, unknown>;
+    requestContext: Record<string, unknown>;
+    response: Record<string, unknown>;
+  },
+): Promise<string | undefined> {
+  const items = extractDishSlateItems(input.surface, input.response);
+  if (!items.length) return undefined;
+
+  const db = createServiceRoleClient(ctx.config);
+  const hashed = await Promise.all(items.map(async (item) => ({
+    ...item,
+    itemHash: await snapshotHash({
+      kind: "dish",
+      surface: input.surface,
+      slot: item.slot ?? null,
+      name: item.name.toLocaleLowerCase("en-IN"),
+    }),
+  })));
+  const eligibleHash = await eligibleSetHash(hashed.map((item) => item.itemHash));
+  const householdHash = await snapshotHash(input.householdSnapshot);
+  const context = { ...input.requestContext, surface: input.surface };
+  const contextHash = await snapshotHash(context);
+
+  const { data: slate, error: slateError } = await withTimeout(
+    db.from("slates").upsert({
+      request_id: input.requestId,
+      household_id: input.householdId,
+      surface: input.surface,
+      policy_code: input.policyCode,
+      model_version: input.modelVersion,
+      config_version: input.configVersion,
+      catalog_version: input.catalogVersion ?? null,
+      eligible_set_hash: eligibleHash,
+      household_snapshot_hash: householdHash,
+      context_snapshot: context,
+      intent_posterior: {},
+    }, { onConflict: "household_id,request_id" }).select("id").single(),
+    "plan.dishes.slate_upsert",
+  );
+  if (slateError || !slate) {
+    throw new AppError(ERROR_CATALOGUE.INTERNAL, {
+      detail: slateError?.message ?? "dish slate missing",
+    });
+  }
+
+  const rows = hashed.map((item, index) => ({
+    slate_id: slate.id,
+    episode_id: null,
+    episode_hash: item.itemHash,
+    rank: index + 1,
+    point_score: item.score,
+    rerank_score: item.score,
+    selection_propensity: 1,
+    generator_codes: [input.surface, item.mealClassCode].filter(
+      (value): value is string => typeof value === "string" && value.length > 0,
+    ),
+    reason_tags: item.reasons,
+    predicted_choose: null,
+    predicted_execute: null,
+    predicted_regret: null,
+    decision_trace: {
+      dish_name: item.name,
+      slot: item.slot ?? null,
+      model_version: input.modelVersion,
+      policy_code: input.policyCode,
+      dish_snapshot: item.snapshot,
+    },
+  }));
+  const { error: itemError } = await withTimeout(
+    db.from("slate_items").upsert(rows, { onConflict: "slate_id,rank" }),
+    "plan.dishes.items_upsert",
+  );
+  if (itemError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: itemError.message });
+
+  const candidates = hashed.map((item, index) => ({
+    candidate_item_hash: item.itemHash,
+    episode_id: null,
+    generator_codes: rows[index].generator_codes,
+    generator_scores: { point_score: item.score, rerank_score: item.score },
+    reason_codes: item.reasons,
+    rank: index + 1,
+  }));
+  const featureHash = await snapshotHash(candidates);
+  const traceChecksum = await snapshotHash({
+    request_id: input.requestId,
+    eligible_set_hash: eligibleHash,
+    household_snapshot_hash: householdHash,
+    context_snapshot_hash: contextHash,
+    feature_snapshot_hash: featureHash,
+  });
+  const { error: lineageError } = await withTimeout(
+    db.rpc("record_episode_recommendation_lineage", {
+      p_payload: {
+        request_id: input.requestId,
+        household_id: input.householdId,
+        slate_id: slate.id,
+        surface: input.surface,
+        meal_slot_code: typeof input.requestContext.slot === "string"
+          ? input.requestContext.slot
+          : null,
+        context,
+        context_snapshot_hash: contextHash,
+        household_snapshot_hash: householdHash,
+        household_snapshot: input.householdSnapshot,
+        feature_set_version: "dish-slate-online-v1",
+        feature_snapshot_hash: featureHash,
+        engine_version: input.modelVersion,
+        model_version: input.modelVersion,
+        config_version: input.configVersion,
+        catalog_version: input.catalogVersion ?? null,
+        policy_version: input.policyCode,
+        latency_ms: input.latencyMs,
+        trace_checksum: traceChecksum,
+        candidates,
+      },
+    }),
+    "plan.dishes.normalized_lineage",
+  );
+  if (lineageError) {
+    throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: lineageError.message });
+  }
+  return slate.id as string;
 }
 
 export async function recordMealEpisodeSlate(
@@ -204,6 +401,7 @@ export async function recordMealEpisodeSlate(
         context,
         context_snapshot_hash: contextHash,
         household_snapshot_hash: householdHash,
+        household_snapshot: input.householdSnapshot,
         feature_set_version: "episode-online-v1",
         feature_snapshot_hash: featureHash,
         engine_version: input.modelVersion,

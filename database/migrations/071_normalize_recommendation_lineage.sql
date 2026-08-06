@@ -127,7 +127,10 @@ BEGIN
   INSERT INTO ml.feature_snapshots(request_id,household_id,feature_set_version,snapshot_hash,values,
     source_watermarks)
   VALUES(v_request_id,v_household_id,coalesce(p_payload->>'feature_set_version','episode-online-v1'),
-    p_payload->>'feature_snapshot_hash',jsonb_build_object('candidates',coalesce(p_payload->'candidates','[]')),
+    p_payload->>'feature_snapshot_hash',jsonb_build_object(
+      'household',coalesce(p_payload->'household_snapshot','{}'),
+      'candidates',coalesce(p_payload->'candidates','[]')
+    ),
     coalesce(p_payload->'feature_source_watermarks','{}'))
   ON CONFLICT(request_id) DO UPDATE SET snapshot_hash=excluded.snapshot_hash,values=excluded.values,
     source_watermarks=excluded.source_watermarks

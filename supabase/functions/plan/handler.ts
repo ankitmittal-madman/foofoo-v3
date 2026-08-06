@@ -46,7 +46,7 @@ import { loadOnlineRecommendationState } from "../recommendations/personalizatio
 import { addDishToDate, loadSavedWeek, saveWeek, setSlotLock } from "./state.ts";
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 import { loadWeatherContext } from "../_shared/services/weather.ts";
-import { recordMealEpisodeSlate } from "./episodes.ts";
+import { recordDishRecommendationSlate, recordMealEpisodeSlate } from "./episodes.ts";
 
 const SERVICE_NAME = "plan";
 
@@ -397,6 +397,30 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           episodes: Array.isArray(episodeBody.episodes)
             ? episodeBody.episodes as Parameters<typeof recordMealEpisodeSlate>[1]["episodes"]
             : [],
+        });
+      } else if (
+        resolvedHouseholdId &&
+        ["cold_start", "calibration", "meal_plan", "class_dishes"].includes(surface)
+      ) {
+        const dishBody = result.body as Record<string, unknown>;
+        slateId = await recordDishRecommendationSlate(ctx, {
+          householdId: resolvedHouseholdId,
+          requestId,
+          surface: surface as "cold_start" | "calibration" | "meal_plan" | "class_dishes",
+          modelVersion: String(
+            dishBody.model_version ?? dishBody.engine_version ?? "ghar-re-rule-v1",
+          ),
+          configVersion: String(dishBody.config_version ?? "unknown"),
+          catalogVersion: typeof dishBody.catalog_version === "string"
+            ? dishBody.catalog_version
+            : null,
+          policyCode: String(dishBody.policy_code ?? "adaptive-diversity-v1"),
+          latencyMs,
+          householdSnapshot: payload.household as Record<string, unknown>,
+          requestContext: payload.context && typeof payload.context === "object"
+            ? payload.context as Record<string, unknown>
+            : {},
+          response: dishBody,
         });
       }
       if (FEEDBACK_ELIGIBLE_SURFACES.has(surface) && resolvedHouseholdId) {

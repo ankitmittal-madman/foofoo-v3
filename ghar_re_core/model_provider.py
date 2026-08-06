@@ -1,22 +1,42 @@
 """
-ghar_re_core.model_provider — the s_pref artifact injection seam (Phase 3, not fit, not shipped).
+ghar_re_core.model_provider — the s_pref artifact injection and validation seam.
 
 Mirrors ghar_re_core/config.py's ConfigProvider injection-seam pattern exactly
 (active_config()/set_active_config()/_ConfigProxy): `active_model()` / `set_active_model()` /
 `PREF_MODEL` (a thin proxy every core module can safely import at module-load time, before any
 provider has been chosen).
 
-Default active provider is `NullModelArtifactProvider` — no artifact, ever. This is the ONLY
-provider actually exercised in this phase: there is no trained artifact anywhere in this repo,
-and this module does not fabricate one. `FileModelArtifactProvider` is the seam a future WP
-wires up once a real artifact exists (RE-DOC-11 §8: "retraining and redeploying becomes a
-deploy, not a code change") — the loader is built now so that future WP is a config change, not
-a code change, but nothing in Phase 3 invokes it against a real file in production.
+Default active provider is `NullModelArtifactProvider`. Service startup selects the file provider
+only when config explicitly enables preference scoring, supplies an artifact path, and assigns a
+non-zero bounded weight. Missing or malformed active artifacts fail startup rather than silently
+degrading to a misleading no-op.
 """
+
 from __future__ import annotations
 
 import os
 from typing import Any, Optional, Protocol
+
+PREFERENCE_ARTIFACT_SCHEMA_VERSION = "preference-artifact-v1"
+
+
+class SklearnPreferenceArtifact:
+    """Stable inference adapter around the serialized sklearn model + DictVectorizer pair.
+
+    Training persists both objects because categorical feature expansion belongs to the fitted
+    model. Core scoring intentionally consumes one narrow `predict_proba(feature_dict)` contract,
+    so it never needs to know about sklearn matrices or artifact serialization details.
+    """
+
+    def __init__(self, model: Any, vectorizer: Any, metadata: dict[str, Any] | None = None):
+        self.model = model
+        self.vectorizer = vectorizer
+        self.metadata = metadata or {}
+
+    def predict_proba(self, features: dict[str, Any]) -> float:
+        matrix = self.vectorizer.transform([features])
+        probabilities = self.model.predict_proba(matrix)
+        return float(probabilities[0][1])
 
 
 class ModelArtifactProvider(Protocol):
@@ -66,8 +86,24 @@ class FileModelArtifactProvider:
             self.artifact = None
             return None
         import joblib  # imported lazily — joblib is a training/inference-only dependency, never
-        # required for the (currently universal) Null-provider path.
-        self.artifact = joblib.load(self._path)
+
+        # required for the default Null-provider path.
+        payload = joblib.load(self._path)
+        if not isinstance(payload, dict) or "model" not in payload or "vectorizer" not in payload:
+            raise ValueError(
+                "Preference artifact must contain fitted 'model' and 'vectorizer' entries"
+            )
+        metadata = payload.get("metadata")
+        if metadata is not None and not isinstance(metadata, dict):
+            raise ValueError("Preference artifact metadata must be an object")
+        schema_version = (metadata or {}).get("artifact_schema_version")
+        if schema_version not in (None, PREFERENCE_ARTIFACT_SCHEMA_VERSION):
+            raise ValueError(f"Unsupported preference artifact schema: {schema_version!r}")
+        self.artifact = SklearnPreferenceArtifact(
+            payload["model"],
+            payload["vectorizer"],
+            metadata,
+        )
         return self.artifact
 
 
