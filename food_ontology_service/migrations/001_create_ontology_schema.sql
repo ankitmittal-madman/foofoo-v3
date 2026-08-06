@@ -219,7 +219,7 @@ CREATE FUNCTION ontology.reconcile_jobs() RETURNS integer LANGUAGE plpgsql
 SECURITY DEFINER SET search_path=ontology,pg_temp AS $$
 DECLARE affected integer;
 BEGIN
-  UPDATE ontology.jobs SET status=CASE WHEN attempts>=max_attempts THEN 'dead' ELSE 'retry' END,
+  UPDATE ontology.jobs SET status=(CASE WHEN attempts>=max_attempts THEN 'dead' ELSE 'retry' END)::ontology.job_status,
     next_attempt_at=now(),locked_by=NULL,lease_expires_at=NULL,last_error_code='lease_expired',updated_at=now()
   WHERE status='running' AND lease_expires_at<now();
   GET DIAGNOSTICS affected=ROW_COUNT;

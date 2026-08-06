@@ -53,6 +53,10 @@ def _request_digest(value: Any) -> str:
     return hashlib.sha256(encoded.encode()).hexdigest()
 
 
+def _jsonable(value: Any) -> Any:
+    return json.loads(json.dumps(value, default=_json))
+
+
 class PostgresRepository:
     """Normalized PostgreSQL adapter. Idempotent commands share one database transaction."""
 
@@ -71,7 +75,11 @@ class PostgresRepository:
             yield active
             return
         with self._connect() as connection:
-            yield connection
+            token = _ACTIVE_CONNECTION.set(connection)
+            try:
+                yield connection
+            finally:
+                _ACTIVE_CONNECTION.reset(token)
 
     def ping(self) -> None:
         with self._connection() as connection:
@@ -109,7 +117,7 @@ class PostgresRepository:
                     """INSERT INTO ontology.idempotency_records
                        (principal,operation,idempotency_key,request_sha256,response_status,response_body)
                        VALUES(%s,%s,%s,%s,%s,%s)""",
-                    (principal, operation, key, digest, status, Jsonb(payload)),
+                    (principal, operation, key, digest, status, Jsonb(_jsonable(payload))),
                 )
             finally:
                 _ACTIVE_CONNECTION.reset(token)
@@ -401,17 +409,27 @@ class PostgresRepository:
         self.get_dish(dish_id)
         with self._connection() as connection:
             asset = connection.execute(
-                """INSERT INTO ontology.image_assets
-                   (cloudinary_public_id,cloudinary_asset_id,cloudinary_version,secure_url,checksum_sha256,
-                    source_type,licence_code,attribution,moderation_status)
-                   VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                   ON CONFLICT(cloudinary_public_id) DO UPDATE SET cloudinary_asset_id=excluded.cloudinary_asset_id,
-                    cloudinary_version=excluded.cloudinary_version,secure_url=excluded.secure_url,
-                    moderation_status=excluded.moderation_status RETURNING id""",
-                (image.cloudinary_public_id, image.cloudinary_asset_id, image.cloudinary_version,
-                 image.secure_url, image.checksum_sha256, image.source_type, image.licence_code,
-                 image.attribution, str(image.review_status)),
+                """SELECT id FROM ontology.image_assets
+                   WHERE cloudinary_public_id=%s OR checksum_sha256=%s FOR UPDATE""",
+                (image.cloudinary_public_id, image.checksum_sha256),
             ).fetchone()
+            if asset:
+                connection.execute(
+                    """UPDATE ontology.image_assets SET cloudinary_asset_id=%s,cloudinary_version=%s,
+                       secure_url=%s,moderation_status=%s WHERE id=%s""",
+                    (image.cloudinary_asset_id, image.cloudinary_version, image.secure_url,
+                     str(image.review_status), asset["id"]),
+                )
+            else:
+                asset = connection.execute(
+                    """INSERT INTO ontology.image_assets
+                       (cloudinary_public_id,cloudinary_asset_id,cloudinary_version,secure_url,checksum_sha256,
+                        source_type,licence_code,attribution,moderation_status)
+                       VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id""",
+                    (image.cloudinary_public_id, image.cloudinary_asset_id, image.cloudinary_version,
+                     image.secure_url, image.checksum_sha256, image.source_type, image.licence_code,
+                     image.attribution, str(image.review_status)),
+                ).fetchone()
             if image.is_primary:
                 connection.execute("UPDATE ontology.dish_images SET is_primary=false WHERE dish_id=%s", (dish_id,))
             connection.execute(
@@ -429,7 +447,7 @@ class PostgresRepository:
                 """INSERT INTO ontology.correction_submissions
                    (dish_id,field_path,proposed_value,reason,actor_reference,submitted_by_principal)
                    VALUES(%s,%s,%s,%s,%s,%s) RETURNING *""",
-                (dish_id, feedback.field_path, Jsonb(feedback.proposed_value), feedback.reason,
+                (dish_id, feedback.field_path, Jsonb(_jsonable(feedback.proposed_value)), feedback.reason,
                  feedback.actor_reference, principal),
             ).fetchone()
 
