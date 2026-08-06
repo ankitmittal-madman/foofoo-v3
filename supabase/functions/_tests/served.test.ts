@@ -7,7 +7,11 @@
  * N served hero dishes across the response's plates[] produce exactly N shown_not_tapped rows.
  */
 import { assertEquals } from "@std/assert";
-import { buildShownNotTappedRows, flattenServedDishes } from "../recommendations/served.ts";
+import {
+  buildShownNotTappedRows,
+  flattenServedDishes,
+  toExposureItems,
+} from "../recommendations/served.ts";
 
 Deno.test("flattenServedDishes: a mix of pair (2 heroes) and single (1 hero) plates flattens to one entry per served dish", () => {
   const plates = [
@@ -17,6 +21,68 @@ Deno.test("flattenServedDishes: a mix of pair (2 heroes) and single (1 hero) pla
   ];
   const served = flattenServedDishes(plates);
   assertEquals(served.map((s) => s.dishName), ["Onion Pakora", "Roti", "Chole", "Khichdi"]);
+});
+
+Deno.test("flattenServedDishes: plan dish cards contribute to the shown denominator", () => {
+  const served = flattenServedDishes([
+    { id: "dish-1", name: "Indori Poha" },
+    { id: "dish-2", name: "  Daal Bafla  " },
+  ]);
+  assertEquals(served.map((s) => s.dishName), ["Indori Poha", "Daal Bafla"]);
+});
+
+Deno.test("toExposureItems: preserves observed plan metadata without inventing missing values", () => {
+  const served = flattenServedDishes([
+    {
+      name: "Indori Poha",
+      cuisine: "madhya_pradesh",
+      meal_class_code: "BF_POHA",
+      heaviness: 1,
+      total_mins: 25,
+    },
+    { name: "Daal Bafla" },
+  ]);
+  assertEquals(toExposureItems(served), [
+    {
+      dish_name: "Indori Poha",
+      meal_class_code: "BF_POHA",
+      cuisine_family: "madhya_pradesh",
+      heaviness: 1,
+      total_mins: 25,
+    },
+    { dish_name: "Daal Bafla" },
+  ]);
+});
+
+Deno.test("flattenServedDishes: episode components contribute to the shown denominator", () => {
+  const served = flattenServedDishes([
+    {
+      episode_id: "episode-1",
+      components: [
+        { dish_name: "Pav Bhaji" },
+        { dish_name: "Mawa Bati" },
+        { dish_name: " " },
+      ],
+    },
+  ]);
+  assertEquals(served.map((s) => s.dishName), ["Pav Bhaji", "Mawa Bati"]);
+  assertEquals(toExposureItems(served), [
+    { dish_name: "Pav Bhaji" },
+    { dish_name: "Mawa Bati" },
+  ]);
+});
+
+Deno.test("toExposureItems: episode cadence metadata is copied to displayed components", () => {
+  const served = flattenServedDishes([{
+    components: [{ dish_name: "Pav Bhaji" }],
+    richness_score: 0.8,
+    practicality: { active_minutes: 35 },
+  }]);
+  assertEquals(toExposureItems(served), [{
+    dish_name: "Pav Bhaji",
+    total_mins: 35,
+    richness_score: 0.8,
+  }]);
 });
 
 Deno.test("flattenServedDishes: non-array / malformed input yields zero served dishes, never throws", () => {

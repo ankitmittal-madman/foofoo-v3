@@ -12,9 +12,26 @@ import type { SupabaseClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
 
-/** One served hero dish, as flattened out of RecommendationResponse.plates[]. */
+/** One served dish, as flattened out of any supported recommendation response shape. */
 export interface ServedDish {
   dishName: string;
+  mealClassCode?: string;
+  cuisineFamily?: string;
+  heaviness?: number;
+  totalMins?: number;
+  richnessScore?: number;
+}
+
+function boundedNumber(value: unknown, minimum: number, maximum?: number): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < minimum) return undefined;
+  if (maximum !== undefined && value > maximum) return undefined;
+  return value;
+}
+
+function text(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim();
+  return normalized || undefined;
 }
 
 /**
@@ -91,21 +108,68 @@ export function buildShownNotTappedRows(
 }
 
 /**
- * Flatten a RecommendationResponse.plates[] array into one ServedDish per hero dish name (a
- * "pair" plate has 2 hero dishes; "single"/"standalone" has 1) — this is what makes "one row per
- * served dish" mean per-dish, not per-plate.
+ * Flatten every serving shape into one ServedDish per displayed dish:
+ * - v1 RE plates expose `hero_dish_names[]`;
+ * - plan/onboarding surfaces expose direct dish cards with `name`;
+ * - episode surfaces expose `components[].dish_name`.
+ *
+ * Keeping these shapes together prevents a surface-specific telemetry blind spot: all displayed
+ * dishes must contribute to the shown denominator used by feedback and preference evaluation.
  */
 export function flattenServedDishes(plates: unknown): ServedDish[] {
   if (!Array.isArray(plates)) return [];
   const out: ServedDish[] = [];
   for (const p of plates) {
-    if (
-      p && typeof p === "object" && Array.isArray((p as Record<string, unknown>).hero_dish_names)
-    ) {
-      for (const name of (p as Record<string, unknown>).hero_dish_names as unknown[]) {
-        if (typeof name === "string" && name.length > 0) out.push({ dishName: name });
+    if (!p || typeof p !== "object") continue;
+    const row = p as Record<string, unknown>;
+    const directName = text(row.name);
+    if (directName) {
+      out.push({
+        dishName: directName,
+        mealClassCode: text(row.meal_class_code),
+        cuisineFamily: text(row.cuisine_family) ?? text(row.cuisine),
+        heaviness: boundedNumber(row.heaviness, 0, 3),
+        totalMins: boundedNumber(row.total_mins, 0),
+        richnessScore: boundedNumber(row.richness_score, 0, 1),
+      });
+    }
+    if (Array.isArray(row.hero_dish_names)) {
+      for (const value of row.hero_dish_names) {
+        const name = text(value);
+        if (name) out.push({ dishName: name });
+      }
+    }
+    if (Array.isArray(row.components)) {
+      const practicality = row.practicality && typeof row.practicality === "object"
+        ? row.practicality as Record<string, unknown>
+        : {};
+      for (const component of row.components) {
+        if (!component || typeof component !== "object") continue;
+        const item = component as Record<string, unknown>;
+        const name = text(item.dish_name);
+        if (name) {
+          out.push({
+            dishName: name,
+            mealClassCode: text(item.meal_class_code),
+            cuisineFamily: text(item.cuisine_family) ?? text(item.cuisine),
+            totalMins: boundedNumber(practicality.active_minutes, 0),
+            richnessScore: boundedNumber(row.richness_score, 0, 1),
+          });
+        }
       }
     }
   }
   return out;
+}
+
+/** RPC payload uses snake_case to match the database boundary. Undefined evidence is omitted. */
+export function toExposureItems(served: ServedDish[]): Array<Record<string, string | number>> {
+  return served.map((item) => ({
+    dish_name: item.dishName,
+    ...(item.mealClassCode ? { meal_class_code: item.mealClassCode } : {}),
+    ...(item.cuisineFamily ? { cuisine_family: item.cuisineFamily } : {}),
+    ...(item.heaviness !== undefined ? { heaviness: item.heaviness } : {}),
+    ...(item.totalMins !== undefined ? { total_mins: item.totalMins } : {}),
+    ...(item.richnessScore !== undefined ? { richness_score: item.richnessScore } : {}),
+  }));
 }
