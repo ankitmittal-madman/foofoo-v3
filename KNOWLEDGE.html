@@ -767,6 +767,10 @@ function deepDiveFeature(featureLabel){
     <div class="nav-item" onclick="showPage('s82')"><span class="nav-icon">🏠</span> S82 · Household roles + invitations <span class="nav-badge">05 Aug</span></div>
     <div class="nav-item" onclick="showPage('s83')"><span class="nav-icon">🤝</span> S83 · Household collaboration live <span class="nav-badge">05 Aug</span></div>
     <div class="nav-item active" onclick="showPage('s84')"><span class="nav-icon">🛠</span> S84 · Gap closure and truthful contracts <span class="nav-badge">05 Aug</span></div>
+    <div class="nav-item" onclick="showPage('s85')">
+      <span class="nav-icon">🗄</span> S85 · Dish ingestion pipeline
+      <span class="nav-badge">Aug 6</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -13699,6 +13703,66 @@ function deepDiveFeature(featureLabel){
     </div>
     <div id="s84-flows" class="view-pane"></div><script>window.FEATURE_FLOWS_S84=[{id:'canonical-complete-meal',label:'Serve a canonical complete meal',steps:[{layer:'App logic',tag:'POLICY',title:'Select and validate a grammar',desc:'A safe plate is matched to a published composition and every component role is checked.',codeFlow:[{chip:'ghar_re_core/meal_episode.py'},{label:'calls'},{chip:'ghar_re_core/episode_grammar.py'}],files:[{path:'ghar_re_core/meal_episode.py',desc:'Builds the complete meal'},{path:'ghar_re_core/episode_grammar.py',desc:'Validates composition'}],api:null,db:null},{layer:'Server',tag:'API',title:'Validate the signed contract',desc:'The recommendation service rejects malformed requests and malformed episode responses.',codeFlow:[{chip:'ghar_re_service/ghar_re_service/main.py'},{label:'uses'},{chip:'contracts/ghar-re-v1.schema.json'}],files:[{path:'ghar_re_service/ghar_re_service/main.py',desc:'Signed route boundary'},{path:'contracts/ghar-re-v1.schema.json',desc:'Canonical episode schema'}],api:{endpoint:'POST /v1/meal-episodes',note:'HMAC-authenticated internal route'},db:null},{layer:'Phone',tag:'UI',title:'Render or retain the meal',desc:'Mobile shows the canonical result; a transient refresh failure leaves safe cached data visible with a warning.',codeFlow:[{chip:'mobile/src/api/plan.ts'},{label:'renders'},{chip:'mobile/src/components/MealEpisodeSection.tsx'}],files:[{path:'mobile/src/api/plan.ts',desc:'Typed client contract'},{path:'mobile/src/components/MealEpisodeSection.tsx',desc:'Complete-meal UI'}],api:{endpoint:'POST /functions/v1/plan · meal_episodes',note:'authenticated household surface'},db:null}]},{id:'governed-household-context',label:'Compose governed household context',steps:[{layer:'Database',tag:'DB',title:'Resolve an active festival date',desc:'A service-only function reads normalized private festival identities and dated occurrences.',codeFlow:[{chip:'database/migrations/075_expose_active_festival_calendar_rpc.sql'}],files:[{path:'database/migrations/075_expose_active_festival_calendar_rpc.sql',desc:'Normalized calendar and narrow facade'}],api:null,db:{table:'food.festivals / food.festival_calendar_occurrences',op:'SELECT',note:'through service-role-only public RPC'}},{layer:'Server',tag:'API',title:'Combine date and explicit member evidence',desc:'Edge applies festival mode and geometric welfare without inventing preferences for members with no data.',codeFlow:[{chip:'supabase/functions/recommendations/compose.ts'},{label:'+'},{chip:'supabase/functions/recommendations/personalization.ts'}],files:[{path:'supabase/functions/recommendations/compose.ts',desc:'Festival context'},{path:'supabase/functions/recommendations/personalization.ts',desc:'Member evidence aggregation'}],api:{endpoint:'POST /functions/v1/recommendations',note:'actor and household remain distinct'},db:{table:'household_memberships / user_taste_vectors',op:'SELECT',note:'active members and explicit dish affinities'}}]},{id:'safe-offline-meals',label:'Keep offline meals truthful',steps:[{layer:'App logic',tag:'POLICY',title:'Persist an allowlisted plan key',desc:'The cache saves only daily plans, meal episodes and saved weeks under the authenticated user.',codeFlow:[{chip:'mobile/src/lib/queryClient.ts'}],files:[{path:'mobile/src/lib/queryClient.ts',desc:'Safe persistence policy'}],api:null,db:null},{layer:'Phone',tag:'UI',title:'Show cached data with recovery',desc:'The visible meal remains usable while the screen explains that refresh failed and offers retry.',codeFlow:[{chip:'mobile/src/components/MealEpisodeSection.tsx'}],files:[{path:'mobile/src/components/MealEpisodeSection.tsx',desc:'Cached warning and retry'}],api:null,db:null}]}];renderFeatureFlows('s84-flows',window.FEATURE_FLOWS_S84);</script>
   </div><!-- /page-s84 -->
+  <div id="page-s85" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">S85 · Dish ingestion pipeline</div>
+      <div class="page-subtitle">Built the ETL that loads the 6,871-recipe CSV into the dish catalogue, with dedupe, ontology mapping, AI enrichment (mock mode), and image plumbing — schema written, dry-run validated on the real file, not yet applied to a live database.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The Indian food dataset CSV sat unused in database/seeds/ — no code path loaded it into the dish catalogue, no dedupe/ontology/enrichment logic existed for it, and there was no way to track an import run, its per-row outcomes, or errors.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">A dry-run-capable, batched, idempotent ETL exists that parses the real CSV, dedupes near-duplicate dish names, maps cuisine/course/diet to this repo's own ontology tables (no fabricated external API), infers missing tags/region with a heuristic fallback when no Groq key is set, and is ready to apply once a live database and migration 076 are in place.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/076_dish_ingestion_pipeline.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/076_dish_ingestion_pipeline_rollback.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/ingest_dish_dataset.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/dish_ingestion/*.py (normalize, dedupe, ontology_adapter, groq_adapter, images, db, pipeline)</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/architecture/[ACTIVE]_RUNBOOK_Dish_Ingestion_Pipeline_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">2026-08-06<br>12 files touched</div>
+      </div>
+      <div class="session-card-desc">
+        New migration 076 adds only the genuinely missing tables (import_runs, dish_source_rows,
+        import_row_results, import_row_errors, dish_ingestion_review_queue, dish_aliases,
+        image_assets, dish_images) and reuses every existing dish/ontology table rather than
+        duplicating them. The Python ETL (database/etl/dish_ingestion/) runs six stages — load,
+        dedupe, ontology map, enrich, image plumb, persist — batched into transactions, safe to
+        rerun (every write is an upsert on a stable key). <b>Important correction:</b> the source
+        CSV's real row count, verified by quote-aware CSV parsing, is 6,871 logical records, not
+        16,523 — the higher number was a raw line count that double-counts rows with embedded
+        newlines in their Instructions text. This was caught and documented, not silently
+        corrected without disclosure.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">9</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">2</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-s85-validation" onclick="toggleDetail('s85-validation')"><div class="detail-left"><span class="tag tag-mod">Verified</span><span class="detail-name">What was actually run vs written-only</span></div><span class="detail-chevron" id="chev-s85-validation">▾</span></div>
+      <div class="detail-drawer" id="draw-s85-validation">
+        <div class="dd-label">Executed and verified</div>
+        <div class="dd-text">`python database/etl/ingest_dish_dataset.py --dry-run` against the real CSV: parsed 6,871 rows in ~6s, exercised dedupe/ontology-fallback/heuristic-enrichment/image-plumbing end to end with zero DB writes. An earlier unblocked fuzzy-dedupe implementation was found too slow and replaced with a blocked comparison — caught by actually running it, not assumed.</div>
+        <div class="dd-label">Written but NOT executed</div>
+        <div class="dd-text">Migration 076's SQL and the `--apply` DB-write code path (db.py/pipeline.py) — no live Postgres/Supabase connection was available in this session. Validated by careful reading against existing migration style, not by running it.</div>
+      </div>
+    </div>
+    <div class="next-box"><div class="next-label">Next session</div><div class="next-text">Apply migration 076 to a real (ideally local/staging) Postgres, then run `--apply` against it and confirm the import_runs summary report; wire a real ontology API or Groq key if/when one becomes available.</div></div>
+  </div><!-- /page-s85 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
