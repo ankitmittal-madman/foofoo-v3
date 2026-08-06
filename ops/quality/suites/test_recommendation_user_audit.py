@@ -49,6 +49,11 @@ def test_user_audit_is_parameterized_and_json_safe():
     assert result["updated_at"] == "2026-08-06T00:00:00+00:00"
 
 
+def test_user_audit_counts_json_dimensions_with_postgres_supported_function():
+    assert "jsonb_object_length" not in user_audit.AUDIT_SQL
+    assert user_audit.AUDIT_SQL.count("jsonb_object_keys") == 2
+
+
 def test_user_audit_fails_closed_for_missing_profile():
     with pytest.raises(RuntimeError, match="Profile does not exist"):
         user_audit.fetch_user_audit(FakeConnection({"profile": None}), PROFILE_ID)
