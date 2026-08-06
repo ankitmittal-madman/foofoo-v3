@@ -31,9 +31,12 @@ logger = logging.getLogger("dish_ingestion.image_prompt")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-# Hugging Face Inference API text-generation endpoint; model overridable via env.
+# Hugging Face's legacy `api-inference.huggingface.co` endpoint was fully retired in favor of the
+# Inference Providers router (https://router.huggingface.co) — the old host no longer resolves for
+# some callers and returns 410 Gone for others. The router speaks the OpenAI-compatible chat
+# completions shape, same as the Groq call above, rather than the old raw text-generation payload.
 HF_MODEL = os.environ.get("HF_MODEL", "mistralai/Mistral-7B-Instruct-v0.3")
-HF_API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
+HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
 
 # The exact standardized template, ported literally from the xlsx `prompt` column (verified across
 # 5 sample rows — see module docstring). {dish_name} and the four LLM-sourced blanks are the only
@@ -147,11 +150,21 @@ class ImagePromptGenerator:
             source="groq_api", model_name=GROQ_MODEL, raw_response=raw,
         )
 
-    # -- Hugging Face Inference API backend (alternate/fallback) ---------------------------------
+    # -- Hugging Face Inference Providers router (alternate/fallback) ----------------------------
     def _call_hf(self, dish_name: str, cuisine_raw: str | None, course_raw: str | None,
                  ingredients: list[str]) -> PromptFields:
         prompt = _fields_prompt(dish_name, cuisine_raw, course_raw, ingredients)
-        payload = {"inputs": prompt, "parameters": {"max_new_tokens": 300, "temperature": 0.4}}
+        # OpenAI-compatible chat completions shape (router.huggingface.co), not the retired
+        # raw text-generation `{"inputs": ...}` payload the old api-inference host accepted.
+        payload = {
+            "model": HF_MODEL,
+            "messages": [
+                {"role": "system", "content": "Return concise JSON only, no prose."},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.4,
+            "max_tokens": 300,
+        }
         req = urllib.request.Request(
             HF_API_URL,
             data=json.dumps(payload).encode("utf-8"),
@@ -160,13 +173,12 @@ class ImagePromptGenerator:
         )
         with urllib.request.urlopen(req, timeout=30) as resp:  # pragma: no cover - network
             raw = json.loads(resp.read().decode("utf-8"))
-        # HF text-generation responses are typically [{"generated_text": "..."}]
-        content = raw[0]["generated_text"] if isinstance(raw, list) else raw.get("generated_text", "")
+        content = raw["choices"][0]["message"]["content"].strip()
         data = _parse_fields_json(content)
         return PromptFields(
             category=data["category"], vessel_type=data["vessel_type"],
             visual_description=data["visual_description"], color_focal_point=data["color_focal_point"],
-            source="hf_api", model_name=HF_MODEL, raw_response=raw if isinstance(raw, dict) else {"raw": raw},
+            source="hf_api", model_name=HF_MODEL, raw_response=raw,
         )
 
 
