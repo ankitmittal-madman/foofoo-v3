@@ -1,0 +1,12 @@
+{
+  "trace_id": "8ecb9205-f4c9-4cc0-a858-b30119bdb125",
+  "existing_result": {"items": [{"id": "legacy-1", "name": "Existing recommendation"}]},
+  "auxiliary_result": {"items": [], "quality_score": 0.0, "confidence": 0.0, "diversity_score": 0.0, "safety_score": 0.0, "alignment_score": 0.0},
+  "selected_result": {"items": [{"id": "legacy-1", "name": "Existing recommendation"}]},
+  "decision": "existing",
+  "decision_reason": "shadow_mode_no_override",
+  "scores": {"existing_quality": 0.5, "auxiliary_quality": 0.0, "improvement_delta": -0.5},
+  "constraint_checks": {"passed": true, "reasons": []},
+  "model_metadata": {"mode": "shadow", "models": []},
+  "debug_trace": null
+}

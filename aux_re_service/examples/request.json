@@ -1,0 +1,34 @@
+{
+  "user_id": "user-123",
+  "household_id": "household-456",
+  "meal_slot": "dinner",
+  "locale": "en-IN",
+  "region": "Maharashtra",
+  "preferences": ["Maharashtrian", "dal"],
+  "restrictions": ["vegetarian"],
+  "allergies": ["peanut"],
+  "pantry_items": ["rice", "lentils", "turmeric"],
+  "recent_meals": ["Paneer Tikka"],
+  "candidate_limit": 2,
+  "debug": true,
+  "existing_result": {
+    "items": [{"id": "legacy-1", "name": "Existing recommendation"}],
+    "metrics": {"quality_score": 0.5, "confidence": 0.7, "diversity_score": 0.4, "safety_score": 1.0, "alignment_score": 0.4}
+  },
+  "candidates": [
+    {
+      "id": "varan-bhaat",
+      "name": "Varan Bhaat",
+      "ingredients": ["rice", "lentils", "turmeric"],
+      "diet_types": ["vegetarian", "vegan"],
+      "cuisines": ["Maharashtrian"],
+      "regions": ["Maharashtra"],
+      "meal_slots": ["dinner"],
+      "pantry_match": 1.0,
+      "nutrition_fit": 0.9,
+      "freshness": 0.9,
+      "collaborative_score": 0.8,
+      "popularity": 0.2
+    }
+  ]
+}
