@@ -18,7 +18,6 @@ jobs:
     timeout-minutes: 30
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
-      OUTPUT_DIR: ${{ runner.temp }}/preference-model
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -35,6 +34,8 @@ jobs:
           pip install -e ".[training]"
           pip install psycopg2-binary
       - name: Check readiness and train only when the database gate passes
+        env:
+          OUTPUT_DIR: ${{ runner.temp }}/preference-model
         run: |
           mkdir -p "$OUTPUT_DIR"
           python -m ops.recommendation.preference_training \
