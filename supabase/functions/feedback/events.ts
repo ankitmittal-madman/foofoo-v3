@@ -91,6 +91,18 @@ async function syncTypedIntelligence(
   eventId: string,
   occurredAt: string,
 ): Promise<void> {
+  // Recompute every taste projection from canonical feedback history. This is deliberately an
+  // idempotent RPC rather than a client-side read/modify/write delta: retries repair stale state,
+  // concurrent member feedback cannot lose an update, and exact-dish evidence generalizes into
+  // meal-class and genome dimensions for related-dish discovery.
+  const { error: tasteStateError } = await withTimeout(
+    db.rpc("refresh_user_taste_vector", { p_profile_id: ev.actorProfileId }),
+    "feedback.events.refresh_user_taste_vector",
+  );
+  if (tasteStateError) {
+    throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: tasteStateError.message });
+  }
+
   const outcomeType = OUTCOME_BY_FEEDBACK[ev.eventType];
   if (outcomeType) {
     let episodeHash = typeof ev.detail?.episode_hash === "string" ? ev.detail.episode_hash : null;
@@ -382,39 +394,6 @@ export async function recordFeedbackEvent(
         "feedback.events.not_today",
       );
       if (stateError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: stateError.message });
-    }
-
-    const delta = ["like", "accept", "make_this", "cooked", "completed"].includes(ev.eventType)
-      ? 0.2
-      : ev.eventType === "dislike" || ev.eventType === "never"
-      ? -0.3
-      : 0;
-    if (delta !== 0) {
-      const { data: taste, error: tasteReadError } = await withTimeout(
-        db.from("user_taste_vectors").select("dish_affinity").eq("profile_id", ev.actorProfileId)
-          .maybeSingle(),
-        "feedback.events.taste_read",
-      );
-      if (tasteReadError) {
-        throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: tasteReadError.message });
-      }
-      const affinities = { ...((taste?.dish_affinity ?? {}) as Record<string, number>) };
-      const affinityName = canonicalDishName ?? ev.dishName;
-      affinities[affinityName] = Math.max(
-        -1,
-        Math.min(1, (affinities[affinityName] ?? 0) + delta),
-      );
-      const { error: tasteWriteError } = await withTimeout(
-        db.from("user_taste_vectors").upsert({
-          profile_id: ev.actorProfileId,
-          dish_affinity: affinities,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: "profile_id" }),
-        "feedback.events.taste_write",
-      );
-      if (tasteWriteError) {
-        throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: tasteWriteError.message });
-      }
     }
   }
 
