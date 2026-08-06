@@ -19,6 +19,7 @@ from ghar_re_core.training.dataset import (
     check_training_readiness,
     guard_sufficient_data,
 )
+from ghar_re_core.training.evaluate import assess_promotion_readiness
 from ghar_re_core.training.train_pref_model import train
 
 CAT = Catalogue()
@@ -184,6 +185,8 @@ def test_train_end_to_end_on_fixture_dataset_produces_loadable_artifact(tmp_path
     assert "model" in artifact and "vectorizer" in artifact
     assert artifact["metadata"]["artifact_schema_version"] == "preference-artifact-v1"
     assert artifact["metadata"]["model_version"].startswith("sha256:")
+    assert artifact["metadata"]["promotion_gate_passed"] is False
+    assert report["promotion_gate"]["checks"]["production_readiness_not_bypassed"] is False
     # The loaded model can score a fresh feature dict without raising.
     x = artifact["vectorizer"].transform([rows and _fixture_features()])
     proba = artifact["model"].predict_proba(x)
@@ -215,6 +218,59 @@ def test_training_holdout_is_household_isolated_when_provenance_exists(tmp_path)
     assert report["train_households"] > 0
     assert report["holdout_households"] > 0
     assert report["household_overlap"] == 0
+
+
+def test_promotion_gate_requires_volume_discrimination_recall_and_calibration():
+    report = {
+        "holdout_n": 2000,
+        "holdout_auc": 0.72,
+        "holdout_positive_recall": 0.75,
+        "holdout_negative_recall": 0.45,
+        "holdout_brier": 0.12,
+        "baseline_brier": 0.18,
+        "holdout_log_loss": 0.42,
+        "baseline_log_loss": 0.55,
+    }
+    gate = assess_promotion_readiness(
+        report,
+        min_holdout_events=1000,
+        min_auc=0.60,
+        min_class_recall=0.20,
+    )
+    assert gate["passed"] is True
+    assert all(gate["checks"].values())
+
+    weak_negative_recall = dict(report, holdout_negative_recall=0.0)
+    rejected = assess_promotion_readiness(
+        weak_negative_recall,
+        min_holdout_events=1000,
+        min_auc=0.60,
+        min_class_recall=0.20,
+    )
+    assert rejected["passed"] is False
+    assert rejected["checks"]["negative_recall"] is False
+
+
+def test_promotion_gate_rejects_model_that_does_not_beat_prevalence_baseline():
+    report = {
+        "holdout_n": 2000,
+        "holdout_auc": 0.70,
+        "holdout_positive_recall": 0.70,
+        "holdout_negative_recall": 0.40,
+        "holdout_brier": 0.20,
+        "baseline_brier": 0.18,
+        "holdout_log_loss": 0.60,
+        "baseline_log_loss": 0.55,
+    }
+    gate = assess_promotion_readiness(
+        report,
+        min_holdout_events=1000,
+        min_auc=0.60,
+        min_class_recall=0.20,
+    )
+    assert gate["passed"] is False
+    assert gate["checks"]["brier_beats_prevalence"] is False
+    assert gate["checks"]["log_loss_beats_prevalence"] is False
 
 
 def test_train_default_path_blocks_the_same_fixture_on_density_not_just_structure(tmp_path):

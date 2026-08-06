@@ -263,6 +263,25 @@ class Config:
         (a never-satisfiable sentinel) as pref_training_min_events if missing."""
         return (self.pref or {}).get("training_readiness", {}).get("min_households", 10**9)
 
+    @property
+    def pref_evaluation_min_holdout_events(self):
+        """Minimum household-isolated evaluation rows. Missing governance blocks promotion."""
+        return (self.pref or {}).get("evaluation_readiness", {}).get(
+            "min_holdout_events", 10**9
+        )
+
+    @property
+    def pref_evaluation_min_auc(self):
+        """Minimum holdout ROC AUC. A missing threshold is deliberately impossible to pass."""
+        return (self.pref or {}).get("evaluation_readiness", {}).get("min_auc", 1.1)
+
+    @property
+    def pref_evaluation_min_class_recall(self):
+        """Minimum recall required independently for positive and negative feedback."""
+        return (self.pref or {}).get("evaluation_readiness", {}).get(
+            "min_class_recall", 1.1
+        )
+
     # --- community priors (community_priors.csv <- KB §C1) ---
     # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a
     # file themselves (RE-DOC-11 §1/§2). Keyed by state -> {state, zone, diet_lean, cadence}.

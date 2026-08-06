@@ -35,7 +35,7 @@ from ghar_re_core.training.dataset import (
     guard_sufficient_data,
     iter_export_rows,
 )
-from ghar_re_core.training.evaluate import evaluate
+from ghar_re_core.training.evaluate import assess_promotion_readiness, evaluate
 from ghar_re_core.model_provider import PREFERENCE_ARTIFACT_SCHEMA_VERSION
 
 
@@ -146,6 +146,19 @@ def train(
     report["train_households"] = len(train_households)
     report["holdout_households"] = len(holdout_households)
     report["household_overlap"] = len(train_households & holdout_households)
+    promotion_gate = assess_promotion_readiness(
+        report,
+        min_holdout_events=CONFIG.pref_evaluation_min_holdout_events,
+        min_auc=CONFIG.pref_evaluation_min_auc,
+        min_class_recall=CONFIG.pref_evaluation_min_class_recall,
+    )
+    # A forced fixture/dev fit is useful for pipeline testing but can never be promotable.
+    if skip_readiness_gate:
+        promotion_gate["passed"] = False
+        promotion_gate["checks"]["production_readiness_not_bypassed"] = False
+    else:
+        promotion_gate["checks"]["production_readiness_not_bypassed"] = True
+    report["promotion_gate"] = promotion_gate
 
     fingerprint_payload = {
         "features": vectorizer.get_feature_names_out().tolist(),
@@ -172,6 +185,8 @@ def train(
         "readiness_gate_bypassed": skip_readiness_gate,
         "split_strategy": split_strategy,
         "household_overlap": len(train_households & holdout_households),
+        "promotion_gate_passed": promotion_gate["passed"],
+        "promotion_gate": promotion_gate,
         "libraries": {
             "scikit_learn": sklearn.__version__,
             "joblib": joblib.__version__,

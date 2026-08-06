@@ -46,6 +46,8 @@ def validate_preference_artifact_for_activation(artifact: object) -> str:
         raise RuntimeError("Preference artifact was not evaluated on household-isolated holdout")
     if metadata.get("household_overlap") != 0:
         raise RuntimeError("Preference artifact evaluation leaks households across the split")
+    if metadata.get("promotion_gate_passed") is not True:
+        raise RuntimeError("Preference artifact did not pass governed promotion quality gates")
     return model_version
 
 

@@ -1,6 +1,6 @@
 {
   "bundle_format": 1,
-  "bundle_version": "sha256:a5ee87d05d91a8ec",
+  "bundle_version": "sha256:60d953601db7ca07",
   "catalogue_sha256": "deeac443356f37abd6076b24c22d90d00779b6f3cffc2d9964cf23773307d082",
   "catalogue_source": "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue (real 810-dish catalogue)",
   "config_sha256": {
@@ -25,11 +25,11 @@
     "filters.yaml": "c7a26cce47205f372e1839c857830d5cbe595e5b40543fe9dec216100e1cf044",
     "ingredients_v5.csv": "88811950ec1c86afee5d154032b79bba0338702f6bea4bdc2a6ba5d60491da2d",
     "pairing_rules.yaml": "f8dcd0defff6ef475623b22c06d6cd96fda15574a9dc4510c50baf519d2eb459",
-    "pref_model.yaml": "39a06b190488e74a9f3401e68b8d6c94b5b99aba636dea36779af488633c3217",
+    "pref_model.yaml": "d22aa4e8bf4afcfe5459903f6fc395ed54cc67bf9a92353e3cacd2ccd35fe5dc",
     "q15_weights.yaml": "59aaccfff883b68a2b5a74a9947adf58de8a53d17f96b8e12ed1b7af791a0486",
     "recipes_v1.json": "ea07df98ab0fcaa6bdd682e94953ec36a43a93cbee2d5ad05e496c2f8f4666d1",
     "weather_rules.yaml": "d69c4eac4967aa455d15d0b418d856841c67f8a91380740f9f2a7c40215911ad"
   },
-  "created_at": "2026-08-06T09:32:15.560102+00:00",
+  "created_at": "2026-08-06T09:59:40.979084+00:00",
   "dish_count": 810
 }
