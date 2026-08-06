@@ -450,6 +450,12 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           latencyMs,
           stubbed: stubbedHousehold,
           slot: typeof body.slot === "string" ? body.slot : undefined,
+          engineVersion: typeof body.engine_version === "string"
+            ? body.engine_version
+            : typeof body.model_version === "string"
+            ? body.model_version
+            : undefined,
+          configVersion: typeof body.config_version === "string" ? body.config_version : undefined,
         });
         await recordProductEvent(ctx, {
           profileId: claims.userId,
