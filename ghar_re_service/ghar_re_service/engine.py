@@ -16,11 +16,10 @@ import uuid
 from typing import Any
 
 from ghar_re_core import calibration as calib
-from ghar_re_core import meal_episode
+from ghar_re_core import meal_episode, taste
 from ghar_re_core import meal_planner as planner
 from ghar_re_core import pipeline as core_pipeline
 from ghar_re_core import scoring as S
-from ghar_re_core import taste
 from ghar_re_service import media
 from ghar_re_service.modules import compose_base
 from ghar_re_service.version import API_VERSION, ENGINE_VERSION
