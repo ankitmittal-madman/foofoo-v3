@@ -1,0 +1,54 @@
+name: recommendation-user-audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile_id:
+        description: Profile UUID to audit (report excludes the UUID and raw feedback text)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: recommendation-user-audit-${{ inputs.profile_id }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Require the read-only audit database connection
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Configure DATABASE_URL, SUPABASE_DB_URL, or FOOFOO_SUPABASE_URI." >&2
+            exit 1
+          fi
+      - name: Install audit runtime
+        run: |
+          pip install -e .
+          pip install psycopg2-binary
+      - name: Generate privacy-minimized recommendation audit
+        env:
+          AUDIT_OUTPUT: ${{ runner.temp }}/recommendation-user-audit.json
+          PROFILE_ID: ${{ inputs.profile_id }}
+        run: |
+          python -m ops.recommendation.user_audit \
+            --profile-id "$PROFILE_ID" \
+            --output "$AUDIT_OUTPUT"
+          cat "$AUDIT_OUTPUT" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload aggregate audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-user-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/recommendation-user-audit.json
+          if-no-files-found: error
+          retention-days: 7
