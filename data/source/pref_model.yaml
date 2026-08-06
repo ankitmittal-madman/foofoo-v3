@@ -34,3 +34,12 @@ w_pref: 0.0
 training_readiness:
   min_real_events: 10000    # fleet-wide real (accept/like/dislike) labeled rows
   min_households: 500       # distinct households contributing at least one such row
+
+# A candidate is never activation-eligible merely because it trained. Evaluation uses a
+# household-isolated holdout and must beat a prevalence-only predictor on both Brier score and
+# log loss in addition to the explicit gates below. These are intentionally conservative starting
+# gates; production shadow metrics should drive later revisions through reviewed config changes.
+evaluation_readiness:
+  min_holdout_events: 1000
+  min_auc: 0.60
+  min_class_recall: 0.20

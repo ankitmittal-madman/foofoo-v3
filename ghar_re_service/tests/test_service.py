@@ -150,6 +150,7 @@ def test_preference_artifact_activation_requires_unbypassed_household_holdout():
             "readiness_gate_bypassed": False,
             "split_strategy": "household_group_holdout",
             "household_overlap": 0,
+            "promotion_gate_passed": True,
         }
     )
     assert lifecycle.validate_preference_artifact_for_activation(valid) == (
@@ -163,6 +164,10 @@ def test_preference_artifact_activation_requires_unbypassed_household_holdout():
     leaky = SimpleNamespace(metadata={**valid.metadata, "household_overlap": 1})
     with pytest.raises(RuntimeError, match="leaks households"):
         lifecycle.validate_preference_artifact_for_activation(leaky)
+
+    weak = SimpleNamespace(metadata={**valid.metadata, "promotion_gate_passed": False})
+    with pytest.raises(RuntimeError, match="promotion quality gates"):
+        lifecycle.validate_preference_artifact_for_activation(weak)
 
 
 def test_recommendations_end_to_end(client):
