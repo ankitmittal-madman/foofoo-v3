@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from food_ontology_service.worker import FieldFreshness, OntologyWorker, enrichment_priority
@@ -36,25 +36,36 @@ def test_worker_completes_reviews_retries_and_dead_letters():
     def fail(_job):
         raise TimeoutError("provider timeout")
 
-    worker = OntologyWorker(queue, "worker-1", {
-        "enrich": lambda _job: "complete",
-        "classify": lambda _job: "review",
-        "image": fail,
-        "publish": fail,
-    })
+    worker = OntologyWorker(
+        queue,
+        "worker-1",
+        {
+            "enrich": lambda _job: "complete",
+            "classify": lambda _job: "review",
+            "image": fail,
+            "publish": fail,
+        },
+    )
     report = worker.run_once()
     assert report.claimed == 5
-    assert (report.completed, report.review, report.retried, report.dead, report.unsupported) == (1, 1, 1, 2, 1)
+    assert (report.completed, report.review, report.retried, report.dead, report.unsupported) == (
+        1,
+        1,
+        1,
+        2,
+        1,
+    )
     assert queue.reconciled == 1
     assert [item[2] for item in queue.finished] == ["complete", "review", "retry", "dead", "dead"]
 
 
 def test_incremental_priority_skips_stable_fields_and_prioritizes_missing_safety():
-    now = datetime(2026, 8, 6, tzinfo=timezone.utc)
-    stable = FieldFreshness("description", 0.95, now-timedelta(days=20), accepted=True)
-    missing_safety = FieldFreshness("allergens", None, None, accepted=False,
-                                    required_for_page=True, safety_critical=True)
-    stale = FieldFreshness("nutrition", 0.9, now-timedelta(days=200), accepted=True)
+    now = datetime(2026, 8, 6, tzinfo=UTC)
+    stable = FieldFreshness("description", 0.95, now - timedelta(days=20), accepted=True)
+    missing_safety = FieldFreshness(
+        "allergens", None, None, accepted=False, required_for_page=True, safety_critical=True
+    )
+    stale = FieldFreshness("nutrition", 0.9, now - timedelta(days=200), accepted=True)
     assert enrichment_priority(stable, now) is None
     assert enrichment_priority(missing_safety, now) == 100
     assert enrichment_priority(stale, now) == 35

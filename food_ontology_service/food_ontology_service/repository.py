@@ -4,13 +4,21 @@ import hashlib
 import json
 import threading
 import unicodedata
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass
-from datetime import timedelta
-from typing import Any, Callable, Protocol
+from typing import Any, Protocol
 from uuid import UUID, uuid4
 
-from .models import DishCreate, DishPatch, DishRecord, FeedbackInput, ImageRef, SimilarityInput, utcnow
+from .models import (
+    DishCreate,
+    DishPatch,
+    DishRecord,
+    FeedbackInput,
+    ImageRef,
+    SimilarityInput,
+    utcnow,
+)
 
 
 class ConflictError(ValueError):
@@ -34,7 +42,11 @@ class IdempotentResult:
 
 class Repository(Protocol):
     def idempotent(
-        self, principal: str, operation: str, key: str, body: Any,
+        self,
+        principal: str,
+        operation: str,
+        key: str,
+        body: Any,
         action: Callable[[], tuple[int, dict[str, Any]]],
     ) -> IdempotentResult: ...
 
@@ -44,12 +56,16 @@ class Repository(Protocol):
     def get_by_name(self, name: str) -> DishRecord: ...
     def list_classes(self) -> list[dict[str, Any]]: ...
     def dishes_by_class(self, class_code: str, role: str, limit: int) -> list[DishRecord]: ...
-    def enqueue(self, dish_id: UUID, kind: str, fields: list[str], priority: int, force: bool) -> dict[str, Any]: ...
+    def enqueue(
+        self, dish_id: UUID, kind: str, fields: list[str], priority: int, force: bool
+    ) -> dict[str, Any]: ...
     def job_status(self, job_id: UUID) -> dict[str, Any]: ...
     def enrichment_status(self, dish_id: UUID) -> dict[str, Any]: ...
     def save_relationship(self, dish_id: UUID, relation: SimilarityInput) -> DishRecord: ...
     def add_image(self, dish_id: UUID, image: ImageRef) -> DishRecord: ...
-    def submit_feedback(self, dish_id: UUID, feedback: FeedbackInput, principal: str) -> dict[str, Any]: ...
+    def submit_feedback(
+        self, dish_id: UUID, feedback: FeedbackInput, principal: str
+    ) -> dict[str, Any]: ...
 
 
 class MemoryRepository:
@@ -63,7 +79,9 @@ class MemoryRepository:
         self.feedback: list[dict[str, Any]] = []
         self.idempotency: dict[tuple[str, str, str], tuple[str, int, dict[str, Any]]] = {}
 
-    def idempotent(self, principal: str, operation: str, key: str, body: Any, action) -> IdempotentResult:
+    def idempotent(
+        self, principal: str, operation: str, key: str, body: Any, action
+    ) -> IdempotentResult:
         def request_shape(value: Any) -> Any:
             if isinstance(value, dict):
                 return {k: request_shape(v) for k, v in value.items() if k != "last_verified_at"}
@@ -92,10 +110,16 @@ class MemoryRepository:
                 raise ConflictError("canonical_name_exists")
             now = utcnow()
             dish = DishRecord(
-                id=uuid4(), canonical_name=data.canonical_name, normalized_name=normalized,
-                locale=data.locale, description=data.description, aliases=data.aliases,
-                class_memberships=data.class_memberships, fields=data.fields,
-                created_at=now, updated_at=now,
+                id=uuid4(),
+                canonical_name=data.canonical_name,
+                normalized_name=normalized,
+                locale=data.locale,
+                description=data.description,
+                aliases=data.aliases,
+                class_memberships=data.class_memberships,
+                fields=data.fields,
+                created_at=now,
+                updated_at=now,
             )
             self.dishes[dish.id] = dish
             self.name_index[normalized] = dish.id
@@ -130,7 +154,9 @@ class MemoryRepository:
         dish_id = self.name_index.get(normalize_name(name))
         if not dish_id:
             for dish in self.dishes.values():
-                if any(normalize_name(alias.name) == normalize_name(name) for alias in dish.aliases):
+                if any(
+                    normalize_name(alias.name) == normalize_name(name) for alias in dish.aliases
+                ):
                     dish_id = dish.id
                     break
         if not dish_id:
@@ -142,31 +168,50 @@ class MemoryRepository:
         for dish in self.dishes.values():
             for item in dish.class_memberships:
                 rows[(item.class_code, item.slot, item.role)] = {
-                    "class_code": item.class_code, "slot": item.slot, "planning_role": item.role
+                    "class_code": item.class_code,
+                    "slot": item.slot,
+                    "planning_role": item.role,
                 }
         return sorted(rows.values(), key=lambda row: (row["slot"], row["class_code"]))
 
     def dishes_by_class(self, class_code: str, role: str, limit: int) -> list[DishRecord]:
         found = []
         for dish in self.dishes.values():
-            if any(m.class_code == class_code and m.role == role and m.review_status != "rejected"
-                   for m in dish.class_memberships):
+            if any(
+                m.class_code == class_code and m.role == role and m.review_status != "rejected"
+                for m in dish.class_memberships
+            ):
                 found.append(dish)
         found.sort(key=lambda dish: dish.canonical_name)
         return deepcopy(found[:limit])
 
-    def enqueue(self, dish_id: UUID, kind: str, fields: list[str], priority: int, force: bool) -> dict[str, Any]:
+    def enqueue(
+        self, dish_id: UUID, kind: str, fields: list[str], priority: int, force: bool
+    ) -> dict[str, Any]:
         self.get_dish(dish_id)
         with self._lock:
             if not force:
                 for job in self.jobs.values():
-                    if job["dish_id"] == dish_id and job["kind"] == kind and job["status"] in {"queued", "running"}:
+                    if (
+                        job["dish_id"] == dish_id
+                        and job["kind"] == kind
+                        and job["status"] in {"queued", "running"}
+                    ):
                         return deepcopy(job)
             job_id = uuid4()
             now = utcnow()
-            job = {"id": job_id, "dish_id": dish_id, "kind": kind, "fields": fields,
-                   "priority": priority, "status": "queued", "attempts": 0,
-                   "next_attempt_at": now, "lease_expires_at": None, "created_at": now}
+            job = {
+                "id": job_id,
+                "dish_id": dish_id,
+                "kind": kind,
+                "fields": fields,
+                "priority": priority,
+                "status": "queued",
+                "attempts": 0,
+                "next_attempt_at": now,
+                "lease_expires_at": None,
+                "created_at": now,
+            }
             self.jobs[job_id] = job
             return deepcopy(job)
 
@@ -178,7 +223,11 @@ class MemoryRepository:
     def enrichment_status(self, dish_id: UUID) -> dict[str, Any]:
         dish = self.get_dish(dish_id)
         jobs = [deepcopy(j) for j in self.jobs.values() if j["dish_id"] == dish_id]
-        missing = [k for k in ("cuisine", "diet_type", "cooking_method", "texture", "region") if k not in dish.fields]
+        missing = [
+            k
+            for k in ("cuisine", "diet_type", "cooking_method", "texture", "region")
+            if k not in dish.fields
+        ]
         return {"dish_id": dish_id, "missing_fields": missing, "jobs": jobs}
 
     def add_relationship(self, dish_id: UUID, relation: SimilarityInput) -> DishRecord:
@@ -186,11 +235,18 @@ class MemoryRepository:
         dish = self.get_dish(dish_id)
         if dish_id == relation.target_dish_id:
             raise ConflictError("self_relationship_not_allowed")
-        relationships = [r for r in dish.relationships if not (
-            r.target_dish_id == relation.target_dish_id and r.relationship == relation.relationship
-        )]
+        relationships = [
+            r
+            for r in dish.relationships
+            if not (
+                r.target_dish_id == relation.target_dish_id
+                and r.relationship == relation.relationship
+            )
+        ]
         relationships.append(relation)
-        return self.update_dish(dish_id, DishPatch()).model_copy(update={"relationships": relationships})
+        return self.update_dish(dish_id, DishPatch()).model_copy(
+            update={"relationships": relationships}
+        )
 
     def save_relationship(self, dish_id: UUID, relation: SimilarityInput) -> DishRecord:
         dish = self.add_relationship(dish_id, relation)
@@ -200,17 +256,28 @@ class MemoryRepository:
 
     def add_image(self, dish_id: UUID, image: ImageRef) -> DishRecord:
         dish = self.get_dish(dish_id)
-        images = [item.model_copy(update={"is_primary": False}) if image.is_primary else item
-                  for item in dish.images if item.cloudinary_public_id != image.cloudinary_public_id]
+        images = [
+            item.model_copy(update={"is_primary": False}) if image.is_primary else item
+            for item in dish.images
+            if item.cloudinary_public_id != image.cloudinary_public_id
+        ]
         images.append(image)
         updated = dish.model_copy(update={"images": images, "updated_at": utcnow()})
         with self._lock:
             self.dishes[dish_id] = updated
         return deepcopy(updated)
 
-    def submit_feedback(self, dish_id: UUID, feedback: FeedbackInput, principal: str) -> dict[str, Any]:
+    def submit_feedback(
+        self, dish_id: UUID, feedback: FeedbackInput, principal: str
+    ) -> dict[str, Any]:
         self.get_dish(dish_id)
-        item = {"id": uuid4(), "dish_id": dish_id, "principal": principal,
-                **feedback.model_dump(), "status": "pending", "created_at": utcnow()}
+        item = {
+            "id": uuid4(),
+            "dish_id": dish_id,
+            "principal": principal,
+            **feedback.model_dump(),
+            "status": "pending",
+            "created_at": utcnow(),
+        }
         self.feedback.append(item)
         return deepcopy(item)

@@ -21,7 +21,7 @@ class Settings:
     max_page_size: int = 100
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         environment = os.getenv("ONTOLOGY_ENV", "development").lower()
         raw = os.getenv("ONTOLOGY_SERVICE_TOKENS")
         principals: list[Principal] = []

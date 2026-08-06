@@ -10,7 +10,14 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
 from . import __version__
-from .models import DishCreate, DishPatch, EnrichmentRequest, FeedbackInput, ImageRef, SimilarityInput
+from .models import (
+    DishCreate,
+    DishPatch,
+    EnrichmentRequest,
+    FeedbackInput,
+    ImageRef,
+    SimilarityInput,
+)
 from .repository import ConflictError, MemoryRepository, NotFoundError, Repository
 from .settings import Principal, Settings
 
@@ -49,12 +56,17 @@ def create_app(settings: Settings | None = None, repository: Repository | None =
             if scope not in principal.scopes:
                 raise HTTPException(status_code=403, detail="forbidden")
             return principal
+
         return dependency
 
-    def response(payload: Any, *, status_code: int = 200, replayed: bool = False, cache: bool = False):
+    def response(
+        payload: Any, *, status_code: int = 200, replayed: bool = False, cache: bool = False
+    ):
         encoded = json.dumps(payload, sort_keys=True, default=str, separators=(",", ":")).encode()
         headers = {"ETag": f'"{hashlib.sha256(encoded).hexdigest()}"'}
-        headers["Cache-Control"] = f"private, max-age={cfg.default_cache_seconds}" if cache else "no-store"
+        headers["Cache-Control"] = (
+            f"private, max-age={cfg.default_cache_seconds}" if cache else "no-store"
+        )
         if replayed:
             headers["Idempotency-Replayed"] = "true"
         return JSONResponse(status_code=status_code, content=json.loads(encoded), headers=headers)
@@ -75,20 +87,30 @@ def create_app(settings: Settings | None = None, repository: Repository | None =
             try:
                 ping()
             except Exception:
-                return JSONResponse(status_code=503, content={"status": "unready", "database": "unavailable"})
+                return JSONResponse(
+                    status_code=503, content={"status": "unready", "database": "unavailable"}
+                )
         return {"status": "ready", "database": "postgres" if cfg.database_url else "memory"}
 
     @app.post("/v1/dishes")
-    def create_dish(data: DishCreate, principal: Principal = Depends(require("ontology:write")),
-                    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None):
-        result = repo.idempotent(principal.name, "create_dish", require_key(idempotency_key),
-                                 data.model_dump(mode="json"),
-                                 lambda: (201, repo.create_dish(data).model_dump(mode="json")))
+    def create_dish(
+        data: DishCreate,
+        principal: Principal = Depends(require("ontology:write")),
+        idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+    ):
+        result = repo.idempotent(
+            principal.name,
+            "create_dish",
+            require_key(idempotency_key),
+            data.model_dump(mode="json"),
+            lambda: (201, repo.create_dish(data).model_dump(mode="json")),
+        )
         return response(result.payload, status_code=result.status_code, replayed=result.replayed)
 
     @app.patch("/v1/dishes/{dish_id}")
-    def update_dish(dish_id: UUID, data: DishPatch,
-                    _principal: Principal = Depends(require("ontology:write"))):
+    def update_dish(
+        dish_id: UUID, data: DishPatch, _principal: Principal = Depends(require("ontology:write"))
+    ):
         return response(repo.update_dish(dish_id, data).model_dump(mode="json"))
 
     @app.get("/v1/dishes/{dish_id}")
@@ -104,36 +126,54 @@ def create_app(settings: Settings | None = None, repository: Repository | None =
         return response({"items": repo.list_classes()}, cache=True)
 
     @app.get("/v1/meal-classes/{class_code}/dishes")
-    def class_dishes(class_code: str,
-                     _principal: Principal = Depends(require("ontology:read")),
-                     role: str = Query(default="primary", pattern="^(primary|addon|combo_component)$"),
-                     limit: int = Query(default=25, ge=1, le=100)):
-        items = [item.model_dump(mode="json") for item in repo.dishes_by_class(class_code, role, limit)]
+    def class_dishes(
+        class_code: str,
+        _principal: Principal = Depends(require("ontology:read")),
+        role: str = Query(default="primary", pattern="^(primary|addon|combo_component)$"),
+        limit: int = Query(default=25, ge=1, le=100),
+    ):
+        items = [
+            item.model_dump(mode="json") for item in repo.dishes_by_class(class_code, role, limit)
+        ]
         return response({"class_code": class_code, "role": role, "items": items}, cache=True)
 
     @app.post("/v1/dishes/{dish_id}/enrichment-jobs")
-    def enrich(dish_id: UUID, data: EnrichmentRequest,
-               principal: Principal = Depends(require("ontology:write")),
-               idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None):
-        result = repo.idempotent(principal.name, f"enrich:{dish_id}", require_key(idempotency_key),
-                                 data.model_dump(mode="json"),
-                                 lambda: (202, repo.enqueue(dish_id, "enrich", data.fields,
-                                                            data.priority, data.force)))
+    def enrich(
+        dish_id: UUID,
+        data: EnrichmentRequest,
+        principal: Principal = Depends(require("ontology:write")),
+        idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+    ):
+        result = repo.idempotent(
+            principal.name,
+            f"enrich:{dish_id}",
+            require_key(idempotency_key),
+            data.model_dump(mode="json"),
+            lambda: (202, repo.enqueue(dish_id, "enrich", data.fields, data.priority, data.force)),
+        )
         return response(result.payload, status_code=result.status_code, replayed=result.replayed)
 
     @app.post("/v1/dishes/{dish_id}/classification-jobs")
-    def classify(dish_id: UUID, data: EnrichmentRequest,
-                 principal: Principal = Depends(require("ontology:write")),
-                 idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None):
-        result = repo.idempotent(principal.name, f"classify:{dish_id}", require_key(idempotency_key),
-                                 data.model_dump(mode="json"),
-                                 lambda: (202, repo.enqueue(dish_id, "classify", data.fields,
-                                                            data.priority, data.force)))
+    def classify(
+        dish_id: UUID,
+        data: EnrichmentRequest,
+        principal: Principal = Depends(require("ontology:write")),
+        idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+    ):
+        result = repo.idempotent(
+            principal.name,
+            f"classify:{dish_id}",
+            require_key(idempotency_key),
+            data.model_dump(mode="json"),
+            lambda: (
+                202,
+                repo.enqueue(dish_id, "classify", data.fields, data.priority, data.force),
+            ),
+        )
         return response(result.payload, status_code=result.status_code, replayed=result.replayed)
 
     @app.get("/v1/dishes/{dish_id}/enrichment-status")
-    def enrichment_status(dish_id: UUID,
-                          _principal: Principal = Depends(require("ontology:read"))):
+    def enrichment_status(dish_id: UUID, _principal: Principal = Depends(require("ontology:read"))):
         return response(repo.enrichment_status(dish_id))
 
     @app.get("/v1/jobs/{job_id}")
@@ -141,36 +181,57 @@ def create_app(settings: Settings | None = None, repository: Repository | None =
         return response(repo.job_status(job_id))
 
     @app.post("/v1/dishes/{dish_id}/relationships")
-    def relationship(dish_id: UUID, data: SimilarityInput,
-                     _principal: Principal = Depends(require("ontology:admin"))):
-        return response(repo.save_relationship(dish_id, data).model_dump(mode="json"), status_code=201)
+    def relationship(
+        dish_id: UUID,
+        data: SimilarityInput,
+        _principal: Principal = Depends(require("ontology:admin")),
+    ):
+        return response(
+            repo.save_relationship(dish_id, data).model_dump(mode="json"), status_code=201
+        )
 
     @app.get("/v1/dishes/{dish_id}/similar")
     def similar(dish_id: UUID, _principal: Principal = Depends(require("ontology:read"))):
         dish = repo.get_dish(dish_id)
-        return response({"dish_id": dish_id, "items": [x.model_dump(mode="json") for x in dish.relationships]}, cache=True)
+        return response(
+            {"dish_id": dish_id, "items": [x.model_dump(mode="json") for x in dish.relationships]},
+            cache=True,
+        )
 
     @app.post("/v1/dishes/{dish_id}/feedback")
-    def feedback(dish_id: UUID, data: FeedbackInput,
-                 principal: Principal = Depends(require("ontology:write"))):
+    def feedback(
+        dish_id: UUID,
+        data: FeedbackInput,
+        principal: Principal = Depends(require("ontology:write")),
+    ):
         return response(repo.submit_feedback(dish_id, data, principal.name), status_code=202)
 
     @app.post("/v1/dishes/{dish_id}/images")
-    def image(dish_id: UUID, data: ImageRef,
-              _principal: Principal = Depends(require("ontology:admin"))):
+    def image(
+        dish_id: UUID, data: ImageRef, _principal: Principal = Depends(require("ontology:admin"))
+    ):
         return response(repo.add_image(dish_id, data).model_dump(mode="json"), status_code=201)
 
     @app.get("/v1/dishes/{dish_id}/images")
     def images(dish_id: UUID, _principal: Principal = Depends(require("ontology:read"))):
-        items = [item.model_dump(mode="json") for item in repo.get_dish(dish_id).images
-                 if item.review_status == "accepted"]
+        items = [
+            item.model_dump(mode="json")
+            for item in repo.get_dish(dish_id).images
+            if item.review_status == "accepted"
+        ]
         return response({"dish_id": dish_id, "items": items}, cache=True)
 
     @app.get("/v1/dishes/{dish_id}/provenance")
     def provenance(dish_id: UUID, _principal: Principal = Depends(require("ontology:read"))):
         dish = repo.get_dish(dish_id)
-        return response({"dish_id": dish_id, "description": dish.description,
-                         "fields": dish.fields, "class_memberships": dish.class_memberships})
+        return response(
+            {
+                "dish_id": dish_id,
+                "description": dish.description,
+                "fields": dish.fields,
+                "class_memberships": dish.class_memberships,
+            }
+        )
 
     return app
 
