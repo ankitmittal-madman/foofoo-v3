@@ -766,7 +766,15 @@ function deepDiveFeature(featureLabel){
     <div class="nav-item" onclick="showPage('s81')"><span class="nav-icon">🧬</span> S81 · Governed lineage + snapshot v2 <span class="nav-badge">05 Aug</span></div>
     <div class="nav-item" onclick="showPage('s82')"><span class="nav-icon">🏠</span> S82 · Household roles + invitations <span class="nav-badge">05 Aug</span></div>
     <div class="nav-item" onclick="showPage('s83')"><span class="nav-icon">🤝</span> S83 · Household collaboration live <span class="nav-badge">05 Aug</span></div>
-    <div class="nav-item active" onclick="showPage('s84')"><span class="nav-icon">🛠</span> S84 · Gap closure and truthful contracts <span class="nav-badge">05 Aug</span></div>
+    <div class="nav-item" onclick="showPage('s84')"><span class="nav-icon">🛠</span> S84 · Gap closure and truthful contracts <span class="nav-badge">05 Aug</span></div>
+    <div class="nav-item" onclick="showPage('s85')">
+      <span class="nav-icon">🗄</span> S85 · Dish ingestion pipeline
+      <span class="nav-badge">Aug 6</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('s86')">
+      <span class="nav-icon">🖼</span> S86 · Dish image generation stage
+      <span class="nav-badge">Aug 6</span>
+    </div>
     <!-- NAV_INJECT -->
   </div>
 
@@ -776,11 +784,11 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">54</span>
+      <span class="nav-badge">55</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">645</span>
+      <span class="nav-badge">653</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
@@ -2572,6 +2580,7 @@ function deepDiveFeature(featureLabel){
 <div class="timeline-row"><div class="tl-date">05 Aug 2026</div><div class="tl-spine"><div class="tl-dot" style="background:#5145b8"></div></div><div class="tl-content"><span class="tl-badge" style="background:#f0effe;color:#5145b8">S82</span><div class="tl-title">Activated governed shared-household authorization</div><div class="tl-chips"><span class="tl-chip" onclick="showPage('s82')">One active owner</span><span class="tl-chip" onclick="showPage('s82')">Hashed invites</span><span class="tl-chip" onclick="showPage('s82')">Role-aware planning</span></div><div class="tl-note">Migration 073 and three Edge deployments make active membership the authorization boundary while preserving the existing recommendation behavior for every current owner household.</div></div></div>
 <div class="timeline-row"><div class="tl-date">05 Aug 2026</div><div class="tl-spine"><div class="tl-dot" style="background:#0e7a5a"></div></div><div class="tl-content"><span class="tl-badge" style="background:#e8f8f2;color:#0e7a5a">S83</span><div class="tl-title">Released shared-household collaboration end to end</div><div class="tl-chips"><span class="tl-chip" onclick="showPage('s83')">Membership picker</span><span class="tl-chip" onclick="showPage('s83')">Role matrix</span><span class="tl-chip" onclick="showPage('s83')">Tenant-safe caches</span></div><div class="tl-note">The production mobile client can accept and administer household access, while feedback authorization and offline state preserve actor attribution and tenant isolation.</div></div></div>
 <div class="timeline-row"><div class="tl-date">05 Aug</div><div class="tl-spine"><div class="tl-dot" style="background:#9a3412"></div></div><div class="tl-content"><span class="tl-badge" style="background:#fff7ed;color:#9a3412">S84</span><div class="tl-title">Gap closure and truthful contracts</div><div class="tl-chips"><span class="tl-chip" onclick="showPage('s84')">Episode grammars</span><span class="tl-chip" onclick="showPage('s84')">Weekly repair</span><span class="tl-chip" onclick="showPage('s84')">Festival context</span><span class="tl-chip" onclick="showPage('s84')">Household fairness</span><span class="tl-chip" onclick="showPage('s84')">Safe offline UX</span></div><div class="tl-note">All locally actionable audit gaps are fixed and verified; deployment, paid-service, device, production-data and governance gates remain explicit.</div></div></div>
+<div class="timeline-row"><div class="tl-date">06 Aug 2026</div><div class="tl-spine"><div class="tl-dot" style="background:#9a3412"></div></div><div class="tl-content"><span class="tl-badge" style="background:#fff7ed;color:#9a3412">S86</span><div class="tl-title">Dish image generation stage</div><div class="tl-chips"><span class="tl-chip" onclick="showPage('s86')">Pollinations flux-pro</span><span class="tl-chip" onclick="showPage('s86')">Signed Cloudinary upload</span><span class="tl-chip" onclick="showPage('s86')">Groq/HF prompt fields</span><span class="tl-chip" onclick="showPage('s86')">Migration 077</span></div><div class="tl-note">Replaced the S85 image stub with a real generate-and-upload path — written, dry-run tested, but no live Pollinations/Cloudinary/Groq/HF call succeeded (sandbox proxy blocks all three hosts, no credentials configured).</div></div></div>
 <!-- TIMELINE_INJECT -->
   </div>
 
@@ -3238,6 +3247,7 @@ function deepDiveFeature(featureLabel){
 <div class="detail-item"><div class="detail-row" id="row-mod-truthful-mobile-state" onclick="toggleDetail('mod-truthful-mobile-state')"><div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">Truthful mobile state and offline behavior</span></div><span class="detail-chevron" id="chev-mod-truthful-mobile-state">▾</span></div><div class="detail-drawer" id="draw-mod-truthful-mobile-state"><div class="dd-label">What this does</div><div class="dd-text">Keeps unfinished mock tabs out of navigation, loads the signed-in profile, and persists only safe plan-shaped query data. A cached meal remains visible during a transient refresh failure and is clearly labelled as cached.</div><div class="dd-label">Files / tables in this module</div><div class="dd-text"><code>mobile/app/(tabs)/_layout.tsx, profile.tsx</code> — honest navigation and account controls.<br><code>mobile/app/profile-edit.tsx</code> — clears incompatible meal caches after diet/allergen changes.<br><code>mobile/src/lib/queryClient.ts</code> — allowlisted, user-scoped persistence.<br><code>mobile/src/components/MealEpisodeSection.tsx</code> — cached fallback, retry and canonical grammar shape.<br><code>mobile/src/api/plan.ts</code> — typed episode contract and explicitly unscored compatibility projection.<br><code>mobile/app/__tests__/household-members.test.tsx</code> — owner/member visibility matrix.</div><div class="dd-label">How it helps the app</div><div class="dd-text">Users do not see fake product areas or stale sensitive query data, and temporary network loss does not erase a meal they can still use.</div><div class="dd-label">Last touched</div><div class="dd-text">S84 · 05 Aug</div></div></div>
 <div class="detail-item"><div class="detail-row" id="row-mod-festival-fairness-edge" onclick="toggleDetail('mod-festival-fairness-edge')"><div class="detail-left"><span class="tag tag-db">DB</span><span class="detail-name">Festival, tenancy and household fairness composition</span></div><span class="detail-chevron" id="chev-mod-festival-fairness-edge">▾</span></div><div class="detail-drawer" id="draw-mod-festival-fairness-edge"><div class="dd-label">What this does</div><div class="dd-text">Resolves active festivals without exposing the private engine schema, keeps the authenticated actor separate from the selected household tenant, and combines only active members' explicit dish evidence using geometric welfare.</div><div class="dd-label">Files / tables in this module</div><div class="dd-text"><code>database/migrations/075_expose_active_festival_calendar_rpc.sql</code> — service-role-only date lookup.<br><code>supabase/functions/recommendations/compose.ts</code> — applies governed festival context.<br><code>supabase/functions/recommendations/personalization.ts</code> — household-scoped evidence and Nash-style aggregation.<br><code>supabase/functions/_shared/analytics/product-events.ts</code> — distinct actor and tenant identifiers.<br><code>supabase/functions/recommendations/handler.ts, plan/handler.ts, feedback/events.ts</code> — propagate those boundaries.</div><div class="dd-label">How it helps the app</div><div class="dd-text">Festival meals activate on governed dates, shared-household actions are attributed correctly, and one member's preference cannot silently stand in for everyone else's.</div><div class="dd-label">Last touched</div><div class="dd-text">S84 · 05 Aug</div></div></div>
 <div class="detail-item"><div class="detail-row" id="row-mod-gap-closure-record" onclick="toggleDetail('mod-gap-closure-record')"><div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">Gap closure and external-blocker record</span></div><span class="detail-chevron" id="chev-mod-gap-closure-record">▾</span></div><div class="detail-drawer" id="draw-mod-gap-closure-record"><div class="dd-label">What this does</div><div class="dd-text">Reconciles the deep audit against the actual runtime, removes false open items, and leaves only work that needs deployment, paid services, physical devices, production data, domain curation or clinical governance.</div><div class="dd-label">Files / tables in this module</div><div class="dd-text"><code>docs/active/OPEN_ITEMS.md</code> — unresolved work and completion evidence.<br><code>docs/active/ROADMAP.md</code> — future-only sequence.<br><code>docs/active/CURRENT_STATUS.md</code> — verified gate counts and repository state.<br><code>deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md</code> — deployed v1 versus target API contract.<br><code>ops/quality/ui/run_persona_journeys.mjs</code> — visible Weekdays/Weekend selector flow.</div><div class="dd-label">How it helps the app</div><div class="dd-text">The team can distinguish defects that are fixed in code from actions that require authority or real-world evidence, without inventing data to make the backlog look complete.</div><div class="dd-label">Last touched</div><div class="dd-text">S84 · 05 Aug</div></div></div>
+<div class="detail-item"><div class="detail-row" id="row-mod-dish-image-generation" onclick="toggleDetail('mod-dish-image-generation')"><div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">Dish image generation and upload</span></div><span class="detail-chevron" id="chev-mod-dish-image-generation">▾</span></div><div class="detail-drawer" id="draw-mod-dish-image-generation"><div class="dd-label">What this does</div><div class="dd-text">For any dish missing a photo, fills in a fixed standardized prompt template (category, vessel, visual description, color focal point — via Groq, then Hugging Face, then a deterministic heuristic), generates a photo with Pollinations.ai flux-pro, and uploads the bytes straight to Cloudinary under the same public_id convention ghar_re_service already reads.</div><div class="dd-label">Files / tables in this module</div><div class="dd-text"><code>database/etl/dish_ingestion/image_prompt.py</code> — owns the fixed template text; LLM only fills 4 blanks.<br><code>database/etl/dish_ingestion/images.py</code> — Pollinations client, signed Cloudinary uploader, in-memory only (no local disk write).<br><code>database/etl/dish_ingestion/db.py</code> — image_assets provenance columns, dish-has-image idempotency lookup.<br><code>database/migrations/077_dish_image_generation_provenance.sql</code> — prompt_text/backend/model, image_gen_backend/seed columns.</div><div class="dd-label">How it helps the app</div><div class="dd-text">Dishes ingested from a CSV with no image column can still get a real, on-brand photo automatically, named so the existing Cloudinary asset-discovery script picks it up without any code change there.</div><div class="dd-label">Last touched</div><div class="dd-text">S86 · 06 Aug — written and dry-run tested; no live Pollinations/Cloudinary/Groq/HF call has succeeded yet (sandbox proxy blocks all three, no credentials configured)</div></div></div>
 <!-- MODULES_INJECT -->
   </div>
 
@@ -4006,6 +4016,14 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">docs/active/CURRENT_STATUS.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S84</td><td class="fr-desc">Records current repository capabilities and gate counts.</td></tr>
   <tr><td class="fr-file mono">deliverables/FooFoo_Comprehensive_PRD_and_Bibles.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S84</td><td class="fr-desc">Distinguishes deployed v1 endpoints from the target API.</td></tr>
   <tr><td class="fr-file mono">ops/quality/ui/run_persona_journeys.mjs</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S84</td><td class="fr-desc">Clicks weekly choices only in their visible segment.</td></tr>
+  <tr><td class="fr-file mono">database/etl/dish_ingestion/image_prompt.py</td><td><span class="tag tag-new">New</span></td><td class="fr-session">S86</td><td class="fr-desc">Assembles the standardized dish-photo prompt from Groq/HF/heuristic-filled fields.</td></tr>
+  <tr><td class="fr-file mono">database/etl/dish_ingestion/images.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S86</td><td class="fr-desc">Replaced the not_applicable-only stub with real Pollinations generation + signed Cloudinary upload.</td></tr>
+  <tr><td class="fr-file mono">database/etl/dish_ingestion/db.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S86</td><td class="fr-desc">Adds image provenance columns to insert_image_asset and a dish-has-image lookup for idempotency.</td></tr>
+  <tr><td class="fr-file mono">database/etl/dish_ingestion/pipeline.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S86</td><td class="fr-desc">Wires Stage 5 real generation into apply mode, gated by an idempotency check and --generate-images.</td></tr>
+  <tr><td class="fr-file mono">database/etl/ingest_dish_dataset.py</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S86</td><td class="fr-desc">Adds --generate-images/--skip-images/--image-delay CLI flags.</td></tr>
+  <tr><td class="fr-file mono">database/migrations/077_dish_image_generation_provenance.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S86</td><td class="fr-desc">Adds prompt/model/seed provenance columns to image_assets.</td></tr>
+  <tr><td class="fr-file mono">database/migrations/077_dish_image_generation_provenance_rollback.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S86</td><td class="fr-desc">Drops the provenance columns cleanly.</td></tr>
+  <tr><td class="fr-file mono">docs/architecture/[ACTIVE]_RUNBOOK_Dish_Ingestion_Pipeline_v1.1.md</td><td><span class="tag tag-mod">Modified</span></td><td class="fr-session">S86</td><td class="fr-desc">Renamed from v1.0; documents Stage 5, env vars, prompt template, and validated-vs-unexecuted status.</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -4786,6 +4804,10 @@ function deepDiveFeature(featureLabel){
   <div class="decision-item"><div class="decision-q">Should thin weekly candidate pools silently violate variety rules?</div><div class="decision-a">No. Deterministic repair tries alternate leaders first and returns explicit residual violations only when the eligible pool cannot satisfy the rule.</div><div class="decision-meta">S84 · 05 Aug</div></div>
   <div class="decision-item"><div class="decision-q">Should PanIndia and Global receive household regional priors?</div><div class="decision-a">No. Those labels describe dish provenance; household region derivation yields only geographic household zones. Adding them would create an invalid household state and weaken the intentional foreign-dish cold-start policy.</div><div class="decision-meta">S84 · 05 Aug</div></div>
   <div class="decision-item"><div class="decision-q">Can missing member preferences or unresolved comfort foods be guessed?</div><div class="decision-a">No. Fairness aggregates only explicit member evidence, and comfort aliases are added only for exact or orthographic catalogue matches. Missing evidence remains an external data/domain task.</div><div class="decision-meta">S84 · 05 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">Where should the fixed prompt template text live — code or the model's output?</div><div class="decision-a">Code (image_prompt.PROMPT_TEMPLATE). The LLM only fills 4 blanks (vessel_type, visual_description, color_focal_point, category); the surrounding template is assembled server-side so prompt format cannot drift dish to dish regardless of which backend answers.</div><div class="decision-meta">S86 · 06 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">Store the Cloudinary public_id or the full delivery URL in dish_images.storage_path?</div><div class="decision-a">public_id. The delivery URL is always derivable from it via ghar_re_service.media.image_url()'s existing formula, so storing the public_id keeps this ETL decoupled from whichever cloud name/transform is configured at read time.</div><div class="decision-meta">S86 · 06 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">How is a dish prevented from being regenerated/re-uploaded on rerun?</div><div class="decision-a">A dish-level guard, not just table-level ON CONFLICT: db.load_dish_ids_with_image() is read once at run start and updated in-memory after every successful generation, so a dish already having an image (from this run or a prior one) never triggers a second Pollinations/Cloudinary call.</div><div class="decision-meta">S86 · 06 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">Did any real Pollinations/Cloudinary/Groq/HF call succeed in this delivery?</div><div class="decision-a">No. env had none of GROQ_API_KEY/HF_API_KEY/HUGGINGFACE_API_KEY/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET set, and the sandbox's own outbound proxy status log recorded a 403 policy denial for all three hosts when a real call was attempted through PollinationsClient.generate_png() — disclosed explicitly rather than claiming success.</div><div class="decision-meta">S86 · 06 Aug</div></div>
   <!-- DECISIONS_INJECT -->
   </div>
 
@@ -13674,7 +13696,7 @@ function deepDiveFeature(featureLabel){
     <div id="s83-swim" class="view-pane active"><div class="swim-lane lane-blue"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Mobile</div><div class="swim-label-sub">authenticated user</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-blue">1</div><div class="step-content"><div class="step-title-row"><span class="step-title">Select joined household</span></div><div class="step-desc">Membership discovery needs no client-supplied tenant; the selection is stored against the current user.</div></div></div></div></div><div class="swim-arrow">↕ JWT actor + household target</div><div class="swim-lane lane-amber"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Edge</div><div class="swim-label-sub">household-access / feedback</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-amber">2</div><div class="step-content"><div class="step-title-row"><span class="step-title">Authorize exact operation</span></div><div class="step-desc">The server resolves the actor from the bearer token, verifies active membership and applies the five-role matrix.</div></div></div></div></div><div class="swim-arrow">↕ scoped persistence</div><div class="swim-lane lane-teal"><div class="swim-label"><div class="swim-label-inner"><div class="swim-label-title">Data</div><div class="swim-label-sub">household + actor evidence</div></div></div><div class="swim-body"><div class="swim-step"><div class="step-num num-teal">3</div><div class="step-content"><div class="step-title-row"><span class="step-title">Retain tenant and attribution</span></div><div class="step-desc">Plan/pantry facts target the household; personal preference evidence stays attributable to the acting profile.</div></div></div></div></div><div class="next-box"><div class="next-label">Remaining launch evidence</div><div class="next-text">Run native-device offline reconnect, queued-feedback flush and push-delivery journeys; no additional AI decision is needed for this collaboration release.</div></div></div>
     <div id="s83-detail" class="view-pane"><div class="detail-item"><div class="detail-row" id="row-s83-mobile" onclick="toggleDetail('s83-mobile')"><div class="detail-left"><span class="tag tag-new">New</span><span class="detail-name">Household management surface</span></div><span class="detail-chevron" id="chev-s83-mobile">▾</span></div><div class="detail-drawer" id="draw-s83-mobile"><div class="dd-text">Joined households can be selected; invite tokens accepted; owners invite, change roles, transfer or revoke; nonowners can leave.</div></div></div><div class="detail-item"><div class="detail-row" id="row-s83-privacy" onclick="toggleDetail('s83-privacy')"><div class="detail-left"><span class="tag tag-mod">Modified</span><span class="detail-name">Tenant-safe offline state</span></div><span class="detail-chevron" id="chev-s83-privacy">▾</span></div><div class="detail-drawer" id="draw-s83-privacy"><div class="dd-text">The active tenant, feedback queue and persisted safe plan queries are user-scoped; sign-out clears active selection and in-memory queries.</div></div></div><div class="detail-item"><div class="detail-row" id="row-s83-roles" onclick="toggleDetail('s83-roles')"><div class="detail-left"><span class="tag tag-db">Policy</span><span class="detail-name">Complete feedback role matrix</span></div><span class="detail-chevron" id="chev-s83-roles">▾</span></div><div class="detail-drawer" id="draw-s83-roles"><div class="dd-text">Plan-control, execution/pantry, preference and read-only actions are independently authorized and covered by Edge tests.</div></div></div></div>
   </div><!-- /page-s83 -->
-  <div id="page-s84" class="page-content">
+  <div id="page-s84" class="page-content" style="display:none">
     <div class="page-header"><div class="page-title">S84 · Gap closure and truthful contracts</div><div class="page-subtitle">Complete meals now have enforced composition rules, weekly plans report real constraint outcomes, offline screens stay honest, and household context uses governed evidence.</div></div>
     <div class="impact-bar"><div class="impact-col impact-before"><div class="impact-label">⛔ Before this session</div><div class="impact-text">The audit found two competing meal contracts, hard-coded composition, weak weekly repair, mock navigation, unsafe cache breadth, missing festival runtime use and no member-level fairness.</div></div><div class="impact-arrow">→</div><div class="impact-col impact-after"><div class="impact-label">✅ After this session</div><div class="impact-text">Complete meals are versioned and validated, weekly exceptions are explicit, only safe plan data survives offline, and festival plus household evidence reaches ranking without invented preferences.</div></div></div>
     <div class="files-changed"><div class="files-changed-label">📁 Main files changed this session</div><div class="files-changed-list"><span class="fc-file"><span class="fc-path">episode grammar + canonical contract</span><span class="tag tag-new">New</span></span><span class="fc-file"><span class="fc-path">meal episode + weekly planner runtime</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">mobile navigation, profile, cache and episode UI</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">recommendations, plan, feedback and analytics Edge paths</span><span class="tag tag-mod">Modified</span></span><span class="fc-file"><span class="fc-path">migration 075 + rollback + validation 930</span><span class="tag tag-db">DB</span></span><span class="fc-file"><span class="fc-path">active status, roadmap, open items and PRD</span><span class="tag tag-mod">Modified</span></span></div></div>
@@ -13699,6 +13721,130 @@ function deepDiveFeature(featureLabel){
     </div>
     <div id="s84-flows" class="view-pane"></div><script>window.FEATURE_FLOWS_S84=[{id:'canonical-complete-meal',label:'Serve a canonical complete meal',steps:[{layer:'App logic',tag:'POLICY',title:'Select and validate a grammar',desc:'A safe plate is matched to a published composition and every component role is checked.',codeFlow:[{chip:'ghar_re_core/meal_episode.py'},{label:'calls'},{chip:'ghar_re_core/episode_grammar.py'}],files:[{path:'ghar_re_core/meal_episode.py',desc:'Builds the complete meal'},{path:'ghar_re_core/episode_grammar.py',desc:'Validates composition'}],api:null,db:null},{layer:'Server',tag:'API',title:'Validate the signed contract',desc:'The recommendation service rejects malformed requests and malformed episode responses.',codeFlow:[{chip:'ghar_re_service/ghar_re_service/main.py'},{label:'uses'},{chip:'contracts/ghar-re-v1.schema.json'}],files:[{path:'ghar_re_service/ghar_re_service/main.py',desc:'Signed route boundary'},{path:'contracts/ghar-re-v1.schema.json',desc:'Canonical episode schema'}],api:{endpoint:'POST /v1/meal-episodes',note:'HMAC-authenticated internal route'},db:null},{layer:'Phone',tag:'UI',title:'Render or retain the meal',desc:'Mobile shows the canonical result; a transient refresh failure leaves safe cached data visible with a warning.',codeFlow:[{chip:'mobile/src/api/plan.ts'},{label:'renders'},{chip:'mobile/src/components/MealEpisodeSection.tsx'}],files:[{path:'mobile/src/api/plan.ts',desc:'Typed client contract'},{path:'mobile/src/components/MealEpisodeSection.tsx',desc:'Complete-meal UI'}],api:{endpoint:'POST /functions/v1/plan · meal_episodes',note:'authenticated household surface'},db:null}]},{id:'governed-household-context',label:'Compose governed household context',steps:[{layer:'Database',tag:'DB',title:'Resolve an active festival date',desc:'A service-only function reads normalized private festival identities and dated occurrences.',codeFlow:[{chip:'database/migrations/075_expose_active_festival_calendar_rpc.sql'}],files:[{path:'database/migrations/075_expose_active_festival_calendar_rpc.sql',desc:'Normalized calendar and narrow facade'}],api:null,db:{table:'food.festivals / food.festival_calendar_occurrences',op:'SELECT',note:'through service-role-only public RPC'}},{layer:'Server',tag:'API',title:'Combine date and explicit member evidence',desc:'Edge applies festival mode and geometric welfare without inventing preferences for members with no data.',codeFlow:[{chip:'supabase/functions/recommendations/compose.ts'},{label:'+'},{chip:'supabase/functions/recommendations/personalization.ts'}],files:[{path:'supabase/functions/recommendations/compose.ts',desc:'Festival context'},{path:'supabase/functions/recommendations/personalization.ts',desc:'Member evidence aggregation'}],api:{endpoint:'POST /functions/v1/recommendations',note:'actor and household remain distinct'},db:{table:'household_memberships / user_taste_vectors',op:'SELECT',note:'active members and explicit dish affinities'}}]},{id:'safe-offline-meals',label:'Keep offline meals truthful',steps:[{layer:'App logic',tag:'POLICY',title:'Persist an allowlisted plan key',desc:'The cache saves only daily plans, meal episodes and saved weeks under the authenticated user.',codeFlow:[{chip:'mobile/src/lib/queryClient.ts'}],files:[{path:'mobile/src/lib/queryClient.ts',desc:'Safe persistence policy'}],api:null,db:null},{layer:'Phone',tag:'UI',title:'Show cached data with recovery',desc:'The visible meal remains usable while the screen explains that refresh failed and offers retry.',codeFlow:[{chip:'mobile/src/components/MealEpisodeSection.tsx'}],files:[{path:'mobile/src/components/MealEpisodeSection.tsx',desc:'Cached warning and retry'}],api:null,db:null}]}];renderFeatureFlows('s84-flows',window.FEATURE_FLOWS_S84);</script>
   </div><!-- /page-s84 -->
+  <div id="page-s85" class="page-content" style="display:none">
+    <div class="page-header">
+      <div class="page-title">S85 · Dish ingestion pipeline</div>
+      <div class="page-subtitle">Built the ETL that loads the 6,871-recipe CSV into the dish catalogue, with dedupe, ontology mapping, AI enrichment (mock mode), and image plumbing — schema written, dry-run validated on the real file, not yet applied to a live database.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">The Indian food dataset CSV sat unused in database/seeds/ — no code path loaded it into the dish catalogue, no dedupe/ontology/enrichment logic existed for it, and there was no way to track an import run, its per-row outcomes, or errors.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">A dry-run-capable, batched, idempotent ETL exists that parses the real CSV, dedupes near-duplicate dish names, maps cuisine/course/diet to this repo's own ontology tables (no fabricated external API), infers missing tags/region with a heuristic fallback when no Groq key is set, and is ready to apply once a live database and migration 076 are in place.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/migrations/076_dish_ingestion_pipeline.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/076_dish_ingestion_pipeline_rollback.sql</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/ingest_dish_dataset.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/dish_ingestion/*.py (normalize, dedupe, ontology_adapter, groq_adapter, images, db, pipeline)</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/architecture/[ACTIVE]_RUNBOOK_Dish_Ingestion_Pipeline_v1.0.md</span><span class="tag tag-new">New</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">2026-08-06<br>12 files touched</div>
+      </div>
+      <div class="session-card-desc">
+        New migration 076 adds only the genuinely missing tables (import_runs, dish_source_rows,
+        import_row_results, import_row_errors, dish_ingestion_review_queue, dish_aliases,
+        image_assets, dish_images) and reuses every existing dish/ontology table rather than
+        duplicating them. The Python ETL (database/etl/dish_ingestion/) runs six stages — load,
+        dedupe, ontology map, enrich, image plumb, persist — batched into transactions, safe to
+        rerun (every write is an upsert on a stable key). <b>Important correction:</b> the source
+        CSV's real row count, verified by quote-aware CSV parsing, is 6,871 logical records, not
+        16,523 — the higher number was a raw line count that double-counts rows with embedded
+        newlines in their Instructions text. This was caught and documented, not silently
+        corrected without disclosure.
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">9</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">2</div><div class="stat-l">DB changes</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-s85-validation" onclick="toggleDetail('s85-validation')"><div class="detail-left"><span class="tag tag-mod">Verified</span><span class="detail-name">What was actually run vs written-only</span></div><span class="detail-chevron" id="chev-s85-validation">▾</span></div>
+      <div class="detail-drawer" id="draw-s85-validation">
+        <div class="dd-label">Executed and verified</div>
+        <div class="dd-text">`python database/etl/ingest_dish_dataset.py --dry-run` against the real CSV: parsed 6,871 rows in ~6s, exercised dedupe/ontology-fallback/heuristic-enrichment/image-plumbing end to end with zero DB writes. An earlier unblocked fuzzy-dedupe implementation was found too slow and replaced with a blocked comparison — caught by actually running it, not assumed.</div>
+        <div class="dd-label">Written but NOT executed</div>
+        <div class="dd-text">Migration 076's SQL and the `--apply` DB-write code path (db.py/pipeline.py) — no live Postgres/Supabase connection was available in this session. Validated by careful reading against existing migration style, not by running it.</div>
+      </div>
+    </div>
+    <div class="next-box"><div class="next-label">Next session</div><div class="next-text">Apply migration 076 to a real (ideally local/staging) Postgres, then run `--apply` against it and confirm the import_runs summary report; wire a real ontology API or Groq key if/when one becomes available.</div></div>
+  </div><!-- /page-s85 -->
+  <div id="page-s86" class="page-content">
+    <div class="page-header">
+      <div class="page-title">S86 · Dish image generation stage</div>
+      <div class="page-subtitle">Replaced the S85 not_applicable image stub with a real generation + upload path — Groq/HF-filled standardized prompt, Pollinations.ai flux-pro generation, signed Cloudinary upload — idempotent, dry-run safe, and honestly reported as unexecuted end-to-end in this sandbox.</div>
+    </div>
+    <div class="impact-bar">
+      <div class="impact-col impact-before">
+        <div class="impact-label">⛔ Before this session</div>
+        <div class="impact-text">Stage 5 of the dish ingestion pipeline (images.py) was a stub: every dish got a not_applicable image_assets placeholder, no download, no upload, nothing real, because the source CSV has no image column.</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-after">
+        <div class="impact-text">A dish missing a photo now gets a real AI-generated one: an LLM fills in a fixed standardized prompt template, Pollinations.ai renders it, and the bytes go straight (no local disk write) into a signed Cloudinary upload named to match the existing ghar_re_service asset convention — gated by an idempotency check so a rerun never regenerates a dish that already has an image.</div>
+      </div>
+    </div>
+    <div class="files-changed">
+      <div class="files-changed-label">📁 Files changed this session</div>
+      <div class="files-changed-list">
+        <span class="fc-file"><span class="fc-path">database/etl/dish_ingestion/image_prompt.py</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/dish_ingestion/images.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/dish_ingestion/db.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/dish_ingestion/pipeline.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/etl/ingest_dish_dataset.py</span><span class="tag tag-mod">Modified</span></span>
+        <span class="fc-file"><span class="fc-path">database/migrations/077_dish_image_generation_provenance.sql (+ rollback)</span><span class="tag tag-new">New</span></span>
+        <span class="fc-file"><span class="fc-path">docs/architecture/[ACTIVE]_RUNBOOK_Dish_Ingestion_Pipeline_v1.1.md</span><span class="tag tag-mod">Modified</span></span>
+      </div>
+    </div>
+    <div class="session-card">
+      <div class="session-card-header">
+        <div class="session-card-title">What was built this session</div>
+        <div class="session-card-meta">2026-08-06<br>8 files touched</div>
+      </div>
+      <div class="session-card-desc">
+        image_prompt.py owns a fixed, verbatim-ported prompt template (from the Founder-supplied
+        xlsx, confirmed against 5 sample rows) and calls Groq (primary), Hugging Face Inference
+        API (alternate), or a deterministic heuristic (last resort) to fill in only the 4 variable
+        fields — never letting the model generate the template text itself. images.py ports the
+        Founder's Pollinations reference script's generation mechanism (flux-pro, 1024x1024,
+        retry/backoff) but drops its local-disk/CSV bookkeeping entirely: bytes go straight from
+        the HTTP response into an in-memory, signed Cloudinary upload under a
+        &lt;dish_slug&gt;_hero_01_&lt;random&gt; public_id matching ghar_re_service's existing
+        convention exactly (verified: slugify("Thai Spring Roll (Fried)") ==
+        "thai_spring_roll_fried"). Idempotency is a dish-level guard (db.load_dish_ids_with_image),
+        not just a table constraint. Migration 077 adds the provenance columns 076 didn't have
+        (prompt text/backend/model, image-gen backend/seed).
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" style="color:#1a56db">0</div><div class="stat-l">Screens</div></div>
+        <div class="stat"><div class="stat-n" style="color:#5145b8">5</div><div class="stat-l">Code files</div></div>
+        <div class="stat"><div class="stat-n" style="color:#0e7a5a">1</div><div class="stat-l">DB migration</div></div>
+        <div class="stat"><div class="stat-n" style="color:#92500a">0</div><div class="stat-l">Server fns</div></div>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-row" id="row-s86-validation" onclick="toggleDetail('s86-validation')"><div class="detail-left"><span class="tag tag-mod">Verified</span><span class="detail-name">What was actually run vs written-only</span></div><span class="detail-chevron" id="chev-s86-validation">▾</span></div>
+      <div class="detail-drawer" id="draw-s86-validation">
+        <div class="dd-label">Executed and verified</div>
+        <div class="dd-text">`--dry-run` (with and without `--skip-images`) ran end to end against the real CSV with Stage 5 wired in, zero network calls, confirmed by sub-100ms elapsed time. `images.slugify()` and `image_prompt.assemble_prompt()`/heuristic fallback were unit-checked directly. `images.PollinationsClient.generate_png()` was called for real against the live host and reproduced a proxy 403 (Tunnel connection failed) — this is the real network-attempt evidence the task asked for.</div>
+        <div class="dd-label">Written but NOT executed</div>
+        <div class="dd-text">Every live-credential path: CloudinaryUploader.upload_png() signed upload, ImagePromptGenerator._call_groq()/_call_hf(). `env | grep -iE 'GROQ|HF_API|HUGGINGFACE|CLOUDINARY'` returned nothing — no credentials are configured in this environment, and the sandbox's outbound proxy independently blocks all three hosts (confirmed via $HTTPS_PROXY/__agentproxy/status's recentRelayFailures log) regardless of credentials. Migration 077's SQL and the `--apply` persistence path for images are unexecuted, same status as migration 076 from S85.</div>
+      </div>
+    </div>
+    <div class="next-box"><div class="next-label">Next session</div><div class="next-text">Once a real database, Cloudinary account, and (optionally) a Groq/HF key are reachable: apply migrations 076+077, run `--apply --generate-images` against a small batch first, then re-run ghar_re_service's build_image_map.py to fold newly uploaded assets into dish_images_v1.json so the app actually serves them.</div></div>
+  </div><!-- /page-s86 -->
   <!-- SESSIONS_INJECT -->
 
 </main>
