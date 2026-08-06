@@ -11,11 +11,15 @@
       "supportsTablet": true,
       "bundleIdentifier": "app.foofoo.mobile",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       },
       "entitlements": {
         "aps-environment": "production",
-        "com.apple.security.application-groups": ["group.app.foofoo.mobile.onesignal"]
+        "com.apple.security.application-groups": [
+          "group.app.foofoo.mobile.onesignal"
+        ]
       }
     },
     "android": {
@@ -26,13 +30,39 @@
       "output": "single"
     },
     "plugins": [
-      ["onesignal-expo-plugin", { "mode": "production" }],
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "production"
+        }
+      ],
       "expo-router"
     ],
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "app.foofoo.mobile.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.app.foofoo.mobile.onesignal"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "3fccc5fc-bf6e-4d37-b14f-9c0bba021d95"
       }
-    }
+    },
+    "owner": "apverse-labs"
   }
 }
