@@ -62,7 +62,7 @@ def expand_preferences(preference_by_dish, catalogue) -> dict[str, float]:
     Unknown names and malformed values are ignored. A transferred value is capped below the
     explicit signal (``TRANSFER_SCALE``), preventing inferred taste from overruling a direct vote.
     """
-    explicit = {}
+    explicit: dict[str, float] = {}
     if not isinstance(preference_by_dish, dict):
         return explicit
     for name, raw_affinity in list(preference_by_dish.items())[-MAX_SEEDS:]:
