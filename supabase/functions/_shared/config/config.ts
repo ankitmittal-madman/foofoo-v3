@@ -8,6 +8,7 @@
 import { ENV_VARS } from "./env.ts";
 
 export type Environment = "local" | "staging" | "production";
+export type FoodOntologyReadMode = "legacy" | "shadow" | "service";
 
 export interface AppConfig {
   readonly environment: Environment;
@@ -21,6 +22,12 @@ export interface AppConfig {
   readonly gharReServiceUrl: string;
   /** Shared HMAC secret for the service-to-service call (RE-DOC-10 §9). */
   readonly gharReServiceSecret: string;
+  readonly foodOntologyServiceUrl: string | null;
+  readonly foodOntologyServiceToken: string | null;
+  readonly foodOntologyReadMode: FoodOntologyReadMode;
+  readonly ontologyRedisRestUrl: string | null;
+  readonly ontologyRedisRestToken: string | null;
+  readonly ontologyCacheSeconds: number;
   /** Optional real alerting sink URL (P1-7). Null when unset -- telemetry falls back to log-only. */
   readonly telemetryWebhookUrl: string | null;
   readonly oneSignalRestApiKey: string | null;
@@ -94,6 +101,29 @@ export function loadConfig(): AppConfig {
     );
   }
 
+  const ontologyModeRaw = (read(ENV_VARS.FOOD_ONTOLOGY_READ_MODE) ?? "legacy").toLowerCase();
+  if (!["legacy", "shadow", "service"].includes(ontologyModeRaw)) {
+    throw new Error("[config] FOOD_ONTOLOGY_READ_MODE must be legacy, shadow, or service.");
+  }
+  const foodOntologyReadMode = ontologyModeRaw as FoodOntologyReadMode;
+  const foodOntologyServiceUrl = read(ENV_VARS.FOOD_ONTOLOGY_SERVICE_URL);
+  const foodOntologyServiceToken = read(ENV_VARS.FOOD_ONTOLOGY_SERVICE_TOKEN);
+  const ontologyRedisRestUrl = read(ENV_VARS.ONTOLOGY_REDIS_REST_URL);
+  const ontologyRedisRestToken = read(ENV_VARS.ONTOLOGY_REDIS_REST_TOKEN);
+  if (foodOntologyReadMode !== "legacy" && (!foodOntologyServiceUrl || !foodOntologyServiceToken)) {
+    throw new Error(
+      "[config] FOOD_ONTOLOGY_SERVICE_URL and FOOD_ONTOLOGY_SERVICE_TOKEN are required outside legacy mode.",
+    );
+  }
+  if (
+    isProduction && foodOntologyReadMode === "service" &&
+    (!ontologyRedisRestUrl || !ontologyRedisRestToken)
+  ) {
+    throw new Error(
+      "[config] ONTOLOGY_REDIS_REST_URL and ONTOLOGY_REDIS_REST_TOKEN are required for production service mode.",
+    );
+  }
+
   return Object.freeze({
     environment,
     logLevel,
@@ -104,6 +134,12 @@ export function loadConfig(): AppConfig {
     isProduction,
     gharReServiceUrl: gharReServiceUrl ?? GHAR_RE_DEV_URL,
     gharReServiceSecret: gharReServiceSecret ?? GHAR_RE_DEV_SECRET,
+    foodOntologyServiceUrl,
+    foodOntologyServiceToken,
+    foodOntologyReadMode,
+    ontologyRedisRestUrl,
+    ontologyRedisRestToken,
+    ontologyCacheSeconds: boundedNumber(read(ENV_VARS.ONTOLOGY_CACHE_SECONDS), 300, 1, 3600),
     telemetryWebhookUrl: read(ENV_VARS.TELEMETRY_WEBHOOK_URL),
     oneSignalRestApiKey: read(ENV_VARS.ONESIGNAL_REST_API_KEY),
     oneSignalAppId: read(ENV_VARS.ONESIGNAL_APP_ID),

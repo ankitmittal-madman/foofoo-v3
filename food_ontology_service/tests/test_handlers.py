@@ -8,7 +8,12 @@ from food_ontology_service.handlers import (
     build_enrich_handler,
 )
 from food_ontology_service.models import DishCreate, FieldValue
-from food_ontology_service.providers import ProviderFact
+from food_ontology_service.providers import (
+    FoodOnProvider,
+    ProviderFact,
+    UsdaProvider,
+    WikidataProvider,
+)
 from food_ontology_service.repository import MemoryRepository
 
 EVIDENCE = [{"source_code": "fixture", "extraction_method": "test"}]
@@ -107,3 +112,49 @@ def test_all_provider_failures_retry_instead_of_silently_reviewing():
         assert str(exc) == "all_enrichment_providers_failed"
     else:
         raise AssertionError("provider outage must be retryable")
+
+
+def test_foodon_and_wikidata_adapters_preserve_external_identity():
+    foodon = FoodOnProvider(
+        lambda _url, _headers: {
+            "response": {
+                "docs": [
+                    {
+                        "label": "Poha",
+                        "iri": "http://purl.obolibrary.org/obo/FOODON_123",
+                        "synonym": ["Kanda Poha"],
+                    }
+                ]
+            }
+        }
+    )
+    wikidata = WikidataProvider(
+        lambda _url, _headers: {
+            "search": [
+                {
+                    "id": "Q123",
+                    "label": "Poha",
+                    "description": "Indian flattened rice dish",
+                    "concepturi": "https://www.wikidata.org/wiki/Q123",
+                }
+            ]
+        }
+    )
+    assert foodon.lookup("Poha")[0].value.endswith("FOODON_123")
+    assert wikidata.lookup("Poha")[0].value == "Q123"
+
+
+def test_usda_adapter_never_transfers_nutrition_from_a_similar_food():
+    usda = UsdaProvider(
+        "test-key",
+        lambda _url, _headers: {
+            "foods": [
+                {
+                    "fdcId": 42,
+                    "description": "Rice flakes",
+                    "foodNutrients": [{"nutrientName": "Protein", "unitName": "G", "value": 4.2}],
+                }
+            ]
+        },
+    )
+    assert usda.lookup("Poha") == []

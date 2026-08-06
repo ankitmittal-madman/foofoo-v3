@@ -8,6 +8,7 @@ import socket
 import time
 from collections.abc import Callable
 
+from .cache_invalidator import CacheInvalidator, RedisRestClient
 from .postgres_repository import PostgresRepository
 from .worker import JobHandler, OntologyWorker
 
@@ -41,10 +42,23 @@ def main() -> None:
     batch_size = max(1, min(int(os.getenv("ONTOLOGY_WORKER_BATCH_SIZE", "20")), 100))
     poll_seconds = max(1, min(int(os.getenv("ONTOLOGY_WORKER_POLL_SECONDS", "5")), 60))
     once = os.getenv("ONTOLOGY_WORKER_ONCE", "false").lower() == "true"
-    worker = OntologyWorker(PostgresRepository(database_url), worker_id, handlers, batch_size)
+    repository = PostgresRepository(database_url)
+    worker = OntologyWorker(repository, worker_id, handlers, batch_size)
+    redis_url = os.getenv("ONTOLOGY_REDIS_REST_URL")
+    redis_token = os.getenv("ONTOLOGY_REDIS_REST_TOKEN")
+    if bool(redis_url) != bool(redis_token):
+        raise RuntimeError(
+            "both ONTOLOGY_REDIS_REST_URL and ONTOLOGY_REDIS_REST_TOKEN are required"
+        )
+    invalidator = (
+        CacheInvalidator(repository, RedisRestClient(redis_url, redis_token))
+        if redis_url and redis_token
+        else None
+    )
     while True:
         report = worker.run_once()
-        print(json.dumps(report.__dict__, sort_keys=True))
+        invalidated = invalidator.run_once() if invalidator else 0
+        print(json.dumps({**report.__dict__, "cache_invalidations": invalidated}, sort_keys=True))
         if once:
             return
         time.sleep(poll_seconds)

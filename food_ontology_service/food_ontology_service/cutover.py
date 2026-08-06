@@ -15,6 +15,7 @@ from .models import (
     DishCreate,
     EvidenceRef,
     FieldValue,
+    ImageRef,
     ReviewStatus,
 )
 from .postgres_repository import PostgresRepository
@@ -75,7 +76,7 @@ def export_legacy(source_dsn: str) -> dict[str, Any]:
         ).fetchall()
         memberships = connection.execute(
             """SELECT dish_id,class_code,slot,item_role AS role,confidence,review_status,
-                      source_name,classification_method
+                      source_name,classification_method AS extraction_method
                FROM public.dish_meal_class_mappings WHERE review_status<>'rejected'
                ORDER BY dish_id,class_code,slot"""
         ).fetchall()
@@ -104,16 +105,55 @@ def export_legacy(source_dsn: str) -> dict[str, Any]:
                       NULL::text AS provider_record_id,source_url
                FROM public.dish_regional_affinities WHERE review_status<>'rejected'"""
         ).fetchall()
+        images = connection.execute(
+            """SELECT di.dish_id,ia.storage_path AS cloudinary_public_id,
+                      ia.source_url AS secure_url,ia.checksum_sha256,di.source_type,
+                      di.is_primary,di.confidence
+               FROM public.dish_images di JOIN public.image_assets ia ON ia.id=di.image_asset_id
+               ORDER BY di.dish_id,di.is_primary DESC"""
+        ).fetchall()
+        jobs = connection.execute(
+            """SELECT id,dish_id,missing_fields,attempts,status
+               FROM public.dish_enrichment_jobs
+               WHERE dish_id IS NOT NULL AND status NOT IN ('complete','failed')
+               ORDER BY id"""
+        ).fetchall()
+        submission_job_blockers = connection.execute(
+            """SELECT count(*) AS value FROM public.dish_enrichment_jobs
+               WHERE submission_id IS NOT NULL AND status NOT IN ('complete','failed')"""
+        ).fetchone()
+        assert submission_job_blockers is not None
 
     fields: dict[str, list[dict[str, Any]]] = {}
     for row in [*taxonomy, *constraints, *regions]:
         fields.setdefault(str(row["dish_id"]), []).append(dict(row))
-    aliases_by_dish: dict[str, list[dict[str, Any]]] = {}
+    alias_index: dict[str, dict[tuple[str, str, str], dict[str, Any]]] = {}
     for row in aliases:
-        aliases_by_dish.setdefault(str(row["dish_id"]), []).append(dict(row))
+        dish_id = str(row["dish_id"])
+        item = dict(row)
+        identity = (
+            " ".join(str(row["name"]).casefold().split()),
+            str(row.get("language") or "und"),
+            str(row.get("region_code") or ""),
+        )
+        prior = alias_index.setdefault(dish_id, {}).get(identity)
+        if prior is None or float(item.get("confidence") or 0) > float(
+            prior.get("confidence") or 0
+        ):
+            alias_index[dish_id][identity] = item
+    aliases_by_dish = {
+        dish_id: sorted(items.values(), key=lambda item: str(item["name"]))
+        for dish_id, items in alias_index.items()
+    }
     classes_by_dish: dict[str, list[dict[str, Any]]] = {}
     for row in memberships:
         classes_by_dish.setdefault(str(row["dish_id"]), []).append(dict(row))
+    images_by_dish: dict[str, list[dict[str, Any]]] = {}
+    for row in images:
+        images_by_dish.setdefault(str(row["dish_id"]), []).append(dict(row))
+    jobs_by_dish: dict[str, list[dict[str, Any]]] = {}
+    for row in jobs:
+        jobs_by_dish.setdefault(str(row["dish_id"]), []).append(dict(row))
 
     exported_dishes = []
     for row in dishes:
@@ -123,6 +163,8 @@ def export_legacy(source_dsn: str) -> dict[str, Any]:
         item["aliases"] = aliases_by_dish.get(legacy_id, [])
         item["class_memberships"] = classes_by_dish.get(legacy_id, [])
         item["fields"] = fields.get(legacy_id, [])
+        item["images"] = images_by_dish.get(legacy_id, [])
+        item["jobs"] = jobs_by_dish.get(legacy_id, [])
         exported_dishes.append(item)
     bundle: dict[str, Any] = {
         "schema_version": "foofoo-ontology-cutover/v1",
@@ -130,6 +172,9 @@ def export_legacy(source_dsn: str) -> dict[str, Any]:
         "watermark": watermark,
         "meal_classes": [dict(row) for row in classes],
         "dishes": exported_dishes,
+        "blockers": {
+            "active_submission_jobs_without_canonical_dish": submission_job_blockers["value"]
+        },
     }
     bundle["checksum_sha256"] = bundle_checksum(bundle)
     return json.loads(canonical_json(bundle))
@@ -157,6 +202,17 @@ def _evidence(row: dict[str, Any]) -> list[EvidenceRef]:
             extraction_method=str(row.get("extraction_method") or EVIDENCE.extraction_method),
         )
     ]
+
+
+def _importable_image(row: dict[str, Any]) -> bool:
+    checksum = str(row.get("checksum_sha256") or "")
+    return (
+        row.get("source_type") in {"ai_generated", "human_upload"}
+        and bool(row.get("cloudinary_public_id"))
+        and str(row.get("secure_url") or "").startswith("https://")
+        and len(checksum) == 64
+        and all(character in "0123456789abcdef" for character in checksum)
+    )
 
 
 def import_bundle(target_dsn: str, bundle: dict[str, Any]) -> dict[str, Any]:
@@ -201,14 +257,6 @@ def import_bundle(target_dsn: str, bundle: dict[str, Any]) -> dict[str, Any]:
 
     imported = 0
     for row in bundle["dishes"]:
-        with psycopg.connect(target_dsn, row_factory=dict_row) as connection:
-            prior = connection.execute(
-                """SELECT service_id FROM ontology.legacy_identity_map
-                   WHERE source_system=%s AND entity_type='dish' AND legacy_id=%s""",
-                (bundle["source_system"], row["legacy_id"]),
-            ).fetchone()
-        if prior:
-            continue
         fields = {
             str(item["field_key"]): FieldValue(
                 value=item["value"],
@@ -243,49 +291,60 @@ def import_bundle(target_dsn: str, bundle: dict[str, Any]) -> dict[str, Any]:
                 review_status=ReviewStatus.accepted,
                 evidence=[EVIDENCE],
             )
-        created = repository.create_dish(
-            DishCreate.model_validate(
-                {
-                    "canonical_name": row["name"],
-                    "description": description,
-                    "aliases": [
-                        AliasInput(
-                            name=item["name"],
-                            language=item.get("language") or "und",
-                            region_code=item.get("region_code"),
-                            alias_type=item.get("alias_type") or "synonym",
-                            confidence=float(item.get("confidence") or 0.7),
-                            evidence=_evidence(item),
-                        )
-                        for item in row["aliases"]
-                    ],
-                    "class_memberships": [
-                        {
-                            "class_code": item["class_code"],
-                            "slot": item["slot"],
-                            "role": item["role"],
-                            "confidence": float(item["confidence"]),
-                            "review_status": item["review_status"],
-                            "evidence": _evidence(item),
-                        }
-                        for item in row["class_memberships"]
-                    ],
-                    "fields": fields,
-                }
-            )
+        dish_data = DishCreate.model_validate(
+            {
+                "canonical_name": row["name"],
+                "description": description,
+                "aliases": [
+                    AliasInput(
+                        name=item["name"],
+                        language=item.get("language") or "und",
+                        region_code=item.get("region_code"),
+                        alias_type=item.get("alias_type") or "synonym",
+                        confidence=float(item.get("confidence") or 0.7),
+                        evidence=_evidence(item),
+                    )
+                    for item in row["aliases"]
+                ],
+                "class_memberships": [
+                    {
+                        "class_code": item["class_code"],
+                        "slot": item["slot"],
+                        "role": item["role"],
+                        "confidence": float(item["confidence"]),
+                        "review_status": item["review_status"],
+                        "evidence": _evidence(item),
+                    }
+                    for item in row["class_memberships"]
+                ],
+                "fields": fields,
+            }
         )
-        with psycopg.connect(target_dsn) as connection:
-            connection.execute(
-                "UPDATE ontology.dishes SET status=%s WHERE id=%s",
-                ("active" if row["is_active"] else "retired", created.id),
+        created, was_created = repository.create_legacy_dish(
+            bundle["source_system"], row["legacy_id"], run_id, dish_data, row["is_active"]
+        )
+        for image in row.get("images", []):
+            if _importable_image(image):
+                repository.add_image(
+                    created.id,
+                    ImageRef(
+                        cloudinary_public_id=image["cloudinary_public_id"],
+                        secure_url=image["secure_url"],
+                        checksum_sha256=image["checksum_sha256"],
+                        source_type=image["source_type"],
+                        review_status=ReviewStatus.provisional,
+                        is_primary=False,
+                    ),
+                )
+        for job in row.get("jobs", []):
+            repository.enqueue(
+                created.id,
+                "enrich",
+                list(job.get("missing_fields") or []),
+                50,
+                False,
             )
-            connection.execute(
-                """INSERT INTO ontology.legacy_identity_map
-                   (source_system,entity_type,legacy_id,service_id,cutover_run_id)
-                   VALUES(%s,'dish',%s,%s,%s)""",
-                (bundle["source_system"], row["legacy_id"], created.id, run_id),
-            )
-        imported += 1
+        imported += int(was_created)
     with psycopg.connect(target_dsn) as connection:
         connection.execute(
             "UPDATE ontology.cutover_runs SET status='imported',completed_at=now() WHERE id=%s",
@@ -298,6 +357,32 @@ def reconcile(target_dsn: str, bundle: dict[str, Any]) -> dict[str, Any]:
     validate_bundle(bundle)
     expected_ids = {str(row["legacy_id"]) for row in bundle["dishes"]}
     expected_classes = {str(row["class_code"]) for row in bundle["meal_classes"]}
+    expected_aliases = sum(len(row.get("aliases", [])) for row in bundle["dishes"])
+    expected_memberships = sum(len(row.get("class_memberships", [])) for row in bundle["dishes"])
+    expected_fields = sum(
+        len(row.get("fields", []))
+        + sum(
+            row.get(path) is not None
+            for path in (
+                "diet_type",
+                "meal_occasion",
+                "cook_time_minutes",
+                "difficulty",
+                "is_jain",
+                "allergen_flags",
+            )
+        )
+        + (1 if row.get("description") else 0)
+        for row in bundle["dishes"]
+    )
+    expected_images = sum(
+        sum(_importable_image(image) for image in row.get("images", [])) for row in bundle["dishes"]
+    )
+    image_blockers = sum(
+        sum(not _importable_image(image) for image in row.get("images", []))
+        for row in bundle["dishes"]
+    )
+    expected_jobs = sum(len(row.get("jobs", [])) for row in bundle["dishes"])
     with psycopg.connect(target_dsn, row_factory=dict_row) as connection:
         maps = connection.execute(
             """SELECT legacy_id,service_id FROM ontology.legacy_identity_map
@@ -322,7 +407,41 @@ def reconcile(target_dsn: str, bundle: dict[str, Any]) -> dict[str, Any]:
         ).fetchone()
         assert pointer_row is not None
         pointer_violations = pointer_row["value"]
+        counts = connection.execute(
+            """SELECT
+                 (SELECT count(*) FROM ontology.dish_aliases a
+                    JOIN ontology.legacy_identity_map m ON m.service_id=a.dish_id
+                    WHERE m.source_system=%s AND m.entity_type='dish') aliases,
+                 (SELECT count(*) FROM ontology.dish_class_memberships c
+                    JOIN ontology.legacy_identity_map m ON m.service_id=c.dish_id
+                    WHERE m.source_system=%s AND m.entity_type='dish') memberships,
+                 (SELECT count(*) FROM ontology.current_field_values f
+                    JOIN ontology.legacy_identity_map m ON m.service_id=f.dish_id
+                    WHERE m.source_system=%s AND m.entity_type='dish') fields,
+                 (SELECT count(*) FROM ontology.dish_images i
+                    JOIN ontology.legacy_identity_map m ON m.service_id=i.dish_id
+                    WHERE m.source_system=%s AND m.entity_type='dish') images,
+                 (SELECT count(*) FROM ontology.jobs j
+                    JOIN ontology.legacy_identity_map m ON m.service_id=j.dish_id
+                    WHERE m.source_system=%s AND m.entity_type='dish') jobs""",
+            (bundle["source_system"],) * 5,
+        ).fetchone()
+        assert counts is not None
+        names = {
+            row["legacy_id"]: row["normalized_name"]
+            for row in connection.execute(
+                """SELECT m.legacy_id,d.normalized_name FROM ontology.legacy_identity_map m
+                   JOIN ontology.dishes d ON d.id=m.service_id
+                   WHERE m.source_system=%s AND m.entity_type='dish'""",
+                (bundle["source_system"],),
+            ).fetchall()
+        }
     actual_ids = {row["legacy_id"] for row in maps}
+    name_mismatches = sorted(
+        str(row["legacy_id"])
+        for row in bundle["dishes"]
+        if names.get(str(row["legacy_id"])) != " ".join(str(row["name"]).casefold().split())
+    )
     report = {
         "schema_version": "foofoo-ontology-reconciliation/v1",
         "source_export_sha256": bundle["checksum_sha256"],
@@ -333,14 +452,35 @@ def reconcile(target_dsn: str, bundle: dict[str, Any]) -> dict[str, Any]:
         "missing_class_codes": sorted(expected_classes - actual_classes),
         "class_role_violations": role_violations,
         "field_pointer_evidence_violations": pointer_violations,
+        "canonical_name_mismatches": name_mismatches,
+        "counts": {
+            "aliases": {"expected": expected_aliases, "actual": counts["aliases"]},
+            "class_memberships": {
+                "expected": expected_memberships,
+                "actual": counts["memberships"],
+            },
+            "current_fields": {"expected": expected_fields, "actual": counts["fields"]},
+            "images": {"expected": expected_images, "actual": counts["images"]},
+            "jobs": {"expected": expected_jobs, "actual": counts["jobs"]},
+        },
+        "image_rows_requiring_review": image_blockers,
+        "source_blockers": bundle.get("blockers", {}),
     }
+    count_mismatches = [
+        name for name, values in report["counts"].items() if values["expected"] != values["actual"]
+    ]
+    report["count_mismatches"] = count_mismatches
     report["passed"] = not any(
         (
             report["missing_legacy_ids"],
             report["unexpected_legacy_ids"],
             report["missing_class_codes"],
+            name_mismatches,
             role_violations,
             pointer_violations,
+            count_mismatches,
+            image_blockers,
+            sum(int(value) for value in report["source_blockers"].values()),
         )
     )
     with psycopg.connect(target_dsn) as connection:

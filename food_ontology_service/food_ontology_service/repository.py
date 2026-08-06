@@ -57,7 +57,14 @@ class Repository(Protocol):
     def get_dish(self, dish_id: UUID) -> DishRecord: ...
     def get_by_name(self, name: str) -> DishRecord: ...
     def list_classes(self) -> list[dict[str, Any]]: ...
-    def dishes_by_class(self, class_code: str, role: str, limit: int) -> list[DishRecord]: ...
+    def dishes_by_class(
+        self,
+        class_code: str,
+        role: str,
+        limit: int,
+        slot: str | None = None,
+        diet: str | None = None,
+    ) -> list[DishRecord]: ...
     def enqueue(
         self, dish_id: UUID, kind: str, fields: list[str], priority: int, force: bool
     ) -> dict[str, Any]: ...
@@ -186,12 +193,26 @@ class MemoryRepository:
                 }
         return sorted(rows.values(), key=lambda row: (row["slot"], row["class_code"]))
 
-    def dishes_by_class(self, class_code: str, role: str, limit: int) -> list[DishRecord]:
+    def dishes_by_class(
+        self,
+        class_code: str,
+        role: str,
+        limit: int,
+        slot: str | None = None,
+        diet: str | None = None,
+    ) -> list[DishRecord]:
         found = []
         for dish in self.dishes.values():
-            if any(
-                m.class_code == class_code and m.role == role and m.review_status != "rejected"
-                for m in dish.class_memberships
+            if (
+                any(
+                    m.class_code == class_code and m.role == role and m.review_status != "rejected"
+                    for m in dish.class_memberships
+                )
+                and (slot is None or any(m.slot == slot for m in dish.class_memberships))
+                and (
+                    diet is None
+                    or ("diet_type" in dish.fields and str(dish.fields["diet_type"].value) == diet)
+                )
             ):
                 found.append(dish)
         found.sort(key=lambda dish: dish.canonical_name)

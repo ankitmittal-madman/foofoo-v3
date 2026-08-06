@@ -136,3 +136,12 @@ def test_relationship_and_cloudinary_reference_are_governed():
     )
     assert image.status_code == 201
     assert api.get(f"/v1/dishes/{source}/images", headers=HEADERS).json()["items"][0]["is_primary"]
+
+
+def test_admin_metrics_are_exposed_and_trace_id_is_propagated():
+    api = client()
+    traced = api.get("/healthz", headers={"x-request-id": "trace-ontology-1"})
+    assert traced.headers["x-request-id"] == "trace-ontology-1"
+    metrics = api.get("/metrics", headers=HEADERS)
+    assert metrics.status_code == 200
+    assert "ontology_http_requests_total" in metrics.text

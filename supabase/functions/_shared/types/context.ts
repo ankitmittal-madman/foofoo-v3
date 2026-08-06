@@ -23,6 +23,7 @@ export interface RequestContext {
   readonly config: AppConfig;
   readonly method: string;
   readonly url: URL;
+  readonly traceParent?: string;
   /** Present only after the auth middleware runs on a protected route. */
   readonly claims?: AuthClaims;
 }

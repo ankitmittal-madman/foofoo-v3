@@ -7,7 +7,7 @@ from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 from . import __version__
 from .models import (
@@ -20,6 +20,7 @@ from .models import (
 )
 from .repository import ConflictError, MemoryRepository, NotFoundError, Repository
 from .settings import Principal, Settings
+from .telemetry import MetricsRegistry, telemetry_middleware
 
 
 def create_app(settings: Settings | None = None, repository: Repository | None = None) -> FastAPI:
@@ -35,6 +36,9 @@ def create_app(settings: Settings | None = None, repository: Repository | None =
     app = FastAPI(title="Foofoo Food Ontology Service", version=__version__)
     app.state.settings = cfg
     app.state.repository = repo
+    metrics = MetricsRegistry()
+    app.state.metrics = metrics
+    app.middleware("http")(telemetry_middleware(metrics))
 
     @app.exception_handler(NotFoundError)
     async def not_found(_request: Request, exc: NotFoundError):
@@ -92,6 +96,10 @@ def create_app(settings: Settings | None = None, repository: Repository | None =
                 )
         return {"status": "ready", "database": "postgres" if cfg.database_url else "memory"}
 
+    @app.get("/metrics")
+    def prometheus_metrics(_principal: Principal = Depends(require("ontology:admin"))):
+        return PlainTextResponse(metrics.render(), media_type="text/plain; version=0.0.4")
+
     @app.post("/v1/dishes")
     def create_dish(
         data: DishCreate,
@@ -131,9 +139,12 @@ def create_app(settings: Settings | None = None, repository: Repository | None =
         _principal: Principal = Depends(require("ontology:read")),
         role: str = Query(default="primary", pattern="^(primary|addon|combo_component)$"),
         limit: int = Query(default=25, ge=1, le=100),
+        slot: str | None = Query(default=None, pattern="^(breakfast|lunch|dinner|snack)$"),
+        diet: str | None = Query(default=None, max_length=40),
     ):
         items = [
-            item.model_dump(mode="json") for item in repo.dishes_by_class(class_code, role, limit)
+            item.model_dump(mode="json")
+            for item in repo.dishes_by_class(class_code, role, limit, slot, diet)
         ]
         return response({"class_code": class_code, "role": role, "items": items}, cache=True)
 

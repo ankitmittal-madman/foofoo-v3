@@ -286,6 +286,36 @@ class PostgresRepository:
         except RaiseException as exc:
             raise ConflictError("meal_class_role_mismatch") from exc
 
+    def create_legacy_dish(
+        self,
+        source_system: str,
+        legacy_id: str,
+        cutover_run_id: UUID,
+        data: DishCreate,
+        active: bool,
+    ) -> tuple[DishRecord, bool]:
+        """Atomically create one imported dish and its durable legacy identity mapping."""
+        with self._connection() as connection:
+            prior = connection.execute(
+                """SELECT service_id FROM ontology.legacy_identity_map
+                   WHERE source_system=%s AND entity_type='dish' AND legacy_id=%s""",
+                (source_system, legacy_id),
+            ).fetchone()
+            if prior:
+                return self.get_dish(prior["service_id"]), False
+            created = self.create_dish(data)
+            connection.execute(
+                "UPDATE ontology.dishes SET status=%s WHERE id=%s",
+                ("active" if active else "retired", created.id),
+            )
+            connection.execute(
+                """INSERT INTO ontology.legacy_identity_map
+                   (source_system,entity_type,legacy_id,service_id,cutover_run_id)
+                   VALUES(%s,'dish',%s,%s,%s)""",
+                (source_system, legacy_id, created.id, cutover_run_id),
+            )
+            return self.get_dish(created.id), True
+
     def update_dish(self, dish_id: UUID, patch: DishPatch) -> DishRecord:
         try:
             with self._connection() as connection:
@@ -426,14 +456,28 @@ class PostgresRepository:
                    FROM ontology.meal_classes WHERE is_active ORDER BY slot,class_code"""
             ).fetchall()
 
-    def dishes_by_class(self, class_code: str, role: str, limit: int) -> list[DishRecord]:
+    def dishes_by_class(
+        self,
+        class_code: str,
+        role: str,
+        limit: int,
+        slot: str | None = None,
+        diet: str | None = None,
+    ) -> list[DishRecord]:
         with self._connection() as connection:
             rows = connection.execute(
                 """SELECT d.id FROM ontology.dishes d JOIN ontology.dish_class_memberships m ON m.dish_id=d.id
                    JOIN ontology.assertions a ON a.id=m.assertion_id
                    WHERE m.class_code=%s AND m.role=%s AND a.review_status<>'rejected' AND d.status<>'retired'
+                     AND (%s::text IS NULL OR m.slot=%s::text)
+                     AND (%s::text IS NULL OR EXISTS (
+                       SELECT 1 FROM ontology.current_field_values cf
+                       JOIN ontology.assertions da ON da.id=cf.assertion_id
+                       WHERE cf.dish_id=d.id AND cf.field_path='diet_type'
+                         AND da.review_status<>'rejected' AND da.value->>'value'=%s::text
+                     ))
                    ORDER BY a.confidence DESC,d.canonical_name LIMIT %s""",
-                (class_code, role, limit),
+                (class_code, role, slot, slot, diet, diet, limit),
             ).fetchall()
             return [self.get_dish(row["id"]) for row in rows]
 
@@ -705,3 +749,12 @@ class PostgresRepository:
                 "reconciliation count",
             )
             return row["count"]
+
+    def cache_invalidation_events(self, after_id: int, limit: int = 500) -> list[dict[str, Any]]:
+        with self._connection() as connection:
+            return connection.execute(
+                """SELECT id,namespace,resource_key,reason,created_at
+                   FROM ontology.cache_invalidation_events WHERE id>%s
+                   ORDER BY id LIMIT %s""",
+                (max(0, after_id), max(1, min(limit, 5000))),
+            ).fetchall()

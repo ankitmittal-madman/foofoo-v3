@@ -23,7 +23,14 @@ export function buildContext(req: Request): RequestContext {
     method: req.method,
     path: url.pathname,
   });
-  return { traceId, logger, config, method: req.method, url };
+  return {
+    traceId,
+    logger,
+    config,
+    method: req.method,
+    url,
+    traceParent: req.headers.get("traceparent") ?? undefined,
+  };
 }
 
 /** Logging middleware: records request start/finish with latency. */

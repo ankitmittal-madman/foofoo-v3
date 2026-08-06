@@ -5,6 +5,8 @@ import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
+import { resolveTelemetrySink } from "../_shared/telemetry/telemetry.ts";
+import { FoodOntologyGateway } from "./gateway.ts";
 import { normalizeFoodName } from "./research.ts";
 import {
   createSubmission,
@@ -49,6 +51,17 @@ export function makeDishOntologyHandler(): Handler {
     const claims = requireAuth(ctx.claims);
     const body = await parseBody(req);
     const action = typeof body.action === "string" ? body.action : "";
+    const gateway = new FoodOntologyGateway({
+      mode: ctx.config.foodOntologyReadMode,
+      serviceUrl: ctx.config.foodOntologyServiceUrl,
+      serviceToken: ctx.config.foodOntologyServiceToken,
+      redisUrl: ctx.config.ontologyRedisRestUrl,
+      redisToken: ctx.config.ontologyRedisRestToken,
+      cacheSeconds: ctx.config.ontologyCacheSeconds,
+      traceId: ctx.traceId,
+      traceParent: ctx.traceParent,
+      telemetry: resolveTelemetrySink(ctx.logger, ctx.config.telemetryWebhookUrl),
+    });
 
     if (action === "submit" || action === "update") {
       const input = submissionInput(body);
@@ -82,8 +95,12 @@ export function makeDishOntologyHandler(): Handler {
     }
 
     if (action === "meal_classes") {
+      const classes = await gateway.read(
+        { action: "meal_classes" },
+        () => fetchMealClasses(ctx),
+      );
       return jsonContract(
-        { kind: "meal_classes", classes: await fetchMealClasses(ctx) },
+        { kind: "meal_classes", classes },
         ctx.traceId,
       );
     }
@@ -95,13 +112,19 @@ export function makeDishOntologyHandler(): Handler {
       }
       const role = body.role === "addon" ? "addon" : "primary";
       const limit = typeof body.limit === "number" ? Math.max(1, Math.min(100, body.limit)) : 25;
-      const candidates = await fetchCandidates(ctx, {
-        classCode,
-        role,
-        limit,
-        slot: typeof body.slot === "string" ? normalizeFoodName(body.slot) : undefined,
-        diet: typeof body.diet === "string" ? normalizeFoodName(body.diet) : undefined,
-      });
+      const slot = typeof body.slot === "string" ? normalizeFoodName(body.slot) : undefined;
+      const diet = typeof body.diet === "string" ? normalizeFoodName(body.diet) : undefined;
+      const candidates = await gateway.read(
+        { action: "candidates", classCode, role, limit, slot, diet },
+        () =>
+          fetchCandidates(ctx, {
+            classCode,
+            role,
+            limit,
+            slot,
+            diet,
+          }),
+      );
       return jsonContract(
         { kind: "dish_candidates", class_code: classCode, role, candidates },
         ctx.traceId,
@@ -122,7 +145,10 @@ export function makeDishOntologyHandler(): Handler {
       ) {
         throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, { detail: "dish_id must be a UUID" });
       }
-      const record = await fetchDishOntologyRecord(ctx, { dishId, name });
+      const record = await gateway.read(
+        { action: "ontology_record", dishId, name },
+        () => fetchDishOntologyRecord(ctx, { dishId, name }),
+      );
       if (!record) throw new AppError(ERROR_CATALOGUE.NOT_FOUND);
       return jsonContract({ kind: "dish_ontology_record", record }, ctx.traceId);
     }

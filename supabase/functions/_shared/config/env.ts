@@ -53,6 +53,36 @@ export const ENV_VARS = {
   // MUST be set in staging/production (enforced in config.ts).
   GHAR_RE_SERVICE_URL: { key: "GHAR_RE_SERVICE_URL", required: false, secret: false },
   GHAR_RE_SERVICE_SECRET: { key: "GHAR_RE_SERVICE_SECRET", required: false, secret: true },
+  FOOD_ONTOLOGY_SERVICE_URL: {
+    key: "FOOD_ONTOLOGY_SERVICE_URL",
+    required: false,
+    secret: false,
+  },
+  FOOD_ONTOLOGY_SERVICE_TOKEN: {
+    key: "FOOD_ONTOLOGY_SERVICE_TOKEN",
+    required: false,
+    secret: true,
+  },
+  FOOD_ONTOLOGY_READ_MODE: {
+    key: "FOOD_ONTOLOGY_READ_MODE",
+    required: false,
+    secret: false,
+  },
+  ONTOLOGY_REDIS_REST_URL: {
+    key: "ONTOLOGY_REDIS_REST_URL",
+    required: false,
+    secret: false,
+  },
+  ONTOLOGY_REDIS_REST_TOKEN: {
+    key: "ONTOLOGY_REDIS_REST_TOKEN",
+    required: false,
+    secret: true,
+  },
+  ONTOLOGY_CACHE_SECONDS: {
+    key: "ONTOLOGY_CACHE_SECONDS",
+    required: false,
+    secret: false,
+  },
   // P1-7 (2026-08): optional real alerting sink. When set, the error-boundary middleware POSTs a
   // JSON payload here for every 500-level request failure across every Edge Function (see
   // telemetry.ts's webhookSink / middleware/error-boundary.ts). Deliberately generic (a plain
