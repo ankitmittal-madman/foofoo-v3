@@ -40,7 +40,7 @@ RUN pip install --no-cache-dir \
       "PyYAML==6.0.1" \
       "joblib==1.5.3" \
       "numpy==2.4.6" \
-      "scipy==1.18.0" \
+      "scipy==1.17.1" \
       "scikit-learn==1.9.0" \
       "threadpoolctl==3.6.0"
 
