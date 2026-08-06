@@ -12,7 +12,12 @@
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
-import { buildShownNotTappedRows, flattenServedDishes, resolveDishIdsByName } from "./served.ts";
+import {
+  buildShownNotTappedRows,
+  flattenServedDishes,
+  resolveDishIdsByName,
+  toExposureItems,
+} from "./served.ts";
 
 export type RecommendationOutcome =
   | "success"
@@ -112,10 +117,10 @@ export async function recordRecommendationEvent(
   // at READ time; nothing here needs to delete/update it. Best-effort, same as the write above:
   // never turns an otherwise-successful recommendation into an error for the user.
   if (ev.outcome === "success" && insertedId && Array.isArray(ev.plates) && ev.plates.length > 0) {
-    try {
-      const db = createServiceRoleClient(ctx.config);
-      const served = flattenServedDishes(ev.plates);
-      if (served.length > 0) {
+    const db = createServiceRoleClient(ctx.config);
+    const served = flattenServedDishes(ev.plates);
+    if (served.length > 0) {
+      try {
         const dishIds = await resolveDishIdsByName(ctx, db, served.map((s) => s.dishName));
         const rows = buildShownNotTappedRows(ev.householdId, insertedId, served, dishIds);
         const { error: feError } = await withTimeout(
@@ -128,13 +133,40 @@ export async function recordRecommendationEvent(
           household_id: ev.householdId,
           row_count: rows.length,
         });
+      } catch (e) {
+        ctx.logger.warn("shown_not_tapped.persist_failed", {
+          request_id: ev.requestId,
+          household_id: ev.householdId,
+          detail: e instanceof Error ? e.message : String(e),
+        });
       }
-    } catch (e) {
-      ctx.logger.warn("shown_not_tapped.persist_failed", {
-        request_id: ev.requestId,
-        household_id: ev.householdId,
-        detail: e instanceof Error ? e.message : String(e),
-      });
+
+      // Exposure state is independent of the feedback denominator. Either secondary write may
+      // fail during a rolling deployment without preventing the other from being retained.
+      try {
+        const { error: exposureError } = await withTimeout(
+          db.rpc("record_recommendation_exposure_state", {
+            p_recommendation_event_id: insertedId,
+            p_items: toExposureItems(served),
+          }),
+          "recommendations.events.record_exposure_state",
+        );
+        if (exposureError) {
+          // Rolling deploys are order-tolerant: a missing/new RPC cannot discard the already
+          // recorded recommendation or shown denominator.
+          ctx.logger.warn("recommendation_exposure_state.persist_failed", {
+            request_id: ev.requestId,
+            household_id: ev.householdId,
+            detail: exposureError.message,
+          });
+        }
+      } catch (e) {
+        ctx.logger.warn("recommendation_exposure_state.persist_failed", {
+          request_id: ev.requestId,
+          household_id: ev.householdId,
+          detail: e instanceof Error ? e.message : String(e),
+        });
+      }
     }
   }
 }

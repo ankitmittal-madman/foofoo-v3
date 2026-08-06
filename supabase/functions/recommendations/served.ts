@@ -15,6 +15,23 @@ import { withTimeout } from "../_shared/utils/timeout.ts";
 /** One served dish, as flattened out of any supported recommendation response shape. */
 export interface ServedDish {
   dishName: string;
+  mealClassCode?: string;
+  cuisineFamily?: string;
+  heaviness?: number;
+  totalMins?: number;
+  richnessScore?: number;
+}
+
+function boundedNumber(value: unknown, minimum: number, maximum?: number): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < minimum) return undefined;
+  if (maximum !== undefined && value > maximum) return undefined;
+  return value;
+}
+
+function text(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim();
+  return normalized || undefined;
 }
 
 /**
@@ -105,22 +122,54 @@ export function flattenServedDishes(plates: unknown): ServedDish[] {
   for (const p of plates) {
     if (!p || typeof p !== "object") continue;
     const row = p as Record<string, unknown>;
-    const directName = typeof row.name === "string" ? row.name.trim() : "";
-    if (directName) out.push({ dishName: directName });
+    const directName = text(row.name);
+    if (directName) {
+      out.push({
+        dishName: directName,
+        mealClassCode: text(row.meal_class_code),
+        cuisineFamily: text(row.cuisine_family) ?? text(row.cuisine),
+        heaviness: boundedNumber(row.heaviness, 0, 3),
+        totalMins: boundedNumber(row.total_mins, 0),
+        richnessScore: boundedNumber(row.richness_score, 0, 1),
+      });
+    }
     if (Array.isArray(row.hero_dish_names)) {
       for (const value of row.hero_dish_names) {
-        const name = typeof value === "string" ? value.trim() : "";
+        const name = text(value);
         if (name) out.push({ dishName: name });
       }
     }
     if (Array.isArray(row.components)) {
+      const practicality = row.practicality && typeof row.practicality === "object"
+        ? row.practicality as Record<string, unknown>
+        : {};
       for (const component of row.components) {
         if (!component || typeof component !== "object") continue;
-        const value = (component as Record<string, unknown>).dish_name;
-        const name = typeof value === "string" ? value.trim() : "";
-        if (name) out.push({ dishName: name });
+        const item = component as Record<string, unknown>;
+        const name = text(item.dish_name);
+        if (name) {
+          out.push({
+            dishName: name,
+            mealClassCode: text(item.meal_class_code),
+            cuisineFamily: text(item.cuisine_family) ?? text(item.cuisine),
+            totalMins: boundedNumber(practicality.active_minutes, 0),
+            richnessScore: boundedNumber(row.richness_score, 0, 1),
+          });
+        }
       }
     }
   }
   return out;
+}
+
+/** RPC payload uses snake_case to match the database boundary. Undefined evidence is omitted. */
+export function toExposureItems(served: ServedDish[]): Array<Record<string, string | number>> {
+  return served.map((item) => ({
+    dish_name: item.dishName,
+    ...(item.mealClassCode ? { meal_class_code: item.mealClassCode } : {}),
+    ...(item.cuisineFamily ? { cuisine_family: item.cuisineFamily } : {}),
+    ...(item.heaviness !== undefined ? { heaviness: item.heaviness } : {}),
+    ...(item.totalMins !== undefined ? { total_mins: item.totalMins } : {}),
+    ...(item.richnessScore !== undefined ? { richness_score: item.richnessScore } : {}),
+  }));
 }
