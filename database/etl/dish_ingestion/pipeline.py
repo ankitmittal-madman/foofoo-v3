@@ -107,13 +107,18 @@ def process_row(row: SourceRow, dedupe_index: DedupeIndex, ontology, groq: GroqA
     except Exception as exc:
         outcome.errors.append(("ontology_map", "ontology_exception", str(exc)))
 
-    try:
-        needs_region = True  # this dataset never supplies region directly
-        if needs_region:
+    # Groq enrichment is a real network call and the dominant cost of a full-dataset run --
+    # skip it entirely for a row dedupe already resolved to a pre-existing dish (from this run's
+    # in-memory index OR a prior run's persisted data, since dedupe_index is seeded from
+    # load_existing_dishes at startup). Its regional-affinity/tags rows were already written the
+    # first time this dish was created; re-deriving them on every resume wastes the majority of a
+    # rerun's wall time re-processing rows that need no new enrichment at all.
+    if outcome.dedupe.outcome != "matched_existing":
+        try:
             outcome.region = groq.infer_regional_affinity(n["name"], n["cuisine_raw"])
-        outcome.tags = groq.infer_tags(n["name"], n["ingredients"])
-    except Exception as exc:
-        outcome.errors.append(("enrich", "enrich_exception", str(exc)))
+            outcome.tags = groq.infer_tags(n["name"], n["ingredients"])
+        except Exception as exc:
+            outcome.errors.append(("enrich", "enrich_exception", str(exc)))
 
     try:
         if not image_ctx.generate_images:
