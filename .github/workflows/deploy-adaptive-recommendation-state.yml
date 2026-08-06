@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: Type apply to deploy migrations 081 and 082
+        description: Type apply to deploy migrations 081 through 083
         required: true
         type: string
 
@@ -62,9 +62,23 @@ jobs:
               -f database/migrations/082_refresh_user_re_state.sql
           fi
 
+      - name: Apply migration 083 when absent
+        run: |
+          present="$(psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -c \
+            "SELECT to_regprocedure('public.refresh_user_taste_vector(uuid)') IS NOT NULL")"
+          if [ "$present" = "t" ]; then
+            echo "Migration 083 already present; skipping."
+          else
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction \
+              -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+              -f database/migrations/083_refresh_user_taste_vectors.sql
+          fi
+
       - name: Validate adaptive state and report aggregate counts
         run: |
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
             -f database/validation/933_recommendation_variety_state_validation.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
             -f database/validation/934_refresh_user_re_state_validation.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/935_refresh_user_taste_vectors_validation.sql
