@@ -54,6 +54,11 @@ def test_user_audit_counts_json_dimensions_with_postgres_supported_function():
     assert user_audit.AUDIT_SQL.count("jsonb_object_keys") == 2
 
 
+def test_user_audit_reports_missing_persisted_variety_state_explicitly():
+    assert "FROM public.variety_window_state" not in user_audit.AUDIT_SQL
+    assert "'status', 'not_implemented'" in user_audit.AUDIT_SQL
+
+
 def test_user_audit_fails_closed_for_missing_profile():
     with pytest.raises(RuntimeError, match="Profile does not exist"):
         user_audit.fetch_user_audit(FakeConnection({"profile": None}), PROFILE_ID)
