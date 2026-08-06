@@ -39,10 +39,12 @@ WITH u AS (
   FROM public.feedback_events
   WHERE household_id = (SELECT id FROM u)
 ), taste AS (
-  SELECT coalesce(jsonb_object_length(class_affinity), 0) AS class_affinity_dimensions,
-         coalesce(jsonb_object_length(dish_affinity), 0) AS dish_affinity_dimensions,
-         coalesce(cardinality(genome_tag_affinity), 0) AS genome_dimensions, updated_at
-  FROM public.user_taste_vectors WHERE profile_id = (SELECT id FROM u)
+  SELECT (SELECT count(*) FROM jsonb_object_keys(coalesce(t.class_affinity, '{}'::jsonb)))
+           AS class_affinity_dimensions,
+         (SELECT count(*) FROM jsonb_object_keys(coalesce(t.dish_affinity, '{}'::jsonb)))
+           AS dish_affinity_dimensions,
+         coalesce(cardinality(t.genome_tag_affinity), 0) AS genome_dimensions, t.updated_at
+  FROM public.user_taste_vectors t WHERE t.profile_id = (SELECT id FROM u)
 ), re_state AS (
   SELECT confidence_score, interaction_count, cold_start_mode, re_engine_version,
          weight_tier, city_overlay_weight, updated_at

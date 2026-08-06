@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+from pathlib import Path
 from uuid import uuid4
 
 import psycopg
@@ -13,11 +14,20 @@ from food_ontology_service.postgres_repository import PostgresRepository
 from food_ontology_service.settings import Principal, Settings
 from food_ontology_service.worker import OntologyWorker
 
+from food_ontology_service import migrate
+
 DSN = os.getenv("ONTOLOGY_TEST_DSN")
 pytestmark = pytest.mark.skipif(not DSN, reason="ONTOLOGY_TEST_DSN not configured")
 TOKEN = "postgres-test-token"
 AUTH = {"Authorization": f"Bearer {TOKEN}"}
 EVIDENCE = [{"source_code": "integration_test", "extraction_method": "test_fixture"}]
+
+
+def test_migrations_are_owned_by_the_installed_package():
+    assert migrate.DEFAULT_MIGRATIONS.parent == Path(migrate.__file__).resolve().parent
+    assert [path.name for path in migrate.DEFAULT_MIGRATIONS.glob("[0-9][0-9][0-9]_*.sql")] == [
+        "001_create_ontology_schema.sql"
+    ]
 
 
 @pytest.fixture(scope="module")

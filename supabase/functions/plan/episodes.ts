@@ -132,7 +132,7 @@ export async function snapshotHash(value: unknown): Promise<string> {
  * UI's primary surfaces emitted feedback_events but no slate or feature snapshot to attribute the
  * feedback to. No probabilities are invented: uncalibrated propensities and prediction columns
  * stay null. */
-export async function recordDishRecommendationSlate(
+async function persistDishRecommendationSlate(
   ctx: RequestContext,
   input: {
     householdId: string;
@@ -283,6 +283,29 @@ export async function recordDishRecommendationSlate(
     throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: lineageError.message });
   }
   return slate.id as string;
+}
+
+type DishSlatePersistence = typeof persistDishRecommendationSlate;
+
+/** Dish-card lineage is observational, not part of the response contract. A schema rollout,
+ * timeout, or analytics failure must never hide an otherwise valid calibration or meal-plan
+ * response from the user. The warning preserves enough context to diagnose and replay the gap. */
+export async function recordDishRecommendationSlate(
+  ctx: RequestContext,
+  input: Parameters<DishSlatePersistence>[1],
+  persist: DishSlatePersistence = persistDishRecommendationSlate,
+): Promise<string | undefined> {
+  try {
+    return await persist(ctx, input);
+  } catch (error) {
+    ctx.logger.warn("plan.dishes.persist_failed", {
+      request_id: input.requestId,
+      household_id: input.householdId,
+      surface: input.surface,
+      detail: error instanceof Error ? error.message : String(error),
+    });
+    return undefined;
+  }
 }
 
 export async function recordMealEpisodeSlate(
