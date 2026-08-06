@@ -170,6 +170,16 @@ async function syncTypedIntelligence(
       ctx.logger.warn("feedback_event.ingredient_not_found", { ingredient_name: ingredientName });
     }
   }
+
+  // Recompute rather than increment: duplicate retries and concurrent household-member actions
+  // converge on the durable feedback history and cannot double-count lifecycle progress.
+  const { error: reStateError } = await withTimeout(
+    db.rpc("refresh_user_re_state", { p_profile_id: ev.householdId }),
+    "feedback.events.refresh_user_re_state",
+  );
+  if (reStateError) {
+    throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: reStateError.message });
+  }
 }
 
 /**
