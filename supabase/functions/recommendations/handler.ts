@@ -29,13 +29,16 @@ import {
   applyFestivalContext,
   buildExcludeDishIds,
   buildRequest,
-  countInteractions,
   type HouseholdRaw,
   loadFestivalContext,
   loadHouseholdRaw,
   loadLatestContext,
   recordHouseholdContext,
 } from "./compose.ts";
+import {
+  loadOnlineRecommendationState,
+  type OnlineRecommendationState,
+} from "./personalization.ts";
 import { validateRequest, validateResponse } from "./contract.ts";
 import { callRecommendationEngine, type ReResult } from "./re-client.ts";
 import { buildFallbackResponse } from "./fallback.ts";
@@ -59,8 +62,11 @@ export interface RecommendationDeps {
   recordEvent?: typeof recordRecommendationEvent;
   /** §0.2 — injectable so tests never need a live household_context table. */
   recordContext?: typeof recordHouseholdContext;
-  /** §0.2 — injectable so tests never need a live feedback_events table. */
-  countInteractionsFn?: typeof countInteractions;
+  /** Shared online learning state, injectable so tests never need live personalization tables. */
+  loadOnlineStateFn?: (
+    ctx: RequestContext,
+    profileId: string,
+  ) => Promise<OnlineRecommendationState>;
   /** WP-8G Option A — injectable so tests never need a live recommendation_events table. */
   buildExcludeDishIdsFn?: typeof buildExcludeDishIds;
   /** WP-14 §3 — injectable so tests never need a live household_context table. */
@@ -82,7 +88,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
       callRecommendationEngine(payload, requestId, cfg, logger));
   const recordEvent = deps.recordEvent ?? recordRecommendationEvent;
   const recordContext = deps.recordContext ?? recordHouseholdContext;
-  const countInteractionsFn = deps.countInteractionsFn ?? countInteractions;
+  const loadOnlineStateFn = deps.loadOnlineStateFn ?? loadOnlineRecommendationState;
   const buildExcludeDishIdsFn = deps.buildExcludeDishIdsFn ?? buildExcludeDishIds;
   const loadLatestContextFn = deps.loadLatestContextFn ?? loadLatestContext;
   const loadFestivalContextFn = deps.loadFestivalContextFn ?? loadFestivalContext;
@@ -143,33 +149,54 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
       ? body.context as Record<string, unknown>
       : undefined;
 
-    // §0.2: interaction_count closes the gap where w_cohort_effective/foreign_demote_effective
-    // (ghar_re_core/config.py) were dead code paths — always n=0 — because no real caller ever
-    // populated ctx['interaction_count']. Computed BEFORE buildRequest so it is merged into
-    // `context` prior to validateRequest below, exactly like every other context field.
-    const interactionCount = await countInteractionsFn(ctx, hid);
-    // WP-8G Option A: the household's own last-served dish ids, so a refresh doesn't keep
-    // resurfacing the exact same plates. Best-effort (buildExcludeDishIdsFn never throws — see
-    // compose.ts) — a lookup failure degrades to no exclusions, never blocks the request.
-    const excludeDishIds = await buildExcludeDishIdsFn(ctx, hid);
-    // WP-14 §3: this household's own most recent context (if any), sitting between
-    // DEFAULT_CONTEXT and an explicit per-request override in buildRequest's precedence — so a
-    // returning household with no override gets ITS real recent context instead of always
-    // dinner/monsoon/Thursday. Best-effort (loadLatestContextFn never throws — see compose.ts).
-    const storedContext = await loadLatestContextFn(ctx, hid);
+    // Load all independent serving state concurrently. Online state is shared with the plan
+    // surface, so this endpoint cannot silently fall back to a less-personalized ranking path.
+    const [online, excludeDishIds, storedContext] = await Promise.all([
+      loadOnlineStateFn(ctx, hid),
+      // Retain id exclusions for compatibility with older recommendation events whose plates did
+      // not persist canonical names.
+      buildExcludeDishIdsFn(ctx, hid),
+      loadLatestContextFn(ctx, hid),
+    ]);
     const festival = await loadFestivalContextFn(
       ctx,
       typeof contextOverride?.date === "string" ? contextOverride.date : undefined,
     );
+    const requestedRefreshGeneration = typeof body.refresh_generation === "number"
+      ? body.refresh_generation
+      : contextOverride?.refresh_generation;
+    const enrichedContext = {
+      ...(contextOverride ?? {}),
+      dish_feedback_counts: online.dishFeedbackCounts,
+      novelty_budget: online.noveltyBudget,
+      richness_debt: online.richnessDebt,
+      ...(typeof requestedRefreshGeneration === "number" &&
+          Number.isFinite(requestedRefreshGeneration)
+        ? { refresh_generation: Math.max(0, Math.trunc(requestedRefreshGeneration)) }
+        : {}),
+    };
     const payload = buildRequest(
       household,
-      contextOverride ? applyFestivalContext(contextOverride, festival) : undefined,
+      applyFestivalContext(enrichedContext, festival),
       requestId,
-      interactionCount,
+      online.interactionCount,
       excludeDishIds,
       storedContext,
     );
     payload.context = applyFestivalContext(payload.context as Record<string, unknown>, festival);
+    const requestedExclusions = Array.isArray(body.exclude_dish_names)
+      ? body.exclude_dish_names.filter((name): name is string =>
+        typeof name === "string" && name.trim().length > 0
+      ).slice(0, 50)
+      : [];
+    payload.exclude_dish_names = [
+      ...new Set([
+        ...online.excludeDishNames,
+        ...(body.exclude_recently_served === false ? [] : online.recentExposureDishNames),
+        ...requestedExclusions,
+      ]),
+    ].slice(0, 50);
+    payload.preference_by_dish = online.preferenceByDish;
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext
