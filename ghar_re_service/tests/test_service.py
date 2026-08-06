@@ -128,7 +128,7 @@ def test_readyz_and_recommend_503_before_ready(client):
 def test_meta_returns_versions(client):
     body = client.get("/v1/meta").json()
     assert body["api_version"] == "v1"
-    assert body["engine_version"] == "1.0.0"
+    assert body["engine_version"] == "1.1.0"
     assert body["config_version"].startswith("Config v")
     assert body["preference_model"] == {
         "status": "disabled",
@@ -231,7 +231,7 @@ def test_recommendations_end_to_end(client):
     assert r.status_code == 200
     body = r.json()
     # contract-shaped response
-    assert body["api_version"] == "v1" and body["engine_version"] == "1.0.0"
+    assert body["api_version"] == "v1" and body["engine_version"] == "1.1.0"
     assert "request_id" in body and isinstance(body["warnings"], list)
     assert len(body["plates"]) == 7
     # open contributions[] with more than the old 3 fixed fields' worth of entries
