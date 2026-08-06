@@ -116,7 +116,10 @@ export async function recordRecommendationEvent(
   // accept/like/dislike/edit/swap row sharing this recommendation_event_id+dish_id supersedes it
   // at READ time; nothing here needs to delete/update it. Best-effort, same as the write above:
   // never turns an otherwise-successful recommendation into an error for the user.
-  if (ev.outcome === "success" && insertedId && Array.isArray(ev.plates) && ev.plates.length > 0) {
+  if (
+    (ev.outcome === "success" || ev.outcome === "partial") && insertedId &&
+    Array.isArray(ev.plates) && ev.plates.length > 0
+  ) {
     const db = createServiceRoleClient(ctx.config);
     const served = flattenServedDishes(ev.plates);
     if (served.length > 0) {

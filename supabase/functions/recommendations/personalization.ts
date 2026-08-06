@@ -118,7 +118,8 @@ export async function loadOnlineRecommendationState(
         ),
         withTimeout(
           db.from("recommendation_events").select("plates").eq("household_id", profileId)
-            .eq("outcome", "success").order("created_at", { ascending: false }).limit(6),
+            .in("outcome", ["success", "partial"]).order("created_at", { ascending: false })
+            .limit(6),
           "personalization.recent_exposures",
         ),
       ]);
