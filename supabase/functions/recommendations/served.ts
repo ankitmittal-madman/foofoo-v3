@@ -12,7 +12,7 @@ import type { SupabaseClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
 
-/** One served hero dish, as flattened out of RecommendationResponse.plates[]. */
+/** One served dish, as flattened out of any supported recommendation response shape. */
 export interface ServedDish {
   dishName: string;
 }
@@ -91,19 +91,34 @@ export function buildShownNotTappedRows(
 }
 
 /**
- * Flatten a RecommendationResponse.plates[] array into one ServedDish per hero dish name (a
- * "pair" plate has 2 hero dishes; "single"/"standalone" has 1) — this is what makes "one row per
- * served dish" mean per-dish, not per-plate.
+ * Flatten every serving shape into one ServedDish per displayed dish:
+ * - v1 RE plates expose `hero_dish_names[]`;
+ * - plan/onboarding surfaces expose direct dish cards with `name`;
+ * - episode surfaces expose `components[].dish_name`.
+ *
+ * Keeping these shapes together prevents a surface-specific telemetry blind spot: all displayed
+ * dishes must contribute to the shown denominator used by feedback and preference evaluation.
  */
 export function flattenServedDishes(plates: unknown): ServedDish[] {
   if (!Array.isArray(plates)) return [];
   const out: ServedDish[] = [];
   for (const p of plates) {
-    if (
-      p && typeof p === "object" && Array.isArray((p as Record<string, unknown>).hero_dish_names)
-    ) {
-      for (const name of (p as Record<string, unknown>).hero_dish_names as unknown[]) {
-        if (typeof name === "string" && name.length > 0) out.push({ dishName: name });
+    if (!p || typeof p !== "object") continue;
+    const row = p as Record<string, unknown>;
+    const directName = typeof row.name === "string" ? row.name.trim() : "";
+    if (directName) out.push({ dishName: directName });
+    if (Array.isArray(row.hero_dish_names)) {
+      for (const value of row.hero_dish_names) {
+        const name = typeof value === "string" ? value.trim() : "";
+        if (name) out.push({ dishName: name });
+      }
+    }
+    if (Array.isArray(row.components)) {
+      for (const component of row.components) {
+        if (!component || typeof component !== "object") continue;
+        const value = (component as Record<string, unknown>).dish_name;
+        const name = typeof value === "string" ? value.trim() : "";
+        if (name) out.push({ dishName: name });
       }
     }
   }

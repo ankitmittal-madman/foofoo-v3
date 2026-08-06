@@ -19,6 +19,28 @@ Deno.test("flattenServedDishes: a mix of pair (2 heroes) and single (1 hero) pla
   assertEquals(served.map((s) => s.dishName), ["Onion Pakora", "Roti", "Chole", "Khichdi"]);
 });
 
+Deno.test("flattenServedDishes: plan dish cards contribute to the shown denominator", () => {
+  const served = flattenServedDishes([
+    { id: "dish-1", name: "Indori Poha" },
+    { id: "dish-2", name: "  Daal Bafla  " },
+  ]);
+  assertEquals(served.map((s) => s.dishName), ["Indori Poha", "Daal Bafla"]);
+});
+
+Deno.test("flattenServedDishes: episode components contribute to the shown denominator", () => {
+  const served = flattenServedDishes([
+    {
+      episode_id: "episode-1",
+      components: [
+        { dish_name: "Pav Bhaji" },
+        { dish_name: "Mawa Bati" },
+        { dish_name: " " },
+      ],
+    },
+  ]);
+  assertEquals(served.map((s) => s.dishName), ["Pav Bhaji", "Mawa Bati"]);
+});
+
 Deno.test("flattenServedDishes: non-array / malformed input yields zero served dishes, never throws", () => {
   assertEquals(flattenServedDishes(undefined), []);
   assertEquals(flattenServedDishes(null), []);
