@@ -11,11 +11,10 @@ generated_from: Phase 3 (Recommendation Engine build) — s_pref ScoringModule s
 # key or this file is ever missing — never silently guessed on.
 enabled: false
 
-# model_artifact_path: where ModelArtifactProvider looks for a trained joblib artifact
-# (ghar_re_core/model_provider.py FileModelArtifactProvider). null = no artifact configured;
-# NullModelArtifactProvider (the default active provider) is used, so s_pref is 0.0 regardless
-# of `enabled`. Activating s_pref later is meant to be exactly this: point this at a real trained
-# file + flip `enabled: true` — "a deploy, not a code change" (RE-DOC-11 §8).
+# model_artifact_path: relative to this config directory. When enabled, export_bundle includes the
+# artifact bytes in the content hash and service startup validates and loads the model+vectorizer.
+# A missing/malformed artifact or a non-positive w_pref fails startup. null while disabled selects
+# NullModelArtifactProvider, so s_pref remains exactly 0.0.
 model_artifact_path: null
 
 # w_pref: the master formula's `w_pref·S_pref` weight. Belt-and-suspenders default 0.0

@@ -15,6 +15,8 @@ dependencies = [
   "uvicorn>=0.29",
   "jsonschema>=4.20",
   "openpyxl>=3.1",       # reads data/source/dishes.xlsx for the real-catalogue build step
+  "joblib>=1.3",         # loads a governed preference artifact when explicitly enabled
+  "scikit-learn>=1.3",   # artifact classes + DictVectorizer inference runtime
 ]
 
 [project.optional-dependencies]

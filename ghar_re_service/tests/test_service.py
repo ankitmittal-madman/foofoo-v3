@@ -12,6 +12,7 @@ import hashlib
 import hmac
 import json
 import time
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -20,7 +21,7 @@ from ghar_re_service.providers import DEV_INSECURE_SECRET
 from ghar_re_core import config as cfgmod
 from ghar_re_core import fixtures as F
 from ghar_re_core.catalogue import Catalogue
-from ghar_re_service import auth, engine, main
+from ghar_re_service import auth, engine, lifecycle, main
 
 
 def test_build_context_preserves_online_features():
@@ -111,6 +112,57 @@ def test_meta_returns_versions(client):
     assert body["api_version"] == "v1"
     assert body["engine_version"] == "1.0.0"
     assert body["config_version"].startswith("Config v")
+    assert body["preference_model"] == {
+        "status": "disabled",
+        "model_version": None,
+        "weight": 0.0,
+    }
+
+
+def test_preference_model_activation_fails_closed_without_artifact(monkeypatch, tmp_path):
+    monkeypatch.delenv(lifecycle.PREFERENCE_MODEL_PATH_VAR, raising=False)
+    cfg = SimpleNamespace(
+        pref_model_enabled=True,
+        w_pref=0.2,
+        pref_model_artifact_path=str(tmp_path / "missing.joblib"),
+    )
+    with pytest.raises(RuntimeError, match="does not exist"):
+        lifecycle.configure_preference_model(cfg)
+
+
+def test_disabled_preference_model_resets_to_null_provider():
+    from ghar_re_core import model_provider
+
+    stale = model_provider.NullModelArtifactProvider()
+    stale.artifact = object()
+    model_provider.set_active_model(stale)
+    provider = lifecycle.configure_preference_model(
+        SimpleNamespace(pref_model_enabled=False, w_pref=0.0),
+    )
+    assert isinstance(provider, model_provider.NullModelArtifactProvider)
+    assert model_provider.active_model().artifact is None
+
+
+def test_preference_artifact_activation_requires_unbypassed_household_holdout():
+    valid = SimpleNamespace(
+        metadata={
+            "model_version": "sha256:0123456789abcdef",
+            "readiness_gate_bypassed": False,
+            "split_strategy": "household_group_holdout",
+            "household_overlap": 0,
+        }
+    )
+    assert lifecycle.validate_preference_artifact_for_activation(valid) == (
+        "sha256:0123456789abcdef"
+    )
+
+    forced = SimpleNamespace(metadata={**valid.metadata, "readiness_gate_bypassed": True})
+    with pytest.raises(RuntimeError, match="bypassed"):
+        lifecycle.validate_preference_artifact_for_activation(forced)
+
+    leaky = SimpleNamespace(metadata={**valid.metadata, "household_overlap": 1})
+    with pytest.raises(RuntimeError, match="leaks households"):
+        lifecycle.validate_preference_artifact_for_activation(leaky)
 
 
 def test_recommendations_end_to_end(client):

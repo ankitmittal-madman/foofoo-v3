@@ -7,10 +7,13 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 import time
 from dataclasses import dataclass, field
 
+from ghar_re_core import config as core_config
+from ghar_re_core import model_provider as core_model
 from ghar_re_service.modules import build_registry
 from ghar_re_service.providers import (
     AuthConfig,
@@ -25,6 +28,25 @@ from ghar_re_service.providers import (
 from ghar_re_service.ratelimit import SlidingWindowRateLimiter
 
 SERVICE_NAME = "ghar_re_service"
+PREFERENCE_MODEL_PATH_VAR = "GHAR_RE_PREF_MODEL_PATH"
+
+
+def validate_preference_artifact_for_activation(artifact: object) -> str:
+    """Return the governed model version or reject an artifact that cannot support a trustworthy
+    production evaluation claim."""
+    metadata = getattr(artifact, "metadata", None)
+    if not isinstance(metadata, dict):
+        raise RuntimeError("Preference artifact is missing governed metadata")
+    model_version = metadata.get("model_version")
+    if not isinstance(model_version, str) or not model_version.startswith("sha256:"):
+        raise RuntimeError("Preference artifact is missing a content-derived model_version")
+    if metadata.get("readiness_gate_bypassed") is not False:
+        raise RuntimeError("Preference artifact bypassed the production readiness gate")
+    if metadata.get("split_strategy") != "household_group_holdout":
+        raise RuntimeError("Preference artifact was not evaluated on household-isolated holdout")
+    if metadata.get("household_overlap") != 0:
+        raise RuntimeError("Preference artifact evaluation leaks households across the split")
+    return model_version
 
 
 # --- structured JSON logging (RE-DOC-10 §10 — logs span two languages, so no plain text) ---
@@ -115,8 +137,51 @@ class AppState:
     auth: AuthConfig | None = None
     rate_limiter: SlidingWindowRateLimiter | None = None
     bundle: dict | None = None  # baked-bundle manifest when serving from an image (RE-DOC-10 §8)
+    preference_model_status: str = "unloaded"
+    preference_model_version: str | None = None
     ready: bool = False
     counters: Counters = field(default_factory=Counters)
+
+
+def configure_preference_model(config: object) -> core_model.ModelArtifactProvider:
+    """Install the configured learned-preference provider, failing closed when activation is
+    requested but incomplete. Disabled deployments explicitly reset to the null provider so test
+    reloads and rolling workers cannot retain a stale model from an earlier configuration."""
+    enabled = bool(getattr(config, "pref_model_enabled", False))
+    provider: core_model.ModelArtifactProvider
+    if not enabled:
+        provider = core_model.NullModelArtifactProvider()
+        provider.load()
+        core_model.set_active_model(provider)
+        return provider
+
+    weight = float(getattr(config, "w_pref", 0.0))
+    if not 0 < weight <= 1:
+        raise RuntimeError(
+            "Preference model is enabled but w_pref is not in (0, 1]; refusing a silent no-op"
+        )
+    configured_path = (
+        os.environ.get(PREFERENCE_MODEL_PATH_VAR)
+        or getattr(config, "pref_model_artifact_path", None)
+        or ""
+    )
+    if not configured_path:
+        raise RuntimeError("Preference model is enabled but no artifact path is configured")
+    path = (
+        configured_path
+        if os.path.isabs(configured_path)
+        else os.path.join(
+            core_config.SRC,
+            configured_path,
+        )
+    )
+    provider = core_model.FileModelArtifactProvider(path)
+    artifact = provider.load()
+    if artifact is None:
+        raise RuntimeError(f"Preference model artifact does not exist: {path}")
+    validate_preference_artifact_for_activation(artifact)
+    core_model.set_active_model(provider)
+    return provider
 
 
 def startup(state: AppState) -> AppState:
@@ -158,6 +223,22 @@ def startup(state: AppState) -> AppState:
     # 1. config
     state.config = state.config_provider.load()
     log_event("startup.config_loaded", config_version=state.config.versions["config"])
+
+    # 1a. learned preference artifact. This used to have a training writer and a file provider but
+    # no startup wiring, so flipping pref_model.yaml could never activate the trained model.
+    preference_provider = configure_preference_model(state.config)
+    preference_artifact = preference_provider.artifact
+    state.preference_model_status = "active" if preference_artifact is not None else "disabled"
+    metadata = getattr(preference_artifact, "metadata", {}) if preference_artifact else {}
+    state.preference_model_version = (
+        metadata.get("model_version") if isinstance(metadata, dict) else None
+    )
+    log_event(
+        "startup.preference_model_loaded",
+        status=state.preference_model_status,
+        model_version=state.preference_model_version,
+        weight=state.config.w_pref,
+    )
 
     # 2. catalogue
     state.catalogue = state.catalogue_provider.load()
