@@ -189,17 +189,21 @@ class Database:
             (dish_id, alias_text, alias_source, run_id, confidence),
         )
 
-    def insert_regional_affinity(self, cur, dish_id: str, region_code: str, score: float, confidence: float, source_name: str, source_type: str) -> None:
+    def insert_regional_affinity(self, cur, dish_id: str, region_code: str, score: float, confidence: float,
+                                  source_name: str, source_type: str, model_name: str | None = None) -> None:
+        # dish_regional_affinities_ml_model_name (migration 065) requires model_name whenever
+        # source_type='ml_model' -- the caller must pass the real model that produced the value.
         cur.execute(
             """
-            INSERT INTO public.dish_regional_affinities (dish_id, region_code, affinity_score, confidence, source_name, source_type)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO public.dish_regional_affinities
+              (dish_id, region_code, affinity_score, confidence, source_name, source_type, model_name)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (dish_id, region_code) DO UPDATE
               SET affinity_score = EXCLUDED.affinity_score, confidence = EXCLUDED.confidence,
-                  source_name = EXCLUDED.source_name, updated_at = now()
+                  source_name = EXCLUDED.source_name, model_name = EXCLUDED.model_name, updated_at = now()
               WHERE public.dish_regional_affinities.review_status <> 'accepted'
             """,
-            (dish_id, region_code, score, confidence, source_name, source_type),
+            (dish_id, region_code, score, confidence, source_name, source_type, model_name),
         )
 
     def insert_meal_class_mapping(self, cur, dish_id: str, class_code: str, slot: str, confidence: float, source_name: str, method: str, source_type: str) -> None:

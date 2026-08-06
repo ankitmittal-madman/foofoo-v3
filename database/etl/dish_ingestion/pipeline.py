@@ -357,8 +357,10 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
 
         # regional affinity (AI-generated enrichment, low confidence, provisional)
         if dish_id and o.region and o.region.value in REGION_CODE_ALIASES:
+            region_source_type = "rules" if o.region.source == "heuristic" else "ml_model"
             db.insert_regional_affinity(cur, dish_id, o.region.value, 0.6, o.region.confidence,
-                                         f"etl:{o.region.source}", "rules" if o.region.source == "heuristic" else "ml_model")
+                                         f"etl:{o.region.source}", region_source_type,
+                                         model_name=o.region.model_name if region_source_type == "ml_model" else None)
 
         # ingredients
         if dish_id:
