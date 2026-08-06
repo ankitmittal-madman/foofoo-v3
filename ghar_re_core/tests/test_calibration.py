@@ -81,3 +81,33 @@ def test_calibration_grid_household_id_shuffles_order_only():
         plain_names = {c["name"] for c in plain["slots"][slot]}
         seeded_names = {c["name"] for c in seeded["slots"][slot]}
         assert plain_names == seeded_names
+
+
+def test_calibration_grid_excludes_recently_served_dishes_across_every_slot():
+    hh = _hh()
+    first = C.calibration_grid(hh, weekday="Monday")
+    served = [cell["name"] for cells in first["slots"].values() for cell in cells]
+    refreshed = C.calibration_grid(hh, weekday="Monday", exclude_dish_names=served)
+    refreshed_names = {
+        cell["name"] for cells in refreshed["slots"].values() for cell in cells
+    }
+    assert refreshed_names.isdisjoint(served)
+
+
+def test_calibration_grid_applies_online_dish_affinity_to_scores():
+    hh = _hh()
+    baseline = C.calibration_grid(hh, weekday="Monday")
+    liked = next(
+        cell for cells in baseline["slots"].values() for cell in cells
+        if cell["cell_role"] == "expected_positive"
+    )
+    personalized = C.calibration_grid(
+        hh,
+        weekday="Monday",
+        preference_by_dish={liked["name"]: 1.0},
+    )
+    personalized_cell = next(
+        cell for cells in personalized["slots"].values() for cell in cells
+        if cell["name"] == liked["name"]
+    )
+    assert personalized_cell["score"] == round(liked["score"] + 0.35, 4)

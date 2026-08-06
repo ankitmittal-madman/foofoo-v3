@@ -16,7 +16,7 @@ import uuid
 from typing import Any
 
 from ghar_re_core import calibration as calib
-from ghar_re_core import meal_episode
+from ghar_re_core import meal_episode, taste
 from ghar_re_core import meal_planner as planner
 from ghar_re_core import pipeline as core_pipeline
 from ghar_re_core import scoring as S
@@ -130,6 +130,13 @@ def _with_images(views: list[dict]) -> list[dict]:
     return views
 
 
+def _online_taste(request: dict[str, Any], catalogue) -> tuple[list[str], dict[str, float]]:
+    """Canonicalize exposure state and derive bounded related-dish affinity once per request."""
+    excluded = taste.canonicalize_names(request.get("exclude_dish_names") or [], catalogue)
+    preferences = taste.expand_preferences(request.get("preference_by_dish") or {}, catalogue)
+    return excluded, preferences
+
+
 def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     """Surface 1: post-onboarding top-15 preference primer (diverse top dishes)."""
     hh = build_household_dict(request["household"])
@@ -149,11 +156,14 @@ def plan_calibration(request: dict[str, Any], catalogue, config) -> dict[str, An
     """WP-18 dish-pick surface: 3 slots x 5 dishes (3 expected-positive + 2 planted-mismatch,
     cell_role never surfaced to the client) for the post-onboarding calibration grid."""
     hh = build_household_dict(request["household"])
+    excluded, preferences = _online_taste(request, catalogue)
     res = calib.calibration_grid(
         hh,
         catalogue,
         weekday=request.get("weekday", "Monday"),
         household_id=request.get("household_id"),
+        exclude_dish_names=excluded,
+        preference_by_dish=preferences,
     )
     for slot_dishes in res["slots"].values():
         _with_images(slot_dishes)
@@ -163,6 +173,7 @@ def plan_calibration(request: dict[str, Any], catalogue, config) -> dict[str, An
 def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     """Surface 2 (and 4 when class_code is set): a slot's 4–5 dish options."""
     hh = build_household_dict(request["household"])
+    excluded, preferences = _online_taste(request, catalogue)
     res = planner.slot_options(
         hh,
         request.get("slot", "dinner"),
@@ -171,8 +182,8 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         weekday=request.get("weekday", "Monday"),
         class_code=request.get("class_code"),
         context=request.get("context") or {},
-        exclude_dish_names=request.get("exclude_dish_names") or [],
-        preference_by_dish=request.get("preference_by_dish") or {},
+        exclude_dish_names=excluded,
+        preference_by_dish=preferences,
     )
     _with_images(res["options"])
     # Deterministic lifecycle add-ons remain separate from the household's primary meal.  These
@@ -212,8 +223,8 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
             n=1,
             weekday=request.get("weekday", "Monday"),
             context=request.get("context") or {},
-            exclude_dish_names=request.get("exclude_dish_names") or [],
-            preference_by_dish=request.get("preference_by_dish") or {},
+            exclude_dish_names=excluded,
+            preference_by_dish=preferences,
         )
         if addon["options"]:
             view = addon["options"][0]
@@ -233,17 +244,19 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
 def plan_weekly(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     """Surface 3: the weekly class plan (7 days × slots, top-3 dish-backed classes each)."""
     hh = build_household_dict(request["household"])
+    _, preferences = _online_taste(request, catalogue)
     return planner.weekly_class_plan(
         hh,
         top_classes=int(request.get("top_classes", 3)),
         catalogue=catalogue,
-        preference_by_dish=request.get("preference_by_dish") or {},
+        preference_by_dish=preferences,
     )
 
 
 def plan_class_dishes(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     """Surface 4: RECONCILIATION — only dishes of a finalized class for that day/slot."""
     hh = build_household_dict(request["household"])
+    excluded, preferences = _online_taste(request, catalogue)
     res = planner.dishes_for_class(
         hh,
         request["slot"],
@@ -252,8 +265,8 @@ def plan_class_dishes(request: dict[str, Any], catalogue, config) -> dict[str, A
         n=int(request.get("count", 8)),
         weekday=request.get("weekday", "Monday"),
         context=request.get("context") or {},
-        exclude_dish_names=request.get("exclude_dish_names") or [],
-        preference_by_dish=request.get("preference_by_dish") or {},
+        exclude_dish_names=excluded,
+        preference_by_dish=preferences,
     )
     _with_images(res["options"])
     return res
@@ -289,10 +302,11 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
         "slot": request.get("slot", "dinner"),
         "weekday": request.get("weekday", "Monday"),
     }
+    excluded, preferences = _online_taste(request, catalogue)
     context = build_context(
         raw_context,
-        exclude_dish_names=request.get("exclude_dish_names") or [],
-        preference_by_dish=request.get("preference_by_dish") or {},
+        exclude_dish_names=excluded,
+        preference_by_dish=preferences,
     )
     context["diversity_policy"] = "home_v2"
     context["_rng_seed"] = _request_rng_seed(household, raw_context)
@@ -305,8 +319,8 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
             class_code,
             catalogue,
             count=8,
-            exclude_dish_names=request.get("exclude_dish_names") or [],
-            preference_by_dish=request.get("preference_by_dish") or {},
+            exclude_dish_names=excluded,
+            preference_by_dish=preferences,
         )
     else:
         result = core_pipeline.recommend(household, context, catalogue)
@@ -370,7 +384,13 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
     """
     request_id = request.get("request_id") or str(uuid.uuid4())
     hh = build_household_dict(request["household"])
-    ctx = build_context(request["context"], request.get("exclude_dish_ids"))
+    excluded, preferences = _online_taste(request, catalogue)
+    ctx = build_context(
+        request["context"],
+        request.get("exclude_dish_ids"),
+        exclude_dish_names=excluded,
+        preference_by_dish=preferences,
+    )
     ctx["_rng_seed"] = _request_rng_seed(hh, request["context"])
     objective = hh.get("q15_objective") or config.default_objective
     want_trace = bool(request.get("include_decision_trace"))

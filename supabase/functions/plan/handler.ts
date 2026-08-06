@@ -306,6 +306,11 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           : [],
         discovery_mode: body.discovery_mode === true,
         recovery_mode: body.recovery_mode === true,
+        // The RE mixes this monotonic client value into its deterministic request seed. Without
+        // forwarding it, Regenerate issued a real network request but replayed identical ranking.
+        refresh_generation: typeof body.refresh_generation === "number"
+          ? Math.max(0, Math.trunc(body.refresh_generation))
+          : 0,
       }, festival);
       const requestedExclusions = Array.isArray(body.exclude_dish_names)
         ? body.exclude_dish_names
@@ -315,9 +320,10 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       payload.exclude_dish_names = [
         ...new Set([
           ...online.excludeDishNames,
+          ...(body.exclude_recently_served === false ? [] : online.recentExposureDishNames),
           ...requestedExclusions,
         ]),
-      ];
+      ].slice(0, 50);
       payload.preference_by_dish = online.preferenceByDish;
       log.info("plan.composed", { household_id: hid, stubbed });
     }

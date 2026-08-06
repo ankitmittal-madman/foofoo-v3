@@ -62,9 +62,11 @@ def derive_theta(hh):
     size = len(ages)
     dependents = sum(1 for a in ages if a["age"] < 18 or a["age"] >= 65)
     zone_home = K.STATE_ZONE.get(hh["q3_home_state"])
-    # city tier from fixtures (CITY_TIER) -> tier1/2/3
-    from ghar_re_core import fixtures as F
-    city_tier = F.CITY_TIER.get(hh["q4_current_city"], "tier2")
+    # City values arrive from user input and are not guaranteed to preserve fixture casing
+    # (production writes values such as "mumbai"). Resolve them through the same normalized
+    # lookup used for local-state derivation so casing/whitespace cannot silently disable the
+    # migration overlay or demote a metro to the tier-2 default.
+    city_tier = _tier_of_city(hh["q4_current_city"])
 
     # ---------------- D1 — income proxy (D1-D7 §4 D1) ----------------
     d1 = cfg.D("D1_income")
@@ -258,7 +260,27 @@ _CITY_STATE = {
 }
 
 
+def _normalized_city(city):
+    """Normalize a user-entered city for lookup without changing unknown-city semantics."""
+    return " ".join(str(city or "").split()).casefold()
+
+
+def _tier_of_city(city):
+    """Resolve city tier case-insensitively; unknown cities retain the conservative tier-2 default."""
+    from ghar_re_core import fixtures as F
+
+    normalized = _normalized_city(city)
+    return next(
+        (tier for name, tier in F.CITY_TIER.items() if _normalized_city(name) == normalized),
+        "tier2",
+    )
+
+
 def _state_of_city(city):
     """Resolve a current-residence city to its state, for computing the household's 'local' zone
     in D4. Falls back to returning the input unchanged for any city not in the lookup table."""
-    return _CITY_STATE.get(city, city)
+    normalized = _normalized_city(city)
+    for known_city, state in _CITY_STATE.items():
+        if _normalized_city(known_city) == normalized:
+            return state
+    return " ".join(str(city or "").split())

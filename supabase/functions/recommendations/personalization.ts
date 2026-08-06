@@ -155,14 +155,10 @@ export async function loadOnlineRecommendationState(
     }
     return {
       interactionCount: countRes.count ?? 0,
-      // Exposure fatigue belongs in the existing exclusion contract so every deployed plan
-      // handler version consumes it without requiring a synchronized handler rollout.
-      excludeDishNames: [
-        ...new Set([
-          ...excluded,
-          ...(exposureRes.data ?? []).flatMap((row) => extractExposureDishNames(row.plates)),
-        ]),
-      ].slice(0, 50),
+      // Durable/intentional suppression stays separate from recent exposure. The plan handler
+      // combines the latter only for an unlocked/refreshable surface; otherwise a locked slot
+      // could silently change merely because its previous slate was recorded successfully.
+      excludeDishNames: [...excluded].slice(0, 50),
       preferenceByDish: aggregateMemberAffinities(
         (tasteRes.data ?? []) as Array<{
           profile_id: string;

@@ -34,6 +34,7 @@ MAIN_SLOTS = ("breakfast", "lunch", "dinner")
 WEEK = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 _CLASS_NAMES = None
 MMR_LAMBDA = 0.75
+_RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich", "oily"}
 
 
 def _class_names():
@@ -191,8 +192,16 @@ def _dish_similarity(left, right):
     return 0.5 * same_class + 0.3 * same_cuisine + 0.2 * ingredient_overlap
 
 
+def _dish_is_rich(dish):
+    return bool(set(dish.richness or []) & _RICH_TAGS) or (dish.heaviness or 0) >= 3
+
+
+def _dish_is_soup(dish):
+    return "soup" in dish.name.casefold() or "soup" in set(dish.dish_category or [])
+
+
 def _mmr_rerank(ranked, n, diversity_lambda=MMR_LAMBDA):
-    """Maximal Marginal Relevance reranking with deterministic tie breaks and top-score padding."""
+    """MMR reranking with deterministic content, richness, and repeated-soup constraints."""
     if not ranked or n <= 0:
         return []
     candidates = list(ranked)
@@ -204,8 +213,19 @@ def _mmr_rerank(ranked, n, diversity_lambda=MMR_LAMBDA):
 
     selected = [candidates.pop(0)]
     while candidates and len(selected) < n:
+        next_size = len(selected) + 1
+        rich_count = sum(_dish_is_rich(dish) for _, dish in selected)
+        soup_count = sum(_dish_is_soup(dish) for _, dish in selected)
+        allowed = [
+            index
+            for index, (_, dish) in enumerate(candidates)
+            if (not _dish_is_rich(dish) or rich_count < (next_size + 1) // 2)
+            and (not _dish_is_soup(dish) or soup_count < 1)
+        ]
+        # Relax only when the safe/eligible catalogue cannot fill the requested response.
+        candidate_indices = allowed or range(len(candidates))
         best_index = max(
-            range(len(candidates)),
+            candidate_indices,
             key=lambda index: (
                 diversity_lambda * relevance(candidates[index][0])
                 - (1.0 - diversity_lambda)
