@@ -1,0 +1,178 @@
+"""Read-only production preference-training orchestration.
+
+The database remains the authority for readiness and point-in-time export eligibility. Raw rows
+exist only inside a TemporaryDirectory and are never uploaded. This command does not change model
+configuration, deploy a service, or activate an artifact.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import tempfile
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any
+
+from ghar_re_core.config import CONFIG
+from ghar_re_core.training.train_pref_model import train
+
+DATABASE_ENV_NAMES = ("DATABASE_URL", "SUPABASE_DB_URL", "FOOFOO_SUPABASE_URI")
+
+
+@dataclass(frozen=True)
+class ReadinessSnapshot:
+    real_labeled_events: int
+    positive_events: int
+    negative_events: int
+    distinct_households: int
+    identity_resolved_events: int
+    attributed_to_slate_events: int
+    identity_coverage: float
+    slate_attribution_coverage: float
+    is_ready: bool
+
+    @classmethod
+    def from_mapping(cls, row: Mapping[str, Any]) -> ReadinessSnapshot:
+        return cls(
+            real_labeled_events=int(row["real_labeled_events"]),
+            positive_events=int(row["positive_events"]),
+            negative_events=int(row["negative_events"]),
+            distinct_households=int(row["distinct_households"]),
+            identity_resolved_events=int(row["identity_resolved_events"]),
+            attributed_to_slate_events=int(row["attributed_to_slate_events"]),
+            identity_coverage=float(row["identity_coverage"]),
+            slate_attribution_coverage=float(row["slate_attribution_coverage"]),
+            is_ready=bool(row["is_ready"]),
+        )
+
+
+def database_url(environ: Mapping[str, str] | None = None) -> str:
+    values = environ or os.environ
+    for name in DATABASE_ENV_NAMES:
+        value = values.get(name)
+        if value:
+            return value
+    raise RuntimeError(
+        "No production database connection configured; set DATABASE_URL, SUPABASE_DB_URL, "
+        "or FOOFOO_SUPABASE_URI."
+    )
+
+
+def fetch_readiness(connection: Any) -> ReadinessSnapshot:
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "select * from ml.preference_training_readiness(%s, %s)",
+            (CONFIG.pref_training_min_events, CONFIG.pref_training_min_households),
+        )
+        row = cursor.fetchone()
+        if row is None:
+            raise RuntimeError("Preference training readiness query returned no row")
+        if not isinstance(row, Mapping):
+            columns = [item[0] for item in cursor.description]
+            row = dict(zip(columns, row, strict=True))
+        return ReadinessSnapshot.from_mapping(row)
+
+
+def export_rows(connection: Any, destination: Path) -> int:
+    """Stream exact-attribution rows to an ephemeral JSONL file without loading all into RAM."""
+    count = 0
+    with destination.open("x", encoding="utf-8") as output, connection.cursor() as cursor:
+        cursor.execute("select ml.preference_training_export_rows() as export_row")
+        for result in cursor:
+            value = result[0] if not isinstance(result, Mapping) else result["export_row"]
+            output.write(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n")
+            count += 1
+    os.chmod(destination, 0o600)
+    return count
+
+
+def _atomic_json(path: Path, value: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", delete=False
+    ) as handle:
+        json.dump(value, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+        temp_name = handle.name
+    os.replace(temp_name, path)
+
+
+def run(
+    connection: Any,
+    *,
+    readiness_out: Path,
+    artifact_out: Path,
+    eval_out: Path,
+) -> dict[str, Any]:
+    readiness = fetch_readiness(connection)
+    result: dict[str, Any] = {
+        "status": "not_ready",
+        "readiness": asdict(readiness),
+        "thresholds": {
+            "min_real_events": CONFIG.pref_training_min_events,
+            "min_households": CONFIG.pref_training_min_households,
+        },
+    }
+    if not readiness.is_ready:
+        _atomic_json(readiness_out, result)
+        return result
+
+    artifact_out.parent.mkdir(parents=True, exist_ok=True)
+    eval_out.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="foofoo-pref-training-") as private_dir:
+        export_path = Path(private_dir) / "private-feedback-export.jsonl"
+        exported = export_rows(connection, export_path)
+        if exported != readiness.real_labeled_events:
+            raise RuntimeError(
+                "Readiness/export count changed during the read-only snapshot; refusing a "
+                "non-reproducible training run"
+            )
+        report = train(str(export_path), str(artifact_out), str(eval_out))
+
+    result.update(
+        status="candidate_passed" if report["promotion_gate"]["passed"] else "candidate_rejected",
+        exported_rows=exported,
+        model_version=report["artifact_metadata"]["model_version"],
+        promotion_gate=report["promotion_gate"],
+    )
+    _atomic_json(readiness_out, result)
+    return result
+
+
+def connect_read_only(dsn: str) -> Any:
+    import psycopg2
+
+    connection = psycopg2.connect(dsn, connect_timeout=15, application_name="foofoo-pref-training")
+    connection.set_session(readonly=True, autocommit=False)
+    with connection.cursor() as cursor:
+        cursor.execute("set local statement_timeout = '5min'")
+    return connection
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--readiness-out", type=Path, required=True)
+    parser.add_argument("--artifact-out", type=Path, required=True)
+    parser.add_argument("--eval-out", type=Path, required=True)
+    args = parser.parse_args(argv)
+
+    connection = connect_read_only(database_url())
+    try:
+        result = run(
+            connection,
+            readiness_out=args.readiness_out,
+            artifact_out=args.artifact_out,
+            eval_out=args.eval_out,
+        )
+        connection.rollback()
+    finally:
+        connection.close()
+    print(json.dumps(result, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
