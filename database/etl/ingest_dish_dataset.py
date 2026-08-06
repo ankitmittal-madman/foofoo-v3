@@ -32,6 +32,7 @@ def main() -> int:
     mode.add_argument("--apply", action="store_true", help="Write to the database at DATABASE_URL/SUPABASE_DB_URL.")
     parser.add_argument("--csv", type=Path, default=DEFAULT_CSV, help=f"Source CSV path (default: {DEFAULT_CSV})")
     parser.add_argument("--batch-size", type=int, default=200, help="Rows per transaction batch (default: 200)")
+    parser.add_argument("--limit", type=int, default=0, help="Process only the first N CSV rows (0 = all rows). For smoke-testing a real --apply run against a small slice first.")
     parser.add_argument("--report-out", type=Path, default=None, help="Optional path to also write the JSON summary report")
     image_mode = parser.add_mutually_exclusive_group()
     image_mode.add_argument("--generate-images", dest="generate_images", action="store_true", default=True,
@@ -53,12 +54,14 @@ def main() -> int:
         log.error("source CSV not found: %s", args.csv)
         return 2
 
-    log.info("starting dish ingestion: mode=%s csv=%s batch_size=%s generate_images=%s",
-              "dry_run" if args.dry_run else "apply", args.csv, args.batch_size, args.generate_images)
+    log.info("starting dish ingestion: mode=%s csv=%s batch_size=%s generate_images=%s limit=%s",
+              "dry_run" if args.dry_run else "apply", args.csv, args.batch_size, args.generate_images,
+              args.limit or "all")
 
     try:
         report = run_pipeline(csv_path=args.csv, dry_run=args.dry_run, batch_size=args.batch_size,
-                               generate_images=args.generate_images, image_delay_seconds=args.image_delay)
+                               generate_images=args.generate_images, image_delay_seconds=args.image_delay,
+                               row_limit=args.limit or None)
     except RuntimeError as exc:
         # e.g. DATABASE_URL missing in --apply mode — a clear, actionable error, not a stack trace.
         log.error(str(exc))

@@ -1,0 +1,85 @@
+name: dish-image-generation
+
+# Manually-triggered smoke/production run for the Stage 5 dish image pipeline
+# (database/etl/dish_ingestion). Never runs on push/PR — image generation costs money
+# (Groq/HF calls, Cloudinary storage) and writes to a real database, so it only ever
+# fires when a human explicitly dispatches it with eyes-open inputs.
+#
+# Required repository secrets (Settings > Secrets and variables > Actions):
+#   DATABASE_URL or SUPABASE_DB_URL   — required whenever apply=true
+#   CLOUDINARY_CLOUD_NAME
+#   CLOUDINARY_API_KEY
+#   CLOUDINARY_API_SECRET
+#   GROQ_API_KEY                      — optional, falls back to Hugging Face then heuristic
+#   HUGGINGFACE_API_KEY               — optional fallback
+#
+# Default dispatch is a dry run with a small limit — deliberately safe. Set apply=true only
+# once a dry run has been reviewed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Write to the database + generate/upload real images (false = --dry-run, no network calls, no writes)"
+        type: boolean
+        default: false
+      limit:
+        description: "Max CSV rows to process this run (0 = all rows; keep small for the first real test)"
+        type: string
+        default: "5"
+      generate_images:
+        description: "Attempt Stage 5 image generation (false = --skip-images, text-only ingestion)"
+        type: boolean
+        default: true
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL }}
+      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ETL dependencies
+        run: pip install psycopg2-binary requests
+
+      - name: Report which optional credentials are present (names only, never values)
+        run: |
+          for v in DATABASE_URL CLOUDINARY_CLOUD_NAME CLOUDINARY_API_KEY CLOUDINARY_API_SECRET GROQ_API_KEY HUGGINGFACE_API_KEY; do
+            if [ -n "${!v}" ]; then echo "$v: set"; else echo "$v: NOT set"; fi
+          done
+
+      - name: Fail fast if apply=true but no database connection is configured
+        if: ${{ inputs.apply == 'true' && env.DATABASE_URL == '' }}
+        run: |
+          echo "apply=true requires DATABASE_URL or SUPABASE_DB_URL to be set as a repository secret." >&2
+          exit 1
+
+      - name: Run dish ingestion pipeline
+        run: |
+          ARGS="database/etl/ingest_dish_dataset.py"
+          if [ "${{ inputs.apply }}" = "true" ]; then ARGS="$ARGS --apply"; else ARGS="$ARGS --dry-run"; fi
+          if [ "${{ inputs.generate_images }}" != "true" ]; then ARGS="$ARGS --skip-images"; fi
+          if [ "${{ inputs.limit }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit }}"; fi
+          echo "Running: python $ARGS"
+          python $ARGS
+
+      - name: Upload import summary report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dish-ingestion-report
+          path: |
+            database/etl/**/*.log
+            database/etl/**/import_report*.json
+          if-no-files-found: ignore

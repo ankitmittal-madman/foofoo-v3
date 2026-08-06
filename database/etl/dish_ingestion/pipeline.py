@@ -131,7 +131,8 @@ def process_row(row: SourceRow, dedupe_index: DedupeIndex, ontology, groq: GroqA
 
 
 def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
-                  generate_images: bool = True, image_delay_seconds: float = DEFAULT_IMAGE_DELAY_SECONDS) -> dict:
+                  generate_images: bool = True, image_delay_seconds: float = DEFAULT_IMAGE_DELAY_SECONDS,
+                  row_limit: int | None = None) -> dict:
     """Entry point used by the CLI. Returns the import summary report dict either way; only
     writes to the database when dry_run is False.
 
@@ -140,6 +141,10 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
     dry_run is True, Stage 5 is only planned/reported (heuristic fields, no network) — see
     process_row's docstring. When True and dry_run is False, real Pollinations+Cloudinary calls
     happen in _persist_row for any dish that does not already have an image.
+
+    row_limit: process only the first N CSV rows (None/0 = all rows). For smoke-testing a real
+    --apply run (e.g. a first live Cloudinary/Groq test) against a small slice before committing
+    to the full dataset. Does not change dedupe/report semantics beyond operating on fewer rows.
     """
     started = time.monotonic()
     checksum = _file_checksum(csv_path)
@@ -196,6 +201,9 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
                              review_reasons, image_ctx)
 
     for row in load_and_normalize(csv_path):
+        if row_limit and total >= row_limit:
+            logger.info("row_limit=%s reached, stopping read early", row_limit)
+            break
         total += 1
         outcome = process_row(row, dedupe_index, ontology, groq, image_ctx)
         batch.append(outcome)
