@@ -1,0 +1,70 @@
+name: Deploy adaptive recommendation state
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type apply to deploy migrations 081 and 082
+        required: true
+        type: string
+
+concurrency:
+  group: production-database-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: inputs.confirm == 'apply'
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require governed production connection
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Configure DATABASE_URL, SUPABASE_DB_URL, or FOOFOO_SUPABASE_URI." >&2
+            exit 1
+          fi
+
+      - name: Inspect current state
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          SELECT
+            to_regprocedure('public.record_recommendation_exposure_state(uuid,jsonb)')
+              AS exposure_rpc,
+            to_regprocedure('public.refresh_user_re_state(uuid)') AS lifecycle_rpc;
+          SQL
+
+      - name: Apply migration 081 when absent
+        run: |
+          present="$(psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -c \
+            "SELECT to_regprocedure('public.record_recommendation_exposure_state(uuid,jsonb)') IS NOT NULL")"
+          if [ "$present" = "t" ]; then
+            echo "Migration 081 already present; skipping."
+          else
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction \
+              -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+              -f database/migrations/081_persist_recommendation_variety_state.sql
+          fi
+
+      - name: Apply migration 082 when absent
+        run: |
+          present="$(psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -c \
+            "SELECT to_regprocedure('public.refresh_user_re_state(uuid)') IS NOT NULL")"
+          if [ "$present" = "t" ]; then
+            echo "Migration 082 already present; skipping."
+          else
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction \
+              -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+              -f database/migrations/082_refresh_user_re_state.sql
+          fi
+
+      - name: Validate adaptive state and report aggregate counts
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/933_recommendation_variety_state_validation.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/934_refresh_user_re_state_validation.sql
