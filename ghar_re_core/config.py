@@ -224,11 +224,23 @@ class Config:
 
     # --- s_pref ScoringModule stub (pref_model.yaml <- Phase 3, not fit, not shipped) ---
     @property
+    def pref_model_mode(self):
+        """Governed lifecycle state: disabled, shadow (score-only), or active (rank-affecting).
+
+        Invalid/missing values fail closed to disabled. The legacy enabled flag remains readable
+        for older bundles that predate the explicit lifecycle state.
+        """
+        mode = (self.pref or {}).get("mode")
+        if mode in {"disabled", "shadow", "active"}:
+            return mode
+        return "active" if bool((self.pref or {}).get("enabled", False)) else "disabled"
+
+    @property
     def pref_model_enabled(self):
         """Master switch for ghar_re_core.preference.s_pref. CODE-LEVEL SAFETY DEFAULT is False
         if pref_model.yaml or this key is ever missing — s_pref must never silently turn itself
         on (Task 3 rule)."""
-        return bool((self.pref or {}).get("enabled", False))
+        return self.pref_model_mode == "active"
 
     @property
     def pref_model_artifact_path(self):
@@ -262,6 +274,25 @@ class Config:
         training — see check_training_readiness. Same fail-closed code-level safety default
         (a never-satisfiable sentinel) as pref_training_min_events if missing."""
         return (self.pref or {}).get("training_readiness", {}).get("min_households", 10**9)
+
+    @property
+    def pref_evaluation_min_holdout_events(self):
+        """Minimum household-isolated evaluation rows. Missing governance blocks promotion."""
+        return (self.pref or {}).get("evaluation_readiness", {}).get(
+            "min_holdout_events", 10**9
+        )
+
+    @property
+    def pref_evaluation_min_auc(self):
+        """Minimum holdout ROC AUC. A missing threshold is deliberately impossible to pass."""
+        return (self.pref or {}).get("evaluation_readiness", {}).get("min_auc", 1.1)
+
+    @property
+    def pref_evaluation_min_class_recall(self):
+        """Minimum recall required independently for positive and negative feedback."""
+        return (self.pref or {}).get("evaluation_readiness", {}).get(
+            "min_class_recall", 1.1
+        )
 
     # --- community priors (community_priors.csv <- KB §C1) ---
     # Loaded HERE, at the config-loader boundary, so core math modules (derivation) never open a

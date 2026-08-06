@@ -16,10 +16,12 @@ import uuid
 from typing import Any
 
 from ghar_re_core import calibration as calib
-from ghar_re_core import meal_episode, taste
+from ghar_re_core import meal_episode, preference, taste
 from ghar_re_core import meal_planner as planner
+from ghar_re_core import model_provider as preference_models
 from ghar_re_core import pipeline as core_pipeline
 from ghar_re_core import scoring as S
+from ghar_re_core.derivation import derive_theta
 from ghar_re_service import media
 from ghar_re_service.modules import compose_base
 from ghar_re_service.version import API_VERSION, ENGINE_VERSION
@@ -130,6 +132,40 @@ def _with_images(views: list[dict]) -> list[dict]:
     return views
 
 
+def _with_shadow_preferences(
+    views: list[dict],
+    household: dict[str, Any],
+    raw_context: dict[str, Any],
+    catalogue,
+    config,
+    *,
+    slot: str | None = None,
+    name_key: str = "name",
+) -> list[dict]:
+    """Attach score-only model output to served views without changing their order or score."""
+    if getattr(config, "pref_model_mode", "disabled") != "shadow":
+        return views
+    artifact = preference_models.active_model().artifact
+    if artifact is None:
+        raise RuntimeError("Shadow preference mode has no loaded artifact")
+    metadata = getattr(artifact, "metadata", {})
+    model_version = metadata.get("model_version") if isinstance(metadata, dict) else None
+    theta = derive_theta(household)
+    for view in views:
+        dish_name = view.get(name_key)
+        dish = catalogue.get(dish_name) if isinstance(dish_name, str) else None
+        if dish is None:
+            continue
+        item_context = dict(raw_context)
+        item_context["slot"] = view.get("slot") or slot or raw_context.get("slot", "dinner")
+        ctx = build_context(item_context)
+        prediction = preference.loaded_preference_score(dish, theta, ctx)
+        if prediction is not None:
+            view["shadow_preference_score"] = round(prediction, 6)
+            view["shadow_preference_model_version"] = model_version
+    return views
+
+
 def _online_taste(request: dict[str, Any], catalogue) -> tuple[list[str], dict[str, float]]:
     """Canonicalize exposure state and derive bounded related-dish affinity once per request."""
     excluded = taste.canonicalize_names(request.get("exclude_dish_names") or [], catalogue)
@@ -149,6 +185,16 @@ def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any
         household_id=request.get("household_id"),
     )
     _with_images(res["dishes"])
+    _with_shadow_preferences(
+        res["dishes"], hh, {"weekday": request.get("weekday", "Monday")}, catalogue, config
+    )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
+        hh,
+        {"weekday": request.get("weekday", "Monday")},
+        catalogue,
+        config,
+    )
     return res
 
 
@@ -165,8 +211,23 @@ def plan_calibration(request: dict[str, Any], catalogue, config) -> dict[str, An
         exclude_dish_names=excluded,
         preference_by_dish=preferences,
     )
-    for slot_dishes in res["slots"].values():
+    for slot, slot_dishes in res["slots"].items():
         _with_images(slot_dishes)
+        _with_shadow_preferences(
+            slot_dishes,
+            hh,
+            {"weekday": request.get("weekday", "Monday")},
+            catalogue,
+            config,
+            slot=slot,
+        )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
+        hh,
+        {"weekday": request.get("weekday", "Monday")},
+        catalogue,
+        config,
+    )
     return res
 
 
@@ -186,6 +247,22 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         preference_by_dish=preferences,
     )
     _with_images(res["options"])
+    _with_shadow_preferences(
+        res["options"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request.get("slot", "dinner"),
+    )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request.get("slot", "dinner"),
+    )
     # Deterministic lifecycle add-ons remain separate from the household's primary meal.  These
     # are food-role rules only; health-condition add-ons intentionally require clinical review.
     addon_classes = {
@@ -229,6 +306,14 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         if addon["options"]:
             view = addon["options"][0]
             media.attach_image(view)
+            _with_shadow_preferences(
+                [view],
+                hh,
+                request.get("context") or {},
+                catalogue,
+                config,
+                slot=request.get("slot", "dinner"),
+            )
             addons.append(
                 {
                     "member_index": index,
@@ -269,6 +354,22 @@ def plan_class_dishes(request: dict[str, Any], catalogue, config) -> dict[str, A
         preference_by_dish=preferences,
     )
     _with_images(res["options"])
+    _with_shadow_preferences(
+        res["options"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request["slot"],
+    )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request["slot"],
+    )
     return res
 
 
@@ -288,6 +389,22 @@ def plan_search(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         context=request.get("context") or {},
     )
     _with_images(res["options"])
+    _with_shadow_preferences(
+        res["options"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request.get("slot", "dinner"),
+    )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request.get("slot", "dinner"),
+    )
     return res
 
 
@@ -333,6 +450,22 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
         for component in episode["components"]:
             if component["dish_id"] is not None:
                 component["image_url"] = media.image_url(component["dish_name"])
+        _with_shadow_preferences(
+            episode["components"],
+            household,
+            raw_context,
+            catalogue,
+            config,
+            slot=context["slot"],
+            name_key="dish_name",
+        )
+        shadow_scores = [
+            component["shadow_preference_score"]
+            for component in episode["components"]
+            if "shadow_preference_score" in component
+        ]
+        if shadow_scores:
+            episode["shadow_preference_mean"] = round(sum(shadow_scores) / len(shadow_scores), 6)
     return {
         "kind": "meal_episode_slate",
         "slot": context["slot"],
@@ -422,6 +555,20 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
                 "contributions": contributions,  # OPEN list (RE-DOC-11 §6)
             }
         )
+        shadow_view = {"name": principal.name}
+        _with_shadow_preferences(
+            [shadow_view],
+            hh,
+            request["context"],
+            catalogue,
+            config,
+            slot=ctx["slot"],
+        )
+        if "shadow_preference_score" in shadow_view:
+            plates_out[-1]["shadow_preference_score"] = shadow_view["shadow_preference_score"]
+            plates_out[-1]["shadow_preference_model_version"] = shadow_view[
+                "shadow_preference_model_version"
+            ]
 
     if len(plates_out) < TARGET_PLATES:
         warnings.append(

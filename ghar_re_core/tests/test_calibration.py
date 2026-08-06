@@ -45,6 +45,8 @@ def test_calibration_grid_shape_and_roles():
 
     all_names = [cell["name"] for slot in MAIN_SLOTS for cell in res["slots"][slot]]
     assert len(set(all_names)) == len(all_names)  # no repetition across meal slots
+    assert len(res["_candidate_lineage"]) > len(all_names)
+    assert {row["slot"] for row in res["_candidate_lineage"]} == set(MAIN_SLOTS)
 
 
 def test_calibration_cells_are_all_eligible():

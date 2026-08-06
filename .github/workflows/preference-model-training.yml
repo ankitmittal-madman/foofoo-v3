@@ -1,0 +1,55 @@
+name: preference-model-training
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preference-model-training
+  cancel-in-progress: false
+
+jobs:
+  readiness-and-training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
+      OUTPUT_DIR: ${{ runner.temp }}/preference-model
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Require the read-only training database connection
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Configure DATABASE_URL, SUPABASE_DB_URL, or FOOFOO_SUPABASE_URI." >&2
+            exit 1
+          fi
+      - name: Install governed training runtime
+        run: |
+          pip install -e ".[training]"
+          pip install psycopg2-binary
+      - name: Check readiness and train only when the database gate passes
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python -m ops.recommendation.preference_training \
+            --readiness-out "$OUTPUT_DIR/readiness.json" \
+            --artifact-out "$OUTPUT_DIR/preference-model.joblib" \
+            --eval-out "$OUTPUT_DIR/evaluation.json"
+          cat "$OUTPUT_DIR/readiness.json" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload aggregate evidence and any candidate artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preference-model-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/preference-model/readiness.json
+            ${{ runner.temp }}/preference-model/evaluation.json
+            ${{ runner.temp }}/preference-model/preference-model.joblib
+          if-no-files-found: warn
+          retention-days: 14

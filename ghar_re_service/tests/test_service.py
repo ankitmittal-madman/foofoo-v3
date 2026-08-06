@@ -123,6 +123,7 @@ def test_preference_model_activation_fails_closed_without_artifact(monkeypatch, 
     monkeypatch.delenv(lifecycle.PREFERENCE_MODEL_PATH_VAR, raising=False)
     cfg = SimpleNamespace(
         pref_model_enabled=True,
+        pref_model_mode="active",
         w_pref=0.2,
         pref_model_artifact_path=str(tmp_path / "missing.joblib"),
     )
@@ -137,7 +138,7 @@ def test_disabled_preference_model_resets_to_null_provider():
     stale.artifact = object()
     model_provider.set_active_model(stale)
     provider = lifecycle.configure_preference_model(
-        SimpleNamespace(pref_model_enabled=False, w_pref=0.0),
+        SimpleNamespace(pref_model_enabled=False, pref_model_mode="disabled", w_pref=0.0),
     )
     assert isinstance(provider, model_provider.NullModelArtifactProvider)
     assert model_provider.active_model().artifact is None
@@ -150,6 +151,7 @@ def test_preference_artifact_activation_requires_unbypassed_household_holdout():
             "readiness_gate_bypassed": False,
             "split_strategy": "household_group_holdout",
             "household_overlap": 0,
+            "promotion_gate_passed": True,
         }
     )
     assert lifecycle.validate_preference_artifact_for_activation(valid) == (
@@ -163,6 +165,47 @@ def test_preference_artifact_activation_requires_unbypassed_household_holdout():
     leaky = SimpleNamespace(metadata={**valid.metadata, "household_overlap": 1})
     with pytest.raises(RuntimeError, match="leaks households"):
         lifecycle.validate_preference_artifact_for_activation(leaky)
+
+    weak = SimpleNamespace(metadata={**valid.metadata, "promotion_gate_passed": False})
+    with pytest.raises(RuntimeError, match="promotion quality gates"):
+        lifecycle.validate_preference_artifact_for_activation(weak)
+
+
+def test_shadow_mode_requires_zero_rank_weight():
+    with pytest.raises(RuntimeError, match="requires w_pref=0"):
+        lifecycle.configure_preference_model(SimpleNamespace(pref_model_mode="shadow", w_pref=0.2))
+
+
+def test_shadow_scores_are_attached_without_changing_served_order_or_score():
+    from ghar_re_core import model_provider
+
+    class Artifact:
+        metadata = {"model_version": "sha256:shadow"}
+
+        def predict_proba(self, _features):
+            return 0.73
+
+    provider = model_provider.NullModelArtifactProvider()
+    provider.artifact = Artifact()
+    original = model_provider.active_model()
+    model_provider.set_active_model(provider)
+    try:
+        views = [{"name": next(iter(Catalogue())).name, "score": 9.25}]
+        original_order = [view["name"] for view in views]
+        engine._with_shadow_preferences(
+            views,
+            _req()["household"],
+            _req()["context"],
+            Catalogue(),
+            SimpleNamespace(pref_model_mode="shadow"),
+            slot="dinner",
+        )
+        assert [view["name"] for view in views] == original_order
+        assert views[0]["score"] == 9.25
+        assert views[0]["shadow_preference_score"] == pytest.approx(0.73)
+        assert views[0]["shadow_preference_model_version"] == "sha256:shadow"
+    finally:
+        model_provider.set_active_model(original)
 
 
 def test_recommendations_end_to_end(client):

@@ -1,5 +1,11 @@
 import { assertEquals, assertNotEquals } from "@std/assert";
-import { eligibleSetHash, extractDishSlateItems, snapshotHash } from "../plan/episodes.ts";
+import {
+  eligibleSetHash,
+  extractDishCandidateItems,
+  extractDishSlateItems,
+  snapshotHash,
+  stripPrivateCandidateLineage,
+} from "../plan/episodes.ts";
 
 Deno.test("eligible episode hash includes the full deterministic set independent of order", async () => {
   assertEquals(await eligibleSetHash(["b", "a", "c"]), await eligibleSetHash(["c", "b", "a"]));
@@ -23,6 +29,27 @@ Deno.test("dish slate normalization covers landing-page options without inventin
   });
   assertEquals(items.map((item) => item.name), ["Poha", "Upma"]);
   assertEquals(items.map((item) => item.score), [4.2, 3.8]);
+});
+
+Deno.test("private candidate lineage keeps the full eligible pool separate from served items", () => {
+  const response = {
+    options: [{ name: "Poha", score: 3, slot: "breakfast" }],
+    _candidate_lineage: [
+      { name: "Poha", score: 3, slot: "breakfast" },
+      { name: "Upma", score: 2.5, slot: "breakfast", shadow_preference_score: 0.61 },
+    ],
+  };
+  assertEquals(extractDishSlateItems("meal_plan", response).length, 1);
+  const candidates = extractDishCandidateItems("meal_plan", response);
+  assertEquals(candidates.length, 2);
+  assertEquals(candidates[1].snapshot.shadow_preference_score, 0.61);
+  assertEquals(
+    extractDishCandidateItems("meal_plan", { ...response, _candidate_lineage: [] }).length,
+    1,
+  );
+  assertEquals(stripPrivateCandidateLineage(response), {
+    options: [{ name: "Poha", score: 3, slot: "breakfast" }],
+  });
 });
 
 Deno.test("calibration slate preserves each cell slot in one globally ordered slate", () => {
