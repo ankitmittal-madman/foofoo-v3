@@ -5,4 +5,4 @@ config_version comes from the loaded EngineConfig; api_version is the URL contra
 """
 
 API_VERSION = "v1"
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.1.0"

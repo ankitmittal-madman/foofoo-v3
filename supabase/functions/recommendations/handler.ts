@@ -197,6 +197,8 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
       ]),
     ].slice(0, 50);
     payload.preference_by_dish = online.preferenceByDish;
+    payload.preference_by_class = online.preferenceByClass;
+    payload.preference_by_tag = online.preferenceByTag;
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext

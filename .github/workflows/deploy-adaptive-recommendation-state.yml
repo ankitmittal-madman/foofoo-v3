@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: Type apply to deploy migrations 081 through 083
+        description: Type apply to deploy migrations 081 through 084
         required: true
         type: string
 
@@ -74,6 +74,18 @@ jobs:
               -f database/migrations/083_refresh_user_taste_vectors.sql
           fi
 
+      - name: Apply migration 084 when absent
+        run: |
+          present="$(psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -c \
+            "SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='user_taste_vectors' AND column_name='tag_affinity')")"
+          if [ "$present" = "t" ]; then
+            echo "Migration 084 already present; skipping."
+          else
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction \
+              -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+              -f database/migrations/084_activate_semantic_taste_vectors.sql
+          fi
+
       - name: Validate adaptive state and report aggregate counts
         run: |
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
@@ -82,3 +94,5 @@ jobs:
             -f database/validation/934_refresh_user_re_state_validation.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
             -f database/validation/935_refresh_user_taste_vectors_validation.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/936_activate_semantic_taste_vectors_validation.sql

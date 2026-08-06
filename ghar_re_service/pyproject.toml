@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ghar-re-service"
-version = "1.0.0"
+version = "1.1.0"
 description = "Ghar RE v1 HTTP service — FastAPI hosting shell over ghar-re-core."
 requires-python = ">=3.11"
 dependencies = [

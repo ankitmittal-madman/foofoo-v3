@@ -27,3 +27,28 @@ def test_negative_feedback_transfers_and_canonicalizes_exclusions():
     assert canonicalize_names(["  moong dal khichdi  ", "Moong Dal Khichdi"], catalogue) == [
         "Moong Dal Khichdi"
     ]
+
+
+def test_class_and_semantic_tag_affinities_generalize_to_unseen_dishes():
+    catalogue = Catalogue()
+    expanded = expand_preferences(
+        {},
+        catalogue,
+        preference_by_class={"BF_EGG_FAST": 0.8},
+        preference_by_tag={"dish_category:egg_dish": 0.6},
+    )
+
+    assert 0 < expanded["Egg Bhurji"] <= TRANSFER_SCALE
+    assert "Moong Dal Khichdi" not in expanded
+
+
+def test_exact_dish_feedback_remains_authoritative_over_semantic_projection():
+    catalogue = Catalogue()
+    expanded = expand_preferences(
+        {"Egg Bhurji": -1.0},
+        catalogue,
+        preference_by_class={"BF_EGG_FAST": 1.0},
+        preference_by_tag={"dish_category:egg_dish": 1.0},
+    )
+
+    assert expanded["Egg Bhurji"] == -1.0

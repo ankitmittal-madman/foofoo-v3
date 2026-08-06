@@ -109,7 +109,9 @@
         "include_decision_trace": { "type": "boolean", "description": "Optional, defaults to false. When true, the response includes decision_trace: the funnel of how many catalogue dishes survived each hard filter (diet/jain/allergen/weaning/fasting), the served plates ranked, and the top near-miss alternatives with why each lost." },
         "exclude_dish_ids": { "type": "array", "items": { "type": "string" }, "description": "WP-8G Option A ('Recommendation Variety on Refresh'). Optional, additive; empty/omitted is a no-op. Dish ids the RE must hard-filter out of the candidate pool BEFORE scoring/selection (never a scoring penalty) — typically the household's own last-served dish ids, so a refresh doesn't repeat them." },
         "exclude_dish_names": { "type": "array", "items": { "type": "string" }, "description": "Canonical names or aliases suppressed from this response, normally from recent exposure or explicit Not Today/Never feedback." },
-        "preference_by_dish": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded online dish affinities. The service canonicalizes aliases and transfers a smaller signal to related dishes before ranking." }
+        "preference_by_dish": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded online dish affinities. Exact explicit feedback remains authoritative." },
+        "preference_by_class": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded meal-class affinities derived from explicit feedback and mapping confidence." },
+        "preference_by_tag": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded semantic affinities keyed as dimension:tag_name; used to generalize feedback to unseen dishes." }
       },
       "required": ["household", "context"]
     },
@@ -181,6 +183,14 @@
         "class_code": { "type": ["string", "null"] },
         "exclude_dish_names": { "type": "array", "items": { "type": "string" } },
         "preference_by_dish": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "preference_by_class": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "preference_by_tag": {
           "type": "object",
           "additionalProperties": { "type": "number" }
         }

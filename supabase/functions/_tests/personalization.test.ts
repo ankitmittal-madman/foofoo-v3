@@ -1,9 +1,20 @@
 import { assertEquals } from "@std/assert";
 import {
+  aggregateAffinityMaps,
   extractExposureDishNames,
   extractPersistedCadence,
   extractPersistedExposureDishNames,
 } from "../recommendations/personalization.ts";
+
+Deno.test("aggregateAffinityMaps combines only members with evidence", () => {
+  const result = aggregateAffinityMaps([
+    { "dish_category:whole_meal": 0.8 },
+    null,
+    { "dish_category:whole_meal": -0.2, "richness:light": 0.4 },
+  ]);
+  assertEquals(result["dish_category:whole_meal"] > 0, true);
+  assertEquals(Math.round(result["richness:light"] * 10), 4);
+});
 
 Deno.test("extractPersistedExposureDishNames: reads the private variety RPC response", () => {
   assertEquals(
