@@ -11,6 +11,8 @@ export interface OnlineRecommendationState {
   /** Canonical names shown in recent successful slates. Used only for freshness/refresh
    * suppression; it is intentionally separate from durable Never/Not-Today intent. */
   recentExposureDishNames: string[];
+  noveltyBudget: number;
+  richnessDebt: number;
 }
 
 export function extractExposureDishNames(plates: unknown): string[] {
@@ -40,6 +42,24 @@ export function extractPersistedExposureDishNames(value: unknown): string[] {
   const names = (value as Record<string, unknown>).recent_dish_names;
   if (!Array.isArray(names)) return [];
   return names.filter((name): name is string => typeof name === "string" && name.length > 0);
+}
+
+export function extractPersistedCadence(value: unknown): {
+  noveltyBudget: number;
+  richnessDebt: number;
+} {
+  const fallback = { noveltyBudget: 0.15, richnessDebt: 0 };
+  if (!value || typeof value !== "object") return fallback;
+  const cadence = (value as Record<string, unknown>).cadence;
+  if (!cadence || typeof cadence !== "object") return fallback;
+  const row = cadence as Record<string, unknown>;
+  const novelty = typeof row.novelty_budget === "number" && Number.isFinite(row.novelty_budget)
+    ? Math.max(0, Math.min(1, row.novelty_budget))
+    : fallback.noveltyBudget;
+  const richness = typeof row.richness_debt === "number" && Number.isFinite(row.richness_debt)
+    ? Math.max(0, Math.min(1, row.richness_debt))
+    : fallback.richnessDebt;
+  return { noveltyBudget: novelty, richnessDebt: richness };
 }
 
 /** Aggregate only explicit member affinities with Nash-style geometric welfare.
@@ -84,7 +104,7 @@ export async function loadOnlineRecommendationState(
       await Promise.all([
         withTimeout(
           db.from("feedback_events").select("id", { count: "exact", head: true })
-            .eq("household_id", profileId),
+            .eq("household_id", profileId).neq("event_type", "shown_not_tapped"),
           "personalization.count",
         ),
         withTimeout(
@@ -132,6 +152,7 @@ export async function loadOnlineRecommendationState(
         detail: varietyRes.error.message,
       });
     }
+    const cadence = extractPersistedCadence(varietyRes.data);
     const joinedName = (row: Record<string, unknown>): string | null => {
       const joined = row.dishes as { name?: unknown } | Array<{ name?: unknown }> | null;
       const name = Array.isArray(joined) ? joined[0]?.name : joined?.name;
@@ -192,6 +213,7 @@ export async function loadOnlineRecommendationState(
         );
         return [...new Set(persisted.length > 0 ? persisted : eventFallback)].slice(0, 50);
       })(),
+      ...cadence,
     };
   } catch (error) {
     ctx.logger.warn("personalization.load_failed", {
@@ -204,6 +226,8 @@ export async function loadOnlineRecommendationState(
       preferenceByDish: {},
       dishFeedbackCounts: [],
       recentExposureDishNames: [],
+      noveltyBudget: 0.15,
+      richnessDebt: 0,
     };
   }
 }

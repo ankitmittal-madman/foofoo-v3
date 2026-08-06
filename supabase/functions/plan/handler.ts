@@ -296,6 +296,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         active_modes: Array.isArray(body.active_modes) ? body.active_modes : [],
         interaction_count: online.interactionCount,
         dish_feedback_counts: online.dishFeedbackCounts,
+        novelty_budget: online.noveltyBudget,
+        richness_debt: online.richnessDebt,
         // The v1 contract types `weather` as an object when present. Provider configuration is
         // optional, so omit the field when weather is unavailable instead of sending `null`,
         // which the stricter meal-episode request validator correctly rejects with HTTP 422.

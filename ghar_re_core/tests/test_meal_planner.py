@@ -124,15 +124,29 @@ def test_mmr_visible_prefix_caps_rich_and_repeated_soup_dishes():
     rich = [dish for dish in cat if MP._dish_is_rich(dish)][:4]
     soup = cat.get("Rasam")
     light = [
-        dish
-        for dish in cat
-        if dish not in rich and dish is not soup and not MP._dish_is_rich(dish)
+        dish for dish in cat if dish not in rich and dish is not soup and not MP._dish_is_rich(dish)
     ][:5]
     ranked = [(100.0 - index, dish) for index, dish in enumerate(rich + [soup, soup] + light)]
     selected = MP._mmr_rerank(ranked, 8)
 
     assert sum(MP._dish_is_rich(dish) for _, dish in selected) <= 4
     assert sum(MP._dish_is_soup(dish) for _, dish in selected) <= 1
+
+
+def test_persisted_cadence_tightens_richness_and_increases_diversity_pressure():
+    assert MP._adaptive_diversity_policy() == (MP.MMR_LAMBDA, 0.5)
+    relevance_lambda, rich_ratio = MP._adaptive_diversity_policy(
+        novelty_budget=0.6, richness_debt=0.3
+    )
+    assert relevance_lambda < MP.MMR_LAMBDA
+    assert rich_ratio == 0.25
+
+    cat = Catalogue()
+    rich = [dish for dish in cat if MP._dish_is_rich(dish)][:6]
+    light = [dish for dish in cat if not MP._dish_is_rich(dish)][:8]
+    ranked = [(100.0 - index, dish) for index, dish in enumerate(rich + light)]
+    selected = MP._mmr_rerank(ranked, 8, novelty_budget=0.6, richness_debt=0.3)
+    assert sum(MP._dish_is_rich(dish) for _, dish in selected) <= 2
 
 
 def test_weekly_class_plan_shape_and_dish_backed():

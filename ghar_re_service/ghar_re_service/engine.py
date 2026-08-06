@@ -191,6 +191,7 @@ def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any
         variety_salt=f"{date_salt}:{refresh_generation}",
         exclude_dish_names=excluded,
         preference_by_dish=preferences,
+        richness_debt=context.get("richness_debt", 0),
     )
     _with_images(res["dishes"])
     _with_shadow_preferences(
