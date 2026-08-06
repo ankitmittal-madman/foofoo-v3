@@ -87,7 +87,9 @@ def test_enabled_preference_artifact_is_bundled_and_content_addressed(tmp_path):
     model_path.write_bytes(b"governed-model-bytes")
     pref_path = source / "pref_model.yaml"
     pref = yaml.safe_load(pref_path.read_text())
-    pref.update({"enabled": True, "w_pref": 0.2, "model_artifact_path": model_rel})
+    pref.update(
+        {"mode": "active", "enabled": True, "w_pref": 0.2, "model_artifact_path": model_rel}
+    )
     pref_path.write_text(yaml.safe_dump(pref, sort_keys=False))
 
     out = tmp_path / "bundle-with-model"
@@ -101,12 +103,38 @@ def test_enabled_preference_artifact_cannot_escape_source_tree(tmp_path):
     source = _copy_source_tree(tmp_path)
     pref_path = source / "pref_model.yaml"
     pref = yaml.safe_load(pref_path.read_text())
-    pref.update({"enabled": True, "w_pref": 0.2, "model_artifact_path": "../outside.joblib"})
+    pref.update(
+        {
+            "mode": "active",
+            "enabled": True,
+            "w_pref": 0.2,
+            "model_artifact_path": "../outside.joblib",
+        }
+    )
     pref_path.write_text(yaml.safe_dump(pref, sort_keys=False))
     (tmp_path / "outside.joblib").write_bytes(b"must-not-be-bundled")
 
     with pytest.raises(ValueError, match="inside data/source"):
         export_bundle.build_bundle(str(source), str(tmp_path / "out"))
+
+
+def test_shadow_preference_artifact_is_also_bundled(tmp_path):
+    source = _copy_source_tree(tmp_path)
+    model_rel = "models/preference-shadow.joblib"
+    model_path = source / model_rel
+    model_path.parent.mkdir(parents=True)
+    model_path.write_bytes(b"shadow-model-bytes")
+    pref_path = source / "pref_model.yaml"
+    pref = yaml.safe_load(pref_path.read_text())
+    pref.update(
+        {"mode": "shadow", "enabled": False, "w_pref": 0.0, "model_artifact_path": model_rel}
+    )
+    pref_path.write_text(yaml.safe_dump(pref, sort_keys=False))
+
+    out = tmp_path / "bundle-with-shadow-model"
+    manifest = export_bundle.build_bundle(str(source), str(out))
+    assert (out / "config" / model_rel).read_bytes() == b"shadow-model-bytes"
+    assert model_rel in manifest["config_sha256"]
 
 
 def test_bundle_catalogue_matches_build_catalogue_output(built):

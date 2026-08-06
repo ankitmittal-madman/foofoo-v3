@@ -24,6 +24,9 @@ class FakeCursor:
     def fetchone(self):
         return self.readiness
 
+    def fetchall(self):
+        return []
+
     def __iter__(self):
         return iter((row,) for row in self.exports)
 

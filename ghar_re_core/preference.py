@@ -22,6 +22,21 @@ from ghar_re_core.config import CONFIG
 from ghar_re_core.model_provider import PREF_MODEL
 
 
+def loaded_preference_score(dish, theta, ctx) -> float | None:
+    """Score the loaded artifact without deciding whether it may affect ranking.
+
+    This is the only entry point shadow instrumentation uses. Returning None distinguishes "no
+    model loaded" from a legitimate prediction of 0.0.
+    """
+    model = PREF_MODEL.artifact
+    if model is None:
+        return None
+    from ghar_re_core.features import extract_features
+
+    features = extract_features(dish, theta, ctx)
+    return float(model.predict_proba(features))
+
+
 def s_pref(dish, theta, ctx) -> float:
     """The `S_pref(x)` term of the master formula — [0,1] learned preference score, or exactly
     0.0 (the neutral/unfit value) when disabled or no artifact is present, which today is always.
@@ -30,12 +45,5 @@ def s_pref(dish, theta, ctx) -> float:
     confidence)."""
     if not CONFIG.pref_model_enabled:
         return 0.0
-    model = PREF_MODEL.artifact
-    if model is None:
-        return 0.0
-
-    # Only reachable once a real artifact is loaded AND pref_model.yaml.enabled is true.
-    from ghar_re_core.features import extract_features
-
-    features = extract_features(dish, theta, ctx)
-    return float(model.predict_proba(features))
+    prediction = loaded_preference_score(dish, theta, ctx)
+    return 0.0 if prediction is None else prediction
