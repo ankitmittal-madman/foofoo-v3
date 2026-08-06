@@ -33,7 +33,9 @@ def main() -> None:
     database_url = os.getenv("ONTOLOGY_DATABASE_URL")
     if not database_url:
         raise RuntimeError("ONTOLOGY_DATABASE_URL is required for workers")
-    factory = os.getenv("ONTOLOGY_WORKER_HANDLER_FACTORY", "")
+    factory = os.getenv(
+        "ONTOLOGY_WORKER_HANDLER_FACTORY", "food_ontology_service.handlers:build_handlers"
+    )
     handlers = load_handlers(factory)
     worker_id = os.getenv("ONTOLOGY_WORKER_ID") or f"{socket.gethostname()}:{os.getpid()}"
     batch_size = max(1, min(int(os.getenv("ONTOLOGY_WORKER_BATCH_SIZE", "20")), 100))

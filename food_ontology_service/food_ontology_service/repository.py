@@ -11,10 +11,12 @@ from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from .models import (
+    ClassMembershipInput,
     DishCreate,
     DishPatch,
     DishRecord,
     FeedbackInput,
+    FieldValue,
     ImageRef,
     SimilarityInput,
     utcnow,
@@ -66,6 +68,14 @@ class Repository(Protocol):
     def submit_feedback(
         self, dish_id: UUID, feedback: FeedbackInput, principal: str
     ) -> dict[str, Any]: ...
+
+    def publish_worker_fields(
+        self, dish_id: UUID, fields: dict[str, FieldValue]
+    ) -> tuple[int, int]: ...
+
+    def publish_worker_classes(
+        self, dish_id: UUID, memberships: list[ClassMembershipInput]
+    ) -> tuple[int, int]: ...
 
 
 class MemoryRepository:
@@ -140,7 +150,9 @@ class MemoryRepository:
                 self.name_index.pop(dish.normalized_name, None)
                 self.name_index[normalized] = dish_id
                 changes["normalized_name"] = normalized
-            updated = dish.model_copy(update={**changes, "updated_at": utcnow()})
+            updated = DishRecord.model_validate(
+                {**dish.model_dump(), **changes, "updated_at": utcnow()}
+            )
             self.dishes[dish_id] = updated
             return deepcopy(updated)
 
@@ -279,5 +291,47 @@ class MemoryRepository:
             "status": "pending",
             "created_at": utcnow(),
         }
-        self.feedback.append(item)
-        return deepcopy(item)
+        with self._lock:
+            self.feedback.append(item)
+            return deepcopy(item)
+
+    def publish_worker_fields(
+        self, dish_id: UUID, fields: dict[str, FieldValue]
+    ) -> tuple[int, int]:
+        dish = self.get_dish(dish_id)
+        selected = dict(dish.fields)
+        published = review = 0
+        for path, candidate in fields.items():
+            current = selected.get(path)
+            if current and current.review_status == "accepted":
+                review += 1
+                continue
+            if candidate.review_status == "accepted":
+                selected[path] = candidate
+                published += 1
+            else:
+                review += 1
+        self.update_dish(dish_id, DishPatch(fields=selected))
+        return published, review
+
+    def publish_worker_classes(
+        self, dish_id: UUID, memberships: list[ClassMembershipInput]
+    ) -> tuple[int, int]:
+        dish = self.get_dish(dish_id)
+        current = list(dish.class_memberships)
+        published = review = 0
+        for candidate in memberships:
+            identity = (candidate.class_code, candidate.slot, candidate.role)
+            accepted = next(
+                (m for m in current if identity == (m.class_code, m.slot, m.role)), None
+            )
+            if accepted and accepted.review_status == "accepted":
+                review += 1
+            elif candidate.review_status == "accepted":
+                current = [m for m in current if identity != (m.class_code, m.slot, m.role)]
+                current.append(candidate)
+                published += 1
+            else:
+                review += 1
+        self.update_dish(dish_id, DishPatch(class_memberships=current))
+        return published, review

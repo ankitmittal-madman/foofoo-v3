@@ -591,6 +591,99 @@ class PostgresRepository:
                 "correction submission",
             )
 
+    def publish_worker_fields(
+        self, dish_id: UUID, fields: dict[str, FieldValue]
+    ) -> tuple[int, int]:
+        """Append every worker assertion, but move pointers only for policy-accepted values."""
+        self.get_dish(dish_id)
+        published = review = 0
+        with self._connection() as connection:
+            for path, field in fields.items():
+                assertion_id = self._assert(connection, dish_id, path, field)
+                current = connection.execute(
+                    """SELECT a.review_status FROM ontology.current_field_values c
+                       JOIN ontology.assertions a ON a.id=c.assertion_id
+                       WHERE c.dish_id=%s AND c.field_path=%s FOR UPDATE""",
+                    (dish_id, path),
+                ).fetchone()
+                protected = current and current["review_status"] == "accepted"
+                if field.review_status == "accepted" and not protected:
+                    connection.execute(
+                        """INSERT INTO ontology.current_field_values
+                           (dish_id,field_path,assertion_id,selected_by) VALUES(%s,%s,%s,'worker_policy')
+                           ON CONFLICT(dish_id,field_path) DO UPDATE SET
+                           assertion_id=excluded.assertion_id,selected_by=excluded.selected_by,
+                           selected_at=now()""",
+                        (dish_id, path, assertion_id),
+                    )
+                    published += 1
+                else:
+                    connection.execute(
+                        """INSERT INTO ontology.review_tasks
+                           (workflow_type,subject_type,subject_id,field_path,reason_code,risk_tier)
+                           VALUES('field','assertion',%s,%s,%s,%s)""",
+                        (
+                            assertion_id,
+                            path,
+                            "accepted_value_protected" if protected else "confidence_review",
+                            "safety"
+                            if path in {"allergens", "diet_type", "constraints"}
+                            else "medium",
+                        ),
+                    )
+                    review += 1
+            connection.execute(
+                "UPDATE ontology.dishes SET updated_at=now() WHERE id=%s", (dish_id,)
+            )
+        return published, review
+
+    def publish_worker_classes(
+        self, dish_id: UUID, memberships: list[ClassMembershipInput]
+    ) -> tuple[int, int]:
+        """Publish only accepted class candidates; DB role trigger remains the final guard."""
+        self.get_dish(dish_id)
+        published = review = 0
+        try:
+            with self._connection() as connection:
+                for candidate in memberships:
+                    assertion_id = self._assert(
+                        connection,
+                        dish_id,
+                        f"class_memberships/{candidate.class_code}:{candidate.slot}:{candidate.role}",
+                        candidate,
+                    )
+                    if candidate.review_status == "accepted":
+                        connection.execute(
+                            """INSERT INTO ontology.dish_class_memberships
+                               (dish_id,class_code,slot,role,assertion_id) VALUES(%s,%s,%s,%s,%s)
+                               ON CONFLICT(dish_id,class_code,slot,role) DO UPDATE
+                               SET assertion_id=excluded.assertion_id""",
+                            (
+                                dish_id,
+                                candidate.class_code,
+                                candidate.slot,
+                                str(candidate.role),
+                                assertion_id,
+                            ),
+                        )
+                        published += 1
+                    else:
+                        connection.execute(
+                            """INSERT INTO ontology.review_tasks
+                               (workflow_type,subject_type,subject_id,field_path,reason_code,risk_tier)
+                               VALUES('field','assertion',%s,%s,'classification_review','medium')""",
+                            (assertion_id, f"class_memberships/{candidate.class_code}"),
+                        )
+                        review += 1
+                connection.execute(
+                    "UPDATE ontology.dishes SET updated_at=now() WHERE id=%s", (dish_id,)
+                )
+        except ForeignKeyViolation as exc:
+            raise ConflictError("unknown_meal_class") from exc
+        except RaiseException as exc:
+            raise ConflictError("meal_class_role_mismatch") from exc
+        return published, review
+
     def claim_jobs(self, worker_id: str, limit: int = 20) -> list[dict[str, Any]]:
         with self._connection() as connection:
             return connection.execute(

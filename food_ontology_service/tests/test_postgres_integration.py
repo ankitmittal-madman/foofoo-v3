@@ -26,7 +26,8 @@ EVIDENCE = [{"source_code": "integration_test", "extraction_method": "test_fixtu
 def test_migrations_are_owned_by_the_installed_package():
     assert migrate.DEFAULT_MIGRATIONS.parent == Path(migrate.__file__).resolve().parent
     assert [path.name for path in migrate.DEFAULT_MIGRATIONS.glob("[0-9][0-9][0-9]_*.sql")] == [
-        "001_create_ontology_schema.sql"
+        "001_create_ontology_schema.sql",
+        "002_add_cutover_control_plane.sql",
     ]
 
 
@@ -34,7 +35,10 @@ def test_migrations_are_owned_by_the_installed_package():
 def repository():
     assert DSN
     first = apply_migrations(DSN)
-    assert first == ["001_create_ontology_schema.sql"]
+    assert first == [
+        "001_create_ontology_schema.sql",
+        "002_add_cutover_control_plane.sql",
+    ]
     assert apply_migrations(DSN) == []
     repo = PostgresRepository(DSN)
     with psycopg.connect(DSN) as connection:
