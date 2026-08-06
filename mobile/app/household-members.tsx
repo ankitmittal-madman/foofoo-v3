@@ -51,15 +51,20 @@ export default function HouseholdMembers() {
 
   useEffect(() => {
     getActiveHouseholdId().then(setActiveId).catch(() => {});
-  }, []);
-  useEffect(() => {
-    const rows = households.data?.households ?? [];
-    if (rows.length === 0) return;
-    if (activeId && rows.some((row) => row.household_id === activeId)) return;
-    const next = rows[0].household_id;
-    setActiveId(next);
-    setActiveHouseholdId(next).catch(() => {});
-  }, [activeId, households.data]);
+    // This effect runs when the list of households changes or on initial load.
+    // It ensures a valid household is always selected if one exists.
+    if (households.isSuccess) {
+      const householdList = households.data?.households ?? [];
+      if (householdList.length === 0) return;
+
+      const currentIdIsValid = activeId && householdList.some((h) => h.household_id === activeId);
+
+      if (!currentIdIsValid) {
+        const nextId = householdList[0].household_id;
+        selectHousehold(nextId).catch(() => {});
+      }
+    }
+  }, [households.isSuccess, households.data, activeId]);
 
   async function selectHousehold(householdId: string) {
     await setActiveHouseholdId(householdId);
