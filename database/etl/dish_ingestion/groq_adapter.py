@@ -111,6 +111,10 @@ class GroqAdapter:
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
+                # Cloudflare (fronting api.groq.com) blocks Python's default urllib
+                # User-Agent ("Python-urllib/3.x") as bot traffic — a real 403 cause
+                # confirmed on Groq's own community forum, independent of key validity.
+                "User-Agent": "foofoo-dish-ingestion/1.0",
             },
             method="POST",
         )

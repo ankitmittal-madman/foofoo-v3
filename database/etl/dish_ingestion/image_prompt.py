@@ -137,7 +137,11 @@ class ImagePromptGenerator:
         req = urllib.request.Request(
             GROQ_API_URL,
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Authorization": f"Bearer {self.groq_api_key}", "Content-Type": "application/json"},
+            headers={
+                "Authorization": f"Bearer {self.groq_api_key}", "Content-Type": "application/json",
+                # see groq_adapter.py's same header for why this is required, not cosmetic.
+                "User-Agent": "foofoo-dish-ingestion/1.0",
+            },
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=25) as resp:  # pragma: no cover - network
@@ -168,7 +172,10 @@ class ImagePromptGenerator:
         req = urllib.request.Request(
             HF_API_URL,
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Authorization": f"Bearer {self.hf_api_key}", "Content-Type": "application/json"},
+            headers={
+                "Authorization": f"Bearer {self.hf_api_key}", "Content-Type": "application/json",
+                "User-Agent": "foofoo-dish-ingestion/1.0",
+            },
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=30) as resp:  # pragma: no cover - network

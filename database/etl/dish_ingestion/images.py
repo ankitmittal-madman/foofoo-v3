@@ -124,7 +124,10 @@ class PollinationsClient:
         last_exc: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
             try:
-                req = urllib.request.Request(url, method="GET")
+                # Pollinations reference script (gemini_image_gen__Pollinations.py) used the
+                # `requests` library, which sends a real browser-style default User-Agent;
+                # urllib's default ("Python-urllib/3.x") is a common bot-blocking signature.
+                req = urllib.request.Request(url, method="GET", headers={"User-Agent": "foofoo-dish-ingestion/1.0"})
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     body = resp.read()
                 if len(body) < MIN_VALID_BYTES:
