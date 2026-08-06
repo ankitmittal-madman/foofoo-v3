@@ -35,18 +35,34 @@ restart. Invalid configuration makes `/readyz` return 503.
 
 Candidates may be passed in the request, loaded from a local JSON pool, or retrieved from Qdrant.
 Qdrant URLs are restricted to loopback or the `qdrant` service hostname. Query embeddings use a
-stable local feature hash. The registry exposes hooks for LightFM, RecBole LightGCN, KGAT,
-FairRec, Debias, CDR, and DA; a hook is only enabled when its local package is installed. This
-service never downloads a model or calls an AI API at runtime.
+stable local feature hash. The registry reports LightFM, RecBole LightGCN, KGAT, FairRec, Debias,
+CDR, and DA honestly as unavailable or `scaffold_only`: those frameworks are not allowed into the
+selection path until a governed artifact loader, feature contract, and validation dataset exist.
+Installing a package alone does not claim that a model works. This service never downloads a model
+or calls an AI API at runtime.
 
 The current production-safe baseline is weighted local reranking with safety filtering,
 popularity debiasing, repetition penalties, diversity selection, and template reason codes. Set
 `AUX_REC_USE_LOCAL_RERANKER=false` to force an existing-engine fallback until another governed
 local model produces a result.
 
-Every optional registry entry also has an independent ablation flag of the form
-`AUX_REC_MODEL_<NAME>_ENABLED`; the complete list is in `.env.example`. Safety and hard dietary
-rules are intentionally not disable-able.
+Implemented optional paths have independent switches in `.env.example`. Scaffold-only framework
+entries cannot be enabled accidentally. Safety and hard dietary rules are intentionally not
+disable-able.
+
+## Offline verification
+
+Labeled replay datasets can be evaluated without network access:
+
+```bash
+AUX_REC_ENABLED=true AUX_REC_MODE=active AUX_REC_ALLOW_OVERRIDE=true \
+  python -m aux_re_service.evaluation path/to/scenarios.json
+```
+
+Each scenario contains `request` and `expected_decision_reason`. The report includes deterministic
+decision accuracy, constraint pass rate, selection/fallback rates, mean quality/diversity, and
+candidate recall size. This harness is operational; a representative production dataset and
+promotion thresholds are still required before active rollout. See `PRODUCTION_READINESS.md`.
 
 ## Contract notes
 

@@ -1,0 +1,42 @@
+{
+  "scenarios": [
+    {
+      "expected_decision_reason": "auxiliary_won_policy_gate",
+      "request": {
+        "user_id": "eval-user",
+        "household_id": "eval-household",
+        "meal_slot": "dinner",
+        "region": "Maharashtra",
+        "preferences": ["Maharashtrian"],
+        "pantry_items": ["rice", "lentils"],
+        "candidate_limit": 1,
+        "debug": true,
+        "existing_result": {
+          "items": [{"id": "existing", "name": "Existing"}],
+          "metrics": {
+            "quality_score": 0.1,
+            "diversity_score": 0.0,
+            "safety_score": 1.0,
+            "alignment_score": 0.0
+          }
+        },
+        "candidates": [
+          {
+            "id": "varan-bhaat",
+            "name": "Varan Bhaat",
+            "ingredients": ["rice", "lentils", "turmeric"],
+            "diet_types": ["vegetarian", "vegan"],
+            "cuisines": ["Maharashtrian"],
+            "regions": ["Maharashtra"],
+            "meal_slots": ["dinner"],
+            "pantry_match": 1.0,
+            "nutrition_fit": 0.9,
+            "freshness": 0.9,
+            "collaborative_score": 0.9,
+            "popularity": 0.2
+          }
+        ]
+      }
+    }
+  ]
+}

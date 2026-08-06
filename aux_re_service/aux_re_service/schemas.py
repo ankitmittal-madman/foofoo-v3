@@ -81,4 +81,5 @@ class RecommendationResponse(BaseModel):
     scores: dict[str, float]
     constraint_checks: ConstraintCheck
     model_metadata: dict[str, Any]
+    timings_ms: dict[str, float]
     debug_trace: dict[str, Any] | None = None

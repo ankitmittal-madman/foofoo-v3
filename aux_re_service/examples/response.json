@@ -8,5 +8,6 @@
   "scores": {"existing_quality": 0.5, "auxiliary_quality": 0.0, "improvement_delta": -0.5},
   "constraint_checks": {"passed": true, "reasons": []},
   "model_metadata": {"mode": "shadow", "models": []},
+  "timings_ms": {"retrieval": 0.1, "reranking": 0.2, "selection": 0.01, "total": 0.35},
   "debug_trace": null
 }

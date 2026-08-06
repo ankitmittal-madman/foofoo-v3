@@ -151,14 +151,24 @@ def test_disabled_reranker_fails_safely_to_existing():
     assert response.debug_trace == {"error_type": "RuntimeError"}
 
 
-def test_retrieval_failure_falls_back_without_leaking_details(tmp_path):
+def test_retrieval_source_failure_preserves_other_candidates(tmp_path):
     response = run(
         RecommendationRequest.model_validate(payload(debug=True)),
         settings(candidate_pool_path=str(tmp_path / "missing.json")),
     )
+    assert response.auxiliary_result is not None
+    assert response.debug_trace["retrieval_failures"] == {"precomputed_pool": "FileNotFoundError"}
+
+
+def test_reranker_failure_falls_back_without_leaking_details(monkeypatch):
+    def broken_rank(*_args, **_kwargs):
+        raise RuntimeError("sensitive internal details")
+
+    monkeypatch.setattr("aux_re_service.service.LocalReranker.rank", broken_rank)
+    response = run(RecommendationRequest.model_validate(payload(debug=True)), settings())
     assert response.decision == "existing"
     assert response.decision_reason == "auxiliary_unavailable"
-    assert response.debug_trace == {"error_type": "FileNotFoundError"}
+    assert response.debug_trace == {"error_type": "RuntimeError"}
 
 
 def test_health_and_http_contract(monkeypatch):
@@ -169,3 +179,4 @@ def test_health_and_http_contract(monkeypatch):
         body = client.post("/v1/recommendations", json=payload()).json()
     assert body["decision_reason"] == "auxiliary_disabled"
     assert body["selected_result"] == body["existing_result"]
+    assert set(body["timings_ms"]) == {"retrieval", "reranking", "selection", "total"}

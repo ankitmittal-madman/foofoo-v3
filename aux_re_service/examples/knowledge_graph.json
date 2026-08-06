@@ -1,0 +1,34 @@
+{
+  "candidates": {
+    "varan-bhaat": {
+      "name": "Varan Bhaat",
+      "ingredients": ["lentils", "rice", "turmeric"],
+      "diet_types": ["vegetarian", "vegan"],
+      "cuisines": ["Maharashtrian"],
+      "regions": ["Maharashtra"],
+      "meal_slots": ["lunch", "dinner"],
+      "pantry_match": 0.8,
+      "nutrition_fit": 0.9,
+      "freshness": 0.9,
+      "collaborative_score": 0.7,
+      "popularity": 0.2
+    },
+    "kanda-poha": {
+      "name": "Kanda Poha",
+      "ingredients": ["flattened rice", "onion", "turmeric"],
+      "diet_types": ["vegetarian", "vegan"],
+      "cuisines": ["Maharashtrian"],
+      "regions": ["Maharashtra"],
+      "meal_slots": ["breakfast"],
+      "pantry_match": 0.6,
+      "nutrition_fit": 0.7,
+      "freshness": 0.8,
+      "collaborative_score": 0.8,
+      "popularity": 0.6
+    }
+  },
+  "relations": {
+    "seed-dal": ["varan-bhaat"],
+    "seed-poha": ["kanda-poha"]
+  }
+}

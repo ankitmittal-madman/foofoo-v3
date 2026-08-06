@@ -22,16 +22,25 @@ def _overlap(left: list[str], right: list[str]) -> float:
     return len(a & b) / max(1, len(a | b))
 
 
-def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str, float]:
-    household_preferences = list(request.preferences)
-    for member in request.household_members:
-        household_preferences.extend(member.preferences)
-    preference_fit = max(
-        _overlap(
-            household_preferences, candidate.cuisines + candidate.regions + candidate.ingredients
-        ),
-        0.5 if not household_preferences else 0.0,
+def _preference_fit(candidate: Candidate, request: RecommendationRequest) -> float:
+    candidate_signals = candidate.cuisines + candidate.regions + candidate.ingredients
+    fits = [_overlap(request.preferences, candidate_signals)]
+    fits.extend(
+        _overlap(member.preferences, candidate_signals) for member in request.household_members
     )
+    nonempty = [value for value in fits if value > 0]
+    if not request.preferences and not any(
+        member.preferences for member in request.household_members
+    ):
+        return 0.5
+    if not nonempty:
+        return 0.0
+    # Blend average household satisfaction with the least-satisfied represented member.
+    return 0.75 * (sum(fits) / len(fits)) + 0.25 * min(fits)
+
+
+def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str, float]:
+    preference_fit = _preference_fit(candidate, request)
     regional_fit = (
         0.5
         if not request.region

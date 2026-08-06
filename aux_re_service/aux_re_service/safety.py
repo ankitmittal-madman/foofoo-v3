@@ -4,9 +4,24 @@ from __future__ import annotations
 
 from .schemas import Candidate, ConstraintCheck, RecommendationRequest
 
+ALIASES = {
+    "groundnut": "peanut",
+    "groundnuts": "peanut",
+    "peanuts": "peanut",
+    "arachis": "peanut",
+    "cashews": "cashew",
+    "milk products": "dairy",
+    "milk solids": "dairy",
+}
+
 
 def _tokens(values: list[str]) -> set[str]:
-    return {value.strip().casefold() for value in values if value.strip()}
+    normalized = set()
+    for value in values:
+        token = value.strip().casefold()
+        if token:
+            normalized.add(ALIASES.get(token, token))
+    return normalized
 
 
 def check_candidate(candidate: Candidate, request: RecommendationRequest) -> ConstraintCheck:

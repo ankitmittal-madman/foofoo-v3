@@ -44,6 +44,10 @@ class Settings:
     qdrant_collection: str
     candidate_pool_path: str | None
     model_artifact_dir: str | None
+    knowledge_graph_path: str | None = None
+    retrieval_timeout_seconds: float = 1.5
+    qdrant_enabled: bool = True
+    embedder_enabled: bool = True
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -65,4 +69,10 @@ class Settings:
             qdrant_collection=os.getenv("AUX_REC_QDRANT_COLLECTION", "foofoo_recipes"),
             candidate_pool_path=os.getenv("AUX_REC_CANDIDATE_POOL_PATH") or None,
             model_artifact_dir=os.getenv("AUX_REC_MODEL_ARTIFACT_DIR") or None,
+            knowledge_graph_path=os.getenv("AUX_REC_KNOWLEDGE_GRAPH_PATH") or None,
+            retrieval_timeout_seconds=_float(
+                "AUX_REC_RETRIEVAL_TIMEOUT_SECONDS", 1.5, minimum=0.1, maximum=10.0
+            ),
+            qdrant_enabled=_bool("AUX_REC_MODEL_QDRANT_ENABLED", True),
+            embedder_enabled=_bool("AUX_REC_MODEL_EMBEDDER_ENABLED", True),
         )

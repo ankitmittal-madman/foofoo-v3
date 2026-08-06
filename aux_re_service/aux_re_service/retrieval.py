@@ -7,10 +7,12 @@ import json
 import math
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from .config import Settings
+from .knowledge_graph import LocalFoodKnowledgeGraph
 from .schemas import Candidate, RecommendationRequest
 
 
@@ -29,20 +31,34 @@ class CandidateRetriever:
     def __init__(self, settings: Settings):
         self.settings = settings
 
-    def retrieve(self, request: RecommendationRequest) -> tuple[list[Candidate], list[str]]:
+    def retrieve(self, request: RecommendationRequest) -> RetrievalResult:
         candidates = [candidate.model_copy(deep=True) for candidate in request.candidates]
         sources = ["request"] if candidates else []
+        failures: dict[str, str] = {}
         if self.settings.candidate_pool_path:
-            candidates.extend(self._from_file(Path(self.settings.candidate_pool_path)))
-            sources.append("precomputed_pool")
-        if self.settings.qdrant_url:
-            candidates.extend(self._from_qdrant(request))
-            sources.append("qdrant")
+            try:
+                candidates.extend(self._from_file(Path(self.settings.candidate_pool_path)))
+                sources.append("precomputed_pool")
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                failures["precomputed_pool"] = type(exc).__name__
+        if self.settings.qdrant_url and self.settings.qdrant_enabled:
+            try:
+                candidates.extend(self._from_qdrant(request))
+                sources.append("qdrant")
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                failures["qdrant"] = type(exc).__name__
+        if self.settings.knowledge_graph_path:
+            try:
+                graph = LocalFoodKnowledgeGraph(Path(self.settings.knowledge_graph_path))
+                candidates.extend(graph.expand(candidates, request, request.candidate_limit * 3))
+                sources.append("knowledge_graph")
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                failures["knowledge_graph"] = type(exc).__name__
 
         deduplicated: dict[str, Candidate] = {}
         for candidate in candidates:
             deduplicated.setdefault(candidate.id, candidate)
-        return list(deduplicated.values()), sources
+        return RetrievalResult(list(deduplicated.values()), sources, failures)
 
     @staticmethod
     def _from_file(path: Path) -> list[Candidate]:
@@ -73,7 +89,9 @@ class CandidateRetriever:
         ).encode()
         url = f"{base.rstrip('/')}/collections/{self.settings.qdrant_collection}/points/query"
         req = urllib.request.Request(url, data=body, headers={"content-type": "application/json"})
-        with urllib.request.urlopen(req, timeout=1.5) as response:  # noqa: S310 - local URL checked
+        with urllib.request.urlopen(
+            req, timeout=self.settings.retrieval_timeout_seconds
+        ) as response:  # noqa: S310 - local URL checked
             result: dict[str, Any] = json.load(response)
         result_body = result.get("result", {})
         points = result_body.get("points", []) if isinstance(result_body, dict) else result_body
@@ -83,3 +101,10 @@ class CandidateRetriever:
             payload.setdefault("id", str(point.get("id")))
             candidates.append(Candidate.model_validate(payload))
         return candidates
+
+
+@dataclass(frozen=True)
+class RetrievalResult:
+    candidates: list[Candidate]
+    sources: list[str]
+    failures: dict[str, str]

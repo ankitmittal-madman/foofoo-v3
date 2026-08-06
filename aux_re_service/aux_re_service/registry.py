@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import importlib.util
-import os
 from dataclasses import asdict, dataclass
 
 from .config import Settings
@@ -16,49 +15,73 @@ class ModelEntry:
     enabled: bool
     available: bool
     local_only: bool = True
-
-
-def _switch(name: str, default: bool = True) -> bool:
-    """Per-model ablation switch, e.g. AUX_REC_MODEL_KGAT_ENABLED=false."""
-    raw = os.getenv(f"AUX_REC_MODEL_{name}_ENABLED")
-    if raw is None:
-        return default
-    if raw.strip().lower() not in {"true", "false"}:
-        raise ValueError(f"AUX_REC_MODEL_{name}_ENABLED must be true or false")
-    return raw.strip().lower() == "true"
+    status: str = "ready"
+    version: str | None = None
 
 
 class ModelRegistry:
     def __init__(self, settings: Settings):
         recbole = importlib.util.find_spec("recbole") is not None
         lightfm = importlib.util.find_spec("lightfm") is not None
-        qdrant = bool(settings.qdrant_url)
+        qdrant = bool(settings.qdrant_url) and settings.qdrant_enabled
+        artifacts = settings.model_artifact_dir
+        scaffold_status = "scaffold_only" if artifacts else "artifact_not_configured"
+        recbole_status = scaffold_status if recbole else "package_missing"
         self.entries = (
-            ModelEntry("Existing Engine", "dependency", True, True),
-            ModelEntry("Qdrant Retriever", "retriever", qdrant and _switch("QDRANT"), qdrant),
-            ModelEntry("LightFM Baseline", "ranker", lightfm and _switch("LIGHTFM"), lightfm),
+            ModelEntry("Existing Engine", "dependency", True, True, status="input_dependency"),
+            ModelEntry(
+                "Qdrant Retriever",
+                "retriever",
+                qdrant,
+                qdrant,
+                status="configured" if qdrant else "not_configured",
+            ),
+            ModelEntry(
+                "LightFM Baseline",
+                "ranker",
+                False,
+                False,
+                status=scaffold_status if lightfm else "package_missing",
+            ),
             ModelEntry(
                 "LightGCN / RecBole-GNN",
                 "ranker",
-                recbole and _switch("LIGHTGCN"),
-                recbole,
+                False,
+                False,
+                status=recbole_status,
             ),
-            ModelEntry("KGAT", "ranker", recbole and _switch("KGAT"), recbole),
-            ModelEntry("RecBole-FairRec", "policy", recbole and _switch("FAIRREC"), recbole),
-            ModelEntry("RecBole-Debias", "policy", recbole and _switch("DEBIAS"), recbole),
-            ModelEntry("RecBole-CDR", "ranker", recbole and _switch("CDR"), recbole),
-            ModelEntry("RecBole-DA", "augmentation", recbole and _switch("DA"), recbole),
+            ModelEntry("KGAT", "ranker", False, False, status=recbole_status),
+            ModelEntry("RecBole-FairRec", "policy", False, False, status=recbole_status),
+            ModelEntry("RecBole-Debias", "policy", False, False, status=recbole_status),
+            ModelEntry("RecBole-CDR", "ranker", False, False, status=recbole_status),
+            ModelEntry("RecBole-DA", "augmentation", False, False, status=recbole_status),
             ModelEntry(
                 "Recipe2Vec-inspired Embedder",
                 "embedder",
-                _switch("EMBEDDER"),
+                settings.embedder_enabled,
                 True,
+                status="built_in_feature_hash",
+                version="feature-hash-v1",
             ),
-            ModelEntry("Local Reranker", "reranker", settings.use_local_reranker, True),
-            ModelEntry("Rule Engine", "policy", True, True),
-            ModelEntry("Diversity Engine", "policy", True, True),
-            ModelEntry("Nutrition/Safety Engine", "policy", True, True),
-            ModelEntry("Exploration Engine", "policy", True, True),
+            ModelEntry(
+                "Local Food Knowledge Graph",
+                "retriever",
+                bool(settings.knowledge_graph_path),
+                bool(settings.knowledge_graph_path),
+                status="configured" if settings.knowledge_graph_path else "not_configured",
+                version="indian-food-graph-v1",
+            ),
+            ModelEntry(
+                "Local Reranker",
+                "reranker",
+                settings.use_local_reranker,
+                True,
+                version="weighted-mmr-v1",
+            ),
+            ModelEntry("Rule Engine", "policy", True, True, version="rules-v1"),
+            ModelEntry("Diversity Engine", "policy", True, True, version="mmr-v1"),
+            ModelEntry("Nutrition/Safety Engine", "policy", True, True, version="safety-v1"),
+            ModelEntry("Exploration Engine", "policy", False, False, status="not_implemented"),
         )
 
     def metadata(self) -> list[dict[str, object]]:
