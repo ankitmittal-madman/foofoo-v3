@@ -54,6 +54,9 @@ def test_cold_start_top15_diverse_and_eligible():
 
     classes = Counter(d["meal_class_code"] for d in res["dishes"])
     assert max(classes.values()) <= 3
+    cat = Catalogue()
+    assert sum(MP._dish_is_rich(cat.get(d["name"])) for d in res["dishes"]) <= 8
+    assert sum(MP._dish_is_soup(cat.get(d["name"])) for d in res["dishes"]) <= 1
     # every dish is slot-tagged and carries a class + score
     for d in res["dishes"]:
         assert d["slot"] in MP.MAIN_SLOTS
@@ -68,6 +71,22 @@ def test_cold_start_top15_favors_quicker_dishes_for_beginner_cooks():
     advanced_dishes = MP.cold_start_top15(_hh(cook_capability="advanced"), n=15)["dishes"]
     avg = lambda dishes: sum(d["total_mins"] for d in dishes) / len(dishes)  # noqa: E731
     assert avg(beginner_dishes) <= avg(advanced_dishes)
+
+
+def test_cold_start_respects_recent_exposure_and_online_preference():
+    hh = _hh()
+    baseline = MP.cold_start_top15(hh, n=15)
+    excluded = [dish["name"] for dish in baseline["dishes"][:5]]
+    refreshed = MP.cold_start_top15(hh, n=15, exclude_dish_names=excluded)
+    assert not set(excluded) & {dish["name"] for dish in refreshed["dishes"]}
+
+    target = refreshed["dishes"][-1]["name"]
+    preferred = MP.cold_start_top15(hh, n=15, preference_by_dish={target: 1.0})
+    preferred_names = [dish["name"] for dish in preferred["dishes"]]
+    assert target in preferred_names
+    assert preferred_names.index(target) < [dish["name"] for dish in refreshed["dishes"]].index(
+        target
+    )
 
 
 def test_slot_options_returns_a_short_eligible_list():
@@ -105,15 +124,29 @@ def test_mmr_visible_prefix_caps_rich_and_repeated_soup_dishes():
     rich = [dish for dish in cat if MP._dish_is_rich(dish)][:4]
     soup = cat.get("Rasam")
     light = [
-        dish
-        for dish in cat
-        if dish not in rich and dish is not soup and not MP._dish_is_rich(dish)
+        dish for dish in cat if dish not in rich and dish is not soup and not MP._dish_is_rich(dish)
     ][:5]
     ranked = [(100.0 - index, dish) for index, dish in enumerate(rich + [soup, soup] + light)]
     selected = MP._mmr_rerank(ranked, 8)
 
     assert sum(MP._dish_is_rich(dish) for _, dish in selected) <= 4
     assert sum(MP._dish_is_soup(dish) for _, dish in selected) <= 1
+
+
+def test_persisted_cadence_tightens_richness_and_increases_diversity_pressure():
+    assert MP._adaptive_diversity_policy() == (MP.MMR_LAMBDA, 0.5)
+    relevance_lambda, rich_ratio = MP._adaptive_diversity_policy(
+        novelty_budget=0.6, richness_debt=0.3
+    )
+    assert relevance_lambda < MP.MMR_LAMBDA
+    assert rich_ratio == 0.25
+
+    cat = Catalogue()
+    rich = [dish for dish in cat if MP._dish_is_rich(dish)][:6]
+    light = [dish for dish in cat if not MP._dish_is_rich(dish)][:8]
+    ranked = [(100.0 - index, dish) for index, dish in enumerate(rich + light)]
+    selected = MP._mmr_rerank(ranked, 8, novelty_budget=0.6, richness_debt=0.3)
+    assert sum(MP._dish_is_rich(dish) for _, dish in selected) <= 2
 
 
 def test_weekly_class_plan_shape_and_dish_backed():

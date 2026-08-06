@@ -20,6 +20,7 @@ plain JSON-serialisable dicts so the FastAPI layer can hand them straight back.
 """
 
 import datetime
+import math
 import random
 
 from ghar_re_core import scoring as S
@@ -148,7 +149,16 @@ def _apply_cook_capability_bias(ranked, cook_capability):
     return within_budget + over_budget
 
 
-def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
+def _adaptive_diversity_policy(novelty_budget=0.15, richness_debt=0.0):
+    """Bounded post-eligibility policy derived only from persisted observed cadence."""
+    novelty = max(0.0, min(1.0, float(novelty_budget or 0.0)))
+    richness = max(0.0, min(1.0, float(richness_debt or 0.0)))
+    relevance_lambda = max(0.50, min(0.85, MMR_LAMBDA - 0.40 * (novelty - 0.15)))
+    max_rich_ratio = max(0.25, 0.50 - min(0.25, richness))
+    return relevance_lambda, max_rich_ratio
+
+
+def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None, richness_debt=0.0):
     """Take the top n dishes while capping repeats per meal class and per cuisine, so the surface
     isn't 15 near-identical dals. Falls back to filling from the remainder if the caps are too
     tight to reach n.
@@ -164,6 +174,10 @@ def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
     exact prior greedy behaviour — this never touches score or eligibility, only pick order."""
     epsilon = CONFIG.bandit_epsilon if rng is not None else 0.0
     picked, seen_class, seen_cuisine = [], {}, {}
+    _, max_rich_ratio = _adaptive_diversity_policy(richness_debt=richness_debt)
+    max_rich = max(1, math.ceil(n * max_rich_ratio))
+    rich_count = 0
+    soup_count = 0
     deferred = []
     for score, d in ranked:
         code = K.dish_to_class_code(d.name)
@@ -171,24 +185,43 @@ def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
             continue
         if seen_cuisine.get(d.cuisine, 0) >= per_cuisine:
             continue
+        if _dish_is_rich(d) and rich_count >= max_rich:
+            continue
+        if _dish_is_soup(d) and soup_count >= 1:
+            continue
         if epsilon > 0 and rng.random() < epsilon:
             deferred.append((score, d))  # exploration: give a later candidate its turn
             continue
         picked.append((score, d))
         seen_class[code] = seen_class.get(code, 0) + 1
         seen_cuisine[d.cuisine] = seen_cuisine.get(d.cuisine, 0) + 1
+        rich_count += int(_dish_is_rich(d))
+        soup_count += int(_dish_is_soup(d))
         if len(picked) >= n:
             return picked
-    # top-up if caps (or deferrals) left us short — deferred picks first, then the remainder,
-    # so an exploration deferral still gets a genuine second chance rather than being discarded.
+    # Top up while preserving visible richness/soup limits. Relax only if the eligible catalogue
+    # cannot fill the requested count, matching _mmr_rerank's safety-first fallback behavior.
     if len(picked) < n:
         chosen = {id(d) for _, d in picked}
         for score, d in deferred + ranked:
-            if id(d) not in chosen:
+            if (
+                id(d) not in chosen
+                and (not _dish_is_rich(d) or rich_count < max_rich)
+                and (not _dish_is_soup(d) or soup_count < 1)
+            ):
                 picked.append((score, d))
                 chosen.add(id(d))
+                rich_count += int(_dish_is_rich(d))
+                soup_count += int(_dish_is_soup(d))
                 if len(picked) >= n:
                     break
+        if len(picked) < n:
+            for score, d in deferred + ranked:
+                if id(d) not in chosen:
+                    picked.append((score, d))
+                    chosen.add(id(d))
+                    if len(picked) >= n:
+                        break
     return picked[:n]
 
 
@@ -210,10 +243,14 @@ def _dish_is_soup(dish):
     return "soup" in dish.name.casefold() or "soup" in set(dish.dish_category or [])
 
 
-def _mmr_rerank(ranked, n, diversity_lambda=MMR_LAMBDA):
+def _mmr_rerank(ranked, n, diversity_lambda=None, novelty_budget=0.15, richness_debt=0.0):
     """MMR reranking with deterministic content, richness, and repeated-soup constraints."""
     if not ranked or n <= 0:
         return []
+    adaptive_lambda, max_rich_ratio = _adaptive_diversity_policy(
+        novelty_budget=novelty_budget, richness_debt=richness_debt
+    )
+    diversity_lambda = adaptive_lambda if diversity_lambda is None else diversity_lambda
     candidates = list(ranked)
     scores = [score for score, _ in candidates]
     low, high = min(scores), max(scores)
@@ -229,7 +266,10 @@ def _mmr_rerank(ranked, n, diversity_lambda=MMR_LAMBDA):
         allowed = [
             index
             for index, (_, dish) in enumerate(candidates)
-            if (not _dish_is_rich(dish) or rich_count < (next_size + 1) // 2)
+            if (
+                not _dish_is_rich(dish)
+                or rich_count < max(1, math.ceil(next_size * max_rich_ratio))
+            )
             and (not _dish_is_soup(dish) or soup_count < 1)
         ]
         # Relax only when the safe/eligible catalogue cannot fill the requested response.
@@ -259,7 +299,15 @@ def _theta_obj(household):
 
 
 def cold_start_top15(
-    household, catalogue=None, n=15, weekday="Monday", household_id=None, variety_salt=None
+    household,
+    catalogue=None,
+    n=15,
+    weekday="Monday",
+    household_id=None,
+    variety_salt=None,
+    exclude_dish_names=None,
+    preference_by_dish=None,
+    richness_debt=0.0,
 ):
     """Surface 1 — the post-onboarding preference primer: the n (default 15) top-scoring, DIVERSE
     dishes across breakfast/lunch/dinner, for the user to like and seed their taste profile. Diverse
@@ -282,6 +330,7 @@ def cold_start_top15(
     in tests) for a reproducible seed."""
     cat = catalogue or Catalogue()
     theta, objective = _theta_obj(household)
+    excluded = set(exclude_dish_names or [])
     if household_id is None:
         rng = None
     else:
@@ -291,13 +340,20 @@ def cold_start_top15(
     pool = {}
     for slot in MAIN_SLOTS:
         ctx = make_context(slot=slot, weekday=weekday)
-        for score, d in _ranked(cat, theta, ctx, objective)[:20]:
+        for score, d in _ranked(
+            cat,
+            theta,
+            ctx,
+            objective,
+            predicate=lambda dish: dish.name not in excluded,
+            preference_by_dish=preference_by_dish,
+        )[:20]:
             prev = pool.get(d.name)
             if prev is None or score > prev[0]:
                 pool[d.name] = (score, d, slot, ctx)
     ranked = sorted(((v[0], v[1]) for v in pool.values()), key=lambda x: -x[0])
     ranked = _apply_cook_capability_bias(ranked, household.get("cook_capability"))
-    picked = _diversify(ranked, n, rng=rng)
+    picked = _diversify(ranked, n, rng=rng, richness_debt=richness_debt)
     slot_of = {v[1].name: (v[2], v[3]) for v in pool.values()}
     return {
         "household": household.get("label"),
@@ -343,6 +399,8 @@ def slot_options(
         calorie_target=context.get("calorie_target"),
     )
     ctx["interaction_count"] = max(0, int(context.get("interaction_count", 0) or 0))
+    ctx["novelty_budget"] = max(0.0, min(1.0, float(context.get("novelty_budget", 0.15) or 0)))
+    ctx["richness_debt"] = max(0.0, min(1.0, float(context.get("richness_debt", 0) or 0)))
     excluded = set(exclude_dish_names or [])
 
     # multi-membership (WP-17.1): a dish is eligible for a class if that class is ANY of its classes
@@ -356,7 +414,16 @@ def slot_options(
     ranked = _ranked(
         cat, theta, ctx, objective, predicate=pred, preference_by_dish=preference_by_dish
     )
-    picked = ranked[:n] if class_code else _mmr_rerank(ranked, n)
+    picked = (
+        ranked[:n]
+        if class_code
+        else _mmr_rerank(
+            ranked,
+            n,
+            novelty_budget=ctx["novelty_budget"],
+            richness_debt=ctx["richness_debt"],
+        )
+    )
     return {
         "household": household.get("label"),
         "slot": slot,
@@ -467,8 +534,7 @@ def search_dishes(
             _dish_view(dish, theta, ctx, objective, score) for _, score, _, dish in selected
         ],
         "_candidate_lineage": [
-            _candidate_lineage(dish, score, slot or "dinner")
-            for _, score, _, dish in matches
+            _candidate_lineage(dish, score, slot or "dinner") for _, score, _, dish in matches
         ],
     }
 
