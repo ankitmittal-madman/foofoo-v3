@@ -91,10 +91,6 @@ WITH u AS (
   SELECT novelty_budget, richness_debt, effort_debt, ordinary_meal_ratio,
          feature_version, updated_at
   FROM re_engine.household_cadence_state WHERE household_id = (SELECT id FROM u)
-), variety AS (
-  SELECT cardinality(last_7_class_codes) AS recent_classes,
-         cardinality(last_7_cuisine_families) AS recent_cuisines, updated_at
-  FROM public.variety_window_state WHERE profile_id = (SELECT id FROM u)
 )
 SELECT jsonb_build_object(
   'profile', (SELECT to_jsonb(u) - 'id' FROM u),
@@ -108,7 +104,10 @@ SELECT jsonb_build_object(
   'lineage', (SELECT to_jsonb(lineage) FROM lineage),
   'attribution', (SELECT to_jsonb(attribution) FROM attribution),
   'cadence', (SELECT to_jsonb(cadence) FROM cadence),
-  'variety', (SELECT to_jsonb(variety) FROM variety),
+  'variety', jsonb_build_object(
+    'status', 'not_implemented',
+    'detail', 'public.variety_window_state is absent from the production schema'
+  ),
   'active_never', (SELECT count(*) FROM public.never_list
                     WHERE profile_id = (SELECT id FROM u) AND is_active),
   'active_not_today', (SELECT count(*) FROM public.not_today_suppression
