@@ -54,9 +54,11 @@ def test_user_audit_counts_json_dimensions_with_postgres_supported_function():
     assert user_audit.AUDIT_SQL.count("jsonb_object_keys") == 2
 
 
-def test_user_audit_reports_missing_persisted_variety_state_explicitly():
+def test_user_audit_reports_private_persisted_variety_state():
     assert "FROM public.variety_window_state" not in user_audit.AUDIT_SQL
-    assert "'status', 'not_implemented'" in user_audit.AUDIT_SQL
+    assert "FROM re_engine.variety_window_state" in user_audit.AUDIT_SQL
+    assert "'status', 'not_implemented'" not in user_audit.AUDIT_SQL
+    assert "recent_dish_dimensions" in user_audit.AUDIT_SQL
 
 
 def test_user_audit_fails_closed_for_missing_profile():

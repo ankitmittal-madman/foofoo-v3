@@ -91,6 +91,24 @@ WITH u AS (
   SELECT novelty_budget, richness_debt, effort_debt, ordinary_meal_ratio,
          feature_version, updated_at
   FROM re_engine.household_cadence_state WHERE household_id = (SELECT id FROM u)
+), variety AS (
+  SELECT
+    count(*) AS dimension_rows,
+    count(*) FILTER (WHERE dimension_code = 'dish_name') AS recent_dish_dimensions,
+    count(*) FILTER (WHERE dimension_code = 'meal_class') AS recent_class_dimensions,
+    count(*) FILTER (WHERE dimension_code = 'cuisine') AS recent_cuisine_dimensions,
+    coalesce(sum(count_in_window), 0) AS total_window_exposures,
+    max(updated_at) AS updated_at,
+    coalesce(jsonb_agg(jsonb_build_object(
+      'dimension_code', dimension_code,
+      'entity_key', entity_key,
+      'window_code', window_code,
+      'last_seen_at', last_seen_at,
+      'count_in_window', count_in_window
+    ) ORDER BY window_code, dimension_code, count_in_window DESC, entity_key)
+      FILTER (WHERE dimension_code IS NOT NULL), '[]'::jsonb) AS dimensions
+  FROM re_engine.variety_window_state
+  WHERE household_id = (SELECT id FROM u)
 )
 SELECT jsonb_build_object(
   'profile', (SELECT to_jsonb(u) - 'id' FROM u),
@@ -104,10 +122,7 @@ SELECT jsonb_build_object(
   'lineage', (SELECT to_jsonb(lineage) FROM lineage),
   'attribution', (SELECT to_jsonb(attribution) FROM attribution),
   'cadence', (SELECT to_jsonb(cadence) FROM cadence),
-  'variety', jsonb_build_object(
-    'status', 'not_implemented',
-    'detail', 'public.variety_window_state is absent from the production schema'
-  ),
+  'variety', (SELECT to_jsonb(variety) FROM variety),
   'active_never', (SELECT count(*) FROM public.never_list
                     WHERE profile_id = (SELECT id FROM u) AND is_active),
   'active_not_today', (SELECT count(*) FROM public.not_today_suppression
