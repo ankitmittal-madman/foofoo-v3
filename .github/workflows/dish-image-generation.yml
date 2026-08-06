@@ -6,7 +6,7 @@ name: dish-image-generation
 # fires when a human explicitly dispatches it with eyes-open inputs.
 #
 # Required repository secrets (Settings > Secrets and variables > Actions):
-#   DATABASE_URL or SUPABASE_DB_URL   — required whenever apply=true
+#   DATABASE_URL, SUPABASE_DB_URL, or FOOFOO_SUPABASE_URI   — required whenever apply=true
 #   CLOUDINARY_CLOUD_NAME
 #   CLOUDINARY_API_KEY
 #   CLOUDINARY_API_SECRET
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
@@ -62,7 +62,7 @@ jobs:
       - name: Fail fast if apply=true but no database connection is configured
         if: ${{ inputs.apply == 'true' && env.DATABASE_URL == '' }}
         run: |
-          echo "apply=true requires DATABASE_URL or SUPABASE_DB_URL to be set as a repository secret." >&2
+          echo "apply=true requires DATABASE_URL, SUPABASE_DB_URL, or FOOFOO_SUPABASE_URI to be set as a repository secret." >&2
           exit 1
 
       - name: Run dish ingestion pipeline
