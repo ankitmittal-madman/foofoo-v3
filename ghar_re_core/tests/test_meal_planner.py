@@ -45,6 +45,8 @@ def test_cold_start_top15_diverse_and_eligible():
     res = MP.cold_start_top15(hh, n=15)
     assert res["kind"] == "cold_start_top_dishes"
     assert len(res["dishes"]) == 15
+    assert len(res["_candidate_lineage"]) > len(res["dishes"])
+    assert all({"name", "score", "slot"} <= set(row) for row in res["_candidate_lineage"])
     names = [d["name"] for d in res["dishes"]]
     assert len(set(names)) == 15  # no duplicate dish
     # diversity: no single meal class dominates the whole surface
@@ -70,8 +72,10 @@ def test_cold_start_top15_favors_quicker_dishes_for_beginner_cooks():
 
 def test_slot_options_returns_a_short_eligible_list():
     hh = _hh(q5_diet="veg")
-    opts = MP.slot_options(hh, "dinner", n=5)["options"]
+    result = MP.slot_options(hh, "dinner", n=5)
+    opts = result["options"]
     assert 1 <= len(opts) <= 5
+    assert len(result["_candidate_lineage"]) > len(opts)
     cat = Catalogue()
     theta = derive_theta(hh)
     ctx = make_context(slot="dinner", weekday="Monday")
