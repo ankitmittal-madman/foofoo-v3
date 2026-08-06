@@ -21,6 +21,7 @@ from .models import (
     DishCreate,
     DishPatch,
     DishRecord,
+    EvidenceRef,
     FeedbackInput,
     FieldValue,
     ImageRef,
@@ -57,6 +58,12 @@ def _request_digest(value: Any) -> str:
 
 def _jsonable(value: Any) -> Any:
     return json.loads(json.dumps(value, default=_json))
+
+
+def _required(row: Row | None, context: str) -> Row:
+    if row is None:
+        raise RuntimeError(f"database did not return {context}")
+    return row
 
 
 class PostgresRepository:
@@ -128,33 +135,39 @@ class PostgresRepository:
     def _source_record(
         self, connection: Connection[Row], dish_id: UUID, evidence: dict[str, Any]
     ) -> UUID:
-        source = connection.execute(
-            """INSERT INTO ontology.data_sources(source_code,source_type)
+        source = _required(
+            connection.execute(
+                """INSERT INTO ontology.data_sources(source_code,source_type)
                VALUES(%s,'declared_evidence') ON CONFLICT(source_code) DO UPDATE SET enabled=true
                RETURNING id""",
-            (evidence["source_code"],),
-        ).fetchone()
+                (evidence["source_code"],),
+            ).fetchone(),
+            "data source",
+        )
         payload = json.dumps(
             {"dish_id": str(dish_id), "evidence": evidence},
             sort_keys=True,
             separators=(",", ":"),
         )
         checksum = hashlib.sha256(payload.encode()).hexdigest()
-        record = connection.execute(
-            """INSERT INTO ontology.source_records
+        record = _required(
+            connection.execute(
+                """INSERT INTO ontology.source_records
                (source_id,provider_record_id,subject_dish_id,source_url,payload,payload_sha256)
                VALUES(%s,%s,%s,%s,%s,%s)
                ON CONFLICT(source_id,payload_sha256) DO UPDATE SET fetched_at=now()
                RETURNING id""",
-            (
-                source["id"],
-                evidence.get("source_record_id"),
-                dish_id,
-                evidence.get("source_url"),
-                Jsonb({"dish_id": str(dish_id), "evidence": evidence}),
-                checksum,
-            ),
-        ).fetchone()
+                (
+                    source["id"],
+                    evidence.get("source_record_id"),
+                    dish_id,
+                    evidence.get("source_url"),
+                    Jsonb({"dish_id": str(dish_id), "evidence": evidence}),
+                    checksum,
+                ),
+            ).fetchone(),
+            "source record",
+        )
         return record["id"]
 
     def _assert(
@@ -165,20 +178,23 @@ class PostgresRepository:
         field: FieldValue | AliasInput | ClassMembershipInput | SimilarityInput,
     ) -> UUID:
         payload = field.model_dump(mode="json")
-        assertion = connection.execute(
-            """INSERT INTO ontology.assertions
+        assertion = _required(
+            connection.execute(
+                """INSERT INTO ontology.assertions
                (dish_id,field_path,value,confidence,review_status,extraction_method,last_verified_at)
                VALUES(%s,%s,%s,%s,%s,%s,%s) RETURNING id""",
-            (
-                dish_id,
-                field_path,
-                Jsonb(payload),
-                field.confidence,
-                str(getattr(field, "review_status", "provisional")),
-                field.evidence[0].extraction_method,
-                getattr(field, "last_verified_at", datetime.now().astimezone()),
-            ),
-        ).fetchone()
+                (
+                    dish_id,
+                    field_path,
+                    Jsonb(payload),
+                    field.confidence,
+                    str(getattr(field, "review_status", "provisional")),
+                    field.evidence[0].extraction_method,
+                    getattr(field, "last_verified_at", datetime.now().astimezone()),
+                ),
+            ).fetchone(),
+            "assertion",
+        )
         for item in field.evidence:
             record_id = self._source_record(connection, dish_id, item.model_dump(mode="json"))
             connection.execute(
@@ -247,11 +263,14 @@ class PostgresRepository:
     def create_dish(self, data: DishCreate) -> DishRecord:
         try:
             with self._connection() as connection:
-                row = connection.execute(
-                    """INSERT INTO ontology.dishes(canonical_name,normalized_name,locale)
+                row = _required(
+                    connection.execute(
+                        """INSERT INTO ontology.dishes(canonical_name,normalized_name,locale)
                        VALUES(%s,%s,%s) RETURNING id""",
-                    (data.canonical_name, normalize_name(data.canonical_name), data.locale),
-                ).fetchone()
+                        (data.canonical_name, normalize_name(data.canonical_name), data.locale),
+                    ).fetchone(),
+                    "dish",
+                )
                 dish_id = row["id"]
                 if data.description:
                     self._select_field(connection, dish_id, "description", data.description)
@@ -300,9 +319,7 @@ class PostgresRepository:
         except RaiseException as exc:
             raise ConflictError("meal_class_role_mismatch") from exc
 
-    def _evidence(
-        self, connection: Connection[Row], assertion_id: UUID
-    ) -> list[dict[str, Any]]:
+    def _evidence(self, connection: Connection[Row], assertion_id: UUID) -> list[EvidenceRef]:
         rows = connection.execute(
             """SELECT ds.source_code,sr.provider_record_id AS source_record_id,sr.source_url,
                       a.extraction_method,ds.checked_at
@@ -313,7 +330,9 @@ class PostgresRepository:
             (assertion_id,),
         ).fetchall()
         return [
-            {k: value for k, value in row.items() if k != "checked_at" and value is not None}
+            EvidenceRef.model_validate(
+                {k: value for k, value in row.items() if k != "checked_at" and value is not None}
+            )
             for row in rows
         ]
 
@@ -431,14 +450,17 @@ class PostgresRepository:
                     "WHERE deduplication_key=%s AND status IN ('queued','running','retry')",
                     (dedupe,),
                 )
-            row = connection.execute(
-                """INSERT INTO ontology.jobs(dish_id,kind,deduplication_key,requested_fields,priority)
+            row = _required(
+                connection.execute(
+                    """INSERT INTO ontology.jobs(dish_id,kind,deduplication_key,requested_fields,priority)
                    VALUES(%s,%s,%s,%s,%s)
                    ON CONFLICT(deduplication_key) WHERE status IN ('queued','running','retry')
                    DO UPDATE SET priority=greatest(ontology.jobs.priority,excluded.priority),updated_at=now()
                    RETURNING *""",
-                (dish_id, kind, dedupe, sorted(set(fields)), priority),
-            ).fetchone()
+                    (dish_id, kind, dedupe, sorted(set(fields)), priority),
+                ).fetchone(),
+                "job",
+            )
             return row
 
     def job_status(self, job_id: UUID) -> dict[str, Any]:
@@ -514,23 +536,27 @@ class PostgresRepository:
                     ),
                 )
             else:
-                asset = connection.execute(
-                    """INSERT INTO ontology.image_assets
+                asset = _required(
+                    connection.execute(
+                        """INSERT INTO ontology.image_assets
                        (cloudinary_public_id,cloudinary_asset_id,cloudinary_version,secure_url,checksum_sha256,
                         source_type,licence_code,attribution,moderation_status)
                        VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id""",
-                    (
-                        image.cloudinary_public_id,
-                        image.cloudinary_asset_id,
-                        image.cloudinary_version,
-                        image.secure_url,
-                        image.checksum_sha256,
-                        image.source_type,
-                        image.licence_code,
-                        image.attribution,
-                        str(image.review_status),
-                    ),
-                ).fetchone()
+                        (
+                            image.cloudinary_public_id,
+                            image.cloudinary_asset_id,
+                            image.cloudinary_version,
+                            image.secure_url,
+                            image.checksum_sha256,
+                            image.source_type,
+                            image.licence_code,
+                            image.attribution,
+                            str(image.review_status),
+                        ),
+                    ).fetchone(),
+                    "image asset",
+                )
+            assert asset is not None
             if image.is_primary:
                 connection.execute(
                     "UPDATE ontology.dish_images SET is_primary=false WHERE dish_id=%s", (dish_id,)
@@ -548,19 +574,22 @@ class PostgresRepository:
     ) -> dict[str, Any]:
         self.get_dish(dish_id)
         with self._connection() as connection:
-            return connection.execute(
-                """INSERT INTO ontology.correction_submissions
+            return _required(
+                connection.execute(
+                    """INSERT INTO ontology.correction_submissions
                    (dish_id,field_path,proposed_value,reason,actor_reference,submitted_by_principal)
                    VALUES(%s,%s,%s,%s,%s,%s) RETURNING *""",
-                (
-                    dish_id,
-                    feedback.field_path,
-                    Jsonb(_jsonable(feedback.proposed_value)),
-                    feedback.reason,
-                    feedback.actor_reference,
-                    principal,
-                ),
-            ).fetchone()
+                    (
+                        dish_id,
+                        feedback.field_path,
+                        Jsonb(_jsonable(feedback.proposed_value)),
+                        feedback.reason,
+                        feedback.actor_reference,
+                        principal,
+                    ),
+                ).fetchone(),
+                "correction submission",
+            )
 
     def claim_jobs(self, worker_id: str, limit: int = 20) -> list[dict[str, Any]]:
         with self._connection() as connection:
@@ -578,5 +607,8 @@ class PostgresRepository:
 
     def reconcile_jobs(self) -> int:
         with self._connection() as connection:
-            row = connection.execute("SELECT ontology.reconcile_jobs() AS count").fetchone()
+            row = _required(
+                connection.execute("SELECT ontology.reconcile_jobs() AS count").fetchone(),
+                "reconciliation count",
+            )
             return row["count"]
