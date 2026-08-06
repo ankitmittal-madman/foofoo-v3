@@ -177,11 +177,12 @@ CREATE TABLE ontology.jobs (
   lease_expires_at timestamptz,
   last_error_code text,
   created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (deduplication_key)
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX jobs_due ON ontology.jobs(priority DESC,next_attempt_at,created_at)
   WHERE status IN ('queued','retry');
+CREATE UNIQUE INDEX jobs_active_deduplication ON ontology.jobs(deduplication_key)
+  WHERE status IN ('queued','running','retry');
 
 CREATE FUNCTION ontology.claim_jobs(p_worker_id text, p_limit integer DEFAULT 20)
 RETURNS SETOF ontology.jobs LANGUAGE plpgsql SECURITY DEFINER SET search_path=ontology,pg_temp AS $$
@@ -251,6 +252,20 @@ CREATE FUNCTION ontology.prevent_decision_mutation() RETURNS trigger LANGUAGE pl
 BEGIN RAISE EXCEPTION 'review decisions are immutable'; END $$;
 CREATE TRIGGER review_decisions_immutable BEFORE UPDATE OR DELETE ON ontology.review_decisions
 FOR EACH ROW EXECUTE FUNCTION ontology.prevent_decision_mutation();
+
+CREATE TABLE ontology.correction_submissions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  dish_id uuid NOT NULL REFERENCES ontology.dishes(id) ON DELETE CASCADE,
+  field_path text NOT NULL,
+  proposed_value jsonb NOT NULL,
+  reason text NOT NULL,
+  actor_reference text,
+  submitted_by_principal text NOT NULL,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','accepted','rejected','superseded')),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX correction_submissions_pending ON ontology.correction_submissions(created_at)
+  WHERE status='pending';
 
 CREATE TABLE ontology.idempotency_records (
   principal text NOT NULL,

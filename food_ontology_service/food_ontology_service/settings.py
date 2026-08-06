@@ -41,10 +41,12 @@ class Settings:
                     scopes=frozenset({"ontology:read", "ontology:write", "ontology:admin"}),
                 )
             )
+        database_url = os.getenv("ONTOLOGY_DATABASE_URL")
+        if environment == "production" and not database_url:
+            raise RuntimeError("ONTOLOGY_DATABASE_URL is required in production")
         return cls(
             environment=environment,
-            database_url=os.getenv("ONTOLOGY_DATABASE_URL"),
+            database_url=database_url,
             principals=tuple(principals),
             default_cache_seconds=int(os.getenv("ONTOLOGY_CACHE_SECONDS", "300")),
         )
-

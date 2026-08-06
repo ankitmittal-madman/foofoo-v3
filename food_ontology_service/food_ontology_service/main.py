@@ -11,13 +11,20 @@ from fastapi.responses import JSONResponse
 
 from . import __version__
 from .models import DishCreate, DishPatch, EnrichmentRequest, FeedbackInput, ImageRef, SimilarityInput
-from .repository import ConflictError, MemoryRepository, NotFoundError
+from .repository import ConflictError, MemoryRepository, NotFoundError, Repository
 from .settings import Principal, Settings
 
 
-def create_app(settings: Settings | None = None, repository: MemoryRepository | None = None) -> FastAPI:
+def create_app(settings: Settings | None = None, repository: Repository | None = None) -> FastAPI:
     cfg = settings or Settings.from_env()
-    repo = repository or MemoryRepository()
+    if repository is not None:
+        repo = repository
+    elif cfg.database_url:
+        from .postgres_repository import PostgresRepository
+
+        repo = PostgresRepository(cfg.database_url)
+    else:
+        repo = MemoryRepository()
     app = FastAPI(title="Foofoo Food Ontology Service", version=__version__)
     app.state.settings = cfg
     app.state.repository = repo
@@ -63,7 +70,13 @@ def create_app(settings: Settings | None = None, repository: MemoryRepository | 
 
     @app.get("/readyz")
     def readyz():
-        return {"status": "ready", "database": "memory" if not cfg.database_url else "configured"}
+        ping = getattr(repo, "ping", None)
+        if ping:
+            try:
+                ping()
+            except Exception:
+                return JSONResponse(status_code=503, content={"status": "unready", "database": "unavailable"})
+        return {"status": "ready", "database": "postgres" if cfg.database_url else "memory"}
 
     @app.post("/v1/dishes")
     def create_dish(data: DishCreate, principal: Principal = Depends(require("ontology:write")),
