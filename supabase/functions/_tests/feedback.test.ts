@@ -17,6 +17,7 @@ import {
 import type { AuthClaims } from "../_shared/mod.ts";
 import { AppError } from "../_shared/errors/app-error.ts";
 import { feedbackAllowedRoles, makeFeedbackHandler } from "../feedback/handler.ts";
+import { slateItemMatchesDish } from "../feedback/events.ts";
 import type { FeedbackEventInput, FeedbackEventResult } from "../feedback/events.ts";
 
 const REQUIRED_ENV = {
@@ -62,6 +63,24 @@ Deno.test("parseFeedbackRequest accepts a well-formed body", () => {
   assertEquals(req.requestId, REQUEST_ID);
   assertEquals(req.eventType, "like");
   assertEquals(req.dishName, "Masala Dosa");
+});
+
+Deno.test("served dish feedback resolves both dish-card and episode decision traces", () => {
+  assertEquals(
+    slateItemMatchesDish(
+      { dish_name: "Poha Jalebi (Indori)", dish_snapshot: { name: "Poha Jalebi (Indori)" } },
+      "poha jalebi (indori)",
+    ),
+    true,
+  );
+  assertEquals(
+    slateItemMatchesDish(
+      { episode_snapshot: { components: [{ dish_name: "Daal Bafla" }] } },
+      "Daal Bafla",
+    ),
+    true,
+  );
+  assertEquals(slateItemMatchesDish({}, "Daal Bafla"), false);
 });
 
 Deno.test("parseFeedbackRequest accepts a body with no dish_name (e.g. 'accept' the whole plate)", () => {

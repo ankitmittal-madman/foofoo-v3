@@ -50,6 +50,10 @@ export interface FeedbackEventResult {
 }
 
 const OUTCOME_BY_FEEDBACK: Partial<Record<FeedbackEventType, string>> = {
+  accept: "chosen",
+  like: "liked",
+  dislike: "disliked",
+  never: "disliked",
   make_this: "chosen",
   lock: "locked",
   cooked: "cooked",
@@ -58,6 +62,27 @@ const OUTCOME_BY_FEEDBACK: Partial<Record<FeedbackEventType, string>> = {
   completed: "completed",
   regretted: "regretted",
 };
+
+export function slateItemMatchesDish(
+  decisionTrace: unknown,
+  requestedDishName: string,
+): boolean {
+  if (!decisionTrace || typeof decisionTrace !== "object") return false;
+  const trace = decisionTrace as Record<string, unknown>;
+  const wanted = requestedDishName.trim().toLocaleLowerCase("en-IN");
+  const direct = typeof trace.dish_name === "string" ? trace.dish_name : undefined;
+  const snapshot = trace.dish_snapshot && typeof trace.dish_snapshot === "object"
+    ? trace.dish_snapshot as Record<string, unknown>
+    : undefined;
+  const episode = trace.episode_snapshot && typeof trace.episode_snapshot === "object"
+    ? trace.episode_snapshot as Record<string, unknown>
+    : undefined;
+  const components = Array.isArray(episode?.components)
+    ? episode.components as Array<Record<string, unknown>>
+    : [];
+  return [direct, snapshot?.name, ...components.map((component) => component.dish_name)]
+    .some((name) => typeof name === "string" && name.trim().toLocaleLowerCase("en-IN") === wanted);
+}
 
 async function syncTypedIntelligence(
   ctx: RequestContext,
@@ -68,7 +93,7 @@ async function syncTypedIntelligence(
 ): Promise<void> {
   const outcomeType = OUTCOME_BY_FEEDBACK[ev.eventType];
   if (outcomeType) {
-    const episodeHash = typeof ev.detail?.episode_hash === "string" ? ev.detail.episode_hash : null;
+    let episodeHash = typeof ev.detail?.episode_hash === "string" ? ev.detail.episode_hash : null;
     const { data: slateRows, error: slateError } = await withTimeout(
       db.from("slates").select("id").eq("household_id", ev.householdId).eq(
         "request_id",
@@ -77,12 +102,30 @@ async function syncTypedIntelligence(
       "feedback.events.slate_lookup",
     );
     if (slateError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: slateError.message });
+    const slateId = slateRows?.[0]?.id ?? null;
+    // Dish-card feedback usually carries only the canonical display name. Resolve it back to the
+    // exact served item so outcome attribution remains point-in-time rather than joining to the
+    // user's latest slate later. Older clients need no new payload field for this.
+    if (!episodeHash && slateId && ev.dishName) {
+      const { data: itemRows, error: itemError } = await withTimeout(
+        db.from("slate_items").select("episode_hash,decision_trace").eq("slate_id", slateId)
+          .order("rank", { ascending: true }).limit(100),
+        "feedback.events.slate_item_lookup",
+      );
+      if (itemError) {
+        throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: itemError.message });
+      }
+      const matching = itemRows?.find((row) =>
+        slateItemMatchesDish(row.decision_trace, ev.dishName!)
+      );
+      episodeHash = matching?.episode_hash ?? null;
+    }
     const { error } = await withTimeout(
       db.from("outcome_events").upsert({
         idempotency_key: eventId,
         household_id: ev.householdId,
         profile_id: ev.actorProfileId,
-        slate_id: slateRows?.[0]?.id ?? null,
+        slate_id: slateId,
         episode_hash: episodeHash,
         outcome_type: outcomeType,
         value: ev.detail ?? {},
