@@ -92,7 +92,9 @@
         "weather": { "$ref": "#/$defs/Weather" },
         "active_modes": { "type": "array", "items": { "type": "string", "enum": ["fasting", "festival", "veg_egg"] } },
         "calorie_target": { "type": ["integer", "null"] },
-        "interaction_count": { "type": "integer", "minimum": 0, "description": "Total feedback_events rows recorded for this household to date (Edge-Function-computed). Drives the master formula's cohort-decay terms (w_cohort_effective/foreign_demote_effective, ghar_re_core/config.py) — absent/omitted is treated as 0 (cold start), same as those functions' own graceful degrade." }
+        "interaction_count": { "type": "integer", "minimum": 0, "description": "Total explicit user feedback rows recorded for this household (automatic shown_not_tapped impressions excluded). Drives cohort-decay terms; absent is treated as 0." },
+        "novelty_budget": { "type": "number", "minimum": 0, "maximum": 1, "description": "Persisted exploration budget derived from repeated recent exposures; used only by post-eligibility diversity reranking." },
+        "richness_debt": { "type": "number", "minimum": 0, "maximum": 1, "description": "Observed excess recent richness above the neutral midpoint; used only to tighten the visible rich-dish cap." }
       },
       "required": ["slot"]
     },
