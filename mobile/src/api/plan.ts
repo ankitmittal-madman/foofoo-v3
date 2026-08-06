@@ -216,6 +216,9 @@ function fetchSlotOptionsAsMealEpisodes(
     weekday?: string;
     class_code?: string;
     count?: number;
+    refresh_generation?: number;
+    exclude_dish_names?: string[];
+    exclude_recently_served?: boolean;
   } = {},
 ): Promise<MealEpisodeResponse> {
   const count = typeof opts.count === "number" ? opts.count : 4;
@@ -226,12 +229,18 @@ function fetchSlotOptionsAsMealEpisodes(
       class_code: opts.class_code,
       weekday: opts.weekday,
       count,
+      ...(opts.refresh_generation !== undefined ? { refresh_generation: opts.refresh_generation } : {}),
+      ...(opts.exclude_dish_names?.length ? { exclude_dish_names: opts.exclude_dish_names } : {}),
+      ...(opts.exclude_recently_served !== undefined ? { exclude_recently_served: opts.exclude_recently_served } : {}),
     }
     : {
       surface: "meal_plan",
       slot,
       weekday: opts.weekday,
       count,
+      ...(opts.refresh_generation !== undefined ? { refresh_generation: opts.refresh_generation } : {}),
+      ...(opts.exclude_dish_names?.length ? { exclude_dish_names: opts.exclude_dish_names } : {}),
+      ...(opts.exclude_recently_served !== undefined ? { exclude_recently_served: opts.exclude_recently_served } : {}),
     }).then((response) => slotOptionsToMealEpisodes(response, slot));
 }
 
@@ -293,6 +302,7 @@ export function fetchSlotOptions(
     class_code?: string;
     count?: number;
     exclude_dish_names?: string[];
+    exclude_recently_served?: boolean;
   } = {},
 ): Promise<SlotOptionsResponse> {
   return apiPost<SlotOptionsResponse>("/plan", { surface: "meal_plan", slot, ...opts });
@@ -310,6 +320,11 @@ export function fetchMealEpisodes(
     leftover_dish_names?: string[];
     discovery_mode?: boolean;
     recovery_mode?: boolean;
+    /** Monotonic per-screen generation. It changes the engine seed and enables recent-exposure
+     * suppression, so Refresh requests a new slate rather than replaying the same ranking. */
+    refresh_generation?: number;
+    exclude_dish_names?: string[];
+    exclude_recently_served?: boolean;
   } = {},
 ): Promise<MealEpisodeResponse> {
   if (process.env.EXPO_PUBLIC_ENABLE_MEAL_EPISODES === "false") {

@@ -75,7 +75,7 @@ class _FnModule:
 def build_registry() -> list[ScoringModule]:
     """The ordered BASE registry (matches ghar_re_core.scoring.base()'s term order exactly)."""
     return [
-        _FnModule("m_palette", "W_PALETTE", S.m_palette, "dish_theta"),
+        _FnModule("m_palette", "W_PALETTE", S.m_palette, "dish_theta_ctx"),
         _FnModule("m_slot", "W_SLOT", S.m_slot, "dish_ctx"),
         _FnModule("m_season", "W_SEASON", S.m_season, "dish_ctx"),
         _FnModule("sig", "W_SIG", S.sig, "dish"),

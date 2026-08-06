@@ -8,6 +8,31 @@ export interface OnlineRecommendationState {
   excludeDishNames: string[];
   preferenceByDish: Record<string, number>;
   dishFeedbackCounts: Array<{ dish_name: string; served: number; rejected: number }>;
+  /** Canonical names shown in recent successful slates. Used only for freshness/refresh
+   * suppression; it is intentionally separate from durable Never/Not-Today intent. */
+  recentExposureDishNames: string[];
+}
+
+export function extractExposureDishNames(plates: unknown): string[] {
+  if (!Array.isArray(plates)) return [];
+  const names: string[] = [];
+  for (const item of plates) {
+    if (!item || typeof item !== "object") continue;
+    const row = item as Record<string, unknown>;
+    if (typeof row.name === "string") names.push(row.name);
+    if (Array.isArray(row.hero_dish_names)) {
+      for (const value of row.hero_dish_names) if (typeof value === "string") names.push(value);
+    }
+    if (Array.isArray(row.components)) {
+      for (const component of row.components) {
+        const name = component && typeof component === "object"
+          ? (component as Record<string, unknown>).dish_name
+          : null;
+        if (typeof name === "string") names.push(name);
+      }
+    }
+  }
+  return names;
 }
 
 /** Aggregate only explicit member affinities with Nash-style geometric welfare.
@@ -48,7 +73,7 @@ export async function loadOnlineRecommendationState(
     if (membershipRes.error) throw membershipRes.error;
     const memberIds = [...new Set((membershipRes.data ?? []).map((row) => String(row.user_id)))];
     if (memberIds.length === 0) memberIds.push(profileId);
-    const [countRes, neverRes, todayRes, tasteRes, feedbackRes] = await Promise.all([
+    const [countRes, neverRes, todayRes, tasteRes, feedbackRes, exposureRes] = await Promise.all([
       withTimeout(
         db.from("feedback_events").select("id", { count: "exact", head: true })
           .eq("household_id", profileId),
@@ -72,15 +97,20 @@ export async function loadOnlineRecommendationState(
         "personalization.taste",
       ),
       withTimeout(
-        db.from("feedback_events").select("event_type,dishes(name)").eq(
+        db.from("feedback_events").select("event_type,created_at,detail,dishes(name)").eq(
           "household_id",
           profileId,
         )
-          .not("dish_id", "is", null).order("created_at", { ascending: false }).limit(500),
+          .order("created_at", { ascending: false }).limit(500),
         "personalization.feedback",
       ),
+      withTimeout(
+        db.from("recommendation_events").select("plates").eq("household_id", profileId)
+          .eq("outcome", "success").order("created_at", { ascending: false }).limit(6),
+        "personalization.recent_exposures",
+      ),
     ]);
-    for (const result of [countRes, neverRes, todayRes, tasteRes, feedbackRes]) {
+    for (const result of [countRes, neverRes, todayRes, tasteRes, feedbackRes, exposureRes]) {
       if (result.error) throw result.error;
     }
     const joinedName = (row: Record<string, unknown>): string | null => {
@@ -97,11 +127,28 @@ export async function loadOnlineRecommendationState(
     }
     const counts = new Map<string, { served: number; rejected: number }>();
     for (const row of (feedbackRes.data ?? []) as Record<string, unknown>[]) {
-      const name = joinedName(row);
+      const detail = row.detail && typeof row.detail === "object"
+        ? row.detail as Record<string, unknown>
+        : null;
+      const fallbackName = typeof detail?.dish_name === "string" ? detail.dish_name : null;
+      const name = joinedName(row) ?? fallbackName;
       if (!name) continue;
+      const eventType = String(row.event_type);
+      if (eventType === "never") excluded.add(name);
+      if (eventType === "not_today") {
+        const occurred = new Date(String(row.created_at));
+        if (
+          Number.isFinite(occurred.getTime()) &&
+          Date.now() - occurred.getTime() < 24 * 60 * 60 * 1000
+        ) {
+          excluded.add(name);
+        }
+      }
       const current = counts.get(name) ?? { served: 0, rejected: 0 };
-      if (["accept", "like"].includes(String(row.event_type))) current.served++;
-      if (["dislike", "never", "not_today", "shown_not_tapped"].includes(String(row.event_type))) {
+      if (["accept", "like", "make_this", "cooked", "completed"].includes(eventType)) {
+        current.served++;
+      }
+      if (["dislike", "never", "not_today", "shown_not_tapped"].includes(eventType)) {
         current.rejected++;
       }
       counts.set(name, current);
@@ -116,6 +163,11 @@ export async function loadOnlineRecommendationState(
         }>,
       ),
       dishFeedbackCounts: [...counts].map(([name, value]) => ({ dish_name: name, ...value })),
+      recentExposureDishNames: [
+        ...new Set(
+          (exposureRes.data ?? []).flatMap((row) => extractExposureDishNames(row.plates)),
+        ),
+      ].slice(0, 50),
     };
   } catch (error) {
     ctx.logger.warn("personalization.load_failed", {
@@ -127,6 +179,7 @@ export async function loadOnlineRecommendationState(
       excludeDishNames: [],
       preferenceByDish: {},
       dishFeedbackCounts: [],
+      recentExposureDishNames: [],
     };
   }
 }

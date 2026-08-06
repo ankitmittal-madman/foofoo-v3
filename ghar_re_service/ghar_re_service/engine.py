@@ -41,7 +41,12 @@ def build_household_dict(hh: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
-def build_context(ctx: dict[str, Any], exclude_dish_ids: list[str] | None = None) -> dict[str, Any]:
+def build_context(
+    ctx: dict[str, Any],
+    exclude_dish_ids: list[str] | None = None,
+    exclude_dish_names: list[str] | None = None,
+    preference_by_dish: dict[str, float] | None = None,
+) -> dict[str, Any]:
     """Map the contract context to a core context dict.
 
     Weather is injected by the Edge layer, which owns provider access and caching.
@@ -64,6 +69,8 @@ def build_context(ctx: dict[str, Any], exclude_dish_ids: list[str] | None = None
         calorie_target=ctx.get("calorie_target"),
     )
     core_ctx["exclude_dish_ids"] = exclude_dish_ids or []
+    core_ctx["exclude_dish_names"] = exclude_dish_names or []
+    core_ctx["preference_by_dish"] = preference_by_dish or {}
     # These are online, household-specific features composed by the Edge layer.  Keeping them
     # here is essential: cohort decay and exploration both read the core context, not the raw
     # HTTP request.  Previously the JSON contract accepted interaction_count but this translation
@@ -83,6 +90,7 @@ def build_context(ctx: dict[str, Any], exclude_dish_ids: list[str] | None = None
     ][:50]
     core_ctx["discovery_mode"] = bool(ctx.get("discovery_mode", False))
     core_ctx["recovery_mode"] = bool(ctx.get("recovery_mode", False))
+    core_ctx["refresh_generation"] = max(0, int(ctx.get("refresh_generation", 0) or 0))
     return core_ctx
 
 
@@ -281,7 +289,13 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
         "slot": request.get("slot", "dinner"),
         "weekday": request.get("weekday", "Monday"),
     }
-    context = build_context(raw_context)
+    context = build_context(
+        raw_context,
+        exclude_dish_names=request.get("exclude_dish_names") or [],
+        preference_by_dish=request.get("preference_by_dish") or {},
+    )
+    context["diversity_policy"] = "home_v2"
+    context["_rng_seed"] = _request_rng_seed(household, raw_context)
     count = max(1, min(int(request.get("count", 4)), 8))
     class_code = request.get("class_code")
     if isinstance(class_code, str) and class_code:
@@ -297,8 +311,11 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
     else:
         result = core_pipeline.recommend(household, context, catalogue)
         all_episodes = meal_episode.build_meal_episodes(result["plates"], household, context)
-    episodes = all_episodes[:count]
-    for episode in episodes:
+    # Final visible-prefix guard: the plate pool is already diverse, but episode success ranking
+    # can otherwise pull every rich plate (or several soups) back into the top four.
+    episodes = _select_visible_episode_diversity(all_episodes, count)
+    for rank, episode in enumerate(episodes, 1):
+        episode["rank"] = rank
         for component in episode["components"]:
             if component["dish_id"] is not None:
                 component["image_url"] = media.image_url(component["dish_name"])
@@ -313,6 +330,31 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
         "model_version": meal_episode.EPISODE_MODEL_VERSION,
         "warnings": [] if episodes else ["no safe meal episode could be formed"],
     }
+
+
+def _select_visible_episode_diversity(episodes: list[dict], count: int) -> list[dict]:
+    selected, deferred = [], []
+    rich_count = soup_count = 0
+    rich_cap = max(1, (count + 1) // 2)
+    for episode in episodes:
+        is_rich = float(episode.get("richness_score", 0.0) or 0.0) >= 0.6
+        is_soup = any(
+            "soup" in str(component.get("dish_name", "")).casefold()
+            for component in episode.get("components", [])
+        )
+        if (is_rich and rich_count >= rich_cap) or (is_soup and soup_count >= 1):
+            deferred.append(episode)
+            continue
+        selected.append(episode)
+        rich_count += int(is_rich)
+        soup_count += int(is_soup)
+        if len(selected) >= count:
+            return selected
+    for episode in deferred:
+        selected.append(episode)
+        if len(selected) >= count:
+            break
+    return selected
 
 
 def recipe_detail(request: dict[str, Any]) -> dict[str, Any]:

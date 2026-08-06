@@ -10,10 +10,75 @@ from ghar_re_core.config import CONFIG
 from ghar_re_core import scoring as S
 from ghar_re_core import decision_log
 from ghar_re_core import exploration
+from ghar_re_core import knowledge as K
 from ghar_re_core import similarity as SIM
 
 
 RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich"}
+
+
+def _plate_is_rich(plate):
+    return any(
+        bool(set(dish.richness) & (RICH_TAGS | {"oily"})) or (dish.heaviness or 0) >= 3
+        for dish in _plate_dishes(plate)
+    )
+
+
+def _plate_classes(plate):
+    return {K.dish_to_class_code(dish.name) for dish in _plate_dishes(plate)} - {None}
+
+
+def _plate_cuisines(plate):
+    return {dish.cuisine for dish in _plate_dishes(plate) if dish.cuisine}
+
+
+def _assemble_diverse(plates, n, disc_cap):
+    """Prefix-aware slate re-ranker for Home.
+
+    Every visible prefix is limited to roughly half rich plates, two uses of one cuisine, and two
+    uses of one meal class. Rejected candidates are reconsidered for later positions, and a final
+    relaxed backfill preserves availability if the eligible catalogue is unusually small.
+    """
+    chosen, used_heroes, used_plate_ids = [], set(), set()
+    class_counts, cuisine_counts = {}, {}
+    rich_count = disc_used = 0
+    while len(chosen) < n:
+        prefix_size = len(chosen) + 1
+        rich_cap = (prefix_size + 1) // 2
+        picked = None
+        for plate in plates:
+            if id(plate) in used_plate_ids or plate["heroes"] & used_heroes:
+                continue
+            if plate["experimental"] and disc_used >= disc_cap:
+                continue
+            if _plate_is_rich(plate) and rich_count >= rich_cap:
+                continue
+            if any(class_counts.get(code, 0) >= 2 for code in _plate_classes(plate)):
+                continue
+            if any(cuisine_counts.get(code, 0) >= 2 for code in _plate_cuisines(plate)):
+                continue
+            picked = plate
+            break
+        if picked is None:
+            # Availability backfill: retain hard hero uniqueness and discovery cap only.
+            picked = next((plate for plate in plates
+                           if id(plate) not in used_plate_ids
+                           and not (plate["heroes"] & used_heroes)
+                           and (not plate["experimental"] or disc_used < disc_cap)), None)
+        if picked is None:
+            break
+        chosen.append(picked)
+        used_plate_ids.add(id(picked))
+        used_heroes |= picked["heroes"]
+        if picked["experimental"]:
+            disc_used += 1
+        if _plate_is_rich(picked):
+            rich_count += 1
+        for code in _plate_classes(picked):
+            class_counts[code] = class_counts.get(code, 0) + 1
+        for code in _plate_cuisines(picked):
+            cuisine_counts[code] = cuisine_counts.get(code, 0) + 1
+    return chosen
 
 
 # ---------------------------------------------------------------------------
@@ -211,20 +276,23 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None, with
 
     rho = theta["rho_disc"]["value"]
     disc_cap = int(rho * n)                     # v1 ~0 (familiarity-first)
-    chosen, used_heroes, disc_used = [], set(), 0
-    for p in plates:
-        if len(chosen) >= n:
-            break
-        # (a) no-duplicate guard: skip if any hero already used
-        if p["heroes"] & used_heroes:
-            continue
-        # (b) discovery dial cap
-        if p["experimental"]:
-            if disc_used >= disc_cap:
+    if ctx.get("diversity_policy") == "home_v2":
+        chosen = _assemble_diverse(plates, n, disc_cap)
+    else:
+        chosen, used_heroes, disc_used = [], set(), 0
+        for p in plates:
+            if len(chosen) >= n:
+                break
+            # (a) no-duplicate guard: skip if any hero already used
+            if p["heroes"] & used_heroes:
                 continue
-            disc_used += 1
-        chosen.append(p)
-        used_heroes |= p["heroes"]
+            # (b) discovery dial cap
+            if p["experimental"]:
+                if disc_used >= disc_cap:
+                    continue
+                disc_used += 1
+            chosen.append(p)
+            used_heroes |= p["heroes"]
 
     # Phase 2 selection-stage epsilon-greedy class-level exploration (ghar_re_core.exploration) —
     # runs AFTER the greedy no-duplicate-guard ranking/selection above, on its already-chosen

@@ -128,9 +128,13 @@ def calibration_grid(household, catalogue=None, weekday="Monday", household_id=N
     cat = catalogue or Catalogue()
     theta, objective = _theta_obj(household)
     slots = {}
+    used_across_slots = set()
     for slot in MAIN_SLOTS:
         ctx = make_context(slot=slot, weekday=weekday)
-        ranked = _ranked_eligible(cat, theta, ctx, objective)
+        ranked = [
+            pair for pair in _ranked_eligible(cat, theta, ctx, objective)
+            if pair[1].name not in used_across_slots
+        ]
         positives = _pick_positives(ranked, n_positive)
         negatives = _pick_negatives(ranked, positives, n_negative)
         cells = (
@@ -140,6 +144,7 @@ def calibration_grid(household, catalogue=None, weekday="Monday", household_id=N
         if household_id is not None:
             random.Random(f"{household_id}:{slot}:calibration").shuffle(cells)
         slots[slot] = cells
+        used_across_slots.update(cell["name"] for cell in cells)
     return {
         "household": household.get("label"),
         "kind": "calibration_grid",

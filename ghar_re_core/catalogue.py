@@ -99,6 +99,13 @@ class Catalogue:
         lookup indices used everywhere else in the engine."""
         self.dishes = [Dish(d) for d in (dish_dicts or F.DISHES)]
         self.by_name = {d.name: d for d in self.dishes}
+        self.by_normalized_name = {}
+        # Canonical catalogue names always win. Synonyms and alternate names are lookup-only:
+        # responses continue to display Dish.name, so users never see an arbitrary alias.
+        for dish in self.dishes:
+            for value in [dish.name, *(dish.synonyms or []), *(dish.alternate_names or [])]:
+                key = " ".join(str(value).casefold().split())
+                self.by_normalized_name.setdefault(key, dish)
         # in-memory indices (built once; RE-DOC-10 §7 "build in-memory indices")
         self.by_id = {d.id: d for d in self.dishes}
         self._by_zone = {}
@@ -112,8 +119,12 @@ class Catalogue:
         return iter(self.dishes)
 
     def get(self, name):
-        """Look up a dish by its exact name. Returns None if no dish has that name."""
-        return self.by_name.get(name)
+        """Resolve a canonical name, synonym, or alternate name to its canonical Dish."""
+        if not isinstance(name, str):
+            return None
+        return self.by_name.get(name) or self.by_normalized_name.get(
+            " ".join(name.casefold().split())
+        )
 
     # --- CatalogueSnapshot read interface (RE-DOC-11 §1) ---
     def get_dish(self, dish_id):

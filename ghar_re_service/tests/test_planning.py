@@ -16,7 +16,7 @@ from fastapi.testclient import TestClient
 from ghar_re_service.providers import DEV_INSECURE_SECRET
 
 from ghar_re_core import fixtures as F
-from ghar_re_service import auth, main
+from ghar_re_service import auth, engine, main
 
 
 @pytest.fixture(scope="module")
@@ -197,6 +197,27 @@ def test_meal_plan_honours_online_suppression_and_affinity(client):
     names = [dish["name"] for dish in personalized.json()["options"]]
     assert first not in names
     assert names.index(promoted) < 7
+
+
+def test_visible_episode_prefix_caps_rich_and_repeated_soup_options():
+    def episode(name, richness):
+        return {
+            "display_name": name,
+            "richness_score": richness,
+            "components": [{"dish_name": name}],
+        }
+
+    ranked = [
+        episode("Cream Soup", 0.9),
+        episode("Paneer Gravy", 0.9),
+        episode("Tomato Soup", 0.2),
+        episode("Dal Makhani", 0.9),
+        episode("Poha", 0.1),
+        episode("Bhindi", 0.1),
+    ]
+    visible = engine._select_visible_episode_diversity(ranked, 4)
+    assert sum(item["richness_score"] >= 0.6 for item in visible) <= 2
+    assert sum("soup" in item["display_name"].casefold() for item in visible) <= 1
 
 
 def test_weekly_plan_shape(client):

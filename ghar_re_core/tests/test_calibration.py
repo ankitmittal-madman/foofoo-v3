@@ -43,6 +43,9 @@ def test_calibration_grid_shape_and_roles():
         names = [c["name"] for c in cells]
         assert len(set(names)) == len(names)   # no duplicate dish within a slot
 
+    all_names = [cell["name"] for slot in MAIN_SLOTS for cell in res["slots"][slot]]
+    assert len(set(all_names)) == len(all_names)  # no repetition across meal slots
+
 
 def test_calibration_cells_are_all_eligible():
     """Planted negatives are a weak fit, never an unsafe/ineligible dish — every returned name

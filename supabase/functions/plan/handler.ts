@@ -263,6 +263,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         "max_total_mins",
         "limit",
         "exclude_dish_names",
+        "refresh_generation",
       ]
     ) {
       if (body[k] !== undefined) payload[k] = body[k];
@@ -306,6 +307,9 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           : [],
         discovery_mode: body.discovery_mode === true,
         recovery_mode: body.recovery_mode === true,
+        refresh_generation: typeof body.refresh_generation === "number"
+          ? Math.max(0, Math.floor(body.refresh_generation))
+          : 0,
       }, festival);
       const requestedExclusions = Array.isArray(body.exclude_dish_names)
         ? body.exclude_dish_names
@@ -316,6 +320,9 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         ...new Set([
           ...online.excludeDishNames,
           ...requestedExclusions,
+          ...(surface === "meal_episodes" && body.exclude_recently_served !== false
+            ? online.recentExposureDishNames
+            : []),
         ]),
       ];
       payload.preference_by_dish = online.preferenceByDish;

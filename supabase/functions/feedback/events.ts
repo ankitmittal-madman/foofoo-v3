@@ -198,7 +198,9 @@ export async function recordFeedbackEvent(
   ).eq("recommendation_event_id", recRow.id).eq("event_type", ev.eventType);
   const { data: existing, error: existingError } = await withTimeout(
     dishId === null
-      ? existingQuery.is("dish_id", null).maybeSingle()
+      ? existingQuery.is("dish_id", null)
+        .contains("detail", ev.dishName ? { dish_name: ev.dishName } : {})
+        .maybeSingle()
       : existingQuery.eq("dish_id", dishId).maybeSingle(),
     "feedback.events.idempotency_lookup",
   );
@@ -226,7 +228,10 @@ export async function recordFeedbackEvent(
         dish_id: dishId,
         event_type: ev.eventType,
         slot: ev.slot ?? null,
-        detail: ev.detail ?? null,
+        detail: {
+          ...(ev.detail ?? {}),
+          ...(ev.dishName ? { dish_name: ev.dishName } : {}),
+        },
         data_source: "real",
       })
       .select("id, created_at")
@@ -247,8 +252,8 @@ export async function recordFeedbackEvent(
   // Apply explicit intent and a bounded online preference update synchronously. A successful
   // feedback response therefore guarantees that the next recommendation reads the new state.
   // Values are deliberately small and clamped; explicit Never/Not-Today use hard exclusions.
-  if (dishId && ev.dishName) {
-    if (ev.eventType === "never") {
+  if (ev.dishName) {
+    if (dishId && ev.eventType === "never") {
       const { error: stateError } = await withTimeout(
         db.from("never_list").upsert({
           profile_id: ev.householdId,
@@ -259,7 +264,7 @@ export async function recordFeedbackEvent(
         "feedback.events.never",
       );
       if (stateError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: stateError.message });
-    } else if (ev.eventType === "not_today") {
+    } else if (dishId && ev.eventType === "not_today") {
       const effectiveUntil = new Date();
       effectiveUntil.setUTCHours(18, 30, 0, 0); // next IST midnight when still ahead
       if (effectiveUntil <= new Date()) effectiveUntil.setUTCDate(effectiveUntil.getUTCDate() + 1);
@@ -276,7 +281,7 @@ export async function recordFeedbackEvent(
       if (stateError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: stateError.message });
     }
 
-    const delta = ev.eventType === "like" || ev.eventType === "accept"
+    const delta = ["like", "accept", "make_this", "cooked", "completed"].includes(ev.eventType)
       ? 0.2
       : ev.eventType === "dislike" || ev.eventType === "never"
       ? -0.3
