@@ -10,6 +10,7 @@ If a formula appears to be needed here, it belongs in ghar_re_core, not this fil
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import uuid
@@ -177,12 +178,19 @@ def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any
     """Surface 1: post-onboarding top-15 preference primer (diverse top dishes)."""
     hh = build_household_dict(request["household"])
     n = int(request.get("count", 15))
+    excluded, preferences = _online_taste(request, catalogue)
+    context = request.get("context") or {}
+    refresh_generation = max(0, int(context.get("refresh_generation", 0) or 0))
+    date_salt = str(context.get("date") or datetime.date.today().isoformat())
     res = planner.cold_start_top15(
         hh,
         catalogue,
         n=n,
         weekday=request.get("weekday", "Monday"),
         household_id=request.get("household_id"),
+        variety_salt=f"{date_salt}:{refresh_generation}",
+        exclude_dish_names=excluded,
+        preference_by_dish=preferences,
     )
     _with_images(res["dishes"])
     _with_shadow_preferences(

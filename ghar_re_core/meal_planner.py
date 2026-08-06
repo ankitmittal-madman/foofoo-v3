@@ -164,6 +164,9 @@ def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
     exact prior greedy behaviour — this never touches score or eligibility, only pick order."""
     epsilon = CONFIG.bandit_epsilon if rng is not None else 0.0
     picked, seen_class, seen_cuisine = [], {}, {}
+    max_rich = max(1, (n + 1) // 2)
+    rich_count = 0
+    soup_count = 0
     deferred = []
     for score, d in ranked:
         code = K.dish_to_class_code(d.name)
@@ -171,24 +174,43 @@ def _diversify(ranked, n, per_class=2, per_cuisine=3, rng=None):
             continue
         if seen_cuisine.get(d.cuisine, 0) >= per_cuisine:
             continue
+        if _dish_is_rich(d) and rich_count >= max_rich:
+            continue
+        if _dish_is_soup(d) and soup_count >= 1:
+            continue
         if epsilon > 0 and rng.random() < epsilon:
             deferred.append((score, d))  # exploration: give a later candidate its turn
             continue
         picked.append((score, d))
         seen_class[code] = seen_class.get(code, 0) + 1
         seen_cuisine[d.cuisine] = seen_cuisine.get(d.cuisine, 0) + 1
+        rich_count += int(_dish_is_rich(d))
+        soup_count += int(_dish_is_soup(d))
         if len(picked) >= n:
             return picked
-    # top-up if caps (or deferrals) left us short — deferred picks first, then the remainder,
-    # so an exploration deferral still gets a genuine second chance rather than being discarded.
+    # Top up while preserving visible richness/soup limits. Relax only if the eligible catalogue
+    # cannot fill the requested count, matching _mmr_rerank's safety-first fallback behavior.
     if len(picked) < n:
         chosen = {id(d) for _, d in picked}
         for score, d in deferred + ranked:
-            if id(d) not in chosen:
+            if (
+                id(d) not in chosen
+                and (not _dish_is_rich(d) or rich_count < max_rich)
+                and (not _dish_is_soup(d) or soup_count < 1)
+            ):
                 picked.append((score, d))
                 chosen.add(id(d))
+                rich_count += int(_dish_is_rich(d))
+                soup_count += int(_dish_is_soup(d))
                 if len(picked) >= n:
                     break
+        if len(picked) < n:
+            for score, d in deferred + ranked:
+                if id(d) not in chosen:
+                    picked.append((score, d))
+                    chosen.add(id(d))
+                    if len(picked) >= n:
+                        break
     return picked[:n]
 
 
@@ -259,7 +281,14 @@ def _theta_obj(household):
 
 
 def cold_start_top15(
-    household, catalogue=None, n=15, weekday="Monday", household_id=None, variety_salt=None
+    household,
+    catalogue=None,
+    n=15,
+    weekday="Monday",
+    household_id=None,
+    variety_salt=None,
+    exclude_dish_names=None,
+    preference_by_dish=None,
 ):
     """Surface 1 — the post-onboarding preference primer: the n (default 15) top-scoring, DIVERSE
     dishes across breakfast/lunch/dinner, for the user to like and seed their taste profile. Diverse
@@ -282,6 +311,7 @@ def cold_start_top15(
     in tests) for a reproducible seed."""
     cat = catalogue or Catalogue()
     theta, objective = _theta_obj(household)
+    excluded = set(exclude_dish_names or [])
     if household_id is None:
         rng = None
     else:
@@ -291,7 +321,14 @@ def cold_start_top15(
     pool = {}
     for slot in MAIN_SLOTS:
         ctx = make_context(slot=slot, weekday=weekday)
-        for score, d in _ranked(cat, theta, ctx, objective)[:20]:
+        for score, d in _ranked(
+            cat,
+            theta,
+            ctx,
+            objective,
+            predicate=lambda dish: dish.name not in excluded,
+            preference_by_dish=preference_by_dish,
+        )[:20]:
             prev = pool.get(d.name)
             if prev is None or score > prev[0]:
                 pool[d.name] = (score, d, slot, ctx)
