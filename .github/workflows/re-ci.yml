@@ -5,9 +5,9 @@ name: re-ci
 # (single verify job, path-scoped triggers) so both sides of the RE follow one convention.
 on:
   push:
-    paths: ["ghar_re_core/**", "ghar_re_service/**", "ops/recommendation/**", "ops/quality/suites/test_preference_training_operations.py", "contracts/**", "data/source/**", ".github/workflows/re-ci.yml", ".github/workflows/preference-model-training.yml"]
+    paths: ["ghar_re_core/**", "ghar_re_service/**", "ops/recommendation/**", "ops/quality/suites/test_preference_training_operations.py", "ops/quality/suites/test_recommendation_user_audit.py", "contracts/**", "data/source/**", ".github/workflows/re-ci.yml", ".github/workflows/preference-model-training.yml", ".github/workflows/recommendation-user-audit.yml"]
   pull_request:
-    paths: ["ghar_re_core/**", "ghar_re_service/**", "ops/recommendation/**", "ops/quality/suites/test_preference_training_operations.py", "contracts/**", "data/source/**", ".github/workflows/re-ci.yml", ".github/workflows/preference-model-training.yml"]
+    paths: ["ghar_re_core/**", "ghar_re_service/**", "ops/recommendation/**", "ops/quality/suites/test_preference_training_operations.py", "ops/quality/suites/test_recommendation_user_audit.py", "contracts/**", "data/source/**", ".github/workflows/re-ci.yml", ".github/workflows/preference-model-training.yml", ".github/workflows/recommendation-user-audit.yml"]
 
 jobs:
   # RE-DOC-10 §14: neither side's suite is allowed to merge unless the contract itself is sound —
@@ -46,13 +46,13 @@ jobs:
       # so the two halves of the RE cannot drift into different style rules (Phase C.5 Task 3,
       # replacing the Phase E placeholder that noted no tool had been chosen yet).
       - name: Lint (ruff)
-        run: python3 -m ruff check ghar_re_core ghar_re_service
+        run: python3 -m ruff check ghar_re_core ghar_re_service ops/recommendation
       # Format check covers ghar_re_service ONLY, deliberately. ghar_re_core is the frozen,
       # golden-master-locked math: running the formatter over it would rewrite ~150 places in code
       # whose output is deliberately pinned, for zero correctness gain. Lint (above) still checks
       # BOTH packages for real defects — it is only auto-formatting that stops at the service edge.
       - name: Format check (ruff, service only — see note)
-        run: python3 -m ruff format --check ghar_re_service
+        run: python3 -m ruff format --check ghar_re_service ops/recommendation
       # Invoked as `python3 -m mypy`, NOT bare `mypy`, on purpose: the module form resolves imports
       # against the running interpreter's own site-packages, so third-party stubs (fastapi ships
       # py.typed) are found regardless of how the runner lays out its Python install.
@@ -64,4 +64,4 @@ jobs:
       - name: Catalogue/config bundle is current
         run: python3 -m ghar_re_service.scripts.export_bundle --check
       - name: pytest — ghar_re_core (17, incl. golden-master) + ghar_re_service (60)
-        run: python3 -m pytest ghar_re_core/tests/ ghar_re_service/tests/ ops/quality/suites/test_preference_training_operations.py -v
+        run: python3 -m pytest ghar_re_core/tests/ ghar_re_service/tests/ ops/quality/suites/test_preference_training_operations.py ops/quality/suites/test_recommendation_user_audit.py -v
