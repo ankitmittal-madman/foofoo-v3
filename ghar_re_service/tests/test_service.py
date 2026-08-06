@@ -19,6 +19,7 @@ from ghar_re_service.providers import DEV_INSECURE_SECRET
 
 from ghar_re_core import config as cfgmod
 from ghar_re_core import fixtures as F
+from ghar_re_core.catalogue import Catalogue
 from ghar_re_service import auth, engine, main
 
 
@@ -32,6 +33,24 @@ def test_build_context_preserves_online_features():
     )
     assert context["interaction_count"] == 9
     assert context["dish_feedback_counts"][0]["served"] == 2
+
+
+def test_legacy_run_consumes_name_suppression_and_preference(monkeypatch):
+    captured = {}
+
+    def fake_recommend(household, context, catalogue, with_trace=False):
+        captured.update(context)
+        return {"plates": [], "theta": {}, "decision_trace": None}
+
+    monkeypatch.setattr(engine.core_pipeline, "recommend", fake_recommend)
+    request = _req()
+    request["exclude_dish_names"] = ["  moong dal khichdi  "]
+    request["preference_by_dish"] = {"Moong Dal Khichdi": 1.0}
+    engine.run(request, Catalogue(), cfgmod.active_config(), None)
+
+    assert captured["exclude_dish_names"] == ["Moong Dal Khichdi"]
+    assert captured["preference_by_dish"]["Moong Dal Khichdi"] == 1.0
+    assert captured["preference_by_dish"]["Lauki Khichdi"] > 0
 
 
 @pytest.fixture(scope="module")

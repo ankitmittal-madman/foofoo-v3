@@ -94,6 +94,24 @@ def test_mmr_rerank_is_deterministic_and_pads_to_requested_count():
     assert len({dish.name for _, dish in first}) == len(first)
 
 
+def test_mmr_visible_prefix_caps_rich_and_repeated_soup_dishes():
+    cat = Catalogue()
+    # Deliberately put rich dishes and the same soup into the highest relevance positions. The
+    # visible selector must still fill the slate from later candidates when alternatives exist.
+    rich = [dish for dish in cat if MP._dish_is_rich(dish)][:4]
+    soup = cat.get("Rasam")
+    light = [
+        dish
+        for dish in cat
+        if dish not in rich and dish is not soup and not MP._dish_is_rich(dish)
+    ][:5]
+    ranked = [(100.0 - index, dish) for index, dish in enumerate(rich + [soup, soup] + light)]
+    selected = MP._mmr_rerank(ranked, 8)
+
+    assert sum(MP._dish_is_rich(dish) for _, dish in selected) <= 4
+    assert sum(MP._dish_is_soup(dish) for _, dish in selected) <= 1
+
+
 def test_weekly_class_plan_shape_and_dish_backed():
     hh = _hh()
     wk = MP.weekly_class_plan(hh, top_classes=3)

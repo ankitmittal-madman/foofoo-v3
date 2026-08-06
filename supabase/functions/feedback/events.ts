@@ -172,7 +172,7 @@ export async function recordFeedbackEvent(
   let canonicalDishName = ev.dishName;
   if (ev.dishName) {
     const { data: dishRow, error: dishErr } = await withTimeout(
-      db.from("dishes").select("id,name").ilike("name", ev.dishName).maybeSingle(),
+      db.from("dishes").select("id,name").ilike("name", ev.dishName).limit(1).maybeSingle(),
       "feedback.events.lookup_dish",
     );
     if (dishErr) {
