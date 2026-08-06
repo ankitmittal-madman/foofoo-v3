@@ -15,6 +15,15 @@ TRANSFER_SCALE = 0.6
 MIN_SIMILARITY = 0.32
 MAX_SEEDS = 100
 
+_TAG_DIMENSION_ATTRIBUTES = {
+    "meal_type": "meal_type",
+    "dish_category": "dish_category",
+    "cooking_method": "cooking_method",
+    "primary_taste": "primary_taste",
+    "texture": "texture",
+    "richness": "richness",
+}
+
 
 def _jaccard(left, right) -> float:
     left, right = set(left or []), set(right or [])
@@ -56,16 +65,58 @@ def canonicalize_names(names, catalogue) -> list[str]:
     return result
 
 
-def expand_preferences(preference_by_dish, catalogue) -> dict[str, float]:
+def _bounded_map(values) -> dict[str, float]:
+    result = {}
+    if not isinstance(values, dict):
+        return result
+    for key, raw in values.items():
+        if not isinstance(key, str):
+            continue
+        try:
+            result[key] = max(-1.0, min(1.0, float(raw)))
+        except (TypeError, ValueError):
+            continue
+    return result
+
+
+def _mean_evidence(keys, affinities) -> float | None:
+    values = [affinities[key] for key in keys if key in affinities]
+    return sum(values) / len(values) if values else None
+
+
+def _semantic_affinity(dish, preference_by_class, preference_by_tag) -> float | None:
+    """Average independent class and tag projections for an unseen dish.
+
+    Each projection is already derived from explicit outcomes. Averaging prevents a dish with
+    many tags from receiving a larger score merely because it has richer catalogue metadata.
+    """
+    sources = []
+    class_value = _mean_evidence(K.dish_to_class_codes(dish.name), preference_by_class)
+    if class_value is not None:
+        sources.append(class_value)
+    tag_keys = []
+    for dimension, attribute in _TAG_DIMENSION_ATTRIBUTES.items():
+        tag_keys.extend(f"{dimension}:{value}" for value in getattr(dish, attribute, []) or [])
+    tag_value = _mean_evidence(tag_keys, preference_by_tag)
+    if tag_value is not None:
+        sources.append(tag_value)
+    return sum(sources) / len(sources) if sources else None
+
+
+def expand_preferences(
+    preference_by_dish,
+    catalogue,
+    preference_by_class=None,
+    preference_by_tag=None,
+) -> dict[str, float]:
     """Canonicalize explicit feedback and transfer its strongest related-dish signal.
 
     Unknown names and malformed values are ignored. A transferred value is capped below the
     explicit signal (``TRANSFER_SCALE``), preventing inferred taste from overruling a direct vote.
     """
     explicit: dict[str, float] = {}
-    if not isinstance(preference_by_dish, dict):
-        return explicit
-    for name, raw_affinity in list(preference_by_dish.items())[-MAX_SEEDS:]:
+    raw_dish_preferences = preference_by_dish if isinstance(preference_by_dish, dict) else {}
+    for name, raw_affinity in list(raw_dish_preferences.items())[-MAX_SEEDS:]:
         dish = catalogue.get(name)
         if dish is None:
             continue
@@ -75,6 +126,8 @@ def expand_preferences(preference_by_dish, catalogue) -> dict[str, float]:
             continue
         explicit[dish.name] = affinity
 
+    class_affinities = _bounded_map(preference_by_class)
+    tag_affinities = _bounded_map(preference_by_tag)
     expanded = dict(explicit)
     seeds = [(catalogue.get(name), affinity) for name, affinity in explicit.items()]
     for candidate in catalogue:
@@ -88,6 +141,11 @@ def expand_preferences(preference_by_dish, catalogue) -> dict[str, float]:
             transferred = affinity * similarity * TRANSFER_SCALE
             if abs(transferred) > abs(strongest):
                 strongest = transferred
+        semantic = _semantic_affinity(candidate, class_affinities, tag_affinities)
+        if semantic is not None:
+            semantic *= TRANSFER_SCALE
+            if abs(semantic) > abs(strongest):
+                strongest = semantic
         if strongest:
             expanded[candidate.name] = max(-TRANSFER_SCALE, min(TRANSFER_SCALE, strongest))
     return expanded

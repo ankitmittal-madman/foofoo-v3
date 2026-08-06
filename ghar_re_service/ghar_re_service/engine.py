@@ -168,9 +168,14 @@ def _with_shadow_preferences(
 
 
 def _online_taste(request: dict[str, Any], catalogue) -> tuple[list[str], dict[str, float]]:
-    """Canonicalize exposure state and derive bounded related-dish affinity once per request."""
+    """Canonicalize exposure state and derive bounded semantic affinity once per request."""
     excluded = taste.canonicalize_names(request.get("exclude_dish_names") or [], catalogue)
-    preferences = taste.expand_preferences(request.get("preference_by_dish") or {}, catalogue)
+    preferences = taste.expand_preferences(
+        request.get("preference_by_dish") or {},
+        catalogue,
+        preference_by_class=request.get("preference_by_class") or {},
+        preference_by_tag=request.get("preference_by_tag") or {},
+    )
     return excluded, preferences
 
 

@@ -7,6 +7,8 @@ export interface OnlineRecommendationState {
   interactionCount: number;
   excludeDishNames: string[];
   preferenceByDish: Record<string, number>;
+  preferenceByClass: Record<string, number>;
+  preferenceByTag: Record<string, number>;
   dishFeedbackCounts: Array<{ dish_name: string; served: number; rejected: number }>;
   /** Canonical names shown in recent successful slates. Used only for freshness/refresh
    * suppression; it is intentionally separate from durable Never/Not-Today intent. */
@@ -67,9 +69,16 @@ export function extractPersistedCadence(value: unknown): {
 export function aggregateMemberAffinities(
   rows: Array<{ profile_id: string; dish_affinity: Record<string, number> | null }>,
 ): Record<string, number> {
+  return aggregateAffinityMaps(rows.map((row) => row.dish_affinity));
+}
+
+/** Nash-style household aggregation for any sparse, explicitly-evidenced affinity map. */
+export function aggregateAffinityMaps(
+  maps: Array<Record<string, number> | null | undefined>,
+): Record<string, number> {
   const byDish = new Map<string, number[]>();
-  for (const row of rows) {
-    for (const [dish, raw] of Object.entries(row.dish_affinity ?? {})) {
+  for (const affinities of maps) {
+    for (const [dish, raw] of Object.entries(affinities ?? {})) {
       if (!Number.isFinite(raw)) continue;
       const affinity = Math.max(-1, Math.min(1, raw));
       byDish.set(dish, [...(byDish.get(dish) ?? []), affinity]);
@@ -118,7 +127,9 @@ export async function loadOnlineRecommendationState(
           "personalization.not_today",
         ),
         withTimeout(
-          db.from("user_taste_vectors").select("profile_id,dish_affinity").in(
+          db.from("user_taste_vectors").select(
+            "profile_id,dish_affinity,class_affinity,tag_affinity",
+          ).in(
             "profile_id",
             memberIds,
           ),
@@ -205,6 +216,16 @@ export async function loadOnlineRecommendationState(
           dish_affinity: Record<string, number> | null;
         }>,
       ),
+      preferenceByClass: aggregateAffinityMaps(
+        (tasteRes.data ?? []).map((row) =>
+          (row as { class_affinity?: Record<string, number> | null }).class_affinity
+        ),
+      ),
+      preferenceByTag: aggregateAffinityMaps(
+        (tasteRes.data ?? []).map((row) =>
+          (row as { tag_affinity?: Record<string, number> | null }).tag_affinity
+        ),
+      ),
       dishFeedbackCounts: [...counts].map(([name, value]) => ({ dish_name: name, ...value })),
       recentExposureDishNames: (() => {
         const persisted = extractPersistedExposureDishNames(varietyRes.data);
@@ -224,6 +245,8 @@ export async function loadOnlineRecommendationState(
       interactionCount: 0,
       excludeDishNames: [],
       preferenceByDish: {},
+      preferenceByClass: {},
+      preferenceByTag: {},
       dishFeedbackCounts: [],
       recentExposureDishNames: [],
       noveltyBudget: 0.15,

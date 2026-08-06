@@ -47,11 +47,29 @@ def test_legacy_run_consumes_name_suppression_and_preference(monkeypatch):
     request = _req()
     request["exclude_dish_names"] = ["  moong dal khichdi  "]
     request["preference_by_dish"] = {"Moong Dal Khichdi": 1.0}
+    request["preference_by_class"] = {"LD_LIGHT_KHICHDI": 0.8}
+    request["preference_by_tag"] = {"dish_category:whole_meal": 0.6}
     engine.run(request, Catalogue(), cfgmod.active_config(), None)
 
     assert captured["exclude_dish_names"] == ["Moong Dal Khichdi"]
     assert captured["preference_by_dish"]["Moong Dal Khichdi"] == 1.0
     assert captured["preference_by_dish"]["Lauki Khichdi"] > 0
+
+
+def test_legacy_run_consumes_class_and_tag_affinity_without_exact_dish_seed(monkeypatch):
+    captured = {}
+
+    def fake_recommend(household, context, catalogue, with_trace=False):
+        captured.update(context)
+        return {"plates": [], "theta": {}, "decision_trace": None}
+
+    monkeypatch.setattr(engine.core_pipeline, "recommend", fake_recommend)
+    request = _req()
+    request["preference_by_class"] = {"BF_EGG_FAST": 0.8}
+    request["preference_by_tag"] = {"dish_category:egg_dish": 0.6}
+    engine.run(request, Catalogue(), cfgmod.active_config(), None)
+
+    assert captured["preference_by_dish"]["Egg Bhurji"] > 0
 
 
 @pytest.fixture(scope="module")
