@@ -34,9 +34,11 @@ export default function Home() {
   });
   const [offlinePlan, setOfflinePlan] = useState<FinalizedWeek | null>(null);
   const [refreshNonce, setRefreshNonce] = useState(0);
+  const [servedBySlot, setServedBySlot] = useState<Partial<Record<SlotName, string[]>>>({});
   const saved = useQuery({ queryKey: ["saved-week", selectedDate], queryFn: () => fetchSavedWeek(selectedDate), staleTime: 0 });
 
   useEffect(() => { loadWeeklyPlan().then(setOfflinePlan).catch(() => setOfflinePlan(null)); }, []);
+  useEffect(() => setServedBySlot({}), [selectedDate, refreshNonce]);
   useFocusEffect(useCallback(() => { saved.refetch(); }, [selectedDate]));
 
   const serverPlan = savedWeekSelections(saved.data);
@@ -51,7 +53,27 @@ export default function Home() {
     <View style={styles.insight}><Text style={styles.insightIcon}>✦</Text><Text style={styles.insightText}>{t("insight")}</Text></View>
     <View style={styles.dateRow}><View><Text style={styles.todayLabel}>{t("todayPlan")}</Text><Text testID="home-selected-date" style={styles.todayDate}>{new Date(`${selectedDate}T12:00:00`).toLocaleDateString(locale === "hi" ? "hi-IN" : "en-IN", { weekday: "long", month: "long", day: "numeric" })}</Text></View><Pressable testID="home-refresh" style={styles.refreshButton} onPress={() => setRefreshNonce((value) => value + 1)}><Text style={styles.refreshText}>↻ {t("refresh")}</Text></Pressable></View>
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.datePicker}>{dates.map((date) => { const active = date === selectedDate; const parsed = new Date(`${date}T12:00:00`); return <Pressable key={date} testID={`home-date-${date}`} accessibilityRole="button" accessibilityState={{ selected: active }} onPress={() => setSelectedDate(date)} style={[styles.dateOption, active && styles.dateOptionActive]}><Text style={[styles.dateOptionDay, active && styles.dateOptionTextActive]}>{parsed.toLocaleDateString(locale === "hi" ? "hi-IN" : "en-IN", { weekday: "short" })}</Text><Text style={[styles.dateOptionNumber, active && styles.dateOptionTextActive]}>{parsed.getDate()}</Text></Pressable>; })}</ScrollView>
-    <View style={styles.episodeList}>{SLOTS.map((slot) => <MealEpisodeSection key={`${selectedDate}-${slot}`} slot={slot} weekday={weekday} slotDate={selectedDate} classCode={plan?.[weekday]?.[slot]} initiallyLocked={locks[weekday]?.[slot] === true} refreshNonce={refreshNonce} />)}</View>
+    <View style={styles.episodeList}>{SLOTS.map((slot, index) => {
+      const earlierSlots = SLOTS.slice(0, index);
+      const enabled = index === 0 || servedBySlot[SLOTS[index - 1]] !== undefined;
+      const exclusions = earlierSlots.flatMap((earlier) => servedBySlot[earlier] ?? []);
+      return <MealEpisodeSection
+        key={`${selectedDate}-${slot}-${refreshNonce}`}
+        slot={slot}
+        weekday={weekday}
+        slotDate={selectedDate}
+        classCode={plan?.[weekday]?.[slot]}
+        initiallyLocked={locks[weekday]?.[slot] === true}
+        refreshNonce={refreshNonce}
+        enabled={enabled}
+        excludeDishNames={exclusions}
+        onEpisodes={(names) => setServedBySlot((current) =>
+          current[slot]?.join("\u0000") === names.join("\u0000")
+            ? current
+            : { ...current, [slot]: names }
+        )}
+      />;
+    })}</View>
     <SectionHeader title={t("todayPlan")} action={t("viewAll")} onAction={() => router.push("/weekly-plan")} />
     <View style={styles.summaryRow}>{SLOTS.map((slot) => <View key={slot} style={styles.summary}><View style={styles.summaryIcon}><Text>{slot === "breakfast" ? "☀" : slot === "lunch" ? "◉" : "☾"}</Text></View><Text numberOfLines={1} style={styles.summaryTitle}>{t(slot)}</Text><Text style={styles.summaryTime}>{TIMES[slot]}</Text><View style={styles.readyDot} /></View>)}</View>
   </ScrollView></View>;

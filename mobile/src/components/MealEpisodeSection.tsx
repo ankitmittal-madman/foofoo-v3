@@ -11,14 +11,34 @@ import { useI18n } from "@/i18n";
 import { palette, Skeleton } from "@/ui/foofoo";
 
 const FOOD = require("../../assets/images/poha-idli-fruit.png");
-interface Props { slot: Slot; weekday: string; slotDate: string; classCode?: string; initiallyLocked: boolean; refreshNonce: number }
+interface Props { slot: Slot; weekday: string; slotDate: string; classCode?: string; initiallyLocked: boolean; refreshNonce: number; enabled?: boolean; excludeDishNames?: string[]; onEpisodes?: (names: string[]) => void }
 
-export function MealEpisodeSection({ slot, weekday, slotDate, classCode, initiallyLocked, refreshNonce }: Props) {
+export function MealEpisodeSection({ slot, weekday, slotDate, classCode, initiallyLocked, refreshNonce, enabled = true, excludeDishNames = [], onEpisodes }: Props) {
   const { t } = useI18n(); const [locked, setLocked] = useState(initiallyLocked); const [showAlternatives, setShowAlternatives] = useState(false);
   const effectiveRefresh = locked ? 0 : refreshNonce;
-  const query = useQuery({ queryKey: ["meal-episodes", slotDate, classCode ?? null, effectiveRefresh], queryFn: () => fetchMealEpisodes(slot, { weekday, class_code: classCode, count: 4 }) });
+  const query = useQuery({
+    queryKey: ["meal-episodes", slotDate, slot, classCode ?? null, effectiveRefresh, excludeDishNames],
+    queryFn: () => fetchMealEpisodes(slot, {
+      weekday,
+      class_code: classCode,
+      count: 4,
+      refresh_generation: effectiveRefresh,
+      exclude_dish_names: excludeDishNames,
+      exclude_recently_served: !locked,
+    }),
+    enabled,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+  });
   const lock = useMutation({ mutationFn: (next: boolean) => setPlanSlotLock(weekday, slot, next, slotDate), onSuccess: (_data, next) => setLocked(next) });
   useEffect(() => setLocked(initiallyLocked), [initiallyLocked]);
+  useEffect(() => {
+    if (!query.data || !onEpisodes || !Array.isArray(query.data.episodes)) return;
+    onEpisodes([...new Set(query.data.episodes.flatMap((episode) =>
+      episode.components.map((component) => component.dish_name)
+    ))]);
+  }, [query.data, onEpisodes]);
 
   if (query.isLoading) return <View style={styles.section}><View style={styles.slotHeader}><Text style={styles.slot}>{t(slot)}</Text></View><Skeleton height={310} /></View>;
   if (query.isError && !query.data) return <View style={styles.section}><Text style={styles.slot}>{t(slot)}</Text><View style={styles.errorCard}><Text style={styles.error}>!  {describeApiError(query.error)}</Text><Pressable style={styles.retry} onPress={() => query.refetch()}><Text style={styles.retryText}>{t("tryAgain")}</Text></Pressable></View></View>;
@@ -41,7 +61,7 @@ function EpisodeCard({ episode, requestId, slot, compact = false, onMakeThis, on
     <View style={styles.imageWrap}><Image source={primaryDish?.image_url ? { uri: primaryDish.image_url } : FOOD} style={[styles.image, compact && styles.compactImage]} /><View style={styles.photoShade} /><View style={styles.intentPill}><Text style={styles.intent}>{episode.intent.replaceAll("_", " ")}</Text></View>{!compact ? <Pressable accessibilityLabel={saved ? t("saved") : t("save")} onPress={() => setSaved(!saved)} style={styles.floatingSave}><Text style={[styles.heart, saved && styles.heartSaved]}>{saved ? "♥" : "♡"}</Text></Pressable> : null}<View style={styles.photoCopy}><Text numberOfLines={2} style={[styles.mealName, compact && styles.compactMealName]}>{episode.display_name}</Text>{!compact ? <Text numberOfLines={2} style={styles.components}>{episode.components.map((x) => x.dish_name).join(" + ")}</Text> : null}</View></View>
     <View style={styles.cardBody}><Text style={styles.practicality}>{episode.practicality.active_minutes} active min · {episode.practicality.burner_peak} burner{episode.practicality.burner_peak === 1 ? "" : "s"} · {episode.practicality.vessel_count} vessels</Text>{episode.reasons.slice(0, compact ? 1 : 2).map((reason) => <Text key={reason} numberOfLines={1} style={styles.reason}>✓  {reason}</Text>)}
       {!compact ? <><View style={styles.socialRow}><Social icon={saved ? "♥" : "♡"} label={saved ? t("saved") : t("save")} onPress={() => setSaved(!saved)} active={saved} /><Social testID={`episode-${slot}-not-today`} icon="×" label={t("notToday")} onPress={() => setAskReason(!askReason)} /><Social icon="↗" label={t("share")} onPress={() => Share.share({ message: `${episode.display_name} · FooFoo` })} /><Social icon="ⓘ" label={t("details")} onPress={detail} /></View>
-        <Pressable testID={`episode-${slot}-make-this`} disabled={feedback.isPending || !requestId} style={({ pressed }) => [styles.makeButton, pressed && styles.pressed, (!requestId || feedback.isPending) && styles.disabled]} onPress={() => feedback.mutate({ eventType: "make_this" }, { onSuccess: onMakeThis })}><Text style={styles.makeText}>＋ {t("makeThis")}</Text></Pressable></> : <Pressable style={styles.swapButton} onPress={() => replace("not_today")}><Text style={styles.swapText}>↻ {t("selectThis")}</Text></Pressable>}
+        <Pressable testID={`episode-${slot}-make-this`} disabled={feedback.isPending || !requestId} style={({ pressed }) => [styles.makeButton, pressed && styles.pressed, (!requestId || feedback.isPending) && styles.disabled]} onPress={() => feedback.mutate({ eventType: "make_this" }, { onSuccess: onMakeThis })}><Text style={styles.makeText}>＋ {t("makeThis")}</Text></Pressable></> : <Pressable style={styles.swapButton} disabled={feedback.isPending || !requestId} onPress={() => feedback.mutate({ eventType: "make_this" })}><Text style={styles.swapText}>✓ {t("selectThis")}</Text></Pressable>}
       {askReason ? <View style={styles.reasonRow}><Reason testID={`episode-${slot}-reason-too-much-work`} label={t("tooMuchWork")} onPress={() => replace("too_much_work")} /><Reason testID={`episode-${slot}-reason-missing-ingredient`} label={t("missingItem")} onPress={() => replace("missing_ingredient")} /><Reason testID={`episode-${slot}-reason-member-objection`} label={t("memberObjected")} onPress={() => replace("member_objection")} /><Reason testID={`episode-${slot}-reason-different-mood`} label={t("differentMood")} onPress={() => replace("not_today")} /></View> : null}
       {primaryDish ? <Pressable testID={`episode-${slot}-recipe`} onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: primaryDish.dish_name } })}><Text style={styles.recipeLink}>{t("cookingDetails")}  ›</Text></Pressable> : null}
     </View>

@@ -32,11 +32,10 @@ GOLDEN_CASES = {
 
 
 def _old_base(dish, theta, ctx):
-    """The exact pre-refactor base() formula (scoring.py lines 296-308 before Phase 1), computed
-    independently of DEFAULT_REGISTRY/scoring.base() — the reference this test checks against."""
+    """The explicit base formula, independently of the registry implementation."""
     cfg = CONFIG
     conf = cfg.all_conf_k
-    return (cfg.W("W_PALETTE") * conf * S.m_palette(dish, theta)
+    return (cfg.W("W_PALETTE") * conf * S.m_palette(dish, theta, ctx)
             + cfg.W("W_SLOT") * conf * S.m_slot(dish, ctx)
             + cfg.W("W_SEASON") * conf * S.m_season(dish, ctx)
             + cfg.W("W_SIG") * conf * S.sig(dish)

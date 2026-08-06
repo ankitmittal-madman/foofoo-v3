@@ -4,7 +4,10 @@ import { supabase } from "@/auth/supabaseClient";
 
 const CACHE_KEY_PREFIX = "foofoo.queryCache.v3";
 const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
-const PERSISTED_PLAN_QUERY_KEYS = new Set(["daily-plan", "meal-episodes", "saved-week"]);
+// Recommendation slates are deliberately not persisted. Rehydrating them made a process restart
+// (including a hard refresh during development) replay yesterday's slate before a real request
+// reached the engine. A finalized/saved plan is user state, so it remains safe to persist.
+const PERSISTED_PLAN_QUERY_KEYS = new Set(["saved-week"]);
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** Returns true only for meal-plan queries that are safe and useful during an offline restart. */
@@ -23,7 +26,8 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 5 * 60 * 1000,
+      staleTime: 0,
+      refetchOnMount: "always",
     },
     mutations: { retry: 0 },
   },

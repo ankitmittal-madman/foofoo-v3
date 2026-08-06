@@ -96,10 +96,13 @@ def pass_exclude_dish_ids(dish, theta, ctx):
     never a scoring penalty, so an excluded dish can never surface even at score rank 1 — see
     docs/archive/implementation/work-packages/ARCHIVED_WP-8G_Recommendation_Variety_on_Refresh_v1.0.md
     §1 Option A."""
-    excl = ctx.get("exclude_dish_ids")
-    if not excl:
-        return True
-    return dish.id not in set(excl)
+    excluded_ids = set(ctx.get("exclude_dish_ids") or [])
+    excluded_names = {
+        " ".join(str(name).casefold().split())
+        for name in (ctx.get("exclude_dish_names") or [])
+    }
+    canonical_name = " ".join(dish.name.casefold().split())
+    return dish.id not in excluded_ids and canonical_name not in excluded_names
 
 
 def pass_mode_fasting(dish, theta, ctx):
@@ -195,13 +198,14 @@ def _cuis(dish, state):
     return 0.0
 
 
-def m_palette(dish, theta):
+def m_palette(dish, theta, ctx=None):
     """§B1 regional-fit BASE term: how well a dish matches this household's palette, blending
     its home-state fit and local-state fit by the D4 blend ratio. Experimental-tier dishes are
     further scaled down by rho_disc (the household's discovery/familiarity dial), so adventurous
     households see more of them and cautious ones see fewer."""
     # §B1 regional fit, D4-blended (blend home vs local). experimental gated by rho_disc.
-    blend = theta["blend"]["value"]
+    slot_blends = theta.get("blend_slot", {}).get("value", {})
+    blend = slot_blends.get((ctx or {}).get("slot"), theta["blend"]["value"])
     home = theta["home_state"]["value"]
     local_state = _zone_state(theta["local_zone"]["value"])
     val = blend * _cuis(dish, home) + (1 - blend) * _cuis(dish, local_state)
@@ -491,7 +495,16 @@ def score(dish, theta, ctx, objective):
 
     cohort_val, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="cohort")
     pref_val, _ = DEFAULT_REGISTRY.combine(dish, theta, ctx, phase="pref")
-    return base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val + pref_val
+    preferences = ctx.get("preference_by_dish") or {}
+    affinity = preferences.get(dish.name, 0.0)
+    try:
+        affinity = max(-1.0, min(1.0, float(affinity)))
+    except (TypeError, ValueError):
+        affinity = 0.0
+    # Same bounded online-affinity coefficient used by meal_planner._ranked. This makes the
+    # complete-meal pipeline respond immediately to explicit feedback while the learned model is
+    # still disabled, without weakening any eligibility gate.
+    return base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val + pref_val + 0.35 * affinity
 
 
 # ---------------------------------------------------------------------------

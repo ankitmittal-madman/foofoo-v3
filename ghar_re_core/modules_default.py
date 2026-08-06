@@ -37,7 +37,7 @@ DEFAULT_REGISTRY = ScoringRegistry()
 
 # ---- phase="base" — the 7 W_k-weighted BASE terms (Core Spine §S2 PART B) ----
 DEFAULT_REGISTRY.register(BoundModule(
-    "m_palette", lambda dish, theta, ctx: S.m_palette(dish, theta),
+    "m_palette", lambda dish, theta, ctx: S.m_palette(dish, theta, ctx),
     phase="base", weight_key="W_PALETTE",
 ))
 DEFAULT_REGISTRY.register(BoundModule(
