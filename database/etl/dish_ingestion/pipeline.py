@@ -17,9 +17,11 @@ import time
 from collections import Counter
 from pathlib import Path
 
+from . import images
 from .dedupe import DedupeDecision, DedupeIndex
 from .groq_adapter import GroqAdapter
-from .images import resolve_image_for_row
+from .image_prompt import ImagePromptGenerator, assemble_prompt
+from .images import CloudinaryUploader, PollinationsClient
 from .normalize import SourceRow, load_and_normalize
 from .ontology_adapter import get_adapter
 
@@ -27,6 +29,29 @@ logger = logging.getLogger("dish_ingestion.pipeline")
 
 BATCH_SIZE = 200
 REGION_CODE_ALIASES = {"north", "south", "east", "west", "northeast", "pan_indian"}
+DEFAULT_IMAGE_DELAY_SECONDS = 3  # ported from the reference Pollinations script's own default
+
+
+class ImageContext:
+    """Threads Stage-5 config + mutable idempotency state through the batch loop.
+
+    `existing_dish_ids_with_image` starts seeded from a real DB query (load_dish_ids_with_image)
+    in apply mode, and this run adds to it as it generates — so two dishes created in the SAME run
+    (e.g. two rows that dedupe-merge onto one dish) never generate/upload twice either, not just
+    across reruns.
+    """
+
+    __slots__ = ("generate_images", "dry_run", "image_delay_seconds", "prompt_gen", "pollinations",
+                 "uploader", "existing_dish_ids_with_image")
+
+    def __init__(self, generate_images: bool, dry_run: bool, image_delay_seconds: float = DEFAULT_IMAGE_DELAY_SECONDS):
+        self.generate_images = generate_images
+        self.dry_run = dry_run
+        self.image_delay_seconds = image_delay_seconds
+        self.prompt_gen = ImagePromptGenerator()
+        self.pollinations = PollinationsClient()
+        self.uploader = CloudinaryUploader()
+        self.existing_dish_ids_with_image: set[str] = set()
 
 
 def _file_checksum(path: Path) -> str:
@@ -52,9 +77,18 @@ class RowOutcome:
         self.errors: list[tuple[str, str, str]] = []  # (stage, code, detail)
 
 
-def process_row(row: SourceRow, dedupe_index: DedupeIndex, ontology, groq: GroqAdapter) -> RowOutcome:
+def process_row(row: SourceRow, dedupe_index: DedupeIndex, ontology, groq: GroqAdapter,
+                 image_ctx: ImageContext) -> RowOutcome:
     """Runs stages 2-5 for a single row in memory. Never touches the DB — pure function of its
-    inputs, which is what makes dry-run mode possible without a database at all."""
+    inputs, which is what makes dry-run mode possible without a database at all.
+
+    Real image generation/upload cannot happen here: it needs a resolved dish_id (to check the
+    idempotency guard) which only exists once the dish is persisted. So in apply mode this stage
+    only PLANS (leaves outcome.image = None; the real work happens in `_persist_row`). In dry-run
+    mode it produces an illustrative `planned_dry_run` result — heuristic fields only, by design,
+    so a dry run never makes a network call to Groq/HF either, matching the same "dry-run touches
+    no external paid/rate-limited service" discipline as Pollinations/Cloudinary.
+    """
     outcome = RowOutcome(row)
     n = row.normalized
 
@@ -80,16 +114,32 @@ def process_row(row: SourceRow, dedupe_index: DedupeIndex, ontology, groq: GroqA
         outcome.errors.append(("enrich", "enrich_exception", str(exc)))
 
     try:
-        outcome.image = resolve_image_for_row(n["name"], None)  # CSV has no image column
+        if not image_ctx.generate_images:
+            outcome.image = images.not_applicable(n["name"])
+        elif image_ctx.dry_run:
+            fields = image_ctx.prompt_gen.resolve_fields(
+                n["name"], n["cuisine_raw"], n["course_raw"], n["ingredients"], force_heuristic=True
+            )
+            prompt_text = assemble_prompt(n["name"], fields)
+            outcome.image = images.planned_dry_run(n["name"], prompt_text, fields.source, fields.model_name)
+        else:
+            outcome.image = None  # resolved for real in _persist_row once dish_id is known
     except Exception as exc:
         outcome.errors.append(("image", "image_exception", str(exc)))
 
     return outcome
 
 
-def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE) -> dict:
+def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
+                  generate_images: bool = True, image_delay_seconds: float = DEFAULT_IMAGE_DELAY_SECONDS) -> dict:
     """Entry point used by the CLI. Returns the import summary report dict either way; only
     writes to the database when dry_run is False.
+
+    generate_images: Stage 5 real generation trigger (--generate-images / --skip-images). When
+    False, every dish gets the not_applicable placeholder regardless of run mode. When True and
+    dry_run is True, Stage 5 is only planned/reported (heuristic fields, no network) — see
+    process_row's docstring. When True and dry_run is False, real Pollinations+Cloudinary calls
+    happen in _persist_row for any dish that does not already have an image.
     """
     started = time.monotonic()
     checksum = _file_checksum(csv_path)
@@ -105,6 +155,7 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE) ->
     cuisines: dict[str, str] = {}
     meal_classes: list[dict] = []
     dedupe_index = DedupeIndex()
+    image_ctx = ImageContext(generate_images=generate_images, dry_run=dry_run, image_delay_seconds=image_delay_seconds)
 
     if not dry_run:
         from .db import Database  # deferred import, see db.py docstring
@@ -117,6 +168,7 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE) ->
             dedupe_index.seed_existing(
                 [{"name": e["name"], "fingerprint": e.get("fingerprint")} for e in existing]
             )
+            image_ctx.existing_dish_ids_with_image = db.load_dish_ids_with_image(cur)
             run_id = db.start_import_run(cur, csv_path.name, checksum, "apply")
     else:
         # Dry-run: no DB, no reference-table reads. Ontology adapter runs against an empty
@@ -140,11 +192,12 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE) ->
             return
         with db.transaction() as cur:
             for o in batch:
-                _persist_row(cur, db, run_id, o, counters, match_method_counts, confidence_buckets, review_reasons)
+                _persist_row(cur, db, run_id, o, counters, match_method_counts, confidence_buckets,
+                             review_reasons, image_ctx)
 
     for row in load_and_normalize(csv_path):
         total += 1
-        outcome = process_row(row, dedupe_index, ontology, groq)
+        outcome = process_row(row, dedupe_index, ontology, groq, image_ctx)
         batch.append(outcome)
         if len(batch) >= batch_size:
             flush(batch)
@@ -201,8 +254,18 @@ def _tally(o: RowOutcome, counters: Counter, match_method_counts: Counter, confi
         review_reasons["ambiguous_dedupe_candidate"] += 1
 
 
+def _persist_image_result(cur, db, dish_id: str, img: images.ImageResult) -> None:
+    asset_id = db.insert_image_asset(
+        cur, img.source_url, img.checksum_sha256, img.fetch_status,
+        storage_path=img.storage_path, prompt_text=img.prompt_text, prompt_backend=img.prompt_backend,
+        prompt_model_name=img.prompt_model_name, image_gen_backend=img.image_gen_backend,
+        image_gen_seed=img.image_gen_seed,
+    )
+    db.link_dish_image(cur, dish_id, asset_id, img.alt_text, img.is_primary, img.source_type, img.confidence)
+
+
 def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_method_counts: Counter,
-                  confidence_buckets: Counter, review_reasons: Counter) -> None:
+                  confidence_buckets: Counter, review_reasons: Counter, image_ctx: ImageContext) -> None:
     row = o.row
     n = row.normalized
     try:
@@ -284,10 +347,32 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                 except Exception as exc:
                     db.insert_row_error(cur, source_row_id, "persist", "ingredient_link_failed", str(exc))
 
-        # image plumbing (mostly not_applicable for this dataset — see images.py)
-        if dish_id and o.image:
-            asset_id = db.insert_image_asset(cur, o.image.source_url, o.image.checksum_sha256, o.image.fetch_status)
-            db.link_dish_image(cur, dish_id, asset_id, o.image.alt_text, o.image.is_primary, o.image.source_type, o.image.confidence)
+        # image handling (Stage 5 — see images.py). o.image is already set (not_applicable) if
+        # generation is disabled; it is None here whenever real generation is enabled in apply
+        # mode, because process_row could not resolve a dish_id to check idempotency against.
+        if dish_id and o.image is not None:
+            _persist_image_result(cur, db, dish_id, o.image)
+        elif dish_id and image_ctx.generate_images and not image_ctx.dry_run:
+            if dish_id in image_ctx.existing_dish_ids_with_image:
+                logger.debug("dish %s already has an image; skipping generation (idempotent)", dish_id)
+            else:
+                fields = image_ctx.prompt_gen.resolve_fields(
+                    n["name"], n["cuisine_raw"], n["course_raw"], n["ingredients"]
+                )
+                prompt_text = assemble_prompt(n["name"], fields)
+                image_result = images.generate_and_upload(
+                    n["name"], prompt_text, fields.source, fields.model_name,
+                    image_ctx.pollinations, image_ctx.uploader,
+                )
+                _persist_image_result(cur, db, dish_id, image_result)
+                if image_result.fetch_status == "fetched":
+                    image_ctx.existing_dish_ids_with_image.add(dish_id)
+                else:
+                    db.insert_row_error(cur, source_row_id, "image", "image_generation_failed",
+                                         image_result.alt_text or "unknown image failure")
+                # rate limiting: small delay between real Pollinations calls, ported from the
+                # reference script's DELAY_BETWEEN_REQUESTS default (task brief rule 4).
+                time.sleep(image_ctx.image_delay_seconds)
 
         for stage, code, detail in o.errors:
             db.insert_row_error(cur, source_row_id, stage, code, detail)

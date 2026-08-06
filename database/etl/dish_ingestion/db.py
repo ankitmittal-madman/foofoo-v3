@@ -238,23 +238,48 @@ class Database:
         )
         return str(cur.fetchone()["id"])
 
-    def insert_image_asset(self, cur, source_url: str | None, checksum: str | None, fetch_status: str) -> str:
+    def insert_image_asset(self, cur, source_url: str | None, checksum: str | None, fetch_status: str,
+                            storage_path: str | None = None, content_type: str | None = None,
+                            prompt_text: str | None = None, prompt_backend: str | None = None,
+                            prompt_model_name: str | None = None, image_gen_backend: str | None = None,
+                            image_gen_seed: int | None = None) -> str:
+        """Idempotent on checksum_sha256 when known (migration 076 UNIQUE constraint) — a re-run
+        that regenerates a byte-identical PNG (unlikely with a random seed, but defensively
+        handled) updates in place rather than duplicating. Rows with no checksum (e.g. a failed
+        generation attempt) always get a fresh row, matching the pre-existing behavior."""
         if checksum:
             cur.execute(
                 """
-                INSERT INTO public.image_assets (source_url, checksum_sha256, fetch_status)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (checksum_sha256) DO UPDATE SET fetch_status = EXCLUDED.fetch_status
+                INSERT INTO public.image_assets
+                  (source_url, checksum_sha256, fetch_status, storage_path, content_type,
+                   prompt_text, prompt_backend, prompt_model_name, image_gen_backend, image_gen_seed)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (checksum_sha256) DO UPDATE SET fetch_status = EXCLUDED.fetch_status,
+                  storage_path = EXCLUDED.storage_path
                 RETURNING id
                 """,
-                (source_url, checksum, fetch_status),
+                (source_url, checksum, fetch_status, storage_path, content_type,
+                 prompt_text, prompt_backend, prompt_model_name, image_gen_backend, image_gen_seed),
             )
         else:
             cur.execute(
-                "INSERT INTO public.image_assets (source_url, fetch_status) VALUES (%s, %s) RETURNING id",
-                (source_url, fetch_status),
+                """
+                INSERT INTO public.image_assets
+                  (source_url, fetch_status, storage_path, content_type,
+                   prompt_text, prompt_backend, prompt_model_name, image_gen_backend, image_gen_seed)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                """,
+                (source_url, fetch_status, storage_path, content_type,
+                 prompt_text, prompt_backend, prompt_model_name, image_gen_backend, image_gen_seed),
             )
         return str(cur.fetchone()["id"])
+
+    def load_dish_ids_with_image(self, cur) -> set[str]:
+        """Every dish_id that already has at least one dish_images row — the idempotency guard
+        for Stage 5: a dish in this set is never regenerated/re-uploaded on rerun (task brief
+        rule 3)."""
+        cur.execute("SELECT DISTINCT dish_id FROM public.dish_images")
+        return {str(row["dish_id"]) for row in cur.fetchall()}
 
     def link_dish_image(self, cur, dish_id: str, image_asset_id: str, alt_text: str | None, is_primary: bool, source_type: str, confidence: float | None) -> None:
         cur.execute(

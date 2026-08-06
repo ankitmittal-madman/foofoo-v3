@@ -6,7 +6,7 @@ Usage:
     DATABASE_URL=postgres://... python database/etl/ingest_dish_dataset.py --apply
     python database/etl/ingest_dish_dataset.py --apply --csv path/to/other.csv --batch-size 500
 
-See docs/architecture/[ACTIVE]_RUNBOOK_Dish_Ingestion_Pipeline_v1.0.md for the full operational
+See docs/architecture/[ACTIVE]_RUNBOOK_Dish_Ingestion_Pipeline_v1.1.md for the full operational
 runbook, exact preconditions, and what --dry-run does and does not verify.
 """
 
@@ -33,6 +33,13 @@ def main() -> int:
     parser.add_argument("--csv", type=Path, default=DEFAULT_CSV, help=f"Source CSV path (default: {DEFAULT_CSV})")
     parser.add_argument("--batch-size", type=int, default=200, help="Rows per transaction batch (default: 200)")
     parser.add_argument("--report-out", type=Path, default=None, help="Optional path to also write the JSON summary report")
+    image_mode = parser.add_mutually_exclusive_group()
+    image_mode.add_argument("--generate-images", dest="generate_images", action="store_true", default=True,
+                             help="Stage 5: generate + upload a dish image for any dish missing one (default: on).")
+    image_mode.add_argument("--skip-images", dest="generate_images", action="store_false",
+                             help="Disable Stage 5 entirely; every row gets a not_applicable image placeholder.")
+    parser.add_argument("--image-delay", type=float, default=3.0,
+                         help="Seconds to sleep between real Pollinations.ai calls (default: 3, rate-limit discipline).")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -46,10 +53,12 @@ def main() -> int:
         log.error("source CSV not found: %s", args.csv)
         return 2
 
-    log.info("starting dish ingestion: mode=%s csv=%s batch_size=%s", "dry_run" if args.dry_run else "apply", args.csv, args.batch_size)
+    log.info("starting dish ingestion: mode=%s csv=%s batch_size=%s generate_images=%s",
+              "dry_run" if args.dry_run else "apply", args.csv, args.batch_size, args.generate_images)
 
     try:
-        report = run_pipeline(csv_path=args.csv, dry_run=args.dry_run, batch_size=args.batch_size)
+        report = run_pipeline(csv_path=args.csv, dry_run=args.dry_run, batch_size=args.batch_size,
+                               generate_images=args.generate_images, image_delay_seconds=args.image_delay)
     except RuntimeError as exc:
         # e.g. DATABASE_URL missing in --apply mode — a clear, actionable error, not a stack trace.
         log.error(str(exc))
