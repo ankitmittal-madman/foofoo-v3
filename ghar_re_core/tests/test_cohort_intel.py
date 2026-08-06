@@ -157,6 +157,20 @@ def test_migration_overlay_shifts_the_plan():
     )
 
 
+def test_migration_overlay_normalizes_user_entered_city_case_and_whitespace():
+    """Production stores free-form city input, so lowercase/whitespace variants must retain the
+    same metro tier, local state and migration overlay as the canonical display spelling."""
+    canonical = derive_theta(_hh("Madhya Pradesh", "Mumbai"))
+    entered = derive_theta(_hh("Madhya Pradesh", "  mUmBaI  "))
+
+    for field in ("local_state", "local_zone", "is_migrant", "blend", "region", "city_tier"):
+        assert entered[field]["value"] == canonical[field]["value"]
+    assert entered["local_state"]["value"] == "Maharashtra"
+    assert entered["local_zone"]["value"] == "West"
+    assert entered["is_migrant"]["value"] is True
+    assert entered["city_tier"]["value"] == "T1"
+
+
 def test_home_state_2letter_code_is_normalized_end_to_end():
     """Regression for the confirmed production bug: the live app writes profiles.home_state as a
     2-letter code ('MP'), but the engine keys on full names. Without normalization the region and

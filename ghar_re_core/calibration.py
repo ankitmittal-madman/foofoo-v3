@@ -116,21 +116,35 @@ def _pick_negatives(ranked, positives, n):
     return picked[:n]
 
 
-def calibration_grid(household, catalogue=None, weekday="Monday", household_id=None,
-                      n_positive=DEFAULT_N_POSITIVE, n_negative=DEFAULT_N_NEGATIVE):
+def calibration_grid(
+    household,
+    catalogue=None,
+    weekday="Monday",
+    household_id=None,
+    n_positive=DEFAULT_N_POSITIVE,
+    n_negative=DEFAULT_N_NEGATIVE,
+    exclude_dish_names=None,
+    preference_by_dish=None,
+):
     """The post-onboarding calibration grid: for each of breakfast/lunch/dinner, n_positive
     expected-positive dishes + n_negative planted-mismatch dishes (still safe/diet-eligible),
     order-shuffled per household+slot so cell_role is never positionally guessable.
 
     `household_id`: when given, seeds a household+slot-stable RNG for the shuffle only — never
     affects WHICH dishes are chosen, only their on-screen order. Omitted (None) => deterministic
-    (positives first, then negatives), useful for tests."""
+    (positives first, then negatives), useful for tests.
+
+    Online preferences and exclusions use the same score/filter contract as the landing-page
+    surfaces. A returning user therefore does not receive a frozen onboarding grid after giving
+    feedback, while every replacement still passes the original hard eligibility gates."""
     cat = catalogue or Catalogue()
     theta, objective = _theta_obj(household)
     slots = {}
     used_across_slots = set()
     for slot in MAIN_SLOTS:
         ctx = make_context(slot=slot, weekday=weekday)
+        ctx["exclude_dish_names"] = list(exclude_dish_names or [])
+        ctx["preference_by_dish"] = dict(preference_by_dish or {})
         ranked = [
             pair for pair in _ranked_eligible(cat, theta, ctx, objective)
             if pair[1].name not in used_across_slots

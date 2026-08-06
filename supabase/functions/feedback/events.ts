@@ -169,9 +169,10 @@ export async function recordFeedbackEvent(
 
   let dishId: string | null = null;
   let dishResolved = false;
+  let canonicalDishName = ev.dishName;
   if (ev.dishName) {
     const { data: dishRow, error: dishErr } = await withTimeout(
-      db.from("dishes").select("id").eq("name", ev.dishName).maybeSingle(),
+      db.from("dishes").select("id,name").ilike("name", ev.dishName).maybeSingle(),
       "feedback.events.lookup_dish",
     );
     if (dishErr) {
@@ -184,9 +185,55 @@ export async function recordFeedbackEvent(
       });
     } else if (dishRow) {
       dishId = dishRow.id as string;
+      canonicalDishName = String(dishRow.name);
       dishResolved = true;
     } else {
-      ctx.logger.warn("feedback_event.dish_not_found_in_public_dishes", { dish_name: ev.dishName });
+      // Serving and database catalogues can temporarily disagree on display spelling. Resolve
+      // through the governed alias ontology before accepting an identity-less feedback row.
+      const { data: aliases, error: aliasError } = await withTimeout(
+        db.from("dish_name_synonyms").select("dish_id,confidence,dishes(name)")
+          .ilike("synonym", ev.dishName).order("confidence", { ascending: false }).limit(1),
+        "feedback.events.lookup_dish_alias",
+      );
+      if (aliasError) {
+        ctx.logger.warn("feedback_event.dish_alias_lookup_failed", {
+          dish_name: ev.dishName,
+          detail: aliasError.message,
+        });
+      } else if (aliases?.[0]) {
+        const alias = aliases[0] as Record<string, unknown>;
+        const joined = alias.dishes as { name?: unknown } | Array<{ name?: unknown }> | null;
+        const joinedName = Array.isArray(joined) ? joined[0]?.name : joined?.name;
+        dishId = String(alias.dish_id);
+        canonicalDishName = typeof joinedName === "string" ? joinedName : ev.dishName;
+        dishResolved = true;
+      } else {
+        // The ingestion pipeline keeps source-derived aliases separate from the curated synonym
+        // ontology. Both are identity evidence and must resolve feedback to the same canonical ID.
+        const { data: importedAliases, error: importedAliasError } = await withTimeout(
+          db.from("dish_aliases").select("dish_id,confidence,dishes(name)")
+            .ilike("alias_text", ev.dishName).order("confidence", { ascending: false }).limit(1),
+          "feedback.events.lookup_imported_dish_alias",
+        );
+        if (importedAliasError) {
+          ctx.logger.warn("feedback_event.imported_dish_alias_lookup_failed", {
+            dish_name: ev.dishName,
+            detail: importedAliasError.message,
+          });
+        }
+        if (importedAliases?.[0]) {
+          const alias = importedAliases[0] as Record<string, unknown>;
+          const joined = alias.dishes as { name?: unknown } | Array<{ name?: unknown }> | null;
+          const joinedName = Array.isArray(joined) ? joined[0]?.name : joined?.name;
+          dishId = String(alias.dish_id);
+          canonicalDishName = typeof joinedName === "string" ? joinedName : ev.dishName;
+          dishResolved = true;
+        } else {
+          ctx.logger.warn("feedback_event.dish_not_found_in_public_dishes", {
+            dish_name: ev.dishName,
+          });
+        }
+      }
     }
   }
 
@@ -231,6 +278,9 @@ export async function recordFeedbackEvent(
         detail: {
           ...(ev.detail ?? {}),
           ...(ev.dishName ? { dish_name: ev.dishName } : {}),
+          ...(canonicalDishName && canonicalDishName !== ev.dishName
+            ? { canonical_dish_name: canonicalDishName }
+            : {}),
         },
         data_source: "real",
       })
@@ -296,7 +346,11 @@ export async function recordFeedbackEvent(
         throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: tasteReadError.message });
       }
       const affinities = { ...((taste?.dish_affinity ?? {}) as Record<string, number>) };
-      affinities[ev.dishName] = Math.max(-1, Math.min(1, (affinities[ev.dishName] ?? 0) + delta));
+      const affinityName = canonicalDishName ?? ev.dishName;
+      affinities[affinityName] = Math.max(
+        -1,
+        Math.min(1, (affinities[affinityName] ?? 0) + delta),
+      );
       const { error: tasteWriteError } = await withTimeout(
         db.from("user_taste_vectors").upsert({
           profile_id: ev.actorProfileId,
@@ -337,6 +391,7 @@ export async function recordFeedbackEvent(
       household_id: ev.householdId,
       slot: ev.slot ?? null,
       dish_name: ev.dishName ?? null,
+      canonical_dish_name: canonicalDishName ?? null,
     },
   });
 

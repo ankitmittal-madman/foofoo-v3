@@ -154,6 +154,8 @@ def plan_calibration(request: dict[str, Any], catalogue, config) -> dict[str, An
         catalogue,
         weekday=request.get("weekday", "Monday"),
         household_id=request.get("household_id"),
+        exclude_dish_names=request.get("exclude_dish_names") or [],
+        preference_by_dish=request.get("preference_by_dish") or {},
     )
     for slot_dishes in res["slots"].values():
         _with_images(slot_dishes)
