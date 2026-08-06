@@ -17,3 +17,6 @@ foofoo-ontology-worker = "food_ontology_service.worker_main:main"
 
 [tool.setuptools]
 packages = ["food_ontology_service"]
+
+[tool.setuptools.package-data]
+food_ontology_service = ["migrations/*.sql"]

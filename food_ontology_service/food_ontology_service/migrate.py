@@ -6,7 +6,7 @@ from pathlib import Path
 
 import psycopg
 
-DEFAULT_MIGRATIONS = Path(__file__).resolve().parents[1] / "migrations"
+DEFAULT_MIGRATIONS = Path(__file__).resolve().parent / "migrations"
 
 
 def apply_migrations(dsn: str, directory: Path = DEFAULT_MIGRATIONS) -> list[str]:

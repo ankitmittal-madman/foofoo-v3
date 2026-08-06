@@ -7,7 +7,8 @@ Foofoo app must not connect to its database.
 The checked-in `MemoryRepository` makes contract tests and local API exploration deterministic.
 When `ONTOLOGY_DATABASE_URL` is set, the API selects `PostgresRepository`; production fails closed
 without that setting. The normalized schema, atomic idempotency records, lease queue and immutable
-review decisions are in [migrations/001_create_ontology_schema.sql](migrations/001_create_ontology_schema.sql).
+review decisions are in
+[food_ontology_service/migrations/001_create_ontology_schema.sql](food_ontology_service/migrations/001_create_ontology_schema.sql).
 
 Run locally:
 

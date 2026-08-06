@@ -1,4 +1,4 @@
--- Standalone Food Ontology Service schema. Apply only to the ontology service database.
+-- Packaged Food Ontology Service schema. Apply only to the ontology service database.
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE SCHEMA IF NOT EXISTS ontology;
 REVOKE ALL ON SCHEMA ontology FROM PUBLIC;
