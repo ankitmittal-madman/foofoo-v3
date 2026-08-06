@@ -46,7 +46,11 @@ import { loadOnlineRecommendationState } from "../recommendations/personalizatio
 import { addDishToDate, loadSavedWeek, saveWeek, setSlotLock } from "./state.ts";
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 import { loadWeatherContext } from "../_shared/services/weather.ts";
-import { recordDishRecommendationSlate, recordMealEpisodeSlate } from "./episodes.ts";
+import {
+  recordDishRecommendationSlate,
+  recordMealEpisodeSlate,
+  stripPrivateCandidateLineage,
+} from "./episodes.ts";
 
 const SERVICE_NAME = "plan";
 
@@ -464,7 +468,11 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       // ctx.traceId, guarantees they always match even if a caller ever supplies its own
       // request_id in the body.
       return jsonContract(
-        { ...result.body, request_id: requestId, slate_id: slateId },
+        {
+          ...stripPrivateCandidateLineage(result.body as Record<string, unknown>),
+          request_id: requestId,
+          slate_id: slateId,
+        },
         ctx.traceId,
         200,
       );

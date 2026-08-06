@@ -5,16 +5,13 @@ import { AppError } from "../_shared/errors/app-error.ts";
 import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { Handler } from "../_shared/middleware/types.ts";
-import { normalizeFoodName, researchDish } from "./research.ts";
+import { normalizeFoodName } from "./research.ts";
 import {
-  autoPromoteSubmission,
   createSubmission,
   fetchCandidates,
   fetchDishOntologyRecord,
   fetchMealClasses,
   loadSubmissionStatus,
-  markResearchComplete,
-  storeResearchRecordsForSubject,
   updateSubmission,
 } from "./store.ts";
 
@@ -45,40 +42,6 @@ function submissionInput(body: Record<string, unknown>): {
   return { enteredName, metadata };
 }
 
-/** Execute best-effort external research and move the job to AI/review without blocking on a miss. */
-async function enrichSubmission(
-  ctx: Parameters<Handler>[1],
-  submissionId: string,
-  enteredName: string,
-): Promise<{
-  evidence_count: number;
-  failed_providers: string[];
-  next_status: string;
-  canonical_dish_id: string | null;
-}> {
-  const research = await researchDish(enteredName, ctx.config.usdaFoodDataApiKey);
-  await storeResearchRecordsForSubject(ctx, {
-    submissionId,
-    dishId: null,
-    query: enteredName,
-    records: research.records,
-  });
-  const canonicalDishId = research.records.length
-    ? await autoPromoteSubmission(ctx, submissionId)
-    : null;
-  if (!canonicalDishId) {
-    await markResearchComplete(ctx, submissionId, research.records.length > 0);
-  }
-  return {
-    evidence_count: research.records.length,
-    failed_providers: research.failedProviders,
-    next_status: canonicalDishId
-      ? "resolved"
-      : (research.records.length > 0 ? "pending_ai" : "review"),
-    canonical_dish_id: canonicalDishId,
-  };
-}
-
 /** Build POST /v1/dish-ontology; existing /plan endpoints remain the weekly-plan contract. */
 export function makeDishOntologyHandler(): Handler {
   return async (req, ctx) => {
@@ -95,13 +58,20 @@ export function makeDishOntologyHandler(): Handler {
         : await createSubmission(ctx, claims.userId, input);
       if (!submission) throw new AppError(ERROR_CATALOGUE.NOT_FOUND);
       const id = String(submission.id);
-      const research = await enrichSubmission(ctx, id, input.enteredName);
-      ctx.logger.info("dish_ontology.research_complete", {
+      // The database trigger creates/deduplicates the durable enrichment job. Provider research,
+      // AI inference and promotion are intentionally worker-only: an external outage must never
+      // lengthen or fail this user-facing request while the ontology service is extracted.
+      const research = {
+        evidence_count: 0,
+        failed_providers: [] as string[],
+        next_status: "pending",
+        canonical_dish_id: null,
+        processing: "asynchronous",
+      };
+      ctx.logger.info("dish_ontology.enrichment_queued", {
         submission_id: id,
-        providers_returned: research.evidence_count,
-        providers_failed: research.failed_providers.length,
       });
-      return jsonContract({ kind: "dish_submission", submission, research }, ctx.traceId, 201);
+      return jsonContract({ kind: "dish_submission", submission, research }, ctx.traceId, 202);
     }
 
     if (action === "status") {

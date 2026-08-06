@@ -83,6 +83,25 @@ export function extractDishSlateItems(
   });
 }
 
+export function extractDishCandidateItems(
+  surface: string,
+  response: Record<string, unknown>,
+): DishSlateItem[] {
+  const privateCandidates = response._candidate_lineage;
+  if (!Array.isArray(privateCandidates) || privateCandidates.length === 0) {
+    return extractDishSlateItems(surface, response);
+  }
+  return extractDishSlateItems("meal_plan", { options: privateCandidates });
+}
+
+export function stripPrivateCandidateLineage(
+  response: Record<string, unknown>,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(response).filter(([key]) => key !== "_candidate_lineage"),
+  );
+}
+
 function hex(bytes: ArrayBuffer): string {
   return [...new Uint8Array(bytes)].map((value) => value.toString(16).padStart(2, "0")).join("");
 }
@@ -111,8 +130,8 @@ export async function snapshotHash(value: unknown): Promise<string> {
 /** Persist the dish-card surfaces used by onboarding and the landing page with the same normalized
  * request/run/candidate lineage as meal episodes. This closes the learning blind spot where the
  * UI's primary surfaces emitted feedback_events but no slate or feature snapshot to attribute the
- * feedback to. No probabilities are invented: deterministic inclusion is logged as propensity 1,
- * while uncalibrated prediction columns stay null. */
+ * feedback to. No probabilities are invented: uncalibrated propensities and prediction columns
+ * stay null. */
 export async function recordDishRecommendationSlate(
   ctx: RequestContext,
   input: {
@@ -131,6 +150,7 @@ export async function recordDishRecommendationSlate(
 ): Promise<string | undefined> {
   const items = extractDishSlateItems(input.surface, input.response);
   if (!items.length) return undefined;
+  const candidateItems = extractDishCandidateItems(input.surface, input.response);
 
   const db = createServiceRoleClient(ctx.config);
   const hashed = await Promise.all(items.map(async (item) => ({
@@ -142,7 +162,16 @@ export async function recordDishRecommendationSlate(
       name: item.name.toLocaleLowerCase("en-IN"),
     }),
   })));
-  const eligibleHash = await eligibleSetHash(hashed.map((item) => item.itemHash));
+  const candidateHashed = await Promise.all(candidateItems.map(async (item) => ({
+    ...item,
+    itemHash: await snapshotHash({
+      kind: "dish",
+      surface: input.surface,
+      slot: item.slot ?? null,
+      name: item.name.toLocaleLowerCase("en-IN"),
+    }),
+  })));
+  const eligibleHash = await eligibleSetHash(candidateHashed.map((item) => item.itemHash));
   const householdHash = await snapshotHash(input.householdSnapshot);
   const context = { ...input.requestContext, surface: input.surface };
   const contextHash = await snapshotHash(context);
@@ -176,7 +205,9 @@ export async function recordDishRecommendationSlate(
     rank: index + 1,
     point_score: item.score,
     rerank_score: item.score,
-    selection_propensity: 1,
+    // The seeded exploration/diversification policy is not probability-calibrated. Null is the
+    // truthful value; writing 1 would falsely claim deterministic inclusion for IPS evaluation.
+    selection_propensity: null,
     generator_codes: [input.surface, item.mealClassCode].filter(
       (value): value is string => typeof value === "string" && value.length > 0,
     ),
@@ -198,11 +229,17 @@ export async function recordDishRecommendationSlate(
   );
   if (itemError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: itemError.message });
 
-  const candidates = hashed.map((item, index) => ({
+  const candidates = candidateHashed.map((item, index) => ({
     candidate_item_hash: item.itemHash,
     episode_id: null,
     generator_codes: rows[index].generator_codes,
-    generator_scores: { point_score: item.score, rerank_score: item.score },
+    generator_scores: {
+      point_score: item.score,
+      rerank_score: item.score,
+      shadow_preference_score: typeof item.snapshot.shadow_preference_score === "number"
+        ? item.snapshot.shadow_preference_score
+        : null,
+    },
     reason_codes: item.reasons,
     rank: index + 1,
   }));
@@ -330,9 +367,9 @@ export async function recordMealEpisodeSlate(
     rank: episode.rank || index + 1,
     point_score: episode.source_plate_score,
     rerank_score: episode.predictions.p_success,
-    // The current rule policy deterministically includes every returned episode. This is the
-    // actual logging-policy probability, not a fabricated exploration propensity.
-    selection_propensity: 1,
+    // The request seed makes replay deterministic, but it is not a calibrated policy probability.
+    // Leave propensity unknown until the exploration policy exposes its true inclusion chance.
+    selection_propensity: null,
     generator_codes: input.classCode ? ["finalized_class"] : ["safe_plate_pipeline"],
     reason_tags: episode.reasons ?? [],
     predicted_choose: episode.predictions.p_choose,

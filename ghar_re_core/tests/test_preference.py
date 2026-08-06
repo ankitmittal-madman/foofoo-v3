@@ -17,7 +17,7 @@ from ghar_re_core.catalogue import Catalogue
 from ghar_re_core.derivation import derive_theta
 from ghar_re_core.modules_default import DEFAULT_REGISTRY
 from ghar_re_core.pipeline import make_context
-from ghar_re_core.preference import s_pref
+from ghar_re_core.preference import loaded_preference_score, s_pref
 
 CAT = Catalogue()
 HH = {h["id_key"]: h for h in F.HOUSEHOLDS}
@@ -46,10 +46,29 @@ def test_s_pref_neutral_value_when_enabled_but_no_artifact(monkeypatch):
     (NullModelArtifactProvider, the only provider ever constructed anywhere in this repo)
     s_pref must still return exactly 0.0 — belt-and-suspenders, independent checks."""
     cfg = cfgmod.active_config()
-    monkeypatch.setattr(cfg, "pref", {**cfg.pref, "enabled": True})
+    monkeypatch.setattr(cfg, "pref", {**cfg.pref, "mode": "active", "enabled": True})
     dish, theta, ctx = _one_dish_theta_ctx()
     assert MP.active_model().artifact is None
     assert s_pref(dish, theta, ctx) == 0.0
+
+
+def test_shadow_model_scores_without_affecting_live_preference_term(monkeypatch):
+    class Artifact:
+        def predict_proba(self, _features):
+            return 0.83
+
+    provider = MP.NullModelArtifactProvider()
+    provider.artifact = Artifact()
+    original = MP.active_model()
+    cfg = cfgmod.active_config()
+    monkeypatch.setattr(cfg, "pref", {**cfg.pref, "mode": "shadow", "w_pref": 0.0})
+    MP.set_active_model(provider)
+    try:
+        dish, theta, ctx = _one_dish_theta_ctx()
+        assert loaded_preference_score(dish, theta, ctx) == pytest.approx(0.83)
+        assert s_pref(dish, theta, ctx) == 0.0
+    finally:
+        MP.set_active_model(original)
 
 
 def test_s_pref_module_registered_with_zero_weight_by_default():
