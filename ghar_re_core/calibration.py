@@ -140,6 +140,7 @@ def calibration_grid(
     cat = catalogue or Catalogue()
     theta, objective = _theta_obj(household)
     slots = {}
+    candidate_lineage = []
     used_across_slots = set()
     for slot in MAIN_SLOTS:
         ctx = make_context(slot=slot, weekday=weekday)
@@ -149,6 +150,15 @@ def calibration_grid(
             pair for pair in _ranked_eligible(cat, theta, ctx, objective)
             if pair[1].name not in used_across_slots
         ]
+        candidate_lineage.extend(
+            {
+                "name": dish.name,
+                "score": round(float(score), 6),
+                "slot": slot,
+                "meal_class_code": K.dish_to_class_code(dish.name),
+            }
+            for score, dish in ranked
+        )
         positives = _pick_positives(ranked, n_positive)
         negatives = _pick_negatives(ranked, positives, n_negative)
         cells = (
@@ -163,4 +173,5 @@ def calibration_grid(
         "household": household.get("label"),
         "kind": "calibration_grid",
         "slots": slots,
+        "_candidate_lineage": candidate_lineage,
     }

@@ -188,6 +188,13 @@ def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any
     _with_shadow_preferences(
         res["dishes"], hh, {"weekday": request.get("weekday", "Monday")}, catalogue, config
     )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
+        hh,
+        {"weekday": request.get("weekday", "Monday")},
+        catalogue,
+        config,
+    )
     return res
 
 
@@ -214,6 +221,13 @@ def plan_calibration(request: dict[str, Any], catalogue, config) -> dict[str, An
             config,
             slot=slot,
         )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
+        hh,
+        {"weekday": request.get("weekday", "Monday")},
+        catalogue,
+        config,
+    )
     return res
 
 
@@ -235,6 +249,14 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     _with_images(res["options"])
     _with_shadow_preferences(
         res["options"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request.get("slot", "dinner"),
+    )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
         hh,
         request.get("context") or {},
         catalogue,
@@ -340,6 +362,14 @@ def plan_class_dishes(request: dict[str, Any], catalogue, config) -> dict[str, A
         config,
         slot=request["slot"],
     )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request["slot"],
+    )
     return res
 
 
@@ -361,6 +391,14 @@ def plan_search(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     _with_images(res["options"])
     _with_shadow_preferences(
         res["options"],
+        hh,
+        request.get("context") or {},
+        catalogue,
+        config,
+        slot=request.get("slot", "dinner"),
+    )
+    _with_shadow_preferences(
+        res["_candidate_lineage"],
         hh,
         request.get("context") or {},
         catalogue,

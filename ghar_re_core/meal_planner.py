@@ -81,6 +81,16 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
     }
 
 
+def _candidate_lineage(d, score, slot):
+    """Private core→Edge candidate evidence; stripped before any client response."""
+    return {
+        "name": d.name,
+        "score": round(float(score), 6),
+        "slot": slot,
+        "meal_class_code": K.dish_to_class_code(d.name),
+    }
+
+
 def _ranked(cat, theta, ctx, objective, predicate=None, preference_by_dish=None):
     """(score, dish) for every slot-appropriate, eligible dish, best first. `predicate` further
     restricts the pool (e.g. to one meal class) without ever loosening eligibility."""
@@ -299,6 +309,9 @@ def cold_start_top15(
             )
             for score, d in picked
         ],
+        "_candidate_lineage": [
+            _candidate_lineage(d, score, slot_of[d.name][0]) for score, d in ranked
+        ],
     }
 
 
@@ -354,6 +367,7 @@ def slot_options(
             _dish_view(d, theta, ctx, objective, score, label_class=class_code)
             for score, d in picked
         ],
+        "_candidate_lineage": [_candidate_lineage(d, score, slot) for score, d in ranked],
     }
 
 
@@ -451,6 +465,10 @@ def search_dishes(
         "count": len(selected),
         "options": [
             _dish_view(dish, theta, ctx, objective, score) for _, score, _, dish in selected
+        ],
+        "_candidate_lineage": [
+            _candidate_lineage(dish, score, slot or "dinner")
+            for _, score, _, dish in matches
         ],
     }
 
