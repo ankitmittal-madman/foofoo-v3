@@ -380,12 +380,16 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
         # image handling (Stage 5 — see images.py). o.image is already set (not_applicable) if
         # generation is disabled; it is None here whenever real generation is enabled in apply
         # mode, because process_row could not resolve a dish_id to check idempotency against.
+        logger.info("image branch check: dish_id=%s o.image=%r generate_images=%s dry_run=%s",
+                    dish_id, o.image, image_ctx.generate_images, image_ctx.dry_run)
         if dish_id and o.image is not None:
+            logger.info("dish %s: persisting pre-set image result (source_type=%s)", dish_id, o.image.source_type)
             _persist_image_result(cur, db, dish_id, o.image)
         elif dish_id and image_ctx.generate_images and not image_ctx.dry_run:
             if dish_id in image_ctx.existing_dish_ids_with_image:
-                logger.debug("dish %s already has an image; skipping generation (idempotent)", dish_id)
+                logger.info("dish %s already has an image; skipping generation (idempotent)", dish_id)
             else:
+                logger.info("dish %s (%s): attempting real image generation", dish_id, n["name"])
                 fields = image_ctx.prompt_gen.resolve_fields(
                     n["name"], n["cuisine_raw"], n["course_raw"], n["ingredients"]
                 )
@@ -394,6 +398,8 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                     n["name"], prompt_text, fields.source, fields.model_name,
                     image_ctx.pollinations, image_ctx.uploader,
                 )
+                logger.info("dish %s: image_result fetch_status=%s storage_path=%s",
+                            dish_id, image_result.fetch_status, image_result.storage_path)
                 _persist_image_result(cur, db, dish_id, image_result)
                 if image_result.fetch_status == "fetched":
                     image_ctx.existing_dish_ids_with_image.add(dish_id)
