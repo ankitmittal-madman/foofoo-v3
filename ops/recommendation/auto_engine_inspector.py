@@ -70,11 +70,11 @@ AUDIT_QUERIES: dict[str, tuple[str, str]] = {
         FROM public.feedback_events""",
     ),
     "regions": (
-        "re_engine.re_states",
+        "public.re_states",
         """/* auto_engine:regions */ SELECT count(*) total_records,
         count(*) FILTER (WHERE state_code<>'' AND region<>'') usable_records,
         count(*) FILTER (WHERE state_name='' OR region='') missing_fields, 0 duplicate_records,
-        0 orphan_records, 0 low_confidence_records FROM re_engine.re_states""",
+        0 orphan_records, 0 low_confidence_records FROM public.re_states""",
     ),
     "ingredients": (
         "public.ingredients",
