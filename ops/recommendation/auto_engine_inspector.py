@@ -159,6 +159,13 @@ AUDIT_QUERIES: dict[str, tuple[str, str]] = {
     ),
 }
 
+RESEARCH_ENTITY_NAMES = tuple(
+    name for name in AUDIT_QUERIES if name.startswith("research_")
+)
+PRODUCTION_ENTITY_NAMES = tuple(
+    name for name in AUDIT_QUERIES if name not in RESEARCH_ENTITY_NAMES
+)
+
 
 def _mapping(cursor: Any, row: Any) -> Mapping[str, Any]:
     if isinstance(row, Mapping):
@@ -166,10 +173,12 @@ def _mapping(cursor: Any, row: Any) -> Mapping[str, Any]:
     return dict(zip((column[0] for column in cursor.description), row, strict=True))
 
 
-def inspect_database(connection: Any, config: AutoEngineConfig) -> InspectionReport:
+def inspect_entities(connection: Any, entity_names: tuple[str, ...]) -> tuple[AuditRow, ...]:
+    """Read a reviewed subset of audit queries from one database connection."""
     rows: list[AuditRow] = []
     with connection.cursor() as cursor:
-        for entity_type, (source_table, query) in AUDIT_QUERIES.items():
+        for entity_type in entity_names:
+            source_table, query = AUDIT_QUERIES[entity_type]
             cursor.execute(query)
             result = cursor.fetchone()
             if result is None:
@@ -187,6 +196,22 @@ def inspect_database(connection: Any, config: AutoEngineConfig) -> InspectionRep
                     low_confidence_records=int(item.get("low_confidence_records") or 0),
                 )
             )
+    return tuple(rows)
+
+
+def build_inspection(
+    rows: tuple[AuditRow, ...], config: AutoEngineConfig
+) -> InspectionReport:
+    """Derive readiness from one complete, uniquely keyed audit snapshot."""
+    names = [row.entity_type for row in rows]
+    missing = sorted(set(AUDIT_QUERIES) - set(names))
+    duplicates = sorted(name for name in set(names) if names.count(name) > 1)
+    unknown = sorted(set(names) - set(AUDIT_QUERIES))
+    if missing or duplicates or unknown:
+        raise RuntimeError(
+            "audit snapshot must contain each governed entity exactly once; "
+            f"missing={missing}, duplicates={duplicates}, unknown={unknown}"
+        )
 
     by_entity = {row.entity_type: row for row in rows}
     thresholds = {
@@ -249,3 +274,16 @@ def inspect_database(connection: Any, config: AutoEngineConfig) -> InspectionRep
         enrichment_targets=enrichment_targets,
         model_readiness=model_readiness,
     )
+
+
+def inspect_database(
+    connection: Any,
+    config: AutoEngineConfig,
+    research_connection: Any | None = None,
+) -> InspectionReport:
+    """Inspect production facts and private research state without mixing write targets."""
+    research_source = research_connection or connection
+    rows = inspect_entities(connection, PRODUCTION_ENTITY_NAMES) + inspect_entities(
+        research_source, RESEARCH_ENTITY_NAMES
+    )
+    return build_inspection(rows, config)

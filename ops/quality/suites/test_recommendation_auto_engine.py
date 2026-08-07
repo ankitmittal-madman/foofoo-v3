@@ -5,8 +5,18 @@ import re
 from decimal import Decimal
 from pathlib import Path
 
-from ops.recommendation.auto_engine import run_auto_engine
-from ops.recommendation.auto_engine_inspector import AUDIT_QUERIES, inspect_database
+import pytest
+
+from ops.recommendation.auto_engine import (
+    _load_production_snapshot,
+    run_auto_engine,
+)
+from ops.recommendation.auto_engine_inspector import (
+    AUDIT_QUERIES,
+    PRODUCTION_ENTITY_NAMES,
+    RESEARCH_ENTITY_NAMES,
+    inspect_database,
+)
 from ops.recommendation.auto_engine_ontology import load_ontology, map_and_score_records
 from ops.recommendation.auto_engine_research import generate_research_records
 from ops.recommendation.auto_engine_store import (
@@ -82,6 +92,45 @@ def test_inspector_reads_every_required_db_entity_before_deciding():
     assert report.strong_enough_for_baseline is True
     assert report.model_readiness["lightgcn"]["ready"] is True
     assert report.model_readiness["kgat"]["ready"] is True
+
+
+def test_inspector_routes_research_queries_to_the_training_connection():
+    production = FakeConnection(strong_counts())
+    training = FakeConnection(
+        {
+            "research_household_personas": (24, 24),
+            "research_interactions": (240, 240),
+            "research_weekly_plans": (24, 24),
+            "research_substitutions": (37, 37),
+        }
+    )
+    report = inspect_database(production, AutoEngineConfig(), research_connection=training)
+    by_name = {row.entity_type: row for row in report.rows}
+    assert tuple(by_name) == PRODUCTION_ENTITY_NAMES + RESEARCH_ENTITY_NAMES
+    assert by_name["research_interactions"].total_records == 240
+    assert by_name["dishes"].total_records == 200
+
+
+def test_production_snapshot_rejects_missing_or_reordered_entities(tmp_path):
+    snapshot = tmp_path / "snapshot.json"
+    snapshot.write_text(
+        json.dumps(
+            {
+                "format": "foofoo-production-audit-v1",
+                "entities": [
+                    {
+                        "entity_type": name,
+                        "source_table": AUDIT_QUERIES[name][0],
+                        "total_records": 1,
+                        "usable_records": 1,
+                    }
+                    for name in reversed(PRODUCTION_ENTITY_NAMES)
+                ],
+            }
+        )
+    )
+    with pytest.raises(RuntimeError, match="missing, extra, or reordered"):
+        _load_production_snapshot(snapshot)
 
 
 def test_postgres_research_fetch_is_bounded_and_parameterized():

@@ -1,9 +1,9 @@
 # Recommendation auto-training engine
 
-The auto-engine is a DB-first operational pipeline. It inventories real production data before it
-does anything else, generates bounded expert-style research only for measured coverage gaps, maps
-every food reference through the canonical ontology, and writes generated evidence only to the
-private `research.auto_training_records` staging table. It never creates fake production users,
+The auto-engine is a DB-first operational pipeline. It inventories aggregate production data
+through a read-only connection, generates bounded expert-style research only for measured coverage
+gaps, maps every food reference through the canonical ontology, and writes generated evidence only
+to `research.auto_training_records` in the dedicated training Supabase project. It never creates fake production users,
 never labels synthetic interactions as real, never changes the active recommender, and never
 activates a model.
 
@@ -45,21 +45,25 @@ coverage is sufficient, generation stops even if the production-real-data gate r
 
 ## Run modes
 
-The CLI requires a service-role PostgreSQL connection through `DATABASE_URL`, `SUPABASE_DB_URL`, or
-`FOOFOO_SUPABASE_URI`.
+The production-audit phase requires `FOOFOO_SUPABASE_URI` and produces an aggregate snapshot. The
+research/training phase requires `TRAINING_DATABASE_URL`; there is deliberately no fallback between
+the two credentials.
 
 ```bash
 # Read-only inventory. No research generation, seeding, or training.
 PYTHONPATH=.:aux_re_service python -m ops.recommendation.auto_engine \
-  --mode audit --report /tmp/foofoo-auto-engine-audit.json
+  --mode audit --write-production-snapshot /tmp/production-audit.json \
+  --report /tmp/foofoo-auto-engine-audit.json
 
 # Read the real DB, simulate enrichment in memory, and show exact would-write counts.
 PYTHONPATH=.:aux_re_service python -m ops.recommendation.auto_engine \
-  --mode dry_run --report /tmp/foofoo-auto-engine-dry-run.json
+  --mode dry_run --production-snapshot /tmp/production-audit.json \
+  --report /tmp/foofoo-auto-engine-dry-run.json
 
 # Seed governed research staging and refresh eligible local candidates.
 PYTHONPATH=.:aux_re_service python -m ops.recommendation.auto_engine \
-  --mode execute --report /secure/foofoo-auto-engine-run.json \
+  --mode execute --production-snapshot /tmp/production-audit.json \
+  --report /secure/foofoo-auto-engine-run.json \
   --output-dir /secure/foofoo-auto-engine-artifacts
 ```
 
@@ -71,10 +75,11 @@ ontology thresholds pass.
 
 ## Scheduling and promotion
 
-The `recommendation-auto-engine` workflow validates the pipeline on changes and weekly. If the
-protected DB secret is configured, scheduled runs use `dry_run`; a write/training `execute` run is
-manual so production DB mutation remains an explicit operator decision. Every run artifact is
-retained for review. Model promotion is still a separate governed action.
+The `recommendation-auto-engine` workflow validates the pipeline on changes and weekly. Its first
+job reads aggregate readiness from the protected production environment; its second job reads and
+writes only the protected training environment. Scheduled runs use `dry_run`; a training-project
+`execute` run is manual and confirmation-gated. Every run artifact is retained for review. Model
+promotion is still a separate governed action.
 
 Before manual execution:
 

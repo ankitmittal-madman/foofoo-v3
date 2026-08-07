@@ -126,6 +126,7 @@ def train_and_evaluate(
     ontology_path: Path,
     output_dir: Path,
     execute: bool,
+    real_data_connection: Any | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     output_dir.mkdir(parents=True, exist_ok=True)
     models: list[dict[str, Any]] = []
@@ -141,7 +142,7 @@ def train_and_evaluate(
     }
     if execute:
         try:
-            from aux_re_service.training.retrieval_pipeline import (  # type: ignore[import-untyped]
+            from aux_re_service.training.retrieval_pipeline import (
                 build as build_retrieval,
             )
 
@@ -186,7 +187,7 @@ def train_and_evaluate(
         report_path = output_dir / "models" / "lightfm_research_challenger_report.json"
         artifact.parent.mkdir(parents=True, exist_ok=True)
         try:
-            from aux_re_service.training.lightfm_pipeline import (  # type: ignore[import-untyped]
+            from aux_re_service.training.lightfm_pipeline import (
                 train as train_lightfm,
             )
 
@@ -232,13 +233,13 @@ def train_and_evaluate(
         if not preference_ready
         else "ready for the existing service-role preference-training exporter",
     }
-    if execute and preference_ready and hasattr(store, "connection"):
+    if execute and preference_ready and real_data_connection is not None:
         from .preference_training import run as train_real_preference
 
         preference_dir = output_dir / "models" / "real_preference"
         preference_dir.mkdir(parents=True, exist_ok=True)
         result = train_real_preference(
-            store.connection,
+            real_data_connection,
             readiness_out=preference_dir / "readiness.json",
             artifact_out=preference_dir / "preference_model.joblib",
             eval_out=preference_dir / "evaluation.json",
