@@ -4,8 +4,8 @@ import {
   extractExposureDishNames,
   extractPersistedCadence,
   extractPersistedExposureDishNames,
-  selectImmediateRefreshExclusions,
   extractPersistedVarietyCounts,
+  selectImmediateRefreshExclusions,
 } from "../recommendations/personalization.ts";
 
 Deno.test("aggregateAffinityMaps combines only members with evidence", () => {
