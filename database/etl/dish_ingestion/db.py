@@ -155,7 +155,12 @@ class Database:
         return str(cur.fetchone()["id"])
 
     def get_dish_id_by_name(self, cur, name: str) -> str | None:
-        cur.execute("SELECT id FROM public.dishes WHERE name = %s", (name,))
+        # DedupeIndex keys and returns target_key as name.strip().lower() (dedupe.py), but
+        # dishes.name is stored in its original source casing -- a case-sensitive `name = %s`
+        # here always misses on a real matched_existing decision, forcing every match down the
+        # "index said matched but DB disagrees" created_new fallback in pipeline.py and paying
+        # for two needless Groq calls per row regardless of whether the dish already exists.
+        cur.execute("SELECT id FROM public.dishes WHERE lower(name) = %s", (name,))
         row = cur.fetchone()
         return str(row["id"]) if row else None
 
