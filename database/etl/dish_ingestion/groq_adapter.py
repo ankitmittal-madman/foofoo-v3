@@ -118,7 +118,12 @@ class GroqAdapter:
             },
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=20) as resp:  # pragma: no cover - network
+        # Two calls per new row (region + tags) share this timeout -- a full-dataset run that
+        # observed ~40s/row on genuinely new rows (vs the ~8s/row before Groq started actually
+        # succeeding) is consistent with calls regularly running to the old 20s ceiling before
+        # falling back, likely rate-limit queuing rather than a fast rejection. Cut to 8s so a
+        # slow/rate-limited call fails fast onto the heuristic path instead of stalling a row.
+        with urllib.request.urlopen(req, timeout=8) as resp:  # pragma: no cover - network
             return json.loads(resp.read().decode("utf-8"))
 
     def _call_groq_region(self, dish_name: str, cuisine_raw: str) -> EnrichmentSuggestion:
