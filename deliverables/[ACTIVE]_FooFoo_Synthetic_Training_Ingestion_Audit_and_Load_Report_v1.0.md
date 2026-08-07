@@ -192,15 +192,55 @@ they are reported and collapsed before load rather than relying on the database 
 
 ### 10.2 Automated verification
 
-Focused importer plus existing training-pipeline tests: 14 passed. Ruff checks for the new importer
-and tests pass. Checksum drift, unsafe destinations, orphan handling, deterministic batch IDs,
-private privileges, and rollback presence are covered.
+Focused importer plus related training/auto-engine suites: 58 passed. Ruff, mypy, Python compile,
+workflow-YAML parsing, migration validation, and knowledge-page structural checks also pass.
+Checksum drift, unsafe destinations, orphan handling, exact-duplicate handling, deterministic batch
+IDs, private privileges, rollback presence, and repeatable load behavior are covered.
 
 ### 10.3 Privileged load
 
-The repository includes a protected, confirmation-gated workflow that applies migrations 087/088,
-runs validations 939/940, executes the private load, verifies synthetic-only invariants and reports
-target counts. Final live counts are recorded here after that workflow completes.
+The protected, confirmation-gated production workflow completed successfully on 2026-08-07 in
+8m02s: [GitHub Actions run 31167064957](https://github.com/ankitmittal-madman/foofoo-v3/actions/runs/31167064957).
+It verified/applied migrations 087/088, passed validations 939/940, committed the private load,
+checked the synthetic-only invariant, and uploaded the non-sensitive report as artifact
+`governed-training-ingestion-31167064957-1` (artifact ID `8989623234`, retained for 30 days).
+
+| Live committed result | Count/status |
+|---|---:|
+| Import status | `completed_with_rejections` |
+| Physical source rows retained | 132,586 |
+| Accepted source rows retained | 132,541 |
+| Rejected source rows retained with reasons | 45 |
+| Total normalized private research records | 113,868 |
+| `research.training_dishes` | 86 |
+| `research.household_personas` | 10,000 |
+| `research.interactions` | 64,842 |
+| `research.weekly_signals` | 10,000 |
+| `research.household_preference_edges` | 28,940 |
+| Synthetic production users inserted | 0 |
+| Synthetic production meal plans inserted | 0 |
+| Synthetic production events inserted | 0 |
+| Production targets requested by loader | 0 |
+
+The live public catalogue independently reports **3,409 rows in `public.dishes`**. These are the
+production dish records and are separate from the 86 synthetic training-dish records. Anonymous
+RLS views of user-owned tables intentionally return no usable production-user/plan census; the
+training result is established instead by the fixed private target allowlist, recorded target list,
+and the successful post-load synthetic-only verification.
+
+An earlier attempt, run `31166273820`, correctly rolled back its data transaction after discovering
+80 exact duplicate preference-edge inputs. The loader was repaired to report and deterministically
+collapse those duplicates; the successful run above is the committed batch. Migrations are
+additive and idempotent, so the earlier schema application did not duplicate data.
+
+## 11. Remaining Gaps
+
+- The 45 rejected workbook rows require source-data repair before they can enter normalized
+  training records; their exact sheet, row, key and rejection reasons remain stored for audit.
+- The synthetic ontology has only 86 training dishes and incomplete ingredient coverage, so it
+  remains unsuitable as production catalogue or safety authority.
+- No synthetic model is promoted to the active recommender. Promotion still requires consented
+  real feedback, shadow evaluation, quality/fairness gates, and an explicit approval workflow.
 
 ## Founder Sign-off
 
