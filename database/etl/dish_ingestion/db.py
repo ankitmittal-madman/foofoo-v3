@@ -284,10 +284,19 @@ class Database:
         return str(cur.fetchone()["id"])
 
     def load_dish_ids_with_image(self, cur) -> set[str]:
-        """Every dish_id that already has at least one dish_images row — the idempotency guard
-        for Stage 5: a dish in this set is never regenerated/re-uploaded on rerun (task brief
-        rule 3)."""
-        cur.execute("SELECT DISTINCT dish_id FROM public.dish_images")
+        """Every dish_id that already has at least one SUCCESSFULLY fetched dish_images row — the
+        idempotency guard for Stage 5: a dish in this set is never regenerated/re-uploaded on
+        rerun (task brief rule 3). Filtered to fetch_status='fetched' (not just any row) because
+        _persist_image_result links a dish_images row even for a failed generation attempt (to
+        preserve the attempt's provenance) -- without this filter, a dish that failed once would
+        be treated as "already has an image" forever and never get a real retry."""
+        cur.execute(
+            """
+            SELECT DISTINCT di.dish_id FROM public.dish_images di
+              JOIN public.image_assets ia ON ia.id = di.image_asset_id
+             WHERE ia.fetch_status = 'fetched'
+            """
+        )
         return {str(row["dish_id"]) for row in cur.fetchall()}
 
     def link_dish_image(self, cur, dish_id: str, image_asset_id: str, alt_text: str | None, is_primary: bool, source_type: str, confidence: float | None) -> None:

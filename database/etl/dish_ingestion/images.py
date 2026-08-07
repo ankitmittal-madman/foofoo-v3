@@ -32,6 +32,7 @@ DB, it is a pure generate+upload function so it stays testable without a DB conn
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import random
 import time
@@ -52,6 +53,15 @@ MIN_VALID_BYTES = 5000       # reference script's own sanity floor for "not an e
 
 CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/{cloud}/image/upload"
 
+# Fallback text-to-image backend, tried only when Pollinations exhausts its retries. Every real
+# generation attempt from this ETL so far has come back HTTP 403 Forbidden from Pollinations
+# despite a non-default User-Agent (see PollinationsClient docstring) -- most consistent with
+# Pollinations blocking GitHub Actions' shared runner IP ranges specifically, not a request-shape
+# problem, so a different provider is the practical fix rather than more urllib tuning.
+HF_ROUTER_IMAGE_URL = "https://router.huggingface.co/hf-inference/models/{model}"
+HF_IMAGE_MODEL = "black-forest-labs/FLUX.1-schnell"
+HF_IMAGE_BACKEND_LABEL = "hf_flux_schnell"  # image_assets.image_gen_backend CHECK value, migration 089
+
 
 @dataclass
 class ImageResult:
@@ -66,7 +76,7 @@ class ImageResult:
     prompt_text: str | None = None
     prompt_backend: str | None = None      # 'groq_api' | 'hf_api' | 'heuristic'
     prompt_model_name: str | None = None
-    image_gen_backend: str | None = None   # 'pollinations_flux_pro'
+    image_gen_backend: str | None = None   # 'pollinations_flux_pro' | 'hf_flux_schnell'
     image_gen_seed: int | None = None
 
 
@@ -141,6 +151,52 @@ class PollinationsClient:
         raise RuntimeError(f"pollinations generation failed after {self.max_retries} attempts: {last_exc}")
 
 
+class HFImageClient:
+    """Fallback real-generation call — Hugging Face Inference Providers router, text-to-image
+    task. Only invoked when PollinationsClient.generate_png raises (see generate_and_upload).
+    Requires HF_API_KEY or HUGGINGFACE_API_KEY (same credential already used by image_prompt.py's
+    prompt-enrichment fallback, so no new secret to provision if that one's already set)."""
+
+    def __init__(self, api_key: str | None = None, model: str = HF_IMAGE_MODEL, timeout: int = 60):
+        import os
+        self.api_key = api_key if api_key is not None else (os.environ.get("HF_API_KEY") or os.environ.get("HUGGINGFACE_API_KEY"))
+        self.model = model
+        self.timeout = timeout
+
+    def configured(self) -> bool:
+        return bool(self.api_key)
+
+    def generate_png(self, prompt: str) -> tuple[bytes, str, int]:
+        """Returns (image_bytes, request_url, seed=0 -- HF's router API doesn't expose the
+        provider's seed). Raises RuntimeError on any failure, same contract as
+        PollinationsClient.generate_png so callers can treat both uniformly."""
+        if not self.configured():
+            raise RuntimeError("HF_API_KEY / HUGGINGFACE_API_KEY not set; cannot use the Hugging Face image fallback.")
+
+        url = HF_ROUTER_IMAGE_URL.format(model=self.model)
+        payload = json.dumps({"inputs": prompt}).encode("utf-8")
+        req = urllib.request.Request(
+            url, data=payload, method="POST",
+            headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                content_type = resp.headers.get("Content-Type", "")
+                body = resp.read()
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"HF image generation failed: HTTP {exc.code}: {detail}") from exc
+
+        # The router returns raw image bytes on success, but a JSON error body (e.g. model still
+        # loading, HTTP 200 with an "error" field) on failure -- distinguish by Content-Type
+        # rather than assuming any 200 response is a valid image.
+        if "image" not in content_type:
+            raise RuntimeError(f"HF image generation returned non-image content-type={content_type!r}: {body[:300]!r}")
+        if len(body) < MIN_VALID_BYTES:
+            raise ValueError(f"HF response too small to be a real image: {len(body)} bytes")
+        return body, url, 0
+
+
 class CloudinaryUploader:
     """Signed upload of in-memory bytes — no local disk write anywhere in this path."""
 
@@ -181,7 +237,6 @@ class CloudinaryUploader:
         )
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:  # pragma: no cover - network
-                import json
                 return json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:  # pragma: no cover - network
             detail = exc.read().decode("utf-8", errors="replace")
@@ -209,24 +264,46 @@ def _build_multipart(fields: dict, file_field: str, filename: str, file_bytes: b
 
 
 def generate_and_upload(dish_name: str, prompt_text: str, prompt_backend: str, prompt_model_name: str | None,
-                         pollinations: PollinationsClient, uploader: CloudinaryUploader) -> ImageResult:
+                         pollinations: PollinationsClient, uploader: CloudinaryUploader,
+                         hf_image: "HFImageClient | None" = None) -> ImageResult:
     """Real generation + upload path — only ever called from apply mode for a dish that does not
     already have an image (idempotency check happens in pipeline.py, before this is called).
+
+    Tries Pollinations first; if it raises (every live attempt so far has come back HTTP 403,
+    consistent with Pollinations blocking GitHub Actions' shared runner IPs -- see images.py
+    module docstring), falls back to the Hugging Face image client when one is configured, rather
+    than failing the row outright on a provider-specific block.
     """
     slug = slugify(dish_name)
     random_suffix = "".join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=6))
     public_id = f"{slug}_hero_01_{random_suffix}"
 
+    image_gen_backend = "pollinations_flux_pro"
     try:
         png_bytes, request_url, seed = pollinations.generate_png(prompt_text)
-    except Exception as exc:
-        logger.error("image generation failed for %s: %s", dish_name, exc)
-        return ImageResult(
-            source_url=None, storage_path=None, checksum_sha256=None, fetch_status="failed",
-            alt_text=f"{dish_name} (generation failed: {exc})", is_primary=False, source_type="ai_generated",
-            confidence=None, prompt_text=prompt_text, prompt_backend=prompt_backend,
-            prompt_model_name=prompt_model_name, image_gen_backend="pollinations_flux_pro", image_gen_seed=None,
-        )
+    except Exception as pollinations_exc:
+        logger.warning("pollinations generation failed for %s, trying HF fallback: %s", dish_name, pollinations_exc)
+        if hf_image is None or not hf_image.configured():
+            logger.error("image generation failed for %s: %s", dish_name, pollinations_exc)
+            return ImageResult(
+                source_url=None, storage_path=None, checksum_sha256=None, fetch_status="failed",
+                alt_text=f"{dish_name} (generation failed: {pollinations_exc})", is_primary=False,
+                source_type="ai_generated", confidence=None, prompt_text=prompt_text, prompt_backend=prompt_backend,
+                prompt_model_name=prompt_model_name, image_gen_backend=image_gen_backend, image_gen_seed=None,
+            )
+        try:
+            png_bytes, request_url, seed = hf_image.generate_png(prompt_text)
+            image_gen_backend = HF_IMAGE_BACKEND_LABEL
+        except Exception as hf_exc:
+            logger.error("image generation failed for %s (pollinations: %s; hf fallback: %s)",
+                         dish_name, pollinations_exc, hf_exc)
+            return ImageResult(
+                source_url=None, storage_path=None, checksum_sha256=None, fetch_status="failed",
+                alt_text=f"{dish_name} (generation failed: pollinations={pollinations_exc}; hf={hf_exc})",
+                is_primary=False, source_type="ai_generated", confidence=None,
+                prompt_text=prompt_text, prompt_backend=prompt_backend, prompt_model_name=prompt_model_name,
+                image_gen_backend=HF_IMAGE_BACKEND_LABEL, image_gen_seed=None,
+            )
 
     checksum = hashlib.sha256(png_bytes).hexdigest()
 
@@ -238,7 +315,7 @@ def generate_and_upload(dish_name: str, prompt_text: str, prompt_backend: str, p
             source_url=request_url, storage_path=None, checksum_sha256=checksum, fetch_status="failed",
             alt_text=f"{dish_name} (upload failed: {exc})", is_primary=False, source_type="ai_generated",
             confidence=None, prompt_text=prompt_text, prompt_backend=prompt_backend,
-            prompt_model_name=prompt_model_name, image_gen_backend="pollinations_flux_pro", image_gen_seed=seed,
+            prompt_model_name=prompt_model_name, image_gen_backend=image_gen_backend, image_gen_seed=seed,
         )
 
     stored_public_id = upload_response.get("public_id", public_id)
@@ -247,5 +324,5 @@ def generate_and_upload(dish_name: str, prompt_text: str, prompt_backend: str, p
         alt_text=f"{dish_name}, AI-generated professional food photograph", is_primary=True,
         source_type="ai_generated", confidence=0.75,
         prompt_text=prompt_text, prompt_backend=prompt_backend, prompt_model_name=prompt_model_name,
-        image_gen_backend="pollinations_flux_pro", image_gen_seed=seed,
+        image_gen_backend=image_gen_backend, image_gen_seed=seed,
     )

@@ -21,7 +21,7 @@ from . import images
 from .dedupe import DedupeDecision, DedupeIndex
 from .groq_adapter import GroqAdapter
 from .image_prompt import ImagePromptGenerator, assemble_prompt
-from .images import CloudinaryUploader, PollinationsClient
+from .images import CloudinaryUploader, HFImageClient, PollinationsClient
 from .normalize import SourceRow, load_and_normalize
 from .ontology_adapter import get_adapter
 
@@ -44,7 +44,7 @@ class ImageContext:
     """
 
     __slots__ = ("generate_images", "dry_run", "image_delay_seconds", "prompt_gen", "pollinations",
-                 "uploader", "existing_dish_ids_with_image")
+                 "hf_image", "uploader", "existing_dish_ids_with_image")
 
     def __init__(self, generate_images: bool, dry_run: bool, image_delay_seconds: float = DEFAULT_IMAGE_DELAY_SECONDS):
         self.generate_images = generate_images
@@ -52,6 +52,7 @@ class ImageContext:
         self.image_delay_seconds = image_delay_seconds
         self.prompt_gen = ImagePromptGenerator()
         self.pollinations = PollinationsClient()
+        self.hf_image = HFImageClient()
         self.uploader = CloudinaryUploader()
         self.existing_dish_ids_with_image: set[str] = set()
 
@@ -396,7 +397,7 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                 prompt_text = assemble_prompt(n["name"], fields)
                 image_result = images.generate_and_upload(
                     n["name"], prompt_text, fields.source, fields.model_name,
-                    image_ctx.pollinations, image_ctx.uploader,
+                    image_ctx.pollinations, image_ctx.uploader, image_ctx.hf_image,
                 )
                 logger.info("dish %s: image_result fetch_status=%s storage_path=%s",
                             dish_id, image_result.fetch_status, image_result.storage_path)
