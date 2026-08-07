@@ -1,7 +1,8 @@
 """Governed workbook-to-research ingestion for FooFoo synthetic training data.
 
-The loader fails closed around a fixed private-target allowlist. It preserves every workbook row,
-keeps rejected rows as lineage evidence, and never writes production identities, plans, or events.
+The loader fails closed around a fixed private-target allowlist. Source-row retention is explicit,
+rejected rows can be kept as compact lineage evidence, and production identities, plans, and
+events are never written.
 """
 
 from __future__ import annotations
@@ -43,6 +44,7 @@ PRODUCTION_DENYLIST = {
     "public.feedback_events",
     "public.outcome_events",
 }
+SOURCE_ROW_RETENTION = ("all", "rejected", "none")
 REQUIRED_SHEETS = {
     "DATA_households",
     "DATA_users",
@@ -438,11 +440,31 @@ def _chunks(values: list[Any], size: int = 1000) -> Iterator[list[Any]]:
         yield values[start : start + size]
 
 
+def retained_source_rows(
+    source_rows: list[SourceRow], retention: str
+) -> list[SourceRow]:
+    """Select raw lineage rows for the requested storage profile.
+
+    The normalized training records are unaffected. Keeping only rejected rows preserves
+    actionable validation evidence without duplicating every accepted workbook payload in
+    PostgreSQL.
+    """
+    if retention not in SOURCE_ROW_RETENTION:
+        raise ValueError(f"unsupported source-row retention: {retention}")
+    if retention == "all":
+        return source_rows
+    if retention == "rejected":
+        return [row for row in source_rows if row.validation_status == "rejected"]
+    return []
+
+
 def load_postgres(
     connection: Any,
     package: dict[str, Any],
     source_rows: list[SourceRow],
     records: list[NormalizedRecord],
+    *,
+    source_row_retention: str = "all",
 ) -> dict[str, Any]:
     """Load one governed batch transactionally and return exact insert/update/skip counts."""
     from psycopg2.extras import execute_values
@@ -478,6 +500,7 @@ def load_postgres(
                 package["normalized_records"]["total"],
             ),
         )
+        retained_rows = retained_source_rows(source_rows, source_row_retention)
         raw_values = [
             (
                 batch_id,
@@ -492,7 +515,7 @@ def load_postgres(
                 row.validation_status,
                 _canonical_json(sorted(set(row.errors))),
             )
-            for row in source_rows
+            for row in retained_rows
         ]
         for chunk in _chunks(raw_values):
             execute_values(
@@ -602,15 +625,20 @@ def load_postgres(
                 for target, key, payload, digest, confidence, mapping, lineage in updates
             ],
         )
-        summary = {
+        normalized_summary = {
             target: dict(sorted(counter.items()))
             for target, counter in sorted(counts.items())
+        }
+        load_summary = {
+            "normalized": normalized_summary,
+            "source_row_retention": source_row_retention,
+            "retained_source_rows": len(retained_rows),
         }
         status = "completed_with_rejections" if package["source_rows"]["rejected"] else "completed"
         cursor.execute(
             """UPDATE ml.training_import_batches SET status=%s,load_summary=%s::jsonb,
                  completed_at=now() WHERE id=%s""",
-            (status, _canonical_json(summary), batch_id),
+            (status, _canonical_json(load_summary), batch_id),
         )
         cursor.execute(
             """SELECT validation_status,count(*) FROM research.training_source_rows
@@ -618,7 +646,12 @@ def load_postgres(
             (batch_id,),
         )
         raw_db_counts = {str(row[0]): int(row[1]) for row in cursor.fetchall()}
-    return {"status": status, "normalized": summary, "raw_source_rows": raw_db_counts}
+    return {
+        "status": status,
+        "normalized": normalized_summary,
+        "source_row_retention": source_row_retention,
+        "raw_source_rows": raw_db_counts,
+    }
 
 
 def connect(dsn: str) -> Any:
@@ -648,6 +681,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dataset-2", type=Path, required=True)
     parser.add_argument("--training-dir", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument(
+        "--source-row-retention",
+        choices=SOURCE_ROW_RETENTION,
+        default="all",
+        help=(
+            "Persist all, rejected-only, or no raw workbook rows; normalized records "
+            "are unchanged."
+        ),
+    )
     args = parser.parse_args(argv)
     report, rows, records = build_ingestion(args.dataset_1, args.dataset_2, args.training_dir)
     report["mode"] = args.mode
@@ -655,7 +697,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.mode == "execute":
         connection = connect(database_url())
         try:
-            report["load"] = {"executed": True, **load_postgres(connection, report, rows, records)}
+            report["load"] = {
+                "executed": True,
+                **load_postgres(
+                    connection,
+                    report,
+                    rows,
+                    records,
+                    source_row_retention=args.source_row_retention,
+                ),
+            }
             connection.commit()
         except Exception:
             connection.rollback()
@@ -663,8 +714,10 @@ def main(argv: list[str] | None = None) -> int:
         finally:
             connection.close()
     elif args.mode == "dry_run":
+        retained_rows = retained_source_rows(rows, args.source_row_retention)
         report["load"]["would_write"] = {
-            "raw_source_rows": len(rows),
+            "raw_source_rows": len(retained_rows),
+            "source_row_retention": args.source_row_retention,
             "normalized_records": len(records),
             "production_records": 0,
         }

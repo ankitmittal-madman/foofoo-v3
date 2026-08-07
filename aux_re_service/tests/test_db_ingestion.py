@@ -115,6 +115,26 @@ def test_manifest_checksum_drift_fails_closed(tmp_path: Path):
         ingestion.verify_manifest(training)
 
 
+def test_rejected_only_retention_keeps_audit_failures_without_accepted_payloads(tmp_path: Path):
+    """The storage-efficient profile retains rejected evidence and drops accepted raw copies."""
+    workbook = tmp_path / "dataset.xlsx"
+    _workbook(workbook, orphan_user=True)
+    rows = ingestion.read_workbook(workbook, "dataset_1")
+    ingestion.validate_relationships(rows)
+
+    retained = ingestion.retained_source_rows(rows, "rejected")
+
+    assert retained
+    assert all(row.validation_status == "rejected" for row in retained)
+    assert len(retained) < len(rows)
+
+
+def test_unknown_source_row_retention_fails_closed():
+    """A misspelled storage profile must not silently discard or retain unexpected rows."""
+    with pytest.raises(ValueError, match="unsupported source-row retention"):
+        ingestion.retained_source_rows([], "unexpected")
+
+
 def test_unsafe_destination_configuration_fails_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     training = _training_dir(tmp_path / "training")
     monkeypatch.setitem(ingestion.TARGETS, "dish", "public.dishes")
