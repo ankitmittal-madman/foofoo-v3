@@ -97,12 +97,15 @@ class MemoryTrainingStore:
         }
         return dict(counts)
 
-    def fetch_research_records(self, target_table: str) -> list[dict[str, Any]]:
-        return [
+    def fetch_research_records(
+        self, target_table: str, limit: int | None = None
+    ) -> list[dict[str, Any]]:
+        values = [
             value
             for (table, _), value in sorted(self.records.items())
             if table == target_table and value["ontology_mapping_status"] != "rejected"
         ]
+        return values[:limit] if limit is not None else values
 
     def write_model_run(self, run_id: str, model: dict[str, Any]) -> None:
         self.model_runs.append({"run_id": run_id, **model})
@@ -289,16 +292,45 @@ class PostgresTrainingStore:
             )
         return dict(counts)
 
-    def fetch_research_records(self, target_table: str) -> list[dict[str, Any]]:
+    def fetch_research_records(
+        self, target_table: str, limit: int | None = None
+    ) -> list[dict[str, Any]]:
+        if limit is not None and limit <= 0:
+            return []
+        with self.connection.cursor() as cursor:
+            query = """SELECT target_table,record_key,payload,payload_sha256,
+                   confidence,confidence_band,
+                   ontology_mapping_status,ontology_version,source_type,generation_method,
+                   provenance_tags,explanation,first_batch_id,last_batch_id,version
+                   FROM research.auto_training_records
+                   WHERE target_table=%s AND ontology_mapping_status<>'rejected'
+                   ORDER BY confidence DESC, record_key"""
+            params: tuple[Any, ...] = (target_table,)
+            if limit is not None:
+                query += " LIMIT %s"
+                params = (target_table, limit)
+            cursor.execute(query, params)
+            columns = [item[0] for item in cursor.description]
+            return [
+                dict(row) if isinstance(row, dict) else dict(zip(columns, row, strict=True))
+                for row in cursor.fetchall()
+            ]
+
+    def fetch_research_records_by_keys(
+        self, target_table: str, record_keys: list[str]
+    ) -> list[dict[str, Any]]:
+        if not record_keys:
+            return []
         with self.connection.cursor() as cursor:
             cursor.execute(
                 """SELECT target_table,record_key,payload,payload_sha256,confidence,confidence_band,
                    ontology_mapping_status,ontology_version,source_type,generation_method,
                    provenance_tags,explanation,first_batch_id,last_batch_id,version
                    FROM research.auto_training_records
-                   WHERE target_table=%s AND ontology_mapping_status<>'rejected'
+                   WHERE target_table=%s AND record_key=ANY(%s)
+                     AND ontology_mapping_status<>'rejected'
                    ORDER BY record_key""",
-                (target_table,),
+                (target_table, record_keys),
             )
             columns = [item[0] for item in cursor.description]
             return [
@@ -361,14 +393,13 @@ class DryRunTrainingStore(MemoryTrainingStore):
     def __init__(self, connection: Any):
         super().__init__()
         self.source = PostgresTrainingStore(connection)
-        self._loaded_tables: set[str] = set()
 
-    def _load(self, target_table: str) -> None:
-        if target_table in self._loaded_tables:
-            return
-        for value in self.source.fetch_research_records(target_table):
+    def _load_keys(self, target_table: str, record_keys: list[str]) -> None:
+        missing = [
+            key for key in record_keys if (target_table, key) not in self.records
+        ]
+        for value in self.source.fetch_research_records_by_keys(target_table, missing):
             self.records[(target_table, value["record_key"])] = value
-        self._loaded_tables.add(target_table)
 
     def seed_records(
         self,
@@ -377,10 +408,16 @@ class DryRunTrainingStore(MemoryTrainingStore):
         records: list[ResearchRecord],
         minimum_confidence: float,
     ) -> dict[str, TableSeedCount]:
-        for target_table in {record.target_table for record in records}:
-            self._load(target_table)
+        keys_by_table: dict[str, list[str]] = defaultdict(list)
+        for record in records:
+            keys_by_table[record.target_table].append(record.record_key)
+        for target_table, record_keys in keys_by_table.items():
+            self._load_keys(target_table, record_keys)
         return super().seed_records(run_id, batch_id, records, minimum_confidence)
 
-    def fetch_research_records(self, target_table: str) -> list[dict[str, Any]]:
-        self._load(target_table)
-        return super().fetch_research_records(target_table)
+    def fetch_research_records(
+        self, target_table: str, limit: int | None = None
+    ) -> list[dict[str, Any]]:
+        for value in self.source.fetch_research_records(target_table, limit):
+            self.records[(target_table, value["record_key"])] = value
+        return super().fetch_research_records(target_table, limit)

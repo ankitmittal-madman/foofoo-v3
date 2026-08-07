@@ -19,11 +19,15 @@ def _write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 def _prepare_research_snapshot(
-    store: Any, ontology_path: Path, destination: Path
+    store: Any, ontology_path: Path, destination: Path, config: AutoEngineConfig
 ) -> dict[str, int]:
     destination.mkdir(parents=True, exist_ok=True)
-    households = store.fetch_research_records("research.household_personas")
-    interactions = store.fetch_research_records("research.interactions")
+    households = store.fetch_research_records(
+        "research.household_personas", config.maximum_shadow_households
+    )
+    interactions = store.fetch_research_records(
+        "research.interactions", config.maximum_shadow_interactions
+    )
     household_rows = [
         {
             "household_id": record["payload"]["household_id"],
@@ -56,12 +60,15 @@ def _checksum(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _research_evaluation(store: Any, ontology_path: Path) -> dict[str, Any]:
-    households = store.fetch_research_records("research.household_personas")
-    interactions = store.fetch_research_records("research.interactions")
-    weekly_plans = store.fetch_research_records("research.weekly_plans")
-    meals = store.fetch_research_records("research.meal_examples")
-    constraints = store.fetch_research_records("research.constraint_examples")
+def _research_evaluation(
+    store: Any, ontology_path: Path, config: AutoEngineConfig
+) -> dict[str, Any]:
+    limit = config.maximum_evaluation_records_per_type
+    households = store.fetch_research_records("research.household_personas", limit)
+    interactions = store.fetch_research_records("research.interactions", limit)
+    weekly_plans = store.fetch_research_records("research.weekly_plans", limit)
+    meals = store.fetch_research_records("research.meal_examples", limit)
+    constraints = store.fetch_research_records("research.constraint_examples", limit)
     household_payloads = {row["payload"]["household_id"]: row["payload"] for row in households}
     ontology = json.loads(ontology_path.read_text(encoding="utf-8"))
     dishes = {dish["id"]: dish for dish in ontology["dishes"]}
@@ -155,7 +162,7 @@ def train_and_evaluate(
     models.append(retrieval)
 
     snapshot_dir = output_dir / "training_snapshot"
-    snapshot_counts = _prepare_research_snapshot(store, ontology_path, snapshot_dir)
+    snapshot_counts = _prepare_research_snapshot(store, ontology_path, snapshot_dir, config)
     baseline_ready = snapshot_counts["households"] >= 10 and snapshot_counts["interactions"] >= 50
     baseline: dict[str, Any] = {
         "model_name": "lightfm_research_challenger",
@@ -275,7 +282,7 @@ def train_and_evaluate(
 
     for model in models:
         store.write_model_run(run_id, model)
-    research_metrics = _research_evaluation(store, ontology_path)
+    research_metrics = _research_evaluation(store, ontology_path, config)
     evaluation = {
         "models_evaluated": sum(bool(model["metrics"]) for model in models),
         "retrieval": retrieval["metrics"],

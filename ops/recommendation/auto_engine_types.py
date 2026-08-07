@@ -104,6 +104,9 @@ class AutoEngineConfig:
     minimum_regions: int = 10
     research_household_limit: int = 24
     research_interaction_limit: int = 240
+    maximum_shadow_households: int = 5_000
+    maximum_shadow_interactions: int = 50_000
+    maximum_evaluation_records_per_type: int = 50_000
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)

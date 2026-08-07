@@ -82,6 +82,44 @@ def test_inspector_reads_every_required_db_entity_before_deciding():
     assert report.model_readiness["kgat"]["ready"] is True
 
 
+def test_postgres_research_fetch_is_bounded_and_parameterized():
+    from ops.recommendation.auto_engine_store import PostgresTrainingStore
+
+    class Cursor:
+        description = [("record_key",)]
+
+        def __init__(self):
+            self.query = ""
+            self.params = ()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def execute(self, query, params):
+            self.query = query
+            self.params = params
+
+        def fetchall(self):
+            return []
+
+    cursor = Cursor()
+
+    class Connection:
+        def cursor(self):
+            return cursor
+
+    rows = PostgresTrainingStore(Connection()).fetch_research_records(
+        "research.interactions", 50_000
+    )
+
+    assert rows == []
+    assert "LIMIT %s" in cursor.query
+    assert cursor.params == ("research.interactions", 50_000)
+
+
 def test_weak_db_triggers_bounded_expert_research_and_ontology_mapping():
     config = AutoEngineConfig(research_household_limit=4, research_interaction_limit=24)
     inspection = inspect_database(FakeConnection({}), config)
@@ -170,8 +208,10 @@ def test_dry_run_reads_existing_db_staging_and_reports_skip(monkeypatch):
     store = DryRunTrainingStore(object())
     monkeypatch.setattr(
         store.source,
-        "fetch_research_records",
-        lambda target: [stored] if target == record.target_table else [],
+        "fetch_research_records_by_keys",
+        lambda target, keys: [stored]
+        if target == record.target_table and record.record_key in keys
+        else [],
     )
     run_id, _ = store.begin_run("batch", config.engine_version, "dry_run", config.as_dict())
     counts = store.seed_records(run_id, "batch", [record], config.minimum_confidence)
