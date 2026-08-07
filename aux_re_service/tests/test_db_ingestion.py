@@ -152,3 +152,26 @@ def test_migration_keeps_training_tables_private_and_has_rollback():
     assert "CHECK (synthetic_only)" in migration
     assert "DROP TABLE IF EXISTS research.training_source_rows" in rollback
     assert "public.profiles" not in rollback
+
+
+def test_production_cleanup_is_exact_count_guarded_and_has_recovery_instructions():
+    """The storage cleanup must fail closed and preserve an explicit recovery path."""
+    root = Path(__file__).parents[2]
+    cleanup = (
+        root
+        / "database/etl/synthetic_training/001_remove_production_synthetic_batch.sql"
+    ).read_text()
+    validation = (
+        root / "database/validation/941_remove_production_synthetic_batch_validation.sql"
+    ).read_text()
+    rollback = (
+        root / "database/rollback/089_remove_production_synthetic_batch_rollback.sql"
+    ).read_text()
+
+    assert "<> 132586" in cleanup
+    assert "<> 113868" in cleanup
+    assert "TRUNCATE TABLE research.training_source_rows" in cleanup
+    assert "TRUNCATE TABLE research.auto_training_records" in cleanup
+    assert "production_cleanup" in validation
+    assert "governed re-ingestion" in rollback
+    assert "TRUNCATE TABLE public." not in cleanup
