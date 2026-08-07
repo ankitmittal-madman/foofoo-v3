@@ -32,6 +32,7 @@ jobs:
     env:
       FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
       PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      RELOCATION_BATCH_ID: sha256:e0a3bacfef4406057177ca4a
       REQUESTED_MODE: ${{ inputs.mode }}
       EXECUTE_CONFIRM: ${{ inputs.confirm }}
     steps:
@@ -61,6 +62,7 @@ jobs:
             --transfer "${RUNNER_TEMP}/auto-engine-research.jsonl.gz" \
             --manifest "${RUNNER_TEMP}/auto-engine-research-manifest.json" \
             --report "${RUNNER_TEMP}/production-export-report.json" \
+            --batch-id "$RELOCATION_BATCH_ID" \
             --expected-count 461
       - name: Upload short-lived private transfer
         uses: actions/upload-artifact@v4
@@ -89,6 +91,7 @@ jobs:
       TRAINING_DATABASE_URL: ${{ secrets.TRAINING_DATABASE_URL }}
       TRAINING_PROJECT_REF: ${{ secrets.TRAINING_PROJECT_REF }}
       PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+      RELOCATION_BATCH_ID: sha256:e0a3bacfef4406057177ca4a
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -120,6 +123,7 @@ jobs:
             --transfer "${RUNNER_TEMP}/transfer/auto-engine-research.jsonl.gz" \
             --manifest "${RUNNER_TEMP}/transfer/auto-engine-research-manifest.json" \
             --report "${RUNNER_TEMP}/training-import-report.json" \
+            --batch-id "$RELOCATION_BATCH_ID" \
             --expected-count 461
           psql "$TRAINING_DATABASE_URL" -v ON_ERROR_STOP=1 \
             -f database/validation/939_auto_training_control_plane_validation.sql
@@ -144,6 +148,7 @@ jobs:
       PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
       GH_TOKEN: ${{ github.token }}
       TRANSFER_ARTIFACT: auto-engine-research-transfer-${{ github.run_id }}-${{ github.run_attempt }}
+      RELOCATION_BATCH_ID: sha256:e0a3bacfef4406057177ca4a
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -171,6 +176,7 @@ jobs:
             --transfer "${RUNNER_TEMP}/transfer/auto-engine-research.jsonl.gz" \
             --manifest "${RUNNER_TEMP}/transfer/auto-engine-research-manifest.json" \
             --report "${RUNNER_TEMP}/production-cleanup-report.json" \
+            --batch-id "$RELOCATION_BATCH_ID" \
             --expected-count 461
       - name: Upload non-sensitive cleanup evidence
         uses: actions/upload-artifact@v4
