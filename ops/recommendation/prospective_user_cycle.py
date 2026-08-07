@@ -160,9 +160,7 @@ def run_refresh_cycle(
             try:
                 raw[slot][generation] = episode_identities(response)
             except RuntimeError as error:
-                raise RuntimeError(
-                    f"{slot} refresh generation {generation}: {error}"
-                ) from error
+                raise RuntimeError(f"{slot} refresh generation {generation}: {error}") from error
         baseline, refreshed = raw[slot][0], raw[slot][1]
         report[slot] = {
             "baseline_count": len(baseline),
