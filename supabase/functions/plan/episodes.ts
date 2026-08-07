@@ -94,6 +94,51 @@ export function extractDishCandidateItems(
   return extractDishSlateItems("meal_plan", { options: privateCandidates });
 }
 
+export async function buildDishLineageCandidates(
+  surface: string,
+  response: Record<string, unknown>,
+): Promise<
+  Array<{
+    candidate_item_hash: string;
+    episode_id: null;
+    generator_codes: string[];
+    generator_scores: Record<string, number | null>;
+    reason_codes: string[];
+    rank: number;
+  }>
+> {
+  const candidates = await Promise.all(
+    extractDishCandidateItems(surface, response).map(async (item, index) => ({
+      candidate_item_hash: await snapshotHash({
+        kind: "dish",
+        surface,
+        slot: item.slot ?? null,
+        name: item.name.toLocaleLowerCase("en-IN"),
+      }),
+      episode_id: null,
+      generator_codes: [surface, item.mealClassCode].filter(
+        (value): value is string => typeof value === "string" && value.length > 0,
+      ),
+      generator_scores: {
+        point_score: item.score,
+        rerank_score: item.score,
+        shadow_preference_score: typeof item.snapshot.shadow_preference_score === "number"
+          ? item.snapshot.shadow_preference_score
+          : null,
+      },
+      reason_codes: item.reasons,
+      rank: index + 1,
+    })),
+  );
+
+  // A malformed/upstream duplicate must not make the normalized lineage RPC violate the
+  // recommendation_candidates primary key after the exposure itself has already been stored.
+  return [
+    ...new Map(candidates.map((candidate) => [candidate.candidate_item_hash, candidate])).values(),
+  ]
+    .map((candidate, index) => ({ ...candidate, rank: index + 1 }));
+}
+
 export function stripPrivateCandidateLineage(
   response: Record<string, unknown>,
 ): Record<string, unknown> {
@@ -150,8 +195,6 @@ async function persistDishRecommendationSlate(
 ): Promise<string | undefined> {
   const items = extractDishSlateItems(input.surface, input.response);
   if (!items.length) return undefined;
-  const candidateItems = extractDishCandidateItems(input.surface, input.response);
-
   const db = createServiceRoleClient(ctx.config);
   const hashed = await Promise.all(items.map(async (item) => ({
     ...item,
@@ -162,16 +205,10 @@ async function persistDishRecommendationSlate(
       name: item.name.toLocaleLowerCase("en-IN"),
     }),
   })));
-  const candidateHashed = await Promise.all(candidateItems.map(async (item) => ({
-    ...item,
-    itemHash: await snapshotHash({
-      kind: "dish",
-      surface: input.surface,
-      slot: item.slot ?? null,
-      name: item.name.toLocaleLowerCase("en-IN"),
-    }),
-  })));
-  const eligibleHash = await eligibleSetHash(candidateHashed.map((item) => item.itemHash));
+  const candidates = await buildDishLineageCandidates(input.surface, input.response);
+  const eligibleHash = await eligibleSetHash(
+    candidates.map((candidate) => candidate.candidate_item_hash),
+  );
   const householdHash = await snapshotHash(input.householdSnapshot);
   const context = { ...input.requestContext, surface: input.surface };
   const contextHash = await snapshotHash(context);
@@ -229,20 +266,6 @@ async function persistDishRecommendationSlate(
   );
   if (itemError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: itemError.message });
 
-  const candidates = candidateHashed.map((item, index) => ({
-    candidate_item_hash: item.itemHash,
-    episode_id: null,
-    generator_codes: rows[index].generator_codes,
-    generator_scores: {
-      point_score: item.score,
-      rerank_score: item.score,
-      shadow_preference_score: typeof item.snapshot.shadow_preference_score === "number"
-        ? item.snapshot.shadow_preference_score
-        : null,
-    },
-    reason_codes: item.reasons,
-    rank: index + 1,
-  }));
   const featureHash = await snapshotHash(candidates);
   const traceChecksum = await snapshotHash({
     request_id: input.requestId,

@@ -1,5 +1,6 @@
 import { assertEquals, assertNotEquals } from "@std/assert";
 import {
+  buildDishLineageCandidates,
   eligibleSetHash,
   extractDishCandidateItems,
   extractDishSlateItems,
@@ -52,6 +53,24 @@ Deno.test("private candidate lineage keeps the full eligible pool separate from 
   assertEquals(stripPrivateCandidateLineage(response), {
     options: [{ name: "Poha", score: 3, slot: "breakfast" }],
   });
+});
+
+Deno.test("dish lineage supports a larger private candidate pool than the served slate", async () => {
+  const candidates = await buildDishLineageCandidates("calibration", {
+    slots: { breakfast: [{ name: "Poha", score: 4.2 }] },
+    _candidate_lineage: [
+      { name: "Poha", score: 4.2, slot: "breakfast", meal_class_code: "INDIAN_BREAKFAST" },
+      { name: "Upma", score: 3.9, slot: "breakfast", meal_class_code: "INDIAN_BREAKFAST" },
+      // Duplicate candidates can occur when generators overlap. They must collapse before the
+      // database primary key is applied.
+      { name: "Upma", score: 3.9, slot: "breakfast", meal_class_code: "INDIAN_BREAKFAST" },
+    ],
+  });
+
+  assertEquals(candidates.length, 2);
+  assertEquals(candidates.map((candidate) => candidate.rank), [1, 2]);
+  assertEquals(candidates[1].generator_codes, ["calibration", "INDIAN_BREAKFAST"]);
+  assertEquals(candidates[1].generator_scores.point_score, 3.9);
 });
 
 Deno.test("calibration slate preserves each cell slot in one globally ordered slate", () => {
