@@ -1,0 +1,71 @@
+name: Deploy preference readiness v2
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Enter APPLY_PREFERENCE_READINESS_V2
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: inputs.confirm == 'APPLY_PREFERENCE_READINESS_V2'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
+      SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      PGAPPNAME: foofoo-migration-090-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify the production Supabase project boundary
+        run: |
+          python - <<'PY'
+          import os
+
+          from ops.recommendation.protected_identity import (
+              database_identifies_project,
+              supabase_project_ref,
+          )
+
+          database_url = os.environ.get("DATABASE_URL", "").strip()
+          supabase_url = os.environ.get("SUPABASE_URL", "").strip()
+          if not database_url or not supabase_url:
+              raise SystemExit("Production database or Supabase URL is not configured")
+          project_ref = supabase_project_ref(supabase_url)
+          if not database_identifies_project(database_url, project_ref):
+              raise SystemExit("Database URL does not identify the production Supabase project")
+          print("Production Supabase project boundary verified")
+          PY
+
+      - name: Inspect current migration state
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -At -c \
+            "SELECT to_regprocedure('ml.preference_training_readiness_v2(integer,integer)') IS NOT NULL"
+
+      - name: Apply migration 090 when absent
+        run: |
+          present="$(psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -c \
+            "SELECT to_regprocedure('ml.preference_training_readiness_v2(integer,integer)') IS NOT NULL")"
+          if [ "$present" = "t" ]; then
+            echo "Migration 090 already present; skipping apply."
+          else
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction \
+              -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+              -f database/migrations/090_preference_training_readiness_v2.sql
+          fi
+
+      - name: Validate function, privileges, and aggregate readiness
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/942_preference_training_readiness_v2_validation.sql
