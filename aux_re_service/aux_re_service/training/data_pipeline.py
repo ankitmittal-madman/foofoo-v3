@@ -375,8 +375,8 @@ def build_ontology(
         dish_id = source["dish_id"]
         name = source["dish_name"]
         recipe = recipes_by_name.get(lookup_key(name), {})
-        ingredients, recipe_diets, allergens = _recipe_metadata(recipe)
-        diets = recipe_diets or [
+        metadata = _recipe_metadata(recipe)
+        diets = metadata["diet_types"] or [
             "vegetarian" if tag == "veg" else str(tag) for tag in source.get("diet_tags", [])
         ]
         cuisine = str(recipe.get("cuisine") or "")
@@ -384,14 +384,22 @@ def build_ontology(
             "id": dish_id,
             "name": name,
             "aliases": [],
-            "ingredients": ingredients,
-            "allergens": allergens,
+            "ingredients": metadata["ingredients"],
+            "allergens": metadata["allergens"],
             "diet_types": diets,
             "cuisines": [cuisine] if cuisine else [],
             "regions": [CUISINE_REGIONS[cuisine]] if cuisine in CUISINE_REGIONS else [],
             "observed_regions": [],
             "meal_slots": [str(value).casefold() for value in source.get("slots", [])],
-            "cooking_methods": recipe.get("attribute_basis", {}).get("cooking_method", []),
+            "cooking_methods": metadata["cooking_methods"],
+            "dish_categories": metadata["dish_categories"],
+            "spice_level": metadata["spice_level"],
+            "spice_profiles": metadata["spice_profiles"],
+            "nutrition_traits": metadata["nutrition_traits"],
+            "cook_minutes": metadata["cook_minutes"],
+            "seasons": [],
+            "occasions": [],
+            "substitutes": [],
             "source_datasets": ["dataset_1_catalog"],
         }
         name_to_id[lookup_key(name)] = dish_id
@@ -422,21 +430,29 @@ def build_ontology(
                 name = str(event["dish_raw_name"])
                 recipe = recipes_by_name.get(normalized, {})
                 is_non_veg = bool(set(normalized.split()) & NON_VEG_WORDS)
-                ingredients, recipe_diets, allergens = _recipe_metadata(recipe)
+                metadata = _recipe_metadata(recipe)
                 cuisine = str(recipe.get("cuisine") or "")
                 dishes[dish_id] = {
                     "id": dish_id,
                     "name": name,
                     "aliases": [],
-                    "ingredients": ingredients,
-                    "allergens": allergens,
-                    "diet_types": recipe_diets
+                    "ingredients": metadata["ingredients"],
+                    "allergens": metadata["allergens"],
+                    "diet_types": metadata["diet_types"]
                     or (["nonvegetarian"] if is_non_veg else ["unknown"]),
                     "cuisines": [cuisine] if cuisine else [],
                     "regions": [CUISINE_REGIONS[cuisine]] if cuisine in CUISINE_REGIONS else [],
                     "observed_regions": [],
                     "meal_slots": [],
-                    "cooking_methods": recipe.get("attribute_basis", {}).get("cooking_method", []),
+                    "cooking_methods": metadata["cooking_methods"],
+                    "dish_categories": metadata["dish_categories"],
+                    "spice_level": metadata["spice_level"],
+                    "spice_profiles": metadata["spice_profiles"],
+                    "nutrition_traits": metadata["nutrition_traits"],
+                    "cook_minutes": metadata["cook_minutes"],
+                    "seasons": [],
+                    "occasions": [],
+                    "substitutes": [],
                     "source_datasets": [],
                 }
             if source_name not in dishes[dish_id]["source_datasets"]:
@@ -457,6 +473,36 @@ def build_ontology(
             ]
             dishes[dish_id]["aliases"] = aliases
 
+    substitutions: dict[str, Counter[str]] = defaultdict(Counter)
+    seasonal: dict[str, set[str]] = defaultdict(set)
+    occasions: dict[str, set[str]] = defaultdict(set)
+    for workbook in (primary_workbook, enrichment_workbook):
+        valid_households = {
+            str(row["household_id"]) for row in rows(workbook, "DATA_households")
+        }
+        for event in rows(workbook, "DATA_recommendation_events"):
+            if str(event.get("household_id")) not in valid_households:
+                continue
+            source = str(event.get("dish_id") or "")
+            target = str(event.get("substitute_dish_id") or "")
+            if source in dishes and target in dishes and source != target:
+                substitutions[source][target] += 1
+        for event in rows(workbook, "DATA_festival_seasonal"):
+            if str(event.get("household_id")) not in valid_households:
+                continue
+            occasion = str(event.get("occasion_id") or "").casefold()
+            for dish_id in _json_list(event.get("dish_ids")):
+                if dish_id not in dishes:
+                    continue
+                if occasion.startswith("season_"):
+                    seasonal[dish_id].add(occasion.removeprefix("season_"))
+                elif occasion:
+                    occasions[dish_id].add(occasion.removeprefix("festival_"))
+    for dish_id, dish in dishes.items():
+        dish["substitutes"] = [target for target, _ in substitutions[dish_id].most_common(8)]
+        dish["seasons"] = sorted(seasonal[dish_id])
+        dish["occasions"] = sorted(occasions[dish_id])
+
     ordered = sorted(dishes.values(), key=lambda row: row["id"])
     nodes = []
     relations = []
@@ -466,11 +512,17 @@ def build_ontology(
         seen_nodes.add(dish["id"])
         relation_dimensions = (
             ("ingredients", "ingredient", "contains"),
+            ("allergens", "allergy", "incompatible_with"),
             ("cuisines", "cuisine", "belongs_to"),
             ("regions", "region", "eaten_in"),
             ("meal_slots", "meal_slot", "served_at"),
             ("diet_types", "diet_type", "compatible_with"),
             ("cooking_methods", "cooking_technique", "cooked_with"),
+            ("dish_categories", "meal_class", "belongs_to"),
+            ("spice_profiles", "spice_profile", "has_spice_profile"),
+            ("nutrition_traits", "nutrition_trait", "has_nutrition_trait"),
+            ("seasons", "season", "eaten_in"),
+            ("occasions", "occasion", "served_at"),
         )
         for field, node_type, relation in relation_dimensions:
             for value in dish[field]:
@@ -479,6 +531,32 @@ def build_ontology(
                     nodes.append({"id": target, "type": node_type, "name": value})
                     seen_nodes.add(target)
                 relations.append({"source": dish["id"], "relation": relation, "target": target})
+        for target in dish["substitutes"]:
+            relations.append(
+                {"source": dish["id"], "relation": "substitutes_for", "target": target}
+            )
+    for dish in ordered:
+        left = set(dish["ingredients"])
+        left_context = set(dish["meal_slots"] + dish["dish_categories"] + dish["cuisines"])
+        ranked_similar = []
+        for other in ordered:
+            if other["id"] == dish["id"]:
+                continue
+            right = set(other["ingredients"])
+            right_context = set(
+                other["meal_slots"] + other["dish_categories"] + other["cuisines"]
+            )
+            ingredient_score = len(left & right) / max(1, len(left | right))
+            context_score = len(left_context & right_context) / max(
+                1, len(left_context | right_context)
+            )
+            score = 0.7 * ingredient_score + 0.3 * context_score
+            if score > 0:
+                ranked_similar.append((score, other["id"]))
+        for _, target in sorted(ranked_similar, key=lambda row: (-row[0], row[1]))[:3]:
+            relations.append(
+                {"source": dish["id"], "relation": "similar_to", "target": target}
+            )
     return {
         "version": "indian-food-ontology-v1",
         "generated_at": datetime.now(UTC).isoformat(),
