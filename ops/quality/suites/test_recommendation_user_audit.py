@@ -74,6 +74,17 @@ def test_user_audit_reports_private_persisted_variety_state():
     assert "recent_dish_dimensions" in user_audit.AUDIT_SQL
 
 
+def test_user_audit_measures_refreshes_with_legacy_and_episode_identities():
+    sql = user_audit.AUDIT_SQL
+    assert "recent_refresh_events" in sql
+    assert "nullif(plate->>'episode_hash', '')" in sql
+    assert "nullif(plate->>'display_name', '')" in sql
+    assert "nullif(plate->>'name', '')" in sql
+    assert "PARTITION BY slot ORDER BY created_at" in sql
+    assert "meaningful_refresh_rate" in sql
+    assert "'refresh_quality'" in sql
+
+
 def test_user_audit_fails_closed_for_missing_profile():
     with pytest.raises(RuntimeError, match="Profile does not exist"):
         user_audit.fetch_user_audit(FakeConnection({"profile": None}), PROFILE_ID)

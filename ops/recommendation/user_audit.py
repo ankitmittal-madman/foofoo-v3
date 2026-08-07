@@ -26,6 +26,72 @@ WITH u AS (
   FROM public.recommendation_events
   WHERE household_id = (SELECT id FROM u)
   ORDER BY created_at DESC LIMIT 10
+), recent_refresh_events AS (
+  SELECT
+    source.created_at,
+    coalesce(source.slot, 'unspecified') AS slot,
+    md5(coalesce((
+      SELECT string_agg(item_key, '|' ORDER BY item_key)
+      FROM (
+        SELECT lower(coalesce(
+          nullif(plate->>'episode_hash', ''),
+          nullif(plate->>'display_name', ''),
+          nullif(plate->>'name', '')
+        )) AS item_key
+        FROM jsonb_array_elements(source.plates) plate
+      ) items
+      WHERE item_key IS NOT NULL
+    ), '')) AS set_hash,
+    lower(coalesce(
+      nullif(source.plates->0->>'episode_hash', ''),
+      nullif(source.plates->0->>'display_name', ''),
+      nullif(source.plates->0->>'name', '')
+    )) AS first_item
+  FROM (
+    SELECT created_at, slot, plates
+    FROM public.recommendation_events
+    WHERE household_id = (SELECT id FROM u)
+      AND outcome = 'success'
+      AND re_served
+      AND jsonb_typeof(plates) = 'array'
+      AND jsonb_array_length(plates) > 0
+    ORDER BY created_at DESC
+    LIMIT 50
+  ) source
+), refresh_sequence AS (
+  SELECT *, lag(set_hash) OVER (PARTITION BY slot ORDER BY created_at) AS previous_set_hash
+  FROM recent_refresh_events
+), refresh_by_slot AS (
+  SELECT
+    slot,
+    count(*) AS event_count,
+    count(DISTINCT set_hash) AS unique_sets,
+    count(DISTINCT first_item) FILTER (WHERE first_item IS NOT NULL) AS unique_first_items,
+    count(*) FILTER (WHERE previous_set_hash IS NOT NULL) AS comparable_refreshes,
+    count(*) FILTER (
+      WHERE previous_set_hash IS NOT NULL AND set_hash <> previous_set_hash
+    ) AS changed_refreshes
+  FROM refresh_sequence
+  GROUP BY slot
+), refresh_quality AS (
+  SELECT
+    coalesce(sum(event_count), 0) AS measured_events,
+    coalesce(sum(unique_sets), 0) AS unique_sets_by_slot,
+    coalesce(sum(comparable_refreshes), 0) AS comparable_refreshes,
+    coalesce(sum(changed_refreshes), 0) AS changed_refreshes,
+    CASE WHEN coalesce(sum(comparable_refreshes), 0) = 0 THEN 0
+         ELSE round(sum(changed_refreshes)::numeric / sum(comparable_refreshes), 4)
+    END AS meaningful_refresh_rate,
+    coalesce(jsonb_object_agg(slot, jsonb_build_object(
+      'event_count', event_count,
+      'unique_sets', unique_sets,
+      'unique_first_items', unique_first_items,
+      'comparable_refreshes', comparable_refreshes,
+      'changed_refreshes', changed_refreshes,
+      'meaningful_refresh_rate', CASE WHEN comparable_refreshes = 0 THEN 0
+        ELSE round(changed_refreshes::numeric / comparable_refreshes, 4) END
+    ) ORDER BY slot), '{}'::jsonb) AS by_slot
+  FROM refresh_by_slot
 ), feedback_counts AS (
   SELECT event_type, count(*) AS event_count
   FROM public.feedback_events
@@ -143,6 +209,7 @@ SELECT jsonb_build_object(
                                   WHERE household_id = (SELECT id FROM u)),
   'recent_recommendations', (SELECT coalesce(jsonb_agg(to_jsonb(recent_recs)
                                       ORDER BY created_at DESC), '[]'::jsonb) FROM recent_recs),
+  'refresh_quality', (SELECT to_jsonb(refresh_quality) FROM refresh_quality),
   'feedback', (SELECT to_jsonb(feedback_summary) FROM feedback_summary),
   'taste_vector', (SELECT to_jsonb(taste) FROM taste),
   're_state', (SELECT to_jsonb(re_state) FROM re_state),
