@@ -14,4 +14,9 @@
   - Resolve the Auth email from the verified expected UUID inside the matching Supabase project, removing the stale duplicate email-secret dependency. Add a guarded credential-rotation operation that updates only that existing auth user after verifying its linked profile, then authenticate immediately after rotation.
   - Format the failing files and include the credential guard tests in `re-ci`.
 - Local re-verification: Ruff lint/format passed; mypy passed; `re-ci` equivalent passed with 261 passed and one intentional skip; the full quality orchestrator passed with 752 passed, zero failed, and 27 environment-dependent skips.
-- GitHub re-verification: `re-ci` passed on `581d853`; the first credential rotation failed closed before any database update because the legacy email secret did not identify the expected Auth row. UUID-bound recovery and the remaining workflow reruns are pending.
+- GitHub re-verification:
+  - `re-ci` passed on final code commit `8630205` (run `31206712544`).
+  - The full `quality-gate` passed on `8630205` (run `31206713598`).
+  - The first credential rotation failed closed before any database update because the legacy email secret did not identify the expected Auth row (run `31206387391`).
+  - UUID-bound rotation verified the matching project, existing Auth user, linked profile, password update, and live authentication (run `31206717628`).
+  - The original prospective-user workflow then passed in read-only identity mode (run `31206770919`).
