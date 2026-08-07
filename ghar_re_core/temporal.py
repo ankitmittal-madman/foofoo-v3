@@ -102,9 +102,7 @@ def dish_entities(dish: Any) -> dict[str, set[str]]:
     return {
         "dish": {normalize_key(getattr(dish, "name", ""))},
         "cuisine": {normalize_key(getattr(dish, "cuisine", ""))},
-        "richness": {
-            normalize_key(value) for value in (getattr(dish, "richness", None) or [])
-        },
+        "richness": {normalize_key(value) for value in (getattr(dish, "richness", None) or [])},
         "cooking_method": {
             normalize_key(value) for value in (getattr(dish, "cooking_method", None) or [])
         },
@@ -142,8 +140,7 @@ def _state_contribution(
         if elapsed < target:
             explicit -= 0.20 * weight * (target - elapsed) / target
         elif (
-            _bounded_int(state.get("explicit_positive_count_28d")) >= 2
-            and elapsed <= 2.0 * target
+            _bounded_int(state.get("explicit_positive_count_28d")) >= 2 and elapsed <= 2.0 * target
         ):
             # A repeated observed rhythm may become gently due. One isolated choice never creates
             # a recurring schedule, and this reward remains much smaller than a negative signal.
@@ -170,7 +167,7 @@ def dish_contribution(dish: Any, ctx: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(planned_date, datetime.date) or not isinstance(index, dict):
         return {"total": 0.0, "explicit": 0.0, "due": 0.0, "exposure": 0.0, "dimensions": []}
 
-    dimension_parts = []
+    dimension_parts: list[dict[str, Any]] = []
     explicit_total = due_total = exposure_total = 0.0
     for dimension, entity_keys in dish_entities(dish).items():
         candidates = []
@@ -185,9 +182,7 @@ def dish_contribution(dish: Any, ctx: dict[str, Any]) -> dict[str, Any]:
             continue
         # Multiple richness/method tags describe the same dish. Use the strongest matching tag
         # per dimension so enrichment density cannot multiply a household signal.
-        total, explicit, due, exposure, entity_key = max(
-            candidates, key=lambda item: abs(item[0])
-        )
+        total, explicit, due, exposure, entity_key = max(candidates, key=lambda item: abs(item[0]))
         explicit_total += explicit
         due_total += due
         exposure_total += exposure
@@ -209,7 +204,7 @@ def dish_contribution(dish: Any, ctx: dict[str, Any]) -> dict[str, Any]:
         "due": due_total,
         "exposure": exposure_total,
         "dimensions": sorted(
-            dimension_parts, key=lambda item: abs(item["contribution"]), reverse=True
+            dimension_parts, key=lambda item: abs(float(item["contribution"])), reverse=True
         )[:4],
     }
 
@@ -226,7 +221,7 @@ def plate_contribution(dishes: Iterable[Any], ctx: dict[str, Any]) -> dict[str, 
         "explicit": sum(part["explicit"] for part in parts) / count,
         "due": sum(part["due"] for part in parts) / count,
         "exposure": sum(part["exposure"] for part in parts) / count,
-        "dimensions": sorted(
-            dimensions, key=lambda item: abs(item["contribution"]), reverse=True
-        )[:4],
+        "dimensions": sorted(dimensions, key=lambda item: abs(item["contribution"]), reverse=True)[
+            :4
+        ],
     }

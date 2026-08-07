@@ -50,6 +50,7 @@ AS $$
         AND d.diet_type IS NOT NULL
         AND d.is_jain IS NOT NULL
         AND d.allergen_flags IS NOT NULL
+        AND d.cuisine_id IS NOT NULL
         AND EXISTS (
           SELECT 1
           FROM public.dish_ingredients di
@@ -61,6 +62,16 @@ AS $$
           FROM public.dish_meal_class_mappings m
           WHERE m.dish_id = d.id
             AND m.review_status <> 'rejected'
+        )
+        AND ARRAY[
+          'hero_role', 'spice_level', 'heaviness', 'cooking_method', 'texture',
+          'richness', 'weather_affinity', 'meal_type'
+        ]::text[] <@ ARRAY(
+          SELECT cur.field_key
+          FROM public.dish_taxonomy_current cur
+          JOIN public.dish_taxonomy_assertions a ON a.id = cur.assertion_id
+          WHERE cur.dish_id = d.id
+            AND a.review_status <> 'rejected'
         )
     )
   FROM public.dishes d;
@@ -105,6 +116,7 @@ AS $$
         'id', i.id,
         'name', i.name,
         'is_optional', di.is_optional,
+        'is_main_ingredient', di.is_main_ingredient,
         'allergen_flags', i.allergen_flags,
         'is_veg', i.is_veg,
         'is_vegan', i.is_vegan,
@@ -130,8 +142,21 @@ AS $$
       WHERE m.dish_id = d.id
         AND m.review_status <> 'rejected'
     ), '[]'::jsonb),
+    'aliases', coalesce((
+      SELECT jsonb_agg(s.synonym ORDER BY s.confidence DESC NULLS LAST, s.synonym)
+      FROM public.dish_name_synonyms s
+      WHERE s.dish_id = d.id
+        AND s.review_status <> 'rejected'
+    ), '[]'::jsonb),
     'taxonomy', coalesce((
-      SELECT jsonb_object_agg(a.field_key, coalesce(t.code, a.value_text, a.value_json::text))
+      SELECT jsonb_object_agg(
+        a.field_key,
+        CASE
+          WHEN t.code IS NOT NULL THEN to_jsonb(t.code)
+          WHEN a.value_text IS NOT NULL THEN to_jsonb(a.value_text)
+          ELSE a.value_json
+        END
+      )
       FROM public.dish_taxonomy_current cur
       JOIN public.dish_taxonomy_assertions a ON a.id = cur.assertion_id
       LEFT JOIN public.taxonomy_terms t ON t.id = a.term_id
@@ -158,6 +183,7 @@ AS $$
     AND d.diet_type IS NOT NULL
     AND d.is_jain IS NOT NULL
     AND d.allergen_flags IS NOT NULL
+    AND d.cuisine_id IS NOT NULL
     AND EXISTS (
       SELECT 1
       FROM public.dish_ingredients di
@@ -169,6 +195,16 @@ AS $$
       FROM public.dish_meal_class_mappings m
       WHERE m.dish_id = d.id
         AND m.review_status <> 'rejected'
+    )
+    AND ARRAY[
+      'hero_role', 'spice_level', 'heaviness', 'cooking_method', 'texture',
+      'richness', 'weather_affinity', 'meal_type'
+    ]::text[] <@ ARRAY(
+      SELECT cur.field_key
+      FROM public.dish_taxonomy_current cur
+      JOIN public.dish_taxonomy_assertions a ON a.id = cur.assertion_id
+      WHERE cur.dish_id = d.id
+        AND a.review_status <> 'rejected'
     )
   ORDER BY d.id
   LIMIT least(greatest(coalesce(p_limit, 500), 1), 2000);

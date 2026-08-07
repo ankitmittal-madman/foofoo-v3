@@ -268,13 +268,15 @@ def test_weekly_plan_uses_dated_slot_specific_temporal_state(client):
             "household": _hh(),
             "context": {
                 "date": "2026-08-03",
-                "temporal_class_state": [{
-                    "meal_slot": "lunch",
-                    "day_type": "weekday",
-                    "class_code": target,
-                    "last_positive_meal_date": "2026-08-02",
-                    "mean_positive_spacing_days": 4,
-                }],
+                "temporal_class_state": [
+                    {
+                        "meal_slot": "lunch",
+                        "day_type": "weekday",
+                        "class_code": target,
+                        "last_positive_meal_date": "2026-08-02",
+                        "mean_positive_spacing_days": 4,
+                    }
+                ],
             },
         },
     )

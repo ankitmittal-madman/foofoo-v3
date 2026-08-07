@@ -65,16 +65,16 @@ def dish_contribution(dish: Any, ctx: dict[str, Any]) -> dict[str, Any]:
     explicit = inferred = 0.0
     objective = signals.get("health_objective")
     if objective:
-        value = str(objective.get("value") or "")
+        objective_value = str(objective.get("value") or "")
         confidence = float(objective["confidence"])
-        if value == "healthy_living":
+        if objective_value == "healthy_living":
             fit = scoring.gs_light(dish)
             explicit = 0.10 * confidence * (fit - 0.5)
-            reasons.append({"feature_code": value, "authority": "explicit", "fit": fit})
-        elif value in {"into_fitness", "protein_calculator"}:
+            reasons.append({"feature_code": objective_value, "authority": "explicit", "fit": fit})
+        elif objective_value in {"into_fitness", "protein_calculator"}:
             fit = 0.70 * scoring.gs_protein(dish) + 0.30 * scoring.gs_light(dish)
             explicit = 0.10 * confidence * (fit - 0.5)
-            reasons.append({"feature_code": value, "authority": "explicit", "fit": fit})
+            reasons.append({"feature_code": objective_value, "authority": "explicit", "fit": fit})
 
     pressure = signals.get("weekday_time_pressure")
     day_type = str(ctx.get("day_type") or "")
@@ -82,14 +82,16 @@ def dish_contribution(dish: Any, ctx: dict[str, Any]) -> dict[str, Any]:
         day_type = "weekend" if ctx.get("weekday") in {"Saturday", "Sunday"} else "weekday"
     if pressure and day_type == "weekday":
         try:
-            value = max(0.0, min(1.0, float(pressure.get("value", 0.0))))
+            pressure_value = max(0.0, min(1.0, float(pressure.get("value", 0.0))))
         except (TypeError, ValueError):
-            value = 0.0
+            pressure_value = 0.0
         total_mins = getattr(dish, "total_mins", None)
         if total_mins is not None:
             minutes = max(0.0, float(total_mins))
-            effort_fit = 1.0 if minutes <= 35 else -1.0 if minutes >= 60 else 1 - 2 * (minutes - 35) / 25
-            inferred = 0.05 * float(pressure["confidence"]) * value * effort_fit
+            effort_fit = (
+                1.0 if minutes <= 35 else -1.0 if minutes >= 60 else 1 - 2 * (minutes - 35) / 25
+            )
+            inferred = 0.05 * float(pressure["confidence"]) * pressure_value * effort_fit
             reasons.append(
                 {
                     "feature_code": "weekday_time_pressure",
@@ -111,7 +113,13 @@ def dish_contribution(dish: Any, ctx: dict[str, Any]) -> dict[str, Any]:
 def plate_contribution(dishes: Iterable[Any], ctx: dict[str, Any]) -> dict[str, Any]:
     parts = [dish_contribution(dish, ctx) for dish in dishes]
     if not parts:
-        return {"total": 0.0, "explicit": 0.0, "inferred": 0.0, "reasons": [], "feature_version": FEATURE_VERSION}
+        return {
+            "total": 0.0,
+            "explicit": 0.0,
+            "inferred": 0.0,
+            "reasons": [],
+            "feature_version": FEATURE_VERSION,
+        }
     count = len(parts)
     return {
         "total": sum(part["total"] for part in parts) / count,
@@ -122,7 +130,9 @@ def plate_contribution(dishes: Iterable[Any], ctx: dict[str, Any]) -> dict[str, 
     }
 
 
-def class_contribution(class_code: str, class_meta: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
+def class_contribution(
+    class_code: str, class_meta: dict[str, Any], ctx: dict[str, Any]
+) -> dict[str, Any]:
     """Bounded class-level context so the weekly plan reflects goals before dish reconciliation."""
     signals = _signals(ctx)
     category = str(class_meta.get("category") or "").casefold()
@@ -130,27 +140,35 @@ def class_contribution(class_code: str, class_meta: dict[str, Any], ctx: dict[st
     explicit = inferred = 0.0
     reasons = []
     objective = signals.get("health_objective")
-    health_like = any(token in category or token in code for token in ("health", "protein", "salad", "light"))
-    indulgent = any(token in category or token in code for token in ("rich", "fried", "festive", "indulg"))
+    health_like = any(
+        token in category or token in code for token in ("health", "protein", "salad", "light")
+    )
+    indulgent = any(
+        token in category or token in code for token in ("rich", "fried", "festive", "indulg")
+    )
     if objective:
-        value = str(objective.get("value") or "")
-        if value == "healthy_living":
+        objective_value = str(objective.get("value") or "")
+        if objective_value == "healthy_living":
             explicit = 0.08 if health_like else -0.04 if indulgent else 0.0
-        elif value in {"into_fitness", "protein_calculator"}:
+        elif objective_value in {"into_fitness", "protein_calculator"}:
             protein_like = "protein" in category or "protein" in code
-            explicit = 0.08 if protein_like else 0.03 if health_like else -0.04 if indulgent else 0.0
+            explicit = (
+                0.08 if protein_like else 0.03 if health_like else -0.04 if indulgent else 0.0
+            )
         if explicit:
-            reasons.append({"feature_code": value, "authority": "explicit"})
+            reasons.append({"feature_code": objective_value, "authority": "explicit"})
     pressure = signals.get("weekday_time_pressure")
     if pressure and str(ctx.get("day_type")) == "weekday":
         try:
-            value = max(0.0, min(1.0, float(pressure.get("value", 0.0))))
+            pressure_value = max(0.0, min(1.0, float(pressure.get("value", 0.0))))
         except (TypeError, ValueError):
-            value = 0.0
-        quick_like = any(token in category or token in code for token in ("quick", "one_pot", "light_repeatable"))
+            pressure_value = 0.0
+        quick_like = any(
+            token in category or token in code for token in ("quick", "one_pot", "light_repeatable")
+        )
         slow_like = indulgent or "weekend" in code
         direction = 1.0 if quick_like else -1.0 if slow_like else 0.0
-        inferred = 0.03 * float(pressure["confidence"]) * value * direction
+        inferred = 0.03 * float(pressure["confidence"]) * pressure_value * direction
         if inferred:
             reasons.append({"feature_code": "weekday_time_pressure", "authority": "inferred"})
     return {

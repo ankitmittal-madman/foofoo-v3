@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 import shutil
+import sqlite3
 import tempfile
 from collections.abc import Iterator, Mapping
 from dataclasses import asdict, dataclass
@@ -105,6 +106,43 @@ def iter_publication_rows(connection: Any, *, page_size: int = 500) -> Iterator[
             return
 
 
+def _create_hydration_index(path: Path) -> sqlite3.Connection:
+    """Create the disk-backed canonical-ID/slot/class index used by bounded engine retrieval."""
+    database = sqlite3.connect(path)
+    database.executescript(
+        """
+        PRAGMA journal_mode=OFF;
+        PRAGMA synchronous=OFF;
+        PRAGMA page_size=4096;
+        CREATE TABLE catalogue (
+          dish_id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          payload TEXT NOT NULL
+        ) WITHOUT ROWID;
+        CREATE TABLE dish_slots (
+          slot TEXT NOT NULL,
+          dish_id TEXT NOT NULL REFERENCES catalogue(dish_id),
+          PRIMARY KEY (slot, dish_id)
+        ) WITHOUT ROWID;
+        CREATE TABLE dish_classes (
+          class_code TEXT NOT NULL,
+          dish_id TEXT NOT NULL REFERENCES catalogue(dish_id),
+          PRIMARY KEY (class_code, dish_id)
+        ) WITHOUT ROWID;
+        """
+    )
+    return database
+
+
+def _sha256_file(path: Path) -> str:
+    """Hash a finished artifact in bounded chunks so large indexes stay memory-safe."""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[str, Any]:
     """Build and atomically expose one checked catalogue directory from a read-only snapshot."""
     if output_dir.exists():
@@ -112,6 +150,7 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}.", dir=output_dir.parent))
     rows_path = stage / "catalogue.jsonl"
+    index_path = stage / "catalogue.sqlite3"
     digest = hashlib.sha256()
     count = 0
     first_id: str | None = None
@@ -120,15 +159,37 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
         coverage = fetch_coverage(connection)
         if coverage.publishable_dishes <= 0:
             raise RuntimeError("No safety-closed, class-mapped dishes are publishable")
-        with rows_path.open("x", encoding="utf-8") as output:
+        with (
+            rows_path.open("x", encoding="utf-8") as output,
+            _create_hydration_index(index_path) as index,
+        ):
             for row in iter_publication_rows(connection, page_size=page_size):
-                encoded = (json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n").encode()
+                canonical = json.dumps(row, sort_keys=True, separators=(",", ":"))
+                encoded = (canonical + "\n").encode()
                 output.write(encoded.decode())
                 digest.update(encoded)
                 dish_id = str(row["id"])
+                index.execute(
+                    "INSERT INTO catalogue(dish_id, name, payload) VALUES (?, ?, ?)",
+                    (dish_id, str(row["name"]), canonical),
+                )
+                index.executemany(
+                    "INSERT OR IGNORE INTO dish_slots(slot, dish_id) VALUES (?, ?)",
+                    ((str(slot), dish_id) for slot in row.get("meal_slots", [])),
+                )
+                index.executemany(
+                    "INSERT OR IGNORE INTO dish_classes(class_code, dish_id) VALUES (?, ?)",
+                    (
+                        (str(item["class_code"]), dish_id)
+                        for item in row.get("meal_classes", [])
+                        if isinstance(item, Mapping) and item.get("class_code")
+                    ),
+                )
                 first_id = first_id or dish_id
                 last_id = dish_id
                 count += 1
+            index.commit()
+            index.execute("VACUUM")
 
         if count != coverage.publishable_dishes:
             raise RuntimeError(
@@ -137,6 +198,7 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
             )
 
         content_sha256 = digest.hexdigest()
+        index_sha256 = _sha256_file(index_path)
         manifest = {
             "schema_version": MANIFEST_SCHEMA_VERSION,
             "publication_version": f"sha256:{content_sha256}",
@@ -146,6 +208,7 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
             "first_dish_id": first_id,
             "last_dish_id": last_id,
             "catalogue_jsonl_sha256": content_sha256,
+            "catalogue_sqlite_sha256": index_sha256,
             "coverage": asdict(coverage),
         }
         (stage / "manifest.json").write_text(

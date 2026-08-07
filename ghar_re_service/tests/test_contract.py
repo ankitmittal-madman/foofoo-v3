@@ -65,6 +65,17 @@ def test_unknown_response_field_is_tolerated():
     schemas.validate_response(resp)  # additive tolerance on the response side too
 
 
+def test_bounded_published_candidate_ids_are_additive_but_capped():
+    request = _sample_request()
+    request["candidate_dish_ids"] = [
+        f"00000000-0000-0000-0000-{index:012d}" for index in range(500)
+    ]
+    schemas.validate_request(request)
+    request["candidate_dish_ids"].append("00000000-0000-0000-0000-000000000500")
+    with pytest.raises(schemas.ContractError, match="too long"):
+        schemas.validate_request(request)
+
+
 def test_missing_required_field_still_fails():
     # additive-open must NOT mean "anything goes" — required fields are still required.
     req = _sample_request()

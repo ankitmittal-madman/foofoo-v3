@@ -96,7 +96,10 @@
         "recent_class_counts": { "type": "object", "description": "Bounded seven-day exposure counts by canonical meal-class code; used only by post-eligibility diversity reranking.", "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 1000 } },
         "recent_cuisine_counts": { "type": "object", "description": "Bounded seven-day exposure counts by canonical cuisine family; used only by post-eligibility diversity reranking.", "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 1000 } },
         "novelty_budget": { "type": "number", "minimum": 0, "maximum": 1, "description": "Persisted exploration budget derived from repeated recent exposures; used only by post-eligibility diversity reranking." },
-        "richness_debt": { "type": "number", "minimum": 0, "maximum": 1, "description": "Observed excess recent richness above the neutral midpoint; used only to tighten the visible rich-dish cap." }
+        "richness_debt": { "type": "number", "minimum": 0, "maximum": 1, "description": "Observed excess recent richness above the neutral midpoint; used only to tighten the visible rich-dish cap." },
+        "temporal_class_state": { "type": "array", "maxItems": 1000, "description": "Private slot/day-type class spacing state derived from dated explicit events; exposure is not acceptance.", "items": { "type": "object", "additionalProperties": true } },
+        "temporal_attribute_state": { "type": "array", "maxItems": 1000, "description": "Private dated dish, cuisine, richness, and cooking-method rhythm for this household; impressions remain weaker than explicit outcomes.", "items": { "type": "object", "additionalProperties": true } },
+        "governed_context_signals": { "type": "array", "maxItems": 20, "description": "Authority-labelled explicit and inferred ranking context. Inferred rows are low-confidence, expiring, correctable, and prohibited from hard safety eligibility.", "items": { "type": "object", "additionalProperties": true } }
       },
       "required": ["slot"]
     },
@@ -113,7 +116,10 @@
         "exclude_dish_names": { "type": "array", "items": { "type": "string" }, "description": "Canonical names or aliases suppressed from this response, normally from recent exposure or explicit Not Today/Never feedback." },
         "preference_by_dish": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded online dish affinities. Exact explicit feedback remains authoritative." },
         "preference_by_class": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded meal-class affinities derived from explicit feedback and mapping confidence." },
-        "preference_by_tag": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded semantic affinities keyed as dimension:tag_name; used to generalize feedback to unseen dishes." }
+        "preference_by_direct_class": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded meal-class affinities learned from explicit actions whose target is the class itself." },
+        "preference_by_projected_class": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded meal-class affinities projected from explicit dish feedback through reviewed dish-to-class mappings." },
+        "preference_by_tag": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded semantic affinities keyed as dimension:tag_name; used to generalize feedback to unseen dishes." },
+        "candidate_dish_ids": { "type": "array", "maxItems": 500, "items": { "type": "string", "format": "uuid" }, "description": "Canonical IDs retrieved from one immutable catalogue publication. Ghar hydrates only this bounded set and repeats all hard safety checks; omitted uses the deterministic fallback bundle." }
       },
       "required": ["household", "context"]
     },
@@ -195,7 +201,8 @@
         "preference_by_tag": {
           "type": "object",
           "additionalProperties": { "type": "number" }
-        }
+        },
+        "candidate_dish_ids": { "type": "array", "maxItems": 500, "items": { "type": "string", "format": "uuid" }, "description": "Optional bounded published-catalogue candidates for meal-episode ranking." }
       },
       "required": ["household", "context"]
     },

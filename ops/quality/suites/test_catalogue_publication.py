@@ -1,4 +1,5 @@
 import json
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -54,6 +55,7 @@ def row(dish_id: str, name: str) -> dict:
         "id": dish_id,
         "name": name,
         "ingredients": [{"name": "example"}],
+        "meal_slots": ["lunch"],
         "meal_classes": [{"class_code": "example"}],
     }
 
@@ -74,7 +76,17 @@ def test_publication_streams_bounded_pages_and_writes_content_addressed_manifest
     assert exported == rows
     assert manifest["row_count"] == 3
     assert manifest["publication_version"].startswith("sha256:")
+    assert manifest["catalogue_sqlite_sha256"]
     assert json.loads((target / "manifest.json").read_text()) == manifest
+    with sqlite3.connect(target / "catalogue.sqlite3") as index:
+        assert index.execute("SELECT dish_id, name FROM catalogue ORDER BY dish_id").fetchall() == [
+            ("0001", "Poha"),
+            ("0002", "Idli"),
+            ("0003", "Dosa"),
+        ]
+        assert index.execute("SELECT count(*) FROM dish_slots WHERE slot='lunch'").fetchone() == (
+            3,
+        )
 
 
 def test_publication_refuses_count_drift_and_leaves_no_partial_target(tmp_path):

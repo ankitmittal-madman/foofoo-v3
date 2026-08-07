@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 
 from ghar_re_service import auth, engine, ratelimit, schemas
 from ghar_re_service.lifecycle import AppState, catalogue_identity_summary, log_event, startup
+from ghar_re_service.published_catalogue import select_for_request
 from ghar_re_service.version import API_VERSION, ENGINE_VERSION
 
 state = AppState()
@@ -238,6 +239,13 @@ def meta():
             "weight": state.config.w_pref if state.config else 0.0,
         },
         "catalogue_identity": catalogue_identity_summary(state.catalogue),
+        "published_catalogue": {
+            "configured": state.published_catalogue is not None,
+            "publication_version": (
+                state.published_catalogue.version if state.published_catalogue else None
+            ),
+            "row_count": state.published_catalogue.row_count if state.published_catalogue else 0,
+        },
         "metrics": state.counters.as_dict(),
     }
     schemas.validate_meta(body)
@@ -312,7 +320,11 @@ def recommendations(
 
     # call the engine (composition → ghar_re_core pipeline → response)
     try:
-        response = engine.run(payload, state.catalogue, state.config, state.registry)
+        request_catalogue, catalogue_selection = select_for_request(
+            payload, state.catalogue, state.published_catalogue
+        )
+        response = engine.run(payload, request_catalogue, state.config, state.registry)
+        response["catalogue_selection"] = catalogue_selection
         # fail-closed: validate our OWN response before returning (RE-DOC-10 §15)
         schemas.validate_response(response)
     except Exception as e:
@@ -384,7 +396,14 @@ def _planning_call(
     try:
         if request_validator is not None:
             request_validator(payload)
-        result = fn(payload, state.catalogue, state.config) if needs_household else fn(payload)
+        if needs_household:
+            request_catalogue, catalogue_selection = select_for_request(
+                payload, state.catalogue, state.published_catalogue
+            )
+            result = fn(payload, request_catalogue, state.config)
+            result["catalogue_selection"] = catalogue_selection
+        else:
+            result = fn(payload)
     except (KeyError, schemas.ContractError) as e:
         state.counters.record("error")
         return JSONResponse(

@@ -120,11 +120,7 @@ def _request_rng_seed(household: dict[str, Any], context: dict[str, Any]) -> int
     signals = stable_context.get("governed_context_signals")
     if isinstance(signals, list):
         stable_context["governed_context_signals"] = [
-            {
-                key: value
-                for key, value in signal.items()
-                if key not in {"created_at", "expires_at"}
-            }
+            {key: value for key, value in signal.items() if key not in {"created_at", "expires_at"}}
             if isinstance(signal, dict)
             else signal
             for signal in signals
@@ -379,9 +375,7 @@ def plan_weekly(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         preference_by_direct_class=request.get("preference_by_direct_class"),
         preference_by_projected_class=request.get("preference_by_projected_class"),
         temporal_class_state=(request.get("context") or {}).get("temporal_class_state"),
-        governed_context_signals=(request.get("context") or {}).get(
-            "governed_context_signals"
-        ),
+        governed_context_signals=(request.get("context") or {}).get("governed_context_signals"),
         start_date=(request.get("context") or {}).get("date"),
     )
 
@@ -607,10 +601,16 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
                 "selection_score": round(p.get("_selection_score", p["score"]), 6),
                 "historical_similarity": round(p.get("_historical_similarity", 0.0), 6),
                 "temporal_contribution": round(p.get("_temporal_contribution", 0.0), 6),
-                "temporal_explanation": p.get("_temporal_explanation", {
-                    "total": 0.0, "explicit": 0.0, "due": 0.0,
-                    "exposure": 0.0, "dimensions": [],
-                }),
+                "temporal_explanation": p.get(
+                    "_temporal_explanation",
+                    {
+                        "total": 0.0,
+                        "explicit": 0.0,
+                        "due": 0.0,
+                        "exposure": 0.0,
+                        "dimensions": [],
+                    },
+                ),
                 "selection_policy": "adaptive_history_v1"
                 if "_selection_score" in p
                 else "home_diversity_v2",

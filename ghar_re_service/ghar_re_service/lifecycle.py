@@ -25,6 +25,7 @@ from ghar_re_service.providers import (
     RateLimitConfigProvider,
     resolve_providers,
 )
+from ghar_re_service.published_catalogue import PublishedCatalogueStore, load_from_environment
 from ghar_re_service.ratelimit import SlidingWindowRateLimiter
 
 SERVICE_NAME = "ghar_re_service"
@@ -156,6 +157,7 @@ class AppState:
     rate_limit_provider: RateLimitConfigProvider = field(default_factory=EnvRateLimitConfigProvider)
     config: object | None = None
     catalogue: object | None = None
+    published_catalogue: PublishedCatalogueStore | None = None
     registry: list | None = None
     auth: AuthConfig | None = None
     rate_limiter: SlidingWindowRateLimiter | None = None
@@ -276,6 +278,19 @@ def startup(state: AppState) -> AppState:
     # 2. catalogue
     state.catalogue = state.catalogue_provider.load()
     log_event("startup.catalogue_loaded", **catalogue_identity_summary(state.catalogue))
+
+    # Optional scalable publication: verified once at startup, hydrated only for bounded IDs on a
+    # request. Absence leaves the immutable bundle path exactly unchanged; a configured but corrupt
+    # artifact fails startup rather than silently serving unverified database candidates.
+    state.published_catalogue = load_from_environment()
+    log_event(
+        "startup.published_catalogue_loaded",
+        configured=state.published_catalogue is not None,
+        publication_version=(
+            state.published_catalogue.version if state.published_catalogue else None
+        ),
+        published_rows=(state.published_catalogue.row_count if state.published_catalogue else 0),
+    )
 
     # 3. in-memory indices (the Catalogue builds by_id/by_zone/by_hero_role in its ctor)
     zones = sorted({d.zone for d in state.catalogue.dishes if d.zone})

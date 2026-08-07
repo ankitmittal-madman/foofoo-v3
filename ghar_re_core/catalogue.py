@@ -49,7 +49,9 @@ class Dish:
         zone_map) and signature score (via its sig_band) at construction time so downstream code
         never has to redo that lookup."""
         self.__dict__.update(d)
-        self.id = "md5:" + d["name"]
+        # Published database candidates carry the canonical public.dishes UUID. Legacy fixtures
+        # and the 810-row fallback bundle do not, so they retain their stable historical id.
+        self.id = d.get("id") or "md5:" + d["name"]
         self.cuisine_group = _CUISINE_GROUP.get(d["cuisine"])
         # Real-catalogue dish dicts (build_catalogue.py) already carry a resolved state_origin
         # sourced from cuisines_v4.csv's 65-cuisine table (see module docstring above for why that
@@ -69,6 +71,11 @@ class Dish:
         # ingredient token set (main + all) for ING-block / same-base / allergen work
         self.ingredient_names = [i for i, _ in d["ingredients"]]
         self.main_ingredients = [i for i, m in d["ingredients"] if m]
+        # Database publications carry the canonical bitfield-derived allergen set explicitly.
+        # This closes the gap for ingredients added after the baked ingredients_v5.csv snapshot.
+        self.explicit_allergens = {
+            canonical_allergen(value) for value in (d.get("allergens") or [])
+        }
         # vegan_compatible: computed here (not pre-baked per-dish like jain_compatible/
         # farali_compatible) so both the golden sample and the real catalogue share one derivation,
         # from ingredients_v5.csv's existing is_vegan column (already populated — dairy/honey are
@@ -240,6 +247,21 @@ ALLERGEN_ALIASES = {
     "egg_allergen": "egg",
 }
 
+# Canonical production bitfield vocabulary, shared with the Edge household composer. Published
+# dish and ingredient rows use this to preserve safety even when an ingredient is newer than the
+# immutable fallback bundle's reference CSV.
+ALLERGEN_FLAG_NAMES = {
+    1: "nuts",
+    2: "dairy",
+    4: "gluten",
+    8: "shellfish",
+    16: "egg",
+    32: "soy",
+    64: "sesame",
+    128: "fish",
+    256: "mustard",
+}
+
 
 def canonical_allergen(value):
     """Return the household-facing allergen category for an input or ingredient-master token.
@@ -252,12 +274,18 @@ def canonical_allergen(value):
     return ALLERGEN_ALIASES.get(token, token)
 
 
+def allergens_from_flags(flags):
+    """Decode the production allergen bitfield into canonical household-facing names."""
+    value = int(flags or 0)
+    return {name for bit, name in ALLERGEN_FLAG_NAMES.items() if value & bit}
+
+
 def dish_allergens(dish):
     """Explicit-ingredient allergen set (A3 BASIC pass), plus the known hidden-derivative carriers
     in HIDDEN_DERIVATIVE_ALLERGENS above (asafoetida, soy sauce, and the two hing-containing spice
     blends — sambar powder, chaat masala). Still not a full hidden-derivative layer covering every
     possible commercial-product risk, but no longer purely explicit-ingredient-only."""
-    out = set()
+    out = set(getattr(dish, "explicit_allergens", set()) or set())
     for ing in dish.ingredient_names:
         info = ingredient_info(ing)
         if info.get("is_allergen") and info.get("allergen_type"):

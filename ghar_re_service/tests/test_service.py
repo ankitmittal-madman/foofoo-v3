@@ -142,6 +142,11 @@ def test_meta_returns_versions(client):
     }
     assert body["catalogue_identity"] == lifecycle.catalogue_identity_summary(main.state.catalogue)
     assert body["catalogue_identity"]["canonical_dishes"] > 0
+    assert body["published_catalogue"] == {
+        "configured": False,
+        "publication_version": None,
+        "row_count": 0,
+    }
 
 
 def test_catalogue_identity_summary_is_safe_before_startup():
@@ -268,6 +273,31 @@ def test_recommendations_end_to_end(client):
     # quality judgement call for the Founder/domain owner, not something to guess here — flagged,
     # not silently "fixed" by picking a replacement. See knowledge.py's COMFORT_HERO_MAP /
     # COMFORT_HERO_TO_DISH for the two concrete data gaps this surfaced.
+
+
+def test_recommendations_selects_bounded_catalogue_and_returns_source_metadata(client, monkeypatch):
+    """The HTTP route must use retrieved IDs and disclose which catalogue actually served."""
+    candidate_id = "00000000-0000-0000-0000-000000000001"
+    observed = {}
+
+    def fake_select(payload, fallback, store):
+        observed["ids"] = payload.get("candidate_dish_ids")
+        assert fallback is main.state.catalogue
+        return fallback, {
+            "source": "published_candidates",
+            "publication_version": "sha256:test",
+            "candidate_count": 1,
+        }
+
+    monkeypatch.setattr(main, "select_for_request", fake_select)
+    payload = _req("couple_mumbai_mh")
+    payload["candidate_dish_ids"] = [candidate_id]
+
+    response = _post(client, payload)
+
+    assert response.status_code == 200
+    assert observed["ids"] == [candidate_id]
+    assert response.json()["catalogue_selection"]["source"] == "published_candidates"
 
 
 def test_recommendations_omits_decision_trace_by_default(client):
