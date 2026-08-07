@@ -39,7 +39,6 @@ jobs:
       TEST_USER_PASSWORD: ${{ secrets.GHAR_SIGNIN_PASSWORD }}
       MODE: ${{ inputs.mode }}
       CONFIRM_PRODUCTION_WRITE: ${{ inputs.confirm_production_write }}
-      REPORT_PATH: ${{ runner.temp }}/prospective-user-cycle.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -50,6 +49,7 @@ jobs:
       - name: Run fail-closed prospective cycle
         env:
           EXPECTED_PROFILE_ID: ${{ inputs.expected_profile_id }}
+          REPORT_PATH: ${{ runner.temp }}/prospective-user-cycle.json
         run: |
           python -m ops.recommendation.prospective_user_cycle \
             --expected-profile-id "$EXPECTED_PROFILE_ID" \
