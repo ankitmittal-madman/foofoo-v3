@@ -193,6 +193,11 @@ def build_meal_episodes(
                 if plate.get("_score_includes_temporal")
                 else float(plate.get("_temporal_contribution", 0.0))
             )
+            + (
+                0.0
+                if plate.get("_score_includes_context")
+                else float(plate.get("_governed_context_contribution", 0.0))
+            )
             for plate in plates
         ]
     )
@@ -271,10 +276,18 @@ def build_meal_episodes(
         temporal_explanation = plate.get("_temporal_explanation") or {
             "total": 0.0, "explicit": 0.0, "due": 0.0, "exposure": 0.0, "dimensions": []
         }
+        context_explanation = plate.get("_governed_context_explanation") or {
+            "total": 0.0, "explicit": 0.0, "inferred": 0.0, "reasons": [],
+            "feature_version": "governed-context-v1",
+        }
         if float(temporal_explanation.get("due", 0.0) or 0.0) > 0:
             reasons.insert(0, "fits this meal moment's learned rotation")
         elif float(temporal_explanation.get("total", 0.0) or 0.0) < -0.02:
             reasons.append("spaced against recent similar meals")
+        if float(context_explanation.get("explicit", 0.0) or 0.0) > 0.01:
+            reasons.insert(0, "supports the household's stated health goal")
+        elif float(context_explanation.get("inferred", 0.0) or 0.0) > 0.01:
+            reasons.append("fits a lower-effort weekday hypothesis")
         episodes.append(
             {
                 "episode_hash": episode_hash,
@@ -292,6 +305,10 @@ def build_meal_episodes(
                     float(temporal_explanation.get("total", 0.0) or 0.0), 6
                 ),
                 "temporal_explanation": temporal_explanation,
+                "governed_context_contribution": round(
+                    float(context_explanation.get("total", 0.0) or 0.0), 6
+                ),
+                "governed_context_explanation": context_explanation,
                 "predictions": {
                     "p_choose": round(p_choose, 6),
                     "p_execute": round(p_execute, 6),
@@ -381,6 +398,17 @@ def build_class_meal_episodes(
                 "dimensions": option.get("explanation", {}).get("temporal_dimensions", []),
             },
             "_score_includes_temporal": True,
+            "_governed_context_contribution": float(
+                option.get("explanation", {}).get("governed_context_contribution", 0.0) or 0.0
+            ),
+            "_governed_context_explanation": {
+                "total": float(option.get("explanation", {}).get("governed_context_contribution", 0.0) or 0.0),
+                "explicit": float(option.get("explanation", {}).get("explicit_context_contribution", 0.0) or 0.0),
+                "inferred": float(option.get("explanation", {}).get("inferred_context_contribution", 0.0) or 0.0),
+                "reasons": option.get("explanation", {}).get("governed_context_reasons", []),
+                "feature_version": "governed-context-v1",
+            },
+            "_score_includes_context": True,
         }
         plate["support"] = pairing.default_carb(plate, theta)
         plates.append(plate)

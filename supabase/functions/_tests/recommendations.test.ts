@@ -110,6 +110,7 @@ const EMPTY_ONLINE_STATE: OnlineRecommendationState = {
   richnessDebt: 0,
   temporalClassState: [],
   temporalAttributeState: [],
+  governedContextSignals: [],
 };
 
 /** A no-op Logger for the re-client tests. */
@@ -266,6 +267,16 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
             dimension_code: "cuisine",
             entity_key: "punjabi",
           }],
+          governedContextSignals: [{
+            feature_code: "weekday_time_pressure",
+            value: 0.2,
+            authority: "inferred",
+            confidence: 1,
+            sources: ["q2_working_professionals"],
+            allowed_use: "soft_rank",
+            correction_state: "confirmed",
+            feature_version: "governed-context-v1",
+          }],
         }),
       callRe: (payload, requestId) => {
         sentPayload = payload;
@@ -304,6 +315,16 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
       dimension_code: "cuisine",
       entity_key: "punjabi",
     }]);
+    const governed = sentContext.governed_context_signals as Array<Record<string, unknown>>;
+    assertEquals(governed.length, 3);
+    assertEquals(governed.find((row) => row.feature_code === "health_objective")?.value,
+      "awesome_taste");
+    assertEquals(governed.find((row) => row.feature_code === "weekday_time_pressure")?.value,
+      0.2);
+    assertEquals(
+      governed.find((row) => row.feature_code === "weekday_time_pressure")?.correction_state,
+      "confirmed",
+    );
     assertEquals(sentContext.recent_cuisine_counts, { "Madhya Pradesh": 3 });
     assertEquals(sentContext.novelty_budget, 0.42);
     assertEquals(sentContext.richness_debt, 0.35);

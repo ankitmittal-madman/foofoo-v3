@@ -43,6 +43,38 @@ class HouseholdMember(BaseModel):
     allergies: list[str] = Field(default_factory=list)
 
 
+class GovernedContextSignal(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    feature_code: Literal["health_objective", "working_professionals", "weekday_time_pressure"]
+    value: Any
+    authority: Literal["explicit", "inferred"]
+    confidence: float = Field(ge=0.0, le=1.0)
+    sources: list[str] = Field(min_length=1, max_length=8)
+    allowed_use: Literal["strong_rank", "soft_rank", "context_input"]
+    created_at: datetime | None = None
+    expires_at: datetime | None = None
+    correction_state: Literal["active", "confirmed", "rejected"] = "active"
+    feature_version: Literal["governed-context-v1"]
+
+    @model_validator(mode="after")
+    def validate_authority_policy(self) -> GovernedContextSignal:
+        policy = {
+            "health_objective": ("explicit", "strong_rank"),
+            "working_professionals": ("explicit", "context_input"),
+            "weekday_time_pressure": ("inferred", "soft_rank"),
+        }
+        if (self.authority, self.allowed_use) != policy[self.feature_code]:
+            raise ValueError("feature authority or allowed_use violates governed policy")
+        if (
+            self.authority == "inferred"
+            and self.correction_state != "confirmed"
+            and self.confidence > 0.70
+        ):
+            raise ValueError("unconfirmed inferred context confidence cannot exceed 0.70")
+        return self
+
+
 class RecommendationRequest(BaseModel):
     model_config = ConfigDict(extra="allow")
 
@@ -61,6 +93,9 @@ class RecommendationRequest(BaseModel):
     recent_meals: list[str] = Field(default_factory=list)
     weekly_meals: list[str] = Field(default_factory=list)
     unavailable_ingredients: list[str] = Field(default_factory=list)
+    governed_context_signals: list[GovernedContextSignal] = Field(
+        default_factory=list, max_length=20
+    )
     plan_date: date | None = None
     day_type: Literal["weekday", "weekend"] | None = None
     season: str | None = None

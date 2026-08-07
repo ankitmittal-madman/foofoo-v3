@@ -39,6 +39,57 @@ def _preference_fit(candidate: Candidate, request: RecommendationRequest) -> flo
     return 0.75 * (sum(fits) / len(fits)) + 0.25 * min(fits)
 
 
+def _governed_context_adjustment(
+    candidate: Candidate, request: RecommendationRequest
+) -> tuple[float, list[str]]:
+    """Signed, bounded post-safety adjustment; rejected/expired inference is a no-op."""
+    now = request.timestamp
+    adjustment = 0.0
+    reasons: list[str] = []
+    for signal in request.governed_context_signals:
+        if signal.correction_state == "rejected":
+            continue
+        if signal.expires_at is not None and signal.correction_state != "confirmed":
+            expires = signal.expires_at
+            if expires.tzinfo is None:
+                expires = expires.replace(tzinfo=now.tzinfo)
+            if expires <= now:
+                continue
+        if signal.feature_code == "health_objective":
+            objective = str(signal.value)
+            if objective == "healthy_living":
+                adjustment += 0.55 * signal.confidence * (candidate.nutrition_fit - 0.5)
+                reasons.append("explicit:healthy_living")
+            elif objective in {"into_fitness", "protein_calculator"}:
+                traits = {value.casefold() for value in candidate.nutrition_traits}
+                protein_fit = 1.0 if traits & {"high_protein", "protein_rich"} else 0.5
+                fit = 0.70 * protein_fit + 0.30 * candidate.nutrition_fit
+                adjustment += 0.55 * signal.confidence * (fit - 0.5)
+                reasons.append(f"explicit:{objective}")
+        elif signal.feature_code == "weekday_time_pressure" and request.day_type == "weekday":
+            try:
+                pressure = max(0.0, min(1.0, float(signal.value)))
+            except (TypeError, ValueError):
+                continue
+            if candidate.cook_minutes is not None:
+                minutes = candidate.cook_minutes
+                effort_fit = (
+                    1.0
+                    if minutes <= 35
+                    else -1.0
+                    if minutes >= 60
+                    else 1 - 2 * (minutes - 35) / 25
+                )
+                confidence = (
+                    signal.confidence
+                    if signal.correction_state == "confirmed"
+                    else min(0.70, signal.confidence)
+                )
+                adjustment += 0.45 * confidence * pressure * effort_fit
+                reasons.append("inferred:weekday_time_pressure")
+    return max(-1.0, min(1.0, adjustment)), reasons
+
+
 def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str, float]:
     preference_fit = _preference_fit(candidate, request)
     regional_fit = (
@@ -86,6 +137,7 @@ def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str,
     spice_fit = 0.5
     if request.preferred_spice_level is not None and candidate.spice_level is not None:
         spice_fit = 1.0 - abs(request.preferred_spice_level - candidate.spice_level) / 4.0
+    context_adjustment, _ = _governed_context_adjustment(candidate, request)
     return {
         "household_fit": preference_fit,
         "regional_fit": regional_fit,
@@ -100,6 +152,7 @@ def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str,
         "season_occasion_fit": context_fit,
         "leftover_fit": leftover_fit,
         "spice_fit": spice_fit,
+        "governed_context_adjustment": context_adjustment,
     }
 
 
@@ -117,6 +170,7 @@ WEIGHTS = {
     "season_occasion_fit": 0.05,
     "leftover_fit": 0.03,
     "spice_fit": 0.03,
+    "governed_context_adjustment": 0.06,
 }
 
 
@@ -188,6 +242,8 @@ class LocalReranker:
             item = row.candidate.model_dump()
             item["auxiliary_score"] = round(row.score, 6)
             item["reason_codes"] = [name for name, value in row.features.items() if value >= 0.7]
+            _, context_reasons = _governed_context_adjustment(row.candidate, request)
+            item["governed_context_reasons"] = context_reasons
             items.append(item)
         return RecommendationSet(
             items=items,

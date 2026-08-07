@@ -90,6 +90,10 @@ def build_context(
     core_ctx["temporal_attribute_state"] = (
         temporal_state if isinstance(temporal_state, list) else []
     )
+    governed_context = ctx.get("governed_context_signals")
+    core_ctx["governed_context_signals"] = (
+        governed_context if isinstance(governed_context, list) else []
+    )
     # Episode/practicality inputs are additive v1 context. They do not alter hard eligibility;
     # ghar_re_core.meal_episode consumes them only after the safe plate pool has been formed.
     if ctx.get("time_budget_minutes") is not None:
@@ -112,7 +116,22 @@ def _request_rng_seed(household: dict[str, Any], context: dict[str, Any]) -> int
     context) always get the same served plates (RE-DOC-11 persistence/repeatability guarantee),
     while distinct households/contexts still land on independent dice-rolls, matching the
     household-seeded RNG precedent in ghar_re_core.meal_planner.cold_start_top15."""
-    payload = json.dumps({"household": household, "context": context}, sort_keys=True, default=str)
+    stable_context = dict(context)
+    signals = stable_context.get("governed_context_signals")
+    if isinstance(signals, list):
+        stable_context["governed_context_signals"] = [
+            {
+                key: value
+                for key, value in signal.items()
+                if key not in {"created_at", "expires_at"}
+            }
+            if isinstance(signal, dict)
+            else signal
+            for signal in signals
+        ]
+    payload = json.dumps(
+        {"household": household, "context": stable_context}, sort_keys=True, default=str
+    )
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
     return int(digest[:16], 16)
 
@@ -360,6 +379,9 @@ def plan_weekly(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         preference_by_direct_class=request.get("preference_by_direct_class"),
         preference_by_projected_class=request.get("preference_by_projected_class"),
         temporal_class_state=(request.get("context") or {}).get("temporal_class_state"),
+        governed_context_signals=(request.get("context") or {}).get(
+            "governed_context_signals"
+        ),
         start_date=(request.get("context") or {}).get("date"),
     )
 

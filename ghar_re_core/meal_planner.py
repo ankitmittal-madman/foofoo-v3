@@ -27,6 +27,7 @@ from ghar_re_core import scoring as S
 from ghar_re_core import cohort_plan as CP
 from ghar_re_core import knowledge as K
 from ghar_re_core import temporal
+from ghar_re_core import contextual
 from ghar_re_core.catalogue import Catalogue
 from ghar_re_core.config import CONFIG
 from ghar_re_core.derivation import derive_theta
@@ -61,6 +62,7 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
     code = label_class or K.dish_to_class_code(d.name)
     explanation = S.explain_dish(d, theta, ctx, objective)
     temporal_parts = temporal.dish_contribution(d, ctx)
+    context_parts = contextual.dish_contribution(d, ctx)
     return {
         "name": d.name,
         "cuisine": d.cuisine,
@@ -82,6 +84,10 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
             "temporal_due_contribution": round(temporal_parts["due"], 4),
             "temporal_exposure_contribution": round(temporal_parts["exposure"], 4),
             "temporal_dimensions": temporal_parts["dimensions"],
+            "governed_context_contribution": round(context_parts["total"], 4),
+            "explicit_context_contribution": round(context_parts["explicit"], 4),
+            "inferred_context_contribution": round(context_parts["inferred"], 4),
+            "governed_context_reasons": context_parts["reasons"],
             "top_contributors": sorted(
                 explanation["base_contributors"],
                 key=lambda item: abs(item["weighted"]),
@@ -94,12 +100,14 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
 def _candidate_lineage(d, score, slot, ctx=None):
     """Private core→Edge candidate evidence; stripped before any client response."""
     temporal_parts = temporal.dish_contribution(d, ctx or {})
+    context_parts = contextual.dish_contribution(d, ctx or {})
     return {
         "name": d.name,
         "score": round(float(score), 6),
         "slot": slot,
         "meal_class_code": K.dish_to_class_code(d.name),
         "temporal_contribution": round(temporal_parts["total"], 6),
+        "governed_context_contribution": round(context_parts["total"], 6),
     }
 
 
@@ -120,7 +128,8 @@ def _ranked(cat, theta, ctx, objective, predicate=None, preference_by_dish=None)
         affinity = float((preference_by_dish or {}).get(d.name, 0.0) or 0.0)
         affinity = max(-1.0, min(1.0, affinity))
         temporal_adjustment = temporal.dish_contribution(d, ctx)["total"]
-        out.append((S.score(d, theta, ctx, objective) + 0.35 * affinity + temporal_adjustment, d))
+        context_adjustment = contextual.dish_contribution(d, ctx)["total"]
+        out.append((S.score(d, theta, ctx, objective) + 0.35 * affinity + temporal_adjustment + context_adjustment, d))
     out.sort(key=lambda x: -x[0])
     return out
 
@@ -478,6 +487,7 @@ def slot_options(
     ctx["date"] = context.get("date")
     ctx["day_type"] = context.get("day_type")
     ctx["temporal_attribute_state"] = context.get("temporal_attribute_state") or []
+    ctx["governed_context_signals"] = context.get("governed_context_signals") or []
     temporal.prepare_context(ctx)
     excluded = set(exclude_dish_names or [])
 
@@ -579,6 +589,8 @@ def search_dishes(
         temp_c=weather.get("temp_c"),
         is_raining=bool(weather.get("is_raining", False)),
     )
+    ctx["day_type"] = context.get("day_type")
+    ctx["governed_context_signals"] = context.get("governed_context_signals") or []
     needle = str(query or "").strip().casefold()
     cuisine_filter = str(cuisine or "").strip().casefold()
     diet_filter = str(diet or "").strip().casefold()
@@ -631,6 +643,7 @@ def weekly_class_plan(
     preference_by_direct_class=None,
     preference_by_projected_class=None,
     temporal_class_state=None,
+    governed_context_signals=None,
     start_date=None,
 ):
     """Surface 3 — the weekly class plan: for each day × main slot, the top-`top_classes` meal
@@ -670,6 +683,10 @@ def weekly_class_plan(
         full_plans = {}
         for slot in MAIN_SLOTS:
             ctx = make_context(slot=slot, weekday=day)
+            ctx["day_type"] = day_type
+            ctx["governed_context_signals"] = (
+                governed_context_signals if isinstance(governed_context_signals, list) else []
+            )
             plan = CP.class_plan(theta, ctx)
             full_plans[slot] = plan
             # A direct class action is more authoritative than a class inferred from dish
@@ -688,12 +705,16 @@ def weekly_class_plan(
                 for code in plan
             }
             temporal_contribution = {code: parts[0] for code, parts in temporal_parts.items()}
+            context_parts = {
+                code: contextual.class_contribution(code, meta.get(code, {}), ctx) for code in plan
+            }
             ranked = sorted(
                 plan.items(),
                 key=lambda item: -(
                     item[1]
                     + 0.35 * class_affinity.get(item[0], 0.0)
                     + temporal_contribution.get(item[0], 0.0)
+                    + context_parts[item[0]]["total"]
                 ),
             )
             candidates = []
@@ -718,6 +739,10 @@ def weekly_class_plan(
                         ),
                         "explicit_spacing_contribution": round(temporal_parts[code][1], 4),
                         "exposure_spacing_contribution": round(temporal_parts[code][2], 4),
+                        "governed_context_contribution": round(context_parts[code]["total"], 4),
+                        "explicit_context_contribution": round(context_parts[code]["explicit"], 4),
+                        "inferred_context_contribution": round(context_parts[code]["inferred"], 4),
+                        "governed_context_reasons": context_parts[code]["reasons"],
                         "dish_count": backing.get(code, 0),
                     }
                 )

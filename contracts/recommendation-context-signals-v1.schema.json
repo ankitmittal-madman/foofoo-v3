@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foofoo.app/contracts/recommendation-context-signals-v1.schema.json",
+  "title": "FooFoo Governed Recommendation Context Signals v1",
+  "type": "array",
+  "maxItems": 20,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "feature_code": {
+        "type": "string",
+        "enum": ["health_objective", "working_professionals", "weekday_time_pressure"]
+      },
+      "value": {},
+      "authority": { "type": "string", "enum": ["explicit", "inferred"] },
+      "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+      "sources": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 8,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "enum": [
+            "q1_household_type", "q2_working_professionals", "q12_member_ages",
+            "q13_who_cooks", "q15_objective", "observed_quick_meal_ratio"
+          ]
+        }
+      },
+      "allowed_use": {
+        "type": "string",
+        "enum": ["strong_rank", "soft_rank", "context_input"]
+      },
+      "created_at": { "type": ["string", "null"], "format": "date-time" },
+      "expires_at": { "type": ["string", "null"], "format": "date-time" },
+      "correction_state": {
+        "type": "string",
+        "enum": ["active", "confirmed", "rejected"]
+      },
+      "feature_version": { "type": "string", "const": "governed-context-v1" }
+    },
+    "required": [
+      "feature_code", "value", "authority", "confidence", "sources", "allowed_use",
+      "correction_state", "feature_version"
+    ]
+  }
+}

@@ -2,6 +2,10 @@
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
+import {
+  extractGovernedContextSignals,
+  type GovernedContextSignal,
+} from "./governed-context.ts";
 
 export interface OnlineRecommendationState {
   interactionCount: number;
@@ -21,6 +25,7 @@ export interface OnlineRecommendationState {
   richnessDebt: number;
   temporalClassState: Array<Record<string, unknown>>;
   temporalAttributeState: Array<Record<string, unknown>>;
+  governedContextSignals: GovernedContextSignal[];
 }
 
 export function extractTemporalAttributeState(value: unknown): Array<Record<string, unknown>> {
@@ -201,6 +206,7 @@ export async function loadOnlineRecommendationState(
       exposureRes,
       classTemporalRes,
       attributeTemporalRes,
+      governedContextRes,
     ] = await Promise.all([
       withTimeout(
         db.from("feedback_events").select("id", { count: "exact", head: true })
@@ -252,6 +258,10 @@ export async function loadOnlineRecommendationState(
         db.rpc("get_meal_attribute_temporal_state", { p_household_id: profileId }),
         "personalization.meal_attribute_temporal_state",
       ),
+      withTimeout(
+        db.rpc("get_governed_context_signals", { p_household_id: profileId }),
+        "personalization.governed_context_signals",
+      ),
     ]);
     for (const result of [countRes, neverRes, todayRes, tasteRes, feedbackRes, exposureRes]) {
       if (result.error) throw result.error;
@@ -272,6 +282,12 @@ export async function loadOnlineRecommendationState(
       ctx.logger.warn("personalization.attribute_temporal_state_unavailable", {
         profile_id: profileId,
         detail: attributeTemporalRes.error.message,
+      });
+    }
+    if (governedContextRes.error) {
+      ctx.logger.warn("personalization.governed_context_signals_unavailable", {
+        profile_id: profileId,
+        detail: governedContextRes.error.message,
       });
     }
     const cadence = extractPersistedCadence(varietyRes.data);
@@ -362,6 +378,7 @@ export async function loadOnlineRecommendationState(
       ...cadence,
       temporalClassState: extractTemporalClassState(classTemporalRes.data),
       temporalAttributeState: extractTemporalAttributeState(attributeTemporalRes.data),
+      governedContextSignals: extractGovernedContextSignals(governedContextRes.data),
     };
   } catch (error) {
     ctx.logger.warn("personalization.load_failed", {
@@ -384,6 +401,7 @@ export async function loadOnlineRecommendationState(
       richnessDebt: 0,
       temporalClassState: [],
       temporalAttributeState: [],
+      governedContextSignals: [],
     };
   }
 }

@@ -14,6 +14,7 @@ from ghar_re_core import exploration
 from ghar_re_core import knowledge as K
 from ghar_re_core import similarity as SIM
 from ghar_re_core import temporal
+from ghar_re_core import contextual
 
 
 RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich"}
@@ -81,7 +82,8 @@ def _history_reranked_plates(plates, ctx):
     }
     temporal.prepare_context(ctx)
     has_temporal = bool(ctx.get("_temporal_attribute_index")) and bool(ctx.get("_planned_meal_date"))
-    if not plates or not (class_counts or cuisine_counts or has_temporal):
+    has_context = bool(ctx.get("governed_context_signals"))
+    if not plates or not (class_counts or cuisine_counts or has_temporal or has_context):
         return plates
     scores = [float(plate["score"]) for plate in plates]
     low, high = min(scores), max(scores)
@@ -96,12 +98,16 @@ def _history_reranked_plates(plates, ctx):
             cuisine_counts=cuisine_counts,
         )
         temporal_parts = temporal.plate_contribution(_plate_dishes(plate), ctx)
+        context_parts = contextual.plate_contribution(_plate_dishes(plate), ctx)
         plate["_historical_similarity"] = history_similarity
         plate["_temporal_contribution"] = temporal_parts["total"]
         plate["_temporal_explanation"] = temporal_parts
+        plate["_governed_context_contribution"] = context_parts["total"]
+        plate["_governed_context_explanation"] = context_parts
         plate["_selection_score"] = (
             relevance_lambda * relevance - (1.0 - relevance_lambda) * history_similarity
             + temporal_parts["total"]
+            + context_parts["total"]
         )
     return sorted(
         plates,

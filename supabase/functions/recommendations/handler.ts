@@ -44,6 +44,10 @@ import { callRecommendationEngine, type ReResult } from "./re-client.ts";
 import { buildFallbackResponse } from "./fallback.ts";
 import { recordRecommendationEvent } from "./events.ts";
 import { maybeLogSummary, recordRequest } from "./metrics.ts";
+import {
+  deriveGovernedContextSignals,
+  mergeGovernedContextSignals,
+} from "./governed-context.ts";
 
 const SERVICE_NAME = "recommendations";
 
@@ -149,6 +153,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     // Fetch household + context from the live `public` tables (compose.ts) — ownership already
     // verified above.
     const { household, householdId: hid, stubbed } = await loadHousehold(ctx, householdId);
+    const derivedGovernedContextSignals = deriveGovernedContextSignals(household);
     log.info("recommendation.composed", { household_id: hid, stubbed });
 
     const contextOverride = (body.context && typeof body.context === "object")
@@ -167,6 +172,10 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     const festival = await loadFestivalContextFn(
       ctx,
       typeof contextOverride?.date === "string" ? contextOverride.date : undefined,
+    );
+    const governedContextSignals = mergeGovernedContextSignals(
+      derivedGovernedContextSignals,
+      online.governedContextSignals,
     );
     const requestedRefreshGeneration = typeof body.refresh_generation === "number"
       ? body.refresh_generation
@@ -212,6 +221,8 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     (payload.context as Record<string, unknown>).temporal_class_state = online.temporalClassState;
     (payload.context as Record<string, unknown>).temporal_attribute_state =
       online.temporalAttributeState;
+    (payload.context as Record<string, unknown>).governed_context_signals =
+      governedContextSignals;
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext
@@ -279,6 +290,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
             ? result.body.config_version
             : undefined,
           decisionTrace: result.body.decision_trace,
+          governedContextSignals: derivedGovernedContextSignals,
         });
         recordRequest(outcome);
         maybeLogSummary(log);
@@ -301,6 +313,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
         detail: respCheck.errors.join("; "),
         latencyMs,
         stubbed,
+        governedContextSignals: derivedGovernedContextSignals,
       });
       recordRequest("fallback");
       maybeLogSummary(log);
@@ -329,6 +342,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
       detail: result.detail,
       latencyMs,
       stubbed,
+      governedContextSignals: derivedGovernedContextSignals,
     });
     recordRequest(result.kind === "timeout" ? "timeout_fallback" : "fallback");
     maybeLogSummary(log);

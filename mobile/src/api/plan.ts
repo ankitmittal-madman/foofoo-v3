@@ -118,6 +118,12 @@ export interface MealEpisode {
     total: number; explicit: number; due: number; exposure: number;
     dimensions: Array<{ dimension: string; entity: string; contribution: number }>;
   };
+  governed_context_contribution?: number;
+  governed_context_explanation?: {
+    total: number; explicit: number; inferred: number;
+    reasons: Array<{ feature_code: string; authority: "explicit" | "inferred"; fit?: number }>;
+    feature_version: "governed-context-v1";
+  };
   predictions: {
     p_choose: number | null;
     p_execute: number | null;

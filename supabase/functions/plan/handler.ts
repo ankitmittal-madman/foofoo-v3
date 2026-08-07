@@ -43,6 +43,11 @@ import {
 } from "../recommendations/events.ts";
 import { callRecommendationEngine } from "../recommendations/re-client.ts";
 import { loadOnlineRecommendationState } from "../recommendations/personalization.ts";
+import {
+  deriveGovernedContextSignals,
+  mergeGovernedContextSignals,
+  type GovernedContextSignal,
+} from "../recommendations/governed-context.ts";
 import { addDishToDate, loadSavedWeek, saveWeek, setSlotLock } from "./state.ts";
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 import { loadWeatherContext } from "../_shared/services/weather.ts";
@@ -279,6 +284,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
     }
     let resolvedHouseholdId: string | undefined;
     let stubbedHousehold = false;
+    let governedContextSignals: GovernedContextSignal[] = [];
+    let derivedGovernedContextSignals: GovernedContextSignal[] = [];
     if (spec.needsHousehold) {
       const { household, householdId: hid, stubbed } = await loadHouseholdRaw(ctx, householdId);
       payload.household = household;
@@ -287,9 +294,14 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       // answers) don't always converge on the exact same top-n dishes. Harmless for the other
       // surfaces — they don't read household_id from the payload.
       payload.household_id = hid;
+      derivedGovernedContextSignals = deriveGovernedContextSignals(household);
       resolvedHouseholdId = hid;
       stubbedHousehold = stubbed;
       const online = await loadOnlineRecommendationState(ctx, hid);
+      governedContextSignals = mergeGovernedContextSignals(
+        derivedGovernedContextSignals,
+        online.governedContextSignals,
+      );
       const weather = await loadWeatherContext(ctx, household.q4_current_city);
       const festival = await loadFestivalContext(
         ctx,
@@ -308,6 +320,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         richness_debt: online.richnessDebt,
         temporal_class_state: online.temporalClassState,
         temporal_attribute_state: online.temporalAttributeState,
+        governed_context_signals: governedContextSignals,
         // The v1 contract types `weather` as an object when present. Provider configuration is
         // optional, so omit the field when weather is unavailable instead of sending `null`,
         // which the stricter meal-episode request validator correctly rejects with HTTP 422.
@@ -492,6 +505,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
             ? body.model_version
             : undefined,
           configVersion: typeof body.config_version === "string" ? body.config_version : undefined,
+          governedContextSignals: derivedGovernedContextSignals,
         });
         await recordProductEvent(ctx, {
           profileId: claims.userId,

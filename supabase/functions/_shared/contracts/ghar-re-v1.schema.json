@@ -98,7 +98,8 @@
         "novelty_budget": { "type": "number", "minimum": 0, "maximum": 1, "description": "Persisted exploration budget derived from repeated recent exposures; used only by post-eligibility diversity reranking." },
         "richness_debt": { "type": "number", "minimum": 0, "maximum": 1, "description": "Observed excess recent richness above the neutral midpoint; used only to tighten the visible rich-dish cap." },
         "temporal_class_state": { "type": "array", "maxItems": 1000, "description": "Private slot/day-type class spacing state derived from dated explicit events; exposure is not acceptance.", "items": { "type": "object", "additionalProperties": true } },
-        "temporal_attribute_state": { "type": "array", "maxItems": 1000, "description": "Private dated dish, cuisine, richness, and cooking-method rhythm for this household; impressions remain weaker than explicit outcomes.", "items": { "type": "object", "additionalProperties": true } }
+        "temporal_attribute_state": { "type": "array", "maxItems": 1000, "description": "Private dated dish, cuisine, richness, and cooking-method rhythm for this household; impressions remain weaker than explicit outcomes.", "items": { "type": "object", "additionalProperties": true } },
+        "governed_context_signals": { "type": "array", "maxItems": 20, "description": "Authority-labelled explicit and inferred ranking context. Inferred rows are low-confidence, expiring, correctable, and prohibited from hard safety eligibility.", "items": { "type": "object", "additionalProperties": true } }
       },
       "required": ["slot"]
     },

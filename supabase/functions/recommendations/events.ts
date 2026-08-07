@@ -21,6 +21,7 @@ import {
   toMealAttributeExposureItems,
   toMealClassExposureItems,
 } from "./served.ts";
+import type { GovernedContextSignal } from "./governed-context.ts";
 
 export type RecommendationOutcome =
   | "success"
@@ -52,6 +53,8 @@ export interface RecommendationEventInput {
    * include_decision_trace=true on the outgoing request (WP-12). Absent on fallback/error paths,
    * since there was no RE decision to trace. */
   decisionTrace?: unknown;
+  /** Authority-labelled request context used for this serving decision. */
+  governedContextSignals?: GovernedContextSignal[];
 }
 
 /**
@@ -113,6 +116,28 @@ export async function recordRecommendationEvent(
       detail: e instanceof Error ? e.message : String(e),
     });
     return;
+  }
+
+  // Store the exact governed context used for this served decision. The RPC preserves any user
+  // correction already attached to an inferred feature and returns only active/confirmed state.
+  if (ev.governedContextSignals?.length) {
+    try {
+      const db = createServiceRoleClient(ctx.config);
+      const { error } = await withTimeout(
+        db.rpc("materialize_governed_context_signals", {
+          p_household_id: ev.householdId,
+          p_signals: ev.governedContextSignals,
+        }),
+        "recommendations.events.materialize_governed_context",
+      );
+      if (error) throw error;
+    } catch (e) {
+      ctx.logger.warn("governed_context.persist_failed", {
+        request_id: ev.requestId,
+        household_id: ev.householdId,
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    }
   }
 
   // §0.1: emit one `shown_not_tapped` feedback_events row per served hero dish, synchronously

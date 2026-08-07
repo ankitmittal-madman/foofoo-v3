@@ -133,6 +133,55 @@ def test_low_confidence_keeps_existing():
     assert response.decision_reason == "confidence_below_threshold"
 
 
+def test_governed_context_prefers_quick_weekday_candidate_without_changing_safety():
+    raw = payload(day_type="weekday")
+    for candidate in raw["candidates"]:
+        candidate.update({
+            "pantry_match": 0.5,
+            "nutrition_fit": 0.5,
+            "freshness": 0.5,
+            "collaborative_score": 0.5,
+            "popularity": 0.5,
+            "ingredients": ["vegetables"],
+        })
+    raw["candidates"][0]["cook_minutes"] = 25
+    raw["candidates"][1]["cook_minutes"] = 75
+    raw["governed_context_signals"] = [{
+        "feature_code": "weekday_time_pressure",
+        "value": 0.8,
+        "authority": "inferred",
+        "confidence": 0.65,
+        "sources": ["q2_working_professionals", "q13_who_cooks"],
+        "allowed_use": "soft_rank",
+        "correction_state": "active",
+        "feature_version": "governed-context-v1",
+    }]
+    response = run(RecommendationRequest.model_validate(raw), settings(min_delta=-1))
+    assert response.auxiliary_result.items[0]["id"] == "varan-bhaat"
+    assert response.auxiliary_result.items[0]["governed_context_reasons"] == [
+        "inferred:weekday_time_pressure"
+    ]
+
+
+def test_unconfirmed_inference_cannot_claim_explicit_confidence():
+    raw = payload(governed_context_signals=[{
+        "feature_code": "weekday_time_pressure",
+        "value": 0.8,
+        "authority": "inferred",
+        "confidence": 1,
+        "sources": ["q2_working_professionals"],
+        "allowed_use": "soft_rank",
+        "correction_state": "active",
+        "feature_version": "governed-context-v1",
+    }])
+    try:
+        RecommendationRequest.model_validate(raw)
+    except ValueError as error:
+        assert "confidence" in str(error)
+    else:
+        raise AssertionError("unconfirmed inference should fail validation")
+
+
 def test_less_diverse_auxiliary_keeps_existing():
     raw = payload()
     raw["existing_result"]["metrics"]["diversity_score"] = 1.0
