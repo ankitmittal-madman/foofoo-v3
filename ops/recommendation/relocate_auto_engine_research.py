@@ -7,6 +7,7 @@ import gzip
 import hashlib
 import json
 import os
+import re
 import tempfile
 from collections import Counter
 from collections.abc import Iterable, Mapping
@@ -14,6 +15,8 @@ from pathlib import Path
 from typing import Any
 
 FORMAT = "foofoo-auto-engine-research-transfer-v1"
+SOURCE_TYPE = "expert_research_synthetic"
+BATCH_ID_PATTERN = re.compile(r"sha256:[0-9a-f]{24,64}\Z")
 ALLOWED_TARGETS = {
     "research.constraint_examples",
     "research.household_personas",
@@ -89,17 +92,40 @@ def _validate_record(record: Mapping[str, Any]) -> None:
         raise RuntimeError("transfer record columns do not match the governed format")
     if record["target_table"] not in ALLOWED_TARGETS:
         raise RuntimeError(f"unsafe transfer target: {record['target_table']}")
-    if record["source_type"] != "expert_research_synthetic" or not record["synthetic_only"]:
+    if record["source_type"] != SOURCE_TYPE or not record["synthetic_only"]:
         raise RuntimeError("only synthetic Auto Engine research records may be transferred")
     digest = hashlib.sha256(_canonical(record["payload"])).hexdigest()
     if digest != record["payload_sha256"]:
         raise RuntimeError(f"payload checksum mismatch for {record['record_key']}")
 
 
+def _validate_batch_id(batch_id: str) -> None:
+    if not BATCH_ID_PATTERN.fullmatch(batch_id):
+        raise RuntimeError("batch ID must be a bounded sha256 provenance identifier")
+
+
+def _manifest_batch_id(manifest: Mapping[str, Any]) -> str:
+    selector = manifest.get("source_selector")
+    if not isinstance(selector, Mapping):
+        raise RuntimeError("transfer manifest is missing its source selector")
+    batch_id = selector.get("batch_id")
+    if not isinstance(batch_id, str):
+        raise RuntimeError("transfer manifest is missing its batch ID")
+    _validate_batch_id(batch_id)
+    if selector != {
+        "batch_id": batch_id,
+        "source_type": SOURCE_TYPE,
+        "synthetic_only": True,
+    }:
+        raise RuntimeError("transfer manifest source selector is not governed")
+    return batch_id
+
+
 def _read_transfer(path: Path, manifest_path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("format") != FORMAT:
         raise RuntimeError("unsupported transfer manifest format")
+    batch_id = _manifest_batch_id(manifest)
     records: list[dict[str, Any]] = []
     digest = hashlib.sha256()
     with gzip.open(path, "rb") as source:
@@ -107,6 +133,8 @@ def _read_transfer(path: Path, manifest_path: Path) -> tuple[list[dict[str, Any]
             digest.update(line)
             record = json.loads(line)
             _validate_record(record)
+            if record["first_batch_id"] != batch_id or record["last_batch_id"] != batch_id:
+                raise RuntimeError("transfer record falls outside the selected batch")
             records.append(record)
             if len(records) > 10_000:
                 raise RuntimeError("transfer record limit exceeded")
@@ -121,9 +149,14 @@ def _read_transfer(path: Path, manifest_path: Path) -> tuple[list[dict[str, Any]
 
 
 def export_records(
-    connection: Any, path: Path, manifest_path: Path, expected_count: int
+    connection: Any,
+    path: Path,
+    manifest_path: Path,
+    expected_count: int,
+    batch_id: str,
 ) -> dict[str, Any]:
     """Export the bounded synthetic research set without including any production identity row."""
+    _validate_batch_id(batch_id)
     select_fields = ",".join(
         (
             "id::text AS id",
@@ -159,8 +192,10 @@ def export_records(
         cursor.execute(
             f"""SELECT {select_fields}
                 FROM research.auto_training_records
-                WHERE synthetic_only AND source_type='expert_research_synthetic'
-                ORDER BY target_table,record_key"""
+                WHERE synthetic_only AND source_type=%s
+                  AND first_batch_id=%s AND last_batch_id=%s
+                ORDER BY target_table,record_key""",
+            (SOURCE_TYPE, batch_id, batch_id),
         )
         columns = [item[0] for item in cursor.description]
         for row in cursor:
@@ -178,6 +213,11 @@ def export_records(
         "record_count": count,
         "content_sha256": digest.hexdigest(),
         "target_counts": dict(sorted(target_counts.items())),
+        "source_selector": {
+            "batch_id": batch_id,
+            "source_type": SOURCE_TYPE,
+            "synthetic_only": True,
+        },
     }
     _atomic_json(manifest_path, manifest)
     return manifest
@@ -330,10 +370,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--expected-count", type=int, default=461)
+    parser.add_argument("--batch-id")
     args = parser.parse_args(argv)
 
     if args.mode in {"export", "import", "delete"} and (not args.transfer or not args.manifest):
         parser.error("--transfer and --manifest are required for export, import, and delete")
+    if args.mode in {"export", "import", "delete"} and not args.batch_id:
+        parser.error("--batch-id is required for export, import, and delete")
     environment = "TRAINING_DATABASE_URL" if args.mode == "import" else "FOOFOO_SUPABASE_URI"
     connection = _connect(
         _required_database_url(environment),
@@ -343,20 +386,26 @@ def main(argv: list[str] | None = None) -> int:
     try:
         before = storage_report(connection)
         if args.mode == "export":
-            result = export_records(connection, args.transfer, args.manifest, args.expected_count)
+            result = export_records(
+                connection,
+                args.transfer,
+                args.manifest,
+                args.expected_count,
+                args.batch_id,
+            )
             connection.rollback()
         elif args.mode == "import":
-            records, _manifest = _read_transfer(args.transfer, args.manifest)
+            records, manifest = _read_transfer(args.transfer, args.manifest)
+            if _manifest_batch_id(manifest) != args.batch_id:
+                raise RuntimeError("requested batch does not match the transfer manifest")
             result = import_records(connection, records, args.expected_count)
             connection.commit()
         elif args.mode == "delete":
-            records, _manifest = _read_transfer(args.transfer, args.manifest)
+            records, manifest = _read_transfer(args.transfer, args.manifest)
+            if _manifest_batch_id(manifest) != args.batch_id:
+                raise RuntimeError("requested batch does not match the transfer manifest")
             result = delete_source_records(connection, records, args.expected_count)
             connection.commit()
-            connection.autocommit = True
-            with connection.cursor() as cursor:
-                cursor.execute("VACUUM (FULL, ANALYZE) research.auto_training_records")
-            connection.autocommit = False
         else:
             result = {"status": "audited"}
             connection.rollback()
