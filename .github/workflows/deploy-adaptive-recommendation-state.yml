@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: Type apply to deploy migrations 081 through 085
+        description: Type apply to deploy migrations 081 through 086
         required: true
         type: string
 
@@ -98,6 +98,18 @@ jobs:
               -f database/migrations/085_backfill_adaptive_serving_state.sql
           fi
 
+      - name: Apply migration 086 when absent
+        run: |
+          present="$(psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -c \
+            "SELECT to_regprocedure('public.resolve_canonical_dish_identity(text)') IS NOT NULL")"
+          if [ "$present" = "t" ]; then
+            echo "Migration 086 already present; skipping."
+          else
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction \
+              -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+              -f database/migrations/086_resolve_canonical_feedback_identity.sql
+          fi
+
       - name: Validate adaptive state and report aggregate counts
         run: |
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
@@ -110,3 +122,5 @@ jobs:
             -f database/validation/936_activate_semantic_taste_vectors_validation.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
             -f database/validation/937_backfill_adaptive_serving_state_validation.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/938_resolve_canonical_feedback_identity_validation.sql

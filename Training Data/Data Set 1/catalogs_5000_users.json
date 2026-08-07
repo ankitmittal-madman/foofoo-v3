@@ -1,0 +1,781 @@
+{
+  "states": [
+    {
+      "state_id": "STATE_MP",
+      "state_name": "Madhya Pradesh",
+      "region": "central"
+    },
+    {
+      "state_id": "STATE_MH",
+      "state_name": "Maharashtra",
+      "region": "west"
+    },
+    {
+      "state_id": "STATE_KA",
+      "state_name": "Karnataka",
+      "region": "south"
+    },
+    {
+      "state_id": "STATE_GJ",
+      "state_name": "Gujarat",
+      "region": "west"
+    },
+    {
+      "state_id": "STATE_WB",
+      "state_name": "West Bengal",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_TN",
+      "state_name": "Tamil Nadu",
+      "region": "south"
+    },
+    {
+      "state_id": "STATE_KL",
+      "state_name": "Kerala",
+      "region": "south"
+    },
+    {
+      "state_id": "STATE_DL",
+      "state_name": "Delhi",
+      "region": "north"
+    },
+    {
+      "state_id": "STATE_PB",
+      "state_name": "Punjab",
+      "region": "north"
+    },
+    {
+      "state_id": "STATE_UP",
+      "state_name": "Uttar Pradesh",
+      "region": "north"
+    },
+    {
+      "state_id": "STATE_RJ",
+      "state_name": "Rajasthan",
+      "region": "north"
+    },
+    {
+      "state_id": "STATE_OR",
+      "state_name": "Odisha",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_AP",
+      "state_name": "Andhra Pradesh",
+      "region": "south"
+    },
+    {
+      "state_id": "STATE_TG",
+      "state_name": "Telangana",
+      "region": "south"
+    },
+    {
+      "state_id": "STATE_HR",
+      "state_name": "Haryana",
+      "region": "north"
+    },
+    {
+      "state_id": "STATE_AS",
+      "state_name": "Assam",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_CH",
+      "state_name": "Chhattisgarh",
+      "region": "central"
+    },
+    {
+      "state_id": "STATE_JH",
+      "state_name": "Jharkhand",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_BR",
+      "state_name": "Bihar",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_HP",
+      "state_name": "Himachal Pradesh",
+      "region": "north"
+    },
+    {
+      "state_id": "STATE_UT",
+      "state_name": "Uttarakhand",
+      "region": "north"
+    },
+    {
+      "state_id": "STATE_GOA",
+      "state_name": "Goa",
+      "region": "west"
+    },
+    {
+      "state_id": "STATE_NL",
+      "state_name": "Nagaland",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_MZ",
+      "state_name": "Mizoram",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_TR",
+      "state_name": "Tripura",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_MN",
+      "state_name": "Manipur",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_SIK",
+      "state_name": "Sikkim",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_AR",
+      "state_name": "Arunachal Pradesh",
+      "region": "east"
+    },
+    {
+      "state_id": "STATE_PY",
+      "state_name": "Puducherry",
+      "region": "south"
+    }
+  ],
+  "cities": [
+    {
+      "city_id": "CITY_Delhi_Central",
+      "state_id": "STATE_DL",
+      "tier": "tier1",
+      "region": "north"
+    },
+    {
+      "city_id": "CITY_Mumbai",
+      "state_id": "STATE_MH",
+      "tier": "tier1",
+      "region": "west"
+    },
+    {
+      "city_id": "CITY_Pune",
+      "state_id": "STATE_MH",
+      "tier": "tier1",
+      "region": "west"
+    },
+    {
+      "city_id": "CITY_Bengaluru",
+      "state_id": "STATE_KA",
+      "tier": "tier1",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Chennai",
+      "state_id": "STATE_TN",
+      "tier": "tier1",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Kolkata",
+      "state_id": "STATE_WB",
+      "tier": "tier1",
+      "region": "east"
+    },
+    {
+      "city_id": "CITY_Ahmedabad",
+      "state_id": "STATE_GJ",
+      "tier": "tier1",
+      "region": "west"
+    },
+    {
+      "city_id": "CITY_Chandigarh",
+      "state_id": "STATE_PB",
+      "tier": "tier1",
+      "region": "north"
+    },
+    {
+      "city_id": "CITY_Kochi",
+      "state_id": "STATE_KL",
+      "tier": "tier1",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Jaipur",
+      "state_id": "STATE_RJ",
+      "tier": "tier1",
+      "region": "north"
+    },
+    {
+      "city_id": "CITY_Lucknow",
+      "state_id": "STATE_UP",
+      "tier": "tier1",
+      "region": "north"
+    },
+    {
+      "city_id": "CITY_Noida",
+      "state_id": "STATE_UP",
+      "tier": "tier1",
+      "region": "north"
+    },
+    {
+      "city_id": "CITY_Gurugram",
+      "state_id": "STATE_HR",
+      "tier": "tier1",
+      "region": "north"
+    },
+    {
+      "city_id": "CITY_Hyderabad",
+      "state_id": "STATE_TG",
+      "tier": "tier1",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Indore",
+      "state_id": "STATE_MP",
+      "tier": "tier2",
+      "region": "central"
+    },
+    {
+      "city_id": "CITY_Bhopal",
+      "state_id": "STATE_MP",
+      "tier": "tier2",
+      "region": "central"
+    },
+    {
+      "city_id": "CITY_Nagpur",
+      "state_id": "STATE_MH",
+      "tier": "tier2",
+      "region": "west"
+    },
+    {
+      "city_id": "CITY_Mysuru",
+      "state_id": "STATE_KA",
+      "tier": "tier2",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Surat",
+      "state_id": "STATE_GJ",
+      "tier": "tier2",
+      "region": "west"
+    },
+    {
+      "city_id": "CITY_Siliguri",
+      "state_id": "STATE_WB",
+      "tier": "tier2",
+      "region": "east"
+    },
+    {
+      "city_id": "CITY_Coimbatore",
+      "state_id": "STATE_TN",
+      "tier": "tier2",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Thiruvananthapuram",
+      "state_id": "STATE_KL",
+      "tier": "tier2",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Vijayawada",
+      "state_id": "STATE_AP",
+      "tier": "tier2",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Bhubaneswar",
+      "state_id": "STATE_OR",
+      "tier": "tier2",
+      "region": "east"
+    },
+    {
+      "city_id": "CITY_Patna",
+      "state_id": "STATE_BR",
+      "tier": "tier2",
+      "region": "east"
+    },
+    {
+      "city_id": "CITY_Guwahati",
+      "state_id": "STATE_AS",
+      "tier": "tier2",
+      "region": "east"
+    },
+    {
+      "city_id": "CITY_Panaji",
+      "state_id": "STATE_GOA",
+      "tier": "tier2",
+      "region": "west"
+    },
+    {
+      "city_id": "CITY_Puducherry",
+      "state_id": "STATE_PY",
+      "tier": "tier2",
+      "region": "south"
+    },
+    {
+      "city_id": "CITY_Raipur",
+      "state_id": "STATE_CH",
+      "tier": "tier2",
+      "region": "central"
+    },
+    {
+      "city_id": "CITY_Shimla",
+      "state_id": "STATE_HP",
+      "tier": "tier2",
+      "region": "north"
+    },
+    {
+      "city_id": "CITY_Dehradun",
+      "state_id": "STATE_UT",
+      "tier": "tier2",
+      "region": "north"
+    }
+  ],
+  "persona_codes": [
+    "P_SINGLE_VEG",
+    "P_SINGLE_NONVEG",
+    "P_COUPLE_YOUNG",
+    "P_COUPLE_INFANT",
+    "P_COUPLE_TODDLER",
+    "P_NUCLEAR_KIDS",
+    "P_JOINT_FAMILY",
+    "P_MULTIGEN_HEALTH",
+    "P_ELDERLY_COUPLE",
+    "P_STUDENT_BUDGET",
+    "P_SHARED_FLAT_YOUNG",
+    "P_PREGNANCY",
+    "P_POSTPARTUM",
+    "P_FITNESS",
+    "P_JAIN",
+    "P_VEGAN",
+    "P_COASTAL_FISH",
+    "P_FESTIVAL_HEAVY",
+    "P_DELIVERY_RELIANT",
+    "P_MIGRANT_HOME_FOOD"
+  ],
+  "household_types": [
+    "single_professional_veg",
+    "single_professional_nonveg",
+    "single_student_budget",
+    "couple_veg",
+    "couple_nonveg",
+    "couple_egg",
+    "couple_with_infant",
+    "couple_with_toddler",
+    "nuclear_family_veg",
+    "nuclear_family_nonveg",
+    "joint_family_traditional",
+    "multigenerational_health",
+    "elderly_couple",
+    "hostel_pg_budget",
+    "pregnancy_family",
+    "postpartum_family",
+    "fitness_focused_household",
+    "jain_family",
+    "vegan_family",
+    "coastal_fish_household",
+    "festival_weekend_heavy",
+    "delivery_reliant_metro",
+    "home_food_first_migrant",
+    "high_repeat_traditional"
+  ],
+  "dishes": [
+    {
+      "dish_id": "DISH_POHA",
+      "dish_name": "Poha",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_UPMA",
+      "dish_name": "Upma",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_IDLI",
+      "dish_name": "Idli",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_DOSA",
+      "dish_name": "Dosa",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_PARATHA",
+      "dish_name": "Paratha",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_THEPLA",
+      "dish_name": "Thepla",
+      "slots": [
+        "breakfast",
+        "snack"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_DHOKLA",
+      "dish_name": "Dhokla",
+      "slots": [
+        "breakfast",
+        "snack"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_SEVAI",
+      "dish_name": "Vegetable Sevai",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_DALIA",
+      "dish_name": "Dalia",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_CHILLA",
+      "dish_name": "Besan Chilla",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_OMLETTE",
+      "dish_name": "Masala Omelette",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "egg"
+      ]
+    },
+    {
+      "dish_id": "DISH_APPAM",
+      "dish_name": "Appam",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_UTTAPAM",
+      "dish_name": "Uttapam",
+      "slots": [
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_KHICHDI",
+      "dish_name": "Khichdi",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg",
+        "jain"
+      ]
+    },
+    {
+      "dish_id": "DISH_DAL_ROTI",
+      "dish_name": "Dal Roti Sabzi",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_RICE_DAL",
+      "dish_name": "Rice Dal Sabzi",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_SIMPLE_SABZI",
+      "dish_name": "Simple Green Sabzi",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_BHINDI",
+      "dish_name": "Bhindi Sabzi",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_LAUKI",
+      "dish_name": "Lauki Sabzi",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_TURAI",
+      "dish_name": "Turai Sabzi",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_TINDA",
+      "dish_name": "Tinda Sabzi",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_BEANS",
+      "dish_name": "Beans Poriyal",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_PANEER_BUTTER",
+      "dish_name": "Paneer Butter Masala",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_CHOLE",
+      "dish_name": "Chole Bhature",
+      "slots": [
+        "breakfast",
+        "lunch"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_PULAO",
+      "dish_name": "Veg Pulao",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_CURD_RICE",
+      "dish_name": "Curd Rice",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_FISH_CURRY",
+      "dish_name": "Fish Curry Rice",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "fish"
+      ]
+    },
+    {
+      "dish_id": "DISH_CHICKEN_CURRY",
+      "dish_name": "Chicken Curry Rice",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "nonveg"
+      ]
+    },
+    {
+      "dish_id": "DISH_MUTTON_CURRY",
+      "dish_name": "Mutton Curry",
+      "slots": [
+        "lunch",
+        "dinner"
+      ],
+      "diet_tags": [
+        "nonveg"
+      ]
+    },
+    {
+      "dish_id": "DISH_SPROUTS",
+      "dish_name": "Sprouts Salad",
+      "slots": [
+        "snack"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_FRUIT_BOWL",
+      "dish_name": "Fruit Bowl",
+      "slots": [
+        "snack"
+      ],
+      "diet_tags": [
+        "veg",
+        "vegan"
+      ]
+    },
+    {
+      "dish_id": "DISH_NUTS",
+      "dish_name": "Nuts Mix",
+      "slots": [
+        "snack"
+      ],
+      "diet_tags": [
+        "veg",
+        "vegan"
+      ]
+    },
+    {
+      "dish_id": "DISH_YOGURT",
+      "dish_name": "Yogurt Bowl",
+      "slots": [
+        "snack",
+        "breakfast"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_SOUP",
+      "dish_name": "Vegetable Soup",
+      "slots": [
+        "snack",
+        "dinner"
+      ],
+      "diet_tags": [
+        "veg",
+        "vegan"
+      ]
+    },
+    {
+      "dish_id": "DISH_LADOO",
+      "dish_name": "Ladoo",
+      "slots": [
+        "festival"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_MODAK",
+      "dish_name": "Modak",
+      "slots": [
+        "festival"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    },
+    {
+      "dish_id": "DISH_GUJIYA",
+      "dish_name": "Gujiya",
+      "slots": [
+        "festival"
+      ],
+      "diet_tags": [
+        "veg"
+      ]
+    }
+  ]
+}
