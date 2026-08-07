@@ -224,11 +224,19 @@ class ImagePromptGenerator:
 _FIELD_METHOD_INSTRUCTIONS = """You are filling in 4 blanks for a food-photography prompt template. Study this method,
 learned from 867 professionally hand-written examples for this same product, before answering:
 
-1. visual_description opens with the dish's PHYSICAL FORM + PRECISE COLOR + TEXTURE of its main
-   component, derived from what the ingredients/cooking method actually produce -- never a vague
-   "delicious" or "tasty". Turmeric/gram-flour dishes are yellow; tomato-butter gravies are
-   orange-red; slow-cooked dals are dark brown; coconut-based preparations are pale
-   white/cream; charred/tandoor items are red-orange or dark with visible char marks.
+1. visual_description opens with the dish's PHYSICAL FORM (an explicit SHAPE word: round coin-
+   shaped slices, whole pods, small cubes, thin strands, a flat disc, individual florets --
+   pick the one that actually matches how this ingredient is cut/shaped in this dish) + PRECISE
+   COLOR + TEXTURE of its main component, derived from what the ingredients/cooking method
+   actually produce -- never a vague "delicious" or "tasty". An image model with no training
+   data for an unfamiliar regional vegetable/dish will guess a generic, wrong shape (e.g.
+   noodle strands, or a shapeless mound) unless the shape is stated explicitly and unambiguously
+   -- do not assume "slices" alone is enough; say what the slice actually looks like (thin round
+   coins with visible seeds and a ridged green-going-brown skin, for example, is a real bitter
+   gourd/karela slice -- adapt precisely to the actual vegetable, do not reuse this verbatim).
+   Turmeric/gram-flour dishes are yellow; tomato-butter gravies are orange-red; slow-cooked dals
+   are dark brown; coconut-based preparations are pale white/cream; charred/tandoor items are
+   red-orange or dark with visible char marks.
 2. It then names ONE OR TWO visible cues that prove HOW it was cooked -- a glossy sheen, char
    marks, froth, a crisp/flaky edge, steam, spiraled/folded shape -- specific to this dish's real
    preparation, not generic.
