@@ -47,7 +47,7 @@ def _prepare_research_snapshot(
                 "weight": payload["weight"],
                 "timestamp": f"2026-01-{index % 28 + 1:02d}T{index % 24:02d}:00:00+00:00",
                 "source": "expert_research_synthetic",
-                "confidence": record["confidence"],
+                "confidence": float(record["confidence"]),
             }
         )
     _write_jsonl(destination / "household_features.jsonl", household_rows)

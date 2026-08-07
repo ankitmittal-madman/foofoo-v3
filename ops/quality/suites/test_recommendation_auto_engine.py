@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from decimal import Decimal
 from pathlib import Path
 
 from ops.recommendation.auto_engine import run_auto_engine
@@ -13,6 +14,7 @@ from ops.recommendation.auto_engine_store import (
     MemoryTrainingStore,
     payload_sha256,
 )
+from ops.recommendation.auto_engine_training import _prepare_research_snapshot
 from ops.recommendation.auto_engine_types import AutoEngineConfig
 
 ROOT = Path(__file__).parents[3]
@@ -119,6 +121,37 @@ def test_postgres_research_fetch_is_bounded_and_parameterized():
     assert "LIMIT %s" in cursor.query
     assert "ORDER BY target_table, record_key" in cursor.query
     assert cursor.params == ("research.interactions", 50_000)
+
+
+def test_research_snapshot_normalizes_postgres_decimal_confidence(tmp_path):
+    household = {
+        "payload": {"household_id": "hh-1", "features": ["diet:vegetarian"]}
+    }
+    interaction = {
+        "record_key": "event-1",
+        "payload": {
+            "household_id": "hh-1",
+            "dish_id": "poha",
+            "event_type": "like",
+            "weight": 1.0,
+        },
+        "confidence": Decimal("0.9100"),
+    }
+
+    class Store:
+        def fetch_research_records(self, target_table, _limit):
+            if target_table == "research.household_personas":
+                return [household]
+            if target_table == "research.interactions":
+                return [interaction]
+            return []
+
+    destination = tmp_path / "snapshot"
+    counts = _prepare_research_snapshot(Store(), ONTOLOGY, destination, AutoEngineConfig())
+    saved = json.loads((destination / "interactions.jsonl").read_text())
+
+    assert counts == {"households": 1, "interactions": 1}
+    assert saved["confidence"] == 0.91
 
 
 def test_weak_db_triggers_bounded_expert_research_and_ontology_mapping():
