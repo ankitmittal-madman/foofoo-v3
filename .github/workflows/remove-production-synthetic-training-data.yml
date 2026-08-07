@@ -73,6 +73,15 @@ jobs:
           GROUP BY target_table
           ORDER BY target_table;
 
+          SELECT
+            count(*) FILTER (WHERE first_batch_id='06a38fd3-ec53-54ab-ab0f-ef04bdf92c44')
+              AS records_created_by_seed,
+            count(*) FILTER (
+              WHERE first_batch_id='06a38fd3-ec53-54ab-ab0f-ef04bdf92c44'
+                AND last_batch_id<>'06a38fd3-ec53-54ab-ab0f-ef04bdf92c44'
+            ) AS seed_records_updated_later
+          FROM research.auto_training_records;
+
           SELECT pg_database_size(current_database()) AS database_bytes_before;
           SELECT schemaname, relname,
                  pg_total_relation_size(format('%I.%I', schemaname, relname)::regclass) AS total_bytes
@@ -93,7 +102,9 @@ jobs:
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
             -f database/validation/941_remove_production_synthetic_batch_validation.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c \
-            "ANALYZE research.training_source_rows, research.auto_training_records;"
+            "VACUUM (FULL, ANALYZE) research.auto_training_records;"
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c \
+            "ANALYZE research.training_source_rows;"
 
       - name: Verify reclaimed production database space
         if: inputs.mode == 'execute'
@@ -109,4 +120,9 @@ jobs:
             ('ml', 'training_import_batches')
           )
           ORDER BY total_bytes DESC;
+
+          SELECT target_table, count(*) AS retained_research_records
+          FROM research.auto_training_records
+          GROUP BY target_table
+          ORDER BY target_table;
           SQL

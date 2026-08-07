@@ -1,6 +1,6 @@
 -- Removes the verified synthetic-training batch from production after it has been copied to the
--- dedicated training project. Exact whole-table assertions allow TRUNCATE to reclaim space
--- immediately while preventing any unrelated research record from being removed.
+-- dedicated training project. Exact batch assertions prevent unrelated research records from
+-- being removed; the raw table is exclusively this batch and can be truncated immediately.
 
 SET TRANSACTION READ WRITE;
 
@@ -10,6 +10,7 @@ DECLARE
   production_dishes_before bigint;
   production_profiles_before bigint;
   production_plans_before bigint;
+  normalized_rows_removed bigint;
 BEGIN
   PERFORM pg_advisory_xact_lock(hashtextextended(expected_batch::text, 0));
 
@@ -37,31 +38,49 @@ BEGIN
     RAISE EXCEPTION 'raw training rows are not exclusively the expected batch';
   END IF;
 
-  IF (SELECT count(*) FROM research.auto_training_records) <> 113868
-     OR (SELECT count(*) FROM research.auto_training_records
-         WHERE first_batch_id = expected_batch::text
-           AND last_batch_id = expected_batch::text
-           AND synthetic_only
-           AND source_dataset_version = 'foofoo-training-v1'
-           AND transformation_version = 'foofoo-training-db-v1') <> 113868 THEN
-    RAISE EXCEPTION 'normalized training rows are not exclusively the expected batch';
+  IF (SELECT count(*) FROM research.auto_training_records
+      WHERE first_batch_id = expected_batch::text
+        AND synthetic_only
+        AND source_dataset_version = 'foofoo-training-v1'
+        AND transformation_version = 'foofoo-training-db-v1') <> 113868 THEN
+    RAISE EXCEPTION 'normalized records created by the expected batch have drifted';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM research.auto_training_records
+    WHERE first_batch_id = expected_batch::text
+      AND last_batch_id <> expected_batch::text
+  ) THEN
+    RAISE EXCEPTION 'a later batch updated records created by this batch; cleanup requires review';
   END IF;
 
   IF (SELECT count(*) FROM research.auto_training_records
-      WHERE target_table = 'research.training_dishes') <> 86
+      WHERE first_batch_id = expected_batch::text
+        AND target_table = 'research.training_dishes') <> 86
      OR (SELECT count(*) FROM research.auto_training_records
-         WHERE target_table = 'research.household_personas') <> 10000
+         WHERE first_batch_id = expected_batch::text
+           AND target_table = 'research.household_personas') <> 10000
      OR (SELECT count(*) FROM research.auto_training_records
-         WHERE target_table = 'research.interactions') <> 64842
+         WHERE first_batch_id = expected_batch::text
+           AND target_table = 'research.interactions') <> 64842
      OR (SELECT count(*) FROM research.auto_training_records
-         WHERE target_table = 'research.weekly_signals') <> 10000
+         WHERE first_batch_id = expected_batch::text
+           AND target_table = 'research.weekly_signals') <> 10000
      OR (SELECT count(*) FROM research.auto_training_records
-         WHERE target_table = 'research.household_preference_edges') <> 28940 THEN
+         WHERE first_batch_id = expected_batch::text
+           AND target_table = 'research.household_preference_edges') <> 28940 THEN
     RAISE EXCEPTION 'normalized target counts have drifted';
   END IF;
 
   TRUNCATE TABLE research.training_source_rows RESTART IDENTITY;
-  TRUNCATE TABLE research.auto_training_records;
+  DELETE FROM research.auto_training_records
+  WHERE first_batch_id = expected_batch::text;
+  GET DIAGNOSTICS normalized_rows_removed = ROW_COUNT;
+
+  IF normalized_rows_removed <> 113868 THEN
+    RAISE EXCEPTION 'normalized delete count mismatch: %', normalized_rows_removed;
+  END IF;
 
   UPDATE ml.training_import_batches
   SET load_summary = load_summary || jsonb_build_object(

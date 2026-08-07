@@ -171,7 +171,8 @@ def test_production_cleanup_is_exact_count_guarded_and_has_recovery_instructions
     assert "<> 132586" in cleanup
     assert "<> 113868" in cleanup
     assert "TRUNCATE TABLE research.training_source_rows" in cleanup
-    assert "TRUNCATE TABLE research.auto_training_records" in cleanup
+    assert "DELETE FROM research.auto_training_records" in cleanup
+    assert "TRUNCATE TABLE research.auto_training_records" not in cleanup
     assert "production_cleanup" in validation
     assert "governed re-ingestion" in rollback
     assert "TRUNCATE TABLE public." not in cleanup
