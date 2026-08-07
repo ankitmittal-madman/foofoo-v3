@@ -66,7 +66,7 @@ def canonicalize_names(names, catalogue) -> list[str]:
 
 
 def _bounded_map(values) -> dict[str, float]:
-    result = {}
+    result: dict[str, float] = {}
     if not isinstance(values, dict):
         return result
     for key, raw in values.items():
@@ -94,7 +94,7 @@ def _semantic_affinity(dish, preference_by_class, preference_by_tag) -> float | 
     class_value = _mean_evidence(K.dish_to_class_codes(dish.name), preference_by_class)
     if class_value is not None:
         sources.append(class_value)
-    tag_keys = []
+    tag_keys: list[str] = []
     for dimension, attribute in _TAG_DIMENSION_ATTRIBUTES.items():
         tag_keys.extend(f"{dimension}:{value}" for value in getattr(dish, attribute, []) or [])
     tag_value = _mean_evidence(tag_keys, preference_by_tag)

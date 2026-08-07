@@ -95,12 +95,12 @@ export class FoodOntologyGateway {
     return read.action === "meal_classes" ? "classes" : "dish";
   }
 
-  private serviceRequest(read: OntologyRead): { path: string; shape: (value: any) => unknown } {
+  private serviceRequest(read: OntologyRead): { path: string; shape: (value: unknown) => unknown } {
     if (read.action === "meal_classes") {
       return {
         path: "/v1/meal-classes",
         shape: (value) =>
-          (value.items ?? []).map((item: Record<string, unknown>) => ({
+          ((value as { items?: Array<Record<string, unknown>> }).items ?? []).map((item) => ({
             ...item,
             slot: [item.slot],
             is_addon: item.planning_role === "addon",
@@ -119,7 +119,7 @@ export class FoodOntologyGateway {
       return {
         path: `/v1/meal-classes/${encodeURIComponent(read.classCode)}/dishes?${params}`,
         shape: (value) =>
-          (value.items ?? []).map((item: Record<string, unknown>) => ({
+          ((value as { items?: Array<Record<string, unknown>> }).items ?? []).map((item) => ({
             ...item,
             dish_id: item.id,
             name: item.canonical_name,
@@ -128,29 +128,32 @@ export class FoodOntologyGateway {
           })),
       };
     }
-    const shapeRecord = (value: Record<string, unknown>) => ({
-      schema_version: "1",
-      dish: {
-        id: value.id,
-        name: value.canonical_name,
-        description: value.description,
-        status: value.status,
-      },
-      aliases: value.aliases ?? [],
-      ingredients: [],
-      meal_classes: value.class_memberships ?? [],
-      taxonomy: Object.entries((value.fields ?? {}) as Record<string, unknown>).map(
-        ([field_key, field]) => ({ field_key, ...(field as Record<string, unknown>) }),
-      ),
-      constraints: [],
-      regional_affinities: [],
-      nutrition: [],
-      recipes: [],
-      meal_episodes: [],
-      relationships: value.relationships ?? [],
-      images: value.images ?? [],
-      evidence: [],
-    });
+    const shapeRecord = (value: unknown) => {
+      const record = value as Record<string, unknown>;
+      return {
+        schema_version: "1",
+        dish: {
+          id: record.id,
+          name: record.canonical_name,
+          description: record.description,
+          status: record.status,
+        },
+        aliases: record.aliases ?? [],
+        ingredients: [],
+        meal_classes: record.class_memberships ?? [],
+        taxonomy: Object.entries((record.fields ?? {}) as Record<string, unknown>).map(
+          ([field_key, field]) => ({ field_key, ...(field as Record<string, unknown>) }),
+        ),
+        constraints: [],
+        regional_affinities: [],
+        nutrition: [],
+        recipes: [],
+        meal_episodes: [],
+        relationships: record.relationships ?? [],
+        images: record.images ?? [],
+        evidence: [],
+      };
+    };
     if (read.dishId) {
       return { path: `/v1/dishes/${encodeURIComponent(read.dishId)}`, shape: shapeRecord };
     }

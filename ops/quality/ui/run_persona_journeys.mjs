@@ -300,12 +300,16 @@ async function waitForSurface(page, testId, timeout = 45000) {
 
 /** Click an action and require the corresponding backend endpoint to complete successfully. */
 async function clickWithApi(page, locator, endpoint, timeout = 30000) {
-  const responsePromise = page.waitForResponse(
-    (response) => new URL(response.url()).pathname.endsWith(`/v1/${endpoint}`),
-    { timeout },
-  );
-  await locator.click({ timeout: 10000 });
-  const response = await responsePromise;
+  // Attach rejection handling to both operations immediately. If the click fails before the
+  // response wait is awaited, a later response timeout would otherwise become an unhandled
+  // rejection and terminate the whole persona batch outside the feature-level error boundary.
+  const [response] = await Promise.all([
+    page.waitForResponse(
+      (candidate) => new URL(candidate.url()).pathname.endsWith(`/v1/${endpoint}`),
+      { timeout },
+    ),
+    locator.click({ timeout: 10000 }),
+  ]);
   if (response.status() >= 400) {
     throw new Error(`${endpoint} returned HTTP ${response.status()}`);
   }
