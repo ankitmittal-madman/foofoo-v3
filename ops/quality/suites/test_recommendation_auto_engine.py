@@ -117,6 +117,7 @@ def test_postgres_research_fetch_is_bounded_and_parameterized():
 
     assert rows == []
     assert "LIMIT %s" in cursor.query
+    assert "ORDER BY target_table, record_key" in cursor.query
     assert cursor.params == ("research.interactions", 50_000)
 
 

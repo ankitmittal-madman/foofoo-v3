@@ -304,7 +304,7 @@ class PostgresTrainingStore:
                    provenance_tags,explanation,first_batch_id,last_batch_id,version
                    FROM research.auto_training_records
                    WHERE target_table=%s AND ontology_mapping_status<>'rejected'
-                   ORDER BY confidence DESC, record_key"""
+                   ORDER BY target_table, record_key"""
             params: tuple[Any, ...] = (target_table,)
             if limit is not None:
                 query += " LIMIT %s"
