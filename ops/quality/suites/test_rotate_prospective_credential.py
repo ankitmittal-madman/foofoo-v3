@@ -1,6 +1,6 @@
 """Safety-boundary tests for the production prospective credential rotation operation."""
 
-from ops.recommendation.rotate_prospective_credential import (
+from ops.recommendation.protected_identity import (
     database_identifies_project,
     supabase_project_ref,
 )

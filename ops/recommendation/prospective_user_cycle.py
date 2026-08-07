@@ -19,6 +19,12 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from uuid import UUID, uuid4
 
+from ops.recommendation.protected_identity import (
+    database_identifies_project,
+    existing_auth_email,
+    supabase_project_ref,
+)
+
 EXECUTE_CONFIRMATION = "EXECUTE_USER_RECOMMENDATION_REFRESH"
 SLOTS = ("breakfast", "lunch", "dinner")
 OpenUrl = Callable[..., Any]
@@ -195,10 +201,23 @@ def main(argv: list[str] | None = None) -> int:
 
     supabase_url = required_env("SUPABASE_URL")
     anon_key = required_env("SUPABASE_ANON_KEY")
+    database_url = required_env("DATABASE_URL")
+    project_ref = supabase_project_ref(supabase_url)
+    if not database_identifies_project(database_url, project_ref):
+        raise RuntimeError("Database URL does not identify the public Supabase project")
+    import psycopg2
+
+    application_name = f"foofoo-prospective-identity-{os.environ.get('GITHUB_RUN_ID', 'local')}"
+    with psycopg2.connect(
+        database_url,
+        application_name=application_name[:63],
+        connect_timeout=10,
+    ) as connection:
+        email = existing_auth_email(connection, args.expected_profile_id, lock=False)
     token = authenticate(
         supabase_url,
         anon_key,
-        required_env("TEST_USER_EMAIL"),
+        email,
         required_env("TEST_USER_PASSWORD"),
         args.expected_profile_id,
     )

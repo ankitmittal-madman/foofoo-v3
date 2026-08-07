@@ -33,9 +33,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
       SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
       SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
-      TEST_USER_EMAIL: ${{ secrets.GHAR_SIGNIN_EMAIL }}
       TEST_USER_PASSWORD: ${{ secrets.GHAR_SIGNIN_PASSWORD }}
       MODE: ${{ inputs.mode }}
       CONFIRM_PRODUCTION_WRITE: ${{ inputs.confirm_production_write }}
@@ -46,6 +46,8 @@ jobs:
           python-version: "3.11"
       - name: Mask the profile identifier
         run: echo "::add-mask::${{ inputs.expected_profile_id }}"
+      - name: Install the production database driver
+        run: pip install psycopg2-binary
       - name: Run fail-closed prospective cycle
         env:
           EXPECTED_PROFILE_ID: ${{ inputs.expected_profile_id }}
