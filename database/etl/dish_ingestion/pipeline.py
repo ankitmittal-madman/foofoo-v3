@@ -20,7 +20,7 @@ from pathlib import Path
 from . import images
 from .dedupe import DedupeDecision, DedupeIndex
 from .groq_adapter import GroqAdapter
-from .image_prompt import ImagePromptGenerator, assemble_prompt
+from .image_prompt import ImagePromptGenerator, assemble_prompt, clean_dish_name_for_prompt
 from .images import CloudinaryUploader, HFImageClient, PollinationsClient
 from .normalize import SourceRow, load_and_normalize
 from .ontology_adapter import get_adapter
@@ -125,10 +125,11 @@ def process_row(row: SourceRow, dedupe_index: DedupeIndex, ontology, groq: GroqA
         if not image_ctx.generate_images:
             outcome.image = images.not_applicable(n["name"])
         elif image_ctx.dry_run:
+            clean_name = clean_dish_name_for_prompt(n["name"])
             fields = image_ctx.prompt_gen.resolve_fields(
-                n["name"], n["cuisine_raw"], n["course_raw"], n["ingredients"], force_heuristic=True
+                clean_name, n["cuisine_raw"], n["course_raw"], n["ingredients"], force_heuristic=True
             )
-            prompt_text = assemble_prompt(n["name"], fields)
+            prompt_text = assemble_prompt(clean_name, fields)
             outcome.image = images.planned_dry_run(n["name"], prompt_text, fields.source, fields.model_name)
         else:
             outcome.image = None  # resolved for real in _persist_row once dish_id is known
@@ -140,7 +141,7 @@ def process_row(row: SourceRow, dedupe_index: DedupeIndex, ontology, groq: GroqA
 
 def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
                   generate_images: bool = True, image_delay_seconds: float = DEFAULT_IMAGE_DELAY_SECONDS,
-                  row_limit: int | None = None) -> dict:
+                  row_limit: int | None = None, only_srno: set[int] | None = None) -> dict:
     """Entry point used by the CLI. Returns the import summary report dict either way; only
     writes to the database when dry_run is False.
 
@@ -153,6 +154,10 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
     row_limit: process only the first N CSV rows (None/0 = all rows). For smoke-testing a real
     --apply run (e.g. a first live Cloudinary/Groq test) against a small slice before committing
     to the full dataset. Does not change dedupe/report semantics beyond operating on fewer rows.
+
+    only_srno: process only these specific, possibly non-contiguous, source_srno values (None =
+    no filter). For re-testing a small named set of dishes (e.g. after a prompt-quality fix)
+    without row_limit's "first N rows" constraint. Combines with row_limit if both are set.
     """
     started = time.monotonic()
     checksum = _file_checksum(csv_path)
@@ -212,6 +217,8 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
         if row_limit and total >= row_limit:
             logger.info("row_limit=%s reached, stopping read early", row_limit)
             break
+        if only_srno is not None and row.srno not in only_srno:
+            continue
         total += 1
         outcome = process_row(row, dedupe_index, ontology, groq, image_ctx)
         batch.append(outcome)
@@ -390,11 +397,13 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
             if dish_id in image_ctx.existing_dish_ids_with_image:
                 logger.info("dish %s already has an image; skipping generation (idempotent)", dish_id)
             else:
-                logger.info("dish %s (%s): attempting real image generation", dish_id, n["name"])
+                clean_name = clean_dish_name_for_prompt(n["name"])
+                logger.info("dish %s (%s -> %s): attempting real image generation", dish_id, n["name"], clean_name)
                 fields = image_ctx.prompt_gen.resolve_fields(
-                    n["name"], n["cuisine_raw"], n["course_raw"], n["ingredients"]
+                    clean_name, n["cuisine_raw"], n["course_raw"], n["ingredients"],
+                    instructions=row.raw.get("Instructions", ""),
                 )
-                prompt_text = assemble_prompt(n["name"], fields)
+                prompt_text = assemble_prompt(clean_name, fields)
                 # HF fallback intentionally not passed here (Founder directive): chaining
                 # Pollinations' full retry cycle + an HF attempt inside one open DB transaction
                 # was long enough to trip Supabase's idle-in-transaction/statement timeout,
@@ -402,7 +411,7 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                 # aborted"). HFImageClient stays available on image_ctx for a future fix that
                 # moves generation outside the transaction, but is not invoked for now.
                 image_result = images.generate_and_upload(
-                    n["name"], prompt_text, fields.source, fields.model_name,
+                    clean_name, prompt_text, fields.source, fields.model_name,
                     image_ctx.pollinations, image_ctx.uploader,
                 )
                 logger.info("dish %s: image_result fetch_status=%s storage_path=%s",

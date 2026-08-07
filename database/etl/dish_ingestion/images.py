@@ -34,6 +34,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 import random
 import time
 import urllib.error
@@ -45,7 +46,14 @@ logger = logging.getLogger("dish_ingestion.images")
 
 IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 1024
-IMAGE_MODEL = "flux-pro"
+# flux-pro produced badly wrong results for unfamiliar/regional dish names -- Founder-confirmed
+# against real output: Carrot Methi Pachadi rendered as 8 separate mounds of colored powder (a
+# "spice palette" trope) instead of a plated chutney, and Masala Karela came out as amorphous
+# orange chunks with no bittergourd shape, despite the text prompt itself being accurate and
+# food-specific in both cases. flux-realism is Pollinations' model tuned for photorealistic
+# output rather than flux-pro's more illustrative/stylized default -- trying it as a same-API,
+# no-code-shape-change swap. Overridable via env without another deploy if this also needs tuning.
+IMAGE_MODEL = os.environ.get("POLLINATIONS_IMAGE_MODEL", "flux-realism")
 POLLINATIONS_BASE = "https://image.pollinations.ai/prompt/"
 MAX_RETRIES = 3
 RETRY_BACKOFF_SECONDS = 15   # ported from reference: `time.sleep(15 * attempt)`
@@ -169,7 +177,6 @@ class HFImageClient:
     prompt-enrichment fallback, so no new secret to provision if that one's already set)."""
 
     def __init__(self, api_key: str | None = None, model: str = HF_IMAGE_MODEL, timeout: int = 60):
-        import os
         self.api_key = api_key if api_key is not None else (os.environ.get("HF_API_KEY") or os.environ.get("HUGGINGFACE_API_KEY"))
         self.model = model
         self.timeout = timeout
@@ -212,7 +219,6 @@ class CloudinaryUploader:
     """Signed upload of in-memory bytes — no local disk write anywhere in this path."""
 
     def __init__(self, cloud_name: str | None = None, api_key: str | None = None, api_secret: str | None = None):
-        import os
         self.cloud_name = cloud_name or os.environ.get("CLOUDINARY_CLOUD_NAME", "dzlqsobol")
         self.api_key = api_key if api_key is not None else os.environ.get("CLOUDINARY_API_KEY")
         self.api_secret = api_secret if api_secret is not None else os.environ.get("CLOUDINARY_API_SECRET")
