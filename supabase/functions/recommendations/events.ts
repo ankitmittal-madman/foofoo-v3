@@ -15,8 +15,10 @@ import { withTimeout } from "../_shared/utils/timeout.ts";
 import {
   buildShownNotTappedRows,
   flattenServedDishes,
+  flattenServedMealClasses,
   resolveDishIdsByName,
   toExposureItems,
+  toMealClassExposureItems,
 } from "./served.ts";
 
 export type RecommendationOutcome =
@@ -165,6 +167,34 @@ export async function recordRecommendationEvent(
         }
       } catch (e) {
         ctx.logger.warn("recommendation_exposure_state.persist_failed", {
+          request_id: ev.requestId,
+          household_id: ev.householdId,
+          detail: e instanceof Error ? e.message : String(e),
+        });
+      }
+    }
+  }
+
+  // Weekly class impressions are stored separately from feedback. Being shown a class can inform
+  // repetition pressure, but must never be counted as the household selecting or accepting it.
+  if (
+    (ev.outcome === "success" || ev.outcome === "partial") && insertedId &&
+    Array.isArray(ev.plates)
+  ) {
+    const servedClasses = flattenServedMealClasses(ev.plates);
+    if (servedClasses.length > 0) {
+      try {
+        const db = createServiceRoleClient(ctx.config);
+        const { error } = await withTimeout(
+          db.rpc("record_meal_class_exposure_state", {
+            p_recommendation_event_id: insertedId,
+            p_items: toMealClassExposureItems(servedClasses),
+          }),
+          "recommendations.events.record_meal_class_exposure_state",
+        );
+        if (error) throw error;
+      } catch (e) {
+        ctx.logger.warn("meal_class_exposure_state.persist_failed", {
           request_id: ev.requestId,
           household_id: ev.householdId,
           detail: e instanceof Error ? e.message : String(e),

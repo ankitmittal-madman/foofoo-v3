@@ -135,6 +135,21 @@ async function syncTypedIntelligence(
     throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: tasteStateError.message });
   }
 
+  if (ev.target?.type === "meal_class" || ev.replacement?.from.type === "meal_class") {
+    const { error: temporalStateError } = await withTimeout(
+      db.rpc("refresh_meal_class_temporal_state", { p_household_id: ev.householdId }),
+      "feedback.events.refresh_meal_class_temporal_state",
+    );
+    // The canonical event is already durable and this state is fully replayable. A rolling
+    // deployment or transient refresh failure must not make the user retry a committed action.
+    if (temporalStateError) {
+      ctx.logger.warn("feedback.events.temporal_state_refresh_failed", {
+        household_id: ev.householdId,
+        detail: temporalStateError.message,
+      });
+    }
+  }
+
   const outcomeType = OUTCOME_BY_FEEDBACK[ev.eventType];
   if (outcomeType) {
     let episodeHash = typeof ev.detail?.episode_hash === "string" ? ev.detail.episode_hash : null;

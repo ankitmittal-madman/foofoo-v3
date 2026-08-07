@@ -252,10 +252,12 @@ export interface WeeklyClass {
   class_name: string;
   plan_weight: number;
   dish_count: number;
+  temporal_contribution?: number;
 }
 
 export interface WeeklyDay {
   weekday: string;
+  date?: string;
   slots: { breakfast: WeeklyClass[]; lunch: WeeklyClass[]; dinner: WeeklyClass[] };
 }
 
@@ -422,8 +424,12 @@ export function addDishToDate(input: {
 }
 
 /** Surface 3 — the weekly class plan (7 days × slots, top-3 dish-backed classes each). */
-export function fetchWeeklyPlan(topClasses = 3): Promise<WeeklyPlanResponse> {
-  return apiPost<WeeklyPlanResponse>("/plan", { surface: "weekly_plan", top_classes: topClasses });
+export function fetchWeeklyPlan(topClasses = 3, weekStartDate?: string): Promise<WeeklyPlanResponse> {
+  return apiPost<WeeklyPlanResponse>("/plan", {
+    surface: "weekly_plan",
+    top_classes: topClasses,
+    ...(weekStartDate ? { date: weekStartDate } : {}),
+  });
 }
 
 /** Surface 4 — reconciliation: only dishes of a finalized class for that day/slot. */

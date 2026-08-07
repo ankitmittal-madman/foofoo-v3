@@ -5,8 +5,21 @@ import {
   extractPersistedCadence,
   extractPersistedExposureDishNames,
   extractPersistedVarietyCounts,
+  extractTemporalClassState,
   selectImmediateRefreshExclusions,
 } from "../recommendations/personalization.ts";
+
+Deno.test("extractTemporalClassState: keeps canonical slot and rhythm rows", () => {
+  assertEquals(
+    extractTemporalClassState([
+      { meal_slot: "lunch", day_type: "weekday", class_code: "LD_DAL_ROTI" },
+      { meal_slot: "snacks", day_type: "weekday", class_code: "BAD" },
+      { meal_slot: "dinner", day_type: "holiday", class_code: "BAD" },
+    ]),
+    [{ meal_slot: "lunch", day_type: "weekday", class_code: "LD_DAL_ROTI" }],
+  );
+  assertEquals(extractTemporalClassState(null), []);
+});
 
 Deno.test("aggregateAffinityMaps combines only members with evidence", () => {
   const result = aggregateAffinityMaps([

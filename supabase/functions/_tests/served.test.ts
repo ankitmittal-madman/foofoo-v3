@@ -10,8 +10,30 @@ import { assertEquals } from "@std/assert";
 import {
   buildShownNotTappedRows,
   flattenServedDishes,
+  flattenServedMealClasses,
   toExposureItems,
+  toMealClassExposureItems,
 } from "../recommendations/served.ts";
+
+Deno.test("weekly class impressions retain date, slot and rank without becoming feedback", () => {
+  const classes = flattenServedMealClasses([
+    {
+      class_code: "LD_DAL_ROTI",
+      meal_slot: "lunch",
+      intended_meal_date: "2026-08-03",
+      day_type: "weekday",
+      shown_rank: 1,
+    },
+    { class_code: "INVALID_WITHOUT_MOMENT" },
+  ]);
+  assertEquals(toMealClassExposureItems(classes), [{
+    class_code: "LD_DAL_ROTI",
+    meal_slot: "lunch",
+    intended_meal_date: "2026-08-03",
+    day_type: "weekday",
+    shown_rank: 1,
+  }]);
+});
 
 Deno.test("flattenServedDishes: a mix of pair (2 heroes) and single (1 hero) plates flattens to one entry per served dish", () => {
   const plates = [

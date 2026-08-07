@@ -255,6 +255,82 @@ def test_weekly_class_plan_prioritizes_and_explains_direct_class_feedback():
     assert target_view["preference_contribution"] == pytest.approx(0.175)
 
 
+def test_weekly_class_plan_applies_slot_and_day_type_spacing_from_intended_date():
+    hh = _hh()
+    baseline = MP.weekly_class_plan(hh, top_classes=3, start_date="2026-08-03")
+    monday_lunch = baseline["days"][0]["slots"]["lunch"]
+    target = monday_lunch[0]["class_code"]
+    state = [{
+        "meal_slot": "lunch",
+        "day_type": "weekday",
+        "class_code": target,
+        "last_positive_meal_date": "2026-08-02",
+        "mean_positive_spacing_days": 5,
+    }]
+
+    personalized = MP.weekly_class_plan(
+        hh, top_classes=3, start_date="2026-08-03", temporal_class_state=state
+    )
+    personalized_lunch = personalized["days"][0]["slots"]["lunch"]
+    target_view = next(item for item in personalized_lunch if item["class_code"] == target)
+
+    assert personalized["days"][0]["date"] == "2026-08-03"
+    assert target_view["temporal_contribution"] < 0
+    assert all(
+        item["temporal_contribution"] == 0
+        for item in personalized["days"][0]["slots"]["dinner"]
+    )
+    assert all(
+        item["temporal_contribution"] == 0
+        for item in personalized["days"][5]["slots"]["lunch"]
+    )
+
+
+def test_weekly_class_exposure_is_a_smaller_signal_than_explicit_selection():
+    hh = _hh()
+    baseline = MP.weekly_class_plan(hh, top_classes=3, start_date="2026-08-03")
+    target = baseline["days"][0]["slots"]["lunch"][0]["class_code"]
+    common = {
+        "meal_slot": "lunch",
+        "day_type": "weekday",
+        "class_code": target,
+        "last_positive_meal_date": "2026-08-02",
+        "mean_positive_spacing_days": 4,
+        "last_exposed_meal_date": "2026-08-02",
+        "exposure_count_14d": 4,
+    }
+    plan = MP.weekly_class_plan(
+        hh, top_classes=3, start_date="2026-08-03", temporal_class_state=[common]
+    )
+    view = next(
+        item for item in plan["days"][0]["slots"]["lunch"] if item["class_code"] == target
+    )
+    assert view["explicit_spacing_contribution"] < view["exposure_spacing_contribution"] < 0
+    assert view["temporal_contribution"] == pytest.approx(
+        view["explicit_spacing_contribution"] + view["exposure_spacing_contribution"], abs=1e-4
+    )
+
+
+def test_weekly_class_spacing_ignores_the_same_planned_date():
+    hh = _hh()
+    baseline = MP.weekly_class_plan(hh, top_classes=3, start_date="2026-08-03")
+    target = baseline["days"][2]["slots"]["lunch"][0]["class_code"]
+    state = [{
+        "meal_slot": "lunch",
+        "day_type": "weekday",
+        "class_code": target,
+        "positive_meal_dates_28d": ["2026-08-05"],
+        "exposure_meal_dates_14d": ["2026-08-05"],
+        "exposure_count_14d": 1,
+        "mean_positive_spacing_days": 4,
+    }]
+    plan = MP.weekly_class_plan(
+        hh, top_classes=3, start_date="2026-08-03", temporal_class_state=state
+    )
+    view = next(item for item in plan["days"][2]["slots"]["lunch"] if item["class_code"] == target)
+    assert view["temporal_contribution"] == 0
+
+
 def test_dishes_for_class_reconciliation_contract():
     """The core WP-18 guarantee: dishes shown for a finalized class belong ONLY to that class."""
     hh = _hh()

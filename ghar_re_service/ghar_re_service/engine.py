@@ -353,6 +353,8 @@ def plan_weekly(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
         preference_by_dish=request.get("preference_by_dish") or {},
         preference_by_direct_class=request.get("preference_by_direct_class"),
         preference_by_projected_class=request.get("preference_by_projected_class"),
+        temporal_class_state=(request.get("context") or {}).get("temporal_class_state"),
+        start_date=(request.get("context") or {}).get("date"),
     )
 
 

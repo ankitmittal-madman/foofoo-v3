@@ -614,6 +614,8 @@ def weekly_class_plan(
     preference_by_dish=None,
     preference_by_direct_class=None,
     preference_by_projected_class=None,
+    temporal_class_state=None,
+    start_date=None,
 ):
     """Surface 3 — the weekly class plan: for each day × main slot, the top-`top_classes` meal
     CLASSES (from the compositional cohort plan) for the user to select and finalize. Selecting a
@@ -637,13 +639,17 @@ def weekly_class_plan(
         else _class_preference_affinity(cat, preference_by_dish)
     )
     direct_class_affinity = _bounded_class_affinity(preference_by_direct_class)
+    temporal_state = _normalized_temporal_class_state(temporal_class_state)
+    week_start = _week_start_date(start_date)
     meta = CP._class_meta()
     days = []
     recent_leaders = {
         slot: [] for slot in MAIN_SLOTS
     }  # slot -> class codes that led on recent days
     leader_counts = {slot: {} for slot in MAIN_SLOTS}
-    for day in WEEK:
+    for day_index, day in enumerate(WEEK):
+        planned_date = week_start + datetime.timedelta(days=day_index)
+        day_type = "weekend" if day in ("Saturday", "Sunday") else "weekday"
         slots = {}
         full_plans = {}
         for slot in MAIN_SLOTS:
@@ -659,9 +665,20 @@ def weekly_class_plan(
                 )[0]
                 for code in plan
             }
+            temporal_parts = {
+                code: _temporal_class_contributions(
+                    temporal_state.get((slot, day_type, code)), planned_date, day_type
+                )
+                for code in plan
+            }
+            temporal_contribution = {code: parts[0] for code, parts in temporal_parts.items()}
             ranked = sorted(
                 plan.items(),
-                key=lambda item: -(item[1] + 0.35 * class_affinity.get(item[0], 0.0)),
+                key=lambda item: -(
+                    item[1]
+                    + 0.35 * class_affinity.get(item[0], 0.0)
+                    + temporal_contribution.get(item[0], 0.0)
+                ),
             )
             candidates = []
             for code, weight in ranked:
@@ -680,6 +697,11 @@ def weekly_class_plan(
                         "dish_projected_preference_contribution": round(
                             0.35 * projected_share, 4
                         ),
+                        "temporal_contribution": round(
+                            temporal_contribution.get(code, 0.0), 4
+                        ),
+                        "explicit_spacing_contribution": round(temporal_parts[code][1], 4),
+                        "exposure_spacing_contribution": round(temporal_parts[code][2], 4),
                         "dish_count": backing.get(code, 0),
                     }
                 )
@@ -729,7 +751,7 @@ def weekly_class_plan(
             code = slots[slot][0]["class_code"]
             recent_leaders[slot] = ([code] + recent_leaders[slot])[:_RECENT_WINDOW]
             leader_counts[slot][code] = leader_counts[slot].get(code, 0) + 1
-        days.append({"weekday": day, "slots": slots})
+        days.append({"weekday": day, "date": planned_date.isoformat(), "slots": slots})
     return {
         "household": household.get("label"),
         "kind": "weekly_class_plan",
@@ -823,6 +845,105 @@ def _combined_class_affinity(code, direct, projected):
     return direct_share + projected_share, direct_share, projected_share
 
 
+def _week_start_date(value):
+    """Return the Monday anchoring this plan; invalid/missing input uses the current week."""
+    try:
+        supplied = datetime.date.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        supplied = datetime.date.today()
+    return supplied - datetime.timedelta(days=supplied.weekday())
+
+
+def _normalized_temporal_class_state(value):
+    """Index bounded slot/day-type/class history supplied by the private Edge read model."""
+    if not isinstance(value, list):
+        return {}
+    normalized = {}
+    for raw in value[:1000]:
+        if not isinstance(raw, dict):
+            continue
+        slot = str(raw.get("meal_slot") or "").strip()
+        day_type = str(raw.get("day_type") or "").strip()
+        class_code = str(raw.get("class_code") or "").strip()
+        if slot not in MAIN_SLOTS or day_type not in {"weekday", "weekend"} or not class_code:
+            continue
+        normalized[(slot, day_type, class_code)] = raw
+    return normalized
+
+
+def _state_date(state, field):
+    if not state or not state.get(field):
+        return None
+    try:
+        return datetime.date.fromisoformat(str(state[field])[:10])
+    except ValueError:
+        return None
+
+
+def _prior_state_date(state, array_field, fallback_field, planned_date):
+    values = state.get(array_field) if state else None
+    parsed = []
+    if isinstance(values, list):
+        for value in values[:100]:
+            try:
+                parsed.append(datetime.date.fromisoformat(str(value)[:10]))
+            except ValueError:
+                continue
+    prior = [value for value in parsed if value < planned_date]
+    if prior:
+        return max(prior)
+    fallback = _state_date(state, fallback_field)
+    return fallback if fallback is not None and fallback < planned_date else None
+
+
+def _temporal_class_contributions(state, planned_date, day_type):
+    """Bounded spacing pressure based on intended meal dates, never on exposure-as-acceptance."""
+    if not state:
+        return 0.0, 0.0, 0.0
+    last_positive = _prior_state_date(
+        state, "positive_meal_dates_28d", "last_positive_meal_date", planned_date
+    )
+    last_negative = _prior_state_date(
+        state, "negative_meal_dates_28d", "last_negative_meal_date", planned_date
+    )
+    last_exposed = _prior_state_date(
+        state, "exposure_meal_dates_14d", "last_exposed_meal_date", planned_date
+    )
+    try:
+        learned_spacing = float(state.get("mean_positive_spacing_days") or 0.0)
+    except (TypeError, ValueError):
+        learned_spacing = 0.0
+    target_spacing = max(
+        1.0,
+        min(28.0, learned_spacing if learned_spacing > 0 else (7.0 if day_type == "weekend" else 3.0)),
+    )
+    explicit = 0.0
+    if last_positive is not None:
+        elapsed = max(0, (planned_date - last_positive).days)
+        if elapsed < target_spacing:
+            explicit -= 0.18 * (target_spacing - elapsed) / target_spacing
+    if last_negative is not None:
+        elapsed = max(0, (planned_date - last_negative).days)
+        if elapsed < 14:
+            explicit -= 0.12 * (14 - elapsed) / 14
+    try:
+        exposure_count = max(0, min(100, int(state.get("exposure_count_14d") or 0)))
+    except (TypeError, ValueError):
+        exposure_count = 0
+    exposure = 0.0
+    if last_exposed is not None and exposure_count > 0:
+        elapsed = max(0, (planned_date - last_exposed).days)
+        if elapsed < 7:
+            exposure = -min(0.04, 0.01 * exposure_count) * (7 - elapsed) / 7
+    combined = explicit + exposure
+    if combined < -0.30:
+        scale = -0.30 / combined
+        explicit *= scale
+        exposure *= scale
+        combined = -0.30
+    return combined, explicit, exposure
+
+
 def _ensure_weekend_special(
     slots, full_plans, backing, meta, top_classes, recent_leaders, leader_counts
 ):
@@ -858,6 +979,9 @@ def _ensure_weekend_special(
         "preference_contribution": 0.0,
         "direct_class_preference_contribution": 0.0,
         "dish_projected_preference_contribution": 0.0,
+        "temporal_contribution": 0.0,
+        "explicit_spacing_contribution": 0.0,
+        "exposure_spacing_contribution": 0.0,
         "dish_count": backing.get(code, 0),
     }
     slots[slot] = [promoted] + [i for i in slots.get(slot, []) if i["class_code"] != code]

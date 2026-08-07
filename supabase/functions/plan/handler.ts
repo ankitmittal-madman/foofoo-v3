@@ -300,6 +300,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         recent_cuisine_counts: online.recentCuisineCounts,
         novelty_budget: online.noveltyBudget,
         richness_debt: online.richnessDebt,
+        temporal_class_state: online.temporalClassState,
         // The v1 contract types `weather` as an object when present. Provider configuration is
         // optional, so omit the field when weather is unavailable instead of sending `null`,
         // which the stricter meal-episode request validator correctly rejects with HTTP 422.
@@ -450,7 +451,19 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
             const slots = day.slots && typeof day.slots === "object"
               ? day.slots as Record<string, unknown>
               : {};
-            return Object.values(slots).flatMap((classes) => Array.isArray(classes) ? classes : []);
+            return Object.entries(slots).flatMap(([slot, classes]) =>
+              Array.isArray(classes)
+                ? classes.map((mealClass, index) => ({
+                  ...(mealClass as Record<string, unknown>),
+                  meal_slot: slot,
+                  intended_meal_date: day.date,
+                  day_type: ["Saturday", "Sunday"].includes(String(day.weekday))
+                    ? "weekend"
+                    : "weekday",
+                  shown_rank: index + 1,
+                }))
+                : []
+            );
           })
           : (body.dishes ?? body.options);
         const dishCount = Array.isArray(dishes) ? dishes.length : 0;

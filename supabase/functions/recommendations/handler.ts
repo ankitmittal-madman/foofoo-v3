@@ -203,6 +203,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     payload.preference_by_direct_class = online.preferenceByDirectClass;
     payload.preference_by_projected_class = online.preferenceByProjectedClass;
     payload.preference_by_tag = online.preferenceByTag;
+    (payload.context as Record<string, unknown>).temporal_class_state = online.temporalClassState;
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext

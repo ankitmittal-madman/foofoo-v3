@@ -108,6 +108,7 @@ const EMPTY_ONLINE_STATE: OnlineRecommendationState = {
   recentCuisineCounts: {},
   noveltyBudget: 0.15,
   richnessDebt: 0,
+  temporalClassState: [],
 };
 
 /** A no-op Logger for the re-client tests. */
@@ -253,6 +254,11 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
           recentCuisineCounts: { "Madhya Pradesh": 3 },
           noveltyBudget: 0.42,
           richnessDebt: 0.35,
+          temporalClassState: [{
+            meal_slot: "lunch",
+            day_type: "weekday",
+            class_code: "BF_POHA_UPMA",
+          }],
         }),
       callRe: (payload, requestId) => {
         sentPayload = payload;
@@ -280,6 +286,11 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
       { dish_name: "Indori Poha", served: 3, rejected: 0 },
     ]);
     assertEquals(sentContext.recent_class_counts, { BF_POHA_UPMA: 4 });
+    assertEquals(sentContext.temporal_class_state, [{
+      meal_slot: "lunch",
+      day_type: "weekday",
+      class_code: "BF_POHA_UPMA",
+    }]);
     assertEquals(sentContext.recent_cuisine_counts, { "Madhya Pradesh": 3 });
     assertEquals(sentContext.novelty_budget, 0.42);
     assertEquals(sentContext.richness_debt, 0.35);

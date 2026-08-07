@@ -22,6 +22,14 @@ export interface ServedDish {
   richnessScore?: number;
 }
 
+export interface ServedMealClass {
+  classCode: string;
+  mealSlot: "breakfast" | "lunch" | "dinner";
+  intendedMealDate: string;
+  dayType: "weekday" | "weekend";
+  shownRank: number;
+}
+
 function boundedNumber(value: unknown, minimum: number, maximum?: number): number | undefined {
   if (typeof value !== "number" || !Number.isFinite(value) || value < minimum) return undefined;
   if (maximum !== undefined && value > maximum) return undefined;
@@ -172,6 +180,46 @@ export function flattenServedDishes(plates: unknown): ServedDish[] {
     }
   }
   return out;
+}
+
+/** Extract dated weekly class impressions without treating them as selections or acceptance. */
+export function flattenServedMealClasses(plates: unknown): ServedMealClass[] {
+  if (!Array.isArray(plates)) return [];
+  const out: ServedMealClass[] = [];
+  for (const value of plates) {
+    if (!value || typeof value !== "object") continue;
+    const row = value as Record<string, unknown>;
+    const classCode = text(row.class_code);
+    const mealSlot = text(row.meal_slot);
+    const intendedMealDate = text(row.intended_meal_date);
+    const dayType = text(row.day_type);
+    const shownRank = boundedNumber(row.shown_rank, 1, 100);
+    if (
+      classCode && (mealSlot === "breakfast" || mealSlot === "lunch" || mealSlot === "dinner") &&
+      intendedMealDate && (dayType === "weekday" || dayType === "weekend") && shownRank
+    ) {
+      out.push({
+        classCode,
+        mealSlot,
+        intendedMealDate,
+        dayType,
+        shownRank: Math.trunc(shownRank),
+      });
+    }
+  }
+  return out;
+}
+
+export function toMealClassExposureItems(
+  served: ServedMealClass[],
+): Array<Record<string, string | number>> {
+  return served.map((item) => ({
+    class_code: item.classCode,
+    meal_slot: item.mealSlot,
+    intended_meal_date: item.intendedMealDate,
+    day_type: item.dayType,
+    shown_rank: item.shownRank,
+  }));
 }
 
 /** RPC payload uses snake_case to match the database boundary. Undefined evidence is omitted. */

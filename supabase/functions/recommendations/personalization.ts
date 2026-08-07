@@ -19,6 +19,18 @@ export interface OnlineRecommendationState {
   recentCuisineCounts: Record<string, number>;
   noveltyBudget: number;
   richnessDebt: number;
+  temporalClassState: Array<Record<string, unknown>>;
+}
+
+export function extractTemporalClassState(value: unknown): Array<Record<string, unknown>> {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is Record<string, unknown> => {
+    if (!item || typeof item !== "object") return false;
+    const row = item as Record<string, unknown>;
+    return ["breakfast", "lunch", "dinner"].includes(String(row.meal_slot)) &&
+      ["weekday", "weekend"].includes(String(row.day_type)) &&
+      typeof row.class_code === "string";
+  }).slice(0, 1_000);
 }
 
 export function extractExposureDishNames(plates: unknown): string[] {
@@ -165,51 +177,63 @@ export async function loadOnlineRecommendationState(
     if (membershipRes.error) throw membershipRes.error;
     const memberIds = [...new Set((membershipRes.data ?? []).map((row) => String(row.user_id)))];
     if (memberIds.length === 0) memberIds.push(profileId);
-    const [countRes, neverRes, todayRes, tasteRes, feedbackRes, varietyRes, exposureRes] =
-      await Promise.all([
-        withTimeout(
-          db.from("feedback_events").select("id", { count: "exact", head: true })
-            .eq("household_id", profileId).neq("event_type", "shown_not_tapped"),
-          "personalization.count",
+    const [
+      countRes,
+      neverRes,
+      todayRes,
+      tasteRes,
+      feedbackRes,
+      varietyRes,
+      exposureRes,
+      temporalRes,
+    ] = await Promise.all([
+      withTimeout(
+        db.from("feedback_events").select("id", { count: "exact", head: true })
+          .eq("household_id", profileId).neq("event_type", "shown_not_tapped"),
+        "personalization.count",
+      ),
+      withTimeout(
+        db.from("never_list").select("dishes(name)").eq("profile_id", profileId)
+          .eq("is_active", true),
+        "personalization.never",
+      ),
+      withTimeout(
+        db.from("not_today_suppression").select("dishes(name)").eq("profile_id", profileId)
+          .eq("is_active", true).gt("effective_until", new Date().toISOString()),
+        "personalization.not_today",
+      ),
+      withTimeout(
+        db.from("user_taste_vectors").select(
+          "profile_id,dish_affinity,class_affinity,direct_class_affinity,projected_class_affinity,tag_affinity",
+        ).in(
+          "profile_id",
+          memberIds,
         ),
-        withTimeout(
-          db.from("never_list").select("dishes(name)").eq("profile_id", profileId)
-            .eq("is_active", true),
-          "personalization.never",
-        ),
-        withTimeout(
-          db.from("not_today_suppression").select("dishes(name)").eq("profile_id", profileId)
-            .eq("is_active", true).gt("effective_until", new Date().toISOString()),
-          "personalization.not_today",
-        ),
-        withTimeout(
-          db.from("user_taste_vectors").select(
-            "profile_id,dish_affinity,class_affinity,direct_class_affinity,projected_class_affinity,tag_affinity",
-          ).in(
-            "profile_id",
-            memberIds,
-          ),
-          "personalization.taste",
-        ),
-        withTimeout(
-          db.from("feedback_events").select("event_type,created_at,detail,dishes(name)").eq(
-            "household_id",
-            profileId,
-          )
-            .order("created_at", { ascending: false }).limit(500),
-          "personalization.feedback",
-        ),
-        withTimeout(
-          db.rpc("get_recommendation_variety_state", { p_household_id: profileId }),
-          "personalization.variety_state",
-        ),
-        withTimeout(
-          db.from("recommendation_events").select("plates").eq("household_id", profileId)
-            .in("outcome", ["success", "partial"]).order("created_at", { ascending: false })
-            .limit(1),
-          "personalization.recent_exposures",
-        ),
-      ]);
+        "personalization.taste",
+      ),
+      withTimeout(
+        db.from("feedback_events").select("event_type,created_at,detail,dishes(name)").eq(
+          "household_id",
+          profileId,
+        )
+          .order("created_at", { ascending: false }).limit(500),
+        "personalization.feedback",
+      ),
+      withTimeout(
+        db.rpc("get_recommendation_variety_state", { p_household_id: profileId }),
+        "personalization.variety_state",
+      ),
+      withTimeout(
+        db.from("recommendation_events").select("plates").eq("household_id", profileId)
+          .in("outcome", ["success", "partial"]).order("created_at", { ascending: false })
+          .limit(1),
+        "personalization.recent_exposures",
+      ),
+      withTimeout(
+        db.rpc("get_meal_class_temporal_state", { p_household_id: profileId }),
+        "personalization.meal_class_temporal_state",
+      ),
+    ]);
     for (const result of [countRes, neverRes, todayRes, tasteRes, feedbackRes, exposureRes]) {
       if (result.error) throw result.error;
     }
@@ -217,6 +241,12 @@ export async function loadOnlineRecommendationState(
       ctx.logger.warn("personalization.variety_state_unavailable", {
         profile_id: profileId,
         detail: varietyRes.error.message,
+      });
+    }
+    if (temporalRes.error) {
+      ctx.logger.warn("personalization.temporal_state_unavailable", {
+        profile_id: profileId,
+        detail: temporalRes.error.message,
       });
     }
     const cadence = extractPersistedCadence(varietyRes.data);
@@ -305,6 +335,7 @@ export async function loadOnlineRecommendationState(
       })(),
       ...variety,
       ...cadence,
+      temporalClassState: extractTemporalClassState(temporalRes.data),
     };
   } catch (error) {
     ctx.logger.warn("personalization.load_failed", {
@@ -325,6 +356,7 @@ export async function loadOnlineRecommendationState(
       recentCuisineCounts: {},
       noveltyBudget: 0.15,
       richnessDebt: 0,
+      temporalClassState: [],
     };
   }
 }

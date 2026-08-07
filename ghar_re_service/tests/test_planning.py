@@ -254,6 +254,39 @@ def test_weekly_plan_uses_direct_class_signal_without_dish_expansion(client):
     assert target_view["direct_class_preference_contribution"] > 0
 
 
+def test_weekly_plan_uses_dated_slot_specific_temporal_state(client):
+    baseline = _post(
+        client,
+        "/v1/weekly-plan",
+        {"household": _hh(), "context": {"date": "2026-08-03"}},
+    ).json()
+    target = baseline["days"][0]["slots"]["lunch"][0]["class_code"]
+    response = _post(
+        client,
+        "/v1/weekly-plan",
+        {
+            "household": _hh(),
+            "context": {
+                "date": "2026-08-03",
+                "temporal_class_state": [{
+                    "meal_slot": "lunch",
+                    "day_type": "weekday",
+                    "class_code": target,
+                    "last_positive_meal_date": "2026-08-02",
+                    "mean_positive_spacing_days": 4,
+                }],
+            },
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["days"][0]["date"] == "2026-08-03"
+    target_view = next(
+        item for item in body["days"][0]["slots"]["lunch"] if item["class_code"] == target
+    )
+    assert target_view["temporal_contribution"] < 0
+
+
 def test_class_dishes_reconciliation(client):
     """The WP-18 guarantee end-to-end: dishes for a finalized class all belong to that class."""
     wk = _post(client, "/v1/weekly-plan", {"household": _hh()}).json()

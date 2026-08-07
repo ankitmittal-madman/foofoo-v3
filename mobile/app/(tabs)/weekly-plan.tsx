@@ -23,10 +23,12 @@ function dateForWeekday(weekday: string, now = new Date()): string | undefined {
   return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, "0")}-${String(monday.getDate()).padStart(2, "0")}`;
 }
 function deviceTimezone(): string { return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; }
+function currentWeekStart(now = new Date()): string { return dateForWeekday("Monday", now)!; }
 
 export default function WeeklyPlan() {
   const { t } = useI18n(); const queryClient = useQueryClient();
-  const query = useQuery<WeeklyPlanResponse>({ queryKey: ["weekly-plan"], queryFn: () => fetchWeeklyPlan(4) });
+  const weekStart = currentWeekStart();
+  const query = useQuery<WeeklyPlanResponse>({ queryKey: ["weekly-plan", weekStart], queryFn: () => fetchWeeklyPlan(4, weekStart) });
   const saved = useQuery({ queryKey: ["saved-week"], queryFn: () => fetchSavedWeek() });
   const [selected, setSelected] = useState<FinalizedWeek>({}); const [period, setPeriod] = useState<"weekdays" | "weekend">("weekdays"); const [locked, setLocked] = useState<Record<string, Partial<Record<SlotName, boolean>>>>({}); const [snacks, setSnacks] = useState<Record<string, number>>({}); const [toast, setToast] = useState("");
 
