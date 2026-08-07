@@ -51,7 +51,20 @@ def test_user_audit_is_parameterized_and_json_safe():
 
 def test_user_audit_counts_json_dimensions_with_postgres_supported_function():
     assert "jsonb_object_length" not in user_audit.AUDIT_SQL
-    assert user_audit.AUDIT_SQL.count("jsonb_object_keys") == 2
+    assert user_audit.AUDIT_SQL.count("jsonb_object_keys") == 3
+    assert "tag_affinity_dimensions" in user_audit.AUDIT_SQL
+
+
+def test_user_audit_only_counts_training_grade_point_in_time_attribution():
+    sql = user_audit.AUDIT_SQL
+    assert "usable_feature_snapshots" in sql
+    assert "jsonb_typeof(fs.values->'household') = 'object'" in sql
+    assert "fs.values->'household' <> '{}'::jsonb" in sql
+    assert "JOIN public.outcome_events o ON o.idempotency_key = f.id" in sql
+    assert "JOIN public.slate_items i ON i.slate_id = s.id" in sql
+    assert "JOIN public.dishes d ON d.id = f.dish_id" in sql
+    assert "exact_attribution_coverage" in sql
+    assert "'not_today','swap','edit'" not in sql
 
 
 def test_user_audit_reports_private_persisted_variety_state():

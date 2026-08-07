@@ -43,6 +43,8 @@ WITH u AS (
            AS class_affinity_dimensions,
          (SELECT count(*) FROM jsonb_object_keys(coalesce(t.dish_affinity, '{}'::jsonb)))
            AS dish_affinity_dimensions,
+         (SELECT count(*) FROM jsonb_object_keys(coalesce(t.tag_affinity, '{}'::jsonb)))
+           AS tag_affinity_dimensions,
          coalesce(cardinality(t.genome_tag_affinity), 0) AS genome_dimensions, t.updated_at
   FROM public.user_taste_vectors t WHERE t.profile_id = (SELECT id FROM u)
 ), re_state AS (
@@ -73,20 +75,45 @@ WITH u AS (
       JOIN public.slates s ON s.id = si.slate_id
       WHERE s.household_id = (SELECT id FROM u)
         AND si.selection_propensity IS NOT NULL) AS calibrated_propensity_items,
+    (SELECT count(*) FROM ml.feature_snapshots fs
+      JOIN public.recommendation_runs rr ON rr.feature_snapshot_id = fs.id
+      JOIN public.slates s ON s.id = rr.slate_id
+      WHERE s.household_id = (SELECT id FROM u)
+        AND jsonb_typeof(fs.values->'household') = 'object'
+        AND fs.values->'household' <> '{}'::jsonb) AS usable_feature_snapshots,
     (SELECT max(s.created_at) FROM public.slates s
       WHERE s.household_id = (SELECT id FROM u)) AS latest_slate_at,
     (SELECT coalesce(jsonb_agg(surface), '[]'::jsonb) FROM (
       SELECT DISTINCT s.surface FROM public.slates s
       WHERE s.household_id = (SELECT id FROM u) ORDER BY s.surface
     ) surfaces) AS surfaces
-), attribution AS (
-  SELECT count(*) AS exact_attributed_feedback
+), labeled_feedback AS (
+  SELECT f.*
   FROM public.feedback_events f
+  WHERE f.household_id = (SELECT id FROM u)
+    AND f.data_source = 'real'
+    AND f.event_type IN (
+      'accept','like','make_this','cooked','completed','dislike','never','regretted'
+    )
+), attribution AS (
+  SELECT
+    (SELECT count(*) FROM labeled_feedback) AS labeled_feedback,
+    (SELECT count(*) FROM labeled_feedback WHERE dish_id IS NOT NULL) AS identity_resolved_feedback,
+    count(*) AS exact_attributed_feedback,
+    CASE WHEN (SELECT count(*) FROM labeled_feedback) = 0 THEN 0
+         ELSE round(count(*)::numeric / (SELECT count(*) FROM labeled_feedback), 4)
+    END AS exact_attribution_coverage
+  FROM labeled_feedback f
   JOIN public.recommendation_events r ON r.id = f.recommendation_event_id
   JOIN public.slates s ON s.household_id = r.household_id AND s.request_id = r.request_id
   JOIN public.recommendation_runs rr ON rr.slate_id = s.id AND rr.run_status = 'success'
-  WHERE f.household_id = (SELECT id FROM u) AND f.data_source = 'real'
-    AND f.event_type IN ('accept','like','dislike','never','not_today','swap','edit')
+  JOIN ml.feature_snapshots fs ON fs.id = rr.feature_snapshot_id
+    AND jsonb_typeof(fs.values->'household') = 'object'
+    AND fs.values->'household' <> '{}'::jsonb
+  JOIN public.outcome_events o ON o.idempotency_key = f.id
+    AND o.slate_id = s.id AND o.episode_hash IS NOT NULL
+  JOIN public.slate_items i ON i.slate_id = s.id AND i.episode_hash = o.episode_hash
+  JOIN public.dishes d ON d.id = f.dish_id
 ), cadence AS (
   SELECT novelty_budget, richness_debt, effort_debt, ordinary_meal_ratio,
          feature_version, updated_at
