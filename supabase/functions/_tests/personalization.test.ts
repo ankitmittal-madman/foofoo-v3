@@ -4,6 +4,7 @@ import {
   extractExposureDishNames,
   extractPersistedCadence,
   extractPersistedExposureDishNames,
+  selectImmediateRefreshExclusions,
   extractPersistedVarietyCounts,
 } from "../recommendations/personalization.ts";
 
@@ -92,3 +93,21 @@ Deno.test("extractExposureDishNames: event-history fallback supports every servi
     ["Indori Poha", "Daal Bafla", "Mawa Bati", "Pav Bhaji"],
   );
 });
+
+Deno.test(
+  "selectImmediateRefreshExclusions: latest slate wins over long history and stays bounded",
+  () => {
+    const persisted = Array.from({ length: 50 }, (_, index) => `Old ${index}`);
+    const selected = selectImmediateRefreshExclusions(persisted, [{
+      plates: [{
+        components: [
+          { dish_name: "Latest Dry" },
+          { dish_name: "Latest Liquid" },
+          { dish_name: "Latest Dry" },
+        ],
+      }],
+    }]);
+    assertEquals(selected, ["Latest Dry", "Latest Liquid"]);
+    assertEquals(selectImmediateRefreshExclusions(persisted, [], 16).length, 16);
+  },
+);

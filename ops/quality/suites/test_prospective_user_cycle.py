@@ -74,6 +74,15 @@ def test_episode_validation_requires_unique_modern_slate_lineage():
         cycle.episode_identities({"episodes": [{"episode_hash": "one"}]})
 
 
+def test_refresh_cycle_reports_safe_slot_and_generation_when_a_slate_is_empty():
+    def opener(_request, *, timeout):
+        assert timeout == 45
+        return Response({"slate_id": "empty", "episodes": []})
+
+    with pytest.raises(RuntimeError, match="breakfast refresh generation 0"):
+        cycle.run_refresh_cycle("https://example.test", "anon", "token", opener=opener)
+
+
 def test_report_writer_is_private(tmp_path):
     path = tmp_path / "report.json"
     cycle.write_report(path, {"identity_verified": True})

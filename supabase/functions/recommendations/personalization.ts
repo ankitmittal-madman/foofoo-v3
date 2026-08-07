@@ -48,6 +48,22 @@ export function extractPersistedExposureDishNames(value: unknown): string[] {
   return names.filter((name): name is string => typeof name === "string" && name.length > 0);
 }
 
+/** Choose the bounded hard-exclusion set used for an immediate refresh.
+ *
+ * The materialized seven-day dish window is useful history, but hard-excluding all of it can
+ * exhaust a meal slot after repeated refreshes. Class/cuisine history already remains active as
+ * a soft diversity penalty. Hard suppression therefore uses only the latest served slate, with a
+ * small persisted fallback for accounts that predate recommendation-event storage. */
+export function selectImmediateRefreshExclusions(
+  persisted: string[],
+  latestExposureRows: Array<{ plates?: unknown }>,
+  limit = 16,
+): string[] {
+  const fromLatestSlate = latestExposureRows.flatMap((row) => extractExposureDishNames(row.plates));
+  const source = fromLatestSlate.length > 0 ? fromLatestSlate : persisted;
+  return [...new Set(source)].slice(0, Math.max(0, Math.min(16, Math.trunc(limit))));
+}
+
 export function extractPersistedCadence(value: unknown): {
   noveltyBudget: number;
   richnessDebt: number;
@@ -188,7 +204,7 @@ export async function loadOnlineRecommendationState(
         withTimeout(
           db.from("recommendation_events").select("plates").eq("household_id", profileId)
             .in("outcome", ["success", "partial"]).order("created_at", { ascending: false })
-            .limit(6),
+            .limit(1),
           "personalization.recent_exposures",
         ),
       ]);
@@ -268,10 +284,10 @@ export async function loadOnlineRecommendationState(
       dishFeedbackCounts: [...counts].map(([name, value]) => ({ dish_name: name, ...value })),
       recentExposureDishNames: (() => {
         const persisted = extractPersistedExposureDishNames(varietyRes.data);
-        const eventFallback = (exposureRes.data ?? []).flatMap((row) =>
-          extractExposureDishNames(row.plates)
+        return selectImmediateRefreshExclusions(
+          persisted,
+          (exposureRes.data ?? []) as Array<{ plates?: unknown }>,
         );
-        return [...new Set(persisted.length > 0 ? persisted : eventFallback)].slice(0, 50);
       })(),
       ...variety,
       ...cadence,
