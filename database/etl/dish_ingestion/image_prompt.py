@@ -45,9 +45,14 @@ GROQ_MODEL = os.environ.get("IMAGE_PROMPT_GROQ_MODEL", "llama-3.3-70b-versatile"
 HF_MODEL = os.environ.get("HF_MODEL", "mistralai/Mistral-7B-Instruct-v0.3")
 HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
 
-# The exact standardized template, ported literally from the xlsx `prompt` column (verified across
-# 5 sample rows — see module docstring). {dish_name} and the four LLM-sourced blanks are the only
-# variable slots; every other word is fixed, byte-for-byte, dish to dish.
+# The exact standardized template, ported literally from the xlsx `prompt` column -- re-verified
+# character-for-character against Butter Chicken's actual cell content this session (the only
+# difference was the xlsx's mojibake-encoded em dash "â€”" vs a real "—" here, an xlsx encoding
+# artifact, not a content difference). {dish_name} and the four LLM-sourced blanks are the only
+# variable slots; every other word is fixed, byte-for-byte, dish to dish. A short, tag-style
+# variant was tried and also failed to fix bad results on unfamiliar dishes (see git history,
+# reverted) -- reverting to this exact reference form rather than continuing to improvise
+# variations away from it.
 PROMPT_TEMPLATE = (
     "Generate a high-quality professional food photograph of {dish_name}: {visual_description}. "
     "Served in a traditional {vessel_type}. The table surface is a clean warm-toned rustic wooden "
@@ -98,9 +103,12 @@ class PromptFields:
 
 def assemble_prompt(dish_name: str, fields: PromptFields) -> str:
     """Server-owned assembly: the LLM never sees or produces the template text itself."""
+    # The template already appends "." after {visual_description}; strip any trailing period the
+    # LLM's own text ends with so real output never doubles up ("...alongside..").
+    description = fields.visual_description.strip().rstrip(".")
     return PROMPT_TEMPLATE.format(
         dish_name=dish_name,
-        visual_description=fields.visual_description,
+        visual_description=description,
         vessel_type=fields.vessel_type,
         color_focal_point=fields.color_focal_point,
     )
