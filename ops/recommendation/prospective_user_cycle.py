@@ -24,6 +24,20 @@ SLOTS = ("breakfast", "lunch", "dinner")
 OpenUrl = Callable[..., Any]
 
 
+def safe_http_error_code(error: HTTPError) -> str | None:
+    """Extract only a bounded machine code; never echo provider messages or response bodies."""
+    try:
+        body = json.loads(error.read().decode())
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(body, Mapping):
+        return None
+    code = body.get("error_code") or body.get("code")
+    if not isinstance(code, str) or not 1 <= len(code) <= 80:
+        return None
+    return code if all(character.isalnum() or character in "_.-" for character in code) else None
+
+
 def required_env(name: str) -> str:
     value = os.environ.get(name, "").strip()
     if not value:
@@ -48,7 +62,9 @@ def post_json(
         with opener(request, timeout=45) as response:
             body = json.loads(response.read().decode())
     except HTTPError as error:
-        raise RuntimeError(f"Request failed with HTTP {error.code}") from error
+        provider_code = safe_http_error_code(error)
+        suffix = f" ({provider_code})" if provider_code else ""
+        raise RuntimeError(f"Request failed with HTTP {error.code}{suffix}") from error
     if not isinstance(body, dict):
         raise RuntimeError("Endpoint returned a non-object JSON response")
     return body
@@ -66,7 +82,7 @@ def authenticate(
     response = post_json(
         f"{supabase_url.rstrip('/')}/auth/v1/token?grant_type=password",
         {"email": email, "password": password},
-        {"apikey": anon_key},
+        {"apikey": anon_key, "Authorization": f"Bearer {anon_key}"},
         opener=opener,
     )
     user = response.get("user")

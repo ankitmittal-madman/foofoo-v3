@@ -1,5 +1,6 @@
 import json
 from io import BytesIO
+from urllib.error import HTTPError
 from uuid import UUID
 
 import pytest
@@ -74,3 +75,10 @@ def test_report_writer_is_private(tmp_path):
     path = tmp_path / "report.json"
     cycle.write_report(path, {"identity_verified": True})
     assert path.stat().st_mode & 0o777 == 0o600
+
+
+def test_http_error_diagnostics_only_admit_bounded_machine_codes():
+    safe = HTTPError("https://example.test", 400, "bad", {}, BytesIO(b'{"code":"invalid_credentials","message":"secret detail"}'))
+    unsafe = HTTPError("https://example.test", 400, "bad", {}, BytesIO(b'{"code":"bad code: leaked"}'))
+    assert cycle.safe_http_error_code(safe) == "invalid_credentials"
+    assert cycle.safe_http_error_code(unsafe) is None
