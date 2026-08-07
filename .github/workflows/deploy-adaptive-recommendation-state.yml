@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: Type apply to deploy migrations 081 through 084
+        description: Type apply to deploy migrations 081 through 085
         required: true
         type: string
 
@@ -86,6 +86,18 @@ jobs:
               -f database/migrations/084_activate_semantic_taste_vectors.sql
           fi
 
+      - name: Apply migration 085 when absent
+        run: |
+          present="$(psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -c \
+            "SELECT position('city_overlay_weight = EXCLUDED.city_overlay_weight' IN pg_get_functiondef('public.refresh_user_re_state(uuid)'::regprocedure)) > 0")"
+          if [ "$present" = "t" ]; then
+            echo "Migration 085 already present; skipping."
+          else
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction \
+              -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+              -f database/migrations/085_backfill_adaptive_serving_state.sql
+          fi
+
       - name: Validate adaptive state and report aggregate counts
         run: |
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
@@ -96,3 +108,5 @@ jobs:
             -f database/validation/935_refresh_user_taste_vectors_validation.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
             -f database/validation/936_activate_semantic_taste_vectors_validation.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/937_backfill_adaptive_serving_state_validation.sql
