@@ -45,10 +45,12 @@ GROQ_MODEL = os.environ.get("IMAGE_PROMPT_GROQ_MODEL", "llama-3.3-70b-versatile"
 HF_MODEL = os.environ.get("HF_MODEL", "mistralai/Mistral-7B-Instruct-v0.3")
 HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
 
-# The exact standardized template, ported literally from the xlsx `prompt` column (verified across
-# 5 sample rows — see module docstring). {dish_name} and the four LLM-sourced blanks are the only
-# variable slots; every other word is fixed, byte-for-byte, dish to dish.
-PROMPT_TEMPLATE = (
+# v1 template, ported literally from the xlsx `prompt` column (verified across 5 sample rows —
+# see module docstring). Kept for reference/rollback -- Founder-confirmed against real generated
+# output that its long descriptive-paragraph shape was losing coherence on Pollinations for
+# unfamiliar regional dishes (Carrot Methi Pachadi rendered as spice-powder mounds; Masala Karela
+# repeatedly rendered as noodle strands or chunks despite an accurate text description).
+PROMPT_TEMPLATE_V1_LONGFORM = (
     "Generate a high-quality professional food photograph of {dish_name}: {visual_description}. "
     "Served in a traditional {vessel_type}. The table surface is a clean warm-toned rustic wooden "
     "board with nothing else on it — no scattered spices, no loose herbs, no cloth, no glass, "
@@ -58,6 +60,17 @@ PROMPT_TEMPLATE = (
     "gently. The colors should draw attention to {color_focal_point}. The image should look like "
     "premium editorial food photography — ultra sharp, high resolution, clean composition. "
     "Aspect ratio 16:9."
+)
+
+# v2 template (current default) -- Founder-specified short, front-loaded, comma-separated tag
+# style rather than a long descriptive paragraph, matching the pattern diffusion models like
+# Pollinations' generally respond to better: subject first, then punchy visual highlights, then a
+# fixed list of photography/style tags. {highlight} is fields.visual_description's content
+# collapsed to short comma-separated phrases rather than full sentences (see assemble_prompt).
+PROMPT_TEMPLATE = (
+    "Professional food photography of {dish_name}, {highlight}, macro shot, overhead view, "
+    "steam rising, natural side lighting, placed on a rustic dark wooden table, depth of field, "
+    "8k resolution, photorealistic."
 )
 
 
@@ -97,13 +110,20 @@ class PromptFields:
 
 
 def assemble_prompt(dish_name: str, fields: PromptFields) -> str:
-    """Server-owned assembly: the LLM never sees or produces the template text itself."""
-    return PROMPT_TEMPLATE.format(
-        dish_name=dish_name,
-        visual_description=fields.visual_description,
-        vessel_type=fields.vessel_type,
-        color_focal_point=fields.color_focal_point,
-    )
+    """Server-owned assembly: the LLM never sees or produces the template text itself.
+
+    Collapses fields.visual_description's sentences into short comma-separated phrases for the
+    v2 tag-style template (e.g. "melting cheddar, crispy bacon, glossy brioche bun" rather than
+    full prose) -- the LLM still reasons in full sentences internally (that structure is what
+    makes the color/shape/texture grounding reliable), only the final assembly is compressed.
+    """
+    highlight = _collapse_to_highlight_phrase(fields.visual_description)
+    return PROMPT_TEMPLATE.format(dish_name=dish_name, highlight=highlight)
+
+
+def _collapse_to_highlight_phrase(visual_description: str) -> str:
+    clauses = [c.strip().rstrip(".") for c in visual_description.split(".") if c.strip()]
+    return ", ".join(clauses)
 
 
 class ImagePromptGenerator:
