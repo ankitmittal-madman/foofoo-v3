@@ -234,6 +234,26 @@ def test_weekly_plan_shape(client):
     )
 
 
+def test_weekly_plan_uses_direct_class_signal_without_dish_expansion(client):
+    baseline = _post(client, "/v1/weekly-plan", {"household": _hh()}).json()
+    dinner = baseline["days"][0]["slots"]["dinner"]
+    leading, target = dinner[0]["class_code"], dinner[2]["class_code"]
+    response = _post(
+        client,
+        "/v1/weekly-plan",
+        {
+            "household": _hh(),
+            "preference_by_direct_class": {leading: -1.0, target: 1.0},
+            "preference_by_projected_class": {leading: 0.0, target: 0.0},
+        },
+    )
+    assert response.status_code == 200
+    personalized = response.json()["days"][0]["slots"]["dinner"]
+    assert [item["class_code"] for item in personalized].index(target) < 2
+    target_view = next(item for item in personalized if item["class_code"] == target)
+    assert target_view["direct_class_preference_contribution"] > 0
+
+
 def test_class_dishes_reconciliation(client):
     """The WP-18 guarantee end-to-end: dishes for a finalized class all belong to that class."""
     wk = _post(client, "/v1/weekly-plan", {"household": _hh()}).json()

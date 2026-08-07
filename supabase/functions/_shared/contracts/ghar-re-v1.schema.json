@@ -113,6 +113,8 @@
         "exclude_dish_names": { "type": "array", "items": { "type": "string" }, "description": "Canonical names or aliases suppressed from this response, normally from recent exposure or explicit Not Today/Never feedback." },
         "preference_by_dish": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded online dish affinities. Exact explicit feedback remains authoritative." },
         "preference_by_class": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded meal-class affinities derived from explicit feedback and mapping confidence." },
+        "preference_by_direct_class": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded meal-class affinities learned from explicit actions whose target is the class itself." },
+        "preference_by_projected_class": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded meal-class affinities projected from explicit dish feedback through reviewed dish-to-class mappings." },
         "preference_by_tag": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Bounded semantic affinities keyed as dimension:tag_name; used to generalize feedback to unseen dishes." }
       },
       "required": ["household", "context"]

@@ -8,6 +8,8 @@ Validates the four user-facing surfaces built on the scoring/cohort stack:
   - dishes_for_class RECONCILES: every returned dish belongs to the selected class (the contract).
 """
 
+import pytest
+
 from ghar_re_core import meal_planner as MP
 from ghar_re_core import cohort_plan as CP
 from ghar_re_core import knowledge as K
@@ -227,6 +229,30 @@ def test_weekly_class_plan_generalizes_dish_feedback_to_class_ranking():
     assert personalized_codes.index(target) < [item["class_code"] for item in dinner].index(target)
     leading_view = next(item for item in personalized_dinner if item["class_code"] == leading)
     assert leading_view["preference_contribution"] < 0
+    assert leading_view["direct_class_preference_contribution"] == 0
+    assert leading_view["dish_projected_preference_contribution"] < 0
+
+
+def test_weekly_class_plan_prioritizes_and_explains_direct_class_feedback():
+    hh = _hh()
+    baseline = MP.weekly_class_plan(hh, top_classes=3)
+    dinner = baseline["days"][0]["slots"]["dinner"]
+    leading, target = dinner[0]["class_code"], dinner[2]["class_code"]
+
+    personalized = MP.weekly_class_plan(
+        hh,
+        top_classes=3,
+        preference_by_direct_class={leading: -1.0, target: 1.0},
+        preference_by_projected_class={leading: 1.0, target: -1.0},
+    )
+    personalized_dinner = personalized["days"][0]["slots"]["dinner"]
+    personalized_codes = [item["class_code"] for item in personalized_dinner]
+
+    assert personalized_codes.index(target) < [item["class_code"] for item in dinner].index(target)
+    target_view = next(item for item in personalized_dinner if item["class_code"] == target)
+    assert target_view["direct_class_preference_contribution"] > 0
+    assert target_view["dish_projected_preference_contribution"] < 0
+    assert target_view["preference_contribution"] == pytest.approx(0.175)
 
 
 def test_dishes_for_class_reconciliation_contract():

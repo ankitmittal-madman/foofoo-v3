@@ -200,6 +200,8 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     ].slice(0, 50);
     payload.preference_by_dish = online.preferenceByDish;
     payload.preference_by_class = online.preferenceByClass;
+    payload.preference_by_direct_class = online.preferenceByDirectClass;
+    payload.preference_by_projected_class = online.preferenceByProjectedClass;
     payload.preference_by_tag = online.preferenceByTag;
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into

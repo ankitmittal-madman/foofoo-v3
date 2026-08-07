@@ -8,6 +8,8 @@ export interface OnlineRecommendationState {
   excludeDishNames: string[];
   preferenceByDish: Record<string, number>;
   preferenceByClass: Record<string, number>;
+  preferenceByDirectClass: Record<string, number>;
+  preferenceByProjectedClass: Record<string, number>;
   preferenceByTag: Record<string, number>;
   dishFeedbackCounts: Array<{ dish_name: string; served: number; rejected: number }>;
   /** Canonical names shown in recent successful slates. Used only for freshness/refresh
@@ -182,7 +184,7 @@ export async function loadOnlineRecommendationState(
         ),
         withTimeout(
           db.from("user_taste_vectors").select(
-            "profile_id,dish_affinity,class_affinity,tag_affinity",
+            "profile_id,dish_affinity,class_affinity,direct_class_affinity,projected_class_affinity,tag_affinity",
           ).in(
             "profile_id",
             memberIds,
@@ -276,6 +278,18 @@ export async function loadOnlineRecommendationState(
           (row as { class_affinity?: Record<string, number> | null }).class_affinity
         ),
       ),
+      preferenceByDirectClass: aggregateAffinityMaps(
+        (tasteRes.data ?? []).map((row) =>
+          (row as { direct_class_affinity?: Record<string, number> | null })
+            .direct_class_affinity
+        ),
+      ),
+      preferenceByProjectedClass: aggregateAffinityMaps(
+        (tasteRes.data ?? []).map((row) =>
+          (row as { projected_class_affinity?: Record<string, number> | null })
+            .projected_class_affinity
+        ),
+      ),
       preferenceByTag: aggregateAffinityMaps(
         (tasteRes.data ?? []).map((row) =>
           (row as { tag_affinity?: Record<string, number> | null }).tag_affinity
@@ -302,6 +316,8 @@ export async function loadOnlineRecommendationState(
       excludeDishNames: [],
       preferenceByDish: {},
       preferenceByClass: {},
+      preferenceByDirectClass: {},
+      preferenceByProjectedClass: {},
       preferenceByTag: {},
       dishFeedbackCounts: [],
       recentExposureDishNames: [],

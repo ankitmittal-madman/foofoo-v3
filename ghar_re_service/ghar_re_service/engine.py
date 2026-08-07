@@ -346,12 +346,13 @@ def plan_slot(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
 def plan_weekly(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
     """Surface 3: the weekly class plan (7 days × slots, top-3 dish-backed classes each)."""
     hh = build_household_dict(request["household"])
-    _, preferences = _online_taste(request, catalogue)
     return planner.weekly_class_plan(
         hh,
         top_classes=int(request.get("top_classes", 3)),
         catalogue=catalogue,
-        preference_by_dish=preferences,
+        preference_by_dish=request.get("preference_by_dish") or {},
+        preference_by_direct_class=request.get("preference_by_direct_class"),
+        preference_by_projected_class=request.get("preference_by_projected_class"),
     )
 
 

@@ -607,7 +607,14 @@ _RECENT_WINDOW = 2  # days a class is held back from re-topping the same slot, o
 _MAX_WEEKLY_LEADS_PER_SLOT = 2
 
 
-def weekly_class_plan(household, top_classes=3, catalogue=None, preference_by_dish=None):
+def weekly_class_plan(
+    household,
+    top_classes=3,
+    catalogue=None,
+    preference_by_dish=None,
+    preference_by_direct_class=None,
+    preference_by_projected_class=None,
+):
     """Surface 3 — the weekly class plan: for each day × main slot, the top-`top_classes` meal
     CLASSES (from the compositional cohort plan) for the user to select and finalize. Selecting a
     class then drives dishes_for_class (surface 4) for that day/slot. Also reports, per class, how
@@ -624,7 +631,12 @@ def weekly_class_plan(household, top_classes=3, catalogue=None, preference_by_di
     cat = catalogue or Catalogue()
     theta, _ = _theta_obj(household)
     backing = _class_dish_counts(cat)
-    class_affinity = _class_preference_affinity(cat, preference_by_dish)
+    dish_projected_affinity = (
+        _bounded_class_affinity(preference_by_projected_class)
+        if preference_by_projected_class is not None
+        else _class_preference_affinity(cat, preference_by_dish)
+    )
+    direct_class_affinity = _bounded_class_affinity(preference_by_direct_class)
     meta = CP._class_meta()
     days = []
     recent_leaders = {
@@ -638,9 +650,15 @@ def weekly_class_plan(household, top_classes=3, catalogue=None, preference_by_di
             ctx = make_context(slot=slot, weekday=day)
             plan = CP.class_plan(theta, ctx)
             full_plans[slot] = plan
-            # Generalize explicit dish feedback to the meal-class choice surface. The bounded
-            # contribution uses the same 0.35 ceiling as dish re-ranking: it can resolve close
-            # class choices but cannot override the household/cohort plan or any hard filter.
+            # A direct class action is more authoritative than a class inferred from dish
+            # feedback. When both exist, direct evidence owns 75% of the same bounded 0.35
+            # preference term; with only projected evidence, the previous behaviour is preserved.
+            class_affinity = {
+                code: _combined_class_affinity(
+                    code, direct_class_affinity, dish_projected_affinity
+                )[0]
+                for code in plan
+            }
             ranked = sorted(
                 plan.items(),
                 key=lambda item: -(item[1] + 0.35 * class_affinity.get(item[0], 0.0)),
@@ -649,12 +667,19 @@ def weekly_class_plan(household, top_classes=3, catalogue=None, preference_by_di
             for code, weight in ranked:
                 if backing.get(code, 0) == 0:  # never offer a class with no dishes to reconcile to
                     continue
+                _, direct_share, projected_share = _combined_class_affinity(
+                    code, direct_class_affinity, dish_projected_affinity
+                )
                 candidates.append(
                     {
                         "class_code": code,
                         "class_name": _class_names().get(code, code),
                         "plan_weight": round(weight, 4),
                         "preference_contribution": round(0.35 * class_affinity.get(code, 0.0), 4),
+                        "direct_class_preference_contribution": round(0.35 * direct_share, 4),
+                        "dish_projected_preference_contribution": round(
+                            0.35 * projected_share, 4
+                        ),
                         "dish_count": backing.get(code, 0),
                     }
                 )
@@ -772,6 +797,32 @@ def _class_preference_affinity(cat, preference_by_dish):
     return {code: totals[code] / counts[code] for code in totals}
 
 
+def _bounded_class_affinity(value):
+    """Normalize an untrusted class-affinity map at the core boundary."""
+    if not isinstance(value, dict):
+        return {}
+    normalized = {}
+    for raw_code, raw_affinity in list(value.items())[:250]:
+        code = str(raw_code).strip()
+        try:
+            affinity = float(raw_affinity)
+        except (TypeError, ValueError):
+            continue
+        if code and math.isfinite(affinity):
+            normalized[code] = max(-1.0, min(1.0, affinity))
+    return normalized
+
+
+def _combined_class_affinity(code, direct, projected):
+    """Return combined affinity plus separately explainable direct/projected shares."""
+    projected_value = projected.get(code, 0.0)
+    if code not in direct:
+        return projected_value, 0.0, projected_value
+    direct_share = 0.75 * direct[code]
+    projected_share = 0.25 * projected_value
+    return direct_share + projected_share, direct_share, projected_share
+
+
 def _ensure_weekend_special(
     slots, full_plans, backing, meta, top_classes, recent_leaders, leader_counts
 ):
@@ -805,6 +856,8 @@ def _ensure_weekend_special(
         "class_name": _class_names().get(code, code),
         "plan_weight": round(weight, 4),
         "preference_contribution": 0.0,
+        "direct_class_preference_contribution": 0.0,
+        "dish_projected_preference_contribution": 0.0,
         "dish_count": backing.get(code, 0),
     }
     slots[slot] = [promoted] + [i for i in slots.get(slot, []) if i["class_code"] != code]

@@ -99,6 +99,8 @@ const EMPTY_ONLINE_STATE: OnlineRecommendationState = {
   excludeDishNames: [],
   preferenceByDish: {},
   preferenceByClass: {},
+  preferenceByDirectClass: {},
+  preferenceByProjectedClass: {},
   preferenceByTag: {},
   dishFeedbackCounts: [],
   recentExposureDishNames: [],
@@ -242,6 +244,8 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
           excludeDishNames: ["Paneer Bhurji"],
           preferenceByDish: { "Indori Poha": 0.8 },
           preferenceByClass: { BF_POHA_UPMA: 0.7 },
+          preferenceByDirectClass: { BF_POHA_UPMA: 0.6 },
+          preferenceByProjectedClass: { BF_POHA_UPMA: 0.2 },
           preferenceByTag: { "dish_category:whole_meal": 0.5 },
           dishFeedbackCounts: [{ dish_name: "Indori Poha", served: 3, rejected: 0 }],
           recentExposureDishNames: ["Dal Bafla"],
@@ -267,6 +271,8 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
     ]);
     assertEquals(sentPayload?.preference_by_dish, { "Indori Poha": 0.8 });
     assertEquals(sentPayload?.preference_by_class, { BF_POHA_UPMA: 0.7 });
+    assertEquals(sentPayload?.preference_by_direct_class, { BF_POHA_UPMA: 0.6 });
+    assertEquals(sentPayload?.preference_by_projected_class, { BF_POHA_UPMA: 0.2 });
     assertEquals(sentPayload?.preference_by_tag, { "dish_category:whole_meal": 0.5 });
     const sentContext = sentPayload?.context as Record<string, unknown>;
     assertEquals(sentContext.interaction_count, 11);

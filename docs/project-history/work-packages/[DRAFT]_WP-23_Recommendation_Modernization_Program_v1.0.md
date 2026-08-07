@@ -275,3 +275,4 @@ Founder acceptance: _______________________ Date: ___________
 |---|---|---|
 | S99 — program start | Selected Today date reaches the Plan request; this work package defines the shared program | Committed; no DB change |
 | S100 — interaction contract v2 | Versioned JSON contract, additive migration 092/validation 944, Edge validation/writer support, canonical service-only view, weekly meal-class selected/replaced/lock events, and focused mobile/Deno tests | Code checkpoint only; migration and Edge/mobile release not yet deployed |
+| S101 — direct meal-class learning | Migration 093 separates direct class affinity from dish-projected class affinity; Edge sends both; Ghar weekly planning weights direct evidence more strongly and explains both contributions; deterministic core/service tests prove ranking movement | Code checkpoint only; migrations 092–093 and serving changes not yet deployed |

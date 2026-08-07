@@ -337,6 +337,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       ].slice(0, 50);
       payload.preference_by_dish = online.preferenceByDish;
       payload.preference_by_class = online.preferenceByClass;
+      payload.preference_by_direct_class = online.preferenceByDirectClass;
+      payload.preference_by_projected_class = online.preferenceByProjectedClass;
       payload.preference_by_tag = online.preferenceByTag;
       log.info("plan.composed", { household_id: hid, stubbed });
     }
