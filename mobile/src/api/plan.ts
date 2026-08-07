@@ -214,6 +214,7 @@ function fetchSlotOptionsAsMealEpisodes(
   slot: Slot,
   opts: {
     weekday?: string;
+    date?: string;
     class_code?: string;
     count?: number;
     refresh_generation?: number;
@@ -228,6 +229,7 @@ function fetchSlotOptionsAsMealEpisodes(
       slot,
       class_code: opts.class_code,
       weekday: opts.weekday,
+      ...(opts.date ? { date: opts.date } : {}),
       count,
       ...(opts.refresh_generation !== undefined ? { refresh_generation: opts.refresh_generation } : {}),
       ...(opts.exclude_dish_names?.length ? { exclude_dish_names: opts.exclude_dish_names } : {}),
@@ -237,6 +239,7 @@ function fetchSlotOptionsAsMealEpisodes(
       surface: "meal_plan",
       slot,
       weekday: opts.weekday,
+      ...(opts.date ? { date: opts.date } : {}),
       count,
       ...(opts.refresh_generation !== undefined ? { refresh_generation: opts.refresh_generation } : {}),
       ...(opts.exclude_dish_names?.length ? { exclude_dish_names: opts.exclude_dish_names } : {}),
@@ -299,6 +302,8 @@ export function fetchSlotOptions(
   slot: Slot,
   opts: {
     weekday?: string;
+    /** ISO meal date selected in Today; drives festival and date-specific recommendation context. */
+    date?: string;
     class_code?: string;
     count?: number;
     exclude_dish_names?: string[];
@@ -313,6 +318,8 @@ export function fetchMealEpisodes(
   slot: Slot,
   opts: {
     weekday?: string;
+    /** ISO meal date selected in Today; drives festival and date-specific recommendation context. */
+    date?: string;
     class_code?: string;
     count?: number;
     time_budget_minutes?: number;

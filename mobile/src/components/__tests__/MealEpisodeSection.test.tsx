@@ -1,9 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
 import { MealEpisodeSection } from "../MealEpisodeSection";
+import { fetchMealEpisodes } from "@/api/plan";
 
 const mockMutate = jest.fn();
 const mockRefetch = jest.fn();
+const mockedFetchMealEpisodes = fetchMealEpisodes as jest.MockedFunction<typeof fetchMealEpisodes>;
 const mockResponse = {
   kind: "meal_episode_slate" as const,
   slot: "dinner",
@@ -68,7 +70,33 @@ jest.mock("@/api/errorMessages", () => ({ describeApiError: () => "Request faile
 describe("MealEpisodeSection", () => {
   beforeEach(() => {
     mockMutate.mockClear();
+    mockedFetchMealEpisodes.mockClear();
     mockQueryState = { data: mockResponse, isLoading: false, isError: false, error: null };
+  });
+
+  it("sends the selected meal date into recommendation context", () => {
+    const useQuery = jest.requireMock("@tanstack/react-query").useQuery as jest.Mock;
+    useQuery.mockImplementationOnce((options: { queryFn: () => unknown }) => {
+      options.queryFn();
+      return { ...mockQueryState, refetch: mockRefetch };
+    });
+
+    render(
+      <MealEpisodeSection
+        slot="lunch"
+        weekday="Wednesday"
+        slotDate="2026-08-12"
+        classCode="LD_DAL_ROTI_SABZI"
+        initiallyLocked={false}
+        refreshNonce={0}
+      />,
+    );
+
+    expect(mockedFetchMealEpisodes).toHaveBeenCalledWith("lunch", expect.objectContaining({
+      weekday: "Wednesday",
+      date: "2026-08-12",
+      class_code: "LD_DAL_ROTI_SABZI",
+    }));
   });
 
   it("renders a complete meal with practicality and reasoned rejection", async () => {

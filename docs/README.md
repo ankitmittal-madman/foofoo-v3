@@ -186,6 +186,7 @@ When a historical document conflicts with these sources, the three documents abo
 - [`docs/project-history/work-packages/[DRAFT]_WP-14_RE_Intelligence_Roadmap_v1.0.md`](<project-history/work-packages/[DRAFT]_WP-14_RE_Intelligence_Roadmap_v1.0.md>)
 - [`docs/project-history/work-packages/[DRAFT]_WP-18_Onboarding_Plan_Recipe_Flow_v1.0.md`](<project-history/work-packages/[DRAFT]_WP-18_Onboarding_Plan_Recipe_Flow_v1.0.md>)
 - [`docs/project-history/work-packages/[DRAFT]_WP-22_Synthetic_Persona_UI_Journey_Reports_v1.0.md`](<project-history/work-packages/[DRAFT]_WP-22_Synthetic_Persona_UI_Journey_Reports_v1.0.md>)
+- [`docs/project-history/work-packages/[DRAFT]_WP-23_Recommendation_Modernization_Program_v1.0.md`](<project-history/work-packages/[DRAFT]_WP-23_Recommendation_Modernization_Program_v1.0.md>)
 - [`docs/roadmaps/[ACTIVE]_PM-SUPP-01_Roadmap_v1.0.docx`](<roadmaps/[ACTIVE]_PM-SUPP-01_Roadmap_v1.0.docx>)
 - [`docs/roadmaps/[ACTIVE]_PM-SUPP-01_Roadmap_v1.0.md`](<roadmaps/[ACTIVE]_PM-SUPP-01_Roadmap_v1.0.md>)
 - [`docs/roadmaps/[ACTIVE]_RE-DOC-05_Evolution_Roadmap.docx`](<roadmaps/[ACTIVE]_RE-DOC-05_Evolution_Roadmap.docx>)

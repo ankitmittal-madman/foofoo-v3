@@ -49,13 +49,18 @@ describe("fetchMealEpisodes", () => {
       episodes: [],
     });
 
-    const response = await fetchMealEpisodes("breakfast", { weekday: "Wednesday", count: 1 });
+    const response = await fetchMealEpisodes("breakfast", {
+      weekday: "Wednesday",
+      date: "2026-08-12",
+      count: 1,
+    });
 
     expect(mockedPost).toHaveBeenCalledTimes(1);
     expect(mockedPost).toHaveBeenCalledWith("/plan", {
       surface: "meal_episodes",
       slot: "breakfast",
       weekday: "Wednesday",
+      date: "2026-08-12",
       count: 1,
     });
     expect(response.kind).toBe("meal_episode_slate");

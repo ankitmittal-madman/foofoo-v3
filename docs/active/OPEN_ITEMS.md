@@ -49,6 +49,9 @@ findings are retained under `docs/archive/`.
 
 ## P3 — Product and intelligence evolution
 
+- Execute WP-23's shared Ghar/Aux recommendation modernization program: canonical class/episode/
+  dish events, temporal sequencing and spacing, governed contextual inference, scalable catalogue
+  retrieval, shadow integration and measurable promotion gates.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
@@ -131,3 +134,4 @@ is not yet certain. They are intentionally not archived:
 - `docs/project-history/work-packages/[DRAFT]_WP-14_RE_Intelligence_Roadmap_v1.0.md`
 - `docs/project-history/work-packages/[DRAFT]_WP-18_Onboarding_Plan_Recipe_Flow_v1.0.md`
 - `docs/project-history/work-packages/[DRAFT]_WP-22_Synthetic_Persona_UI_Journey_Reports_v1.0.md`
+- `docs/project-history/work-packages/[DRAFT]_WP-23_Recommendation_Modernization_Program_v1.0.md`

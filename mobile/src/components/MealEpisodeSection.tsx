@@ -20,6 +20,7 @@ export function MealEpisodeSection({ slot, weekday, slotDate, classCode, initial
     queryKey: ["meal-episodes", slotDate, slot, classCode ?? null, effectiveRefresh, excludeDishNames],
     queryFn: () => fetchMealEpisodes(slot, {
       weekday,
+      date: slotDate,
       class_code: classCode,
       count: 4,
       refresh_generation: effectiveRefresh,

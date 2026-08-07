@@ -23,3 +23,6 @@ Only future work is listed here. Evidence and acceptance detail are in `OPEN_ITE
 10. Add clinically governed health-condition suitability.
 11. Activate preference personalization after a real training threshold is met.
 12. Expand and safety-review the bounded food graph.
+13. Execute WP-23 in gated slices: shared event identity and selected-date correctness, temporal
+    cadence, governed household context, scalable catalogue retrieval, Ghar/Aux shadow integration,
+    then evidence-gated active promotion.
