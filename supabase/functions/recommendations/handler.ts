@@ -168,6 +168,8 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     const enrichedContext = {
       ...(contextOverride ?? {}),
       dish_feedback_counts: online.dishFeedbackCounts,
+      recent_class_counts: online.recentClassCounts,
+      recent_cuisine_counts: online.recentCuisineCounts,
       novelty_budget: online.noveltyBudget,
       richness_debt: online.richnessDebt,
       ...(typeof requestedRefreshGeneration === "number" &&

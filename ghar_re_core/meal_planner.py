@@ -243,14 +243,51 @@ def _dish_is_soup(dish):
     return "soup" in dish.name.casefold() or "soup" in set(dish.dish_category or [])
 
 
-def _mmr_rerank(ranked, n, diversity_lambda=None, novelty_budget=0.15, richness_debt=0.0):
-    """MMR reranking with deterministic content, richness, and repeated-soup constraints."""
+def _bounded_history_counts(value):
+    """Normalize untrusted contract maps without allowing negative or unbounded pressure."""
+    if not isinstance(value, dict):
+        return {}
+    normalized = {}
+    for raw_key, raw_count in list(value.items())[:100]:
+        key = str(raw_key).strip()
+        try:
+            count = int(raw_count)
+        except (TypeError, ValueError):
+            continue
+        if key and count > 0:
+            normalized[key] = min(1000, count)
+    return normalized
+
+
+def _historical_similarity(dish, recent_class_counts, recent_cuisine_counts):
+    """Bounded exposure similarity aligned with the persisted seven-day variety caps."""
+    class_code = K.dish_to_class_code(dish.name)
+    class_count = recent_class_counts.get(class_code, 0) if class_code else 0
+    cuisine_count = recent_cuisine_counts.get(dish.cuisine.casefold(), 0)
+    return max(min(1.0, class_count / 3.0), min(1.0, cuisine_count / 2.0))
+
+
+def _mmr_rerank(
+    ranked,
+    n,
+    diversity_lambda=None,
+    novelty_budget=0.15,
+    richness_debt=0.0,
+    recent_class_counts=None,
+    recent_cuisine_counts=None,
+):
+    """MMR reranking with deterministic current-slate and seven-day diversity constraints."""
     if not ranked or n <= 0:
         return []
     adaptive_lambda, max_rich_ratio = _adaptive_diversity_policy(
         novelty_budget=novelty_budget, richness_debt=richness_debt
     )
     diversity_lambda = adaptive_lambda if diversity_lambda is None else diversity_lambda
+    recent_class_counts = _bounded_history_counts(recent_class_counts)
+    recent_cuisine_counts = {
+        key.casefold(): count
+        for key, count in _bounded_history_counts(recent_cuisine_counts).items()
+    }
     candidates = list(ranked)
     scores = [score for score, _ in candidates]
     low, high = min(scores), max(scores)
@@ -258,7 +295,23 @@ def _mmr_rerank(ranked, n, diversity_lambda=None, novelty_budget=0.15, richness_
     def relevance(score):
         return (score - low) / (high - low) if high > low else 1.0
 
-    selected = [candidates.pop(0)]
+    if recent_class_counts or recent_cuisine_counts:
+        first_index = max(
+            range(len(candidates)),
+            key=lambda index: (
+                diversity_lambda * relevance(candidates[index][0])
+                - (1.0 - diversity_lambda)
+                * _historical_similarity(
+                    candidates[index][1], recent_class_counts, recent_cuisine_counts
+                ),
+                candidates[index][0],
+                candidates[index][1].name,
+            ),
+        )
+        selected = [candidates.pop(first_index)]
+    else:
+        # Preserve the pre-history path byte-for-byte: the top relevance candidate leads.
+        selected = [candidates.pop(0)]
     while candidates and len(selected) < n:
         next_size = len(selected) + 1
         rich_count = sum(_dish_is_rich(dish) for _, dish in selected)
@@ -279,7 +332,14 @@ def _mmr_rerank(ranked, n, diversity_lambda=None, novelty_budget=0.15, richness_
             key=lambda index: (
                 diversity_lambda * relevance(candidates[index][0])
                 - (1.0 - diversity_lambda)
-                * max(_dish_similarity(candidates[index][1], chosen[1]) for chosen in selected),
+                * max(
+                    _historical_similarity(
+                        candidates[index][1], recent_class_counts, recent_cuisine_counts
+                    ),
+                    max(
+                        _dish_similarity(candidates[index][1], chosen[1]) for chosen in selected
+                    ),
+                ),
                 candidates[index][0],
                 candidates[index][1].name,
             ),
@@ -401,6 +461,8 @@ def slot_options(
     ctx["interaction_count"] = max(0, int(context.get("interaction_count", 0) or 0))
     ctx["novelty_budget"] = max(0.0, min(1.0, float(context.get("novelty_budget", 0.15) or 0)))
     ctx["richness_debt"] = max(0.0, min(1.0, float(context.get("richness_debt", 0) or 0)))
+    ctx["recent_class_counts"] = context.get("recent_class_counts") or {}
+    ctx["recent_cuisine_counts"] = context.get("recent_cuisine_counts") or {}
     excluded = set(exclude_dish_names or [])
 
     # multi-membership (WP-17.1): a dish is eligible for a class if that class is ANY of its classes
@@ -422,6 +484,8 @@ def slot_options(
             n,
             novelty_budget=ctx["novelty_budget"],
             richness_debt=ctx["richness_debt"],
+            recent_class_counts=ctx["recent_class_counts"],
+            recent_cuisine_counts=ctx["recent_cuisine_counts"],
         )
     )
     return {

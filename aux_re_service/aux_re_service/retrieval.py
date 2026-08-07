@@ -15,6 +15,30 @@ from .config import Settings
 from .knowledge_graph import LocalFoodKnowledgeGraph
 from .schemas import Candidate, RecommendationRequest
 
+REGION_GROUPS = {
+    "maharashtra": "west",
+    "gujarat": "west",
+    "goa": "west",
+    "rajasthan": "north",
+    "punjab": "north",
+    "delhi": "north",
+    "haryana": "north",
+    "uttar pradesh": "north",
+    "uttarakhand": "north",
+    "himachal pradesh": "north",
+    "karnataka": "south",
+    "kerala": "south",
+    "tamil nadu": "south",
+    "telangana": "south",
+    "andhra pradesh": "south",
+    "west bengal": "east",
+    "odisha": "east",
+    "bihar": "east",
+    "assam": "east",
+    "madhya pradesh": "central",
+    "chhattisgarh": "central",
+}
+
 
 def local_embedding(text: str, dimensions: int = 64) -> list[float]:
     """Stable feature-hash embedding; local, dependency-free, and deterministic."""
@@ -79,12 +103,40 @@ class CandidateRetriever:
         query = " ".join(
             [request.meal_slot, request.region or "", *request.preferences, *request.pantry_items]
         )
+        must: list[dict[str, Any]] = [{"key": "meal_slots", "match": {"any": [request.meal_slot]}}]
+        if request.region:
+            region = request.region.casefold()
+            must.append(
+                {
+                    "key": "regions",
+                    "match": {"any": sorted({region, REGION_GROUPS.get(region, region)})},
+                }
+            )
+        restrictions = {value.casefold() for value in request.restrictions}
+        if restrictions & {"vegetarian", "veg"}:
+            must.append({"key": "diet_types", "match": {"any": ["vegetarian", "vegan", "jain"]}})
+        elif "vegan" in restrictions:
+            must.append({"key": "diet_types", "match": {"any": ["vegan"]}})
+        elif "jain" in restrictions:
+            must.append({"key": "diet_types", "match": {"any": ["jain"]}})
+        forbidden_allergens = sorted(
+            {value.casefold().replace("groundnut", "peanut") for value in request.allergies}
+        )
+        unavailable = sorted({value.casefold() for value in request.unavailable_ingredients})
+        must_not = []
+        if forbidden_allergens:
+            must_not.append({"key": "allergens", "match": {"any": forbidden_allergens}})
+        if unavailable:
+            must_not.append({"key": "ingredients", "match": {"any": unavailable}})
+        query_filter: dict[str, Any] = {"must": must}
+        if must_not:
+            query_filter["must_not"] = must_not
         body = json.dumps(
             {
                 "query": local_embedding(query),
                 "limit": min(request.candidate_limit * 5, 100),
                 "with_payload": True,
-                "filter": {"must": [{"key": "meal_slots", "match": {"any": [request.meal_slot]}}]},
+                "filter": query_filter,
             }
         ).encode()
         url = f"{base.rstrip('/')}/collections/{self.settings.qdrant_collection}/points/query"

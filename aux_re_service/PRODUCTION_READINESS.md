@@ -1,5 +1,14 @@
 # Auxiliary recommender production-readiness report
 
+## Current verdict (2026-08-07)
+
+The auxiliary stack is ready for local and production-traffic **shadow validation**, not active
+selection. Canonical data, Qdrant artifacts, the feature contract, a trained LightFM hybrid model,
+offline comparison, runtime loader, container packaging, and recurring CI gates now exist. The
+synthetic-data guard is enforced in code: shadow can score, while compare/active cannot apply this
+artifact. LightGCN and KGAT are correctly deferred. See `DATASET_AND_MODEL_REPORT.md` and
+`data/reports/quality_gate_v1.json` for measured evidence.
+
 ## Implementation audit
 
 Production-safe and exercised:
@@ -18,19 +27,20 @@ Production-safe and exercised:
 
 Partially implemented:
 
-- The local graph format and lookup work, but the example graph is not a production Indian food
-  ontology and has no artifact version manifest or automated build pipeline.
+- The versioned Indian food graph contains canonical dishes and typed ingredient, diet, region,
+  cuisine, meal-slot, and cooking-technique relations, but ingredient coverage is only 43.0% and
+  provenance/reviewer workflows are not yet production-grade.
 - The feature-hash embedder is deterministic and useful for Qdrant plumbing, but is not a learned
   Recipe2Vec representation and has no semantic-quality benchmark.
 - Household fit blends member preference overlap, but does not model preference strength,
   negotiation roles, child/adult nutrition targets, or time-varying taste.
 - Metrics are process-local and reset at restart; logs require an external collector/dashboard.
 
-Explicitly scaffolded, not claimed as working:
+Explicitly deferred, not claimed as working:
 
-- LightFM, RecBole LightGCN, KGAT, FairRec, Debias, CDR, and DA. Registry entries now remain disabled
-  and report `package_missing`, `artifact_not_configured`, or `scaffold_only`. No trained artifacts,
-  governed feature mappings, loaders, or quality gates exist in this repository.
+- RecBole LightGCN, KGAT, FairRec, Debias, CDR, and DA remain disabled or `scaffold_only`.
+  LightFM is implemented and trained, but is shadow-only until real interaction and online evidence
+  replace the synthetic training basis.
 - Exploration is reported as `not_implemented`; active output is deterministic exploitation only.
 - The product Edge still needs to call this service with the existing engine output. No existing
   recommendation code was edited, which preserves isolation but means deployment alone does not
@@ -59,9 +69,9 @@ Still needed before active production rollout:
    not only positive interactions.
 2. Define promotion gates for Recall@K, NDCG@K, MAP@K, constraint-violation rate, catalogue coverage,
    intra-list diversity, novelty, calibration, regional slices, household slices, and latency p95/p99.
-3. Train and register versioned LightFM/LightGCN artifacts only after defining stable user, household,
-   dish, and context feature contracts. Add checksums, training-data windows, code version, metrics,
-   and rollback metadata to each manifest.
+3. Retrain and register LightFM on consented real events using the existing stable household, dish,
+   and context contracts. Train LightGCN only after at least 5 positive events exist for a broad
+   household cohort; train KGAT only after interaction and ontology gates both pass.
 4. Build an ingredient canonicalization service covering Indian-language aliases, transliteration,
    packaged ingredients, derivatives, cross-contact, and quantity-aware substitutions. The current
    alias table is deliberately small.

@@ -4,6 +4,7 @@ import {
   extractExposureDishNames,
   extractPersistedCadence,
   extractPersistedExposureDishNames,
+  extractPersistedVarietyCounts,
 } from "../recommendations/personalization.ts";
 
 Deno.test("aggregateAffinityMaps combines only members with evidence", () => {
@@ -14,6 +15,47 @@ Deno.test("aggregateAffinityMaps combines only members with evidence", () => {
   ]);
   assertEquals(result["dish_category:whole_meal"] > 0, true);
   assertEquals(Math.round(result["richness:light"] * 10), 4);
+});
+
+Deno.test("extractPersistedVarietyCounts: reads only bounded seven-day class/cuisine state", () => {
+  assertEquals(
+    extractPersistedVarietyCounts({
+      dimensions: [
+        {
+          dimension_code: "meal_class",
+          entity_key: "LD_DAL_RICE",
+          window_code: "7d",
+          count_in_window: 4,
+        },
+        {
+          dimension_code: "cuisine",
+          entity_key: "Maharashtrian",
+          window_code: "7d",
+          count_in_window: 2,
+        },
+        {
+          dimension_code: "dish_name",
+          entity_key: "poha",
+          window_code: "30d",
+          count_in_window: 99,
+        },
+        {
+          dimension_code: "cuisine",
+          entity_key: "ignored",
+          window_code: "30d",
+          count_in_window: 3,
+        },
+      ],
+    }),
+    {
+      recentClassCounts: { LD_DAL_RICE: 4 },
+      recentCuisineCounts: { Maharashtrian: 2 },
+    },
+  );
+  assertEquals(extractPersistedVarietyCounts(null), {
+    recentClassCounts: {},
+    recentCuisineCounts: {},
+  });
 });
 
 Deno.test("extractPersistedExposureDishNames: reads the private variety RPC response", () => {

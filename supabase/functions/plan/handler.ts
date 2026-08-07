@@ -296,6 +296,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         active_modes: Array.isArray(body.active_modes) ? body.active_modes : [],
         interaction_count: online.interactionCount,
         dish_feedback_counts: online.dishFeedbackCounts,
+        recent_class_counts: online.recentClassCounts,
+        recent_cuisine_counts: online.recentCuisineCounts,
         novelty_budget: online.noveltyBudget,
         richness_debt: online.richnessDebt,
         // The v1 contract types `weather` as an object when present. Provider configuration is

@@ -1,0 +1,730 @@
+{
+  "datasets": [
+    {
+      "dataset": "dataset_1",
+      "path": "Training Data/Data Set 1/indian_meal_habits_template_5000_users.xlsx",
+      "inventory": [
+        {
+          "sheet": "README",
+          "rows": 5,
+          "columns": [
+            "section",
+            "guidance"
+          ]
+        },
+        {
+          "sheet": "FIELD_DICTIONARY",
+          "rows": 133,
+          "columns": [
+            "sheet_name",
+            "field_name",
+            "user_question",
+            "db_table",
+            "db_column",
+            "data_type",
+            "allowed_values",
+            "validation_rule",
+            "source_category",
+            "required_yes_no",
+            "example_value",
+            "notes"
+          ]
+        },
+        {
+          "sheet": "QUESTIONNAIRE",
+          "rows": 18,
+          "columns": [
+            "order",
+            "stage",
+            "question",
+            "answer_type",
+            "maps_to",
+            "show_if",
+            "friction_note"
+          ]
+        },
+        {
+          "sheet": "DB_GROUPING",
+          "rows": 11,
+          "columns": [
+            "domain",
+            "tables",
+            "grain",
+            "primary_use",
+            "key_relationship"
+          ]
+        },
+        {
+          "sheet": "MVP_ONBOARDING",
+          "rows": 10,
+          "columns": [
+            "order",
+            "field_or_group",
+            "why_required",
+            "destination"
+          ]
+        },
+        {
+          "sheet": "FULL_ONBOARDING",
+          "rows": 10,
+          "columns": [
+            "module",
+            "fields",
+            "priority",
+            "note"
+          ]
+        },
+        {
+          "sheet": "MASTER_SEED",
+          "rows": 12,
+          "columns": [
+            "master",
+            "minimum_content",
+            "timing",
+            "governance_note"
+          ]
+        },
+        {
+          "sheet": "AI_RULES",
+          "rows": 9,
+          "columns": [
+            "capability",
+            "ai_may_do",
+            "validation_required",
+            "never_do"
+          ]
+        },
+        {
+          "sheet": "USAGE_LATER",
+          "rows": 12,
+          "columns": [
+            "signal",
+            "fields",
+            "destination",
+            "why_later"
+          ]
+        },
+        {
+          "sheet": "SOURCE_LEGEND",
+          "rows": 6,
+          "columns": [
+            "source_category",
+            "definition",
+            "example"
+          ]
+        },
+        {
+          "sheet": "DATA_households",
+          "rows": 5000,
+          "columns": [
+            "household_id",
+            "household_name",
+            "current_city_id",
+            "current_state_id",
+            "origin_state_ids",
+            "living_setup",
+            "household_size",
+            "adult_count",
+            "child_count",
+            "elder_count",
+            "infant_count",
+            "decision_model",
+            "monthly_food_budget_inr",
+            "created_at"
+          ]
+        },
+        {
+          "sheet": "DATA_users",
+          "rows": 5000,
+          "columns": [
+            "user_id",
+            "household_id",
+            "display_name",
+            "age_band",
+            "gender",
+            "persona_codes",
+            "is_primary_user",
+            "onboarding_depth",
+            "consent_personalization",
+            "profile_updated_at"
+          ]
+        },
+        {
+          "sheet": "DATA_members",
+          "rows": 14640,
+          "columns": [
+            "member_id",
+            "household_id",
+            "linked_user_id",
+            "member_label",
+            "life_stage",
+            "meal_participation",
+            "is_decision_maker",
+            "notes"
+          ]
+        },
+        {
+          "sheet": "DATA_food_preferences",
+          "rows": 6805,
+          "columns": [
+            "preference_id",
+            "household_id",
+            "member_id",
+            "diet_pattern",
+            "fasting_patterns",
+            "spice_level",
+            "sweetness_level",
+            "oil_level",
+            "texture_preference",
+            "home_cooked_days_week",
+            "eat_out_meals_week",
+            "delivery_meals_week",
+            "comfort_dish_ids"
+          ]
+        },
+        {
+          "sheet": "DATA_regional_taste",
+          "rows": 5000,
+          "columns": [
+            "regional_taste_id",
+            "household_id",
+            "cuisine_region_id",
+            "preference_score",
+            "authenticity_preference",
+            "familiarity",
+            "source_reason"
+          ]
+        },
+        {
+          "sheet": "DATA_exclusions",
+          "rows": 1270,
+          "columns": [
+            "exclusion_id",
+            "household_id",
+            "member_id",
+            "exclusion_type",
+            "entity_type",
+            "entity_id",
+            "severity",
+            "cross_contact_concern",
+            "user_note",
+            "confirmed_by_user"
+          ]
+        },
+        {
+          "sheet": "DATA_cooking_capability",
+          "rows": 5000,
+          "columns": [
+            "capability_id",
+            "household_id",
+            "primary_cook_role",
+            "cook_frequency",
+            "skill_level",
+            "recipe_confidence",
+            "spice_handling_confidence",
+            "preferred_complexity",
+            "weekday_minutes",
+            "weekend_minutes",
+            "equipment_ids",
+            "novelty_willingness"
+          ]
+        },
+        {
+          "sheet": "DATA_health_goals",
+          "rows": 5354,
+          "columns": [
+            "goal_id",
+            "household_id",
+            "member_id",
+            "goal_code",
+            "priority",
+            "protein_target_g",
+            "clinician_advised",
+            "active_from",
+            "active_to"
+          ]
+        },
+        {
+          "sheet": "DATA_meal_history",
+          "rows": 10000,
+          "columns": [
+            "meal_event_id",
+            "household_id",
+            "meal_date",
+            "meal_slot",
+            "dish_raw_name",
+            "dish_alias_local",
+            "canonical_dish_id",
+            "source_mode",
+            "portion_size",
+            "frequency_count",
+            "satisfaction_score",
+            "sentiment",
+            "repeat_desire",
+            "leftover_level",
+            "issue_flags",
+            "context_flags"
+          ]
+        },
+        {
+          "sheet": "DATA_meal_consumers",
+          "rows": 19020,
+          "columns": [
+            "meal_consumer_id",
+            "meal_event_id",
+            "member_id",
+            "member_sentiment",
+            "portion_size",
+            "finished_portion"
+          ]
+        },
+        {
+          "sheet": "DATA_dish_preferences",
+          "rows": 10000,
+          "columns": [
+            "dish_preference_id",
+            "household_id",
+            "member_id",
+            "dish_id",
+            "preference_type",
+            "preference_score",
+            "evidence_source",
+            "confidence_score",
+            "confirmed_by_user"
+          ]
+        },
+        {
+          "sheet": "DATA_festival_seasonal",
+          "rows": 5000,
+          "columns": [
+            "occasion_pref_id",
+            "household_id",
+            "occasion_id",
+            "dish_ids",
+            "preference_strength",
+            "restriction_codes",
+            "user_confirmed"
+          ]
+        },
+        {
+          "sheet": "DATA_recommendation_events",
+          "rows": 10000,
+          "columns": [
+            "event_id",
+            "user_id",
+            "household_id",
+            "dish_id",
+            "event_type",
+            "event_at",
+            "meal_slot",
+            "context_json",
+            "recommendation_rank",
+            "reason_code",
+            "feedback_score",
+            "substitute_dish_id"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "severity": "info",
+          "dataset": "dataset_1",
+          "check": "dish_namespace",
+          "count": 37,
+          "detail": "unique dish ids"
+        },
+        {
+          "severity": "warning",
+          "dataset": "dataset_1",
+          "check": "synthetic_provenance",
+          "count": 20000,
+          "detail": "AI-generated rows are suitable for pipeline validation, not production-lift claims"
+        }
+      ]
+    },
+    {
+      "dataset": "dataset_2",
+      "path": "Training Data/Data Set 2/populated_indian_meal_habits.xlsx",
+      "inventory": [
+        {
+          "sheet": "README",
+          "rows": 5,
+          "columns": [
+            "section",
+            "guidance"
+          ]
+        },
+        {
+          "sheet": "DATA_households",
+          "rows": 5000,
+          "columns": [
+            "household_id",
+            "household_name",
+            "current_city_id",
+            "current_state_id",
+            "origin_state_ids",
+            "living_setup",
+            "household_size",
+            "adult_count",
+            "child_count",
+            "elder_count",
+            "infant_count",
+            "decision_model",
+            "monthly_food_budget_inr",
+            "created_at"
+          ]
+        },
+        {
+          "sheet": "DATA_users",
+          "rows": 5000,
+          "columns": [
+            "user_id",
+            "household_id",
+            "display_name",
+            "age_band",
+            "gender",
+            "persona_codes",
+            "is_primary_user",
+            "onboarding_depth",
+            "consent_personalization",
+            "profile_updated_at"
+          ]
+        },
+        {
+          "sheet": "DATA_members",
+          "rows": 5,
+          "columns": [
+            "member_id",
+            "household_id",
+            "linked_user_id",
+            "member_label",
+            "life_stage",
+            "meal_participation",
+            "is_decision_maker",
+            "notes"
+          ]
+        },
+        {
+          "sheet": "DATA_food_preferences",
+          "rows": 5000,
+          "columns": [
+            "preference_id",
+            "household_id",
+            "member_id",
+            "diet_pattern",
+            "fasting_patterns",
+            "spice_level",
+            "sweetness_level",
+            "oil_level",
+            "texture_preference",
+            "home_cooked_days_week",
+            "eat_out_meals_week",
+            "delivery_meals_week",
+            "comfort_dish_ids"
+          ]
+        },
+        {
+          "sheet": "DATA_regional_taste",
+          "rows": 5,
+          "columns": [
+            "regional_taste_id",
+            "household_id",
+            "cuisine_region_id",
+            "preference_score",
+            "authenticity_preference",
+            "familiarity",
+            "source_reason"
+          ]
+        },
+        {
+          "sheet": "DATA_exclusions",
+          "rows": 5,
+          "columns": [
+            "exclusion_id",
+            "household_id",
+            "member_id",
+            "exclusion_type",
+            "entity_type",
+            "entity_id",
+            "severity",
+            "cross_contact_concern",
+            "user_note",
+            "confirmed_by_user"
+          ]
+        },
+        {
+          "sheet": "DATA_cooking_capability",
+          "rows": 5,
+          "columns": [
+            "capability_id",
+            "household_id",
+            "primary_cook_role",
+            "cook_frequency",
+            "skill_level",
+            "recipe_confidence",
+            "spice_handling_confidence",
+            "preferred_complexity",
+            "weekday_minutes",
+            "weekend_minutes",
+            "equipment_ids",
+            "novelty_willingness"
+          ]
+        },
+        {
+          "sheet": "DATA_health_goals",
+          "rows": 5,
+          "columns": [
+            "goal_id",
+            "household_id",
+            "member_id",
+            "goal_code",
+            "priority",
+            "protein_target_g",
+            "clinician_advised",
+            "active_from",
+            "active_to"
+          ]
+        },
+        {
+          "sheet": "DATA_meal_history",
+          "rows": 15000,
+          "columns": [
+            "meal_event_id",
+            "household_id",
+            "meal_date",
+            "meal_slot",
+            "dish_raw_name",
+            "dish_alias_local",
+            "canonical_dish_id",
+            "source_mode",
+            "portion_size",
+            "frequency_count",
+            "satisfaction_score",
+            "sentiment",
+            "repeat_desire",
+            "leftover_level",
+            "issue_flags",
+            "context_flags"
+          ]
+        },
+        {
+          "sheet": "DATA_meal_consumers",
+          "rows": 5,
+          "columns": [
+            "meal_consumer_id",
+            "meal_event_id",
+            "member_id",
+            "member_sentiment",
+            "portion_size",
+            "finished_portion"
+          ]
+        },
+        {
+          "sheet": "DATA_dish_preferences",
+          "rows": 5,
+          "columns": [
+            "dish_preference_id",
+            "household_id",
+            "member_id",
+            "dish_id",
+            "preference_type",
+            "preference_score",
+            "evidence_source",
+            "confidence_score",
+            "confirmed_by_user"
+          ]
+        },
+        {
+          "sheet": "DATA_festival_seasonal",
+          "rows": 5,
+          "columns": [
+            "occasion_pref_id",
+            "household_id",
+            "occasion_id",
+            "dish_ids",
+            "preference_strength",
+            "restriction_codes",
+            "user_confirmed"
+          ]
+        },
+        {
+          "sheet": "DATA_recommendation_events",
+          "rows": 5,
+          "columns": [
+            "event_id",
+            "user_id",
+            "household_id",
+            "dish_id",
+            "event_type",
+            "event_at",
+            "meal_slot",
+            "context_json",
+            "recommendation_rank",
+            "reason_code",
+            "feedback_score",
+            "substitute_dish_id"
+          ]
+        },
+        {
+          "sheet": "FIELD_DICTIONARY",
+          "rows": 133,
+          "columns": [
+            "sheet_name",
+            "field_name",
+            "user_question",
+            "db_table",
+            "db_column",
+            "data_type",
+            "allowed_values",
+            "validation_rule",
+            "source_category",
+            "required_yes_no",
+            "example_value",
+            "notes"
+          ]
+        },
+        {
+          "sheet": "QUESTIONNAIRE",
+          "rows": 18,
+          "columns": [
+            "order",
+            "stage",
+            "question",
+            "answer_type",
+            "maps_to",
+            "show_if",
+            "friction_note"
+          ]
+        },
+        {
+          "sheet": "DB_GROUPING",
+          "rows": 11,
+          "columns": [
+            "domain",
+            "tables",
+            "grain",
+            "primary_use",
+            "key_relationship"
+          ]
+        },
+        {
+          "sheet": "MVP_ONBOARDING",
+          "rows": 10,
+          "columns": [
+            "order",
+            "field_or_group",
+            "why_required",
+            "destination"
+          ]
+        },
+        {
+          "sheet": "FULL_ONBOARDING",
+          "rows": 10,
+          "columns": [
+            "module",
+            "fields",
+            "priority",
+            "note"
+          ]
+        },
+        {
+          "sheet": "MASTER_SEED",
+          "rows": 12,
+          "columns": [
+            "master",
+            "minimum_content",
+            "timing",
+            "governance_note"
+          ]
+        },
+        {
+          "sheet": "AI_RULES",
+          "rows": 9,
+          "columns": [
+            "capability",
+            "ai_may_do",
+            "validation_required",
+            "never_do"
+          ]
+        },
+        {
+          "sheet": "USAGE_LATER",
+          "rows": 12,
+          "columns": [
+            "signal",
+            "fields",
+            "destination",
+            "why_later"
+          ]
+        },
+        {
+          "sheet": "SOURCE_LEGEND",
+          "rows": 6,
+          "columns": [
+            "source_category",
+            "definition",
+            "example"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "severity": "error",
+          "dataset": "dataset_2",
+          "check": "events.household_fk",
+          "count": 5,
+          "detail": "orphan rows"
+        },
+        {
+          "severity": "error",
+          "dataset": "dataset_2",
+          "check": "members.household_fk",
+          "count": 5,
+          "detail": "orphan rows"
+        },
+        {
+          "severity": "error",
+          "dataset": "dataset_2",
+          "check": "regional.household_fk",
+          "count": 5,
+          "detail": "orphan rows"
+        },
+        {
+          "severity": "error",
+          "dataset": "dataset_2",
+          "check": "exclusions.household_fk",
+          "count": 5,
+          "detail": "orphan rows"
+        },
+        {
+          "severity": "error",
+          "dataset": "dataset_2",
+          "check": "consumers.meal_fk",
+          "count": 5,
+          "detail": "orphan rows"
+        },
+        {
+          "severity": "error",
+          "dataset": "dataset_2",
+          "check": "events.user_fk",
+          "count": 5,
+          "detail": "orphan rows"
+        },
+        {
+          "severity": "info",
+          "dataset": "dataset_2",
+          "check": "dish_namespace",
+          "count": 65,
+          "detail": "unique dish ids"
+        },
+        {
+          "severity": "warning",
+          "dataset": "dataset_2",
+          "check": "synthetic_provenance",
+          "count": 15005,
+          "detail": "AI-generated rows are suitable for pipeline validation, not production-lift claims"
+        }
+      ]
+    }
+  ]
+}

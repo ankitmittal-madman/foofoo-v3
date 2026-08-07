@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-08-07T07:10:59.780130+00:00",
+  "shadow_gate_passed": true,
+  "production_activation_allowed": false,
+  "production_blockers": [
+    "synthetic_training_data",
+    "no_online_shadow_or_ab_evidence"
+  ],
+  "artifact_checks": {
+    "checksums_valid": true,
+    "ontology_candidate_count_matches": true,
+    "qdrant_point_count_matches": true,
+    "qdrant_vectors_are_64d": true,
+    "lightfm": {
+      "report_promotion_gate": true,
+      "beats_popularity": true,
+      "shadow_only": true,
+      "artifact_exists": true
+    }
+  },
+  "checksum_failures": [],
+  "data": {
+    "dishes": 86,
+    "households": 10000,
+    "interactions": 35000,
+    "real_interactions": 0,
+    "households_with_5_positive_events": 0,
+    "ontology_coverage": {
+      "ingredients": 0.43023255813953487,
+      "diet_types": 1.0,
+      "regions": 1.0,
+      "meal_slots": 1.0
+    }
+  },
+  "models": {
+    "lightfm": {
+      "ready_for_shadow": true,
+      "ready_for_active": false,
+      "metrics": {
+        "evaluated_households": 7313.0,
+        "recall_at_10": 0.36346232736223166,
+        "precision_at_10": 0.036346232736223165,
+        "ndcg_at_10": 0.1390537371630906,
+        "catalog_coverage": 0.872093023255814
+      },
+      "baseline": {
+        "evaluated_households": 7313.0,
+        "recall_at_10": 0.12689730616709968,
+        "precision_at_10": 0.012689730616709968,
+        "ndcg_at_10": 0.054652581869252176,
+        "catalog_coverage": 0.13953488372093023
+      }
+    },
+    "lightgcn": {
+      "ready": false,
+      "blockers": [
+        "no_real_interactions",
+        "insufficient_households_with_5_positive_events"
+      ]
+    },
+    "kgat": {
+      "ready": false,
+      "blockers": [
+        "no_real_interactions",
+        "insufficient_households_with_5_positive_events",
+        "ingredient_coverage_below_90_percent"
+      ]
+    }
+  }
+}

@@ -30,10 +30,14 @@ def test_build_context_preserves_online_features():
             "slot": "dinner",
             "interaction_count": 9,
             "dish_feedback_counts": [{"dish_name": "Poha", "served": 2, "rejected": 1}],
+            "recent_class_counts": {"BF_POHA_UPMA": 4},
+            "recent_cuisine_counts": {"Maharashtrian": 2},
         }
     )
     assert context["interaction_count"] == 9
     assert context["dish_feedback_counts"][0]["served"] == 2
+    assert context["recent_class_counts"] == {"BF_POHA_UPMA": 4}
+    assert context["recent_cuisine_counts"] == {"Maharashtrian": 2}
 
 
 def test_legacy_run_consumes_name_suppression_and_preference(monkeypatch):

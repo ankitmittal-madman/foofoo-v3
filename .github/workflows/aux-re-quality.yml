@@ -1,0 +1,58 @@
+name: auxiliary-recommender-quality
+
+on:
+  push:
+    paths:
+      - "aux_re_service/**"
+      - "Training Data/**"
+      - "data/source/recipes_v1.json"
+      - ".github/workflows/aux-re-quality.yml"
+  pull_request:
+    paths:
+      - "aux_re_service/**"
+      - "Training Data/**"
+      - "data/source/recipes_v1.json"
+      - ".github/workflows/aux-re-quality.yml"
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auxiliary-recommender-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-shadow-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install local ML and test runtime
+        run: |
+          python -m pip install "setuptools==79.0.1" "wheel==0.45.1"
+          python -m pip install -e "./aux_re_service[test,models]"
+      - name: Run auxiliary tests
+        run: python -m pytest aux_re_service/tests -q
+      - name: Enforce artifact and model quality gates
+        run: |
+          python -m aux_re_service.training.quality_gate \
+            --training-dir aux_re_service/data/training/v1 \
+            --retrieval-dir aux_re_service/data/retrieval/v1 \
+            --model-report aux_re_service/data/models/lightfm_v1_report.json \
+            --output "${RUNNER_TEMP}/aux-re-quality.json"
+      - name: Verify the production image builds with LightFM
+        run: docker build -f aux_re_service/Dockerfile -t foofoo-aux-re:ci .
+      - name: Upload quality evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auxiliary-recommender-quality-${{ github.run_id }}
+          path: ${{ runner.temp }}/aux-re-quality.json
+          if-no-files-found: warn
+          retention-days: 30

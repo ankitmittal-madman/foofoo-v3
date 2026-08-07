@@ -31,15 +31,22 @@ inspect the `foofoo.aux_re` structured logs and `/v1/meta` counters, then progre
 active separately. Environment is re-read per request, so the kill switches apply without process
 restart. Invalid configuration makes `/readyz` return 503.
 
-## Local model and retrieval hooks
+## Dataset, model, and retrieval pipeline
 
 Candidates may be passed in the request, loaded from a local JSON pool, or retrieved from Qdrant.
 Qdrant URLs are restricted to loopback or the `qdrant` service hostname. Query embeddings use a
-stable local feature hash. The registry reports LightFM, RecBole LightGCN, KGAT, FairRec, Debias,
-CDR, and DA honestly as unavailable or `scaffold_only`: those frameworks are not allowed into the
-selection path until a governed artifact loader, feature contract, and validation dataset exist.
-Installing a package alone does not claim that a model works. This service never downloads a model
-or calls an AI API at runtime.
+stable local feature hash. The supplied workbooks are audited and converted into a checksummed
+canonical ontology, household features, weighted interactions, retrieval points, and graph edges.
+The committed LightFM hybrid model is real and beats the popularity baseline offline. Because its
+source interactions are synthetic, the loader permits it in shadow mode only; active mode rejects
+it even when the synthetic-artifact switch is set. RecBole LightGCN and KGAT remain deferred until
+the readiness report proves enough real interaction density and ontology coverage. This service
+never downloads a model or calls an AI API at runtime.
+
+Run the complete local stack with `docker compose -f aux_re_service/compose.local.yml up --build`.
+It starts pinned Qdrant, uploads all canonical dish vectors, and starts the service in shadow mode.
+The current evidence and exact schemas are in `DATASET_AND_MODEL_REPORT.md`; the machine-readable
+gate is `data/reports/quality_gate_v1.json`.
 
 The current production-safe baseline is weighted local reranking with safety filtering,
 popularity debiasing, repetition penalties, diversity selection, and template reason codes. Set

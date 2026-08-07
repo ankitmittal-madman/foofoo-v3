@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -26,6 +27,74 @@ class EvaluationSummary:
 
     def as_dict(self) -> dict[str, int | float]:
         return self.__dict__.copy()
+
+
+@dataclass(frozen=True)
+class RankingMetrics:
+    households: int
+    precision_at_k: float
+    recall_at_k: float
+    ndcg_at_k: float
+    catalog_coverage: float
+    intra_list_diversity: float
+    repetition_rate: float
+    safety_violations: int
+
+    def as_dict(self) -> dict[str, int | float]:
+        return self.__dict__.copy()
+
+
+def ranking_metrics(
+    predictions: dict[str, list[str]],
+    relevant: dict[str, set[str]],
+    *,
+    catalog: set[str],
+    ingredients: dict[str, set[str]] | None = None,
+    recent: dict[str, set[str]] | None = None,
+    unsafe: dict[str, set[str]] | None = None,
+    k: int = 10,
+) -> RankingMetrics:
+    """Compute repeatable ranking, diversity, repetition, and safety metrics."""
+    if not predictions or k < 1:
+        raise ValueError("predictions must be non-empty and k must be positive")
+    ingredients = ingredients or {}
+    recent = recent or {}
+    unsafe = unsafe or {}
+    precision = recall = ndcg = diversity = repetition = 0.0
+    violations = 0
+    recommended: set[str] = set()
+    for household, values in predictions.items():
+        ranked = values[:k]
+        truth = relevant.get(household, set())
+        hits = [index for index, item in enumerate(ranked) if item in truth]
+        precision += len(hits) / k
+        recall += len(hits) / max(1, len(truth))
+        dcg = sum(1.0 / math.log2(index + 2) for index in hits)
+        ideal = sum(1.0 / math.log2(index + 2) for index in range(min(len(truth), k)))
+        ndcg += dcg / ideal if ideal else 0.0
+        similarities = []
+        for index, left in enumerate(ranked):
+            for right in ranked[index + 1 :]:
+                a = ingredients.get(left, set())
+                b = ingredients.get(right, set())
+                similarities.append(len(a & b) / max(1, len(a | b)))
+        diversity += 1.0 - (sum(similarities) / len(similarities) if similarities else 0.0)
+        repetition += sum(item in recent.get(household, set()) for item in ranked) / max(
+            1, len(ranked)
+        )
+        violations += sum(item in unsafe.get(household, set()) for item in ranked)
+        recommended.update(ranked)
+    count = len(predictions)
+    return RankingMetrics(
+        households=count,
+        precision_at_k=precision / count,
+        recall_at_k=recall / count,
+        ndcg_at_k=ndcg / count,
+        catalog_coverage=len(recommended) / max(1, len(catalog)),
+        intra_list_diversity=diversity / count,
+        repetition_rate=repetition / count,
+        safety_violations=violations,
+    )
 
 
 def evaluate(rows: list[dict[str, Any]], settings: Settings) -> EvaluationSummary:

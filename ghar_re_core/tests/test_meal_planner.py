@@ -117,6 +117,30 @@ def test_mmr_rerank_is_deterministic_and_pads_to_requested_count():
     assert len({dish.name for _, dish in first}) == len(first)
 
 
+def test_mmr_recent_class_and_cuisine_history_can_change_the_leader():
+    cat = Catalogue()
+    top = next(dish for dish in cat if K.dish_to_class_code(dish.name))
+    alternative = next(
+        dish
+        for dish in cat
+        if K.dish_to_class_code(dish.name) != K.dish_to_class_code(top.name)
+        and dish.cuisine.casefold() != top.cuisine.casefold()
+    )
+    third = next(dish for dish in cat if dish.name not in {top.name, alternative.name})
+    ranked = [(100.0, top), (99.0, alternative), (0.0, third)]
+
+    unchanged = MP._mmr_rerank(ranked, 2)
+    diversified = MP._mmr_rerank(
+        ranked,
+        2,
+        recent_class_counts={K.dish_to_class_code(top.name): 3},
+        recent_cuisine_counts={top.cuisine: 2},
+    )
+
+    assert unchanged[0][1].name == top.name
+    assert diversified[0][1].name == alternative.name
+
+
 def test_mmr_visible_prefix_caps_rich_and_repeated_soup_dishes():
     cat = Catalogue()
     # Deliberately put rich dishes and the same soup into the highest relevance positions. The

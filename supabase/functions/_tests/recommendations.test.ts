@@ -102,6 +102,8 @@ const EMPTY_ONLINE_STATE: OnlineRecommendationState = {
   preferenceByTag: {},
   dishFeedbackCounts: [],
   recentExposureDishNames: [],
+  recentClassCounts: {},
+  recentCuisineCounts: {},
   noveltyBudget: 0.15,
   richnessDebt: 0,
 };
@@ -243,6 +245,8 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
           preferenceByTag: { "dish_category:whole_meal": 0.5 },
           dishFeedbackCounts: [{ dish_name: "Indori Poha", served: 3, rejected: 0 }],
           recentExposureDishNames: ["Dal Bafla"],
+          recentClassCounts: { BF_POHA_UPMA: 4 },
+          recentCuisineCounts: { "Madhya Pradesh": 3 },
           noveltyBudget: 0.42,
           richnessDebt: 0.35,
         }),
@@ -269,6 +273,8 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
     assertEquals(sentContext.dish_feedback_counts, [
       { dish_name: "Indori Poha", served: 3, rejected: 0 },
     ]);
+    assertEquals(sentContext.recent_class_counts, { BF_POHA_UPMA: 4 });
+    assertEquals(sentContext.recent_cuisine_counts, { "Madhya Pradesh": 3 });
     assertEquals(sentContext.novelty_budget, 0.42);
     assertEquals(sentContext.richness_debt, 0.35);
     assertEquals(sentContext.refresh_generation, 3);

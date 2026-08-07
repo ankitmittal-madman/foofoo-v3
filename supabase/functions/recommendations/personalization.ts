@@ -13,6 +13,8 @@ export interface OnlineRecommendationState {
   /** Canonical names shown in recent successful slates. Used only for freshness/refresh
    * suppression; it is intentionally separate from durable Never/Not-Today intent. */
   recentExposureDishNames: string[];
+  recentClassCounts: Record<string, number>;
+  recentCuisineCounts: Record<string, number>;
   noveltyBudget: number;
   richnessDebt: number;
 }
@@ -62,6 +64,42 @@ export function extractPersistedCadence(value: unknown): {
     ? Math.max(0, Math.min(1, row.richness_debt))
     : fallback.richnessDebt;
   return { noveltyBudget: novelty, richnessDebt: richness };
+}
+
+/** Read the materialized seven-day class/cuisine window used for cross-request diversity.
+ * Values are bounded before they cross the service contract; duplicate rows keep the maximum
+ * rather than being added (the RPC can evolve to expose overlapping windows). */
+export function extractPersistedVarietyCounts(value: unknown): {
+  recentClassCounts: Record<string, number>;
+  recentCuisineCounts: Record<string, number>;
+} {
+  const result = {
+    recentClassCounts: {} as Record<string, number>,
+    recentCuisineCounts: {} as Record<string, number>,
+  };
+  if (!value || typeof value !== "object") return result;
+  const dimensions = (value as Record<string, unknown>).dimensions;
+  if (!Array.isArray(dimensions)) return result;
+  for (const item of dimensions) {
+    if (!item || typeof item !== "object") continue;
+    const row = item as Record<string, unknown>;
+    if (row.window_code !== "7d") continue;
+    const key = typeof row.entity_key === "string" ? row.entity_key.trim() : "";
+    const rawCount = row.count_in_window;
+    if (!key || typeof rawCount !== "number" || !Number.isFinite(rawCount) || rawCount <= 0) {
+      continue;
+    }
+    const count = Math.min(1_000, Math.trunc(rawCount));
+    const target = row.dimension_code === "meal_class"
+      ? result.recentClassCounts
+      : row.dimension_code === "cuisine"
+      ? result.recentCuisineCounts
+      : null;
+    if (target && (key in target || Object.keys(target).length < 100)) {
+      target[key] = Math.max(target[key] ?? 0, count);
+    }
+  }
+  return result;
 }
 
 /** Aggregate only explicit member affinities with Nash-style geometric welfare.
@@ -164,6 +202,7 @@ export async function loadOnlineRecommendationState(
       });
     }
     const cadence = extractPersistedCadence(varietyRes.data);
+    const variety = extractPersistedVarietyCounts(varietyRes.data);
     const joinedName = (row: Record<string, unknown>): string | null => {
       const joined = row.dishes as { name?: unknown } | Array<{ name?: unknown }> | null;
       const name = Array.isArray(joined) ? joined[0]?.name : joined?.name;
@@ -234,6 +273,7 @@ export async function loadOnlineRecommendationState(
         );
         return [...new Set(persisted.length > 0 ? persisted : eventFallback)].slice(0, 50);
       })(),
+      ...variety,
       ...cadence,
     };
   } catch (error) {
@@ -249,6 +289,8 @@ export async function loadOnlineRecommendationState(
       preferenceByTag: {},
       dishFeedbackCounts: [],
       recentExposureDishNames: [],
+      recentClassCounts: {},
+      recentCuisineCounts: {},
       noveltyBudget: 0.15,
       richnessDebt: 0,
     };

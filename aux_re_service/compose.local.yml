@@ -1,0 +1,48 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.18.2@sha256:75eab8c4ba42096724fdcfde8b4de0b5713d529dde32f285a1f86fdcb2c9e50c
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  qdrant-init:
+    build:
+      context: ..
+      dockerfile: aux_re_service/Dockerfile
+    depends_on:
+      qdrant:
+        condition: service_started
+    entrypoint: ["python", "-m", "aux_re_service.training.retrieval_pipeline"]
+    command:
+      - "--upload-points"
+      - "/srv/aux-re/retrieval/qdrant_points.json"
+      - "--qdrant-url"
+      - "http://qdrant:6333"
+      - "--collection"
+      - "foofoo_recipes"
+    restart: on-failure
+
+  auxiliary-recommender:
+    build:
+      context: ..
+      dockerfile: aux_re_service/Dockerfile
+    depends_on:
+      qdrant-init:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      AUX_REC_ENABLED: "true"
+      AUX_REC_MODE: shadow
+      AUX_REC_ALLOW_OVERRIDE: "false"
+      AUX_REC_QDRANT_URL: http://qdrant:6333
+      AUX_REC_MODEL_QDRANT_ENABLED: "true"
+      AUX_REC_MODEL_LIGHTFM_ENABLED: "true"
+      AUX_REC_LIGHTFM_ALLOW_SYNTHETIC: "true"
+      AUX_REC_LIGHTFM_ALLOW_UNPROMOTED: "false"
+    restart: unless-stopped
+
+volumes:
+  qdrant_data:

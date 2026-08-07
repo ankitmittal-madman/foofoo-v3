@@ -1,0 +1,8804 @@
+{
+  "version": "indian-food-ontology-v1",
+  "generated_at": "2026-08-07T07:10:08.466858+00:00",
+  "nodes": [
+    {
+      "id": "DISH_AJWAIN_PARATHA",
+      "type": "dish",
+      "name": "Ajwain Paratha"
+    },
+    {
+      "id": "REGION_MAHARASHTRA",
+      "type": "region",
+      "name": "maharashtra"
+    },
+    {
+      "id": "REGION_RAJASTHAN",
+      "type": "region",
+      "name": "rajasthan"
+    },
+    {
+      "id": "REGION_GUJARAT",
+      "type": "region",
+      "name": "gujarat"
+    },
+    {
+      "id": "REGION_KARNATAKA",
+      "type": "region",
+      "name": "karnataka"
+    },
+    {
+      "id": "MEAL_SLOT_BREAKFAST",
+      "type": "meal_slot",
+      "name": "breakfast"
+    },
+    {
+      "id": "DIET_TYPE_UNKNOWN",
+      "type": "diet_type",
+      "name": "unknown"
+    },
+    {
+      "id": "DISH_ALOO_PARATHA",
+      "type": "dish",
+      "name": "Aloo Paratha"
+    },
+    {
+      "id": "INGREDIENT_WHEAT_FLOUR",
+      "type": "ingredient",
+      "name": "wheat_flour"
+    },
+    {
+      "id": "INGREDIENT_POTATO",
+      "type": "ingredient",
+      "name": "potato"
+    },
+    {
+      "id": "INGREDIENT_GREEN_CHILLI",
+      "type": "ingredient",
+      "name": "green_chilli"
+    },
+    {
+      "id": "INGREDIENT_CORIANDER_LEAVES",
+      "type": "ingredient",
+      "name": "coriander_leaves"
+    },
+    {
+      "id": "INGREDIENT_CUMIN_SEEDS",
+      "type": "ingredient",
+      "name": "cumin_seeds"
+    },
+    {
+      "id": "INGREDIENT_AJWAIN",
+      "type": "ingredient",
+      "name": "ajwain"
+    },
+    {
+      "id": "INGREDIENT_GHEE",
+      "type": "ingredient",
+      "name": "ghee"
+    },
+    {
+      "id": "INGREDIENT_SALT",
+      "type": "ingredient",
+      "name": "salt"
+    },
+    {
+      "id": "CUISINE_PUNJABI",
+      "type": "cuisine",
+      "name": "punjabi"
+    },
+    {
+      "id": "REGION_NORTH",
+      "type": "region",
+      "name": "north"
+    },
+    {
+      "id": "DIET_TYPE_VEGETARIAN",
+      "type": "diet_type",
+      "name": "vegetarian"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_SHALLOW_FRIED",
+      "type": "cooking_technique",
+      "name": "shallow_fried"
+    },
+    {
+      "id": "DISH_ALOO_POSTO",
+      "type": "dish",
+      "name": "Aloo Posto"
+    },
+    {
+      "id": "INGREDIENT_POPPY_SEEDS",
+      "type": "ingredient",
+      "name": "poppy_seeds"
+    },
+    {
+      "id": "INGREDIENT_TURMERIC",
+      "type": "ingredient",
+      "name": "turmeric"
+    },
+    {
+      "id": "INGREDIENT_NIGELLA_SEEDS",
+      "type": "ingredient",
+      "name": "nigella_seeds"
+    },
+    {
+      "id": "INGREDIENT_MUSTARD_OIL",
+      "type": "ingredient",
+      "name": "mustard_oil"
+    },
+    {
+      "id": "CUISINE_BENGALI",
+      "type": "cuisine",
+      "name": "bengali"
+    },
+    {
+      "id": "REGION_EAST",
+      "type": "region",
+      "name": "east"
+    },
+    {
+      "id": "MEAL_SLOT_DINNER",
+      "type": "meal_slot",
+      "name": "dinner"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_SAUTEED",
+      "type": "cooking_technique",
+      "name": "sauteed"
+    },
+    {
+      "id": "DISH_APPAM",
+      "type": "dish",
+      "name": "Appam"
+    },
+    {
+      "id": "INGREDIENT_RICE_REGULAR",
+      "type": "ingredient",
+      "name": "rice_regular"
+    },
+    {
+      "id": "INGREDIENT_COCONUT_MILK",
+      "type": "ingredient",
+      "name": "coconut_milk"
+    },
+    {
+      "id": "INGREDIENT_SUGAR",
+      "type": "ingredient",
+      "name": "sugar"
+    },
+    {
+      "id": "CUISINE_TAMIL",
+      "type": "cuisine",
+      "name": "tamil"
+    },
+    {
+      "id": "REGION_SOUTH",
+      "type": "region",
+      "name": "south"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_FERMENTED_COOK",
+      "type": "cooking_technique",
+      "name": "fermented_cook"
+    },
+    {
+      "id": "DISH_BEANS",
+      "type": "dish",
+      "name": "Beans Poriyal"
+    },
+    {
+      "id": "REGION_WEST",
+      "type": "region",
+      "name": "west"
+    },
+    {
+      "id": "MEAL_SLOT_LUNCH",
+      "type": "meal_slot",
+      "name": "lunch"
+    },
+    {
+      "id": "DISH_BHAKRI_AND_PITHLA",
+      "type": "dish",
+      "name": "Bhakri & Pithla"
+    },
+    {
+      "id": "INGREDIENT_GRAM_FLOUR",
+      "type": "ingredient",
+      "name": "gram_flour"
+    },
+    {
+      "id": "INGREDIENT_JOWAR_FLOUR",
+      "type": "ingredient",
+      "name": "jowar_flour"
+    },
+    {
+      "id": "INGREDIENT_ONION",
+      "type": "ingredient",
+      "name": "onion"
+    },
+    {
+      "id": "INGREDIENT_GARLIC",
+      "type": "ingredient",
+      "name": "garlic"
+    },
+    {
+      "id": "INGREDIENT_MUSTARD_SEEDS",
+      "type": "ingredient",
+      "name": "mustard_seeds"
+    },
+    {
+      "id": "INGREDIENT_CURRY_LEAVES",
+      "type": "ingredient",
+      "name": "curry_leaves"
+    },
+    {
+      "id": "INGREDIENT_VEGETABLE_OIL",
+      "type": "ingredient",
+      "name": "vegetable_oil"
+    },
+    {
+      "id": "CUISINE_MAHARASHTRIAN",
+      "type": "cuisine",
+      "name": "maharashtrian"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_ROASTED",
+      "type": "cooking_technique",
+      "name": "roasted"
+    },
+    {
+      "id": "DISH_BHINDI",
+      "type": "dish",
+      "name": "Bhindi Sabzi"
+    },
+    {
+      "id": "DISH_BISI_BELE_BATH",
+      "type": "dish",
+      "name": "Bisi Bele Bath"
+    },
+    {
+      "id": "INGREDIENT_TOOR_DAL",
+      "type": "ingredient",
+      "name": "toor_dal"
+    },
+    {
+      "id": "INGREDIENT_TOMATO",
+      "type": "ingredient",
+      "name": "tomato"
+    },
+    {
+      "id": "INGREDIENT_TAMARIND",
+      "type": "ingredient",
+      "name": "tamarind"
+    },
+    {
+      "id": "INGREDIENT_COCONUT_FRESH",
+      "type": "ingredient",
+      "name": "coconut_fresh"
+    },
+    {
+      "id": "INGREDIENT_CASHEW",
+      "type": "ingredient",
+      "name": "cashew"
+    },
+    {
+      "id": "CUISINE_KARNATAKA",
+      "type": "cuisine",
+      "name": "karnataka"
+    },
+    {
+      "id": "REGION_TELANGANA",
+      "type": "region",
+      "name": "telangana"
+    },
+    {
+      "id": "REGION_TAMIL_NADU",
+      "type": "region",
+      "name": "tamil nadu"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_PRESSURE_COOKED",
+      "type": "cooking_technique",
+      "name": "pressure_cooked"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_TEMPERED",
+      "type": "cooking_technique",
+      "name": "tempered"
+    },
+    {
+      "id": "DISH_CHAPATI_AND_KURMA",
+      "type": "dish",
+      "name": "Chapati & Kurma"
+    },
+    {
+      "id": "DISH_CHHENAGAJA",
+      "type": "dish",
+      "name": "Chhenagaja"
+    },
+    {
+      "id": "REGION_DELHI",
+      "type": "region",
+      "name": "delhi"
+    },
+    {
+      "id": "DISH_CHICKEN_BHARTA",
+      "type": "dish",
+      "name": "Chicken Bharta"
+    },
+    {
+      "id": "REGION_UTTAR_PRADESH",
+      "type": "region",
+      "name": "uttar pradesh"
+    },
+    {
+      "id": "DIET_TYPE_NONVEGETARIAN",
+      "type": "diet_type",
+      "name": "nonvegetarian"
+    },
+    {
+      "id": "DISH_CHICKEN_CHETTINAD",
+      "type": "dish",
+      "name": "Chicken Chettinad"
+    },
+    {
+      "id": "INGREDIENT_CHICKEN",
+      "type": "ingredient",
+      "name": "chicken"
+    },
+    {
+      "id": "INGREDIENT_GINGER",
+      "type": "ingredient",
+      "name": "ginger"
+    },
+    {
+      "id": "INGREDIENT_BLACK_PEPPER",
+      "type": "ingredient",
+      "name": "black_pepper"
+    },
+    {
+      "id": "INGREDIENT_FENNEL_SEEDS",
+      "type": "ingredient",
+      "name": "fennel_seeds"
+    },
+    {
+      "id": "INGREDIENT_STAR_ANISE",
+      "type": "ingredient",
+      "name": "star_anise"
+    },
+    {
+      "id": "INGREDIENT_RED_CHILLI_POWDER",
+      "type": "ingredient",
+      "name": "red_chilli_powder"
+    },
+    {
+      "id": "INGREDIENT_COCONUT_OIL",
+      "type": "ingredient",
+      "name": "coconut_oil"
+    },
+    {
+      "id": "CUISINE_CHETTINAD",
+      "type": "cuisine",
+      "name": "chettinad"
+    },
+    {
+      "id": "REGION_WEST_BENGAL",
+      "type": "region",
+      "name": "west bengal"
+    },
+    {
+      "id": "DISH_CHICKEN_CURRY",
+      "type": "dish",
+      "name": "Chicken Curry Rice"
+    },
+    {
+      "id": "DIET_TYPE_NONVEG",
+      "type": "diet_type",
+      "name": "nonveg"
+    },
+    {
+      "id": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "type": "dish",
+      "name": "Chicken Curry & Roti"
+    },
+    {
+      "id": "DISH_CHICKEN_XACUTI",
+      "type": "dish",
+      "name": "Chicken Xacuti"
+    },
+    {
+      "id": "INGREDIENT_CORIANDER_POWDER",
+      "type": "ingredient",
+      "name": "coriander_powder"
+    },
+    {
+      "id": "INGREDIENT_CINNAMON",
+      "type": "ingredient",
+      "name": "cinnamon"
+    },
+    {
+      "id": "INGREDIENT_CLOVE",
+      "type": "ingredient",
+      "name": "clove"
+    },
+    {
+      "id": "CUISINE_GOAN",
+      "type": "cuisine",
+      "name": "goan"
+    },
+    {
+      "id": "DISH_CHILLA",
+      "type": "dish",
+      "name": "Besan Chilla"
+    },
+    {
+      "id": "DISH_CHIRA_BHAJA",
+      "type": "dish",
+      "name": "Chira Bhaja"
+    },
+    {
+      "id": "DISH_CHOLE",
+      "type": "dish",
+      "name": "Chole Bhature"
+    },
+    {
+      "id": "DISH_CURD_RICE",
+      "type": "dish",
+      "name": "Curd Rice"
+    },
+    {
+      "id": "INGREDIENT_CURD",
+      "type": "ingredient",
+      "name": "curd"
+    },
+    {
+      "id": "INGREDIENT_URAD_DAL",
+      "type": "ingredient",
+      "name": "urad_dal"
+    },
+    {
+      "id": "DISH_DALIA",
+      "type": "dish",
+      "name": "Dalia"
+    },
+    {
+      "id": "DISH_DALMA",
+      "type": "dish",
+      "name": "Dalma"
+    },
+    {
+      "id": "INGREDIENT_PUMPKIN",
+      "type": "ingredient",
+      "name": "pumpkin"
+    },
+    {
+      "id": "INGREDIENT_RAW_BANANA",
+      "type": "ingredient",
+      "name": "raw_banana"
+    },
+    {
+      "id": "INGREDIENT_BAY_LEAF",
+      "type": "ingredient",
+      "name": "bay_leaf"
+    },
+    {
+      "id": "CUISINE_ODIA",
+      "type": "cuisine",
+      "name": "odia"
+    },
+    {
+      "id": "DISH_DAL_DHOKLI",
+      "type": "dish",
+      "name": "Dal Dhokli"
+    },
+    {
+      "id": "INGREDIENT_JAGGERY",
+      "type": "ingredient",
+      "name": "jaggery"
+    },
+    {
+      "id": "INGREDIENT_PEANUT",
+      "type": "ingredient",
+      "name": "peanut"
+    },
+    {
+      "id": "CUISINE_GUJARATI",
+      "type": "cuisine",
+      "name": "gujarati"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_BOILED",
+      "type": "cooking_technique",
+      "name": "boiled"
+    },
+    {
+      "id": "DISH_DAL_MAKHANI_AND_ROTI",
+      "type": "dish",
+      "name": "Dal Makhani & Roti"
+    },
+    {
+      "id": "DISH_DAL_ROTI",
+      "type": "dish",
+      "name": "Dal Roti Sabzi"
+    },
+    {
+      "id": "DISH_DAL_TADKA_AND_PHULKA",
+      "type": "dish",
+      "name": "Dal Tadka & Phulka"
+    },
+    {
+      "id": "DISH_DHOKLA",
+      "type": "dish",
+      "name": "Dhokla"
+    },
+    {
+      "id": "INGREDIENT_SESAME_SEEDS",
+      "type": "ingredient",
+      "name": "sesame_seeds"
+    },
+    {
+      "id": "INGREDIENT_LEMON",
+      "type": "ingredient",
+      "name": "lemon"
+    },
+    {
+      "id": "MEAL_SLOT_SNACK",
+      "type": "meal_slot",
+      "name": "snack"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_STEAMED",
+      "type": "cooking_technique",
+      "name": "steamed"
+    },
+    {
+      "id": "DISH_DOSA",
+      "type": "dish",
+      "name": "Dosa"
+    },
+    {
+      "id": "DISH_FAFDA_JALEBI",
+      "type": "dish",
+      "name": "Fafda Jalebi"
+    },
+    {
+      "id": "INGREDIENT_REFINED_FLOUR",
+      "type": "ingredient",
+      "name": "refined_flour"
+    },
+    {
+      "id": "INGREDIENT_SAFFRON",
+      "type": "ingredient",
+      "name": "saffron"
+    },
+    {
+      "id": "COOKING_TECHNIQUE_DEEP_FRIED",
+      "type": "cooking_technique",
+      "name": "deep_fried"
+    },
+    {
+      "id": "DISH_FISH_CURRY",
+      "type": "dish",
+      "name": "Fish Curry Rice"
+    },
+    {
+      "id": "DIET_TYPE_FISH",
+      "type": "diet_type",
+      "name": "fish"
+    },
+    {
+      "id": "DISH_FISH_PATURI",
+      "type": "dish",
+      "name": "Fish Paturi"
+    },
+    {
+      "id": "DISH_FRUIT_BOWL",
+      "type": "dish",
+      "name": "Fruit Bowl"
+    },
+    {
+      "id": "DIET_TYPE_VEGAN",
+      "type": "diet_type",
+      "name": "vegan"
+    },
+    {
+      "id": "DISH_GHUGNI",
+      "type": "dish",
+      "name": "Ghugni"
+    },
+    {
+      "id": "INGREDIENT_GREEN_GRAM_WHOLE",
+      "type": "ingredient",
+      "name": "green_gram_whole"
+    },
+    {
+      "id": "DISH_GOAN_FISH_CURRY",
+      "type": "dish",
+      "name": "Goan Fish Curry"
+    },
+    {
+      "id": "INGREDIENT_FISH_GENERIC",
+      "type": "ingredient",
+      "name": "fish_generic"
+    },
+    {
+      "id": "INGREDIENT_KOKUM",
+      "type": "ingredient",
+      "name": "kokum"
+    },
+    {
+      "id": "DISH_GUJARATI_THALI",
+      "type": "dish",
+      "name": "Gujarati Thali"
+    },
+    {
+      "id": "DISH_GUJIYA",
+      "type": "dish",
+      "name": "Gujiya"
+    },
+    {
+      "id": "INGREDIENT_KHOYA",
+      "type": "ingredient",
+      "name": "khoya"
+    },
+    {
+      "id": "INGREDIENT_ALMOND",
+      "type": "ingredient",
+      "name": "almond"
+    },
+    {
+      "id": "INGREDIENT_PISTACHIO",
+      "type": "ingredient",
+      "name": "pistachio"
+    },
+    {
+      "id": "INGREDIENT_COCONUT_DESICCATED",
+      "type": "ingredient",
+      "name": "coconut_desiccated"
+    },
+    {
+      "id": "INGREDIENT_CARDAMOM_GREEN",
+      "type": "ingredient",
+      "name": "cardamom_green"
+    },
+    {
+      "id": "CUISINE_STREET_FOOD_GENERIC",
+      "type": "cuisine",
+      "name": "street_food_generic"
+    },
+    {
+      "id": "MEAL_SLOT_FESTIVAL",
+      "type": "meal_slot",
+      "name": "festival"
+    },
+    {
+      "id": "DISH_IDIYAPPAM",
+      "type": "dish",
+      "name": "Idiyappam"
+    },
+    {
+      "id": "INGREDIENT_RICE_FLOUR",
+      "type": "ingredient",
+      "name": "rice_flour"
+    },
+    {
+      "id": "INGREDIENT_WATER",
+      "type": "ingredient",
+      "name": "water"
+    },
+    {
+      "id": "CUISINE_KERALA",
+      "type": "cuisine",
+      "name": "kerala"
+    },
+    {
+      "id": "DISH_IDLI",
+      "type": "dish",
+      "name": "Idli"
+    },
+    {
+      "id": "DISH_IDLI_SAMBAR",
+      "type": "dish",
+      "name": "Idli Sambar"
+    },
+    {
+      "id": "DISH_KACHORI",
+      "type": "dish",
+      "name": "Kachori"
+    },
+    {
+      "id": "DISH_KADHI_PAKORA",
+      "type": "dish",
+      "name": "Kadhi Pakora"
+    },
+    {
+      "id": "DISH_KANDA_POHA",
+      "type": "dish",
+      "name": "Kanda Poha"
+    },
+    {
+      "id": "DISH_KHICHDI",
+      "type": "dish",
+      "name": "Khichdi"
+    },
+    {
+      "id": "INGREDIENT_MOONG_DAL",
+      "type": "ingredient",
+      "name": "moong_dal"
+    },
+    {
+      "id": "CUISINE_UP",
+      "type": "cuisine",
+      "name": "up"
+    },
+    {
+      "id": "DISH_KHICHDI_KADHI",
+      "type": "dish",
+      "name": "Khichdi Kadhi"
+    },
+    {
+      "id": "DISH_KOSHA_MANGSHO",
+      "type": "dish",
+      "name": "Kosha Mangsho"
+    },
+    {
+      "id": "INGREDIENT_MUTTON",
+      "type": "ingredient",
+      "name": "mutton"
+    },
+    {
+      "id": "INGREDIENT_GARAM_MASALA",
+      "type": "ingredient",
+      "name": "garam_masala"
+    },
+    {
+      "id": "DISH_LADOO",
+      "type": "dish",
+      "name": "Ladoo"
+    },
+    {
+      "id": "DISH_LAUKI",
+      "type": "dish",
+      "name": "Lauki Sabzi"
+    },
+    {
+      "id": "DISH_LEMON_RICE",
+      "type": "dish",
+      "name": "Lemon Rice"
+    },
+    {
+      "id": "INGREDIENT_ASAFOETIDA",
+      "type": "ingredient",
+      "name": "asafoetida"
+    },
+    {
+      "id": "DISH_LUCHI_ALOO_DUM",
+      "type": "dish",
+      "name": "Luchi Aloo Dum"
+    },
+    {
+      "id": "DISH_MACHHER_JHOL_AND_RICE",
+      "type": "dish",
+      "name": "Machher Jhol & Rice"
+    },
+    {
+      "id": "DISH_MALABAR_FISH_CURRY",
+      "type": "dish",
+      "name": "Malabar Fish Curry"
+    },
+    {
+      "id": "DISH_MASALA_DOSA",
+      "type": "dish",
+      "name": "Masala Dosa"
+    },
+    {
+      "id": "CUISINE_UDUPI",
+      "type": "cuisine",
+      "name": "udupi"
+    },
+    {
+      "id": "DISH_MISAL_PAV",
+      "type": "dish",
+      "name": "Misal Pav"
+    },
+    {
+      "id": "INGREDIENT_MOTH_BEANS",
+      "type": "ingredient",
+      "name": "moth_beans"
+    },
+    {
+      "id": "INGREDIENT_BREAD",
+      "type": "ingredient",
+      "name": "bread"
+    },
+    {
+      "id": "DISH_MIXED_VEG_AND_ROTI",
+      "type": "dish",
+      "name": "Mixed Veg & Roti"
+    },
+    {
+      "id": "DISH_MODAK",
+      "type": "dish",
+      "name": "Modak"
+    },
+    {
+      "id": "DISH_MURI_GHONTO",
+      "type": "dish",
+      "name": "Muri Ghonto"
+    },
+    {
+      "id": "DISH_MUTTON_CURRY",
+      "type": "dish",
+      "name": "Mutton Curry"
+    },
+    {
+      "id": "DISH_MUTTON_ROGAN_JOSH",
+      "type": "dish",
+      "name": "Mutton Rogan Josh"
+    },
+    {
+      "id": "INGREDIENT_KASHMIRI_CHILLI",
+      "type": "ingredient",
+      "name": "kashmiri_chilli"
+    },
+    {
+      "id": "CUISINE_MUGHLAI",
+      "type": "cuisine",
+      "name": "mughlai"
+    },
+    {
+      "id": "DISH_NUTS",
+      "type": "dish",
+      "name": "Nuts Mix"
+    },
+    {
+      "id": "DISH_OMLETTE",
+      "type": "dish",
+      "name": "Masala Omelette"
+    },
+    {
+      "id": "INGREDIENT_EGG",
+      "type": "ingredient",
+      "name": "egg"
+    },
+    {
+      "id": "DIET_TYPE_EGG",
+      "type": "diet_type",
+      "name": "egg"
+    },
+    {
+      "id": "DISH_PALAK_PANEER",
+      "type": "dish",
+      "name": "Palak Paneer"
+    },
+    {
+      "id": "INGREDIENT_SPINACH",
+      "type": "ingredient",
+      "name": "spinach"
+    },
+    {
+      "id": "INGREDIENT_PANEER",
+      "type": "ingredient",
+      "name": "paneer"
+    },
+    {
+      "id": "INGREDIENT_CREAM",
+      "type": "ingredient",
+      "name": "cream"
+    },
+    {
+      "id": "DISH_PANEER_BUTTER",
+      "type": "dish",
+      "name": "Paneer Butter Masala"
+    },
+    {
+      "id": "INGREDIENT_BUTTER",
+      "type": "ingredient",
+      "name": "butter"
+    },
+    {
+      "id": "INGREDIENT_KASURI_METHI",
+      "type": "ingredient",
+      "name": "kasuri_methi"
+    },
+    {
+      "id": "DISH_PARATHA",
+      "type": "dish",
+      "name": "Paratha"
+    },
+    {
+      "id": "DISH_PAV_BHAJI",
+      "type": "dish",
+      "name": "Pav Bhaji"
+    },
+    {
+      "id": "INGREDIENT_CAPSICUM",
+      "type": "ingredient",
+      "name": "capsicum"
+    },
+    {
+      "id": "INGREDIENT_CAULIFLOWER",
+      "type": "ingredient",
+      "name": "cauliflower"
+    },
+    {
+      "id": "INGREDIENT_GREEN_PEAS",
+      "type": "ingredient",
+      "name": "green_peas"
+    },
+    {
+      "id": "DISH_PESARATTU",
+      "type": "dish",
+      "name": "Pesarattu"
+    },
+    {
+      "id": "CUISINE_ANDHRA",
+      "type": "cuisine",
+      "name": "andhra"
+    },
+    {
+      "id": "DISH_POHA",
+      "type": "dish",
+      "name": "Poha"
+    },
+    {
+      "id": "INGREDIENT_RICE_FLATTENED",
+      "type": "ingredient",
+      "name": "rice_flattened"
+    },
+    {
+      "id": "DISH_PULAO",
+      "type": "dish",
+      "name": "Veg Pulao"
+    },
+    {
+      "id": "DISH_RAJMA_CHAWAL",
+      "type": "dish",
+      "name": "Rajma Chawal"
+    },
+    {
+      "id": "DISH_RASAM_RICE",
+      "type": "dish",
+      "name": "Rasam Rice"
+    },
+    {
+      "id": "DISH_RICE_AND_SAMBAR",
+      "type": "dish",
+      "name": "Rice & Sambar"
+    },
+    {
+      "id": "DISH_RICE_DAL",
+      "type": "dish",
+      "name": "Rice Dal Sabzi"
+    },
+    {
+      "id": "DISH_ROTI_AND_SABZI",
+      "type": "dish",
+      "name": "Roti & Sabzi"
+    },
+    {
+      "id": "DISH_SATTU_PARATHA",
+      "type": "dish",
+      "name": "Sattu Paratha"
+    },
+    {
+      "id": "INGREDIENT_SATTU",
+      "type": "ingredient",
+      "name": "sattu"
+    },
+    {
+      "id": "CUISINE_BIHARI",
+      "type": "cuisine",
+      "name": "bihari"
+    },
+    {
+      "id": "DISH_SEVAI",
+      "type": "dish",
+      "name": "Vegetable Sevai"
+    },
+    {
+      "id": "DISH_SEV_TOMATO_SHAAK",
+      "type": "dish",
+      "name": "Sev Tomato Shaak"
+    },
+    {
+      "id": "DISH_SHUKTO",
+      "type": "dish",
+      "name": "Shukto"
+    },
+    {
+      "id": "INGREDIENT_BITTER_GOURD",
+      "type": "ingredient",
+      "name": "bitter_gourd"
+    },
+    {
+      "id": "INGREDIENT_DRUMSTICK",
+      "type": "ingredient",
+      "name": "drumstick"
+    },
+    {
+      "id": "INGREDIENT_MILK",
+      "type": "ingredient",
+      "name": "milk"
+    },
+    {
+      "id": "DISH_SIMPLE_SABZI",
+      "type": "dish",
+      "name": "Simple Green Sabzi"
+    },
+    {
+      "id": "DISH_SOUP",
+      "type": "dish",
+      "name": "Vegetable Soup"
+    },
+    {
+      "id": "DISH_SPROUTS",
+      "type": "dish",
+      "name": "Sprouts Salad"
+    },
+    {
+      "id": "DISH_THEPLA",
+      "type": "dish",
+      "name": "Thepla"
+    },
+    {
+      "id": "INGREDIENT_FENUGREEK_LEAVES",
+      "type": "ingredient",
+      "name": "fenugreek_leaves"
+    },
+    {
+      "id": "DISH_TINDA",
+      "type": "dish",
+      "name": "Tinda Sabzi"
+    },
+    {
+      "id": "DISH_TURAI",
+      "type": "dish",
+      "name": "Turai Sabzi"
+    },
+    {
+      "id": "DISH_UPMA",
+      "type": "dish",
+      "name": "Upma"
+    },
+    {
+      "id": "INGREDIENT_SEMOLINA",
+      "type": "ingredient",
+      "name": "semolina"
+    },
+    {
+      "id": "DISH_UTTAPAM",
+      "type": "dish",
+      "name": "Uttapam"
+    },
+    {
+      "id": "DISH_VANGYACHE_BHARIT",
+      "type": "dish",
+      "name": "Vangyache Bharit"
+    },
+    {
+      "id": "DISH_VARAN_BHAAT",
+      "type": "dish",
+      "name": "Varan Bhaat"
+    },
+    {
+      "id": "DISH_YOGURT",
+      "type": "dish",
+      "name": "Yogurt Bowl"
+    }
+  ],
+  "relations": [
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_WHEAT_FLOUR"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_POTATO"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_AJWAIN"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "belongs_to",
+      "target": "CUISINE_PUNJABI"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "contains",
+      "target": "INGREDIENT_POTATO"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "contains",
+      "target": "INGREDIENT_POPPY_SEEDS"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "contains",
+      "target": "INGREDIENT_NIGELLA_SEEDS"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_OIL"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "belongs_to",
+      "target": "CUISINE_BENGALI"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_MILK"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_SUGAR"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "belongs_to",
+      "target": "CUISINE_TAMIL"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_GRAM_FLOUR"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_JOWAR_FLOUR"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_GARLIC"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "belongs_to",
+      "target": "CUISINE_MAHARASHTRIAN"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_ROASTED"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_TOOR_DAL"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_TAMARIND"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_FRESH"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_CASHEW"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "belongs_to",
+      "target": "CUISINE_KARNATAKA"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_PRESSURE_COOKED"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "eaten_in",
+      "target": "REGION_DELHI"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_CHICKEN"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_FRESH"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_GARLIC"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_BLACK_PEPPER"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_FENNEL_SEEDS"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_STAR_ANISE"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_RED_CHILLI_POWDER"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_OIL"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "belongs_to",
+      "target": "CUISINE_CHETTINAD"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEG"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_DELHI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_CHICKEN"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_FRESH"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_POPPY_SEEDS"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_POWDER"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_FENNEL_SEEDS"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_CINNAMON"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_CLOVE"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_STAR_ANISE"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_BLACK_PEPPER"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_OIL"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "belongs_to",
+      "target": "CUISINE_GOAN"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_ROASTED"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_CURD"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_URAD_DAL"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "belongs_to",
+      "target": "CUISINE_TAMIL"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_PUMPKIN"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_RAW_BANANA"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_TOOR_DAL"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_POTATO"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_FRESH"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_BAY_LEAF"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "belongs_to",
+      "target": "CUISINE_ODIA"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_PRESSURE_COOKED"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_TOOR_DAL"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_WHEAT_FLOUR"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_JAGGERY"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_TAMARIND"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_PEANUT"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "belongs_to",
+      "target": "CUISINE_GUJARATI"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_BOILED"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_GRAM_FLOUR"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURD"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_SUGAR"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_SESAME_SEEDS"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_LEMON"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "belongs_to",
+      "target": "CUISINE_GUJARATI"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_SNACK"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_STEAMED"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_GRAM_FLOUR"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_REFINED_FLOUR"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_SUGAR"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_SAFFRON"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_CURD"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_AJWAIN"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "belongs_to",
+      "target": "CUISINE_GUJARATI"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_DEEP_FRIED"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_FISH"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_SNACK"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGAN"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_GRAM_WHOLE"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_POTATO"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_OIL"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "belongs_to",
+      "target": "CUISINE_BENGALI"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_FISH_GENERIC"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_FRESH"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_KOKUM"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_TAMARIND"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_RED_CHILLI_POWDER"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_POWDER"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_OIL"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "belongs_to",
+      "target": "CUISINE_GOAN"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "eaten_in",
+      "target": "REGION_DELHI"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_REFINED_FLOUR"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_KHOYA"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_SUGAR"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_ALMOND"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_PISTACHIO"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_DESICCATED"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_CARDAMOM_GREEN"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "belongs_to",
+      "target": "CUISINE_STREET_FOOD_GENERIC"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_FESTIVAL"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_DEEP_FRIED"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_FLOUR"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_WATER"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "belongs_to",
+      "target": "CUISINE_KERALA"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_STEAMED"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "contains",
+      "target": "INGREDIENT_URAD_DAL"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "belongs_to",
+      "target": "CUISINE_TAMIL"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_STEAMED"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "eaten_in",
+      "target": "REGION_DELHI"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURD"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_GRAM_FLOUR"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "belongs_to",
+      "target": "CUISINE_PUNJABI"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_DEEP_FRIED"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "contains",
+      "target": "INGREDIENT_MOONG_DAL"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "contains",
+      "target": "INGREDIENT_WATER"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "belongs_to",
+      "target": "CUISINE_UP"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_PRESSURE_COOKED"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "eaten_in",
+      "target": "REGION_DELHI"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_MUTTON"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_CURD"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_GARLIC"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_POWDER"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_RED_CHILLI_POWDER"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_GARAM_MASALA"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_BAY_LEAF"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_OIL"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_SUGAR"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "belongs_to",
+      "target": "CUISINE_BENGALI"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_FESTIVAL"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_LEMON"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_PEANUT"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_URAD_DAL"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_ASAFOETIDA"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "belongs_to",
+      "target": "CUISINE_TAMIL"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "eaten_in",
+      "target": "REGION_DELHI"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_URAD_DAL"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_POTATO"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "belongs_to",
+      "target": "CUISINE_UDUPI"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_MOTH_BEANS"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_GARLIC"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_RED_CHILLI_POWDER"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_BREAD"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_LEMON"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "belongs_to",
+      "target": "CUISINE_MAHARASHTRIAN"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_PRESSURE_COOKED"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_DELHI"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_FLOUR"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "contains",
+      "target": "INGREDIENT_COCONUT_FRESH"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "contains",
+      "target": "INGREDIENT_JAGGERY"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "contains",
+      "target": "INGREDIENT_CARDAMOM_GREEN"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "belongs_to",
+      "target": "CUISINE_MAHARASHTRIAN"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_FESTIVAL"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_STEAMED"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_FISH_GENERIC"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_BAY_LEAF"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_GARAM_MASALA"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_OIL"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "belongs_to",
+      "target": "CUISINE_BENGALI"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEG"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_MUTTON"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_CURD"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_GARLIC"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_KASHMIRI_CHILLI"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_FENNEL_SEEDS"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_CARDAMOM_GREEN"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_CINNAMON"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_CLOVE"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_BAY_LEAF"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "belongs_to",
+      "target": "CUISINE_MUGHLAI"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_NONVEGETARIAN"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_SNACK"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGAN"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "contains",
+      "target": "INGREDIENT_EGG"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "belongs_to",
+      "target": "CUISINE_STREET_FOOD_GENERIC"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_EGG"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_SPINACH"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_PANEER"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_GARLIC"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_GARAM_MASALA"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_CREAM"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "belongs_to",
+      "target": "CUISINE_PUNJABI"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_BOILED"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_PANEER"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_BUTTER"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_CREAM"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_CASHEW"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_GARLIC"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_KASHMIRI_CHILLI"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_GARAM_MASALA"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_KASURI_METHI"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_SUGAR"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "belongs_to",
+      "target": "CUISINE_PUNJABI"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_CAPSICUM"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_POTATO"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_CAULIFLOWER"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_PEAS"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_BUTTER"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_GARLIC"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_RED_CHILLI_POWDER"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_GARAM_MASALA"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_BREAD"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_LEMON"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "belongs_to",
+      "target": "CUISINE_MAHARASHTRIAN"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "contains",
+      "target": "INGREDIENT_MOONG_DAL"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "belongs_to",
+      "target": "CUISINE_ANDHRA"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_FLATTENED"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_POTATO"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_PEANUT"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_LEMON"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "belongs_to",
+      "target": "CUISINE_MAHARASHTRIAN"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "eaten_in",
+      "target": "REGION_DELHI"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "eaten_in",
+      "target": "REGION_GUJARAT"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_WHEAT_FLOUR"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_SATTU"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_LEMON"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "contains",
+      "target": "INGREDIENT_GHEE"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "belongs_to",
+      "target": "CUISINE_BIHARI"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "eaten_in",
+      "target": "REGION_RAJASTHAN"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_BITTER_GOURD"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_RAW_BANANA"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_DRUMSTICK"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_POTATO"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_NIGELLA_SEEDS"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_BAY_LEAF"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_MILK"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_OIL"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "belongs_to",
+      "target": "CUISINE_BENGALI"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_SNACK"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGAN"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_SNACK"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_FENUGREEK_LEAVES"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_WHEAT_FLOUR"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURD"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_TURMERIC"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_RED_CHILLI_POWDER"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_CUMIN_SEEDS"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_SESAME_SEEDS"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "belongs_to",
+      "target": "CUISINE_GUJARATI"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_SNACK"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_SEMOLINA"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_GINGER"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_MUSTARD_SEEDS"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_CURRY_LEAVES"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_URAD_DAL"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_CASHEW"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "belongs_to",
+      "target": "CUISINE_TAMIL"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_CAPSICUM"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_RICE_REGULAR"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_URAD_DAL"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_ONION"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_TOMATO"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_GREEN_CHILLI"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_CORIANDER_LEAVES"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "contains",
+      "target": "INGREDIENT_VEGETABLE_OIL"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "belongs_to",
+      "target": "CUISINE_TAMIL"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "eaten_in",
+      "target": "REGION_TAMIL_NADU"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "eaten_in",
+      "target": "REGION_TELANGANA"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_DINNER"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "eaten_in",
+      "target": "REGION_MAHARASHTRA"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "eaten_in",
+      "target": "REGION_WEST_BENGAL"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "eaten_in",
+      "target": "REGION_UTTAR_PRADESH"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "eaten_in",
+      "target": "REGION_KARNATAKA"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_LUNCH"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_UNKNOWN"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "eaten_in",
+      "target": "REGION_NORTH"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "eaten_in",
+      "target": "REGION_SOUTH"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "eaten_in",
+      "target": "REGION_WEST"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "eaten_in",
+      "target": "REGION_EAST"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_SNACK"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "served_at",
+      "target": "MEAL_SLOT_BREAKFAST"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "compatible_with",
+      "target": "DIET_TYPE_VEGETARIAN"
+    }
+  ],
+  "dishes": [
+    {
+      "id": "DISH_AJWAIN_PARATHA",
+      "name": "Ajwain Paratha",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "rajasthan",
+        "gujarat",
+        "karnataka"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "rajasthan",
+        "gujarat",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_ALOO_PARATHA",
+      "name": "Aloo Paratha",
+      "aliases": [],
+      "ingredients": [
+        "wheat_flour",
+        "potato",
+        "green_chilli",
+        "coriander_leaves",
+        "cumin_seeds",
+        "ajwain",
+        "ghee",
+        "salt"
+      ],
+      "allergens": [
+        "wheat"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "punjabi"
+      ],
+      "regions": [
+        "north"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "gujarat",
+        "tamil nadu",
+        "telangana"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "shallow_fried"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_ALOO_POSTO",
+      "name": "Aloo Posto",
+      "aliases": [],
+      "ingredients": [
+        "potato",
+        "poppy_seeds",
+        "green_chilli",
+        "turmeric",
+        "nigella_seeds",
+        "mustard_oil",
+        "salt"
+      ],
+      "allergens": [
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "bengali"
+      ],
+      "regions": [
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "tamil nadu",
+        "karnataka",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_APPAM",
+      "name": "Appam",
+      "aliases": [],
+      "ingredients": [
+        "rice_regular",
+        "coconut_milk",
+        "sugar",
+        "salt"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "tamil"
+      ],
+      "regions": [
+        "south"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "tamil nadu",
+        "uttar pradesh"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "shallow_fried",
+        "fermented_cook"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_BEANS",
+      "name": "Beans Poriyal",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_BHAKRI_AND_PITHLA",
+      "name": "Bhakri & Pithla",
+      "aliases": [],
+      "ingredients": [
+        "gram_flour",
+        "jowar_flour",
+        "onion",
+        "garlic",
+        "green_chilli",
+        "turmeric",
+        "mustard_seeds",
+        "curry_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "maharashtrian"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "rajasthan",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [
+        "sauteed",
+        "roasted"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_BHINDI",
+      "name": "Bhindi Sabzi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_BISI_BELE_BATH",
+      "name": "Bisi Bele Bath",
+      "aliases": [],
+      "ingredients": [
+        "rice_regular",
+        "toor_dal",
+        "onion",
+        "tomato",
+        "tamarind",
+        "coconut_fresh",
+        "cashew",
+        "curry_leaves",
+        "mustard_seeds",
+        "turmeric",
+        "ghee",
+        "salt"
+      ],
+      "allergens": [
+        "mustard",
+        "tree_nut"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "karnataka"
+      ],
+      "regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "tamil nadu"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "tamil nadu"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "pressure_cooked",
+        "tempered"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHAPATI_AND_KURMA",
+      "name": "Chapati & Kurma",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "gujarat",
+        "telangana",
+        "karnataka"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "gujarat",
+        "telangana",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHHENAGAJA",
+      "name": "Chhenagaja",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "rajasthan",
+        "delhi",
+        "tamil nadu"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "rajasthan",
+        "delhi",
+        "tamil nadu"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHICKEN_BHARTA",
+      "name": "Chicken Bharta",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "telangana",
+        "rajasthan",
+        "uttar pradesh"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "rajasthan",
+        "uttar pradesh"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHICKEN_CHETTINAD",
+      "name": "Chicken Chettinad",
+      "aliases": [],
+      "ingredients": [
+        "chicken",
+        "coconut_fresh",
+        "onion",
+        "tomato",
+        "ginger",
+        "garlic",
+        "black_pepper",
+        "fennel_seeds",
+        "star_anise",
+        "curry_leaves",
+        "red_chilli_powder",
+        "turmeric",
+        "salt",
+        "coconut_oil"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [
+        "chettinad"
+      ],
+      "regions": [
+        "maharashtra",
+        "west bengal",
+        "telangana",
+        "uttar pradesh"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "west bengal",
+        "telangana",
+        "uttar pradesh"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHICKEN_CURRY",
+      "name": "Chicken Curry Rice",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "nonveg"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "name": "Chicken Curry & Roti",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "delhi",
+        "rajasthan",
+        "tamil nadu"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "delhi",
+        "rajasthan",
+        "tamil nadu"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHICKEN_XACUTI",
+      "name": "Chicken Xacuti",
+      "aliases": [],
+      "ingredients": [
+        "chicken",
+        "coconut_fresh",
+        "onion",
+        "tomato",
+        "poppy_seeds",
+        "coriander_powder",
+        "fennel_seeds",
+        "cinnamon",
+        "clove",
+        "star_anise",
+        "black_pepper",
+        "turmeric",
+        "salt",
+        "coconut_oil"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [
+        "goan"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "rajasthan",
+        "tamil nadu",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [
+        "roasted",
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHILLA",
+      "name": "Besan Chilla",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "west",
+        "south",
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "tamil nadu",
+        "delhi",
+        "gujarat"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHIRA_BHAJA",
+      "name": "Chira Bhaja",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "telangana",
+        "rajasthan",
+        "uttar pradesh"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "rajasthan",
+        "uttar pradesh"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CHOLE",
+      "name": "Chole Bhature",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "west",
+        "south",
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "uttar pradesh"
+      ],
+      "meal_slots": [
+        "breakfast",
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_CURD_RICE",
+      "name": "Curd Rice",
+      "aliases": [],
+      "ingredients": [
+        "rice_regular",
+        "curd",
+        "mustard_seeds",
+        "urad_dal",
+        "curry_leaves",
+        "ginger",
+        "green_chilli",
+        "coriander_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "dairy",
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "tamil"
+      ],
+      "regions": [
+        "south"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "rajasthan",
+        "telangana",
+        "tamil nadu"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [
+        "tempered"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_DALIA",
+      "name": "Dalia",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "south",
+        "north",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "south",
+        "north",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_DALMA",
+      "name": "Dalma",
+      "aliases": [],
+      "ingredients": [
+        "pumpkin",
+        "raw_banana",
+        "toor_dal",
+        "potato",
+        "coconut_fresh",
+        "cumin_seeds",
+        "turmeric",
+        "bay_leaf",
+        "ghee",
+        "salt"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "odia"
+      ],
+      "regions": [
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "gujarat",
+        "karnataka",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "pressure_cooked"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_DAL_DHOKLI",
+      "name": "Dal Dhokli",
+      "aliases": [],
+      "ingredients": [
+        "toor_dal",
+        "wheat_flour",
+        "tomato",
+        "jaggery",
+        "tamarind",
+        "turmeric",
+        "mustard_seeds",
+        "curry_leaves",
+        "peanut",
+        "ghee",
+        "salt"
+      ],
+      "allergens": [
+        "mustard",
+        "peanut",
+        "wheat"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "gujarati"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "delhi",
+        "west bengal",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "boiled"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_DAL_MAKHANI_AND_ROTI",
+      "name": "Dal Makhani & Roti",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "gujarat",
+        "tamil nadu",
+        "rajasthan"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "gujarat",
+        "tamil nadu",
+        "rajasthan"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_DAL_ROTI",
+      "name": "Dal Roti Sabzi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_DAL_TADKA_AND_PHULKA",
+      "name": "Dal Tadka & Phulka",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "gujarat",
+        "tamil nadu",
+        "telangana"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "gujarat",
+        "tamil nadu",
+        "telangana"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_DHOKLA",
+      "name": "Dhokla",
+      "aliases": [],
+      "ingredients": [
+        "gram_flour",
+        "curd",
+        "sugar",
+        "green_chilli",
+        "ginger",
+        "mustard_seeds",
+        "curry_leaves",
+        "sesame_seeds",
+        "coriander_leaves",
+        "lemon",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "dairy",
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "gujarati"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "delhi",
+        "tamil nadu",
+        "telangana"
+      ],
+      "meal_slots": [
+        "breakfast",
+        "snack"
+      ],
+      "cooking_methods": [
+        "steamed",
+        "tempered",
+        "fermented_cook"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_DOSA",
+      "name": "Dosa",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "south",
+        "north",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "tamil nadu",
+        "west bengal",
+        "telangana"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_FAFDA_JALEBI",
+      "name": "Fafda Jalebi",
+      "aliases": [],
+      "ingredients": [
+        "gram_flour",
+        "refined_flour",
+        "sugar",
+        "saffron",
+        "curd",
+        "ajwain",
+        "turmeric",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "gujarati"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "delhi",
+        "rajasthan",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "deep_fried"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_FISH_CURRY",
+      "name": "Fish Curry Rice",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "fish"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_FISH_PATURI",
+      "name": "Fish Paturi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "west bengal",
+        "gujarat",
+        "rajasthan"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "west bengal",
+        "gujarat",
+        "rajasthan"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_FRUIT_BOWL",
+      "name": "Fruit Bowl",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian",
+        "vegan"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "snack"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_GHUGNI",
+      "name": "Ghugni",
+      "aliases": [],
+      "ingredients": [
+        "green_gram_whole",
+        "potato",
+        "onion",
+        "tomato",
+        "ginger",
+        "green_chilli",
+        "cumin_seeds",
+        "turmeric",
+        "coriander_leaves",
+        "mustard_oil",
+        "salt"
+      ],
+      "allergens": [
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "bengali"
+      ],
+      "regions": [
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "west bengal",
+        "rajasthan"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_GOAN_FISH_CURRY",
+      "name": "Goan Fish Curry",
+      "aliases": [],
+      "ingredients": [
+        "fish_generic",
+        "coconut_fresh",
+        "kokum",
+        "onion",
+        "tomato",
+        "tamarind",
+        "red_chilli_powder",
+        "turmeric",
+        "coriander_powder",
+        "salt",
+        "coconut_oil"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [
+        "goan"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "rajasthan",
+        "uttar pradesh",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_GUJARATI_THALI",
+      "name": "Gujarati Thali",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "tamil nadu",
+        "delhi",
+        "karnataka"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "tamil nadu",
+        "delhi",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_GUJIYA",
+      "name": "Gujiya",
+      "aliases": [],
+      "ingredients": [
+        "refined_flour",
+        "khoya",
+        "sugar",
+        "almond",
+        "pistachio",
+        "coconut_desiccated",
+        "cardamom_green",
+        "ghee",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "tree_nut"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "street_food_generic"
+      ],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "festival"
+      ],
+      "cooking_methods": [
+        "deep_fried"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_IDIYAPPAM",
+      "name": "Idiyappam",
+      "aliases": [],
+      "ingredients": [
+        "rice_flour",
+        "salt",
+        "water"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "kerala"
+      ],
+      "regions": [
+        "south"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "west bengal",
+        "rajasthan",
+        "gujarat"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [
+        "steamed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_IDLI",
+      "name": "Idli",
+      "aliases": [],
+      "ingredients": [
+        "rice_regular",
+        "urad_dal",
+        "salt"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "tamil"
+      ],
+      "regions": [
+        "south"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "steamed",
+        "fermented_cook"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_IDLI_SAMBAR",
+      "name": "Idli Sambar",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "tamil nadu",
+        "delhi"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "tamil nadu",
+        "delhi"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_KACHORI",
+      "name": "Kachori",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "karnataka",
+        "rajasthan",
+        "gujarat"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "rajasthan",
+        "gujarat"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_KADHI_PAKORA",
+      "name": "Kadhi Pakora",
+      "aliases": [],
+      "ingredients": [
+        "curd",
+        "gram_flour",
+        "onion",
+        "green_chilli",
+        "turmeric",
+        "cumin_seeds",
+        "mustard_seeds",
+        "curry_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "dairy",
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "punjabi"
+      ],
+      "regions": [
+        "north"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "gujarat",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "deep_fried",
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_KANDA_POHA",
+      "name": "Kanda Poha",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "west bengal",
+        "rajasthan",
+        "karnataka"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "west bengal",
+        "rajasthan",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_KHICHDI",
+      "name": "Khichdi",
+      "aliases": [],
+      "ingredients": [
+        "rice_regular",
+        "moong_dal",
+        "turmeric",
+        "cumin_seeds",
+        "ghee",
+        "salt",
+        "water"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "up"
+      ],
+      "regions": [
+        "north"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "delhi",
+        "rajasthan"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [
+        "pressure_cooked",
+        "tempered"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_KHICHDI_KADHI",
+      "name": "Khichdi Kadhi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "delhi",
+        "west bengal",
+        "tamil nadu"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "delhi",
+        "west bengal",
+        "tamil nadu"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_KOSHA_MANGSHO",
+      "name": "Kosha Mangsho",
+      "aliases": [],
+      "ingredients": [
+        "mutton",
+        "onion",
+        "curd",
+        "ginger",
+        "garlic",
+        "turmeric",
+        "cumin_seeds",
+        "coriander_powder",
+        "red_chilli_powder",
+        "garam_masala",
+        "bay_leaf",
+        "mustard_oil",
+        "sugar",
+        "salt"
+      ],
+      "allergens": [
+        "dairy",
+        "mustard"
+      ],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [
+        "bengali"
+      ],
+      "regions": [
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "tamil nadu"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_LADOO",
+      "name": "Ladoo",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "festival"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_LAUKI",
+      "name": "Lauki Sabzi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_LEMON_RICE",
+      "name": "Lemon Rice",
+      "aliases": [],
+      "ingredients": [
+        "rice_regular",
+        "lemon",
+        "mustard_seeds",
+        "curry_leaves",
+        "peanut",
+        "turmeric",
+        "green_chilli",
+        "urad_dal",
+        "asafoetida",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "mustard",
+        "peanut"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "tamil"
+      ],
+      "regions": [
+        "south"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "gujarat",
+        "delhi",
+        "telangana"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "tempered"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_LUCHI_ALOO_DUM",
+      "name": "Luchi Aloo Dum",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "west bengal",
+        "delhi"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "west bengal",
+        "delhi"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_MACHHER_JHOL_AND_RICE",
+      "name": "Machher Jhol & Rice",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "rajasthan",
+        "uttar pradesh",
+        "west bengal"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "rajasthan",
+        "uttar pradesh",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_MALABAR_FISH_CURRY",
+      "name": "Malabar Fish Curry",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "telangana",
+        "gujarat",
+        "west bengal"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "gujarat",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_MASALA_DOSA",
+      "name": "Masala Dosa",
+      "aliases": [],
+      "ingredients": [
+        "rice_regular",
+        "urad_dal",
+        "potato",
+        "onion",
+        "green_chilli",
+        "mustard_seeds",
+        "curry_leaves",
+        "turmeric",
+        "coriander_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "udupi"
+      ],
+      "regions": [
+        "maharashtra",
+        "west bengal",
+        "tamil nadu",
+        "karnataka"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "west bengal",
+        "tamil nadu",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "shallow_fried",
+        "fermented_cook"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_MISAL_PAV",
+      "name": "Misal Pav",
+      "aliases": [],
+      "ingredients": [
+        "moth_beans",
+        "onion",
+        "tomato",
+        "ginger",
+        "garlic",
+        "mustard_seeds",
+        "curry_leaves",
+        "turmeric",
+        "red_chilli_powder",
+        "bread",
+        "lemon",
+        "coriander_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "maharashtrian"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "gujarat",
+        "west bengal",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "pressure_cooked",
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_MIXED_VEG_AND_ROTI",
+      "name": "Mixed Veg & Roti",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "delhi",
+        "tamil nadu",
+        "gujarat"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "delhi",
+        "tamil nadu",
+        "gujarat"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_MODAK",
+      "name": "Modak",
+      "aliases": [],
+      "ingredients": [
+        "rice_flour",
+        "coconut_fresh",
+        "jaggery",
+        "cardamom_green",
+        "ghee",
+        "salt"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "maharashtrian"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "north",
+        "west",
+        "south",
+        "east"
+      ],
+      "meal_slots": [
+        "festival"
+      ],
+      "cooking_methods": [
+        "steamed"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_MURI_GHONTO",
+      "name": "Muri Ghonto",
+      "aliases": [],
+      "ingredients": [
+        "fish_generic",
+        "rice_regular",
+        "onion",
+        "ginger",
+        "turmeric",
+        "cumin_seeds",
+        "bay_leaf",
+        "garam_masala",
+        "mustard_oil",
+        "salt"
+      ],
+      "allergens": [
+        "fish",
+        "mustard"
+      ],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [
+        "bengali"
+      ],
+      "regions": [
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "gujarat",
+        "uttar pradesh"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_MUTTON_CURRY",
+      "name": "Mutton Curry",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "nonveg"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_MUTTON_ROGAN_JOSH",
+      "name": "Mutton Rogan Josh",
+      "aliases": [],
+      "ingredients": [
+        "mutton",
+        "curd",
+        "onion",
+        "ginger",
+        "garlic",
+        "kashmiri_chilli",
+        "fennel_seeds",
+        "cardamom_green",
+        "cinnamon",
+        "clove",
+        "bay_leaf",
+        "ghee",
+        "coriander_leaves",
+        "salt"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "diet_types": [
+        "nonvegetarian"
+      ],
+      "cuisines": [
+        "mughlai"
+      ],
+      "regions": [
+        "north"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "west bengal",
+        "tamil nadu"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_NUTS",
+      "name": "Nuts Mix",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian",
+        "vegan"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "snack"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_OMLETTE",
+      "name": "Masala Omelette",
+      "aliases": [],
+      "ingredients": [
+        "egg",
+        "onion",
+        "tomato",
+        "green_chilli",
+        "turmeric",
+        "coriander_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "egg"
+      ],
+      "diet_types": [
+        "egg"
+      ],
+      "cuisines": [
+        "street_food_generic"
+      ],
+      "regions": [
+        "north",
+        "west",
+        "south",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "west",
+        "south",
+        "east"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "shallow_fried"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_PALAK_PANEER",
+      "name": "Palak Paneer",
+      "aliases": [],
+      "ingredients": [
+        "spinach",
+        "paneer",
+        "onion",
+        "tomato",
+        "green_chilli",
+        "ginger",
+        "garlic",
+        "cumin_seeds",
+        "garam_masala",
+        "cream",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "punjabi"
+      ],
+      "regions": [
+        "north"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "rajasthan",
+        "delhi",
+        "uttar pradesh"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [
+        "boiled",
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_PANEER_BUTTER",
+      "name": "Paneer Butter Masala",
+      "aliases": [],
+      "ingredients": [
+        "paneer",
+        "butter",
+        "cream",
+        "tomato",
+        "cashew",
+        "onion",
+        "ginger",
+        "garlic",
+        "kashmiri_chilli",
+        "garam_masala",
+        "kasuri_methi",
+        "sugar",
+        "salt"
+      ],
+      "allergens": [
+        "dairy",
+        "tree_nut"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "punjabi"
+      ],
+      "regions": [
+        "north"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "tamil nadu",
+        "telangana",
+        "gujarat"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_PARATHA",
+      "name": "Paratha",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_PAV_BHAJI",
+      "name": "Pav Bhaji",
+      "aliases": [],
+      "ingredients": [
+        "capsicum",
+        "potato",
+        "cauliflower",
+        "green_peas",
+        "onion",
+        "tomato",
+        "butter",
+        "ginger",
+        "garlic",
+        "red_chilli_powder",
+        "garam_masala",
+        "bread",
+        "lemon",
+        "coriander_leaves",
+        "salt"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "maharashtrian"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "rajasthan",
+        "gujarat",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_PESARATTU",
+      "name": "Pesarattu",
+      "aliases": [],
+      "ingredients": [
+        "moong_dal",
+        "rice_regular",
+        "ginger",
+        "green_chilli",
+        "cumin_seeds",
+        "coriander_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "andhra"
+      ],
+      "regions": [
+        "south"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "gujarat",
+        "telangana",
+        "delhi"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "shallow_fried"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_POHA",
+      "name": "Poha",
+      "aliases": [],
+      "ingredients": [
+        "rice_flattened",
+        "onion",
+        "potato",
+        "green_chilli",
+        "mustard_seeds",
+        "curry_leaves",
+        "turmeric",
+        "peanut",
+        "lemon",
+        "coriander_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "mustard",
+        "peanut"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "maharashtrian"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "tamil nadu",
+        "telangana",
+        "rajasthan"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "sauteed",
+        "tempered"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_PULAO",
+      "name": "Veg Pulao",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_RAJMA_CHAWAL",
+      "name": "Rajma Chawal",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "delhi",
+        "gujarat",
+        "karnataka"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "delhi",
+        "gujarat",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_RASAM_RICE",
+      "name": "Rasam Rice",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "rajasthan"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "rajasthan"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_RICE_AND_SAMBAR",
+      "name": "Rice & Sambar",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "west bengal"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_RICE_DAL",
+      "name": "Rice Dal Sabzi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_ROTI_AND_SABZI",
+      "name": "Roti & Sabzi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "karnataka",
+        "rajasthan"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "karnataka",
+        "rajasthan"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_SATTU_PARATHA",
+      "name": "Sattu Paratha",
+      "aliases": [],
+      "ingredients": [
+        "wheat_flour",
+        "sattu",
+        "onion",
+        "green_chilli",
+        "lemon",
+        "salt",
+        "ghee"
+      ],
+      "allergens": [
+        "wheat"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "bihari"
+      ],
+      "regions": [
+        "maharashtra",
+        "telangana",
+        "west bengal",
+        "uttar pradesh"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "west bengal",
+        "uttar pradesh"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "shallow_fried"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_SEVAI",
+      "name": "Vegetable Sevai",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_SEV_TOMATO_SHAAK",
+      "name": "Sev Tomato Shaak",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "rajasthan"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "karnataka",
+        "telangana",
+        "rajasthan"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_SHUKTO",
+      "name": "Shukto",
+      "aliases": [],
+      "ingredients": [
+        "bitter_gourd",
+        "raw_banana",
+        "drumstick",
+        "potato",
+        "ginger",
+        "nigella_seeds",
+        "bay_leaf",
+        "milk",
+        "mustard_oil",
+        "salt"
+      ],
+      "allergens": [
+        "dairy",
+        "mustard"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "bengali"
+      ],
+      "regions": [
+        "east"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "west bengal",
+        "telangana"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [
+        "sauteed"
+      ],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_SIMPLE_SABZI",
+      "name": "Simple Green Sabzi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_SOUP",
+      "name": "Vegetable Soup",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian",
+        "vegan"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "snack",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_SPROUTS",
+      "name": "Sprouts Salad",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "snack"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_THEPLA",
+      "name": "Thepla",
+      "aliases": [],
+      "ingredients": [
+        "fenugreek_leaves",
+        "wheat_flour",
+        "curd",
+        "turmeric",
+        "red_chilli_powder",
+        "cumin_seeds",
+        "sesame_seeds",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "dairy",
+        "wheat"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "gujarati"
+      ],
+      "regions": [
+        "west"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "uttar pradesh",
+        "rajasthan",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "breakfast",
+        "snack"
+      ],
+      "cooking_methods": [
+        "shallow_fried"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_TINDA",
+      "name": "Tinda Sabzi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_TURAI",
+      "name": "Turai Sabzi",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "west",
+        "south",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "west",
+        "south",
+        "east"
+      ],
+      "meal_slots": [
+        "lunch",
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_UPMA",
+      "name": "Upma",
+      "aliases": [],
+      "ingredients": [
+        "semolina",
+        "onion",
+        "green_chilli",
+        "ginger",
+        "mustard_seeds",
+        "curry_leaves",
+        "urad_dal",
+        "cashew",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [
+        "mustard",
+        "tree_nut"
+      ],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "tamil"
+      ],
+      "regions": [
+        "south"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "telangana",
+        "karnataka",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "sauteed",
+        "tempered"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1",
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_UTTAPAM",
+      "name": "Uttapam",
+      "aliases": [],
+      "ingredients": [
+        "capsicum",
+        "rice_regular",
+        "urad_dal",
+        "onion",
+        "tomato",
+        "green_chilli",
+        "coriander_leaves",
+        "salt",
+        "vegetable_oil"
+      ],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [
+        "tamil"
+      ],
+      "regions": [
+        "south"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "breakfast"
+      ],
+      "cooking_methods": [
+        "shallow_fried",
+        "fermented_cook"
+      ],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    },
+    {
+      "id": "DISH_VANGYACHE_BHARIT",
+      "name": "Vangyache Bharit",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "tamil nadu",
+        "telangana",
+        "west bengal"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "tamil nadu",
+        "telangana",
+        "west bengal"
+      ],
+      "meal_slots": [
+        "dinner"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_VARAN_BHAAT",
+      "name": "Varan Bhaat",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "unknown"
+      ],
+      "cuisines": [],
+      "regions": [
+        "maharashtra",
+        "west bengal",
+        "uttar pradesh",
+        "karnataka"
+      ],
+      "observed_regions": [
+        "maharashtra",
+        "west bengal",
+        "uttar pradesh",
+        "karnataka"
+      ],
+      "meal_slots": [
+        "lunch"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_2"
+      ]
+    },
+    {
+      "id": "DISH_YOGURT",
+      "name": "Yogurt Bowl",
+      "aliases": [],
+      "ingredients": [],
+      "allergens": [],
+      "diet_types": [
+        "vegetarian"
+      ],
+      "cuisines": [],
+      "regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "observed_regions": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "meal_slots": [
+        "snack",
+        "breakfast"
+      ],
+      "cooking_methods": [],
+      "source_datasets": [
+        "dataset_1_catalog",
+        "dataset_1"
+      ]
+    }
+  ]
+}

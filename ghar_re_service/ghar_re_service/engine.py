@@ -81,6 +81,9 @@ def build_context(
     core_ctx["interaction_count"] = max(0, int(ctx.get("interaction_count", 0) or 0))
     feedback_counts = ctx.get("dish_feedback_counts")
     core_ctx["dish_feedback_counts"] = feedback_counts if isinstance(feedback_counts, list) else []
+    for field in ("recent_class_counts", "recent_cuisine_counts"):
+        counts = ctx.get(field)
+        core_ctx[field] = counts if isinstance(counts, dict) else {}
     # Episode/practicality inputs are additive v1 context. They do not alter hard eligibility;
     # ghar_re_core.meal_episode consumes them only after the safe plate pool has been formed.
     if ctx.get("time_budget_minutes") is not None:

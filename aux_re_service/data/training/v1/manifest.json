@@ -1,0 +1,16 @@
+{
+  "version": "foofoo-training-v1",
+  "generated_at": "2026-08-07T07:10:27.436806+00:00",
+  "synthetic_only": true,
+  "ontology_dishes": 86,
+  "interactions": 35000,
+  "positive_interactions": 21565,
+  "negative_interactions": 5267,
+  "households": 10000,
+  "sha256": {
+    "dataset_audit.json": "87b6041b95f70343cd4c55b7ebcfb8b7e03233b206114252321751b5c402af23",
+    "canonical_food_ontology.json": "24bd8b64490cbfc4ba4a968410c4e5689672f45311a6c6d031576401cd587d03",
+    "interactions.jsonl": "14809fda14e83c06102d683c09fa58a65b9a1b8e44b476fd50d304dc84dd1875",
+    "household_features.jsonl": "d7690cd00734d09cdc701e1f61e534f5cf4754c3235071ed22c6dd7ee7c981f4"
+  }
+}

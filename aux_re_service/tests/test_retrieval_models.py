@@ -76,6 +76,10 @@ def test_qdrant_query_and_structured_output(monkeypatch):
     assert captured["url"].endswith("/collections/foofoo_recipes/points/query")
     assert len(captured["body"]["query"]) == 64
     assert captured["body"]["filter"]["must"][0]["key"] == "meal_slots"
+    assert captured["body"]["filter"]["must"][1] == {
+        "key": "regions",
+        "match": {"any": ["maharashtra", "west"]},
+    }
     assert result.candidates[0].id == "q-1"
     assert result.failures == {}
 

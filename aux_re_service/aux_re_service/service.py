@@ -5,9 +5,12 @@ from __future__ import annotations
 import copy
 import time
 import uuid
+from dataclasses import asdict
+from pathlib import Path
 from typing import Any
 
-from .config import Settings
+from .config import Mode, Settings
+from .lightfm_runtime import LightFMArtifactError, LightFMScorer, LightFMScoreTrace
 from .observability import log_decision, record
 from .policy import decide, existing_metrics
 from .ranking import LocalReranker
@@ -28,6 +31,7 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
     timings = {"retrieval": 0.0, "reranking": 0.0, "selection": 0.0, "total": 0.0}
     retrieval_failures: dict[str, str] = {}
     candidate_count = 0
+    model_trace: dict[str, Any] = {"lightfm": {"applied": False, "reason": "disabled"}}
 
     if settings.enabled:
         try:
@@ -36,10 +40,39 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
             timings["retrieval"] = (time.perf_counter() - retrieval_started) * 1000
             candidate_count = len(retrieval.candidates)
             retrieval_failures = retrieval.failures
+            candidates = retrieval.candidates
+            if settings.lightfm_enabled:
+                try:
+                    if not settings.lightfm_artifact_path:
+                        raise LightFMArtifactError("artifact path is not configured")
+                    scorer = LightFMScorer.load(
+                        Path(settings.lightfm_artifact_path),
+                        allow_synthetic=settings.lightfm_allow_synthetic,
+                        allow_unpromoted=settings.lightfm_allow_unpromoted,
+                    )
+                    if scorer.synthetic_only and settings.mode is not Mode.SHADOW:
+                        lightfm_trace = LightFMScoreTrace(
+                            False,
+                            0,
+                            scorer.version,
+                            "synthetic_artifact_shadow_only",
+                        )
+                    else:
+                        candidates, lightfm_trace = scorer.apply(
+                            candidates,
+                            request,
+                            blend_weight=settings.lightfm_weight,
+                        )
+                    model_trace["lightfm"] = asdict(lightfm_trace)
+                except (LightFMArtifactError, ImportError, ValueError) as exc:
+                    model_trace["lightfm"] = {
+                        "applied": False,
+                        "reason": type(exc).__name__,
+                    }
             if not settings.use_local_reranker:
                 raise RuntimeError("local reranker disabled and no governed model output available")
             rerank_started = time.perf_counter()
-            auxiliary, rejected = LocalReranker().rank(retrieval.candidates, request)
+            auxiliary, rejected = LocalReranker().rank(candidates, request)
             timings["reranking"] = (time.perf_counter() - rerank_started) * 1000
             all_rejected = bool(retrieval.candidates) and not auxiliary.items
             constraints = ConstraintCheck(
@@ -53,6 +86,7 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
                 "retrieval_failures": retrieval.failures,
                 "candidate_count": candidate_count,
                 "rejected_candidates": rejected,
+                "model_trace": model_trace,
             }
         except Exception as exc:  # auxiliary failure must never fail the product response
             constraints = ConstraintCheck(passed=False, reasons=["auxiliary_pipeline_error"])
@@ -76,7 +110,12 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
         decision.reason,
         enabled=settings.enabled,
         selected_auxiliary=decision.code == "auxiliary",
-        model_failed=bool(debug.get("error_type") or retrieval_failures),
+        model_failed=bool(
+            debug.get("error_type")
+            or retrieval_failures
+            or model_trace["lightfm"].get("reason")
+            not in {"disabled", "scored", "unknown_household", "no_known_candidates"}
+        ),
         constraint_violations=len(constraints.reasons),
         candidate_count=candidate_count,
         diversity_score=diversity,
@@ -109,6 +148,7 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
             "models": registry.metadata(),
             "mode": settings.mode,
             "retrieval_failures": retrieval_failures,
+            "model_trace": model_trace,
         },
         timings_ms={name: round(value, 3) for name, value in timings.items()},
         debug_trace=debug if request.debug else None,

@@ -48,6 +48,11 @@ class Settings:
     retrieval_timeout_seconds: float = 1.5
     qdrant_enabled: bool = True
     embedder_enabled: bool = True
+    lightfm_enabled: bool = False
+    lightfm_artifact_path: str | None = None
+    lightfm_weight: float = 0.35
+    lightfm_allow_synthetic: bool = False
+    lightfm_allow_unpromoted: bool = False
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -75,4 +80,9 @@ class Settings:
             ),
             qdrant_enabled=_bool("AUX_REC_MODEL_QDRANT_ENABLED", True),
             embedder_enabled=_bool("AUX_REC_MODEL_EMBEDDER_ENABLED", True),
+            lightfm_enabled=_bool("AUX_REC_MODEL_LIGHTFM_ENABLED", False),
+            lightfm_artifact_path=os.getenv("AUX_REC_LIGHTFM_ARTIFACT_PATH") or None,
+            lightfm_weight=_float("AUX_REC_LIGHTFM_WEIGHT", 0.35),
+            lightfm_allow_synthetic=_bool("AUX_REC_LIGHTFM_ALLOW_SYNTHETIC", False),
+            lightfm_allow_unpromoted=_bool("AUX_REC_LIGHTFM_ALLOW_UNPROMOTED", False),
         )

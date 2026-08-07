@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 from dataclasses import asdict, dataclass
+from pathlib import Path
 
 from .config import Settings
 
@@ -27,6 +28,18 @@ class ModelRegistry:
         artifacts = settings.model_artifact_dir
         scaffold_status = "scaffold_only" if artifacts else "artifact_not_configured"
         recbole_status = scaffold_status if recbole else "package_missing"
+        lightfm_artifact = bool(
+            settings.lightfm_artifact_path and Path(settings.lightfm_artifact_path).is_file()
+        )
+        lightfm_ready = settings.lightfm_enabled and lightfm and lightfm_artifact
+        if not lightfm:
+            lightfm_status = "package_missing"
+        elif not lightfm_artifact:
+            lightfm_status = "artifact_not_configured"
+        elif settings.lightfm_enabled:
+            lightfm_status = "configured"
+        else:
+            lightfm_status = "disabled"
         self.entries = (
             ModelEntry("Existing Engine", "dependency", True, True, status="input_dependency"),
             ModelEntry(
@@ -39,9 +52,10 @@ class ModelRegistry:
             ModelEntry(
                 "LightFM Baseline",
                 "ranker",
-                False,
-                False,
-                status=scaffold_status if lightfm else "package_missing",
+                lightfm_ready,
+                lightfm and lightfm_artifact,
+                status=lightfm_status,
+                version="lightfm-warp-v1" if lightfm_artifact else None,
             ),
             ModelEntry(
                 "LightGCN / RecBole-GNN",
