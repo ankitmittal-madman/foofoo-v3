@@ -52,5 +52,9 @@ jobs:
 
       - name: Deploy recommendation serving functions
         run: |
-          supabase functions deploy plan --project-ref "$PRODUCTION_PROJECT_REF"
-          supabase functions deploy recommendations --project-ref "$PRODUCTION_PROJECT_REF"
+          supabase functions deploy plan \
+            --project-ref "$PRODUCTION_PROJECT_REF" \
+            --import-map supabase/deno.json
+          supabase functions deploy recommendations \
+            --project-ref "$PRODUCTION_PROJECT_REF" \
+            --import-map supabase/deno.json
