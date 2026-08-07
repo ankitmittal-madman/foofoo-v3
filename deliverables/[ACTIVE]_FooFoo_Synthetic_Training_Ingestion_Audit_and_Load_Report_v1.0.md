@@ -174,18 +174,21 @@ The content-derived batch is `06a38fd3-ec53-54ab-ab0f-ef04bdf92c44`; its source 
 | Physical workbook rows read | 132,586 |
 | Accepted source rows | 132,541 |
 | Rejected source rows | 45 |
-| Normalized private research records | 113,948 |
+| Normalized private research records | 113,868 |
+| Exact duplicate preference edges skipped | 80 |
 | Production records requested | 0 |
 | Training dishes | 86 |
 | Household feature records | 10,000 |
 | Normalized interactions | 64,842 |
 | Weekly signal records | 10,000 |
-| Household preference edges | 29,020 |
+| Unique household preference edges | 28,940 |
 
 The 45 rejected physical rows comprise 40 household-reference failures, five meal-event-reference
 failures, and five user-reference failures; some rows fail more than one relationship, so reason
 counts sum to 50. The full row numbers and record keys are present in the generated dry-run report
 and will be stored in `research.training_source_rows` with `validation_status='rejected'`.
+The transformer also found 80 byte-equivalent preference-graph edges sharing the same natural key;
+they are reported and collapsed before load rather than relying on the database to reject them.
 
 ### 10.2 Automated verification
 

@@ -370,6 +370,26 @@ def _blocked_summary(rows: Iterable[SourceRow]) -> dict[str, Any]:
     }
 
 
+def deduplicate_normalized_records(
+    records: Iterable[NormalizedRecord],
+) -> tuple[list[NormalizedRecord], dict[str, int]]:
+    """Collapse exact duplicate entities and fail on conflicting payloads for one natural key."""
+    unique: dict[tuple[str, str], NormalizedRecord] = {}
+    duplicates: Counter[str] = Counter()
+    for record in records:
+        key = (record.target_table, record.record_key)
+        prior = unique.get(key)
+        if prior is None:
+            unique[key] = record
+            continue
+        if _canonical_json(prior.payload) != _canonical_json(record.payload):
+            raise ValueError(
+                f"conflicting normalized records for {record.target_table}/{record.record_key}"
+            )
+        duplicates[record.target_table] += 1
+    return list(unique.values()), dict(sorted(duplicates.items()))
+
+
 def build_ingestion(
     dataset_1: Path, dataset_2: Path, training_dir: Path
 ) -> tuple[dict[str, Any], list[SourceRow], list[NormalizedRecord]]:
@@ -382,7 +402,8 @@ def build_ingestion(
         rows.extend(read_workbook(path, label))
     validate_relationships(rows)
     bundle_hash, batch_id = _bundle_identity(source_files, manifest)
-    records = build_normalized_records(training_dir, batch_id, source_files)
+    generated_records = build_normalized_records(training_dir, batch_id, source_files)
+    records, normalized_duplicates = deduplicate_normalized_records(generated_records)
     accepted = sum(row.validation_status == "accepted" for row in rows)
     report = {
         "batch_id": batch_id,
@@ -397,6 +418,8 @@ def build_ingestion(
         "normalized_records": {
             "total": len(records),
             "by_target": dict(sorted(Counter(record.target_table for record in records).items())),
+            "exact_duplicates_skipped": sum(normalized_duplicates.values()),
+            "duplicates_by_target": normalized_duplicates,
         },
         "blocked_rows": _blocked_summary(rows),
         "production_targets": [],

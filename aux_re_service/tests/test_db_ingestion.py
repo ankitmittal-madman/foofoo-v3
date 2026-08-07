@@ -53,10 +53,13 @@ def _training_dir(path: Path) -> Path:
         )
         + "\n",
         "weekly_signals.jsonl": json.dumps({"household_id": "dataset_1:HH1"}) + "\n",
-        "household_preference_graph.jsonl": json.dumps(
-            {"source": "DISH_POHA", "relation": "liked_by", "target": "dataset_1:HH1"}
+        "household_preference_graph.jsonl": (
+            json.dumps(
+                {"source": "DISH_POHA", "relation": "liked_by", "target": "dataset_1:HH1"}
+            )
+            + "\n"
         )
-        + "\n",
+        * 2,
     }
     hashes = {}
     for name, value in artifacts.items():
@@ -102,6 +105,7 @@ def test_build_ingestion_is_deterministic_and_writes_no_production_targets(tmp_p
     assert not ({record.target_table for record in records} & ingestion.PRODUCTION_DENYLIST)
     assert one["source_rows"]["total"] == len(rows)
     assert one["normalized_records"]["total"] == 5
+    assert one["normalized_records"]["exact_duplicates_skipped"] == 1
 
 
 def test_manifest_checksum_drift_fails_closed(tmp_path: Path):
