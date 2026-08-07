@@ -33,6 +33,10 @@ def main() -> int:
     parser.add_argument("--csv", type=Path, default=DEFAULT_CSV, help=f"Source CSV path (default: {DEFAULT_CSV})")
     parser.add_argument("--batch-size", type=int, default=200, help="Rows per transaction batch (default: 200)")
     parser.add_argument("--limit", type=int, default=0, help="Process only the first N CSV rows (0 = all rows). For smoke-testing a real --apply run against a small slice first.")
+    parser.add_argument("--only-srno", type=str, default=None,
+                         help="Comma-separated list of specific source_srno values to process, e.g. '1,2,3151' -- "
+                              "for re-testing a small named set of dishes (possibly non-contiguous) without the "
+                              "'first N rows' constraint of --limit. Combines with --limit if both are given.")
     parser.add_argument("--report-out", type=Path, default=None, help="Optional path to also write the JSON summary report")
     image_mode = parser.add_mutually_exclusive_group()
     image_mode.add_argument("--generate-images", dest="generate_images", action="store_true", default=True,
@@ -54,14 +58,22 @@ def main() -> int:
         log.error("source CSV not found: %s", args.csv)
         return 2
 
-    log.info("starting dish ingestion: mode=%s csv=%s batch_size=%s generate_images=%s limit=%s",
+    only_srno = None
+    if args.only_srno:
+        try:
+            only_srno = {int(x.strip()) for x in args.only_srno.split(",") if x.strip()}
+        except ValueError:
+            log.error("--only-srno must be a comma-separated list of integers, got: %r", args.only_srno)
+            return 2
+
+    log.info("starting dish ingestion: mode=%s csv=%s batch_size=%s generate_images=%s limit=%s only_srno=%s",
               "dry_run" if args.dry_run else "apply", args.csv, args.batch_size, args.generate_images,
-              args.limit or "all")
+              args.limit or "all", sorted(only_srno) if only_srno else None)
 
     try:
         report = run_pipeline(csv_path=args.csv, dry_run=args.dry_run, batch_size=args.batch_size,
                                generate_images=args.generate_images, image_delay_seconds=args.image_delay,
-                               row_limit=args.limit or None)
+                               row_limit=args.limit or None, only_srno=only_srno)
     except RuntimeError as exc:
         # e.g. DATABASE_URL missing in --apply mode — a clear, actionable error, not a stack trace.
         log.error(str(exc))

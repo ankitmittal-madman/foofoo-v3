@@ -31,6 +31,10 @@ on:
         description: "Attempt Stage 5 image generation (false = --skip-images, text-only ingestion)"
         type: boolean
         default: true
+      only_srno:
+        description: "Optional: comma-separated source_srno values to process instead of the first N rows, e.g. '1,2,3151'"
+        type: string
+        default: ""
 
 jobs:
   run-pipeline:
@@ -75,6 +79,7 @@ jobs:
           if [ "${{ inputs.apply }}" = "true" ]; then ARGS="$ARGS --apply"; else ARGS="$ARGS --dry-run"; fi
           if [ "${{ inputs.generate_images }}" != "true" ]; then ARGS="$ARGS --skip-images"; fi
           if [ "${{ inputs.limit }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit }}"; fi
+          if [ -n "${{ inputs.only_srno }}" ]; then ARGS="$ARGS --only-srno ${{ inputs.only_srno }}"; fi
           echo "Running: python $ARGS"
           python $ARGS
 
