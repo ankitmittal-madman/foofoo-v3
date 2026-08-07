@@ -28,8 +28,15 @@ from dataclasses import dataclass
 
 logger = logging.getLogger("dish_ingestion.image_prompt")
 
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+# Deliberately a larger model than groq_adapter.py's region/tag classification (llama-3.1-8b-
+# instant is fine for short classification tasks, but proved too shallow for grounding a dish's
+# real cooked color/texture in its cooking method -- see IMAGE_PROMPT_GROQ_MODEL_CHANGE note in
+# the runbook: it described Masala Karela as "bright yellow" from seeing "turmeric" in the
+# ingredient list, when the real dish (roasted with red chilli powder) is dark reddish-brown/
+# near-black, confirmed against a Founder-supplied reference photo). Own env var, not shared with
+# groq_adapter.py's GROQ_MODEL, so tuning one doesn't silently retune the other.
+GROQ_MODEL = os.environ.get("IMAGE_PROMPT_GROQ_MODEL", "llama-3.3-70b-versatile")
 
 # Hugging Face's legacy `api-inference.huggingface.co` endpoint was fully retired in favor of the
 # Inference Providers router (https://router.huggingface.co) — the old host no longer resolves for
@@ -113,17 +120,18 @@ class ImagePromptGenerator:
         )
 
     def resolve_fields(self, dish_name: str, cuisine_raw: str | None, course_raw: str | None,
-                        ingredients: list[str], force_heuristic: bool = False) -> PromptFields:
+                        ingredients: list[str], force_heuristic: bool = False,
+                        instructions: str | None = None) -> PromptFields:
         if force_heuristic:
             return self._heuristic(dish_name, cuisine_raw, course_raw, ingredients)
         if self.groq_api_key:
             try:
-                return self._call_groq(dish_name, cuisine_raw, course_raw, ingredients)
+                return self._call_groq(dish_name, cuisine_raw, course_raw, ingredients, instructions)
             except Exception as exc:  # pragma: no cover - network
                 logger.warning("groq prompt-field call failed for %s: %s; falling back", dish_name, exc)
         if self.hf_api_key:
             try:
-                return self._call_hf(dish_name, cuisine_raw, course_raw, ingredients)
+                return self._call_hf(dish_name, cuisine_raw, course_raw, ingredients, instructions)
             except Exception as exc:  # pragma: no cover - network
                 logger.warning("hf prompt-field call failed for %s: %s; falling back to heuristic", dish_name, exc)
         return self._heuristic(dish_name, cuisine_raw, course_raw, ingredients)
@@ -147,8 +155,8 @@ class ImagePromptGenerator:
 
     # -- Groq backend ----------------------------------------------------------------------------
     def _call_groq(self, dish_name: str, cuisine_raw: str | None, course_raw: str | None,
-                    ingredients: list[str]) -> PromptFields:
-        prompt = _fields_prompt(dish_name, cuisine_raw, course_raw, ingredients)
+                    ingredients: list[str], instructions: str | None = None) -> PromptFields:
+        prompt = _fields_prompt(dish_name, cuisine_raw, course_raw, ingredients, instructions)
         payload = {
             "model": GROQ_MODEL,
             "messages": [
@@ -180,8 +188,8 @@ class ImagePromptGenerator:
 
     # -- Hugging Face Inference Providers router (alternate/fallback) ----------------------------
     def _call_hf(self, dish_name: str, cuisine_raw: str | None, course_raw: str | None,
-                 ingredients: list[str]) -> PromptFields:
-        prompt = _fields_prompt(dish_name, cuisine_raw, course_raw, ingredients)
+                 ingredients: list[str], instructions: str | None = None) -> PromptFields:
+        prompt = _fields_prompt(dish_name, cuisine_raw, course_raw, ingredients, instructions)
         # OpenAI-compatible chat completions shape (router.huggingface.co), not the retired
         # raw text-generation `{"inputs": ...}` payload the old api-inference host accepted.
         payload = {
@@ -251,12 +259,26 @@ yellow spiraled rolls with sesame-coconut topping"
 """
 
 
-def _fields_prompt(dish_name: str, cuisine_raw: str | None, course_raw: str | None, ingredients: list[str]) -> str:
+def _fields_prompt(dish_name: str, cuisine_raw: str | None, course_raw: str | None, ingredients: list[str],
+                    instructions: str | None = None) -> str:
     ing_text = ", ".join(ingredients[:12]) if ingredients else "unknown"
+    # Truncated, not the full method -- enough for the model to see the actual cooking technique
+    # (roasted/fried/simmered/steamed, which spices go in when) without ballooning token cost.
+    instr_text = (instructions or "unknown").strip().replace("\n", " ")[:600]
     return (
         _FIELD_METHOD_INSTRUCTIONS +
+        "\nCRITICAL — color must come from real-world cooking knowledge, not ingredient-name "
+        "guessing: reason about what the dish actually looks like ONCE FULLY COOKED, from the "
+        "combination of every spice/technique in the instructions, not the single most "
+        "colorful-sounding raw ingredient. A raw spice's own color is not the finished dish's "
+        "color. Concretely: red chilli powder + roasting/frying typically darkens a dish to deep "
+        "reddish-brown or near-black at the edges, not the pale yellow of turmeric alone; slow "
+        "browning/caramelizing darkens further; a dish simmered briefly in a wet gravy stays "
+        "closer to its raw ingredient colors. If you are not confident, describe the dominant "
+        "true color conservatively (e.g. \"deep reddish-brown\") rather than defaulting to a "
+        "bright primary color that is not actually correct for this preparation.\n"
         f"\nNow apply this method to: Indian dish '{dish_name}' (cuisine: '{cuisine_raw or 'unknown'}', "
-        f"course: '{course_raw or 'unknown'}', key ingredients: {ing_text}).\n"
+        f"course: '{course_raw or 'unknown'}', key ingredients: {ing_text}, cooking method: {instr_text}).\n"
         "Respond with JSON only, exactly these keys: "
         '"category" (short cuisine/course label, e.g. "North Indian Gravy"), '
         '"vessel_type" (culturally-authentic traditional serving vessel per rule 4 above), '

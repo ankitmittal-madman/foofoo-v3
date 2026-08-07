@@ -400,7 +400,8 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                 clean_name = clean_dish_name_for_prompt(n["name"])
                 logger.info("dish %s (%s -> %s): attempting real image generation", dish_id, n["name"], clean_name)
                 fields = image_ctx.prompt_gen.resolve_fields(
-                    clean_name, n["cuisine_raw"], n["course_raw"], n["ingredients"]
+                    clean_name, n["cuisine_raw"], n["course_raw"], n["ingredients"],
+                    instructions=row.raw.get("Instructions", ""),
                 )
                 prompt_text = assemble_prompt(clean_name, fields)
                 # HF fallback intentionally not passed here (Founder directive): chaining
