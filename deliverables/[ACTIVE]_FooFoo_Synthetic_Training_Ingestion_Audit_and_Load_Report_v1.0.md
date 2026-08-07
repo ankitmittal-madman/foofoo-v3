@@ -237,15 +237,21 @@ additive and idempotent, so the earlier schema application did not duplicate dat
 
 On 2026-08-07 the normalized batch was copied to a dedicated private training Supabase project,
 with only the 45 rejected raw rows retained in PostgreSQL. Protected cleanup then removed all
-132,586 raw source rows and all 113,868 workbook-seed normalized records from production while
-preserving 461 later research records. Production database size fell from 563,186,835 bytes to
-376,728,723 bytes. Full evidence, secret boundaries and recovery instructions are recorded in
+132,586 raw source rows and all 113,868 workbook-seed normalized records from production. The 461
+synthetic Auto Engine records initially preserved by that operation were subsequently copied and
+verified in training before exact production cleanup in protected workflow run
+[31178058011](https://github.com/ankitmittal-madman/foofoo-v3/actions/runs/31178058011).
+Production now contains zero synthetic records from these two governed batches; the training
+project contains 114,329 normalized records in total. This move did not activate a model or change
+the user-facing recommendation path. Full evidence, secret boundaries and recovery instructions
+are recorded in
 `deliverables/[ACTIVE]_FooFoo_Synthetic_Training_Storage_Relocation_Report_v1.0.md`.
 
 ## 11. Remaining Gaps
 
 - The 45 rejected workbook rows require source-data repair before they can enter normalized
-  training records; their exact sheet, row, key and rejection reasons remain stored for audit.
+  training records; their exact sheet, row, key and rejection reasons remain in private training
+  storage for audit.
 - The synthetic ontology has only 86 training dishes and incomplete ingredient coverage, so it
   remains unsuitable as production catalogue or safety authority.
 - No synthetic model is promoted to the active recommender. Promotion still requires consented
