@@ -8,7 +8,11 @@ from ops.recommendation.auto_engine import run_auto_engine
 from ops.recommendation.auto_engine_inspector import AUDIT_QUERIES, inspect_database
 from ops.recommendation.auto_engine_ontology import load_ontology, map_and_score_records
 from ops.recommendation.auto_engine_research import generate_research_records
-from ops.recommendation.auto_engine_store import MemoryTrainingStore
+from ops.recommendation.auto_engine_store import (
+    DryRunTrainingStore,
+    MemoryTrainingStore,
+    payload_sha256,
+)
 from ops.recommendation.auto_engine_types import AutoEngineConfig
 
 ROOT = Path(__file__).parents[3]
@@ -140,6 +144,41 @@ def test_seed_repeats_are_idempotent_and_report_exact_table_counts(tmp_path):
     assert first["run_id"] != second["run_id"]
 
 
+def test_dry_run_reads_existing_db_staging_and_reports_skip(monkeypatch):
+    config = AutoEngineConfig(research_household_limit=1, research_interaction_limit=1)
+    inspection = inspect_database(FakeConnection({}), config)
+    ontology = load_ontology(ONTOLOGY)
+    proposed = generate_research_records(inspection, ontology, config)
+    mapped, _ = map_and_score_records(proposed, ontology, config)
+    record = mapped[0]
+    stored = {
+        "record_key": record.record_key,
+        "payload": record.payload,
+        "payload_sha256": payload_sha256(record.payload),
+        "confidence": record.confidence,
+        "confidence_band": record.confidence_band,
+        "ontology_mapping_status": record.ontology_mapping_status,
+        "ontology_version": record.ontology_version,
+        "source_type": record.source_type,
+        "generation_method": record.generation_method,
+        "provenance_tags": list(record.provenance_tags),
+        "explanation": record.explanation,
+        "first_batch_id": "prior",
+        "last_batch_id": "prior",
+        "version": 1,
+    }
+    store = DryRunTrainingStore(object())
+    monkeypatch.setattr(
+        store.source,
+        "fetch_research_records",
+        lambda target: [stored] if target == record.target_table else [],
+    )
+    run_id, _ = store.begin_run("batch", config.engine_version, "dry_run", config.as_dict())
+    counts = store.seed_records(run_id, "batch", [record], config.minimum_confidence)
+    assert counts[record.target_table].inserted == 0
+    assert counts[record.target_table].skipped == 1
+
+
 def test_strong_db_uses_existing_data_and_does_not_generate_filler(tmp_path):
     report = run_auto_engine(
         FakeConnection(strong_counts()),
@@ -153,6 +192,24 @@ def test_strong_db_uses_existing_data_and_does_not_generate_filler(tmp_path):
     assert report["seeding"]["total_inserted"] == 0
     assert report["readiness"]["existing_recommender_untouched"] is True
     assert report["readiness"]["fallback_required"] is True
+
+
+def test_weak_production_db_reuses_sufficient_staged_research(tmp_path):
+    counts = {
+        "research_household_personas": (24, 24),
+        "research_interactions": (240, 240),
+        "research_weekly_plans": (24, 24),
+    }
+    report = run_auto_engine(
+        FakeConnection(counts),
+        store=MemoryTrainingStore(),
+        mode="dry_run",
+        ontology_path=ONTOLOGY,
+        output_dir=tmp_path,
+    )
+    assert report["db_audit"]["enrichment_targets"]
+    assert report["research_generation"]["triggered"] is False
+    assert report["research_generation"]["generated_records"] == 0
 
 
 def test_audit_mode_never_generates_or_seeds(tmp_path):
@@ -199,6 +256,11 @@ def test_execute_refreshes_retrieval_and_trains_shadow_challenger(tmp_path, monk
     assert by_name["ontology_retrieval"]["status"] == "refreshed"
     assert by_name["lightfm_research_challenger"]["status"] == "trained"
     assert by_name["lightfm_research_challenger"]["gate_checks"]["production_eligible"] is False
+    assert report["evaluation"]["safety"]["positive_safety_violations"] == 0
+    assert report["evaluation"]["repeat_rate"] <= 0.1
+    assert report["evaluation"]["regional_relevance"] >= 0.7
+    assert report["evaluation"]["research_scenario_metrics"]["weekly_catalog_diversity"] >= 0.8
+    assert report["evaluation"]["household_fit"] == 1.0
     assert report["readiness"]["existing_recommender_untouched"] is True
 
 

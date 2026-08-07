@@ -18,7 +18,7 @@ from typing import Any
 from .auto_engine_inspector import inspect_database
 from .auto_engine_ontology import load_ontology, map_and_score_records
 from .auto_engine_research import generate_research_records
-from .auto_engine_store import MemoryTrainingStore, PostgresTrainingStore
+from .auto_engine_store import DryRunTrainingStore, MemoryTrainingStore, PostgresTrainingStore
 from .auto_engine_training import train_and_evaluate
 from .auto_engine_types import AutoEngineConfig
 
@@ -100,8 +100,10 @@ def run_auto_engine(
     counts = store.seed_records(run_id, batch_id, mapped, selected.minimum_confidence)
     seed_summary = _seed_report(counts)
     research_summary: dict[str, Any] = {
-        "triggered": bool(inspection.enrichment_targets) and mode != "audit",
-        "reason": list(inspection.enrichment_targets),
+        "triggered": bool(proposed),
+        "reason": list(inspection.enrichment_targets)
+        if proposed
+        else ["audit_only_or_required_research_coverage_already_staged"],
         "generated_records": len(proposed),
         "source_type": "expert_research_synthetic",
         "generation_method": selected.generator_version,
@@ -198,9 +200,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     connection = connect(database_url())
-    store: Any = (
-        PostgresTrainingStore(connection) if args.mode == "execute" else MemoryTrainingStore()
-    )
+    store: Any
+    if args.mode == "execute":
+        store = PostgresTrainingStore(connection)
+    elif args.mode == "dry_run":
+        store = DryRunTrainingStore(connection)
+    else:
+        store = MemoryTrainingStore()
     try:
         report = run_auto_engine(
             connection,

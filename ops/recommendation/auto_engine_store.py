@@ -353,3 +353,34 @@ class PostgresTrainingStore:
                     run_id,
                 ),
             )
+
+
+class DryRunTrainingStore(MemoryTrainingStore):
+    """Simulate writes while reading already-staged research from PostgreSQL."""
+
+    def __init__(self, connection: Any):
+        super().__init__()
+        self.source = PostgresTrainingStore(connection)
+        self._loaded_tables: set[str] = set()
+
+    def _load(self, target_table: str) -> None:
+        if target_table in self._loaded_tables:
+            return
+        for value in self.source.fetch_research_records(target_table):
+            self.records[(target_table, value["record_key"])] = value
+        self._loaded_tables.add(target_table)
+
+    def seed_records(
+        self,
+        run_id: str,
+        batch_id: str,
+        records: list[ResearchRecord],
+        minimum_confidence: float,
+    ) -> dict[str, TableSeedCount]:
+        for target_table in {record.target_table for record in records}:
+            self._load(target_table)
+        return super().seed_records(run_id, batch_id, records, minimum_confidence)
+
+    def fetch_research_records(self, target_table: str) -> list[dict[str, Any]]:
+        self._load(target_table)
+        return super().fetch_research_records(target_table)

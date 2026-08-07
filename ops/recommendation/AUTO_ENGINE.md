@@ -39,7 +39,9 @@ Migration `087_auto_training_control_plane.sql` adds:
 
 Research records are unique by `(target_table, record_key)`. A repeat run therefore reports the
 same unchanged records as skipped; it does not duplicate them. Changed records update only when the
-new confidence is at least as strong as the stored confidence.
+new confidence is at least as strong as the stored confidence. Later inspections count staged
+households, interactions, weekly plans, substitutions, and low-confidence rows; once research
+coverage is sufficient, generation stops even if the production-real-data gate remains open.
 
 ## Run modes
 
@@ -85,3 +87,6 @@ Before manual execution:
 
 The output report always contains DB audit, research generation, seeding, ontology, training,
 evaluation, readiness, and exact next-action sections.
+
+Local verification evidence, including the distinction between simulated DB coverage and a real
+protected DB audit, is recorded in `AUTO_ENGINE_VERIFICATION.md`.

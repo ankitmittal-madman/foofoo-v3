@@ -123,6 +123,40 @@ AUDIT_QUERIES: dict[str, tuple[str, str]] = {
         count(*) FILTER (WHERE slate_id IS NULL OR episode_hash IS NULL) missing_fields,
         0 duplicate_records, 0 orphan_records, 0 low_confidence_records FROM public.outcome_events""",
     ),
+    "research_household_personas": (
+        "research.auto_training_records",
+        """/* auto_engine:research_household_personas */ SELECT count(*) total_records,
+        count(*) FILTER (WHERE ontology_mapping_status<>'rejected' AND confidence>=0.65) usable_records,
+        count(*) FILTER (WHERE payload='{}'::jsonb) missing_fields, 0 duplicate_records,
+        0 orphan_records, count(*) FILTER (WHERE confidence<0.65) low_confidence_records
+        FROM research.auto_training_records WHERE target_table='research.household_personas'""",
+    ),
+    "research_interactions": (
+        "research.auto_training_records",
+        """/* auto_engine:research_interactions */ SELECT count(*) total_records,
+        count(*) FILTER (WHERE ontology_mapping_status='mapped' AND confidence>=0.65) usable_records,
+        count(*) FILTER (WHERE NOT (payload ? 'household_id' AND payload ? 'dish_id')) missing_fields,
+        0 duplicate_records, 0 orphan_records,
+        count(*) FILTER (WHERE confidence<0.65) low_confidence_records
+        FROM research.auto_training_records WHERE target_table='research.interactions'""",
+    ),
+    "research_weekly_plans": (
+        "research.auto_training_records",
+        """/* auto_engine:research_weekly_plans */ SELECT count(*) total_records,
+        count(*) FILTER (WHERE ontology_mapping_status='mapped' AND confidence>=0.65) usable_records,
+        count(*) FILTER (WHERE NOT payload ? 'meals') missing_fields, 0 duplicate_records,
+        0 orphan_records, count(*) FILTER (WHERE confidence<0.65) low_confidence_records
+        FROM research.auto_training_records WHERE target_table='research.weekly_plans'""",
+    ),
+    "research_substitutions": (
+        "research.auto_training_records",
+        """/* auto_engine:research_substitutions */ SELECT count(*) total_records,
+        count(*) FILTER (WHERE ontology_mapping_status='mapped' AND confidence>=0.65) usable_records,
+        count(*) FILTER (WHERE NOT (payload ? 'dish_id' AND payload ? 'substitute_dish_id')) missing_fields,
+        0 duplicate_records, 0 orphan_records,
+        count(*) FILTER (WHERE confidence<0.65) low_confidence_records
+        FROM research.auto_training_records WHERE target_table='research.substitution_examples'""",
+    ),
 }
 
 

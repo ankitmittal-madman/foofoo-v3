@@ -6,6 +6,7 @@ LLM, a paid API, or create fake production users. Output is research-only traini
 
 from __future__ import annotations
 
+from collections import Counter
 from typing import Any
 
 from .auto_engine_types import AutoEngineConfig, InspectionReport
@@ -69,6 +70,7 @@ def _choose_dish(
     allergies: list[str],
     slot: str,
     offset: int,
+    excluded: set[str] | None = None,
 ) -> dict[str, Any]:
     safe_dishes = [dish for dish in dishes if _allergy_safe(dish, allergies)]
     compatible = [
@@ -81,9 +83,15 @@ def _choose_dish(
         and (not dish.get("meal_slots") or slot in {str(v).lower() for v in dish["meal_slots"]})
     ]
     diet_safe = [dish for dish in safe_dishes if _diet_compatible(dish, diet)]
-    pool = compatible or slot_and_diet or diet_safe or safe_dishes
-    if not pool:
+    pools = (compatible, slot_and_diet, diet_safe, safe_dishes)
+    if not any(pools):
         raise RuntimeError("canonical ontology has no allergy-safe dish for research persona")
+    excluded_ids = excluded or set()
+    for candidates in pools:
+        unseen = [dish for dish in candidates if dish["id"] not in excluded_ids]
+        if unseen:
+            return unseen[offset % len(unseen)]
+    pool = next(candidates for candidates in pools if candidates)
     return pool[offset % len(pool)]
 
 
@@ -95,15 +103,26 @@ def generate_research_records(
     """Generate bounded records only when DB inspection identified coverage gaps."""
     if not inspection.enrichment_targets:
         return []
+    existing = {row.entity_type: row.usable_records for row in inspection.rows}
+    if (
+        existing.get("research_household_personas", 0) >= config.research_household_limit
+        and existing.get("research_interactions", 0) >= config.research_interaction_limit
+        and existing.get("research_weekly_plans", 0) >= config.research_household_limit
+    ):
+        return []
     dishes = sorted(ontology.get("dishes", []), key=lambda row: row["id"])
     if not dishes:
         raise RuntimeError("canonical ontology contains no dishes; research generation refused")
     dishes_by_id = {dish["id"]: dish for dish in dishes}
 
+    region_counts = Counter(
+        str(region).lower() for dish in dishes for region in dish.get("regions", []) if region
+    )
     ontology_regions = tuple(
-        sorted(
-            {str(region).lower() for dish in dishes for region in dish.get("regions", []) if region}
-        )
+        region
+        for region, _count in sorted(region_counts.items(), key=lambda item: (-item[1], item[0]))[
+            :8
+        ]
     )
     region_profiles = ontology_regions or REGION_PROFILES
     records: list[dict[str, Any]] = []
@@ -175,6 +194,7 @@ def generate_research_records(
 
         weekly: list[dict[str, str]] = []
         household_dishes: list[str] = []
+        used_dishes: set[str] = set()
         for day in range(7):
             for slot_index, slot in enumerate(("lunch", "dinner")):
                 dish = _choose_dish(
@@ -184,9 +204,11 @@ def generate_research_records(
                     allergies=allergies,
                     slot=slot,
                     offset=index * 7 + day * 2 + slot_index,
+                    excluded=used_dishes,
                 )
                 weekly.append({"day": str(day + 1), "slot": slot, "dish_id": dish["id"]})
                 household_dishes.append(dish["id"])
+                used_dishes.add(dish["id"])
         records.append(
             {
                 "target_table": "research.weekly_plans",

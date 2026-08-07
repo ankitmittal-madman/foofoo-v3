@@ -56,6 +56,60 @@ def _checksum(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _research_evaluation(store: Any, ontology_path: Path) -> dict[str, Any]:
+    households = store.fetch_research_records("research.household_personas")
+    interactions = store.fetch_research_records("research.interactions")
+    weekly_plans = store.fetch_research_records("research.weekly_plans")
+    meals = store.fetch_research_records("research.meal_examples")
+    constraints = store.fetch_research_records("research.constraint_examples")
+    household_payloads = {row["payload"]["household_id"]: row["payload"] for row in households}
+    ontology = json.loads(ontology_path.read_text(encoding="utf-8"))
+    dishes = {dish["id"]: dish for dish in ontology["dishes"]}
+
+    positive_safety_violations = 0
+    represented_households: set[str] = set()
+    for row in interactions:
+        payload = row["payload"]
+        represented_households.add(payload["household_id"])
+        if float(payload["weight"]) <= 0:
+            continue
+        household = household_payloads.get(payload["household_id"], {})
+        allergies = {str(value).lower() for value in household.get("allergies", [])}
+        allergens = {
+            str(value).lower() for value in dishes.get(payload["dish_id"], {}).get("allergens", [])
+        }
+        positive_safety_violations += bool(allergies.intersection(allergens))
+
+    planned_dishes = [
+        dish_id for row in weekly_plans for dish_id in row["payload"].get("dish_ids", [])
+    ]
+    repeats = sum(int(row["payload"].get("repeat_count", 0)) for row in weekly_plans)
+    plan_diversities = [
+        len(set(row["payload"].get("dish_ids", [])))
+        / max(1, len(row["payload"].get("dish_ids", [])))
+        for row in weekly_plans
+    ]
+    regional_values = [
+        float(row["payload"].get("regional_match", False))
+        for row in meals
+        if "regional_match" in row["payload"]
+    ]
+    return {
+        "research_households": len(households),
+        "research_interactions": len(interactions),
+        "weekly_plans": len(weekly_plans),
+        "hard_constraint_examples": len(constraints),
+        "positive_safety_violations": positive_safety_violations,
+        "repeat_rate": round(repeats / max(1, len(planned_dishes)), 4),
+        "weekly_catalog_diversity": round(sum(plan_diversities) / max(1, len(plan_diversities)), 4),
+        "weekly_catalog_coverage": round(len(set(planned_dishes)) / max(1, len(dishes)), 4),
+        "regional_match_rate": round(sum(regional_values) / max(1, len(regional_values)), 4),
+        "household_interaction_coverage": round(
+            len(represented_households) / max(1, len(households)), 4
+        ),
+    }
+
+
 def train_and_evaluate(
     *,
     run_id: str,
@@ -221,6 +275,7 @@ def train_and_evaluate(
 
     for model in models:
         store.write_model_run(run_id, model)
+    research_metrics = _research_evaluation(store, ontology_path)
     evaluation = {
         "models_evaluated": sum(bool(model["metrics"]) for model in models),
         "retrieval": retrieval["metrics"],
@@ -229,10 +284,15 @@ def train_and_evaluate(
             "hard_constraints_preserved": True,
             "synthetic_never_promoted_as_real": True,
             "existing_recommender_modified": False,
+            "hard_constraint_examples": research_metrics["hard_constraint_examples"],
+            "positive_safety_violations": research_metrics["positive_safety_violations"],
         },
-        "diversity": baseline["metrics"].get("catalog_coverage"),
-        "repeat_rate": None,
-        "regional_relevance": "covered by ontology-mapped research scenarios",
-        "household_fit": "covered by household-isolated research personas",
+        "diversity": baseline["metrics"].get(
+            "catalog_coverage", research_metrics["weekly_catalog_diversity"]
+        ),
+        "repeat_rate": research_metrics["repeat_rate"],
+        "regional_relevance": research_metrics["regional_match_rate"],
+        "household_fit": research_metrics["household_interaction_coverage"],
+        "research_scenario_metrics": research_metrics,
     }
     return models, evaluation
