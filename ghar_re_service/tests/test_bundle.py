@@ -168,6 +168,52 @@ def test_bundle_catalogue_has_full_state_origin_coverage(built):
     assert missing == [], f"{len(missing)}/810 dishes have no state_origin: {missing[:10]}..."
 
 
+def test_named_animal_dishes_cannot_be_derived_as_vegetarian(built):
+    """Missing spreadsheet ingredients must fail safe at the catalogue build boundary."""
+    out, _ = built
+    catalogue = providers.BundleCatalogueProvider(out).load()
+    expected_main_ingredients = {
+        "Duck Curry (Assamese)": "duck",
+        "Eromba": "fish_generic",
+        "Singju": "fish_generic",
+        "Tisrya Masala": "clam",
+    }
+
+    for dish_name, ingredient_name in expected_main_ingredients.items():
+        dish = catalogue.get(dish_name)
+        assert dish is not None
+        assert dish.diet == "non_veg"
+        assert ingredient_name in dish.main_ingredients
+
+
+def test_clam_safety_override_retains_shellfish_allergen(built):
+    out, _ = built
+    catalogue = providers.BundleCatalogueProvider(out).load()
+
+    from ghar_re_core.catalogue import dish_allergens
+
+    assert "shellfish" in dish_allergens(catalogue.get("Tisrya Masala"))
+
+
+def test_vegetarian_candidate_pool_excludes_corrected_animal_dishes_in_every_slot(built):
+    out, _ = built
+    catalogue = providers.BundleCatalogueProvider(out).load()
+
+    from ghar_re_core import fixtures
+    from ghar_re_core.derivation import derive_theta
+    from ghar_re_core.pipeline import make_context
+    from ghar_re_core.scoring import eligible
+
+    household = next(row for row in fixtures.HOUSEHOLDS if row["id_key"] == "couple_mumbai_mh")
+    theta = derive_theta(household)
+    corrected = {"Duck Curry (Assamese)", "Eromba", "Singju", "Tisrya Masala"}
+    for slot in ("breakfast", "lunch", "dinner"):
+        context = make_context(slot=slot)
+        candidates = {dish.name for dish in catalogue if eligible(dish, theta, context)}
+        assert candidates.isdisjoint(corrected)
+        assert all(catalogue.get(name).diet == "veg" for name in candidates)
+
+
 def test_bundle_catalogue_identity_is_canonical_and_ambiguous_aliases_fail_closed(built):
     """Pin the identity health of the production bundle and canonical-name precedence."""
     out, _ = built

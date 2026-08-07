@@ -133,9 +133,11 @@ mutton,Mutton / Goat (Gosht),meat,non_veg,N,,N,N,grams,N,Y,Rogan josh biryani ke
 lamb,Lamb,meat,non_veg,N,,N,N,grams,N,Y,Similar to mutton but younger animal. Kebabs chops curries.,N,,N,N
 pork,Pork,meat,non_veg,N,,N,N,grams,N,Y,Goan vindaloo sorpotel Naga smoked pork. Regional.,N,,N,N
 beef,Beef,meat,non_veg,N,,N,N,grams,N,Y,Kerala beef fry Goan beef curry. Regional and community-specific.,N,,N,N
+duck,Duck,meat,non_veg,N,,N,N,grams,N,Y,Assamese duck curry and other regional duck preparations.,Y,07-08-2026,Y,N
 fish_generic,Fish (Machhi),seafood,non_veg,Y,fish,N,N,grams,N,Y,Machher jhol fish fry fish curry. Bengali Goan Kerala staple.,N,,N,N
 prawns,Prawns (Jhinga),seafood,non_veg,Y,shellfish,N,N,grams,N,Y,Prawn curry tandoori prawns. Coastal cuisines.,N,,N,N
 crab,Crab (Kekda),seafood,non_veg,Y,shellfish,N,N,grams,N,Y,Crab curry crab masala. Coastal — Goan Mangalorean Kerala.,N,,N,N
+clam,Clam (Tisrya),seafood,non_veg,Y,shellfish,N,N,grams,N,Y,Tisrya masala and other coastal clam preparations.,Y,07-08-2026,Y,N
 pomfret,Pomfret,seafood,non_veg,Y,fish,N,N,pieces,N,Y,Fried pomfret tawa fry. Premium Indian fish. Mumbai and coastal.,N,,N,N
 rohu,Rohu,seafood,non_veg,Y,fish,N,N,grams,N,Y,Bengali fish curry staple. Machher jhol rohu kalia.,N,,N,N
 hilsa,Hilsa (Ilish),seafood,non_veg,Y,fish,N,N,pieces,N,Y,Shorshe ilish — Bengali delicacy. Seasonal monsoon. Premium.,N,,N,N

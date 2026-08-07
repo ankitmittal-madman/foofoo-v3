@@ -151,9 +151,11 @@ INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_f
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('lamb',false,false,true,0,true) ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('pork',false,false,true,0,true) ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('beef',false,false,true,0,true) ON CONFLICT (name) DO NOTHING;
+INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('duck',false,false,true,0,true) ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('fish_generic',false,false,true,0,true) ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('prawns',false,false,true,8,true) ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('crab',false,false,true,8,true) ON CONFLICT (name) DO NOTHING;
+INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('clam',false,false,true,8,true) ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('pomfret',false,false,true,0,true) ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('rohu',false,false,true,0,true) ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.ingredients (name,is_veg,is_vegan,is_jain_excluded,allergen_flags,is_active) VALUES ('hilsa',false,false,true,0,true) ON CONFLICT (name) DO NOTHING;

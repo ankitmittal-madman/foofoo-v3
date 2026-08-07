@@ -158,6 +158,18 @@ MAIN_INGREDIENT_CATEGORIES = {
 # brewing, sambar powder/chaat masala's hing content).
 HIDDEN_ALLERGEN_RISK_NAMES = {"hing", "asafoetida", "soy_sauce", "sambar_powder", "chaat_masala"}
 
+# Safety-critical corrections for authored dishes whose spreadsheet ingredient list omits the
+# animal ingredient named by the dish and its description. Without these rows, diet derivation
+# incorrectly classified all four dishes as vegetarian. Keep this narrow and evidence-backed:
+# every entry is corroborated by database/seeds/106_seed_dishes.sql, while the original authored
+# tokens remain intact for provenance and recipe work.
+DISH_INGREDIENT_SAFETY_OVERRIDES: dict[str, tuple[str, ...]] = {
+    "Duck Curry (Assamese)": ("duck",),
+    "Eromba": ("fish_generic",),
+    "Singju": ("fish_generic",),
+    "Tisrya Masala": ("clam",),
+}
+
 
 @dataclass
 class BuildReport:
@@ -405,7 +417,10 @@ def transform_dish_row(
 ) -> dict:
     name = row["Dish Name"]
 
-    raw_tokens = _split(row["Ingredients"])
+    raw_tokens = [
+        *DISH_INGREDIENT_SAFETY_OVERRIDES.get(name, ()),
+        *_split(row["Ingredients"]),
+    ]
     resolved: list[tuple[str, bool]] = [
         resolve_ingredient(tok, ing_map, alias_map) for tok in raw_tokens
     ]

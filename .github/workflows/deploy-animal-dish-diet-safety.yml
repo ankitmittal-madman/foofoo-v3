@@ -1,0 +1,61 @@
+name: Deploy animal-dish diet safety
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Enter APPLY_ANIMAL_DISH_DIET_SAFETY
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: inputs.confirm == 'APPLY_ANIMAL_DISH_DIET_SAFETY'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
+      SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      PGAPPNAME: foofoo-migration-091-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify the production Supabase project boundary
+        run: |
+          python - <<'PY'
+          import os
+
+          from ops.recommendation.protected_identity import (
+              database_identifies_project,
+              supabase_project_ref,
+          )
+
+          database_url = os.environ.get("DATABASE_URL", "").strip()
+          supabase_url = os.environ.get("SUPABASE_URL", "").strip()
+          if not database_url or not supabase_url:
+              raise SystemExit("Production database or Supabase URL is not configured")
+          project_ref = supabase_project_ref(supabase_url)
+          if not database_identifies_project(database_url, project_ref):
+              raise SystemExit("Database URL does not identify the production Supabase project")
+          print("Production Supabase project boundary verified")
+          PY
+
+      - name: Apply migration 091 in one serialized transaction
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -c "SELECT pg_advisory_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/091_correct_animal_dish_ingredient_safety.sql \
+            -c "SELECT pg_advisory_unlock(hashtext('foofoo-production-schema-migrations'))"
+
+      - name: Validate canonical ingredients, diet and shellfish propagation
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/943_animal_dish_ingredient_safety_validation.sql
