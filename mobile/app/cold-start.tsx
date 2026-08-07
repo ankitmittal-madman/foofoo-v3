@@ -5,8 +5,8 @@
  * tokens, existing feedback/plan API shapes) rather than copied verbatim.
  *
  * Each slot's 5 dishes come from POST /v1/calibration (ghar_re_core.calibration.calibration_grid):
- * 3 engine-predicted expected-positives + 2 planted-mismatch dishes (still safe/diet-eligible,
- * just a deliberately poor personal fit) — mixed and order-shuffled so which is which is never
+ * 3 engine-predicted expected-positives + 2 safe, plausible lower-middle-ranked challengers —
+ * mixed and order-shuffled so which is which is never
  * positionally guessable. `cell_role` rides along in the payload purely so a "like" can carry it
  * back to /v1/feedback; this screen never reads or renders it.
  */

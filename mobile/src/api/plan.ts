@@ -288,7 +288,7 @@ export function fetchColdStart(count = 15): Promise<ColdStartResponse> {
   return apiPost<ColdStartResponse>("/plan", { surface: "cold_start", count });
 }
 
-/** Dish-pick calibration grid — 3 slots x 5 dishes (3 expected-positive + 2 planted-mismatch,
+/** Dish-pick calibration grid — 3 slots x 5 dishes (3 expected-positive + 2 plausible challengers,
  * cell_role never shown in the UI, only echoed back on feedback). */
 export function fetchCalibrationGrid(): Promise<CalibrationResponse> {
   return apiPost<CalibrationResponse>("/plan", { surface: "calibration" });

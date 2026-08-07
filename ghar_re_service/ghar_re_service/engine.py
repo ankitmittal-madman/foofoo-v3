@@ -216,8 +216,8 @@ def plan_cold_start(request: dict[str, Any], catalogue, config) -> dict[str, Any
 
 
 def plan_calibration(request: dict[str, Any], catalogue, config) -> dict[str, Any]:
-    """WP-18 dish-pick surface: 3 slots x 5 dishes (3 expected-positive + 2 planted-mismatch,
-    cell_role never surfaced to the client) for the post-onboarding calibration grid."""
+    """WP-18 dish-pick surface: 3 slots x 5 dishes (3 expected-positive + 2 plausible
+    lower-middle-ranked challengers) for the post-onboarding calibration grid."""
     hh = build_household_dict(request["household"])
     excluded, preferences = _online_taste(request, catalogue)
     res = calib.calibration_grid(
