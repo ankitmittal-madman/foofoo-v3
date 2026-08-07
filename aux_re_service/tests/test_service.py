@@ -99,6 +99,10 @@ def test_shadow_runs_and_never_overrides():
     assert response.auxiliary_result is not None
     assert response.selected_result == response.existing_result
     assert response.decision_reason == "shadow_mode_no_override"
+    assert response.model_metadata["catalogue_publication"] == {
+        "version": None,
+        "qdrant_collection": None,
+    }
 
 
 def test_compare_can_select_only_after_policy_win():
@@ -117,6 +121,15 @@ def test_hard_allergy_constraint_rejects_auxiliary():
     raw = payload(allergies=["lentils", "chickpea flour"])
     response = run(RecommendationRequest.model_validate(raw), settings())
     assert response.decision == "existing"
+    assert response.decision_reason == "hard_constraint_failed"
+    assert not response.constraint_checks.passed
+
+
+def test_canonical_nut_flag_blocks_peanut_vocabulary_variant():
+    raw = payload(allergies=["peanut"])
+    for candidate in raw["candidates"]:
+        candidate["allergens"] = ["nuts"]
+    response = run(RecommendationRequest.model_validate(raw), settings())
     assert response.decision_reason == "hard_constraint_failed"
     assert not response.constraint_checks.passed
 
@@ -225,6 +238,10 @@ def test_health_and_http_contract(monkeypatch):
     with TestClient(app) as client:
         assert client.get("/healthz").json() == {"status": "alive"}
         assert client.get("/readyz").status_code == 200
+        assert client.get("/v1/meta").json()["catalogue_publication"] == {
+            "version": None,
+            "qdrant_collection": None,
+        }
         body = client.post("/v1/recommendations", json=payload()).json()
     assert body["decision_reason"] == "auxiliary_disabled"
     assert body["selected_result"] == body["existing_result"]

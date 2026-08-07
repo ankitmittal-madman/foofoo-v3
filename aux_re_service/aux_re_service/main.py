@@ -38,6 +38,12 @@ def meta() -> dict[str, object]:
         "version": __version__,
         "enabled": settings.enabled,
         "mode": settings.mode,
+        "catalogue_publication": {
+            "version": settings.catalogue_publication_version,
+            "qdrant_collection": (
+                settings.qdrant_collection if settings.catalogue_publication_version else None
+            ),
+        },
         "metrics": metrics(),
     }
 

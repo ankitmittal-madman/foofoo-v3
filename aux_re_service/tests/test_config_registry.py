@@ -43,6 +43,19 @@ def test_invalid_model_switch_fails_configuration_validation(monkeypatch):
         Settings.from_env()
 
 
+def test_catalogue_publication_configuration_is_version_bound(monkeypatch):
+    digest = "a" * 64
+    monkeypatch.setenv("AUX_REC_QDRANT_URL", "http://qdrant:6333")
+    monkeypatch.setenv("AUX_REC_QDRANT_COLLECTION", f"foofoo_recipes__{digest[:12]}")
+    monkeypatch.setenv("AUX_REC_CATALOGUE_PUBLICATION_VERSION", f"sha256:{digest}")
+    config = Settings.from_env()
+    assert config.catalogue_publication_version == f"sha256:{digest}"
+
+    monkeypatch.setenv("AUX_REC_QDRANT_COLLECTION", "foofoo_recipes__wrong")
+    with pytest.raises(ValueError, match="hash prefix"):
+        Settings.from_env()
+
+
 def test_registry_reports_working_and_scaffold_only_paths(monkeypatch):
     monkeypatch.delenv("AUX_REC_MODEL_EMBEDDER_ENABLED", raising=False)
     registry = ModelRegistry(Settings.from_env()).metadata()

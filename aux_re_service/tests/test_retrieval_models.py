@@ -97,6 +97,90 @@ def test_qdrant_failure_isolated_when_request_candidates_exist(monkeypatch):
     assert result.failures == {"qdrant": "TimeoutError"}
 
 
+def test_qdrant_binds_retrieval_to_one_publication_and_canonical_ids(monkeypatch):
+    captured = {}
+    version = "sha256:catalogue-v1"
+    dish_id = "00000000-0000-0000-0000-000000000001"
+
+    class Response(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            self.close()
+
+    def fake_urlopen(req, timeout):
+        captured["body"] = json.loads(req.data)
+        return Response(
+            json.dumps(
+                {
+                    "result": {
+                        "points": [
+                            {
+                                "id": dish_id,
+                                "payload": {
+                                    "id": dish_id,
+                                    "name": "Published Poha",
+                                    "meal_slots": ["dinner"],
+                                    "publication_version": version,
+                                },
+                            }
+                        ]
+                    },
+                }
+            ).encode()
+        )
+
+    monkeypatch.setattr("aux_re_service.retrieval.urllib.request.urlopen", fake_urlopen)
+    result = CandidateRetriever(
+        config(
+            qdrant_url="http://localhost:6333",
+            qdrant_enabled=True,
+            catalogue_publication_version=version,
+        )
+    ).retrieve(request())
+
+    assert captured["body"]["filter"]["must"][1] == {
+        "key": "publication_version",
+        "match": {"value": version},
+    }
+    assert result.candidates[0].id == dish_id
+
+
+def test_qdrant_prefilter_uses_strongest_diet_and_canonical_allergen(monkeypatch):
+    captured = {}
+
+    class Response(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            self.close()
+
+    def fake_urlopen(req, timeout):
+        captured["body"] = json.loads(req.data)
+        return Response(json.dumps({"result": {"points": []}}).encode())
+
+    monkeypatch.setattr("aux_re_service.retrieval.urllib.request.urlopen", fake_urlopen)
+    CandidateRetriever(config(qdrant_url="http://localhost:6333", qdrant_enabled=True)).retrieve(
+        request(
+            restrictions=["vegetarian", "vegan"],
+            allergies=["groundnut"],
+        )
+    )
+
+    query_filter = captured["body"]["filter"]
+    by_key = {item["key"]: item for item in query_filter["must"]}
+    assert by_key["diet_types"] == {
+        "key": "diet_types",
+        "match": {"any": ["vegan"]},
+    }
+    assert query_filter["must_not"][0] == {
+        "key": "allergens",
+        "match": {"any": ["nuts"]},
+    }
+
+
 def test_knowledge_graph_expands_seed_and_cold_start():
     graph_path = Path(__file__).parents[1] / "examples" / "knowledge_graph.json"
     seed = {"id": "seed-dal", "name": "Dal seed", "meal_slots": ["dinner"]}

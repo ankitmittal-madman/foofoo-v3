@@ -43,6 +43,22 @@ it even when the synthetic-artifact switch is set. RecBole LightGCN and KGAT rem
 the readiness report proves enough real interaction density and ontology coverage. This service
 never downloads a model or calls an AI API at runtime.
 
+For a database-backed catalogue publication, upload directly into a new versioned collection. The
+importer verifies the JSONL checksum and row count before upload, streams bounded batches, and
+verifies the exact Qdrant count afterward:
+
+```bash
+python -m aux_re_service.training.retrieval_pipeline \
+  --upload-publication /absolute/path/to/publication \
+  --qdrant-url http://127.0.0.1:6333 \
+  --collection foofoo_recipes__PUBLICATION_HASH_PREFIX
+```
+
+Then set `AUX_REC_QDRANT_COLLECTION` to that immutable collection and
+`AUX_REC_CATALOGUE_PUBLICATION_VERSION` to the full `sha256:...` value in its manifest. Runtime
+queries filter on that version and reject a mismatched or non-UUID result. Switching both values
+back to the prior collection is the rollback; activation remains an operator action.
+
 Run the complete local stack with `docker compose -f aux_re_service/compose.local.yml up --build`.
 It starts pinned Qdrant, uploads all canonical dish vectors, and starts the service in shadow mode.
 The current evidence and exact schemas are in `DATASET_AND_MODEL_REPORT.md`; the machine-readable

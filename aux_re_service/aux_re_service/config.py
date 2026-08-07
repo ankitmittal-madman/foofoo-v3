@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -44,6 +45,7 @@ class Settings:
     qdrant_collection: str
     candidate_pool_path: str | None
     model_artifact_dir: str | None
+    catalogue_publication_version: str | None = None
     knowledge_graph_path: str | None = None
     retrieval_timeout_seconds: float = 1.5
     qdrant_enabled: bool = True
@@ -79,6 +81,9 @@ class Settings:
             allow_override=_bool("AUX_REC_ALLOW_OVERRIDE", False),
             qdrant_url=os.getenv("AUX_REC_QDRANT_URL") or None,
             qdrant_collection=os.getenv("AUX_REC_QDRANT_COLLECTION", "foofoo_recipes"),
+            catalogue_publication_version=(
+                os.getenv("AUX_REC_CATALOGUE_PUBLICATION_VERSION") or None
+            ),
             candidate_pool_path=os.getenv("AUX_REC_CANDIDATE_POOL_PATH") or None,
             model_artifact_dir=os.getenv("AUX_REC_MODEL_ARTIFACT_DIR") or None,
             knowledge_graph_path=os.getenv("AUX_REC_KNOWLEDGE_GRAPH_PATH") or None,
@@ -102,4 +107,20 @@ class Settings:
         )
         if settings.feedback_enabled and not settings.feedback_path:
             raise ValueError("AUX_REC_FEEDBACK_PATH is required when feedback is enabled")
+        if re.fullmatch(r"[A-Za-z0-9_-]+", settings.qdrant_collection) is None:
+            raise ValueError("AUX_REC_QDRANT_COLLECTION contains unsupported characters")
+        if settings.catalogue_publication_version:
+            match = re.fullmatch(r"sha256:([0-9a-f]{64})", settings.catalogue_publication_version)
+            if match is None:
+                raise ValueError(
+                    "AUX_REC_CATALOGUE_PUBLICATION_VERSION must be a full sha256 digest"
+                )
+            if not settings.qdrant_url:
+                raise ValueError(
+                    "AUX_REC_QDRANT_URL is required for a catalogue publication version"
+                )
+            if match.group(1)[:12] not in settings.qdrant_collection:
+                raise ValueError(
+                    "AUX_REC_QDRANT_COLLECTION must include the publication hash prefix"
+                )
         return settings

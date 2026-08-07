@@ -7,12 +7,14 @@ import json
 import math
 import urllib.parse
 import urllib.request
+import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from .config import Settings
 from .knowledge_graph import LocalFoodKnowledgeGraph
+from .safety import canonical_tokens
 from .schemas import Candidate, RecommendationRequest
 
 REGION_GROUPS = {
@@ -113,6 +115,13 @@ class CandidateRetriever:
             ]
         )
         must: list[dict[str, Any]] = [{"key": "meal_slots", "match": {"any": [request.meal_slot]}}]
+        if self.settings.catalogue_publication_version:
+            must.append(
+                {
+                    "key": "publication_version",
+                    "match": {"value": self.settings.catalogue_publication_version},
+                }
+            )
         if request.region:
             region = request.region.casefold()
             must.append(
@@ -121,17 +130,26 @@ class CandidateRetriever:
                     "match": {"any": sorted({region, REGION_GROUPS.get(region, region)})},
                 }
             )
-        restrictions = {value.casefold() for value in request.restrictions}
-        if restrictions & {"vegetarian", "veg"}:
-            must.append({"key": "diet_types", "match": {"any": ["vegetarian", "vegan", "jain"]}})
+        restrictions = {
+            value.casefold()
+            for value in (
+                request.restrictions
+                + [value for member in request.household_members for value in member.restrictions]
+            )
+        }
+        if restrictions & {"jain", "no onion garlic"}:
+            must.append({"key": "diet_types", "match": {"any": ["jain"]}})
         elif "vegan" in restrictions:
             must.append({"key": "diet_types", "match": {"any": ["vegan"]}})
-        elif "jain" in restrictions:
-            must.append({"key": "diet_types", "match": {"any": ["jain"]}})
+        elif restrictions & {"vegetarian", "veg"}:
+            must.append({"key": "diet_types", "match": {"any": ["vegetarian", "vegan", "jain"]}})
         forbidden_allergens = sorted(
-            {value.casefold().replace("groundnut", "peanut") for value in request.allergies}
+            canonical_tokens(
+                request.allergies
+                + [value for member in request.household_members for value in member.allergies]
+            )
         )
-        unavailable = sorted({value.casefold() for value in request.unavailable_ingredients})
+        unavailable = sorted(canonical_tokens(request.unavailable_ingredients))
         must_not = []
         if forbidden_allergens:
             must_not.append({"key": "allergens", "match": {"any": forbidden_allergens}})
@@ -160,6 +178,13 @@ class CandidateRetriever:
         for point in points:
             payload = dict(point.get("payload") or {})
             payload.setdefault("id", str(point.get("id")))
+            if self.settings.catalogue_publication_version:
+                if (
+                    payload.get("publication_version")
+                    != self.settings.catalogue_publication_version
+                ):
+                    raise ValueError("Qdrant returned a candidate from the wrong publication")
+                uuid.UUID(str(payload["id"]))
             candidates.append(Candidate.model_validate(payload))
         return candidates
 

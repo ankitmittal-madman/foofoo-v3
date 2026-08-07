@@ -155,6 +155,12 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
             "retrieval_failures": retrieval_failures,
             "model_trace": model_trace,
             "experiment": asdict(experiment),
+            "catalogue_publication": {
+                "version": settings.catalogue_publication_version,
+                "qdrant_collection": (
+                    settings.qdrant_collection if settings.catalogue_publication_version else None
+                ),
+            },
         },
         timings_ms={name: round(value, 3) for name, value in timings.items()},
         debug_trace=debug if request.debug else None,
