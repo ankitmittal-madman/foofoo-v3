@@ -53,7 +53,7 @@ IMAGE_HEIGHT = 1024
 # food-specific in both cases. flux-realism is Pollinations' model tuned for photorealistic
 # output rather than flux-pro's more illustrative/stylized default -- trying it as a same-API,
 # no-code-shape-change swap. Overridable via env without another deploy if this also needs tuning.
-IMAGE_MODEL = os.environ.get("POLLINATIONS_IMAGE_MODEL", "flux-realism")
+IMAGE_MODEL = os.environ.get("POLLINATIONS_IMAGE_MODEL", "flux-pro")  # Founder: back to flux-pro
 POLLINATIONS_BASE = "https://image.pollinations.ai/prompt/"
 MAX_RETRIES = 3
 RETRY_BACKOFF_SECONDS = 15   # ported from reference: `time.sleep(15 * attempt)`
