@@ -14,10 +14,9 @@
 | Real-only preference gate and LightGCN/KGAT gates | Pass; remain disabled without real volume |
 | Existing recommender mutation | None |
 
-The production-image execution used a deterministic weak-DB fixture because this shell has no
-`DATABASE_URL`, `SUPABASE_DB_URL`, or `FOOFOO_SUPABASE_URI`. It is integration evidence, not a
-claim about current production table counts. The protected workflow will produce the real audit
-once its DB secret is configured.
+The original production-image execution used a deterministic weak-DB fixture because that shell
+had no database credential. Subsequent protected, credential-isolated workflows supplied the live
+database evidence described below.
 
 ## Production-image result
 
@@ -33,6 +32,45 @@ once its DB secret is configured.
 The small research challenger trained successfully but remains shadow-only by provenance and
 sample size. Retrieval refreshed. The real preference model, LightGCN, and KGAT remained gated.
 No artifact was activated and the existing recommender/fallback path was not changed.
+
+## Historical production writer attribution
+
+The 461-row set found in production matched the checked-in execute report exactly:
+
+| Evidence | Value |
+|---|---|
+| Writing application path | `.github/workflows/recommendation-auto-engine.yml` → `ops/recommendation/auto_engine.py` → PostgreSQL training store |
+| Batch ID | `sha256:e0a3bacfef4406057177ca4a` |
+| Generation method | `expert-household-research-v1` |
+| Rows | 461 |
+
+This identifies the automated writer path and payload. The historical rows did not preserve a
+reliable initiating human/AI actor, so they cannot support stronger personal attribution.
+
+## Live two-project relocation verification
+
+Read-only run [31177968315](https://github.com/ankitmittal-madman/foofoo-v3/actions/runs/31177968315)
+bounded the transfer to that immutable batch. Protected execute run
+[31178058011](https://github.com/ankitmittal-madman/foofoo-v3/actions/runs/31178058011)
+completed successfully.
+
+| Check | Result |
+|---|---:|
+| Exported from production | 461 |
+| Inserted into training | 461 |
+| Verified in training | 461 |
+| Deleted from production after verification | 461 |
+| Remaining matching production rows | 0 |
+| Manifest content SHA-256 | `5ef9eee5ffbf7f91de5da281a3816fd8d78e993f54e9b763b1bb37c3c4b706d3` |
+
+Production database size fell from 378,825,875 to 172,182,675 bytes during the exact cleanup and
+compaction. The training database grew from 224,095,379 to 224,537,747 bytes. The data-bearing
+transfer artifacts were deleted after the move; non-sensitive count reports remain as audit
+evidence.
+
+The current workflow gives the production job read-only access for aggregate snapshot creation.
+Only the protected training job can create synthetic research rows, and it uses
+`TRAINING_DATABASE_URL` with explicit project-reference inequality and a typed confirmation.
 
 ## Regression evidence
 
