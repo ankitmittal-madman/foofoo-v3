@@ -261,6 +261,86 @@ def audit_dataset(path: Path, label: str) -> dict[str, Any]:
         if count:
             findings.append(AuditFinding("error", label, check, count, "orphan rows"))
 
+    critical_fields = {
+        "DATA_households": ("household_id", "current_state_id", "household_size"),
+        "DATA_food_preferences": ("household_id", "diet_pattern"),
+        "DATA_meal_history": (
+            "meal_event_id",
+            "household_id",
+            "meal_date",
+            "meal_slot",
+            "dish_raw_name",
+        ),
+        "DATA_recommendation_events": (
+            "event_id",
+            "household_id",
+            "dish_id",
+            "event_type",
+            "event_at",
+        ),
+    }
+    for sheet, fields in critical_fields.items():
+        for field in fields:
+            missing = sum(row.get(field) in (None, "") for row in loaded[sheet])
+            if missing:
+                findings.append(
+                    AuditFinding(
+                        "error", label, f"{sheet}.{field}.missing", missing, "required values"
+                    )
+                )
+    known_labels = set(POSITIVE_EVENTS) | set(NEGATIVE_EVENTS) | {"substituted"}
+    unknown_labels = Counter(
+        str(row.get("event_type") or "").casefold()
+        for row in loaded["DATA_recommendation_events"]
+        if str(row.get("event_type") or "").casefold() not in known_labels
+    )
+    if unknown_labels:
+        findings.append(
+            AuditFinding(
+                "warning",
+                label,
+                "events.unknown_labels",
+                sum(unknown_labels.values()),
+                json.dumps(dict(sorted(unknown_labels.items()))),
+            )
+        )
+    malformed_context = sum(
+        bool(row.get("context_json")) and not _context(row.get("context_json"))
+        for row in loaded["DATA_recommendation_events"]
+    )
+    if malformed_context:
+        findings.append(
+            AuditFinding("error", label, "events.context_json", malformed_context, "malformed JSON")
+        )
+    history_dates = Counter(str(row.get("meal_date") or "") for row in loaded["DATA_meal_history"])
+    if len(history_dates) < 7:
+        findings.append(
+            AuditFinding(
+                "warning",
+                label,
+                "history.temporal_coverage",
+                len(history_dates),
+                "fewer than seven distinct dates; weekday/weekend learning is biased",
+            )
+        )
+    household_count = len(loaded["DATA_households"])
+    for sheet in (
+        "DATA_members",
+        "DATA_regional_taste",
+        "DATA_cooking_capability",
+        "DATA_festival_seasonal",
+    ):
+        if sheet in loaded and len(loaded[sheet]) < household_count * 0.5:
+            findings.append(
+                AuditFinding(
+                    "warning",
+                    label,
+                    f"{sheet}.coverage",
+                    len(loaded[sheet]),
+                    f"rows for {household_count} households",
+                )
+            )
+
     dish_ids = {
         row.get("canonical_dish_id")
         for row in loaded["DATA_meal_history"]
@@ -331,9 +411,7 @@ def _recipe_metadata(recipe: dict[str, Any]) -> dict[str, Any]:
     if raw_spice_level not in (None, ""):
         spice_level = max(1, min(5, int(raw_spice_level)))
     spice_profiles = [
-        group
-        for group, tokens in SPICE_GROUPS.items()
-        if normalized_ingredients & tokens
+        group for group, tokens in SPICE_GROUPS.items() if normalized_ingredients & tokens
     ]
     if spice_level is not None:
         spice_profiles.append(
@@ -342,7 +420,9 @@ def _recipe_metadata(recipe: dict[str, Any]) -> dict[str, Any]:
     nutrition_traits = [
         trait
         for trait, tokens in NUTRITION_TRAITS.items()
-        if any(any(token in ingredient for token in tokens) for ingredient in normalized_ingredients)
+        if any(
+            any(token in ingredient for token in tokens) for ingredient in normalized_ingredients
+        )
     ]
     attributes = recipe.get("attribute_basis", {})
     return {
@@ -477,9 +557,7 @@ def build_ontology(
     seasonal: dict[str, set[str]] = defaultdict(set)
     occasions: dict[str, set[str]] = defaultdict(set)
     for workbook in (primary_workbook, enrichment_workbook):
-        valid_households = {
-            str(row["household_id"]) for row in rows(workbook, "DATA_households")
-        }
+        valid_households = {str(row["household_id"]) for row in rows(workbook, "DATA_households")}
         for event in rows(workbook, "DATA_recommendation_events"):
             if str(event.get("household_id")) not in valid_households:
                 continue
@@ -543,9 +621,7 @@ def build_ontology(
             if other["id"] == dish["id"]:
                 continue
             right = set(other["ingredients"])
-            right_context = set(
-                other["meal_slots"] + other["dish_categories"] + other["cuisines"]
-            )
+            right_context = set(other["meal_slots"] + other["dish_categories"] + other["cuisines"])
             ingredient_score = len(left & right) / max(1, len(left | right))
             context_score = len(left_context & right_context) / max(
                 1, len(left_context | right_context)
@@ -554,11 +630,9 @@ def build_ontology(
             if score > 0:
                 ranked_similar.append((score, other["id"]))
         for _, target in sorted(ranked_similar, key=lambda row: (-row[0], row[1]))[:3]:
-            relations.append(
-                {"source": dish["id"], "relation": "similar_to", "target": target}
-            )
+            relations.append({"source": dish["id"], "relation": "similar_to", "target": target})
     return {
-        "version": "indian-food-ontology-v1",
+        "version": "indian-food-ontology-v2",
         "generated_at": datetime.now(UTC).isoformat(),
         "nodes": nodes,
         "relations": relations,
@@ -570,68 +644,270 @@ def _event_weight(event: dict[str, Any]) -> float:
     event_type = str(event.get("event_type") or "").casefold()
     if event_type == "rated" and event.get("feedback_score") is not None:
         return (float(event["feedback_score"]) - 3.0) / 2.0
+    if event_type == "substituted":
+        return -0.4
     return POSITIVE_EVENTS.get(event_type, NEGATIVE_EVENTS.get(event_type, 0.1))
+
+
+def _context(value: Any) -> dict[str, Any]:
+    if not value:
+        return {}
+    try:
+        parsed = json.loads(str(value))
+        return parsed if isinstance(parsed, dict) else {}
+    except json.JSONDecodeError:
+        return {}
+
+
+def _day_type(timestamp: str) -> str:
+    try:
+        day = datetime.fromisoformat(timestamp[:10]).weekday()
+    except ValueError:
+        return "unknown"
+    return "weekend" if day >= 5 else "weekday"
+
+
+def _ordinal_level(value: Any) -> int:
+    normalized = str(value or "0").strip().casefold()
+    aliases = {"low": 1, "mild": 1, "medium": 3, "moderate": 3, "high": 5, "hot": 5}
+    if normalized in aliases:
+        return aliases[normalized]
+    try:
+        return max(0, min(5, int(float(normalized))))
+    except ValueError:
+        return 0
 
 
 def build_interactions(
     workbook: Path, dataset_name: str, name_to_id: dict[str, str]
 ) -> list[dict[str, Any]]:
-    output: dict[tuple[str, str, str], dict[str, Any]] = {}
+    output: list[dict[str, Any]] = []
     prefix = f"{dataset_name}:"
     valid_households = {str(row["household_id"]) for row in rows(workbook, "DATA_households")}
     for event in rows(workbook, "DATA_recommendation_events"):
         if str(event["household_id"]) not in valid_households:
             continue
         dish_id = str(event["dish_id"])
-        key = (prefix + str(event["household_id"]), dish_id, str(event.get("event_at") or ""))
-        output[key] = {
-            "household_id": key[0],
-            "dish_id": dish_id,
-            "timestamp": key[2],
-            "meal_slot": str(event.get("meal_slot") or "").casefold(),
-            "weight": _event_weight(event),
-            "event_type": str(event.get("event_type") or ""),
-            "source_dataset": dataset_name,
-        }
-    for event in rows(workbook, "DATA_meal_history"):
+        timestamp = str(event.get("event_at") or "")
+        context = _context(event.get("context_json"))
+        output.append(
+            {
+                "event_id": prefix + str(event.get("event_id") or ""),
+                "household_id": prefix + str(event["household_id"]),
+                "dish_id": dish_id,
+                "timestamp": timestamp,
+                "meal_slot": str(event.get("meal_slot") or "").casefold(),
+                "weight": _event_weight(event),
+                "event_type": str(event.get("event_type") or ""),
+                "member_id": None,
+                "day_type": str(context.get("day_type") or _day_type(timestamp)).casefold(),
+                "context": context,
+                "source_dataset": dataset_name,
+            }
+        )
+        substitute = str(event.get("substitute_dish_id") or "")
+        if substitute:
+            output.append(
+                {
+                    "event_id": prefix + str(event.get("event_id") or "") + ":substitute",
+                    "household_id": prefix + str(event["household_id"]),
+                    "dish_id": substitute,
+                    "timestamp": timestamp,
+                    "meal_slot": str(event.get("meal_slot") or "").casefold(),
+                    "weight": 0.75,
+                    "event_type": "substitute_selected",
+                    "member_id": None,
+                    "day_type": str(context.get("day_type") or _day_type(timestamp)).casefold(),
+                    "context": context,
+                    "source_dataset": dataset_name,
+                }
+            )
+    history = rows(workbook, "DATA_meal_history")
+    history_by_event: dict[str, dict[str, Any]] = {}
+    for event in history:
         dish_id = name_to_id.get(
             lookup_key(str(event["dish_raw_name"])), str(event["canonical_dish_id"])
         )
         satisfaction = float(event.get("satisfaction_score") or 3)
-        weight = max(-1.0, min(1.0, (satisfaction - 3.0) / 2.0))
-        key = (prefix + str(event["household_id"]), dish_id, str(event.get("meal_date") or ""))
+        satisfaction_weight = (satisfaction - 3.0) / 2.0
+        sentiment_weight = MEMBER_SENTIMENT_WEIGHTS.get(
+            str(event.get("sentiment") or "").casefold(), 0.0
+        )
+        repeat_weight = {
+            "very_high": 0.4,
+            "high": 0.25,
+            "medium": 0.0,
+            "low": -0.25,
+            "never": -0.5,
+        }.get(str(event.get("repeat_desire") or "").casefold(), 0.0)
+        weight = max(
+            -1.0,
+            min(1.0, 0.6 * satisfaction_weight + 0.25 * sentiment_weight + 0.15 * repeat_weight),
+        )
+        timestamp = str(event.get("meal_date") or "")
+        context_flags = [value.casefold() for value in _json_list(event.get("context_flags"))]
         row = {
-            "household_id": key[0],
+            "event_id": prefix + str(event.get("meal_event_id") or ""),
+            "household_id": prefix + str(event["household_id"]),
             "dish_id": dish_id,
-            "timestamp": key[2],
+            "timestamp": timestamp,
             "meal_slot": str(event.get("meal_slot") or "").casefold(),
             "weight": weight,
             "event_type": "meal_history",
+            "member_id": None,
+            "day_type": "weekend" if "weekend" in context_flags else _day_type(timestamp),
+            "context": {
+                "flags": context_flags,
+                "source_mode": str(event.get("source_mode") or "").casefold(),
+                "leftover_level": str(event.get("leftover_level") or "").casefold(),
+                "portion_size": str(event.get("portion_size") or "").casefold(),
+            },
             "source_dataset": dataset_name,
         }
-        prior = output.get(key)
-        if prior is None or abs(weight) > abs(float(prior["weight"])):
-            output[key] = row
+        output.append(row)
+        history_by_event[str(event.get("meal_event_id"))] = row
+
+    for event in rows(workbook, "DATA_meal_consumers"):
+        meal = history_by_event.get(str(event.get("meal_event_id")))
+        if meal is None:
+            continue
+        sentiment = str(event.get("member_sentiment") or "").casefold()
+        weight = MEMBER_SENTIMENT_WEIGHTS.get(sentiment, 0.0)
+        output.append(
+            {
+                **meal,
+                "event_id": prefix + str(event.get("meal_consumer_id") or ""),
+                "weight": weight,
+                "event_type": "member_meal_feedback",
+                "member_id": prefix + str(event.get("member_id") or ""),
+                "context": {
+                    **meal["context"],
+                    "member_sentiment": sentiment,
+                    "finished_portion": str(event.get("finished_portion") or "").casefold(),
+                },
+            }
+        )
+
+    for event in rows(workbook, "DATA_dish_preferences"):
+        household_id = str(event.get("household_id") or "")
+        if household_id not in valid_households:
+            continue
+        preference_type = str(event.get("preference_type") or "neutral").casefold()
+        confidence = float(event.get("confidence_score") or 50) / 100.0
+        confirmed_boost = 1.0 if bool(event.get("confirmed_by_user")) else 0.85
+        weight = PREFERENCE_WEIGHTS.get(preference_type, 0.0) * confidence * confirmed_boost
+        output.append(
+            {
+                "event_id": prefix + str(event.get("dish_preference_id") or ""),
+                "household_id": prefix + household_id,
+                "dish_id": str(event.get("dish_id") or ""),
+                "timestamp": "2026-01-01T00:00:00Z",
+                "meal_slot": "",
+                "weight": max(-1.0, min(1.0, weight)),
+                "event_type": f"dish_preference:{preference_type}",
+                "member_id": prefix + str(event.get("member_id") or ""),
+                "day_type": "profile",
+                "context": {
+                    "evidence_source": str(event.get("evidence_source") or "").casefold(),
+                    "confirmed_by_user": bool(event.get("confirmed_by_user")),
+                },
+                "source_dataset": dataset_name,
+            }
+        )
     return sorted(
-        output.values(), key=lambda row: (row["household_id"], row["timestamp"], row["dish_id"])
+        output,
+        key=lambda row: (
+            row["household_id"],
+            row["timestamp"],
+            row["dish_id"],
+            row["event_id"],
+        ),
     )
 
 
 def build_household_features(workbook: Path, dataset_name: str) -> list[dict[str, Any]]:
     prefix = f"{dataset_name}:"
-    preferences: dict[str, list[str]] = defaultdict(list)
+    preferences: dict[str, set[str]] = defaultdict(set)
     for row in rows(workbook, "DATA_food_preferences"):
-        preferences[str(row["household_id"])].append(
-            str(row.get("diet_pattern") or "unknown").casefold()
+        household_id = str(row["household_id"])
+        preferences[household_id].update(
+            {
+                f"diet:{str(row.get('diet_pattern') or 'unknown').casefold()}",
+                f"spice:{_ordinal_level(row.get('spice_level'))}",
+                f"sweetness:{_ordinal_level(row.get('sweetness_level'))}",
+                f"oil:{_ordinal_level(row.get('oil_level'))}",
+                f"texture:{str(row.get('texture_preference') or 'unknown').casefold()}",
+                f"home_cooked_days:{min(7, int(row.get('home_cooked_days_week') or 0))}",
+            }
         )
-    regional: dict[str, list[str]] = defaultdict(list)
+        preferences[household_id].update(
+            f"fasting:{value.casefold()}" for value in _json_list(row.get("fasting_patterns"))
+        )
+        preferences[household_id].update(
+            f"comfort:{value}" for value in _json_list(row.get("comfort_dish_ids"))
+        )
+    regional: dict[str, set[str]] = defaultdict(set)
     for row in rows(workbook, "DATA_regional_taste"):
-        regional[str(row["household_id"])].append(
-            str(row.get("cuisine_region_id") or "unknown").casefold()
+        household_id = str(row["household_id"])
+        regional[household_id].update(
+            {
+                f"region:{str(row.get('cuisine_region_id') or 'unknown').casefold()}",
+                f"regional_familiarity:{str(row.get('familiarity') or 'unknown').casefold()}",
+                "regional_authenticity:"
+                + str(row.get("authenticity_preference") or "unknown").casefold(),
+                f"regional_score:{int(float(row.get('preference_score') or 0) // 20)}",
+            }
         )
+    capability: dict[str, set[str]] = defaultdict(set)
+    for row in rows(workbook, "DATA_cooking_capability"):
+        household_id = str(row["household_id"])
+        capability[household_id].update(
+            {
+                f"cook_role:{str(row.get('primary_cook_role') or 'unknown').casefold()}",
+                f"cook_frequency:{str(row.get('cook_frequency') or 'unknown').casefold()}",
+                f"skill:{str(row.get('skill_level') or 'unknown').casefold()}",
+                f"complexity:{str(row.get('preferred_complexity') or 'unknown').casefold()}",
+                f"weekday_minutes:{int(row.get('weekday_minutes') or 0) // 15 * 15}",
+                f"weekend_minutes:{int(row.get('weekend_minutes') or 0) // 30 * 30}",
+                f"novelty:{int(row.get('novelty_willingness') or 0)}",
+            }
+        )
+        capability[household_id].update(
+            f"equipment:{value.casefold()}" for value in _json_list(row.get("equipment_ids"))
+        )
+    exclusions: dict[str, set[str]] = defaultdict(set)
+    for row in rows(workbook, "DATA_exclusions"):
+        if not bool(row.get("confirmed_by_user")):
+            continue
+        exclusions[str(row["household_id"])].add(
+            "exclude:"
+            + str(row.get("exclusion_type") or "unknown").casefold()
+            + ":"
+            + str(row.get("entity_id") or "unknown").casefold()
+        )
+    health: dict[str, set[str]] = defaultdict(set)
+    for row in rows(workbook, "DATA_health_goals"):
+        household_id = str(row["household_id"])
+        health[household_id].add(f"health_goal:{str(row.get('goal_code') or 'unknown').casefold()}")
+    history: dict[str, Counter[str]] = defaultdict(Counter)
+    for row in rows(workbook, "DATA_meal_history"):
+        household_id = str(row["household_id"])
+        timestamp = str(row.get("meal_date") or "")
+        flags = [value.casefold() for value in _json_list(row.get("context_flags"))]
+        history[household_id][f"history_slot:{str(row.get('meal_slot') or '').casefold()}"] += 1
+        history[household_id][f"history_day:{_day_type(timestamp)}"] += 1
+        history[household_id][
+            f"history_source:{str(row.get('source_mode') or 'unknown').casefold()}"
+        ] += 1
+        history[household_id][
+            f"leftover:{str(row.get('leftover_level') or 'unknown').casefold()}"
+        ] += 1
+        for flag in flags:
+            history[household_id][f"context:{flag}"] += 1
     output = []
     for row in rows(workbook, "DATA_households"):
         household_id = str(row["household_id"])
+        history_features = {feature for feature, _ in history[household_id].most_common(12)}
         output.append(
             {
                 "household_id": prefix + household_id,
@@ -641,13 +917,205 @@ def build_household_features(workbook: Path, dataset_name: str) -> list[dict[str
                         f"origin:{str(row.get('origin_state_ids') or 'unknown').casefold()}",
                         f"setup:{str(row.get('living_setup') or 'unknown').casefold()}",
                         f"size:{min(8, int(row.get('household_size') or 1))}",
-                        *(f"diet:{value}" for value in preferences.get(household_id, ["unknown"])),
-                        *(f"region:{value}" for value in regional.get(household_id, [])),
+                        f"adults:{min(6, int(row.get('adult_count') or 0))}",
+                        f"children:{min(4, int(row.get('child_count') or 0))}",
+                        f"elders:{min(4, int(row.get('elder_count') or 0))}",
+                        f"infants:{min(2, int(row.get('infant_count') or 0))}",
+                        "decision_model:" + str(row.get("decision_model") or "unknown").casefold(),
+                        *preferences.get(household_id, {"diet:unknown"}),
+                        *regional.get(household_id, set()),
+                        *capability.get(household_id, set()),
+                        *exclusions.get(household_id, set()),
+                        *health.get(household_id, set()),
+                        *history_features,
                     }
                 ),
             }
         )
     return output
+
+
+def build_weekly_signals(workbook: Path, dataset_name: str) -> list[dict[str, Any]]:
+    prefix = f"{dataset_name}:"
+    signals: dict[str, dict[str, Counter[str]]] = defaultdict(
+        lambda: {
+            "slot": Counter(),
+            "day_type": Counter(),
+            "day_slot_dish": Counter(),
+            "source": Counter(),
+            "leftover": Counter(),
+            "context": Counter(),
+        }
+    )
+    for row in rows(workbook, "DATA_meal_history"):
+        household_id = str(row["household_id"])
+        slot = str(row.get("meal_slot") or "unknown").casefold()
+        timestamp = str(row.get("meal_date") or "")
+        flags = [value.casefold() for value in _json_list(row.get("context_flags"))]
+        day_type = "weekend" if "weekend" in flags else _day_type(timestamp)
+        dish_id = str(row.get("canonical_dish_id") or "")
+        signals[household_id]["slot"][slot] += 1
+        signals[household_id]["day_type"][day_type] += 1
+        signals[household_id]["day_slot_dish"][f"{day_type}:{slot}:{dish_id}"] += 1
+        signals[household_id]["source"][str(row.get("source_mode") or "unknown").casefold()] += 1
+        signals[household_id]["leftover"][
+            str(row.get("leftover_level") or "unknown").casefold()
+        ] += 1
+        signals[household_id]["context"].update(flags)
+    capability = {
+        str(row["household_id"]): row for row in rows(workbook, "DATA_cooking_capability")
+    }
+    output = []
+    for household_id in sorted(signals):
+        values = signals[household_id]
+        cooking = capability.get(household_id, {})
+        output.append(
+            {
+                "household_id": prefix + household_id,
+                "slot_counts": dict(values["slot"]),
+                "day_type_counts": dict(values["day_type"]),
+                "top_day_slot_dishes": [
+                    {"key": key, "count": count}
+                    for key, count in values["day_slot_dish"].most_common(12)
+                ],
+                "source_counts": dict(values["source"]),
+                "leftover_counts": dict(values["leftover"]),
+                "context_counts": dict(values["context"]),
+                "weekday_minutes": int(cooking.get("weekday_minutes") or 0),
+                "weekend_minutes": int(cooking.get("weekend_minutes") or 0),
+            }
+        )
+    return output
+
+
+def build_household_preference_graph(workbook: Path, dataset_name: str) -> list[dict[str, Any]]:
+    prefix = f"{dataset_name}:"
+    valid_households = {str(row["household_id"]) for row in rows(workbook, "DATA_households")}
+    edges = []
+    for row in rows(workbook, "DATA_dish_preferences"):
+        household_id = str(row.get("household_id") or "")
+        if household_id not in valid_households:
+            continue
+        preference = str(row.get("preference_type") or "neutral").casefold()
+        relation = "avoided_by" if preference in {"avoid", "never"} else "preferred_by"
+        edges.append(
+            {
+                "source": str(row.get("dish_id") or ""),
+                "relation": relation,
+                "target": prefix + str(row.get("member_id") or household_id),
+                "household_id": prefix + household_id,
+                "weight": PREFERENCE_WEIGHTS.get(preference, 0.0),
+                "confirmed": bool(row.get("confirmed_by_user")),
+            }
+        )
+    history = {str(row.get("meal_event_id")): row for row in rows(workbook, "DATA_meal_history")}
+    for row in rows(workbook, "DATA_meal_consumers"):
+        meal = history.get(str(row.get("meal_event_id")))
+        if meal is None:
+            continue
+        household_id = str(meal.get("household_id") or "")
+        edges.append(
+            {
+                "source": str(meal.get("canonical_dish_id") or ""),
+                "relation": "consumed_by",
+                "target": prefix + str(row.get("member_id") or ""),
+                "household_id": prefix + household_id,
+                "weight": MEMBER_SENTIMENT_WEIGHTS.get(
+                    str(row.get("member_sentiment") or "neutral").casefold(), 0.0
+                ),
+                "confirmed": False,
+            }
+        )
+    return sorted(
+        edges,
+        key=lambda row: (row["household_id"], row["source"], row["relation"], row["target"]),
+    )
+
+
+def split_interactions(
+    interactions: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    by_household: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in interactions:
+        if float(row["weight"]) > 0:
+            by_household[row["household_id"]].append(row)
+    validation_ids: set[str] = set()
+    test_ids: set[str] = set()
+    for values in by_household.values():
+        values.sort(key=lambda row: (row["timestamp"], row["event_id"]))
+        distinct_reversed = []
+        seen_dishes: set[str] = set()
+        for row in reversed(values):
+            if row["dish_id"] not in seen_dishes:
+                distinct_reversed.append(row)
+                seen_dishes.add(row["dish_id"])
+        if len(distinct_reversed) >= 3:
+            test_ids.add(distinct_reversed[0]["event_id"])
+            validation_ids.add(distinct_reversed[1]["event_id"])
+    training = [
+        row
+        for row in interactions
+        if row["event_id"] not in validation_ids and row["event_id"] not in test_ids
+    ]
+    validation = [row for row in interactions if row["event_id"] in validation_ids]
+    test = [row for row in interactions if row["event_id"] in test_ids]
+    return training, validation, test
+
+
+SCHEMA_MAP = {
+    "dish": {
+        "sources": ["catalogs.dishes", "DATA_meal_history", "recipes_v1.json"],
+        "fields": [
+            "id",
+            "name",
+            "aliases",
+            "ingredients",
+            "allergens",
+            "diet_types",
+            "cuisines",
+            "regions",
+            "meal_slots",
+            "dish_categories",
+            "spice_profiles",
+            "nutrition_traits",
+            "seasons",
+            "occasions",
+            "substitutes",
+        ],
+    },
+    "household": {
+        "sources": [
+            "DATA_households",
+            "DATA_food_preferences",
+            "DATA_regional_taste",
+            "DATA_cooking_capability",
+            "DATA_exclusions",
+            "DATA_health_goals",
+            "DATA_meal_history",
+        ],
+        "fields": ["household_id", "features"],
+    },
+    "interaction": {
+        "sources": [
+            "DATA_recommendation_events",
+            "DATA_meal_history",
+            "DATA_meal_consumers",
+            "DATA_dish_preferences",
+        ],
+        "fields": [
+            "event_id",
+            "household_id",
+            "member_id",
+            "dish_id",
+            "timestamp",
+            "meal_slot",
+            "day_type",
+            "weight",
+            "event_type",
+            "context",
+        ],
+    },
+}
 
 
 def write_artifacts(
@@ -656,6 +1124,8 @@ def write_artifacts(
     ontology: dict[str, Any],
     interactions: list[dict[str, Any]],
     households: list[dict[str, Any]],
+    weekly_signals: list[dict[str, Any]],
+    preference_graph: list[dict[str, Any]],
 ) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "dataset_audit.json").write_text(
@@ -670,6 +1140,22 @@ def write_artifacts(
     (output_dir / "household_features.jsonl").write_text(
         "".join(json.dumps(row) + "\n" for row in households)
     )
+    (output_dir / "weekly_signals.jsonl").write_text(
+        "".join(json.dumps(row) + "\n" for row in weekly_signals)
+    )
+    (output_dir / "household_preference_graph.jsonl").write_text(
+        "".join(json.dumps(row) + "\n" for row in preference_graph)
+    )
+    (output_dir / "schema_map.json").write_text(json.dumps(SCHEMA_MAP, indent=2) + "\n")
+    train, validation, test = split_interactions(interactions)
+    for name, values in (
+        ("interactions_train.jsonl", train),
+        ("interactions_validation.jsonl", validation),
+        ("interactions_test.jsonl", test),
+    ):
+        (output_dir / name).write_text(
+            "".join(json.dumps(row, default=str) + "\n" for row in values)
+        )
     manifest: dict[str, Any] = {
         "version": "foofoo-training-v1",
         "generated_at": datetime.now(UTC).isoformat(),
@@ -679,6 +1165,11 @@ def write_artifacts(
         "positive_interactions": sum(float(row["weight"]) > 0 for row in interactions),
         "negative_interactions": sum(float(row["weight"]) < 0 for row in interactions),
         "households": len(households),
+        "weekly_signal_households": len(weekly_signals),
+        "household_graph_edges": len(preference_graph),
+        "training_interactions": len(train),
+        "validation_interactions": len(validation),
+        "test_interactions": len(test),
         "sha256": {},
     }
     for name in (
@@ -686,6 +1177,12 @@ def write_artifacts(
         "canonical_food_ontology.json",
         "interactions.jsonl",
         "household_features.jsonl",
+        "weekly_signals.jsonl",
+        "household_preference_graph.jsonl",
+        "schema_map.json",
+        "interactions_train.jsonl",
+        "interactions_validation.jsonl",
+        "interactions_test.jsonl",
     ):
         manifest["sha256"][name] = hashlib.sha256((output_dir / name).read_bytes()).hexdigest()
     (output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
@@ -710,7 +1207,19 @@ def main() -> None:
     interactions.extend(build_interactions(args.dataset_2, "dataset_2", name_to_id))
     households = build_household_features(args.dataset_1, "dataset_1")
     households.extend(build_household_features(args.dataset_2, "dataset_2"))
-    write_artifacts(args.output_dir, audits, ontology, interactions, households)
+    weekly_signals = build_weekly_signals(args.dataset_1, "dataset_1")
+    weekly_signals.extend(build_weekly_signals(args.dataset_2, "dataset_2"))
+    preference_graph = build_household_preference_graph(args.dataset_1, "dataset_1")
+    preference_graph.extend(build_household_preference_graph(args.dataset_2, "dataset_2"))
+    write_artifacts(
+        args.output_dir,
+        audits,
+        ontology,
+        interactions,
+        households,
+        weekly_signals,
+        preference_graph,
+    )
 
 
 if __name__ == "__main__":

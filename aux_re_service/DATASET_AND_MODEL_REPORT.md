@@ -29,20 +29,23 @@ offline shadow validation, not proof of production preference quality.
 - Retrieval: one deterministic 64-dimensional local vector and filterable payload per canonical
   dish.
 
-The v1 snapshot contains 86 canonical dishes, 10,000 households, and 35,000 interactions: 21,565
-positive and 5,267 negative. Artifacts have SHA-256 checksums in `data/training/v1/manifest.json`.
+The v2 canonical snapshot contains 86 dishes and 10,000 households. It now uses recommendation
+events, meal history, member reactions, explicit dish preferences, family-vote evidence, and chosen
+substitutes: 64,842 interactions, including 46,047 positive and 17,459 negative rows. It also
+contains 10,000 weekly-signal rows, 29,020 household/member graph edges, and disjoint train,
+validation, and test tables. Artifacts have SHA-256 checksums in `data/training/v1/manifest.json`.
 
 ## Measured model result
 
-LightFM WARP hybrid was trained in pinned Python 3.11 and evaluated with a per-household time split
-over 7,313 holdout interactions.
+LightFM WARP hybrid v2 was trained in pinned Python 3.11 with 17,459 negative events affecting the
+eligible positive pairs. It was evaluated on a harder, leakage-resistant 4,219-household holdout.
 
 | Metric @10 | LightFM | Popularity baseline |
 |---|---:|---:|
-| Recall | 0.3635 | 0.1269 |
-| Precision | 0.0363 | 0.0127 |
-| NDCG | 0.1391 | 0.0547 |
-| Catalogue coverage | 0.8721 | 0.1395 |
+| Recall | 0.1093 | 0.0351 |
+| Precision | 0.0109 | 0.0035 |
+| NDCG | 0.0393 | 0.0149 |
+| Catalogue coverage | 0.6047 | 0.1395 |
 
 The offline gate passes for shadow use. Production activation remains blocked by synthetic-only
 training and missing online shadow/A/B evidence. Runtime verification proved that shadow mode loads
@@ -54,8 +57,8 @@ returns `synthetic_artifact_shadow_only` and does not apply the model.
 - LightFM: implemented, packaged, tested, and shadow-ready; not active-ready.
 - Qdrant: 86 real canonical dish payloads/vectors uploaded and queried successfully with slot,
   region, diet, allergen, and unavailable-ingredient filtering.
-- LightGCN: deferred because there are zero real interactions and no households with five synthetic
-  positive events in this sparse snapshot.
+- LightGCN: its RecBole input is exported, but training is deferred because there are zero real
+  interactions and only 4,357 households have five positive synthetic events.
 - KGAT: deferred for the same interaction reasons and because only 43.0% of dishes currently have
   ingredient coverage.
 

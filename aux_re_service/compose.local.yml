@@ -42,7 +42,14 @@ services:
       AUX_REC_MODEL_LIGHTFM_ENABLED: "true"
       AUX_REC_LIGHTFM_ALLOW_SYNTHETIC: "true"
       AUX_REC_LIGHTFM_ALLOW_UNPROMOTED: "false"
+      AUX_REC_FEEDBACK_ENABLED: "true"
+      AUX_REC_FEEDBACK_PATH: /srv/aux-re/state/feedback.jsonl
+      AUX_REC_EXPERIMENT_ENABLED: "false"
+      AUX_REC_EXPERIMENT_PERCENT: "0.0"
+    volumes:
+      - auxiliary_feedback:/srv/aux-re/state
     restart: unless-stopped
 
 volumes:
   qdrant_data:
+  auxiliary_feedback:

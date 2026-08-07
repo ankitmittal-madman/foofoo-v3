@@ -15,6 +15,7 @@ on:
       - ".github/workflows/aux-re-quality.yml"
   schedule:
     - cron: "23 4 * * 1"
+    - cron: "41 4 1 * *"
   workflow_dispatch: {}
 
 permissions:
@@ -44,15 +45,34 @@ jobs:
           python -m aux_re_service.training.quality_gate \
             --training-dir aux_re_service/data/training/v1 \
             --retrieval-dir aux_re_service/data/retrieval/v1 \
-            --model-report aux_re_service/data/models/lightfm_v1_report.json \
+            --model-report aux_re_service/data/models/lightfm_v2_report.json \
             --output "${RUNNER_TEMP}/aux-re-quality.json"
-      - name: Verify the production image builds with LightFM
-        run: docker build -f aux_re_service/Dockerfile -t foofoo-aux-re:ci .
+      - name: Run live Qdrant and container shadow flow
+        run: |
+          trap 'docker compose -f aux_re_service/compose.local.yml down --volumes' EXIT
+          docker compose -f aux_re_service/compose.local.yml up --build --detach auxiliary-recommender
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8081/readyz; then break; fi
+            sleep 2
+          done
+          jq '.household_id="HH-00001" | .user_id="U-00001"' \
+            aux_re_service/examples/request.json \
+            | curl --fail --silent --header 'content-type: application/json' \
+                --data-binary @- http://127.0.0.1:8081/v1/recommendations \
+            > "${RUNNER_TEMP}/aux-re-live-response.json"
+          jq --exit-status '
+            .decision == "existing"
+            and .decision_reason == "shadow_mode_no_override"
+            and .model_metadata.model_trace.lightfm.applied == true
+            and (.model_metadata.retrieval_failures | length) == 0
+          ' "${RUNNER_TEMP}/aux-re-live-response.json"
       - name: Upload quality evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: auxiliary-recommender-quality-${{ github.run_id }}
-          path: ${{ runner.temp }}/aux-re-quality.json
+          path: |
+            ${{ runner.temp }}/aux-re-quality.json
+            ${{ runner.temp }}/aux-re-live-response.json
           if-no-files-found: warn
           retention-days: 30

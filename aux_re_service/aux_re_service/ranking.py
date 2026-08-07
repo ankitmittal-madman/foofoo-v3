@@ -52,7 +52,40 @@ def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str,
         or candidate.name.casefold() in {m.casefold() for m in request.recent_meals}
         else 1.0
     )
+    weekly_diversity = (
+        0.0
+        if candidate.id.casefold() in {meal.casefold() for meal in request.weekly_meals}
+        or candidate.name.casefold() in {meal.casefold() for meal in request.weekly_meals}
+        else 1.0
+    )
     pantry = max(candidate.pantry_match, _overlap(request.pantry_items, candidate.ingredients))
+    leftover_fit = _overlap(request.leftover_items, candidate.ingredients)
+    if not request.leftover_items:
+        leftover_fit = 0.5
+    schedule_fit = 0.5
+    if request.available_cook_minutes is not None and candidate.cook_minutes is not None:
+        schedule_fit = float(candidate.cook_minutes <= request.available_cook_minutes)
+    context_scores = []
+    if request.season:
+        context_scores.append(
+            0.5
+            if not candidate.seasons
+            else float(
+                request.season.casefold() in {value.casefold() for value in candidate.seasons}
+            )
+        )
+    if request.occasion:
+        context_scores.append(
+            0.5
+            if not candidate.occasions
+            else float(
+                request.occasion.casefold() in {value.casefold() for value in candidate.occasions}
+            )
+        )
+    context_fit = sum(context_scores) / len(context_scores) if context_scores else 0.5
+    spice_fit = 0.5
+    if request.preferred_spice_level is not None and candidate.spice_level is not None:
+        spice_fit = 1.0 - abs(request.preferred_spice_level - candidate.spice_level) / 4.0
     return {
         "household_fit": preference_fit,
         "regional_fit": regional_fit,
@@ -62,18 +95,28 @@ def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str,
         "nutrition_fit": candidate.nutrition_fit,
         "collaborative": candidate.collaborative_score,
         "debias": 1.0 - candidate.popularity,
+        "weekly_diversity": weekly_diversity,
+        "schedule_fit": schedule_fit,
+        "season_occasion_fit": context_fit,
+        "leftover_fit": leftover_fit,
+        "spice_fit": spice_fit,
     }
 
 
 WEIGHTS = {
-    "household_fit": 0.20,
-    "regional_fit": 0.12,
-    "freshness": 0.12,
-    "novelty": 0.14,
-    "pantry_fit": 0.14,
-    "nutrition_fit": 0.13,
+    "household_fit": 0.16,
+    "regional_fit": 0.10,
+    "freshness": 0.07,
+    "novelty": 0.09,
+    "pantry_fit": 0.10,
+    "nutrition_fit": 0.09,
     "collaborative": 0.10,
-    "debias": 0.05,
+    "debias": 0.04,
+    "weekly_diversity": 0.08,
+    "schedule_fit": 0.06,
+    "season_occasion_fit": 0.05,
+    "leftover_fit": 0.03,
+    "spice_fit": 0.03,
 }
 
 

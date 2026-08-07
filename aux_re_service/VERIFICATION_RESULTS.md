@@ -1,61 +1,35 @@
-# Verification results — 2026-08-06
+# Verification results — 2026-08-07
 
 ## Executed paths
 
-| Path | Result | Evidence |
+| Path | Result |
+|---|---|
+| Disabled/shadow/compare/active and immutable fallback | Pass |
+| Stable household A/B assignment and control-arm protection | Pass |
+| Local feedback validation, idempotency, persistence, and normalization | Pass |
+| Dataset PK/FK/schema/label/temporal/dedupe checks | Pass; Dataset 2 gaps remain reported |
+| Canonical ontology v2 and typed graph | Pass: 86 dishes and 1,908 ontology relations |
+| Household/member preference graph | Pass: 29,020 edges |
+| Weekly feature and plan-context pipeline | Pass: 10,000 households |
+| Qdrant vectors, metadata filters, local upload and live query | Pass: 86 points |
+| LightFM v2 training, loading, scoring and active-mode synthetic block | Pass |
+| Safety, diversity, repetition, pantry, leftovers, schedule and occasion ranking | Pass |
+| Offline scorecards and before/after promotion comparison | Pass |
+| Prometheus-compatible metrics, structured logs and model trace | Pass |
+| Independent Python 3.11 production image | Pass |
+
+## Model evidence
+
+| Model family | State | Evidence |
 |---|---|---|
-| Disabled/shadow/compare/active policy | Pass | Service and HTTP integration tests |
-| Existing-result immutability | Pass | Deep-copy regression test |
-| Local weighted reranker | Pass | Scores structured candidates and changes order by context |
-| Safety rules | Pass | Peanut/groundnut alias, restriction, unavailable item, and slot rejection |
-| Diversity and repetition | Pass | MMR ingredient penalty and recent-meal novelty test |
-| Feature-hash embedder | Pass | Determinism, normalization, and context-sensitivity test |
-| Local food graph | Pass | Seed expansion and regional/slot cold-start lookup test |
-| Qdrant adapter | Contract pass | Query/filter/timeout/response tested with a local HTTP double; no live server was available |
-| JSON candidate pool | Pass | Load and source-isolated failure behavior |
-| Offline replay | Pass | Example scenario achieved expected deterministic decision |
-| Observability | Pass | Trace, model states, stage timings, counters, rates, and score aggregates emitted |
-| Existing Ghar RE regression | Pass | 238 passed, 1 skipped |
-| Independent container | Pass | Pinned image built; non-root `/healthz` returned 200 |
+| LightFM WARP hybrid v2 | Shadow-ready only | Recall@10 0.1093 vs 0.0351 popularity; NDCG@10 0.0393 vs 0.0149; coverage 0.6047 vs 0.1395 |
+| Local weighted/MMR reranker | Ready | Deterministic household/context score and hard-filter tests |
+| Qdrant + local feature hash | Ready for local/shadow | Live 64-dimensional point upload/query and payload filtering |
+| Local food/household graph | Ready for retrieval/export | Ontology, similarity, substitution and member relations |
+| LightGCN | Deferred | Input exported; no real interaction volume and density gate fails |
+| KGAT | Deferred | Input exported; same interaction gate plus ingredient coverage 43.0% |
+| FairRec/Debias/CDR/DA | Scaffold-only | Current deterministic fairness/diversity/debias policies remain safer until real slice benchmarks exist |
 
-## Model readiness
-
-| Model family | Runtime state | Selection capable? |
-|---|---|---|
-| Existing engine | Opaque input dependency | Baseline only |
-| Local weighted/MMR reranker v1 | Ready and exercised | Yes |
-| Rule/safety/diversity engines v1 | Ready and exercised | Yes |
-| Feature-hash embedder v1 | Ready and exercised | Retrieval only |
-| Local food graph v1 | Ready when a graph path is configured | Candidate generation |
-| Qdrant | Ready when a local endpoint is configured | Candidate generation |
-| LightFM | Package absent; no artifact/loader | No |
-| RecBole LightGCN | Package absent; no artifact/loader | No |
-| KGAT/FairRec/Debias/CDR/DA | Package absent; no artifact/loader | No |
-| Exploration | Not implemented | No |
-
-Framework names are not treated as working models merely because registry rows exist. They remain
-disabled until training data, an artifact manifest, an actual loader/scorer, and promotion metrics
-are added.
-
-## Commands and results
-
-```text
-PYTHONPATH=aux_re_service pytest -q aux_re_service/tests
-26 passed
-
-pytest -q ghar_re_core/tests ghar_re_service/tests
-238 passed, 1 skipped
-
-ruff check aux_re_service
-All checks passed
-
-mypy aux_re_service/aux_re_service --ignore-missing-imports
-Success: no issues found in 13 source files
-
-AUX_REC_ENABLED=true AUX_REC_MODE=active AUX_REC_ALLOW_OVERRIDE=true \
-  python -m aux_re_service.evaluation aux_re_service/examples/evaluation.json
-expected decision accuracy=1.0, selection rate=1.0, quality=0.795, diversity=1.0
-```
-
-The example replay proves wiring and metric calculation, not real-world lift. Production claims
-require the household-disjoint, time-split dataset and promotion gates in `PRODUCTION_READINESS.md`.
+The machine-readable source of truth is `data/reports/quality_gate_v2.json`. Synthetic artifacts are
+allowed only in shadow mode, even when the local synthetic-artifact switch is enabled. Production
+activation remains false.

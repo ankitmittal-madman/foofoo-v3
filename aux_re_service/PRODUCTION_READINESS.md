@@ -7,7 +7,7 @@ selection. Canonical data, Qdrant artifacts, the feature contract, a trained Lig
 offline comparison, runtime loader, container packaging, and recurring CI gates now exist. The
 synthetic-data guard is enforced in code: shadow can score, while compare/active cannot apply this
 artifact. LightGCN and KGAT are correctly deferred. See `DATASET_AND_MODEL_REPORT.md` and
-`data/reports/quality_gate_v1.json` for measured evidence.
+`data/reports/quality_gate_v2.json` for measured evidence.
 
 ## Implementation audit
 

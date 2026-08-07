@@ -1,0 +1,61 @@
+{
+  "dish": {
+    "sources": [
+      "catalogs.dishes",
+      "DATA_meal_history",
+      "recipes_v1.json"
+    ],
+    "fields": [
+      "id",
+      "name",
+      "aliases",
+      "ingredients",
+      "allergens",
+      "diet_types",
+      "cuisines",
+      "regions",
+      "meal_slots",
+      "dish_categories",
+      "spice_profiles",
+      "nutrition_traits",
+      "seasons",
+      "occasions",
+      "substitutes"
+    ]
+  },
+  "household": {
+    "sources": [
+      "DATA_households",
+      "DATA_food_preferences",
+      "DATA_regional_taste",
+      "DATA_cooking_capability",
+      "DATA_exclusions",
+      "DATA_health_goals",
+      "DATA_meal_history"
+    ],
+    "fields": [
+      "household_id",
+      "features"
+    ]
+  },
+  "interaction": {
+    "sources": [
+      "DATA_recommendation_events",
+      "DATA_meal_history",
+      "DATA_meal_consumers",
+      "DATA_dish_preferences"
+    ],
+    "fields": [
+      "event_id",
+      "household_id",
+      "member_id",
+      "dish_id",
+      "timestamp",
+      "meal_slot",
+      "day_type",
+      "weight",
+      "event_type",
+      "context"
+    ]
+  }
+}

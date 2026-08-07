@@ -46,7 +46,23 @@ never downloads a model or calls an AI API at runtime.
 Run the complete local stack with `docker compose -f aux_re_service/compose.local.yml up --build`.
 It starts pinned Qdrant, uploads all canonical dish vectors, and starts the service in shadow mode.
 The current evidence and exact schemas are in `DATASET_AND_MODEL_REPORT.md`; the machine-readable
-gate is `data/reports/quality_gate_v1.json`.
+gate is `data/reports/quality_gate_v2.json`, and the ask-by-ask status is in
+`REQUIREMENTS_COMPLETION_MATRIX.md`.
+
+Consented product feedback can be posted to `/v1/feedback` after configuring an absolute local
+`AUX_REC_FEEDBACK_PATH`. Event IDs are idempotent; ratings, household votes, and substitutions have
+event-specific validation. Normalize a captured snapshot before a governed refresh with:
+
+```bash
+python -m aux_re_service.training.feedback_pipeline \
+  --source /absolute/path/feedback.jsonl \
+  --output /absolute/path/normalized.jsonl \
+  --report /absolute/path/feedback-report.json
+```
+
+`AUX_REC_EXPERIMENT_ENABLED` and `AUX_REC_EXPERIMENT_PERCENT` provide stable household-level
+control/treatment assignment. The control arm can never override the existing result. Keep both
+switches off until authenticated product integration and experiment approval exist.
 
 The current production-safe baseline is weighted local reranking with safety filtering,
 popularity debiasing, repetition penalties, diversity selection, and template reason codes. Set

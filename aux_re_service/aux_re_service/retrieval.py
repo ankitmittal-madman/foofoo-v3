@@ -101,7 +101,16 @@ class CandidateRetriever:
         }:
             raise ValueError("AUX_REC_QDRANT_URL must point to the local Qdrant service")
         query = " ".join(
-            [request.meal_slot, request.region or "", *request.preferences, *request.pantry_items]
+            [
+                request.meal_slot,
+                request.region or "",
+                request.season or "",
+                request.occasion or "",
+                request.day_type or "",
+                *request.preferences,
+                *request.pantry_items,
+                *request.leftover_items,
+            ]
         )
         must: list[dict[str, Any]] = [{"key": "meal_slots", "match": {"any": [request.meal_slot]}}]
         if request.region:

@@ -1,0 +1,97 @@
+{
+  "generated_at": "2026-08-07T08:03:24.111316+00:00",
+  "shadow_gate_passed": true,
+  "production_activation_allowed": false,
+  "production_blockers": [
+    "synthetic_training_data",
+    "no_online_shadow_or_ab_evidence"
+  ],
+  "artifact_checks": {
+    "checksums_valid": true,
+    "ontology_candidate_count_matches": true,
+    "qdrant_point_count_matches": true,
+    "qdrant_vectors_are_64d": true,
+    "interaction_event_ids_unique": true,
+    "interaction_dishes_resolve": true,
+    "interaction_households_resolve": true,
+    "splits_are_disjoint": true,
+    "splits_cover_interactions": true,
+    "negative_samples_present": true,
+    "weekly_signals_present": true,
+    "household_preference_graph_present": true,
+    "lightfm": {
+      "report_promotion_gate": true,
+      "beats_popularity": true,
+      "shadow_only": true,
+      "artifact_exists": true
+    }
+  },
+  "checksum_failures": [],
+  "data": {
+    "dishes": 86,
+    "households": 10000,
+    "interactions": 64842,
+    "real_interactions": 0,
+    "households_with_5_positive_events": 4357,
+    "negative_interactions": 17459,
+    "weekly_signal_households": 10000,
+    "household_preference_edges": 29020,
+    "split_counts": {
+      "train": 56404,
+      "validation": 4219,
+      "test": 4219
+    },
+    "ontology_coverage": {
+      "ingredients": 0.43023255813953487,
+      "diet_types": 1.0,
+      "regions": 1.0,
+      "meal_slots": 1.0,
+      "substitutes": 0.43023255813953487,
+      "spice_profiles": 0.43023255813953487,
+      "nutrition_traits": 0.32558139534883723,
+      "seasons_or_occasions": 0.43023255813953487
+    }
+  },
+  "recurring_reviews": {
+    "code_change": "unit_lint_type_and_container",
+    "data_refresh": "checksums_schema_fk_dedupe_labels_and_splits",
+    "model_update": "baseline_delta_and_shadow_gate",
+    "weekly": "shadow_safety_and_fallback_review",
+    "monthly": "diversity_repetition_region_and_household_fit_review"
+  },
+  "models": {
+    "lightfm": {
+      "ready_for_shadow": true,
+      "ready_for_active": false,
+      "metrics": {
+        "evaluated_households": 4219.0,
+        "recall_at_10": 0.10926759895709884,
+        "precision_at_10": 0.010926759895709884,
+        "ndcg_at_10": 0.039252372036401195,
+        "catalog_coverage": 0.6046511627906976
+      },
+      "baseline": {
+        "evaluated_households": 4219.0,
+        "recall_at_10": 0.0350794027020621,
+        "precision_at_10": 0.00350794027020621,
+        "ndcg_at_10": 0.014906346307064085,
+        "catalog_coverage": 0.13953488372093023
+      }
+    },
+    "lightgcn": {
+      "ready": false,
+      "blockers": [
+        "no_real_interactions",
+        "insufficient_households_with_5_positive_events"
+      ]
+    },
+    "kgat": {
+      "ready": false,
+      "blockers": [
+        "no_real_interactions",
+        "insufficient_households_with_5_positive_events",
+        "ingredient_coverage_below_90_percent"
+      ]
+    }
+  }
+}

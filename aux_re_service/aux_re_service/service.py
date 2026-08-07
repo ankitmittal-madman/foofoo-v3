@@ -10,9 +10,10 @@ from pathlib import Path
 from typing import Any
 
 from .config import Mode, Settings
+from .experiments import assign
 from .lightfm_runtime import LightFMArtifactError, LightFMScorer, LightFMScoreTrace
 from .observability import log_decision, record
-from .policy import decide, existing_metrics
+from .policy import Decision, decide, existing_metrics
 from .ranking import LocalReranker
 from .registry import ModelRegistry
 from .retrieval import CandidateRetriever
@@ -32,6 +33,7 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
     retrieval_failures: dict[str, str] = {}
     candidate_count = 0
     model_trace: dict[str, Any] = {"lightfm": {"applied": False, "reason": "disabled"}}
+    experiment = assign(request.household_id, settings)
 
     if settings.enabled:
         try:
@@ -94,6 +96,8 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
 
     selection_started = time.perf_counter()
     decision = decide(existing, auxiliary, constraints, settings)
+    if experiment.enabled and experiment.variant == "control" and decision.code == "auxiliary":
+        decision = Decision(existing, "existing", "experiment_control")
     timings["selection"] = (time.perf_counter() - selection_started) * 1000
     timings["total"] = (time.perf_counter() - started) * 1000
     old_metrics = existing_metrics(existing)
@@ -122,6 +126,7 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
         repetition_rate=repetition_rate,
         rerank_delta=scores["improvement_delta"],
         timings_ms=timings,
+        experiment_variant=experiment.variant,
     )
     if settings.log_all:
         log_decision(
@@ -149,6 +154,7 @@ def run(request: RecommendationRequest, settings: Settings | None = None) -> Rec
             "mode": settings.mode,
             "retrieval_failures": retrieval_failures,
             "model_trace": model_trace,
+            "experiment": asdict(experiment),
         },
         timings_ms={name: round(value, 3) for name, value in timings.items()},
         debug_trace=debug if request.debug else None,

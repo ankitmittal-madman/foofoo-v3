@@ -711,6 +711,41 @@
           "detail": "orphan rows"
         },
         {
+          "severity": "warning",
+          "dataset": "dataset_2",
+          "check": "history.temporal_coverage",
+          "count": 1,
+          "detail": "fewer than seven distinct dates; weekday/weekend learning is biased"
+        },
+        {
+          "severity": "warning",
+          "dataset": "dataset_2",
+          "check": "DATA_members.coverage",
+          "count": 5,
+          "detail": "rows for 5000 households"
+        },
+        {
+          "severity": "warning",
+          "dataset": "dataset_2",
+          "check": "DATA_regional_taste.coverage",
+          "count": 5,
+          "detail": "rows for 5000 households"
+        },
+        {
+          "severity": "warning",
+          "dataset": "dataset_2",
+          "check": "DATA_cooking_capability.coverage",
+          "count": 5,
+          "detail": "rows for 5000 households"
+        },
+        {
+          "severity": "warning",
+          "dataset": "dataset_2",
+          "check": "DATA_festival_seasonal.coverage",
+          "count": 5,
+          "detail": "rows for 5000 households"
+        },
+        {
           "severity": "info",
           "dataset": "dataset_2",
           "check": "dish_namespace",

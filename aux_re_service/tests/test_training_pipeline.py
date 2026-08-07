@@ -6,6 +6,7 @@ from pathlib import Path
 
 from aux_re_service.evaluation import ranking_metrics
 from aux_re_service.training.data_pipeline import canonical_id, normalize_name
+from aux_re_service.training.graph_export import export
 from aux_re_service.training.quality_gate import evaluate
 from aux_re_service.training.retrieval_pipeline import build
 
@@ -17,9 +18,13 @@ def test_generated_training_manifest_is_complete_and_checksummed():
     manifest = json.loads((TRAINING / "manifest.json").read_text())
     assert manifest["synthetic_only"] is True
     assert manifest["ontology_dishes"] == 86
-    assert manifest["interactions"] == 35000
-    assert manifest["positive_interactions"] > 20000
-    assert manifest["negative_interactions"] > 5000
+    assert manifest["interactions"] == 64842
+    assert manifest["positive_interactions"] > 46000
+    assert manifest["negative_interactions"] > 17000
+    assert manifest["weekly_signal_households"] == 10000
+    assert manifest["household_graph_edges"] == 29020
+    assert manifest["validation_interactions"] > 4000
+    assert manifest["test_interactions"] > 4000
     for name, expected in manifest["sha256"].items():
         assert hashlib.sha256((TRAINING / name).read_bytes()).hexdigest() == expected
 
@@ -54,6 +59,14 @@ def test_retrieval_artifact_builder_outputs_vectors_and_graph(tmp_path):
                 "cuisines": ["south"],
                 "regions": ["south"],
                 "meal_slots": ["lunch"],
+                "dish_categories": [],
+                "spice_profiles": [],
+                "spice_level": None,
+                "nutrition_traits": [],
+                "seasons": [],
+                "occasions": [],
+                "substitutes": [],
+                "cook_minutes": None,
             },
             {
                 "id": "DISH_B",
@@ -64,6 +77,14 @@ def test_retrieval_artifact_builder_outputs_vectors_and_graph(tmp_path):
                 "cuisines": ["south"],
                 "regions": ["south"],
                 "meal_slots": ["lunch"],
+                "dish_categories": [],
+                "spice_profiles": [],
+                "spice_level": None,
+                "nutrition_traits": [],
+                "seasons": [],
+                "occasions": [],
+                "substitutes": [],
+                "cook_minutes": None,
             },
         ]
     }
@@ -96,20 +117,22 @@ def test_ranking_metrics_cover_quality_diversity_repetition_and_safety():
 
 def test_trained_lightfm_report_beats_popularity_baseline():
     report = json.loads(
-        (ROOT / "aux_re_service" / "data" / "models" / "lightfm_v1_report.json").read_text()
+        (ROOT / "aux_re_service" / "data" / "models" / "lightfm_v2_report.json").read_text()
     )
+    assert report["format"] == "foofoo-lightfm-v2"
     assert report["model_type"] == "LightFM-WARP-hybrid"
     assert report["promotion_gate_passed"] is True
     assert report["metric_deltas"]["recall_at_10"] > 0
     assert report["metric_deltas"]["ndcg_at_10"] > 0
     assert report["activation_scope"] == "shadow_validation_only"
+    assert report["production_eligible"] is False
 
 
 def test_quality_gate_allows_shadow_but_defers_graph_models_and_active_use():
     report = evaluate(
         TRAINING,
         ROOT / "aux_re_service" / "data" / "retrieval" / "v1",
-        ROOT / "aux_re_service" / "data" / "models" / "lightfm_v1_report.json",
+        ROOT / "aux_re_service" / "data" / "models" / "lightfm_v2_report.json",
     )
     assert report["shadow_gate_passed"] is True
     assert report["production_activation_allowed"] is False
@@ -117,3 +140,21 @@ def test_quality_gate_allows_shadow_but_defers_graph_models_and_active_use():
     assert report["models"]["lightgcn"]["ready"] is False
     assert report["models"]["kgat"]["ready"] is False
     assert "no_real_interactions" in report["models"]["lightgcn"]["blockers"]
+
+
+def test_ontology_contains_substitution_season_spice_and_household_relations():
+    ontology = json.loads((TRAINING / "canonical_food_ontology.json").read_text())
+    relations = {row["relation"] for row in ontology["relations"]}
+    node_types = {row["type"] for row in ontology["nodes"]}
+    assert {"substitutes_for", "similar_to", "incompatible_with"} <= relations
+    assert {"season", "occasion", "spice_profile", "nutrition_trait", "allergy"} <= node_types
+    assert any(dish["substitutes"] for dish in ontology["dishes"])
+
+
+def test_graph_exports_are_ready_but_training_is_truthfully_blocked(tmp_path):
+    report = export(TRAINING, tmp_path)
+    assert report["interactions"] > 25000
+    assert report["lightgcn_training_allowed"] is False
+    assert report["kgat_training_allowed"] is False
+    assert (tmp_path / "foofoo.inter").is_file()
+    assert (tmp_path / "foofoo.kg").is_file()

@@ -16,12 +16,20 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_ALOO_PARATHA": {
       "id": "DISH_ALOO_PARATHA",
@@ -51,12 +59,26 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "paratha_roti"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 35,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_ALOO_POSTO": {
       "id": "DISH_ALOO_POSTO",
@@ -85,12 +107,26 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [
+        "dry_sabzi"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 30,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_APPAM": {
       "id": "DISH_APPAM",
@@ -116,12 +152,44 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_profiles": [
+        "mild"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CURD_RICE",
+        "DISH_FRUIT_BOWL",
+        "DISH_DHOKLA",
+        "DISH_IDLI",
+        "DISH_FISH_CURRY",
+        "DISH_DOSA",
+        "DISH_LADOO",
+        "DISH_DALIA"
+      ],
+      "cook_minutes": 25,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_BEANS": {
       "id": "DISH_BEANS",
@@ -142,12 +210,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_POHA",
+        "DISH_OMLETTE",
+        "DISH_CHOLE",
+        "DISH_FISH_CURRY",
+        "DISH_CHILLA",
+        "DISH_FRUIT_BOWL",
+        "DISH_CHICKEN_CURRY",
+        "DISH_NUTS"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_BHAKRI_AND_PITHLA": {
       "id": "DISH_BHAKRI_AND_PITHLA",
@@ -179,12 +273,29 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [
+        "bread",
+        "curry"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_millet"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 20,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_BHINDI": {
       "id": "DISH_BHINDI",
@@ -205,12 +316,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CURD_RICE",
+        "DISH_DALIA",
+        "DISH_PARATHA",
+        "DISH_GUJIYA",
+        "DISH_SIMPLE_SABZI",
+        "DISH_RICE_DAL",
+        "DISH_OMLETTE",
+        "DISH_UTTAPAM"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_BISI_BELE_BATH": {
       "id": "DISH_BISI_BELE_BATH",
@@ -248,12 +385,27 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 45,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHAPATI_AND_KURMA": {
       "id": "DISH_CHAPATI_AND_KURMA",
@@ -271,12 +423,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHHENAGAJA": {
       "id": "DISH_CHHENAGAJA",
@@ -294,12 +454,20 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHICKEN_BHARTA": {
       "id": "DISH_CHICKEN_BHARTA",
@@ -319,12 +487,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHICKEN_CHETTINAD": {
       "id": "DISH_CHICKEN_CHETTINAD",
@@ -361,12 +537,27 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "hot",
+        "warming_whole_spices"
+      ],
+      "spice_level": 4,
+      "nutrition_traits": [
+        "contains_meat"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 60,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHICKEN_CURRY": {
       "id": "DISH_CHICKEN_CURRY",
@@ -387,12 +578,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_DHOKLA",
+        "DISH_CURD_RICE",
+        "DISH_SEVAI",
+        "DISH_TURAI",
+        "DISH_OMLETTE",
+        "DISH_LAUKI",
+        "DISH_UTTAPAM",
+        "DISH_RICE_DAL"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHICKEN_CURRY_AND_ROTI": {
       "id": "DISH_CHICKEN_CURRY_AND_ROTI",
@@ -412,12 +629,20 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHICKEN_XACUTI": {
       "id": "DISH_CHICKEN_XACUTI",
@@ -451,12 +676,27 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "medium",
+        "warming_whole_spices"
+      ],
+      "spice_level": 3,
+      "nutrition_traits": [
+        "contains_meat"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 65,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHILLA": {
       "id": "DISH_CHILLA",
@@ -476,12 +716,38 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_TURAI",
+        "DISH_FRUIT_BOWL",
+        "DISH_IDLI",
+        "DISH_MUTTON_CURRY",
+        "DISH_SEVAI",
+        "DISH_TINDA",
+        "DISH_FISH_CURRY",
+        "DISH_DHOKLA"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHIRA_BHAJA": {
       "id": "DISH_CHIRA_BHAJA",
@@ -499,12 +765,20 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CHOLE": {
       "id": "DISH_CHOLE",
@@ -525,12 +799,38 @@
         "breakfast",
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_UPMA",
+        "DISH_THEPLA",
+        "DISH_MUTTON_CURRY",
+        "DISH_POHA",
+        "DISH_SPROUTS",
+        "DISH_UTTAPAM",
+        "DISH_FRUIT_BOWL"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_CURD_RICE": {
       "id": "DISH_CURD_RICE",
@@ -564,12 +864,47 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_pulse"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_TINDA",
+        "DISH_MODAK",
+        "DISH_OMLETTE",
+        "DISH_KHICHDI",
+        "DISH_FISH_CURRY",
+        "DISH_BHINDI",
+        "DISH_LAUKI"
+      ],
+      "cook_minutes": 15,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_DALIA": {
       "id": "DISH_DALIA",
@@ -589,12 +924,38 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_NUTS",
+        "DISH_DAL_ROTI",
+        "DISH_CHILLA",
+        "DISH_CHICKEN_CURRY",
+        "DISH_YOGURT",
+        "DISH_TINDA",
+        "DISH_DOSA",
+        "DISH_UTTAPAM"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_DALMA": {
       "id": "DISH_DALMA",
@@ -624,12 +985,27 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "dal_lentil"
+      ],
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 40,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_DAL_DHOKLI": {
       "id": "DISH_DAL_DHOKLI",
@@ -664,12 +1040,27 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "dal_lentil"
+      ],
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 50,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_DAL_MAKHANI_AND_ROTI": {
       "id": "DISH_DAL_MAKHANI_AND_ROTI",
@@ -687,12 +1078,20 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_DAL_ROTI": {
       "id": "DISH_DAL_ROTI",
@@ -713,12 +1112,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_CHOLE",
+        "DISH_POHA",
+        "DISH_CHICKEN_CURRY",
+        "DISH_MODAK",
+        "DISH_THEPLA",
+        "DISH_UPMA",
+        "DISH_NUTS"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_DAL_TADKA_AND_PHULKA": {
       "id": "DISH_DAL_TADKA_AND_PHULKA",
@@ -736,12 +1161,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_DHOKLA": {
       "id": "DISH_DHOKLA",
@@ -777,12 +1210,46 @@
         "breakfast",
         "snack"
       ],
+      "dish_categories": [
+        "snack_starter"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CHOLE",
+        "DISH_DOSA",
+        "DISH_OMLETTE",
+        "DISH_RICE_DAL",
+        "DISH_SEVAI",
+        "DISH_PANEER_BUTTER",
+        "DISH_TINDA",
+        "DISH_IDLI"
+      ],
+      "cook_minutes": 35,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_DOSA": {
       "id": "DISH_DOSA",
@@ -802,12 +1269,38 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_DAL_ROTI",
+        "DISH_MODAK",
+        "DISH_PULAO",
+        "DISH_UPMA",
+        "DISH_OMLETTE",
+        "DISH_SOUP",
+        "DISH_APPAM",
+        "DISH_KHICHDI"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_FAFDA_JALEBI": {
       "id": "DISH_FAFDA_JALEBI",
@@ -838,12 +1331,27 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "snack_starter",
+        "sweet_dessert"
+      ],
+      "spice_profiles": [
+        "mild"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 35,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_FISH_CURRY": {
       "id": "DISH_FISH_CURRY",
@@ -864,12 +1372,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_PANEER_BUTTER",
+        "DISH_DOSA",
+        "DISH_DALIA",
+        "DISH_DAL_ROTI",
+        "DISH_PARATHA",
+        "DISH_IDLI",
+        "DISH_BEANS",
+        "DISH_MUTTON_CURRY"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_FISH_PATURI": {
       "id": "DISH_FISH_PATURI",
@@ -889,12 +1423,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_FRUIT_BOWL": {
       "id": "DISH_FRUIT_BOWL",
@@ -915,12 +1457,38 @@
       "meal_slots": [
         "snack"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SOUP",
+        "DISH_GUJIYA",
+        "DISH_THEPLA",
+        "DISH_POHA",
+        "DISH_CHICKEN_CURRY",
+        "DISH_YOGURT",
+        "DISH_BEANS",
+        "DISH_DHOKLA"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_GHUGNI": {
       "id": "DISH_GHUGNI",
@@ -953,12 +1521,26 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "snack_starter"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 40,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_GOAN_FISH_CURRY": {
       "id": "DISH_GOAN_FISH_CURRY",
@@ -991,12 +1573,26 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "mild"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_fish_or_seafood"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 35,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_GUJARATI_THALI": {
       "id": "DISH_GUJARATI_THALI",
@@ -1014,12 +1610,20 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_GUJIYA": {
       "id": "DISH_GUJIYA",
@@ -1053,12 +1657,43 @@
       "meal_slots": [
         "festival"
       ],
+      "dish_categories": [
+        "sweet_dessert"
+      ],
+      "spice_profiles": [
+        "mild",
+        "warming_whole_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_UTTAPAM",
+        "DISH_TURAI",
+        "DISH_SOUP",
+        "DISH_BEANS",
+        "DISH_PARATHA",
+        "DISH_FISH_CURRY",
+        "DISH_MODAK"
+      ],
+      "cook_minutes": 45,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_IDIYAPPAM": {
       "id": "DISH_IDIYAPPAM",
@@ -1081,12 +1716,24 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_profiles": [
+        "mild"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 25,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_IDLI": {
       "id": "DISH_IDLI",
@@ -1109,12 +1756,44 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_profiles": [
+        "mild"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_POHA",
+        "DISH_RICE_DAL",
+        "DISH_TINDA",
+        "DISH_MUTTON_CURRY",
+        "DISH_BHINDI",
+        "DISH_DAL_ROTI",
+        "DISH_DHOKLA",
+        "DISH_MODAK"
+      ],
+      "cook_minutes": 30,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_IDLI_SAMBAR": {
       "id": "DISH_IDLI_SAMBAR",
@@ -1132,12 +1811,20 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_KACHORI": {
       "id": "DISH_KACHORI",
@@ -1155,12 +1842,20 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_KADHI_PAKORA": {
       "id": "DISH_KADHI_PAKORA",
@@ -1193,12 +1888,28 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 55,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_KANDA_POHA": {
       "id": "DISH_KANDA_POHA",
@@ -1216,12 +1927,20 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_KHICHDI": {
       "id": "DISH_KHICHDI",
@@ -1249,12 +1968,45 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CHICKEN_CURRY",
+        "DISH_THEPLA",
+        "DISH_CURD_RICE",
+        "DISH_PULAO",
+        "DISH_TINDA",
+        "DISH_YOGURT",
+        "DISH_SEVAI",
+        "DISH_PARATHA"
+      ],
+      "cook_minutes": 35,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_KHICHDI_KADHI": {
       "id": "DISH_KHICHDI_KADHI",
@@ -1272,12 +2024,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_KOSHA_MANGSHO": {
       "id": "DISH_KOSHA_MANGSHO",
@@ -1314,12 +2074,28 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "medium",
+        "tempering_spices"
+      ],
+      "spice_level": 3,
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_meat"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 80,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_LADOO": {
       "id": "DISH_LADOO",
@@ -1339,12 +2115,38 @@
       "meal_slots": [
         "festival"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CHOLE",
+        "DISH_CHICKEN_CURRY",
+        "DISH_LAUKI",
+        "DISH_PULAO",
+        "DISH_NUTS",
+        "DISH_RICE_DAL",
+        "DISH_YOGURT",
+        "DISH_CHILLA"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_LAUKI": {
       "id": "DISH_LAUKI",
@@ -1365,12 +2167,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_PARATHA",
+        "DISH_MODAK",
+        "DISH_UTTAPAM",
+        "DISH_PANEER_BUTTER",
+        "DISH_FRUIT_BOWL",
+        "DISH_BEANS",
+        "DISH_DHOKLA",
+        "DISH_CURD_RICE"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_LEMON_RICE": {
       "id": "DISH_LEMON_RICE",
@@ -1404,12 +2232,28 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 20,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_LUCHI_ALOO_DUM": {
       "id": "DISH_LUCHI_ALOO_DUM",
@@ -1427,12 +2271,20 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MACHHER_JHOL_AND_RICE": {
       "id": "DISH_MACHHER_JHOL_AND_RICE",
@@ -1450,12 +2302,20 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MALABAR_FISH_CURRY": {
       "id": "DISH_MALABAR_FISH_CURRY",
@@ -1475,12 +2335,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MASALA_DOSA": {
       "id": "DISH_MASALA_DOSA",
@@ -1516,12 +2384,28 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 35,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MISAL_PAV": {
       "id": "DISH_MISAL_PAV",
@@ -1557,12 +2441,27 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "whole_meal"
+      ],
+      "spice_profiles": [
+        "hot",
+        "tempering_spices"
+      ],
+      "spice_level": 4,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 45,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MIXED_VEG_AND_ROTI": {
       "id": "DISH_MIXED_VEG_AND_ROTI",
@@ -1580,12 +2479,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MODAK": {
       "id": "DISH_MODAK",
@@ -1611,12 +2518,43 @@
       "meal_slots": [
         "festival"
       ],
+      "dish_categories": [
+        "sweet_dessert"
+      ],
+      "spice_profiles": [
+        "mild",
+        "warming_whole_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SOUP",
+        "DISH_SEVAI",
+        "DISH_NUTS",
+        "DISH_DAL_ROTI",
+        "DISH_LAUKI",
+        "DISH_CHOLE",
+        "DISH_TURAI",
+        "DISH_PANEER_BUTTER"
+      ],
+      "cook_minutes": 50,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MURI_GHONTO": {
       "id": "DISH_MURI_GHONTO",
@@ -1649,12 +2587,27 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [
+        "whole_meal"
+      ],
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_fish_or_seafood"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 45,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MUTTON_CURRY": {
       "id": "DISH_MUTTON_CURRY",
@@ -1675,12 +2628,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_BHINDI",
+        "DISH_OMLETTE",
+        "DISH_UTTAPAM",
+        "DISH_DOSA",
+        "DISH_PULAO",
+        "DISH_SPROUTS",
+        "DISH_PARATHA",
+        "DISH_SIMPLE_SABZI"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_MUTTON_ROGAN_JOSH": {
       "id": "DISH_MUTTON_ROGAN_JOSH",
@@ -1716,12 +2695,28 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "medium",
+        "warming_whole_spices"
+      ],
+      "spice_level": 3,
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_meat"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 80,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_NUTS": {
       "id": "DISH_NUTS",
@@ -1742,12 +2737,38 @@
       "meal_slots": [
         "snack"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_UTTAPAM",
+        "DISH_TINDA",
+        "DISH_TURAI",
+        "DISH_CURD_RICE",
+        "DISH_YOGURT",
+        "DISH_APPAM",
+        "DISH_CHOLE",
+        "DISH_MODAK"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_OMLETTE": {
       "id": "DISH_OMLETTE",
@@ -1780,12 +2801,45 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "egg_dish"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_egg"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_TURAI",
+        "DISH_SIMPLE_SABZI",
+        "DISH_FRUIT_BOWL",
+        "DISH_YOGURT",
+        "DISH_CURD_RICE",
+        "DISH_DALIA",
+        "DISH_THEPLA",
+        "DISH_SOUP"
+      ],
+      "cook_minutes": 10,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_PALAK_PANEER": {
       "id": "DISH_PALAK_PANEER",
@@ -1819,12 +2873,29 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_leafy_green"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 40,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_PANEER_BUTTER": {
       "id": "DISH_PANEER_BUTTER",
@@ -1861,12 +2932,45 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "mild"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_leafy_green"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_LAUKI",
+        "DISH_CHOLE",
+        "DISH_APPAM",
+        "DISH_CURD_RICE",
+        "DISH_NUTS",
+        "DISH_LADOO",
+        "DISH_BHINDI"
+      ],
+      "cook_minutes": 50,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_PARATHA": {
       "id": "DISH_PARATHA",
@@ -1886,12 +2990,38 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_UTTAPAM",
+        "DISH_BHINDI",
+        "DISH_SOUP",
+        "DISH_GUJIYA",
+        "DISH_CHILLA",
+        "DISH_FRUIT_BOWL",
+        "DISH_THEPLA",
+        "DISH_SEVAI"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_PAV_BHAJI": {
       "id": "DISH_PAV_BHAJI",
@@ -1926,12 +3056,24 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "whole_meal"
+      ],
+      "spice_profiles": [
+        "mild"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 45,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_PESARATTU": {
       "id": "DISH_PESARATTU",
@@ -1959,12 +3101,28 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 25,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_POHA": {
       "id": "DISH_POHA",
@@ -1999,12 +3157,44 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SEVAI",
+        "DISH_CHICKEN_CURRY",
+        "DISH_UTTAPAM",
+        "DISH_UPMA",
+        "DISH_SIMPLE_SABZI",
+        "DISH_PULAO",
+        "DISH_LADOO",
+        "DISH_GUJIYA"
+      ],
+      "cook_minutes": 15,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_PULAO": {
       "id": "DISH_PULAO",
@@ -2025,12 +3215,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_GUJIYA",
+        "DISH_FRUIT_BOWL",
+        "DISH_DAL_ROTI",
+        "DISH_TINDA",
+        "DISH_OMLETTE",
+        "DISH_LADOO",
+        "DISH_BHINDI",
+        "DISH_CHOLE"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_RAJMA_CHAWAL": {
       "id": "DISH_RAJMA_CHAWAL",
@@ -2048,12 +3264,20 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_RASAM_RICE": {
       "id": "DISH_RASAM_RICE",
@@ -2071,12 +3295,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_RICE_AND_SAMBAR": {
       "id": "DISH_RICE_AND_SAMBAR",
@@ -2094,12 +3326,20 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_RICE_DAL": {
       "id": "DISH_RICE_DAL",
@@ -2120,12 +3360,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_BHINDI",
+        "DISH_UPMA",
+        "DISH_PANEER_BUTTER",
+        "DISH_SPROUTS",
+        "DISH_NUTS",
+        "DISH_FRUIT_BOWL",
+        "DISH_DALIA",
+        "DISH_CHOLE"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_ROTI_AND_SABZI": {
       "id": "DISH_ROTI_AND_SABZI",
@@ -2143,12 +3409,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_SATTU_PARATHA": {
       "id": "DISH_SATTU_PARATHA",
@@ -2180,12 +3454,25 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "paratha_roti"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild"
+      ],
+      "spice_level": 2,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 30,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_SEVAI": {
       "id": "DISH_SEVAI",
@@ -2205,12 +3492,38 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_PANEER_BUTTER",
+        "DISH_RICE_DAL",
+        "DISH_YOGURT",
+        "DISH_KHICHDI",
+        "DISH_SIMPLE_SABZI",
+        "DISH_SPROUTS",
+        "DISH_MUTTON_CURRY",
+        "DISH_IDLI"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_SEV_TOMATO_SHAAK": {
       "id": "DISH_SEV_TOMATO_SHAAK",
@@ -2228,12 +3541,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_SHUKTO": {
       "id": "DISH_SHUKTO",
@@ -2266,12 +3587,27 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": 45,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_SIMPLE_SABZI": {
       "id": "DISH_SIMPLE_SABZI",
@@ -2292,12 +3628,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_RICE_DAL",
+        "DISH_DALIA",
+        "DISH_YOGURT",
+        "DISH_POHA",
+        "DISH_PARATHA",
+        "DISH_FISH_CURRY",
+        "DISH_MUTTON_CURRY",
+        "DISH_PANEER_BUTTER"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_SOUP": {
       "id": "DISH_SOUP",
@@ -2319,12 +3681,38 @@
         "snack",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CURD_RICE",
+        "DISH_POHA",
+        "DISH_SPROUTS",
+        "DISH_FRUIT_BOWL",
+        "DISH_TURAI",
+        "DISH_PANEER_BUTTER",
+        "DISH_DHOKLA",
+        "DISH_SIMPLE_SABZI"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_SPROUTS": {
       "id": "DISH_SPROUTS",
@@ -2344,12 +3732,38 @@
       "meal_slots": [
         "snack"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SOUP",
+        "DISH_CURD_RICE",
+        "DISH_MUTTON_CURRY",
+        "DISH_DAL_ROTI",
+        "DISH_KHICHDI",
+        "DISH_DOSA",
+        "DISH_OMLETTE",
+        "DISH_LAUKI"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_THEPLA": {
       "id": "DISH_THEPLA",
@@ -2382,12 +3796,45 @@
         "breakfast",
         "snack"
       ],
+      "dish_categories": [
+        "paratha_roti"
+      ],
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_BEANS",
+        "DISH_CHOLE",
+        "DISH_DALIA",
+        "DISH_TINDA",
+        "DISH_APPAM",
+        "DISH_KHICHDI",
+        "DISH_LAUKI",
+        "DISH_MODAK"
+      ],
+      "cook_minutes": 30,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_TINDA": {
       "id": "DISH_TINDA",
@@ -2408,12 +3855,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_RICE_DAL",
+        "DISH_TURAI",
+        "DISH_UTTAPAM",
+        "DISH_POHA",
+        "DISH_MUTTON_CURRY",
+        "DISH_FRUIT_BOWL",
+        "DISH_GUJIYA",
+        "DISH_MODAK"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_TURAI": {
       "id": "DISH_TURAI",
@@ -2434,12 +3907,38 @@
         "lunch",
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_THEPLA",
+        "DISH_DOSA",
+        "DISH_MODAK",
+        "DISH_IDLI",
+        "DISH_UTTAPAM",
+        "DISH_SIMPLE_SABZI",
+        "DISH_KHICHDI",
+        "DISH_TINDA"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_UPMA": {
       "id": "DISH_UPMA",
@@ -2472,12 +3971,46 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_FRUIT_BOWL",
+        "DISH_CHICKEN_CURRY",
+        "DISH_POHA",
+        "DISH_KHICHDI",
+        "DISH_NUTS",
+        "DISH_PARATHA",
+        "DISH_SPROUTS",
+        "DISH_CHOLE"
+      ],
+      "cook_minutes": 20,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_UTTAPAM": {
       "id": "DISH_UTTAPAM",
@@ -2506,12 +4039,45 @@
       "meal_slots": [
         "breakfast"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_profiles": [
+        "chilli_forward",
+        "mild"
+      ],
+      "spice_level": 1,
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_DOSA",
+        "DISH_THEPLA",
+        "DISH_TINDA",
+        "DISH_IDLI",
+        "DISH_MUTTON_CURRY",
+        "DISH_SPROUTS",
+        "DISH_CURD_RICE"
+      ],
+      "cook_minutes": 30,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_VANGYACHE_BHARIT": {
       "id": "DISH_VANGYACHE_BHARIT",
@@ -2529,12 +4095,20 @@
       "meal_slots": [
         "dinner"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_VARAN_BHAAT": {
       "id": "DISH_VARAN_BHAAT",
@@ -2552,12 +4126,20 @@
       "meal_slots": [
         "lunch"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     },
     "DISH_YOGURT": {
       "id": "DISH_YOGURT",
@@ -2578,12 +4160,38 @@
         "snack",
         "breakfast"
       ],
+      "dish_categories": [],
+      "spice_profiles": [],
+      "spice_level": null,
+      "nutrition_traits": [],
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SIMPLE_SABZI",
+        "DISH_APPAM",
+        "DISH_NUTS",
+        "DISH_UTTAPAM",
+        "DISH_CURD_RICE",
+        "DISH_PARATHA",
+        "DISH_IDLI",
+        "DISH_LAUKI"
+      ],
+      "cook_minutes": null,
       "pantry_match": 0.0,
       "nutrition_fit": 0.5,
       "freshness": 0.5,
       "collaborative_score": 0.5,
       "popularity": 0.0,
-      "ontology_version": "indian-food-ontology-v1"
+      "ontology_version": "indian-food-ontology-v2"
     }
   },
   "relations": {
@@ -2602,8 +4210,8 @@
       "DISH_PALAK_PANEER",
       "DISH_PANEER_BUTTER",
       "DISH_SATTU_PARATHA",
-      "DISH_KHICHDI",
       "DISH_GHUGNI",
+      "DISH_KHICHDI",
       "DISH_PESARATTU",
       "DISH_MASALA_DOSA"
     ],
@@ -2625,7 +4233,7 @@
       "DISH_LEMON_RICE",
       "DISH_PESARATTU",
       "DISH_IDIYAPPAM",
-      "DISH_FAFDA_JALEBI"
+      "DISH_MASALA_DOSA"
     ],
     "DISH_BEANS": [
       "DISH_BHINDI",
@@ -2642,10 +4250,10 @@
       "DISH_MISAL_PAV",
       "DISH_PAV_BHAJI",
       "DISH_MODAK",
-      "DISH_DHOKLA",
       "DISH_KADHI_PAKORA",
-      "DISH_FAFDA_JALEBI",
-      "DISH_CHICKEN_XACUTI"
+      "DISH_DHOKLA",
+      "DISH_CHICKEN_XACUTI",
+      "DISH_PALAK_PANEER"
     ],
     "DISH_BHINDI": [
       "DISH_BEANS",
@@ -2659,13 +4267,13 @@
     ],
     "DISH_BISI_BELE_BATH": [
       "DISH_DAL_DHOKLI",
+      "DISH_LEMON_RICE",
       "DISH_MASALA_DOSA",
-      "DISH_CHICKEN_CHETTINAD",
       "DISH_DALMA",
       "DISH_KADHI_PAKORA",
-      "DISH_LEMON_RICE",
-      "DISH_GOAN_FISH_CURRY",
-      "DISH_KHICHDI"
+      "DISH_KHICHDI",
+      "DISH_CHICKEN_CHETTINAD",
+      "DISH_GOAN_FISH_CURRY"
     ],
     "DISH_CHAPATI_AND_KURMA": [
       "DISH_DAL_TADKA_AND_PHULKA",
@@ -2700,12 +4308,12 @@
     "DISH_CHICKEN_CHETTINAD": [
       "DISH_GOAN_FISH_CURRY",
       "DISH_CHICKEN_XACUTI",
-      "DISH_BISI_BELE_BATH",
       "DISH_KOSHA_MANGSHO",
-      "DISH_PAV_BHAJI",
-      "DISH_SATTU_PARATHA",
+      "DISH_BISI_BELE_BATH",
       "DISH_KADHI_PAKORA",
-      "DISH_MACHHER_JHOL_AND_RICE"
+      "DISH_PAV_BHAJI",
+      "DISH_MUTTON_ROGAN_JOSH",
+      "DISH_PANEER_BUTTER"
     ],
     "DISH_CHICKEN_CURRY": [
       "DISH_MUTTON_CURRY",
@@ -2729,13 +4337,13 @@
     ],
     "DISH_CHICKEN_XACUTI": [
       "DISH_GOAN_FISH_CURRY",
-      "DISH_BHAKRI_AND_PITHLA",
       "DISH_CHICKEN_CHETTINAD",
+      "DISH_BHAKRI_AND_PITHLA",
       "DISH_MUTTON_ROGAN_JOSH",
       "DISH_MISAL_PAV",
       "DISH_MURI_GHONTO",
       "DISH_DAL_DHOKLI",
-      "DISH_POHA"
+      "DISH_MODAK"
     ],
     "DISH_CHILLA": [
       "DISH_DALIA",
@@ -2774,8 +4382,8 @@
       "DISH_IDLI",
       "DISH_APPAM",
       "DISH_PESARATTU",
-      "DISH_MASALA_DOSA",
-      "DISH_DHOKLA"
+      "DISH_DHOKLA",
+      "DISH_MASALA_DOSA"
     ],
     "DISH_DALIA": [
       "DISH_CHILLA",
@@ -2790,11 +4398,11 @@
     "DISH_DALMA": [
       "DISH_SHUKTO",
       "DISH_KOSHA_MANGSHO",
+      "DISH_DAL_DHOKLI",
       "DISH_GHUGNI",
       "DISH_ALOO_POSTO",
       "DISH_BISI_BELE_BATH",
       "DISH_MURI_GHONTO",
-      "DISH_DAL_DHOKLI",
       "DISH_KHICHDI"
     ],
     "DISH_DAL_DHOKLI": [
@@ -2805,7 +4413,7 @@
       "DISH_GOAN_FISH_CURRY",
       "DISH_PAV_BHAJI",
       "DISH_POHA",
-      "DISH_MISAL_PAV"
+      "DISH_DALMA"
     ],
     "DISH_DAL_MAKHANI_AND_ROTI": [
       "DISH_CHHENAGAJA",
@@ -2845,7 +4453,7 @@
       "DISH_MISAL_PAV",
       "DISH_BHAKRI_AND_PITHLA",
       "DISH_CURD_RICE",
-      "DISH_PAV_BHAJI"
+      "DISH_UPMA"
     ],
     "DISH_DOSA": [
       "DISH_CHILLA",
@@ -2864,8 +4472,8 @@
       "DISH_POHA",
       "DISH_MISAL_PAV",
       "DISH_BHAKRI_AND_PITHLA",
-      "DISH_OMLETTE",
-      "DISH_MODAK"
+      "DISH_MODAK",
+      "DISH_APPAM"
     ],
     "DISH_FISH_CURRY": [
       "DISH_BEANS",
@@ -2909,13 +4517,13 @@
     ],
     "DISH_GOAN_FISH_CURRY": [
       "DISH_CHICKEN_XACUTI",
+      "DISH_CHICKEN_CHETTINAD",
       "DISH_DAL_DHOKLI",
       "DISH_PAV_BHAJI",
-      "DISH_CHICKEN_CHETTINAD",
       "DISH_KOSHA_MANGSHO",
-      "DISH_MISAL_PAV",
       "DISH_BISI_BELE_BATH",
-      "DISH_THEPLA"
+      "DISH_MISAL_PAV",
+      "DISH_BHAKRI_AND_PITHLA"
     ],
     "DISH_GUJARATI_THALI": [
       "DISH_BISI_BELE_BATH",
@@ -2929,8 +4537,8 @@
     ],
     "DISH_GUJIYA": [
       "DISH_OMLETTE",
-      "DISH_LADOO",
       "DISH_MODAK",
+      "DISH_LADOO",
       "DISH_BEANS",
       "DISH_BHINDI",
       "DISH_CHILLA",
@@ -2939,10 +4547,10 @@
     ],
     "DISH_IDIYAPPAM": [
       "DISH_IDLI",
-      "DISH_CURD_RICE",
       "DISH_APPAM",
-      "DISH_PESARATTU",
       "DISH_UTTAPAM",
+      "DISH_PESARATTU",
+      "DISH_CURD_RICE",
       "DISH_UPMA",
       "DISH_LEMON_RICE",
       "DISH_KHICHDI"
@@ -2985,7 +4593,7 @@
       "DISH_KHICHDI",
       "DISH_LEMON_RICE",
       "DISH_CURD_RICE",
-      "DISH_BISI_BELE_BATH"
+      "DISH_MASALA_DOSA"
     ],
     "DISH_KANDA_POHA": [
       "DISH_AJWAIN_PARATHA",
@@ -3002,10 +4610,10 @@
       "DISH_PANEER_BUTTER",
       "DISH_ALOO_PARATHA",
       "DISH_PALAK_PANEER",
-      "DISH_MUTTON_ROGAN_JOSH",
-      "DISH_DALMA",
       "DISH_BISI_BELE_BATH",
-      "DISH_PESARATTU"
+      "DISH_CURD_RICE",
+      "DISH_DALMA",
+      "DISH_LEMON_RICE"
     ],
     "DISH_KHICHDI_KADHI": [
       "DISH_MIXED_VEG_AND_ROTI",
@@ -3053,9 +4661,9 @@
       "DISH_UTTAPAM",
       "DISH_IDLI",
       "DISH_APPAM",
+      "DISH_POHA",
       "DISH_KADHI_PAKORA",
-      "DISH_PESARATTU",
-      "DISH_MASALA_DOSA"
+      "DISH_PESARATTU"
     ],
     "DISH_LUCHI_ALOO_DUM": [
       "DISH_IDLI_SAMBAR",
@@ -3091,11 +4699,11 @@
       "DISH_POHA",
       "DISH_UTTAPAM",
       "DISH_UPMA",
-      "DISH_CURD_RICE",
-      "DISH_MISAL_PAV",
-      "DISH_GHUGNI",
       "DISH_PESARATTU",
-      "DISH_OMLETTE"
+      "DISH_CURD_RICE",
+      "DISH_GHUGNI",
+      "DISH_LEMON_RICE",
+      "DISH_IDLI"
     ],
     "DISH_MISAL_PAV": [
       "DISH_POHA",
@@ -3118,12 +4726,12 @@
       "DISH_RASAM_RICE"
     ],
     "DISH_MODAK": [
-      "DISH_BHAKRI_AND_PITHLA",
       "DISH_POHA",
-      "DISH_MISAL_PAV",
+      "DISH_BHAKRI_AND_PITHLA",
       "DISH_PAV_BHAJI",
-      "DISH_DAL_DHOKLI",
+      "DISH_MISAL_PAV",
       "DISH_GUJIYA",
+      "DISH_DAL_DHOKLI",
       "DISH_FAFDA_JALEBI",
       "DISH_THEPLA"
     ],
@@ -3133,9 +4741,9 @@
       "DISH_GHUGNI",
       "DISH_SHUKTO",
       "DISH_DALMA",
-      "DISH_MUTTON_ROGAN_JOSH",
       "DISH_PALAK_PANEER",
-      "DISH_CHICKEN_XACUTI"
+      "DISH_MUTTON_ROGAN_JOSH",
+      "DISH_KHICHDI"
     ],
     "DISH_MUTTON_CURRY": [
       "DISH_CHICKEN_CURRY",
@@ -3151,11 +4759,11 @@
       "DISH_PALAK_PANEER",
       "DISH_PANEER_BUTTER",
       "DISH_CHICKEN_XACUTI",
+      "DISH_KADHI_PAKORA",
+      "DISH_KOSHA_MANGSHO",
       "DISH_KHICHDI",
       "DISH_MURI_GHONTO",
-      "DISH_ALOO_PARATHA",
-      "DISH_KADHI_PAKORA",
-      "DISH_KOSHA_MANGSHO"
+      "DISH_ALOO_PARATHA"
     ],
     "DISH_NUTS": [
       "DISH_FRUIT_BOWL",
@@ -3170,11 +4778,11 @@
     "DISH_OMLETTE": [
       "DISH_GUJIYA",
       "DISH_UTTAPAM",
-      "DISH_GHUGNI",
       "DISH_POHA",
+      "DISH_GHUGNI",
       "DISH_MASALA_DOSA",
-      "DISH_MISAL_PAV",
       "DISH_PESARATTU",
+      "DISH_MISAL_PAV",
       "DISH_UPMA"
     ],
     "DISH_PALAK_PANEER": [
@@ -3182,8 +4790,8 @@
       "DISH_KADHI_PAKORA",
       "DISH_ALOO_PARATHA",
       "DISH_MUTTON_ROGAN_JOSH",
-      "DISH_KHICHDI",
       "DISH_BHAKRI_AND_PITHLA",
+      "DISH_KHICHDI",
       "DISH_MURI_GHONTO",
       "DISH_GHUGNI"
     ],
@@ -3194,8 +4802,8 @@
       "DISH_KHICHDI",
       "DISH_MUTTON_ROGAN_JOSH",
       "DISH_PAV_BHAJI",
-      "DISH_CURD_RICE",
-      "DISH_BEANS"
+      "DISH_KOSHA_MANGSHO",
+      "DISH_CURD_RICE"
     ],
     "DISH_PARATHA": [
       "DISH_CHILLA",
@@ -3212,30 +4820,30 @@
       "DISH_POHA",
       "DISH_BHAKRI_AND_PITHLA",
       "DISH_MODAK",
-      "DISH_DAL_DHOKLI",
       "DISH_GOAN_FISH_CURRY",
+      "DISH_DAL_DHOKLI",
       "DISH_DHOKLA",
       "DISH_PANEER_BUTTER"
     ],
     "DISH_PESARATTU": [
       "DISH_UTTAPAM",
+      "DISH_IDLI",
       "DISH_UPMA",
       "DISH_CURD_RICE",
-      "DISH_IDLI",
       "DISH_APPAM",
+      "DISH_MASALA_DOSA",
       "DISH_LEMON_RICE",
-      "DISH_GHUGNI",
-      "DISH_MASALA_DOSA"
+      "DISH_GHUGNI"
     ],
     "DISH_POHA": [
       "DISH_MISAL_PAV",
       "DISH_BHAKRI_AND_PITHLA",
       "DISH_PAV_BHAJI",
       "DISH_MODAK",
-      "DISH_MASALA_DOSA",
       "DISH_DHOKLA",
-      "DISH_FAFDA_JALEBI",
-      "DISH_OMLETTE"
+      "DISH_MASALA_DOSA",
+      "DISH_UPMA",
+      "DISH_FAFDA_JALEBI"
     ],
     "DISH_PULAO": [
       "DISH_BEANS",
@@ -3304,7 +4912,7 @@
       "DISH_UTTAPAM",
       "DISH_UPMA",
       "DISH_GHUGNI",
-      "DISH_MISAL_PAV",
+      "DISH_OMLETTE",
       "DISH_PESARATTU"
     ],
     "DISH_SEVAI": [
@@ -3333,9 +4941,9 @@
       "DISH_GHUGNI",
       "DISH_MURI_GHONTO",
       "DISH_DALMA",
-      "DISH_PAV_BHAJI",
       "DISH_KADHI_PAKORA",
-      "DISH_DAL_DHOKLI"
+      "DISH_PAV_BHAJI",
+      "DISH_PANEER_BUTTER"
     ],
     "DISH_SIMPLE_SABZI": [
       "DISH_BEANS",
@@ -3371,10 +4979,10 @@
       "DISH_DHOKLA",
       "DISH_FAFDA_JALEBI",
       "DISH_DAL_DHOKLI",
-      "DISH_MISAL_PAV",
       "DISH_POHA",
+      "DISH_MISAL_PAV",
       "DISH_BHAKRI_AND_PITHLA",
-      "DISH_PAV_BHAJI",
+      "DISH_ALOO_PARATHA",
       "DISH_MODAK"
     ],
     "DISH_TINDA": [
@@ -3398,20 +5006,20 @@
       "DISH_TINDA"
     ],
     "DISH_UPMA": [
-      "DISH_UTTAPAM",
       "DISH_CURD_RICE",
-      "DISH_IDLI",
+      "DISH_UTTAPAM",
       "DISH_LEMON_RICE",
+      "DISH_IDLI",
       "DISH_APPAM",
       "DISH_PESARATTU",
-      "DISH_MASALA_DOSA",
-      "DISH_POHA"
+      "DISH_POHA",
+      "DISH_MASALA_DOSA"
     ],
     "DISH_UTTAPAM": [
-      "DISH_UPMA",
       "DISH_IDLI",
-      "DISH_CURD_RICE",
+      "DISH_UPMA",
       "DISH_APPAM",
+      "DISH_CURD_RICE",
       "DISH_LEMON_RICE",
       "DISH_PESARATTU",
       "DISH_MASALA_DOSA",

@@ -1,0 +1,38 @@
+{
+  "format": "foofoo-lightfm-v2",
+  "model_type": "LightFM-WARP-hybrid",
+  "model_version": "sha256:a062d4cbd7b71e958844361113e14596b2401262fc0736e4917e853742fe72f6",
+  "created_at": "2026-08-07T08:03:13.379391+00:00",
+  "synthetic_only": true,
+  "promotion_gate_passed": true,
+  "promotion_target": "shadow_challenger",
+  "production_eligible": false,
+  "activation_scope": "shadow_validation_only",
+  "epochs": 60,
+  "components": 64,
+  "seed": 20260807,
+  "train_interactions": 26937,
+  "explicit_negative_events": 17459,
+  "negative_affected_pairs": 6174,
+  "holdout_interactions": 4219,
+  "metrics": {
+    "evaluated_households": 4219.0,
+    "recall_at_10": 0.10926759895709884,
+    "precision_at_10": 0.010926759895709884,
+    "ndcg_at_10": 0.039252372036401195,
+    "catalog_coverage": 0.6046511627906976
+  },
+  "popularity_baseline": {
+    "evaluated_households": 4219.0,
+    "recall_at_10": 0.0350794027020621,
+    "precision_at_10": 0.00350794027020621,
+    "ndcg_at_10": 0.014906346307064085,
+    "catalog_coverage": 0.13953488372093023
+  },
+  "metric_deltas": {
+    "recall_at_10": 0.07418819625503674,
+    "precision_at_10": 0.007418819625503674,
+    "ndcg_at_10": 0.024346025729337112,
+    "catalog_coverage": 0.4651162790697674
+  }
+}

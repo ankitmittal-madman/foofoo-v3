@@ -69,6 +69,23 @@ def test_region_household_pantry_and_repetition_change_ranking():
     assert top_id(request([familiar, novel], recent_meals=["familiar"])) == "novel"
 
 
+def test_weekly_schedule_leftover_and_occasion_signals_change_ranking():
+    quick = candidate("quick", ingredients=["rice"], cook_minutes=15)
+    festive = candidate("festive", occasions=["diwali"], cook_minutes=90)
+    assert (
+        top_id(
+            request(
+                [festive, quick],
+                weekly_meals=["festive"],
+                leftover_items=["rice"],
+                available_cook_minutes=20,
+            )
+        )
+        == "quick"
+    )
+    assert top_id(request([quick, festive], occasion="diwali")) == "festive"
+
+
 def test_meal_slot_and_allergy_are_hard_filters():
     unsafe = candidate("unsafe", ingredients=["groundnut"], collaborative_score=1.0)
     wrong_slot = candidate("breakfast", meal_slots=["breakfast"], collaborative_score=1.0)

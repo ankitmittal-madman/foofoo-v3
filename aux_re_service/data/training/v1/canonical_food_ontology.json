@@ -1,6 +1,6 @@
 {
-  "version": "indian-food-ontology-v1",
-  "generated_at": "2026-08-07T07:10:08.466858+00:00",
+  "version": "indian-food-ontology-v2",
+  "generated_at": "2026-08-07T08:00:56.247379+00:00",
   "nodes": [
     {
       "id": "DISH_AJWAIN_PARATHA",
@@ -83,6 +83,11 @@
       "name": "salt"
     },
     {
+      "id": "ALLERGY_WHEAT",
+      "type": "allergy",
+      "name": "wheat"
+    },
+    {
       "id": "CUISINE_PUNJABI",
       "type": "cuisine",
       "name": "punjabi"
@@ -101,6 +106,26 @@
       "id": "COOKING_TECHNIQUE_SHALLOW_FRIED",
       "type": "cooking_technique",
       "name": "shallow_fried"
+    },
+    {
+      "id": "MEAL_CLASS_PARATHA_ROTI",
+      "type": "meal_class",
+      "name": "paratha_roti"
+    },
+    {
+      "id": "SPICE_PROFILE_CHILLI_FORWARD",
+      "type": "spice_profile",
+      "name": "chilli_forward"
+    },
+    {
+      "id": "SPICE_PROFILE_MILD",
+      "type": "spice_profile",
+      "name": "mild"
+    },
+    {
+      "id": "SPICE_PROFILE_TEMPERING_SPICES",
+      "type": "spice_profile",
+      "name": "tempering_spices"
     },
     {
       "id": "DISH_ALOO_POSTO",
@@ -128,6 +153,11 @@
       "name": "mustard_oil"
     },
     {
+      "id": "ALLERGY_MUSTARD",
+      "type": "allergy",
+      "name": "mustard"
+    },
+    {
       "id": "CUISINE_BENGALI",
       "type": "cuisine",
       "name": "bengali"
@@ -146,6 +176,11 @@
       "id": "COOKING_TECHNIQUE_SAUTEED",
       "type": "cooking_technique",
       "name": "sauteed"
+    },
+    {
+      "id": "MEAL_CLASS_DRY_SABZI",
+      "type": "meal_class",
+      "name": "dry_sabzi"
     },
     {
       "id": "DISH_APPAM",
@@ -168,6 +203,11 @@
       "name": "sugar"
     },
     {
+      "id": "ALLERGY_DAIRY",
+      "type": "allergy",
+      "name": "dairy"
+    },
+    {
       "id": "CUISINE_TAMIL",
       "type": "cuisine",
       "name": "tamil"
@@ -181,6 +221,51 @@
       "id": "COOKING_TECHNIQUE_FERMENTED_COOK",
       "type": "cooking_technique",
       "name": "fermented_cook"
+    },
+    {
+      "id": "MEAL_CLASS_DOSA_IDLI",
+      "type": "meal_class",
+      "name": "dosa_idli"
+    },
+    {
+      "id": "NUTRITION_TRAIT_CONTAINS_DAIRY",
+      "type": "nutrition_trait",
+      "name": "contains_dairy"
+    },
+    {
+      "id": "SEASON_MONSOON",
+      "type": "season",
+      "name": "monsoon"
+    },
+    {
+      "id": "SEASON_SUMMER",
+      "type": "season",
+      "name": "summer"
+    },
+    {
+      "id": "SEASON_WINTER",
+      "type": "season",
+      "name": "winter"
+    },
+    {
+      "id": "OCCASION_DIWALI",
+      "type": "occasion",
+      "name": "diwali"
+    },
+    {
+      "id": "OCCASION_EID",
+      "type": "occasion",
+      "name": "eid"
+    },
+    {
+      "id": "OCCASION_NAVRATRI",
+      "type": "occasion",
+      "name": "navratri"
+    },
+    {
+      "id": "OCCASION_POOJA",
+      "type": "occasion",
+      "name": "pooja"
     },
     {
       "id": "DISH_BEANS",
@@ -248,6 +333,21 @@
       "name": "roasted"
     },
     {
+      "id": "MEAL_CLASS_BREAD",
+      "type": "meal_class",
+      "name": "bread"
+    },
+    {
+      "id": "MEAL_CLASS_CURRY",
+      "type": "meal_class",
+      "name": "curry"
+    },
+    {
+      "id": "NUTRITION_TRAIT_CONTAINS_MILLET",
+      "type": "nutrition_trait",
+      "name": "contains_millet"
+    },
+    {
       "id": "DISH_BHINDI",
       "type": "dish",
       "name": "Bhindi Sabzi"
@@ -283,6 +383,11 @@
       "name": "cashew"
     },
     {
+      "id": "ALLERGY_TREE_NUT",
+      "type": "allergy",
+      "name": "tree_nut"
+    },
+    {
       "id": "CUISINE_KARNATAKA",
       "type": "cuisine",
       "name": "karnataka"
@@ -306,6 +411,16 @@
       "id": "COOKING_TECHNIQUE_TEMPERED",
       "type": "cooking_technique",
       "name": "tempered"
+    },
+    {
+      "id": "MEAL_CLASS_RICE",
+      "type": "meal_class",
+      "name": "rice"
+    },
+    {
+      "id": "NUTRITION_TRAIT_CONTAINS_PULSE",
+      "type": "nutrition_trait",
+      "name": "contains_pulse"
     },
     {
       "id": "DISH_CHAPATI_AND_KURMA",
@@ -388,6 +503,21 @@
       "name": "west bengal"
     },
     {
+      "id": "SPICE_PROFILE_HOT",
+      "type": "spice_profile",
+      "name": "hot"
+    },
+    {
+      "id": "SPICE_PROFILE_WARMING_WHOLE_SPICES",
+      "type": "spice_profile",
+      "name": "warming_whole_spices"
+    },
+    {
+      "id": "NUTRITION_TRAIT_CONTAINS_MEAT",
+      "type": "nutrition_trait",
+      "name": "contains_meat"
+    },
+    {
       "id": "DISH_CHICKEN_CURRY",
       "type": "dish",
       "name": "Chicken Curry Rice"
@@ -426,6 +556,11 @@
       "id": "CUISINE_GOAN",
       "type": "cuisine",
       "name": "goan"
+    },
+    {
+      "id": "SPICE_PROFILE_MEDIUM",
+      "type": "spice_profile",
+      "name": "medium"
     },
     {
       "id": "DISH_CHILLA",
@@ -488,6 +623,11 @@
       "name": "odia"
     },
     {
+      "id": "MEAL_CLASS_DAL_LENTIL",
+      "type": "meal_class",
+      "name": "dal_lentil"
+    },
+    {
       "id": "DISH_DAL_DHOKLI",
       "type": "dish",
       "name": "Dal Dhokli"
@@ -500,6 +640,11 @@
     {
       "id": "INGREDIENT_PEANUT",
       "type": "ingredient",
+      "name": "peanut"
+    },
+    {
+      "id": "ALLERGY_PEANUT",
+      "type": "allergy",
       "name": "peanut"
     },
     {
@@ -553,6 +698,11 @@
       "name": "steamed"
     },
     {
+      "id": "MEAL_CLASS_SNACK_STARTER",
+      "type": "meal_class",
+      "name": "snack_starter"
+    },
+    {
       "id": "DISH_DOSA",
       "type": "dish",
       "name": "Dosa"
@@ -576,6 +726,11 @@
       "id": "COOKING_TECHNIQUE_DEEP_FRIED",
       "type": "cooking_technique",
       "name": "deep_fried"
+    },
+    {
+      "id": "MEAL_CLASS_SWEET_DESSERT",
+      "type": "meal_class",
+      "name": "sweet_dessert"
     },
     {
       "id": "DISH_FISH_CURRY",
@@ -626,6 +781,16 @@
       "id": "INGREDIENT_KOKUM",
       "type": "ingredient",
       "name": "kokum"
+    },
+    {
+      "id": "ALLERGY_FISH",
+      "type": "allergy",
+      "name": "fish"
+    },
+    {
+      "id": "NUTRITION_TRAIT_CONTAINS_FISH_OR_SEAFOOD",
+      "type": "nutrition_trait",
+      "name": "contains_fish_or_seafood"
     },
     {
       "id": "DISH_GUJARATI_THALI",
@@ -813,6 +978,11 @@
       "name": "bread"
     },
     {
+      "id": "MEAL_CLASS_WHOLE_MEAL",
+      "type": "meal_class",
+      "name": "whole_meal"
+    },
+    {
       "id": "DISH_MIXED_VEG_AND_ROTI",
       "type": "dish",
       "name": "Mixed Veg & Roti"
@@ -863,9 +1033,24 @@
       "name": "egg"
     },
     {
+      "id": "ALLERGY_EGG",
+      "type": "allergy",
+      "name": "egg"
+    },
+    {
       "id": "DIET_TYPE_EGG",
       "type": "diet_type",
       "name": "egg"
+    },
+    {
+      "id": "MEAL_CLASS_EGG_DISH",
+      "type": "meal_class",
+      "name": "egg_dish"
+    },
+    {
+      "id": "NUTRITION_TRAIT_CONTAINS_EGG",
+      "type": "nutrition_trait",
+      "name": "contains_egg"
     },
     {
       "id": "DISH_PALAK_PANEER",
@@ -886,6 +1071,11 @@
       "id": "INGREDIENT_CREAM",
       "type": "ingredient",
       "name": "cream"
+    },
+    {
+      "id": "NUTRITION_TRAIT_CONTAINS_LEAFY_GREEN",
+      "type": "nutrition_trait",
+      "name": "contains_leafy_green"
     },
     {
       "id": "DISH_PANEER_BUTTER",
@@ -1161,6 +1351,11 @@
     },
     {
       "source": "DISH_ALOO_PARATHA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_WHEAT"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
       "relation": "belongs_to",
       "target": "CUISINE_PUNJABI"
     },
@@ -1183,6 +1378,26 @@
       "source": "DISH_ALOO_PARATHA",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_PARATHA_ROTI"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
     },
     {
       "source": "DISH_ALOO_POSTO",
@@ -1221,6 +1436,11 @@
     },
     {
       "source": "DISH_ALOO_POSTO",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
       "relation": "belongs_to",
       "target": "CUISINE_BENGALI"
     },
@@ -1245,6 +1465,26 @@
       "target": "COOKING_TECHNIQUE_SAUTEED"
     },
     {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DRY_SABZI"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
       "source": "DISH_APPAM",
       "relation": "contains",
       "target": "INGREDIENT_RICE_REGULAR"
@@ -1263,6 +1503,11 @@
       "source": "DISH_APPAM",
       "relation": "contains",
       "target": "INGREDIENT_SALT"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
     },
     {
       "source": "DISH_APPAM",
@@ -1287,12 +1532,102 @@
     {
       "source": "DISH_APPAM",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
     },
     {
       "source": "DISH_APPAM",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DOSA_IDLI"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_DHOKLA"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_FISH_CURRY"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_DOSA"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_LADOO"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_DALIA"
     },
     {
       "source": "DISH_BEANS",
@@ -1328,6 +1663,81 @@
       "source": "DISH_BEANS",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "substitutes_for",
+      "target": "DISH_FISH_CURRY"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "substitutes_for",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "substitutes_for",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
     },
     {
       "source": "DISH_BHAKRI_AND_PITHLA",
@@ -1381,6 +1791,11 @@
     },
     {
       "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
       "relation": "belongs_to",
       "target": "CUISINE_MAHARASHTRIAN"
     },
@@ -1402,12 +1817,42 @@
     {
       "source": "DISH_BHAKRI_AND_PITHLA",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_SAUTEED"
+      "target": "COOKING_TECHNIQUE_ROASTED"
     },
     {
       "source": "DISH_BHAKRI_AND_PITHLA",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_ROASTED"
+      "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_BREAD"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_MILLET"
     },
     {
       "source": "DISH_BHINDI",
@@ -1443,6 +1888,81 @@
       "source": "DISH_BHINDI",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "substitutes_for",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "substitutes_for",
+      "target": "DISH_GUJIYA"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "substitutes_for",
+      "target": "DISH_SIMPLE_SABZI"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "substitutes_for",
+      "target": "DISH_RICE_DAL"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
     },
     {
       "source": "DISH_BISI_BELE_BATH",
@@ -1506,6 +2026,16 @@
     },
     {
       "source": "DISH_BISI_BELE_BATH",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_TREE_NUT"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
       "relation": "belongs_to",
       "target": "CUISINE_KARNATAKA"
     },
@@ -1548,6 +2078,26 @@
       "source": "DISH_BISI_BELE_BATH",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_RICE"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
     },
     {
       "source": "DISH_CHAPATI_AND_KURMA",
@@ -1750,6 +2300,26 @@
       "target": "COOKING_TECHNIQUE_SAUTEED"
     },
     {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_HOT"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_WARMING_WHOLE_SPICES"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_MEAT"
+    },
+    {
       "source": "DISH_CHICKEN_CURRY",
       "relation": "eaten_in",
       "target": "REGION_NORTH"
@@ -1783,6 +2353,81 @@
       "source": "DISH_CHICKEN_CURRY",
       "relation": "compatible_with",
       "target": "DIET_TYPE_NONVEG"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_DHOKLA"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_SEVAI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_TURAI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_LAUKI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_RICE_DAL"
     },
     {
       "source": "DISH_CHICKEN_CURRY_AND_ROTI",
@@ -1915,6 +2560,26 @@
       "target": "COOKING_TECHNIQUE_SAUTEED"
     },
     {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MEDIUM"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_WARMING_WHOLE_SPICES"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_MEAT"
+    },
+    {
       "source": "DISH_CHILLA",
       "relation": "eaten_in",
       "target": "REGION_NORTH"
@@ -1943,6 +2608,81 @@
       "source": "DISH_CHILLA",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "substitutes_for",
+      "target": "DISH_TURAI"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "substitutes_for",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "substitutes_for",
+      "target": "DISH_SEVAI"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "substitutes_for",
+      "target": "DISH_FISH_CURRY"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "substitutes_for",
+      "target": "DISH_DHOKLA"
     },
     {
       "source": "DISH_CHIRA_BHAJA",
@@ -2010,6 +2750,81 @@
       "target": "DIET_TYPE_VEGETARIAN"
     },
     {
+      "source": "DISH_CHOLE",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "substitutes_for",
+      "target": "DISH_UPMA"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "substitutes_for",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "substitutes_for",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
       "source": "DISH_CURD_RICE",
       "relation": "contains",
       "target": "INGREDIENT_RICE_REGULAR"
@@ -2061,6 +2876,16 @@
     },
     {
       "source": "DISH_CURD_RICE",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_CURD_RICE",
       "relation": "belongs_to",
       "target": "CUISINE_TAMIL"
     },
@@ -2088,6 +2913,111 @@
       "source": "DISH_CURD_RICE",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_RICE"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "substitutes_for",
+      "target": "DISH_KHICHDI"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "substitutes_for",
+      "target": "DISH_FISH_CURRY"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "substitutes_for",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "substitutes_for",
+      "target": "DISH_LAUKI"
     },
     {
       "source": "DISH_DALIA",
@@ -2118,6 +3048,81 @@
       "source": "DISH_DALIA",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "substitutes_for",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "substitutes_for",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "substitutes_for",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "substitutes_for",
+      "target": "DISH_DOSA"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
     },
     {
       "source": "DISH_DALMA",
@@ -2195,6 +3200,26 @@
       "target": "COOKING_TECHNIQUE_PRESSURE_COOKED"
     },
     {
+      "source": "DISH_DALMA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DAL_LENTIL"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
+    },
+    {
       "source": "DISH_DAL_DHOKLI",
       "relation": "contains",
       "target": "INGREDIENT_TOOR_DAL"
@@ -2251,6 +3276,21 @@
     },
     {
       "source": "DISH_DAL_DHOKLI",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_PEANUT"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_WHEAT"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
       "relation": "belongs_to",
       "target": "CUISINE_GUJARATI"
     },
@@ -2273,6 +3313,26 @@
       "source": "DISH_DAL_DHOKLI",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_BOILED"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DAL_LENTIL"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
     },
     {
       "source": "DISH_DAL_MAKHANI_AND_ROTI",
@@ -2338,6 +3398,81 @@
       "source": "DISH_DAL_ROTI",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "substitutes_for",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "substitutes_for",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "substitutes_for",
+      "target": "DISH_UPMA"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
     },
     {
       "source": "DISH_DAL_TADKA_AND_PHULKA",
@@ -2431,6 +3566,16 @@
     },
     {
       "source": "DISH_DHOKLA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_DHOKLA",
       "relation": "belongs_to",
       "target": "CUISINE_GUJARATI"
     },
@@ -2457,6 +3602,11 @@
     {
       "source": "DISH_DHOKLA",
       "relation": "cooked_with",
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_STEAMED"
     },
     {
@@ -2466,8 +3616,103 @@
     },
     {
       "source": "DISH_DHOKLA",
-      "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_SNACK_STARTER"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "substitutes_for",
+      "target": "DISH_DOSA"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "substitutes_for",
+      "target": "DISH_RICE_DAL"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "substitutes_for",
+      "target": "DISH_SEVAI"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "substitutes_for",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "substitutes_for",
+      "target": "DISH_IDLI"
     },
     {
       "source": "DISH_DOSA",
@@ -2498,6 +3743,81 @@
       "source": "DISH_DOSA",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "substitutes_for",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "substitutes_for",
+      "target": "DISH_PULAO"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "substitutes_for",
+      "target": "DISH_UPMA"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "substitutes_for",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "substitutes_for",
+      "target": "DISH_APPAM"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "substitutes_for",
+      "target": "DISH_KHICHDI"
     },
     {
       "source": "DISH_FAFDA_JALEBI",
@@ -2546,6 +3866,11 @@
     },
     {
       "source": "DISH_FAFDA_JALEBI",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
       "relation": "belongs_to",
       "target": "CUISINE_GUJARATI"
     },
@@ -2568,6 +3893,26 @@
       "source": "DISH_FAFDA_JALEBI",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_DEEP_FRIED"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_SNACK_STARTER"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_SWEET_DESSERT"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
     },
     {
       "source": "DISH_FISH_CURRY",
@@ -2603,6 +3948,81 @@
       "source": "DISH_FISH_CURRY",
       "relation": "compatible_with",
       "target": "DIET_TYPE_FISH"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_DOSA"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
     },
     {
       "source": "DISH_FISH_PATURI",
@@ -2670,6 +4090,81 @@
       "target": "DIET_TYPE_VEGAN"
     },
     {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "substitutes_for",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "substitutes_for",
+      "target": "DISH_GUJIYA"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "substitutes_for",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "substitutes_for",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "substitutes_for",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "substitutes_for",
+      "target": "DISH_DHOKLA"
+    },
+    {
       "source": "DISH_GHUGNI",
       "relation": "contains",
       "target": "INGREDIENT_GREEN_GRAM_WHOLE"
@@ -2726,6 +4221,11 @@
     },
     {
       "source": "DISH_GHUGNI",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_GHUGNI",
       "relation": "belongs_to",
       "target": "CUISINE_BENGALI"
     },
@@ -2748,6 +4248,26 @@
       "source": "DISH_GHUGNI",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_SNACK_STARTER"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
     },
     {
       "source": "DISH_GOAN_FISH_CURRY",
@@ -2806,6 +4326,11 @@
     },
     {
       "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_FISH"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
       "relation": "belongs_to",
       "target": "CUISINE_GOAN"
     },
@@ -2828,6 +4353,21 @@
       "source": "DISH_GOAN_FISH_CURRY",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_FISH_OR_SEAFOOD"
     },
     {
       "source": "DISH_GUJARATI_THALI",
@@ -2906,6 +4446,11 @@
     },
     {
       "source": "DISH_GUJIYA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_TREE_NUT"
+    },
+    {
+      "source": "DISH_GUJIYA",
       "relation": "belongs_to",
       "target": "CUISINE_STREET_FOOD_GENERIC"
     },
@@ -2943,6 +4488,96 @@
       "source": "DISH_GUJIYA",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_DEEP_FRIED"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_SWEET_DESSERT"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_WARMING_WHOLE_SPICES"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "substitutes_for",
+      "target": "DISH_TURAI"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "substitutes_for",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "substitutes_for",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "substitutes_for",
+      "target": "DISH_FISH_CURRY"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
     },
     {
       "source": "DISH_IDIYAPPAM",
@@ -2985,6 +4620,16 @@
       "target": "COOKING_TECHNIQUE_STEAMED"
     },
     {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DOSA_IDLI"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
       "source": "DISH_IDLI",
       "relation": "contains",
       "target": "INGREDIENT_RICE_REGULAR"
@@ -3022,12 +4667,102 @@
     {
       "source": "DISH_IDLI",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_STEAMED"
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
     },
     {
       "source": "DISH_IDLI",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+      "target": "COOKING_TECHNIQUE_STEAMED"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DOSA_IDLI"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "substitutes_for",
+      "target": "DISH_RICE_DAL"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "substitutes_for",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "substitutes_for",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "substitutes_for",
+      "target": "DISH_DHOKLA"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
     },
     {
       "source": "DISH_IDLI_SAMBAR",
@@ -3141,6 +4876,16 @@
     },
     {
       "source": "DISH_KADHI_PAKORA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
       "relation": "belongs_to",
       "target": "CUISINE_PUNJABI"
     },
@@ -3168,6 +4913,31 @@
       "source": "DISH_KADHI_PAKORA",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
     },
     {
       "source": "DISH_KANDA_POHA",
@@ -3270,6 +5040,101 @@
       "target": "COOKING_TECHNIQUE_TEMPERED"
     },
     {
+      "source": "DISH_KHICHDI",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_RICE"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "substitutes_for",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "substitutes_for",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "substitutes_for",
+      "target": "DISH_PULAO"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "substitutes_for",
+      "target": "DISH_SEVAI"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
       "source": "DISH_KHICHDI_KADHI",
       "relation": "eaten_in",
       "target": "REGION_MAHARASHTRA"
@@ -3371,6 +5236,16 @@
     },
     {
       "source": "DISH_KOSHA_MANGSHO",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
       "relation": "belongs_to",
       "target": "CUISINE_BENGALI"
     },
@@ -3393,6 +5268,31 @@
       "source": "DISH_KOSHA_MANGSHO",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MEDIUM"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_MEAT"
     },
     {
       "source": "DISH_LADOO",
@@ -3423,6 +5323,81 @@
       "source": "DISH_LADOO",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "substitutes_for",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "substitutes_for",
+      "target": "DISH_LAUKI"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "substitutes_for",
+      "target": "DISH_PULAO"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "substitutes_for",
+      "target": "DISH_RICE_DAL"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "substitutes_for",
+      "target": "DISH_CHILLA"
     },
     {
       "source": "DISH_LAUKI",
@@ -3458,6 +5433,81 @@
       "source": "DISH_LAUKI",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "substitutes_for",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "substitutes_for",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "substitutes_for",
+      "target": "DISH_DHOKLA"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
     },
     {
       "source": "DISH_LEMON_RICE",
@@ -3516,6 +5566,16 @@
     },
     {
       "source": "DISH_LEMON_RICE",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_PEANUT"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
       "relation": "belongs_to",
       "target": "CUISINE_TAMIL"
     },
@@ -3538,6 +5598,31 @@
       "source": "DISH_LEMON_RICE",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_RICE"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
     },
     {
       "source": "DISH_LUCHI_ALOO_DUM",
@@ -3686,6 +5771,11 @@
     },
     {
       "source": "DISH_MASALA_DOSA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
       "relation": "belongs_to",
       "target": "CUISINE_UDUPI"
     },
@@ -3722,12 +5812,37 @@
     {
       "source": "DISH_MASALA_DOSA",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
     },
     {
       "source": "DISH_MASALA_DOSA",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DOSA_IDLI"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
     },
     {
       "source": "DISH_MISAL_PAV",
@@ -3801,6 +5916,11 @@
     },
     {
       "source": "DISH_MISAL_PAV",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
       "relation": "belongs_to",
       "target": "CUISINE_MAHARASHTRIAN"
     },
@@ -3828,6 +5948,26 @@
       "source": "DISH_MISAL_PAV",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_WHOLE_MEAL"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_HOT"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
     },
     {
       "source": "DISH_MIXED_VEG_AND_ROTI",
@@ -3915,6 +6055,96 @@
       "target": "COOKING_TECHNIQUE_STEAMED"
     },
     {
+      "source": "DISH_MODAK",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_SWEET_DESSERT"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_WARMING_WHOLE_SPICES"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "substitutes_for",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "substitutes_for",
+      "target": "DISH_SEVAI"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "substitutes_for",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "substitutes_for",
+      "target": "DISH_LAUKI"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "substitutes_for",
+      "target": "DISH_TURAI"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "substitutes_for",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
       "source": "DISH_MURI_GHONTO",
       "relation": "contains",
       "target": "INGREDIENT_FISH_GENERIC"
@@ -3966,6 +6196,16 @@
     },
     {
       "source": "DISH_MURI_GHONTO",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_FISH"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
       "relation": "belongs_to",
       "target": "CUISINE_BENGALI"
     },
@@ -3988,6 +6228,26 @@
       "source": "DISH_MURI_GHONTO",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_WHOLE_MEAL"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_FISH_OR_SEAFOOD"
     },
     {
       "source": "DISH_MUTTON_CURRY",
@@ -4023,6 +6283,81 @@
       "source": "DISH_MUTTON_CURRY",
       "relation": "compatible_with",
       "target": "DIET_TYPE_NONVEG"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_DOSA"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_PULAO"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "substitutes_for",
+      "target": "DISH_SIMPLE_SABZI"
     },
     {
       "source": "DISH_MUTTON_ROGAN_JOSH",
@@ -4096,6 +6431,11 @@
     },
     {
       "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
       "relation": "belongs_to",
       "target": "CUISINE_MUGHLAI"
     },
@@ -4118,6 +6458,31 @@
       "source": "DISH_MUTTON_ROGAN_JOSH",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MEDIUM"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_WARMING_WHOLE_SPICES"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_MEAT"
     },
     {
       "source": "DISH_NUTS",
@@ -4153,6 +6518,81 @@
       "source": "DISH_NUTS",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGAN"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_TURAI"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_APPAM"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
     },
     {
       "source": "DISH_OMLETTE",
@@ -4196,6 +6636,11 @@
     },
     {
       "source": "DISH_OMLETTE",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_EGG"
+    },
+    {
+      "source": "DISH_OMLETTE",
       "relation": "belongs_to",
       "target": "CUISINE_STREET_FOOD_GENERIC"
     },
@@ -4233,6 +6678,101 @@
       "source": "DISH_OMLETTE",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_EGG_DISH"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_EGG"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "substitutes_for",
+      "target": "DISH_TURAI"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "substitutes_for",
+      "target": "DISH_SIMPLE_SABZI"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "substitutes_for",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "substitutes_for",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "substitutes_for",
+      "target": "DISH_SOUP"
     },
     {
       "source": "DISH_PALAK_PANEER",
@@ -4296,6 +6836,11 @@
     },
     {
       "source": "DISH_PALAK_PANEER",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
       "relation": "belongs_to",
       "target": "CUISINE_PUNJABI"
     },
@@ -4323,6 +6868,36 @@
       "source": "DISH_PALAK_PANEER",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_LEAFY_GREEN"
     },
     {
       "source": "DISH_PANEER_BUTTER",
@@ -4391,6 +6966,16 @@
     },
     {
       "source": "DISH_PANEER_BUTTER",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_TREE_NUT"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
       "relation": "belongs_to",
       "target": "CUISINE_PUNJABI"
     },
@@ -4418,6 +7003,101 @@
       "source": "DISH_PANEER_BUTTER",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_LEAFY_GREEN"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "substitutes_for",
+      "target": "DISH_LAUKI"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "substitutes_for",
+      "target": "DISH_APPAM"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "substitutes_for",
+      "target": "DISH_LADOO"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "substitutes_for",
+      "target": "DISH_BHINDI"
     },
     {
       "source": "DISH_PARATHA",
@@ -4448,6 +7128,81 @@
       "source": "DISH_PARATHA",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "substitutes_for",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "substitutes_for",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "substitutes_for",
+      "target": "DISH_GUJIYA"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "substitutes_for",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "substitutes_for",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "substitutes_for",
+      "target": "DISH_SEVAI"
     },
     {
       "source": "DISH_PAV_BHAJI",
@@ -4550,6 +7305,16 @@
       "target": "COOKING_TECHNIQUE_SAUTEED"
     },
     {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_WHOLE_MEAL"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
       "source": "DISH_PESARATTU",
       "relation": "contains",
       "target": "INGREDIENT_MOONG_DAL"
@@ -4615,6 +7380,31 @@
       "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
     },
     {
+      "source": "DISH_PESARATTU",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DOSA_IDLI"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
+    },
+    {
       "source": "DISH_POHA",
       "relation": "contains",
       "target": "INGREDIENT_RICE_FLATTENED"
@@ -4676,6 +7466,16 @@
     },
     {
       "source": "DISH_POHA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_PEANUT"
+    },
+    {
+      "source": "DISH_POHA",
       "relation": "belongs_to",
       "target": "CUISINE_MAHARASHTRIAN"
     },
@@ -4703,6 +7503,101 @@
       "source": "DISH_POHA",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_RICE"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "substitutes_for",
+      "target": "DISH_SEVAI"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "substitutes_for",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "substitutes_for",
+      "target": "DISH_UPMA"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "substitutes_for",
+      "target": "DISH_SIMPLE_SABZI"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "substitutes_for",
+      "target": "DISH_PULAO"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "substitutes_for",
+      "target": "DISH_LADOO"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "substitutes_for",
+      "target": "DISH_GUJIYA"
     },
     {
       "source": "DISH_PULAO",
@@ -4738,6 +7633,81 @@
       "source": "DISH_PULAO",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "substitutes_for",
+      "target": "DISH_GUJIYA"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "substitutes_for",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "substitutes_for",
+      "target": "DISH_LADOO"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "substitutes_for",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
     },
     {
       "source": "DISH_RAJMA_CHAWAL",
@@ -4865,6 +7835,81 @@
       "target": "DIET_TYPE_VEGETARIAN"
     },
     {
+      "source": "DISH_RICE_DAL",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "substitutes_for",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "substitutes_for",
+      "target": "DISH_UPMA"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "substitutes_for",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "substitutes_for",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "substitutes_for",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
       "source": "DISH_ROTI_AND_SABZI",
       "relation": "eaten_in",
       "target": "REGION_MAHARASHTRA"
@@ -4931,6 +7976,11 @@
     },
     {
       "source": "DISH_SATTU_PARATHA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_WHEAT"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
       "relation": "belongs_to",
       "target": "CUISINE_BIHARI"
     },
@@ -4970,6 +8020,21 @@
       "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
     },
     {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_PARATHA_ROTI"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
       "source": "DISH_SEVAI",
       "relation": "eaten_in",
       "target": "REGION_NORTH"
@@ -4998,6 +8063,81 @@
       "source": "DISH_SEVAI",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "substitutes_for",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "substitutes_for",
+      "target": "DISH_RICE_DAL"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "substitutes_for",
+      "target": "DISH_KHICHDI"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "substitutes_for",
+      "target": "DISH_SIMPLE_SABZI"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "substitutes_for",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "substitutes_for",
+      "target": "DISH_IDLI"
     },
     {
       "source": "DISH_SEV_TOMATO_SHAAK",
@@ -5081,6 +8221,16 @@
     },
     {
       "source": "DISH_SHUKTO",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_SHUKTO",
       "relation": "belongs_to",
       "target": "CUISINE_BENGALI"
     },
@@ -5103,6 +8253,26 @@
       "source": "DISH_SHUKTO",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_SAUTEED"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_CURRY"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
     },
     {
       "source": "DISH_SIMPLE_SABZI",
@@ -5138,6 +8308,81 @@
       "source": "DISH_SIMPLE_SABZI",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "substitutes_for",
+      "target": "DISH_RICE_DAL"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "substitutes_for",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "substitutes_for",
+      "target": "DISH_FISH_CURRY"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "substitutes_for",
+      "target": "DISH_PANEER_BUTTER"
     },
     {
       "source": "DISH_SOUP",
@@ -5180,6 +8425,81 @@
       "target": "DIET_TYPE_VEGAN"
     },
     {
+      "source": "DISH_SOUP",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "substitutes_for",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "substitutes_for",
+      "target": "DISH_TURAI"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "substitutes_for",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "substitutes_for",
+      "target": "DISH_DHOKLA"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "substitutes_for",
+      "target": "DISH_SIMPLE_SABZI"
+    },
+    {
       "source": "DISH_SPROUTS",
       "relation": "eaten_in",
       "target": "REGION_NORTH"
@@ -5208,6 +8528,81 @@
       "source": "DISH_SPROUTS",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_KHICHDI"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_DOSA"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "substitutes_for",
+      "target": "DISH_LAUKI"
     },
     {
       "source": "DISH_THEPLA",
@@ -5256,6 +8651,16 @@
     },
     {
       "source": "DISH_THEPLA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_DAIRY"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_WHEAT"
+    },
+    {
+      "source": "DISH_THEPLA",
       "relation": "belongs_to",
       "target": "CUISINE_GUJARATI"
     },
@@ -5285,6 +8690,101 @@
       "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
     },
     {
+      "source": "DISH_THEPLA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_PARATHA_ROTI"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_DAIRY"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "substitutes_for",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "substitutes_for",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "substitutes_for",
+      "target": "DISH_APPAM"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "substitutes_for",
+      "target": "DISH_KHICHDI"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "substitutes_for",
+      "target": "DISH_LAUKI"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
+    },
+    {
       "source": "DISH_TINDA",
       "relation": "eaten_in",
       "target": "REGION_NORTH"
@@ -5320,6 +8820,81 @@
       "target": "DIET_TYPE_VEGETARIAN"
     },
     {
+      "source": "DISH_TINDA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "substitutes_for",
+      "target": "DISH_RICE_DAL"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "substitutes_for",
+      "target": "DISH_TURAI"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "substitutes_for",
+      "target": "DISH_GUJIYA"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
+    },
+    {
       "source": "DISH_TURAI",
       "relation": "eaten_in",
       "target": "REGION_NORTH"
@@ -5353,6 +8928,81 @@
       "source": "DISH_TURAI",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "substitutes_for",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "substitutes_for",
+      "target": "DISH_DOSA"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "substitutes_for",
+      "target": "DISH_MODAK"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "substitutes_for",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "substitutes_for",
+      "target": "DISH_SIMPLE_SABZI"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "substitutes_for",
+      "target": "DISH_KHICHDI"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
     },
     {
       "source": "DISH_UPMA",
@@ -5406,6 +9056,16 @@
     },
     {
       "source": "DISH_UPMA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_MUSTARD"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "incompatible_with",
+      "target": "ALLERGY_TREE_NUT"
+    },
+    {
+      "source": "DISH_UPMA",
       "relation": "belongs_to",
       "target": "CUISINE_TAMIL"
     },
@@ -5433,6 +9093,106 @@
       "source": "DISH_UPMA",
       "relation": "cooked_with",
       "target": "COOKING_TECHNIQUE_TEMPERED"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_RICE"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_TEMPERING_SPICES"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "substitutes_for",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "substitutes_for",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "substitutes_for",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "substitutes_for",
+      "target": "DISH_KHICHDI"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "substitutes_for",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "substitutes_for",
+      "target": "DISH_CHOLE"
     },
     {
       "source": "DISH_UTTAPAM",
@@ -5502,12 +9262,107 @@
     {
       "source": "DISH_UTTAPAM",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
     },
     {
       "source": "DISH_UTTAPAM",
       "relation": "cooked_with",
-      "target": "COOKING_TECHNIQUE_FERMENTED_COOK"
+      "target": "COOKING_TECHNIQUE_SHALLOW_FRIED"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "belongs_to",
+      "target": "MEAL_CLASS_DOSA_IDLI"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_CHILLI_FORWARD"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "has_spice_profile",
+      "target": "SPICE_PROFILE_MILD"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "has_nutrition_trait",
+      "target": "NUTRITION_TRAIT_CONTAINS_PULSE"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_YOGURT"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_DOSA"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_TINDA"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_MUTTON_CURRY"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
     },
     {
       "source": "DISH_VANGYACHE_BHARIT",
@@ -5603,6 +9458,1366 @@
       "source": "DISH_YOGURT",
       "relation": "compatible_with",
       "target": "DIET_TYPE_VEGETARIAN"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "eaten_in",
+      "target": "SEASON_MONSOON"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "eaten_in",
+      "target": "SEASON_SUMMER"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "eaten_in",
+      "target": "SEASON_WINTER"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "served_at",
+      "target": "OCCASION_DIWALI"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "served_at",
+      "target": "OCCASION_EID"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "served_at",
+      "target": "OCCASION_NAVRATRI"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "served_at",
+      "target": "OCCASION_POOJA"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "substitutes_for",
+      "target": "DISH_SIMPLE_SABZI"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "substitutes_for",
+      "target": "DISH_APPAM"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "substitutes_for",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "substitutes_for",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "substitutes_for",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "substitutes_for",
+      "target": "DISH_PARATHA"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "substitutes_for",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "substitutes_for",
+      "target": "DISH_LAUKI"
+    },
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_AJWAIN_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_SATTU_PARATHA"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_GHUGNI"
+    },
+    {
+      "source": "DISH_ALOO_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_PESARATTU"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "similar_to",
+      "target": "DISH_GHUGNI"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "similar_to",
+      "target": "DISH_MURI_GHONTO"
+    },
+    {
+      "source": "DISH_ALOO_POSTO",
+      "relation": "similar_to",
+      "target": "DISH_SHUKTO"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "similar_to",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "similar_to",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_APPAM",
+      "relation": "similar_to",
+      "target": "DISH_PESARATTU"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_BEANS",
+      "relation": "similar_to",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "similar_to",
+      "target": "DISH_KADHI_PAKORA"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "similar_to",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_BHAKRI_AND_PITHLA",
+      "relation": "similar_to",
+      "target": "DISH_MASALA_DOSA"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_BHINDI",
+      "relation": "similar_to",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "similar_to",
+      "target": "DISH_DAL_DHOKLI"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "similar_to",
+      "target": "DISH_LEMON_RICE"
+    },
+    {
+      "source": "DISH_BISI_BELE_BATH",
+      "relation": "similar_to",
+      "target": "DISH_GOAN_FISH_CURRY"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_CHAPATI_AND_KURMA",
+      "relation": "similar_to",
+      "target": "DISH_FISH_PATURI"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY_AND_ROTI"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "similar_to",
+      "target": "DISH_DAL_MAKHANI_AND_ROTI"
+    },
+    {
+      "source": "DISH_CHHENAGAJA",
+      "relation": "similar_to",
+      "target": "DISH_GUJARATI_THALI"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_CHICKEN_BHARTA",
+      "relation": "similar_to",
+      "target": "DISH_FISH_PATURI"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_XACUTI"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "similar_to",
+      "target": "DISH_GOAN_FISH_CURRY"
+    },
+    {
+      "source": "DISH_CHICKEN_CHETTINAD",
+      "relation": "similar_to",
+      "target": "DISH_KOSHA_MANGSHO"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_DAL_ROTI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_CHHENAGAJA"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_DAL_MAKHANI_AND_ROTI"
+    },
+    {
+      "source": "DISH_CHICKEN_CURRY_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_GUJARATI_THALI"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CHETTINAD"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "similar_to",
+      "target": "DISH_GOAN_FISH_CURRY"
+    },
+    {
+      "source": "DISH_CHICKEN_XACUTI",
+      "relation": "similar_to",
+      "target": "DISH_MUTTON_ROGAN_JOSH"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_CHILLA",
+      "relation": "similar_to",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_CHIRA_BHAJA",
+      "relation": "similar_to",
+      "target": "DISH_DALIA"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "similar_to",
+      "target": "DISH_CHHENAGAJA"
+    },
+    {
+      "source": "DISH_CHOLE",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY_AND_ROTI"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "similar_to",
+      "target": "DISH_LEMON_RICE"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "similar_to",
+      "target": "DISH_UPMA"
+    },
+    {
+      "source": "DISH_CURD_RICE",
+      "relation": "similar_to",
+      "target": "DISH_MASALA_DOSA"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_DALIA",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "similar_to",
+      "target": "DISH_DAL_DHOKLI"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "similar_to",
+      "target": "DISH_BISI_BELE_BATH"
+    },
+    {
+      "source": "DISH_DALMA",
+      "relation": "similar_to",
+      "target": "DISH_KHICHDI"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "similar_to",
+      "target": "DISH_BISI_BELE_BATH"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "similar_to",
+      "target": "DISH_DALMA"
+    },
+    {
+      "source": "DISH_DAL_DHOKLI",
+      "relation": "similar_to",
+      "target": "DISH_LEMON_RICE"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_CHHENAGAJA"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY_AND_ROTI"
+    },
+    {
+      "source": "DISH_DAL_MAKHANI_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_GUJARATI_THALI"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_DAL_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_DAL_TADKA_AND_PHULKA",
+      "relation": "similar_to",
+      "target": "DISH_FISH_PATURI"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "similar_to",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "similar_to",
+      "target": "DISH_FAFDA_JALEBI"
+    },
+    {
+      "source": "DISH_DHOKLA",
+      "relation": "similar_to",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_DOSA",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "similar_to",
+      "target": "DISH_DHOKLA"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "similar_to",
+      "target": "DISH_THEPLA"
+    },
+    {
+      "source": "DISH_FAFDA_JALEBI",
+      "relation": "similar_to",
+      "target": "DISH_KADHI_PAKORA"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_FISH_PATURI",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "similar_to",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "similar_to",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_FRUIT_BOWL",
+      "relation": "similar_to",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "similar_to",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "similar_to",
+      "target": "DISH_MURI_GHONTO"
+    },
+    {
+      "source": "DISH_GHUGNI",
+      "relation": "similar_to",
+      "target": "DISH_ALOO_POSTO"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CHETTINAD"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_XACUTI"
+    },
+    {
+      "source": "DISH_GOAN_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_KOSHA_MANGSHO"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "similar_to",
+      "target": "DISH_CHHENAGAJA"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY_AND_ROTI"
+    },
+    {
+      "source": "DISH_GUJARATI_THALI",
+      "relation": "similar_to",
+      "target": "DISH_DAL_MAKHANI_AND_ROTI"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "similar_to",
+      "target": "DISH_MODAK"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "similar_to",
+      "target": "DISH_FAFDA_JALEBI"
+    },
+    {
+      "source": "DISH_GUJIYA",
+      "relation": "similar_to",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "similar_to",
+      "target": "DISH_KHICHDI"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "similar_to",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_IDIYAPPAM",
+      "relation": "similar_to",
+      "target": "DISH_MODAK"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "similar_to",
+      "target": "DISH_APPAM"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "similar_to",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_IDLI",
+      "relation": "similar_to",
+      "target": "DISH_MASALA_DOSA"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_IDLI_SAMBAR",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_KACHORI",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "similar_to",
+      "target": "DISH_BHAKRI_AND_PITHLA"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "similar_to",
+      "target": "DISH_PALAK_PANEER"
+    },
+    {
+      "source": "DISH_KADHI_PAKORA",
+      "relation": "similar_to",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_KANDA_POHA",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "similar_to",
+      "target": "DISH_BISI_BELE_BATH"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "similar_to",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_KHICHDI",
+      "relation": "similar_to",
+      "target": "DISH_DALMA"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_KHICHDI_KADHI",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "similar_to",
+      "target": "DISH_SHUKTO"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "similar_to",
+      "target": "DISH_MURI_GHONTO"
+    },
+    {
+      "source": "DISH_KOSHA_MANGSHO",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CHETTINAD"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "similar_to",
+      "target": "DISH_GUJIYA"
+    },
+    {
+      "source": "DISH_LADOO",
+      "relation": "similar_to",
+      "target": "DISH_MODAK"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_LAUKI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "similar_to",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "similar_to",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_LEMON_RICE",
+      "relation": "similar_to",
+      "target": "DISH_UPMA"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_LUCHI_ALOO_DUM",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "similar_to",
+      "target": "DISH_CHHENAGAJA"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY_AND_ROTI"
+    },
+    {
+      "source": "DISH_MACHHER_JHOL_AND_RICE",
+      "relation": "similar_to",
+      "target": "DISH_DAL_MAKHANI_AND_ROTI"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_MALABAR_FISH_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "similar_to",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "similar_to",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_MASALA_DOSA",
+      "relation": "similar_to",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "similar_to",
+      "target": "DISH_PAV_BHAJI"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "similar_to",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_MISAL_PAV",
+      "relation": "similar_to",
+      "target": "DISH_BHAKRI_AND_PITHLA"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_MIXED_VEG_AND_ROTI",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "similar_to",
+      "target": "DISH_GUJIYA"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "similar_to",
+      "target": "DISH_IDIYAPPAM"
+    },
+    {
+      "source": "DISH_MODAK",
+      "relation": "similar_to",
+      "target": "DISH_DALMA"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "similar_to",
+      "target": "DISH_KOSHA_MANGSHO"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "similar_to",
+      "target": "DISH_GHUGNI"
+    },
+    {
+      "source": "DISH_MURI_GHONTO",
+      "relation": "similar_to",
+      "target": "DISH_ALOO_POSTO"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_MUTTON_CURRY",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_XACUTI"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "similar_to",
+      "target": "DISH_KOSHA_MANGSHO"
+    },
+    {
+      "source": "DISH_MUTTON_ROGAN_JOSH",
+      "relation": "similar_to",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "similar_to",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "similar_to",
+      "target": "DISH_SPROUTS"
+    },
+    {
+      "source": "DISH_NUTS",
+      "relation": "similar_to",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "similar_to",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "similar_to",
+      "target": "DISH_GHUGNI"
+    },
+    {
+      "source": "DISH_OMLETTE",
+      "relation": "similar_to",
+      "target": "DISH_MASALA_DOSA"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "similar_to",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "similar_to",
+      "target": "DISH_KADHI_PAKORA"
+    },
+    {
+      "source": "DISH_PALAK_PANEER",
+      "relation": "similar_to",
+      "target": "DISH_BHAKRI_AND_PITHLA"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "similar_to",
+      "target": "DISH_PALAK_PANEER"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "similar_to",
+      "target": "DISH_KOSHA_MANGSHO"
+    },
+    {
+      "source": "DISH_PANEER_BUTTER",
+      "relation": "similar_to",
+      "target": "DISH_KADHI_PAKORA"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "similar_to",
+      "target": "DISH_MISAL_PAV"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "similar_to",
+      "target": "DISH_PANEER_BUTTER"
+    },
+    {
+      "source": "DISH_PAV_BHAJI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CHETTINAD"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "similar_to",
+      "target": "DISH_UTTAPAM"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "similar_to",
+      "target": "DISH_MASALA_DOSA"
+    },
+    {
+      "source": "DISH_PESARATTU",
+      "relation": "similar_to",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "similar_to",
+      "target": "DISH_MASALA_DOSA"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "similar_to",
+      "target": "DISH_MISAL_PAV"
+    },
+    {
+      "source": "DISH_POHA",
+      "relation": "similar_to",
+      "target": "DISH_LEMON_RICE"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_PULAO",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "similar_to",
+      "target": "DISH_CHHENAGAJA"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY_AND_ROTI"
+    },
+    {
+      "source": "DISH_RAJMA_CHAWAL",
+      "relation": "similar_to",
+      "target": "DISH_DAL_MAKHANI_AND_ROTI"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_RASAM_RICE",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "similar_to",
+      "target": "DISH_CHHENAGAJA"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY_AND_ROTI"
+    },
+    {
+      "source": "DISH_RICE_AND_SAMBAR",
+      "relation": "similar_to",
+      "target": "DISH_DAL_MAKHANI_AND_ROTI"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_RICE_DAL",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_ROTI_AND_SABZI",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_ALOO_PARATHA"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_SATTU_PARATHA",
+      "relation": "similar_to",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_SEVAI",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_SEV_TOMATO_SHAAK",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "similar_to",
+      "target": "DISH_KOSHA_MANGSHO"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "similar_to",
+      "target": "DISH_ALOO_POSTO"
+    },
+    {
+      "source": "DISH_SHUKTO",
+      "relation": "similar_to",
+      "target": "DISH_DALMA"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_SIMPLE_SABZI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_SOUP",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "similar_to",
+      "target": "DISH_FRUIT_BOWL"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "similar_to",
+      "target": "DISH_NUTS"
+    },
+    {
+      "source": "DISH_SPROUTS",
+      "relation": "similar_to",
+      "target": "DISH_SOUP"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "similar_to",
+      "target": "DISH_DHOKLA"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "similar_to",
+      "target": "DISH_FAFDA_JALEBI"
+    },
+    {
+      "source": "DISH_THEPLA",
+      "relation": "similar_to",
+      "target": "DISH_ALOO_PARATHA"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_TINDA",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "similar_to",
+      "target": "DISH_BEANS"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "similar_to",
+      "target": "DISH_BHINDI"
+    },
+    {
+      "source": "DISH_TURAI",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "similar_to",
+      "target": "DISH_CURD_RICE"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "similar_to",
+      "target": "DISH_LEMON_RICE"
+    },
+    {
+      "source": "DISH_UPMA",
+      "relation": "similar_to",
+      "target": "DISH_POHA"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "similar_to",
+      "target": "DISH_IDLI"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "similar_to",
+      "target": "DISH_MASALA_DOSA"
+    },
+    {
+      "source": "DISH_UTTAPAM",
+      "relation": "similar_to",
+      "target": "DISH_OMLETTE"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "similar_to",
+      "target": "DISH_CHAPATI_AND_KURMA"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_BHARTA"
+    },
+    {
+      "source": "DISH_VANGYACHE_BHARIT",
+      "relation": "similar_to",
+      "target": "DISH_DAL_TADKA_AND_PHULKA"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "similar_to",
+      "target": "DISH_CHHENAGAJA"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "similar_to",
+      "target": "DISH_CHICKEN_CURRY_AND_ROTI"
+    },
+    {
+      "source": "DISH_VARAN_BHAAT",
+      "relation": "similar_to",
+      "target": "DISH_DAL_MAKHANI_AND_ROTI"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "similar_to",
+      "target": "DISH_AJWAIN_PARATHA"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "similar_to",
+      "target": "DISH_CHILLA"
+    },
+    {
+      "source": "DISH_YOGURT",
+      "relation": "similar_to",
+      "target": "DISH_CHIRA_BHAJA"
     }
   ],
   "dishes": [
@@ -5632,6 +10847,14 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -5674,6 +10897,20 @@
       "cooking_methods": [
         "shallow_fried"
       ],
+      "dish_categories": [
+        "paratha_roti"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 35,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -5715,6 +10952,20 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "dry_sabzi"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 30,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -5751,8 +11002,40 @@
         "breakfast"
       ],
       "cooking_methods": [
-        "shallow_fried",
-        "fermented_cook"
+        "fermented_cook",
+        "shallow_fried"
+      ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild"
+      ],
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "cook_minutes": 25,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CURD_RICE",
+        "DISH_FRUIT_BOWL",
+        "DISH_DHOKLA",
+        "DISH_IDLI",
+        "DISH_FISH_CURRY",
+        "DISH_DOSA",
+        "DISH_LADOO",
+        "DISH_DALIA"
       ],
       "source_datasets": [
         "dataset_1_catalog",
@@ -5787,6 +11070,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_POHA",
+        "DISH_OMLETTE",
+        "DISH_CHOLE",
+        "DISH_FISH_CURRY",
+        "DISH_CHILLA",
+        "DISH_FRUIT_BOWL",
+        "DISH_CHICKEN_CURRY",
+        "DISH_NUTS"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -5830,9 +11139,26 @@
         "dinner"
       ],
       "cooking_methods": [
-        "sauteed",
-        "roasted"
+        "roasted",
+        "sauteed"
       ],
+      "dish_categories": [
+        "bread",
+        "curry"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_millet"
+      ],
+      "cook_minutes": 20,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -5864,6 +11190,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CURD_RICE",
+        "DISH_DALIA",
+        "DISH_PARATHA",
+        "DISH_GUJIYA",
+        "DISH_SIMPLE_SABZI",
+        "DISH_RICE_DAL",
+        "DISH_OMLETTE",
+        "DISH_UTTAPAM"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -5916,6 +11268,21 @@
         "pressure_cooked",
         "tempered"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 45,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -5946,6 +11313,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -5976,6 +11351,14 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6006,6 +11389,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6055,6 +11446,21 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 4,
+      "spice_profiles": [
+        "hot",
+        "warming_whole_spices"
+      ],
+      "nutrition_traits": [
+        "contains_meat"
+      ],
+      "cook_minutes": 60,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6086,6 +11492,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_DHOKLA",
+        "DISH_CURD_RICE",
+        "DISH_SEVAI",
+        "DISH_TURAI",
+        "DISH_OMLETTE",
+        "DISH_LAUKI",
+        "DISH_UTTAPAM",
+        "DISH_RICE_DAL"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -6117,6 +11549,14 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6164,6 +11604,21 @@
         "roasted",
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 3,
+      "spice_profiles": [
+        "medium",
+        "warming_whole_spices"
+      ],
+      "nutrition_traits": [
+        "contains_meat"
+      ],
+      "cook_minutes": 65,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6194,6 +11649,32 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_TURAI",
+        "DISH_FRUIT_BOWL",
+        "DISH_IDLI",
+        "DISH_MUTTON_CURRY",
+        "DISH_SEVAI",
+        "DISH_TINDA",
+        "DISH_FISH_CURRY",
+        "DISH_DHOKLA"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -6226,6 +11707,14 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6257,6 +11746,32 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_UPMA",
+        "DISH_THEPLA",
+        "DISH_MUTTON_CURRY",
+        "DISH_POHA",
+        "DISH_SPROUTS",
+        "DISH_UTTAPAM",
+        "DISH_FRUIT_BOWL"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -6305,6 +11820,41 @@
       "cooking_methods": [
         "tempered"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_pulse"
+      ],
+      "cook_minutes": 15,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_TINDA",
+        "DISH_MODAK",
+        "DISH_OMLETTE",
+        "DISH_KHICHDI",
+        "DISH_FISH_CURRY",
+        "DISH_BHINDI",
+        "DISH_LAUKI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -6337,6 +11887,32 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_NUTS",
+        "DISH_DAL_ROTI",
+        "DISH_CHILLA",
+        "DISH_CHICKEN_CURRY",
+        "DISH_YOGURT",
+        "DISH_TINDA",
+        "DISH_DOSA",
+        "DISH_UTTAPAM"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -6380,6 +11956,21 @@
       "cooking_methods": [
         "pressure_cooked"
       ],
+      "dish_categories": [
+        "dal_lentil"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 40,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6427,6 +12018,21 @@
       "cooking_methods": [
         "boiled"
       ],
+      "dish_categories": [
+        "dal_lentil"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 50,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6457,6 +12063,14 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6488,6 +12102,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_CHOLE",
+        "DISH_POHA",
+        "DISH_CHICKEN_CURRY",
+        "DISH_MODAK",
+        "DISH_THEPLA",
+        "DISH_UPMA",
+        "DISH_NUTS"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -6519,6 +12159,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6565,9 +12213,43 @@
         "snack"
       ],
       "cooking_methods": [
+        "fermented_cook",
         "steamed",
-        "tempered",
-        "fermented_cook"
+        "tempered"
+      ],
+      "dish_categories": [
+        "snack_starter"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "cook_minutes": 35,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CHOLE",
+        "DISH_DOSA",
+        "DISH_OMLETTE",
+        "DISH_RICE_DAL",
+        "DISH_SEVAI",
+        "DISH_PANEER_BUTTER",
+        "DISH_TINDA",
+        "DISH_IDLI"
       ],
       "source_datasets": [
         "dataset_1_catalog",
@@ -6601,6 +12283,32 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_DAL_ROTI",
+        "DISH_MODAK",
+        "DISH_PULAO",
+        "DISH_UPMA",
+        "DISH_OMLETTE",
+        "DISH_SOUP",
+        "DISH_APPAM",
+        "DISH_KHICHDI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -6646,6 +12354,21 @@
       "cooking_methods": [
         "deep_fried"
       ],
+      "dish_categories": [
+        "snack_starter",
+        "sweet_dessert"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild"
+      ],
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "cook_minutes": 35,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6677,6 +12400,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_PANEER_BUTTER",
+        "DISH_DOSA",
+        "DISH_DALIA",
+        "DISH_DAL_ROTI",
+        "DISH_PARATHA",
+        "DISH_IDLI",
+        "DISH_BEANS",
+        "DISH_MUTTON_CURRY"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -6708,6 +12457,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6739,6 +12496,32 @@
         "snack"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SOUP",
+        "DISH_GUJIYA",
+        "DISH_THEPLA",
+        "DISH_POHA",
+        "DISH_CHICKEN_CURRY",
+        "DISH_YOGURT",
+        "DISH_BEANS",
+        "DISH_DHOKLA"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -6785,6 +12568,20 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "snack_starter"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 40,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6830,6 +12627,20 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "mild"
+      ],
+      "nutrition_traits": [
+        "contains_fish_or_seafood"
+      ],
+      "cook_minutes": 35,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6860,6 +12671,14 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6906,6 +12725,37 @@
       "cooking_methods": [
         "deep_fried"
       ],
+      "dish_categories": [
+        "sweet_dessert"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild",
+        "warming_whole_spices"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 45,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_UTTAPAM",
+        "DISH_TURAI",
+        "DISH_SOUP",
+        "DISH_BEANS",
+        "DISH_PARATHA",
+        "DISH_FISH_CURRY",
+        "DISH_MODAK"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -6942,6 +12792,18 @@
       "cooking_methods": [
         "steamed"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 25,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -6975,8 +12837,40 @@
         "breakfast"
       ],
       "cooking_methods": [
-        "steamed",
-        "fermented_cook"
+        "fermented_cook",
+        "steamed"
+      ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 30,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_POHA",
+        "DISH_RICE_DAL",
+        "DISH_TINDA",
+        "DISH_MUTTON_CURRY",
+        "DISH_BHINDI",
+        "DISH_DAL_ROTI",
+        "DISH_DHOKLA",
+        "DISH_MODAK"
       ],
       "source_datasets": [
         "dataset_1_catalog",
@@ -7009,6 +12903,14 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7039,6 +12941,14 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7085,6 +12995,22 @@
         "deep_fried",
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "cook_minutes": 55,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7115,6 +13041,14 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7156,6 +13090,39 @@
         "pressure_cooked",
         "tempered"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 35,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CHICKEN_CURRY",
+        "DISH_THEPLA",
+        "DISH_CURD_RICE",
+        "DISH_PULAO",
+        "DISH_TINDA",
+        "DISH_YOGURT",
+        "DISH_SEVAI",
+        "DISH_PARATHA"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -7188,6 +13155,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7237,6 +13212,22 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 3,
+      "spice_profiles": [
+        "medium",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_meat"
+      ],
+      "cook_minutes": 80,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7267,6 +13258,32 @@
         "festival"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CHOLE",
+        "DISH_CHICKEN_CURRY",
+        "DISH_LAUKI",
+        "DISH_PULAO",
+        "DISH_NUTS",
+        "DISH_RICE_DAL",
+        "DISH_YOGURT",
+        "DISH_CHILLA"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -7299,6 +13316,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_PARATHA",
+        "DISH_MODAK",
+        "DISH_UTTAPAM",
+        "DISH_PANEER_BUTTER",
+        "DISH_FRUIT_BOWL",
+        "DISH_BEANS",
+        "DISH_DHOKLA",
+        "DISH_CURD_RICE"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -7346,6 +13389,22 @@
       "cooking_methods": [
         "tempered"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 20,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7376,6 +13435,14 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7406,6 +13473,14 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7436,6 +13511,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7482,9 +13565,25 @@
         "breakfast"
       ],
       "cooking_methods": [
-        "shallow_fried",
-        "fermented_cook"
+        "fermented_cook",
+        "shallow_fried"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 35,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7534,6 +13633,21 @@
         "pressure_cooked",
         "sauteed"
       ],
+      "dish_categories": [
+        "whole_meal"
+      ],
+      "spice_level": 4,
+      "spice_profiles": [
+        "hot",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 45,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7564,6 +13678,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7601,6 +13723,37 @@
       ],
       "cooking_methods": [
         "steamed"
+      ],
+      "dish_categories": [
+        "sweet_dessert"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild",
+        "warming_whole_spices"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 50,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SOUP",
+        "DISH_SEVAI",
+        "DISH_NUTS",
+        "DISH_DAL_ROTI",
+        "DISH_LAUKI",
+        "DISH_CHOLE",
+        "DISH_TURAI",
+        "DISH_PANEER_BUTTER"
       ],
       "source_datasets": [
         "dataset_1_catalog",
@@ -7648,6 +13801,21 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "whole_meal"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_fish_or_seafood"
+      ],
+      "cook_minutes": 45,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7679,6 +13847,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_BHINDI",
+        "DISH_OMLETTE",
+        "DISH_UTTAPAM",
+        "DISH_DOSA",
+        "DISH_PULAO",
+        "DISH_SPROUTS",
+        "DISH_PARATHA",
+        "DISH_SIMPLE_SABZI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -7728,6 +13922,22 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 3,
+      "spice_profiles": [
+        "medium",
+        "warming_whole_spices"
+      ],
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_meat"
+      ],
+      "cook_minutes": 80,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7759,6 +13969,32 @@
         "snack"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_UTTAPAM",
+        "DISH_TINDA",
+        "DISH_TURAI",
+        "DISH_CURD_RICE",
+        "DISH_YOGURT",
+        "DISH_APPAM",
+        "DISH_CHOLE",
+        "DISH_MODAK"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -7804,6 +14040,39 @@
       ],
       "cooking_methods": [
         "shallow_fried"
+      ],
+      "dish_categories": [
+        "egg_dish"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild"
+      ],
+      "nutrition_traits": [
+        "contains_egg"
+      ],
+      "cook_minutes": 10,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_TURAI",
+        "DISH_SIMPLE_SABZI",
+        "DISH_FRUIT_BOWL",
+        "DISH_YOGURT",
+        "DISH_CURD_RICE",
+        "DISH_DALIA",
+        "DISH_THEPLA",
+        "DISH_SOUP"
       ],
       "source_datasets": [
         "dataset_1_catalog",
@@ -7853,6 +14122,23 @@
         "boiled",
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_leafy_green"
+      ],
+      "cook_minutes": 40,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -7902,6 +14188,39 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "mild"
+      ],
+      "nutrition_traits": [
+        "contains_dairy",
+        "contains_leafy_green"
+      ],
+      "cook_minutes": 50,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_LAUKI",
+        "DISH_CHOLE",
+        "DISH_APPAM",
+        "DISH_CURD_RICE",
+        "DISH_NUTS",
+        "DISH_LADOO",
+        "DISH_BHINDI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -7934,6 +14253,32 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_UTTAPAM",
+        "DISH_BHINDI",
+        "DISH_SOUP",
+        "DISH_GUJIYA",
+        "DISH_CHILLA",
+        "DISH_FRUIT_BOWL",
+        "DISH_THEPLA",
+        "DISH_SEVAI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -7982,6 +14327,18 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "whole_meal"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "mild"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 45,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8022,6 +14379,22 @@
       "cooking_methods": [
         "shallow_fried"
       ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 25,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8070,6 +14443,38 @@
         "sauteed",
         "tempered"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 15,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SEVAI",
+        "DISH_CHICKEN_CURRY",
+        "DISH_UTTAPAM",
+        "DISH_UPMA",
+        "DISH_SIMPLE_SABZI",
+        "DISH_PULAO",
+        "DISH_LADOO",
+        "DISH_GUJIYA"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -8103,6 +14508,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_GUJIYA",
+        "DISH_FRUIT_BOWL",
+        "DISH_DAL_ROTI",
+        "DISH_TINDA",
+        "DISH_OMLETTE",
+        "DISH_LADOO",
+        "DISH_BHINDI",
+        "DISH_CHOLE"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -8134,6 +14565,14 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8164,6 +14603,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8194,6 +14641,14 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8225,6 +14680,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_BHINDI",
+        "DISH_UPMA",
+        "DISH_PANEER_BUTTER",
+        "DISH_SPROUTS",
+        "DISH_NUTS",
+        "DISH_FRUIT_BOWL",
+        "DISH_DALIA",
+        "DISH_CHOLE"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -8256,6 +14737,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8300,6 +14789,19 @@
       "cooking_methods": [
         "shallow_fried"
       ],
+      "dish_categories": [
+        "paratha_roti"
+      ],
+      "spice_level": 2,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild"
+      ],
+      "nutrition_traits": [],
+      "cook_minutes": 30,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8330,6 +14832,32 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_PANEER_BUTTER",
+        "DISH_RICE_DAL",
+        "DISH_YOGURT",
+        "DISH_KHICHDI",
+        "DISH_SIMPLE_SABZI",
+        "DISH_SPROUTS",
+        "DISH_MUTTON_CURRY",
+        "DISH_IDLI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -8361,6 +14889,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8406,6 +14942,21 @@
       "cooking_methods": [
         "sauteed"
       ],
+      "dish_categories": [
+        "curry"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "cook_minutes": 45,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8437,6 +14988,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_RICE_DAL",
+        "DISH_DALIA",
+        "DISH_YOGURT",
+        "DISH_POHA",
+        "DISH_PARATHA",
+        "DISH_FISH_CURRY",
+        "DISH_MUTTON_CURRY",
+        "DISH_PANEER_BUTTER"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -8470,6 +15047,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_CURD_RICE",
+        "DISH_POHA",
+        "DISH_SPROUTS",
+        "DISH_FRUIT_BOWL",
+        "DISH_TURAI",
+        "DISH_PANEER_BUTTER",
+        "DISH_DHOKLA",
+        "DISH_SIMPLE_SABZI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -8501,6 +15104,32 @@
         "snack"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SOUP",
+        "DISH_CURD_RICE",
+        "DISH_MUTTON_CURRY",
+        "DISH_DAL_ROTI",
+        "DISH_KHICHDI",
+        "DISH_DOSA",
+        "DISH_OMLETTE",
+        "DISH_LAUKI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -8547,6 +15176,39 @@
       "cooking_methods": [
         "shallow_fried"
       ],
+      "dish_categories": [
+        "paratha_roti"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_dairy"
+      ],
+      "cook_minutes": 30,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_BEANS",
+        "DISH_CHOLE",
+        "DISH_DALIA",
+        "DISH_TINDA",
+        "DISH_APPAM",
+        "DISH_KHICHDI",
+        "DISH_LAUKI",
+        "DISH_MODAK"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -8580,6 +15242,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_RICE_DAL",
+        "DISH_TURAI",
+        "DISH_UTTAPAM",
+        "DISH_POHA",
+        "DISH_MUTTON_CURRY",
+        "DISH_FRUIT_BOWL",
+        "DISH_GUJIYA",
+        "DISH_MODAK"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -8612,6 +15300,32 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_THEPLA",
+        "DISH_DOSA",
+        "DISH_MODAK",
+        "DISH_IDLI",
+        "DISH_UTTAPAM",
+        "DISH_SIMPLE_SABZI",
+        "DISH_KHICHDI",
+        "DISH_TINDA"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"
@@ -8659,6 +15373,40 @@
         "sauteed",
         "tempered"
       ],
+      "dish_categories": [
+        "rice"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild",
+        "tempering_spices"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 20,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_FRUIT_BOWL",
+        "DISH_CHICKEN_CURRY",
+        "DISH_POHA",
+        "DISH_KHICHDI",
+        "DISH_NUTS",
+        "DISH_PARATHA",
+        "DISH_SPROUTS",
+        "DISH_CHOLE"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1",
@@ -8700,8 +15448,41 @@
         "breakfast"
       ],
       "cooking_methods": [
-        "shallow_fried",
-        "fermented_cook"
+        "fermented_cook",
+        "shallow_fried"
+      ],
+      "dish_categories": [
+        "dosa_idli"
+      ],
+      "spice_level": 1,
+      "spice_profiles": [
+        "chilli_forward",
+        "mild"
+      ],
+      "nutrition_traits": [
+        "contains_pulse"
+      ],
+      "cook_minutes": 30,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_YOGURT",
+        "DISH_DOSA",
+        "DISH_THEPLA",
+        "DISH_TINDA",
+        "DISH_IDLI",
+        "DISH_MUTTON_CURRY",
+        "DISH_SPROUTS",
+        "DISH_CURD_RICE"
       ],
       "source_datasets": [
         "dataset_1_catalog",
@@ -8734,6 +15515,14 @@
         "dinner"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8764,6 +15553,14 @@
         "lunch"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [],
+      "occasions": [],
+      "substitutes": [],
       "source_datasets": [
         "dataset_2"
       ]
@@ -8795,6 +15592,32 @@
         "breakfast"
       ],
       "cooking_methods": [],
+      "dish_categories": [],
+      "spice_level": null,
+      "spice_profiles": [],
+      "nutrition_traits": [],
+      "cook_minutes": null,
+      "seasons": [
+        "monsoon",
+        "summer",
+        "winter"
+      ],
+      "occasions": [
+        "diwali",
+        "eid",
+        "navratri",
+        "pooja"
+      ],
+      "substitutes": [
+        "DISH_SIMPLE_SABZI",
+        "DISH_APPAM",
+        "DISH_NUTS",
+        "DISH_UTTAPAM",
+        "DISH_CURD_RICE",
+        "DISH_PARATHA",
+        "DISH_IDLI",
+        "DISH_LAUKI"
+      ],
       "source_datasets": [
         "dataset_1_catalog",
         "dataset_1"

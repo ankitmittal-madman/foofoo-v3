@@ -1,0 +1,13 @@
+{
+  "interactions": 37609,
+  "items": 86,
+  "ontology_relations": 1908,
+  "household_relations": 29020,
+  "lightgcn_training_allowed": false,
+  "kgat_training_allowed": false,
+  "blockers": [
+    "synthetic_only_interactions",
+    "insufficient_per_household_interaction_density",
+    "ingredient_coverage_below_90_percent"
+  ]
+}

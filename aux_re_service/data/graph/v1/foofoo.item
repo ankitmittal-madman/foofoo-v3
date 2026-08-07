@@ -1,0 +1,87 @@
+item_id:token	meal_slots:token_seq	regions:token_seq	diets:token_seq	categories:token_seq	nutrition_traits:token_seq
+DISH_AJWAIN_PARATHA	breakfast	maharashtra rajasthan gujarat karnataka	unknown	unknown	unknown
+DISH_ALOO_PARATHA	breakfast	north	vegetarian	paratha_roti	unknown
+DISH_ALOO_POSTO	dinner	east	vegetarian	dry_sabzi	unknown
+DISH_APPAM	breakfast	south	vegetarian	dosa_idli	contains_dairy
+DISH_BEANS	lunch dinner	north south west east	vegetarian	unknown	unknown
+DISH_BHAKRI_AND_PITHLA	dinner	west	vegetarian	bread curry	contains_millet
+DISH_BHINDI	lunch dinner	north south west east	vegetarian	unknown	unknown
+DISH_BISI_BELE_BATH	lunch	maharashtra karnataka telangana tamil nadu	vegetarian	rice	contains_pulse
+DISH_CHAPATI_AND_KURMA	dinner	maharashtra gujarat telangana karnataka	unknown	unknown	unknown
+DISH_CHHENAGAJA	lunch	maharashtra rajasthan delhi tamil nadu	unknown	unknown	unknown
+DISH_CHICKEN_BHARTA	dinner	maharashtra telangana rajasthan uttar pradesh	nonvegetarian	unknown	unknown
+DISH_CHICKEN_CHETTINAD	lunch	maharashtra west bengal telangana uttar pradesh	nonvegetarian	curry	contains_meat
+DISH_CHICKEN_CURRY	lunch dinner	north south west east	nonveg	unknown	unknown
+DISH_CHICKEN_CURRY_AND_ROTI	lunch	maharashtra delhi rajasthan tamil nadu	nonvegetarian	unknown	unknown
+DISH_CHICKEN_XACUTI	dinner	west	nonvegetarian	curry	contains_meat
+DISH_CHILLA	breakfast	north west south east	vegetarian	unknown	unknown
+DISH_CHIRA_BHAJA	breakfast	maharashtra telangana rajasthan uttar pradesh	unknown	unknown	unknown
+DISH_CHOLE	breakfast lunch	north west south east	vegetarian	unknown	unknown
+DISH_CURD_RICE	lunch dinner	south	vegetarian	rice	contains_dairy contains_pulse
+DISH_DALIA	breakfast	south north west east	vegetarian	unknown	unknown
+DISH_DALMA	lunch	east	vegetarian	dal_lentil	contains_pulse
+DISH_DAL_DHOKLI	lunch	west	vegetarian	dal_lentil	contains_pulse
+DISH_DAL_MAKHANI_AND_ROTI	lunch	maharashtra gujarat tamil nadu rajasthan	unknown	unknown	unknown
+DISH_DAL_ROTI	lunch dinner	north south west east	vegetarian	unknown	unknown
+DISH_DAL_TADKA_AND_PHULKA	dinner	maharashtra gujarat tamil nadu telangana	unknown	unknown	unknown
+DISH_DHOKLA	breakfast snack	west	vegetarian	snack_starter	contains_dairy
+DISH_DOSA	breakfast	south north west east	vegetarian	unknown	unknown
+DISH_FAFDA_JALEBI	breakfast	west	vegetarian	snack_starter sweet_dessert	contains_dairy
+DISH_FISH_CURRY	lunch dinner	north south west east	fish	unknown	unknown
+DISH_FISH_PATURI	dinner	maharashtra west bengal gujarat rajasthan	nonvegetarian	unknown	unknown
+DISH_FRUIT_BOWL	snack	north south west east	vegetarian vegan	unknown	unknown
+DISH_GHUGNI	breakfast	east	vegetarian	snack_starter	unknown
+DISH_GOAN_FISH_CURRY	lunch	west	nonvegetarian	curry	contains_fish_or_seafood
+DISH_GUJARATI_THALI	lunch	maharashtra tamil nadu delhi karnataka	unknown	unknown	unknown
+DISH_GUJIYA	festival	north south west east	vegetarian	sweet_dessert	unknown
+DISH_IDIYAPPAM	dinner	south	vegetarian	dosa_idli	unknown
+DISH_IDLI	breakfast	south	vegetarian	dosa_idli	contains_pulse
+DISH_IDLI_SAMBAR	breakfast	maharashtra uttar pradesh tamil nadu delhi	unknown	unknown	unknown
+DISH_KACHORI	breakfast	maharashtra karnataka rajasthan gujarat	unknown	unknown	unknown
+DISH_KADHI_PAKORA	lunch	north	vegetarian	curry	contains_dairy
+DISH_KANDA_POHA	breakfast	maharashtra west bengal rajasthan karnataka	unknown	unknown	unknown
+DISH_KHICHDI	lunch dinner	north	vegetarian	rice	contains_pulse
+DISH_KHICHDI_KADHI	dinner	maharashtra delhi west bengal tamil nadu	unknown	unknown	unknown
+DISH_KOSHA_MANGSHO	lunch	east	nonvegetarian	curry	contains_dairy contains_meat
+DISH_LADOO	festival	north south west east	vegetarian	unknown	unknown
+DISH_LAUKI	lunch dinner	north south west east	vegetarian	unknown	unknown
+DISH_LEMON_RICE	lunch	south	vegetarian	rice	contains_pulse
+DISH_LUCHI_ALOO_DUM	breakfast	maharashtra uttar pradesh west bengal delhi	unknown	unknown	unknown
+DISH_MACHHER_JHOL_AND_RICE	lunch	maharashtra rajasthan uttar pradesh west bengal	unknown	unknown	unknown
+DISH_MALABAR_FISH_CURRY	dinner	maharashtra telangana gujarat west bengal	nonvegetarian	unknown	unknown
+DISH_MASALA_DOSA	breakfast	maharashtra west bengal tamil nadu karnataka	vegetarian	dosa_idli	contains_pulse
+DISH_MISAL_PAV	breakfast	west	vegetarian	whole_meal	contains_pulse
+DISH_MIXED_VEG_AND_ROTI	dinner	maharashtra delhi tamil nadu gujarat	unknown	unknown	unknown
+DISH_MODAK	festival	west	vegetarian	sweet_dessert	unknown
+DISH_MURI_GHONTO	dinner	east	nonvegetarian	whole_meal	contains_fish_or_seafood
+DISH_MUTTON_CURRY	lunch dinner	north south west east	nonveg	unknown	unknown
+DISH_MUTTON_ROGAN_JOSH	dinner	north	nonvegetarian	curry	contains_dairy contains_meat
+DISH_NUTS	snack	north south west east	vegetarian vegan	unknown	unknown
+DISH_OMLETTE	breakfast	north west south east	egg	egg_dish	contains_egg
+DISH_PALAK_PANEER	dinner	north	vegetarian	curry	contains_dairy contains_leafy_green
+DISH_PANEER_BUTTER	lunch dinner	north	vegetarian	curry	contains_dairy contains_leafy_green
+DISH_PARATHA	breakfast	north south west east	vegetarian	unknown	unknown
+DISH_PAV_BHAJI	lunch	west	vegetarian	whole_meal	unknown
+DISH_PESARATTU	breakfast	south	vegetarian	dosa_idli	contains_pulse
+DISH_POHA	breakfast	west	vegetarian	rice	unknown
+DISH_PULAO	lunch dinner	north south west east	vegetarian	unknown	unknown
+DISH_RAJMA_CHAWAL	lunch	maharashtra delhi gujarat karnataka	unknown	unknown	unknown
+DISH_RASAM_RICE	dinner	maharashtra karnataka telangana rajasthan	unknown	unknown	unknown
+DISH_RICE_AND_SAMBAR	lunch	maharashtra karnataka telangana west bengal	unknown	unknown	unknown
+DISH_RICE_DAL	lunch dinner	north south west east	vegetarian	unknown	unknown
+DISH_ROTI_AND_SABZI	dinner	maharashtra uttar pradesh karnataka rajasthan	unknown	unknown	unknown
+DISH_SATTU_PARATHA	breakfast	maharashtra telangana west bengal uttar pradesh	vegetarian	paratha_roti	unknown
+DISH_SEVAI	breakfast	north south west east	vegetarian	unknown	unknown
+DISH_SEV_TOMATO_SHAAK	dinner	maharashtra karnataka telangana rajasthan	unknown	unknown	unknown
+DISH_SHUKTO	lunch	east	vegetarian	curry	contains_dairy
+DISH_SIMPLE_SABZI	lunch dinner	north south west east	vegetarian	unknown	unknown
+DISH_SOUP	snack dinner	north south west east	vegetarian vegan	unknown	unknown
+DISH_SPROUTS	snack	north south west east	vegetarian	unknown	unknown
+DISH_THEPLA	breakfast snack	west	vegetarian	paratha_roti	contains_dairy
+DISH_TINDA	lunch dinner	north south west east	vegetarian	unknown	unknown
+DISH_TURAI	lunch dinner	north west south east	vegetarian	unknown	unknown
+DISH_UPMA	breakfast	south	vegetarian	rice	contains_pulse
+DISH_UTTAPAM	breakfast	south	vegetarian	dosa_idli	contains_pulse
+DISH_VANGYACHE_BHARIT	dinner	maharashtra tamil nadu telangana west bengal	unknown	unknown	unknown
+DISH_VARAN_BHAAT	lunch	maharashtra west bengal uttar pradesh karnataka	unknown	unknown	unknown
+DISH_YOGURT	snack breakfast	north south west east	vegetarian	unknown	unknown

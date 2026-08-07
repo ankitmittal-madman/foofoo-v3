@@ -28,6 +28,12 @@ class ModelRegistry:
         artifacts = settings.model_artifact_dir
         scaffold_status = "scaffold_only" if artifacts else "artifact_not_configured"
         recbole_status = scaffold_status if recbole else "package_missing"
+        lightgcn_status = (
+            "readiness_gate_blocked" if settings.lightgcn_enabled and recbole else recbole_status
+        )
+        kgat_status = (
+            "readiness_gate_blocked" if settings.kgat_enabled and recbole else recbole_status
+        )
         lightfm_artifact = bool(
             settings.lightfm_artifact_path and Path(settings.lightfm_artifact_path).is_file()
         )
@@ -55,16 +61,16 @@ class ModelRegistry:
                 lightfm_ready,
                 lightfm and lightfm_artifact,
                 status=lightfm_status,
-                version="lightfm-warp-v1" if lightfm_artifact else None,
+                version="lightfm-warp-v2" if lightfm_artifact else None,
             ),
             ModelEntry(
                 "LightGCN / RecBole-GNN",
                 "ranker",
+                settings.lightgcn_enabled,
                 False,
-                False,
-                status=recbole_status,
+                status=lightgcn_status,
             ),
-            ModelEntry("KGAT", "ranker", False, False, status=recbole_status),
+            ModelEntry("KGAT", "ranker", settings.kgat_enabled, False, status=kgat_status),
             ModelEntry("RecBole-FairRec", "policy", False, False, status=recbole_status),
             ModelEntry("RecBole-Debias", "policy", False, False, status=recbole_status),
             ModelEntry("RecBole-CDR", "ranker", False, False, status=recbole_status),
@@ -83,7 +89,7 @@ class ModelRegistry:
                 bool(settings.knowledge_graph_path),
                 bool(settings.knowledge_graph_path),
                 status="configured" if settings.knowledge_graph_path else "not_configured",
-                version="indian-food-graph-v1",
+                version="indian-food-graph-v2",
             ),
             ModelEntry(
                 "Local Reranker",

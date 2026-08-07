@@ -25,7 +25,7 @@ class LightFMScoreTrace:
 class LightFMScorer:
     def __init__(self, artifact: dict[str, Any], *, allow_synthetic: bool, allow_unpromoted: bool):
         metadata = artifact.get("metadata", {})
-        if metadata.get("format") != "foofoo-lightfm-v1":
+        if metadata.get("format") not in {"foofoo-lightfm-v1", "foofoo-lightfm-v2"}:
             raise LightFMArtifactError("unsupported artifact format")
         if metadata.get("synthetic_only") and not allow_synthetic:
             raise LightFMArtifactError("synthetic artifact activation is disabled")

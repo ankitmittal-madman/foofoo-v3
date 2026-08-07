@@ -1,16 +1,27 @@
 {
   "version": "foofoo-training-v1",
-  "generated_at": "2026-08-07T07:10:27.436806+00:00",
+  "generated_at": "2026-08-07T08:01:48.343162+00:00",
   "synthetic_only": true,
   "ontology_dishes": 86,
-  "interactions": 35000,
-  "positive_interactions": 21565,
-  "negative_interactions": 5267,
+  "interactions": 64842,
+  "positive_interactions": 46047,
+  "negative_interactions": 17459,
   "households": 10000,
+  "weekly_signal_households": 10000,
+  "household_graph_edges": 29020,
+  "training_interactions": 56404,
+  "validation_interactions": 4219,
+  "test_interactions": 4219,
   "sha256": {
-    "dataset_audit.json": "87b6041b95f70343cd4c55b7ebcfb8b7e03233b206114252321751b5c402af23",
-    "canonical_food_ontology.json": "24bd8b64490cbfc4ba4a968410c4e5689672f45311a6c6d031576401cd587d03",
-    "interactions.jsonl": "14809fda14e83c06102d683c09fa58a65b9a1b8e44b476fd50d304dc84dd1875",
-    "household_features.jsonl": "d7690cd00734d09cdc701e1f61e534f5cf4754c3235071ed22c6dd7ee7c981f4"
+    "dataset_audit.json": "dfaad933f49cdcdccd837c4e11266b9d61086f6d5cae8591db4c2445fc6e03dd",
+    "canonical_food_ontology.json": "2b1aee91c65ab436115cd5c01aa40e440ce916397a7b6463705a69decb20c468",
+    "interactions.jsonl": "e761de89595906a70006ee92cb314ad385e20233d909c80507cd6432f81f1d0b",
+    "household_features.jsonl": "17a30e555c430e4d6b69ddd487602aaaa148ed16c379364b88cef8e236a01895",
+    "weekly_signals.jsonl": "40540c72ff9f11f6f522c86ee1191d561df2f0394287e2cdef801fd638ba01c4",
+    "household_preference_graph.jsonl": "8d459165e7a93b28c265e36b39a7310a71302fd44ff8355abe2890ebf41f2a90",
+    "schema_map.json": "a85bc4cfcdf14e52f77bed1e228bbf93413551c77b3ac33f457022b014b163f1",
+    "interactions_train.jsonl": "d14a08936c8e9ecdc58bf3934d3b4bcc981afee61fc1ff35fe02fe4779571861",
+    "interactions_validation.jsonl": "fb409ba185eb5d5b523eceb3597a08301ab2352289ca0c6a874be918035a71f3",
+    "interactions_test.jsonl": "53340b8f90b4bf222073bcc05a47815ed00a4507b8013f510e2ebee93ce2b33e"
   }
 }

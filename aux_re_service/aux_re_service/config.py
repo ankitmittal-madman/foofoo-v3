@@ -53,6 +53,13 @@ class Settings:
     lightfm_weight: float = 0.35
     lightfm_allow_synthetic: bool = False
     lightfm_allow_unpromoted: bool = False
+    feedback_enabled: bool = False
+    feedback_path: str | None = None
+    experiment_enabled: bool = False
+    experiment_percent: float = 0.0
+    experiment_salt: str = "foofoo-aux-v1"
+    lightgcn_enabled: bool = False
+    kgat_enabled: bool = False
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -61,7 +68,7 @@ class Settings:
             mode = Mode(mode_raw)
         except ValueError as exc:
             raise ValueError("AUX_REC_MODE must be shadow, compare, or active") from exc
-        return cls(
+        settings = cls(
             enabled=_bool("AUX_REC_ENABLED", False),
             mode=mode,
             min_delta=_float("AUX_REC_MIN_DELTA", 0.05),
@@ -85,4 +92,14 @@ class Settings:
             lightfm_weight=_float("AUX_REC_LIGHTFM_WEIGHT", 0.35),
             lightfm_allow_synthetic=_bool("AUX_REC_LIGHTFM_ALLOW_SYNTHETIC", False),
             lightfm_allow_unpromoted=_bool("AUX_REC_LIGHTFM_ALLOW_UNPROMOTED", False),
+            feedback_enabled=_bool("AUX_REC_FEEDBACK_ENABLED", False),
+            feedback_path=os.getenv("AUX_REC_FEEDBACK_PATH") or None,
+            experiment_enabled=_bool("AUX_REC_EXPERIMENT_ENABLED", False),
+            experiment_percent=_float("AUX_REC_EXPERIMENT_PERCENT", 0.0),
+            experiment_salt=os.getenv("AUX_REC_EXPERIMENT_SALT", "foofoo-aux-v1"),
+            lightgcn_enabled=_bool("AUX_REC_MODEL_LIGHTGCN_ENABLED", False),
+            kgat_enabled=_bool("AUX_REC_MODEL_KGAT_ENABLED", False),
         )
+        if settings.feedback_enabled and not settings.feedback_path:
+            raise ValueError("AUX_REC_FEEDBACK_PATH is required when feedback is enabled")
+        return settings

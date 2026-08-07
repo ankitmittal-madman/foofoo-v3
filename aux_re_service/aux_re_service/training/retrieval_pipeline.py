@@ -25,12 +25,20 @@ def _candidate(dish: dict[str, Any]) -> dict[str, Any]:
         "cuisines": dish["cuisines"],
         "regions": dish["regions"],
         "meal_slots": dish["meal_slots"],
+        "dish_categories": dish["dish_categories"],
+        "spice_profiles": dish["spice_profiles"],
+        "spice_level": dish["spice_level"],
+        "nutrition_traits": dish["nutrition_traits"],
+        "seasons": dish["seasons"],
+        "occasions": dish["occasions"],
+        "substitutes": dish["substitutes"],
+        "cook_minutes": dish["cook_minutes"],
         "pantry_match": 0.0,
         "nutrition_fit": 0.5,
         "freshness": 0.5,
         "collaborative_score": 0.5,
         "popularity": 0.0,
-        "ontology_version": "indian-food-ontology-v1",
+        "ontology_version": "indian-food-ontology-v2",
     }
 
 
@@ -42,6 +50,9 @@ def _similar(left: dict[str, Any], right: dict[str, Any]) -> float:
         ("regions", 0.15),
         ("meal_slots", 0.10),
         ("diet_types", 0.05),
+        ("dish_categories", 0.05),
+        ("spice_profiles", 0.03),
+        ("seasons", 0.02),
     ):
         a = set(left[field])
         b = set(right[field])
@@ -76,6 +87,11 @@ def build(ontology_path: Path, output_dir: Path) -> dict[str, int]:
                 *candidate["regions"],
                 *candidate["meal_slots"],
                 *candidate["diet_types"],
+                *candidate["dish_categories"],
+                *candidate["spice_profiles"],
+                *candidate["nutrition_traits"],
+                *candidate["seasons"],
+                *candidate["occasions"],
             ]
         )
         points.append(

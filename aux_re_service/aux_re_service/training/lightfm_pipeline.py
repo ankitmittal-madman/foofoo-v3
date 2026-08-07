@@ -26,6 +26,11 @@ def _item_features(ontology: dict[str, Any]) -> dict[str, list[str]]:
                 *(f"region:{value}" for value in dish["regions"]),
                 *(f"cuisine:{value}" for value in dish["cuisines"]),
                 *(f"ingredient:{value}" for value in dish["ingredients"]),
+                *(f"category:{value}" for value in dish.get("dish_categories", [])),
+                *(f"spice:{value}" for value in dish.get("spice_profiles", [])),
+                *(f"nutrition:{value}" for value in dish.get("nutrition_traits", [])),
+                *(f"season:{value}" for value in dish.get("seasons", [])),
+                *(f"occasion:{value}" for value in dish.get("occasions", [])),
             }
         )
     return features
@@ -138,8 +143,8 @@ def train(
     artifact_path: Path,
     report_path: Path,
     *,
-    epochs: int = 20,
-    components: int = 32,
+    epochs: int = 60,
+    components: int = 64,
     k: int = 10,
     seed: int = 20260807,
 ) -> dict[str, Any]:
@@ -153,8 +158,22 @@ def train(
     interactions = _jsonl(data_dir / "interactions.jsonl")
     household_rows = _jsonl(data_dir / "household_features.jsonl")
     ontology = json.loads((data_dir / "canonical_food_ontology.json").read_text())
-    positives = [row for row in interactions if float(row["weight"]) > 0]
-    train_rows, test_rows = _time_split(positives)
+    split_train_path = data_dir / "interactions_train.jsonl"
+    split_test_path = data_dir / "interactions_test.jsonl"
+    if split_train_path.is_file() and split_test_path.is_file():
+        raw_train_rows = _jsonl(split_train_path)
+        test_rows = [row for row in _jsonl(split_test_path) if float(row["weight"]) > 0]
+    else:
+        positives = [row for row in interactions if float(row["weight"]) > 0]
+        raw_train_rows, test_rows = _time_split(positives)
+    net_signal: dict[tuple[str, str], float] = defaultdict(float)
+    for row in raw_train_rows:
+        net_signal[(row["household_id"], row["dish_id"])] += float(row["weight"])
+    train_rows = [
+        row
+        for row in raw_train_rows
+        if float(row["weight"]) > 0 and net_signal[(row["household_id"], row["dish_id"])] > 0
+    ]
     household_features = {row["household_id"]: row["features"] for row in household_rows}
     item_features_by_id = _item_features(ontology)
     users = sorted(household_features)
@@ -213,28 +232,37 @@ def train(
         for name in (f"recall_at_{k}", f"precision_at_{k}", f"ndcg_at_{k}", "catalog_coverage")
     }
     promotion_gate_passed = (
-        metrics[f"recall_at_{k}"] >= 0.20
-        and metrics[f"ndcg_at_{k}"] >= 0.08
+        metrics["evaluated_households"] >= 1000
+        and metrics[f"recall_at_{k}"] >= max(0.05, baseline_metrics[f"recall_at_{k}"] * 1.5)
+        and metrics[f"ndcg_at_{k}"] >= max(0.025, baseline_metrics[f"ndcg_at_{k}"] * 1.5)
         and metrics["catalog_coverage"] >= 0.50
-        and metric_deltas[f"ndcg_at_{k}"] >= 0.0
+        and metric_deltas[f"recall_at_{k}"] > 0.0
+        and metric_deltas[f"ndcg_at_{k}"] > 0.0
     )
+    semantic_ontology = {key: value for key, value in ontology.items() if key != "generated_at"}
     fingerprint = hashlib.sha256(
-        (data_dir / "manifest.json").read_bytes()
+        (data_dir / "interactions.jsonl").read_bytes()
+        + (data_dir / "household_features.jsonl").read_bytes()
+        + json.dumps(semantic_ontology, sort_keys=True).encode()
         + json.dumps(metrics, sort_keys=True).encode()
         + f"{epochs}:{components}:{seed}".encode()
     ).hexdigest()
     metadata = {
-        "format": "foofoo-lightfm-v1",
+        "format": "foofoo-lightfm-v2",
         "model_type": "LightFM-WARP-hybrid",
         "model_version": f"sha256:{fingerprint}",
         "created_at": datetime.now(UTC).isoformat(),
         "synthetic_only": True,
         "promotion_gate_passed": promotion_gate_passed,
+        "promotion_target": "shadow_challenger",
+        "production_eligible": False,
         "activation_scope": "shadow_validation_only",
         "epochs": epochs,
         "components": components,
         "seed": seed,
         "train_interactions": int(train_interactions.nnz),
+        "explicit_negative_events": sum(float(row["weight"]) < 0 for row in interactions),
+        "negative_affected_pairs": sum(value <= 0 for value in net_signal.values()),
         "holdout_interactions": len(test_rows),
         "metrics": metrics,
         "popularity_baseline": baseline_metrics,
@@ -259,8 +287,8 @@ def main() -> None:
     parser.add_argument("--data-dir", type=Path, required=True)
     parser.add_argument("--artifact", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
-    parser.add_argument("--epochs", type=int, default=20)
-    parser.add_argument("--components", type=int, default=32)
+    parser.add_argument("--epochs", type=int, default=60)
+    parser.add_argument("--components", type=int, default=64)
     parser.add_argument("--k", type=int, default=10)
     args = parser.parse_args()
     metadata = train(

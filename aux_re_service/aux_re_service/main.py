@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 from . import __version__
 from .config import Settings
-from .observability import metrics
-from .schemas import RecommendationRequest, RecommendationResponse
+from .feedback import FeedbackStoreError, LocalFeedbackStore
+from .observability import metrics, record_feedback
+from .schemas import FeedbackEvent, FeedbackReceipt, RecommendationRequest, RecommendationResponse
 from .service import run
 
 app = FastAPI(title="FooFoo Auxiliary Recommender", version=__version__)
@@ -39,6 +42,32 @@ def meta() -> dict[str, object]:
     }
 
 
+@app.get("/metrics", response_class=PlainTextResponse)
+def prometheus_metrics() -> str:
+    lines = []
+    for name, value in sorted(metrics().items()):
+        safe_name = "foofoo_aux_re_" + "".join(
+            character if character.isalnum() or character == "_" else "_" for character in name
+        )
+        lines.append(f"{safe_name} {value}")
+    return "\n".join(lines) + "\n"
+
+
 @app.post("/v1/recommendations", response_model=RecommendationResponse)
 def recommendations(payload: RecommendationRequest) -> RecommendationResponse:
     return run(payload)
+
+
+@app.post("/v1/feedback", response_model=FeedbackReceipt)
+def feedback(payload: FeedbackEvent) -> FeedbackReceipt:
+    settings = Settings.from_env()
+    if not settings.feedback_enabled:
+        raise HTTPException(status_code=503, detail="feedback_disabled")
+    if not settings.feedback_path:
+        raise HTTPException(status_code=503, detail="feedback_path_not_configured")
+    try:
+        stored = LocalFeedbackStore(Path(settings.feedback_path)).append(payload)
+    except (OSError, FeedbackStoreError) as exc:
+        raise HTTPException(status_code=503, detail="feedback_store_unavailable") from exc
+    record_feedback(stored=stored, event_type=payload.event_type)
+    return FeedbackReceipt(accepted=True, stored=stored, event_id=payload.event_id)

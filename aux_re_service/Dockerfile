@@ -49,11 +49,13 @@ COPY --from=builder /opt/venv /opt/venv
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends libgomp1 \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --no-create-home --uid 10002 auxrec
+    && useradd --no-create-home --uid 10002 auxrec \
+    && mkdir -p /srv/aux-re/state \
+    && chown auxrec:auxrec /srv/aux-re/state
 COPY aux_re_service/data/models /srv/aux-re/models
 COPY aux_re_service/data/retrieval/v1 /srv/aux-re/retrieval
 ENV AUX_REC_MODEL_ARTIFACT_DIR=/srv/aux-re/models \
-    AUX_REC_LIGHTFM_ARTIFACT_PATH=/srv/aux-re/models/lightfm_v1.joblib \
+    AUX_REC_LIGHTFM_ARTIFACT_PATH=/srv/aux-re/models/lightfm_v2.joblib \
     AUX_REC_CANDIDATE_POOL_PATH=/srv/aux-re/retrieval/candidates.json \
     AUX_REC_KNOWLEDGE_GRAPH_PATH=/srv/aux-re/retrieval/knowledge_graph.json
 USER auxrec
