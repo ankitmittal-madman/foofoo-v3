@@ -1,0 +1,7 @@
+{
+  "chat.permissions.default": "autoApprove",
+  "chat.tools.terminal.autoApprove": {
+    "/.*/": true
+  },
+  "chat.tools.terminal.ignoreDefaultAutoApproveRules": true
+}
