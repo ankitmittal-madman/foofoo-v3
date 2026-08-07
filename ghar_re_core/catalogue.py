@@ -5,6 +5,7 @@ Mirrors what ghar_re.dishes + joins hold in Postgres, so the pipeline/tests run 
 while staying faithful to the seeded schema. Zone is resolved cuisine -> cuisine_group -> zone_map
 (KB §R1), exactly as the DB would via ghar_re.zone_map.
 """
+
 from ghar_re_core import fixtures as F
 from ghar_re_core import knowledge as K
 
@@ -29,6 +30,10 @@ _CUISINE_GROUP = dict(K.CUISINE_GROUP_MAP)
 _CUISINE_STATE = {c[0]: c[4] for c in F.CUISINES}
 # cuisine_group -> zone (KB §R1)
 _GROUP_ZONE = {z[0]: z[1] for z in K.ZONE_MAP}
+
+
+def _normalize_name(value):
+    return " ".join(str(value).casefold().split())
 
 
 class Dish:
@@ -99,13 +104,41 @@ class Catalogue:
         lookup indices used everywhere else in the engine."""
         self.dishes = [Dish(d) for d in (dish_dicts or F.DISHES)]
         self.by_name = {d.name: d for d in self.dishes}
-        self.by_normalized_name = {}
-        # Canonical catalogue names always win. Synonyms and alternate names are lookup-only:
-        # responses continue to display Dish.name, so users never see an arbitrary alias.
+        canonical_candidates = {}
         for dish in self.dishes:
-            for value in [dish.name, *(dish.synonyms or []), *(dish.alternate_names or [])]:
-                key = " ".join(str(value).casefold().split())
-                self.by_normalized_name.setdefault(key, dish)
+            key = _normalize_name(dish.name)
+            prior = canonical_candidates.get(key)
+            if prior is not None and prior.name != dish.name:
+                raise ValueError(
+                    f"canonical dish identity collision: {prior.name!r} and {dish.name!r}"
+                )
+            canonical_candidates[key] = dish
+
+        # Build aliases separately so catalogue order cannot decide identity. Canonical names
+        # always win, uniquely owned aliases resolve, and aliases owned by multiple dishes fail
+        # closed. The ambiguity map is diagnostics-only and contains no ranking behavior.
+        alias_candidates = {}
+        for dish in self.dishes:
+            for value in [*(dish.synonyms or []), *(dish.alternate_names or [])]:
+                key = _normalize_name(value)
+                if not key:
+                    continue
+                alias_candidates.setdefault(key, {})[dish.name] = dish
+
+        self.by_normalized_name = dict(canonical_candidates)
+        self.ambiguous_aliases = {}
+        self.shadowed_aliases = {}
+        for key, candidates in alias_candidates.items():
+            if key in canonical_candidates:
+                canonical = canonical_candidates[key]
+                shadowed = tuple(sorted(name for name in candidates if name != canonical.name))
+                if shadowed:
+                    self.shadowed_aliases[key] = shadowed
+                continue
+            if len(candidates) == 1:
+                self.by_normalized_name[key] = next(iter(candidates.values()))
+            else:
+                self.ambiguous_aliases[key] = tuple(sorted(candidates))
         # in-memory indices (built once; RE-DOC-10 §7 "build in-memory indices")
         self.by_id = {d.id: d for d in self.dishes}
         self._by_zone = {}
@@ -122,9 +155,7 @@ class Catalogue:
         """Resolve a canonical name, synonym, or alternate name to its canonical Dish."""
         if not isinstance(name, str):
             return None
-        return self.by_name.get(name) or self.by_normalized_name.get(
-            " ".join(name.casefold().split())
-        )
+        return self.by_name.get(name) or self.by_normalized_name.get(_normalize_name(name))
 
     # --- CatalogueSnapshot read interface (RE-DOC-11 §1) ---
     def get_dish(self, dish_id):
@@ -149,6 +180,7 @@ class Catalogue:
 # already be correct when the module loads, before any provider runs.
 import csv as _csv, os as _os
 from ghar_re_core import config as _cfg
+
 _ING = {}
 with open(_os.path.join(_cfg.SRC, "ingredients_v5.csv")) as _f:
     for _r in _csv.DictReader(_f):

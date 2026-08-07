@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+from ghar_re_core import fixtures as F
 from ghar_re_core.catalogue import Catalogue
 from ghar_re_core.taste import TRANSFER_SCALE, canonicalize_names, expand_preferences
 
@@ -8,7 +11,9 @@ def test_alias_feedback_is_canonical_and_exact_signal_wins():
     catalogue.by_normalized_name["dal fry"] = catalogue.get("Dal Tadka")
     expanded = expand_preferences({"  DAL FRY ": 1.0}, catalogue)
     assert expanded["Dal Tadka"] == 1.0
-    assert max(abs(value) for name, value in expanded.items() if name != "Dal Tadka") <= TRANSFER_SCALE
+    assert (
+        max(abs(value) for name, value in expanded.items() if name != "Dal Tadka") <= TRANSFER_SCALE
+    )
 
 
 def test_related_dish_gets_bounded_transfer_but_unrelated_dish_does_not():
@@ -52,3 +57,30 @@ def test_exact_dish_feedback_remains_authoritative_over_semantic_projection():
     )
 
     assert expanded["Egg Bhurji"] == -1.0
+
+
+def test_canonical_names_win_and_ambiguous_aliases_fail_closed():
+    alpha, beta = deepcopy(F.DISHES[0]), deepcopy(F.DISHES[1])
+    alpha.update(name="Alpha", synonyms=["Shared", "Beta"], alternate_names=[])
+    beta.update(name="Beta", synonyms=["Shared", "Only Beta"], alternate_names=[])
+
+    catalogue = Catalogue([alpha, beta])
+
+    assert catalogue.get(" beta ").name == "Beta"
+    assert catalogue.get("only beta").name == "Beta"
+    assert catalogue.get("shared") is None
+    assert catalogue.ambiguous_aliases["shared"] == ("Alpha", "Beta")
+    assert catalogue.shadowed_aliases["beta"] == ("Alpha",)
+
+
+def test_duplicate_normalized_canonical_names_are_rejected():
+    alpha, duplicate = deepcopy(F.DISHES[0]), deepcopy(F.DISHES[1])
+    alpha.update(name="Canonical Dish", synonyms=[], alternate_names=[])
+    duplicate.update(name="  canonical   dish ", synonyms=[], alternate_names=[])
+
+    try:
+        Catalogue([alpha, duplicate])
+    except ValueError as error:
+        assert "canonical dish identity collision" in str(error)
+    else:
+        raise AssertionError("normalized canonical identity collision should fail closed")
