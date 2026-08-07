@@ -1,0 +1,66 @@
+name: prospective-user-recommendation-cycle
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_profile_id:
+        description: Expected profile UUID; authentication fails closed on any mismatch
+        required: true
+        type: string
+      mode:
+        description: Identity check is read-only; recommend-refresh writes real exposure lineage
+        required: true
+        default: identity-only
+        type: choice
+        options:
+          - identity-only
+          - recommend-refresh
+      confirm_production_write:
+        description: For recommend-refresh, enter EXECUTE_USER_RECOMMENDATION_REFRESH
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prospective-user-cycle-${{ inputs.expected_profile_id }}
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+      TEST_USER_EMAIL: ${{ secrets.GHAR_SIGNIN_EMAIL }}
+      TEST_USER_PASSWORD: ${{ secrets.GHAR_SIGNIN_PASSWORD }}
+      MODE: ${{ inputs.mode }}
+      CONFIRM_PRODUCTION_WRITE: ${{ inputs.confirm_production_write }}
+      REPORT_PATH: ${{ runner.temp }}/prospective-user-cycle.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Mask the profile identifier
+        run: echo "::add-mask::${{ inputs.expected_profile_id }}"
+      - name: Run fail-closed prospective cycle
+        env:
+          EXPECTED_PROFILE_ID: ${{ inputs.expected_profile_id }}
+        run: |
+          python -m ops.recommendation.prospective_user_cycle \
+            --expected-profile-id "$EXPECTED_PROFILE_ID" \
+            --mode "$MODE" \
+            --confirm-production-write "$CONFIRM_PRODUCTION_WRITE" \
+            --output "$REPORT_PATH"
+          cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload privacy-minimized cycle evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: prospective-user-cycle-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/prospective-user-cycle.json
+          if-no-files-found: error
+          retention-days: 7
