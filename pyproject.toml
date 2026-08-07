@@ -58,6 +58,7 @@ select = ["E", "W", "F", "I", "B", "UP", "C4", "SIM"]
 # are more readable when their query fragments stay intact. Keep every real-defect rule enabled.
 "food_ontology_service/food_ontology_service/main.py" = ["B008", "E501"]
 "food_ontology_service/food_ontology_service/postgres_repository.py" = ["E501"]
+"ops/recommendation/auto_engine_inspector.py" = ["E501"]  # reviewed inventory SQL
 
 # ghar_re_core is the FROZEN reference implementation of the recommendation mathematics, locked by
 # the golden-master test (ghar_re_core/tests/test_golden_master.py). The rules disabled below are
