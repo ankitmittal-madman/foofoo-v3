@@ -168,6 +168,17 @@ def test_bundle_catalogue_has_full_state_origin_coverage(built):
     assert missing == [], f"{len(missing)}/810 dishes have no state_origin: {missing[:10]}..."
 
 
+def test_bundle_catalogue_identity_is_canonical_and_ambiguous_aliases_fail_closed(built):
+    """Pin the identity health of the production bundle and canonical-name precedence."""
+    out, _ = built
+    catalogue = providers.BundleCatalogueProvider(out).load()
+
+    assert all(catalogue.get(dish.name) is dish for dish in catalogue.dishes)
+    assert len(catalogue.ambiguous_aliases) == 8
+    assert len(catalogue.shadowed_aliases) == 16
+    assert all(catalogue.get(alias) is None for alias in catalogue.ambiguous_aliases)
+
+
 def test_engine_runs_from_bundle_without_repo_config(built, monkeypatch):
     """The container case: serve a real recommendation with the config layer read ONLY from the
     bundle. Pointing core_config at a non-existent repo path first proves the bundle is genuinely

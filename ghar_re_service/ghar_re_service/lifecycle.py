@@ -75,6 +75,27 @@ def log_event(event: str, **fields):
     LOG.info(json.dumps({"event": event, "service": SERVICE_NAME, **fields}))
 
 
+def catalogue_identity_summary(catalogue: object | None) -> dict[str, int]:
+    """Return public, count-only diagnostics for the loaded catalogue identity index.
+
+    Alias strings are intentionally excluded: operators need to know whether ambiguity changed,
+    while the unauthenticated metadata endpoint should disclose no catalogue content.
+    """
+    if catalogue is None:
+        return {
+            "canonical_dishes": 0,
+            "resolvable_names": 0,
+            "ambiguous_aliases": 0,
+            "shadowed_aliases": 0,
+        }
+    return {
+        "canonical_dishes": len(getattr(catalogue, "dishes", ()) or ()),
+        "resolvable_names": len(getattr(catalogue, "by_normalized_name", {}) or {}),
+        "ambiguous_aliases": len(getattr(catalogue, "ambiguous_aliases", {}) or {}),
+        "shadowed_aliases": len(getattr(catalogue, "shadowed_aliases", {}) or {}),
+    }
+
+
 @dataclass
 class Counters:
     """Lightweight in-process counters (Phase D Task 3) — cheap, removable, no metrics backend.
@@ -254,7 +275,7 @@ def startup(state: AppState) -> AppState:
 
     # 2. catalogue
     state.catalogue = state.catalogue_provider.load()
-    log_event("startup.catalogue_loaded", dishes=len(state.catalogue.dishes))
+    log_event("startup.catalogue_loaded", **catalogue_identity_summary(state.catalogue))
 
     # 3. in-memory indices (the Catalogue builds by_id/by_zone/by_hero_role in its ctor)
     zones = sorted({d.zone for d in state.catalogue.dishes if d.zone})

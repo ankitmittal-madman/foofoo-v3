@@ -14,7 +14,7 @@ from fastapi import Body, FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from ghar_re_service import auth, engine, ratelimit, schemas
-from ghar_re_service.lifecycle import AppState, log_event, startup
+from ghar_re_service.lifecycle import AppState, catalogue_identity_summary, log_event, startup
 from ghar_re_service.version import API_VERSION, ENGINE_VERSION
 
 state = AppState()
@@ -237,6 +237,7 @@ def meta():
             "model_version": state.preference_model_version,
             "weight": state.config.w_pref if state.config else 0.0,
         },
+        "catalogue_identity": catalogue_identity_summary(state.catalogue),
         "metrics": state.counters.as_dict(),
     }
     schemas.validate_meta(body)

@@ -140,6 +140,19 @@ def test_meta_returns_versions(client):
         "model_version": None,
         "weight": 0.0,
     }
+    assert body["catalogue_identity"] == lifecycle.catalogue_identity_summary(
+        main.state.catalogue
+    )
+    assert body["catalogue_identity"]["canonical_dishes"] > 0
+
+
+def test_catalogue_identity_summary_is_safe_before_startup():
+    assert lifecycle.catalogue_identity_summary(None) == {
+        "canonical_dishes": 0,
+        "resolvable_names": 0,
+        "ambiguous_aliases": 0,
+        "shadowed_aliases": 0,
+    }
 
 
 def test_preference_model_activation_fails_closed_without_artifact(monkeypatch, tmp_path):
