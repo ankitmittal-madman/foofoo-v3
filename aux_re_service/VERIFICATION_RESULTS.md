@@ -33,3 +33,25 @@
 The machine-readable source of truth is `data/reports/quality_gate_v2.json`. Synthetic artifacts are
 allowed only in shadow mode, even when the local synthetic-artifact switch is enabled. Production
 activation remains false.
+
+## Final integrated regression
+
+Executed from a clean `main` checkout after the v2 checkpoint:
+
+| Check | Result |
+|---|---|
+| Auxiliary unit/integration suite | 43 passed |
+| Existing `ghar_re_core` suite | 149 passed, 1 skipped |
+| Existing `ghar_re_service` suite | 93 passed |
+| Existing `food_ontology_service` suite | 16 passed, 6 integration skips |
+| Formatting, lint and static typing | Ruff format/check passed; mypy passed for 23 files |
+| Local Docker Compose build/start | Pass after reclaiming inactive Docker build cache |
+| Qdrant initialization | Healthy collection with 86 points and 64-dimensional vectors |
+| Known-household shadow request | 86 LightFM candidates scored; no retrieval failures; existing result retained |
+| Feedback live request | First event stored; replay of the same event rejected as a duplicate |
+| Metrics endpoint | Request, latency, fallback, model-failure, constraint, diversity, repetition and feedback metrics exported |
+
+The first container attempt could not unpack its completed image because the local Docker partition
+had only 61 MB free. Removing inactive Docker build cache recovered 3.987 GB; the unchanged image
+then built and the complete live flow passed. This was an infrastructure-capacity issue, not a code
+or dependency failure.
