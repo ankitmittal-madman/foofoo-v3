@@ -159,12 +159,8 @@ AUDIT_QUERIES: dict[str, tuple[str, str]] = {
     ),
 }
 
-RESEARCH_ENTITY_NAMES = tuple(
-    name for name in AUDIT_QUERIES if name.startswith("research_")
-)
-PRODUCTION_ENTITY_NAMES = tuple(
-    name for name in AUDIT_QUERIES if name not in RESEARCH_ENTITY_NAMES
-)
+RESEARCH_ENTITY_NAMES = tuple(name for name in AUDIT_QUERIES if name.startswith("research_"))
+PRODUCTION_ENTITY_NAMES = tuple(name for name in AUDIT_QUERIES if name not in RESEARCH_ENTITY_NAMES)
 
 
 def _mapping(cursor: Any, row: Any) -> Mapping[str, Any]:
@@ -199,9 +195,7 @@ def inspect_entities(connection: Any, entity_names: tuple[str, ...]) -> tuple[Au
     return tuple(rows)
 
 
-def build_inspection(
-    rows: tuple[AuditRow, ...], config: AutoEngineConfig
-) -> InspectionReport:
+def build_inspection(rows: tuple[AuditRow, ...], config: AutoEngineConfig) -> InspectionReport:
     """Derive readiness from one complete, uniquely keyed audit snapshot."""
     names = [row.entity_type for row in rows]
     missing = sorted(set(AUDIT_QUERIES) - set(names))

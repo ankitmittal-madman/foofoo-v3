@@ -343,9 +343,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         before = storage_report(connection)
         if args.mode == "export":
-            result = export_records(
-                connection, args.transfer, args.manifest, args.expected_count
-            )
+            result = export_records(connection, args.transfer, args.manifest, args.expected_count)
             connection.rollback()
         elif args.mode == "import":
             records, _manifest = _read_transfer(args.transfer, args.manifest)
