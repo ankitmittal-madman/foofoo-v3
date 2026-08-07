@@ -115,6 +115,26 @@ def test_manifest_checksum_drift_fails_closed(tmp_path: Path):
         ingestion.verify_manifest(training)
 
 
+def test_rejected_only_retention_keeps_audit_failures_without_accepted_payloads(tmp_path: Path):
+    """The storage-efficient profile retains rejected evidence and drops accepted raw copies."""
+    workbook = tmp_path / "dataset.xlsx"
+    _workbook(workbook, orphan_user=True)
+    rows = ingestion.read_workbook(workbook, "dataset_1")
+    ingestion.validate_relationships(rows)
+
+    retained = ingestion.retained_source_rows(rows, "rejected")
+
+    assert retained
+    assert all(row.validation_status == "rejected" for row in retained)
+    assert len(retained) < len(rows)
+
+
+def test_unknown_source_row_retention_fails_closed():
+    """A misspelled storage profile must not silently discard or retain unexpected rows."""
+    with pytest.raises(ValueError, match="unsupported source-row retention"):
+        ingestion.retained_source_rows([], "unexpected")
+
+
 def test_unsafe_destination_configuration_fails_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     training = _training_dir(tmp_path / "training")
     monkeypatch.setitem(ingestion.TARGETS, "dish", "public.dishes")
@@ -132,3 +152,26 @@ def test_migration_keeps_training_tables_private_and_has_rollback():
     assert "CHECK (synthetic_only)" in migration
     assert "DROP TABLE IF EXISTS research.training_source_rows" in rollback
     assert "public.profiles" not in rollback
+
+
+def test_production_cleanup_is_exact_count_guarded_and_has_recovery_instructions():
+    """The storage cleanup must fail closed and preserve an explicit recovery path."""
+    root = Path(__file__).parents[2]
+    cleanup = (
+        root
+        / "database/etl/synthetic_training/001_remove_production_synthetic_batch.sql"
+    ).read_text()
+    validation = (
+        root / "database/validation/941_remove_production_synthetic_batch_validation.sql"
+    ).read_text()
+    rollback = (
+        root / "database/rollback/089_remove_production_synthetic_batch_rollback.sql"
+    ).read_text()
+
+    assert "<> 132586" in cleanup
+    assert "<> 113868" in cleanup
+    assert "TRUNCATE TABLE research.training_source_rows" in cleanup
+    assert "TRUNCATE TABLE research.auto_training_records" in cleanup
+    assert "production_cleanup" in validation
+    assert "governed re-ingestion" in rollback
+    assert "TRUNCATE TABLE public." not in cleanup

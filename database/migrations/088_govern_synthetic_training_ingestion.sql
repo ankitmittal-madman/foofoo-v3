@@ -64,7 +64,6 @@ GRANT USAGE, SELECT ON SEQUENCE research.training_source_rows_id_seq TO service_
 COMMENT ON TABLE ml.training_import_batches IS
   'Private audit header for deterministic synthetic workbook imports; never a production user batch.';
 COMMENT ON TABLE research.training_source_rows IS
-  'Immutable workbook rows with file, sheet, row, hash and validation lineage. Rejected rows remain evidence only.';
+  'Retained workbook rows with file, sheet, row, hash and validation lineage; storage policy may keep rejected evidence only.';
 COMMENT ON COLUMN research.auto_training_records.source_lineage IS
   'Source files/artifacts and row references used by the versioned synthetic transformation.';
-
