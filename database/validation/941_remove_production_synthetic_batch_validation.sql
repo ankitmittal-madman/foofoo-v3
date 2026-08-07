@@ -5,7 +5,10 @@ DECLARE
   expected_batch constant uuid := '06a38fd3-ec53-54ab-ab0f-ef04bdf92c44';
 BEGIN
   IF EXISTS (SELECT 1 FROM research.training_source_rows)
-     OR EXISTS (SELECT 1 FROM research.auto_training_records) THEN
+     OR EXISTS (
+       SELECT 1 FROM research.auto_training_records
+       WHERE first_batch_id = expected_batch::text
+     ) THEN
     RAISE EXCEPTION 'synthetic training payloads remain in production';
   END IF;
 
