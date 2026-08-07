@@ -77,6 +77,13 @@ export interface ShownNotTappedRow {
   recommendation_event_id: string;
   dish_id: string | null;
   event_type: "shown_not_tapped";
+  schema_version: "1";
+  target_type: "dish";
+  target_id: string;
+  target_identity_status: "resolved" | "unresolved";
+  target_snapshot: { display_name: string };
+  evidence_kind: "integration";
+  source_surface: "recommendation_served";
   data_source: "real";
 }
 
@@ -97,14 +104,19 @@ export function buildShownNotTappedRows(
   served: ServedDish[],
   dishIds: Map<string, string>,
 ): ShownNotTappedRow[] {
-  return served.map((s) => ({
-    profile_id: profileId,
-    household_id: profileId,
-    recommendation_event_id: recommendationEventId,
-    dish_id: dishIds.get(s.dishName) ?? null,
-    event_type: "shown_not_tapped" as const,
-    data_source: "real" as const,
-  }));
+  return served.map((s) => {
+    const dishId = dishIds.get(s.dishName) ?? null;
+    return {
+      profile_id: profileId, household_id: profileId,
+      recommendation_event_id: recommendationEventId, dish_id: dishId,
+      event_type: "shown_not_tapped" as const, schema_version: "1" as const,
+      target_type: "dish" as const, target_id: dishId ?? s.dishName,
+      target_identity_status: dishId ? "resolved" as const : "unresolved" as const,
+      target_snapshot: { display_name: s.dishName },
+      evidence_kind: "integration" as const, source_surface: "recommendation_served" as const,
+      data_source: "real" as const,
+    };
+  });
 }
 
 /**

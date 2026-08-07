@@ -268,3 +268,10 @@ certificates; this file must not be marked complete without them.
 ## Founder Sign-off
 
 Founder acceptance: _______________________ Date: ___________
+
+## Implementation Checkpoints
+
+| Checkpoint | Repository evidence | Deployment status |
+|---|---|---|
+| S99 — program start | Selected Today date reaches the Plan request; this work package defines the shared program | Committed; no DB change |
+| S100 — interaction contract v2 | Versioned JSON contract, additive migration 092/validation 944, Edge validation/writer support, canonical service-only view, weekly meal-class selected/replaced/lock events, and focused mobile/Deno tests | Code checkpoint only; migration and Edge/mobile release not yet deployed |

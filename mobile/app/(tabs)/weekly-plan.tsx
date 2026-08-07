@@ -3,6 +3,7 @@ import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View
 import { router } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { describeApiError } from "@/api/errorMessages";
+import { postFeedback } from "@/api/feedback";
 import { fetchSavedWeek, fetchWeeklyPlan, savedWeekLocks, savedWeekSelections, saveWeekPlan, setPlanSlotLock } from "@/api/plan";
 import type { WeeklyClass, WeeklyPlanResponse } from "@/api/plan";
 import { useI18n } from "@/i18n";
@@ -14,6 +15,14 @@ const SLOTS: SlotName[] = ["breakfast", "lunch", "dinner"];
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 const WEEKEND = ["Saturday", "Sunday"];
 const SNACKS = ["Sprouts Chaat", "Roasted Makhana", "Fruit Chaat", "Buttermilk & Nuts"];
+
+function dateForWeekday(weekday: string, now = new Date()): string | undefined {
+  const offset = [...WEEKDAYS, ...WEEKEND].indexOf(weekday); if (offset < 0) return undefined;
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate()); const day = monday.getDay();
+  monday.setDate(monday.getDate() - (day === 0 ? 6 : day - 1) + offset);
+  return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, "0")}-${String(monday.getDate()).padStart(2, "0")}`;
+}
+function deviceTimezone(): string { return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; }
 
 export default function WeeklyPlan() {
   const { t } = useI18n(); const queryClient = useQueryClient();
@@ -36,12 +45,25 @@ export default function WeeklyPlan() {
     });
   }, [query.data]);
   useEffect(() => { if (saved.data?.plan) { const persisted = savedWeekSelections(saved.data); setSelected((current) => { const next = { ...current }; for (const [day, slots] of Object.entries(persisted)) next[day] = { ...next[day], ...slots }; return next; }); setLocked(savedWeekLocks(saved.data)); } }, [saved.data]);
-  const lockMutation = useMutation({ mutationFn: ({ weekday, slot, value }: { weekday: string; slot: SlotName; value: boolean }) => setPlanSlotLock(weekday, slot, value) });
+  const classInteraction = useMutation({ mutationFn: (input: { weekday: string; slot: SlotName; code: string; displayName: string; previousCode?: string; previousDisplayName?: string; eventType: "selected" | "replaced" | "lock" | "unlock" }) => {
+    if (!query.data?.request_id) return Promise.resolve(null); const occurredAt = new Date().toISOString();
+    const target = { type: "meal_class" as const, id: input.code, identity_status: "resolved" as const, display_name: input.displayName };
+    const previous = input.previousCode ? { type: "meal_class" as const, id: input.previousCode, identity_status: "resolved" as const, display_name: input.previousDisplayName ?? input.previousCode } : undefined;
+    return postFeedback({ schema_version: "2", idempotency_key: [query.data.request_id, occurredAt, input.weekday, input.slot, input.eventType, input.code].join(":"), request_id: query.data.request_id, event_type: input.eventType, target,
+      ...(input.eventType === "replaced" && previous ? { replacement: { from: previous, to: target } } : {}),
+      moment: { occurred_at: occurredAt, local_timezone: deviceTimezone(), intended_meal_date: dateForWeekday(input.weekday), meal_slot: input.slot, weekday: input.weekday as "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday", day_type: WEEKEND.includes(input.weekday) ? "weekend" : "weekday" },
+      evidence: { kind: "explicit", source_surface: "weekly_plan" }, versions: { catalog: query.data.catalog_version, config: query.data.config_version, feature: "weekly-class-interaction-v2", policy: "class-first-v1" } });
+  }, onError: () => setToast(t("saveFailed")) });
+  const lockMutation = useMutation({ mutationFn: async ({ weekday, slot, value, code, displayName }: { weekday: string; slot: SlotName; value: boolean; code?: string; displayName?: string }) => {
+    const result = await setPlanSlotLock(weekday, slot, value);
+    if (code) await classInteraction.mutateAsync({ weekday, slot, code, displayName: displayName ?? code, eventType: value ? "lock" : "unlock" });
+    return result;
+  } });
   const finalize = useMutation({ mutationFn: async (plan: FinalizedWeek) => { await saveWeekPlan(plan, true); await saveWeeklyPlan(plan); await Promise.all([queryClient.invalidateQueries({ queryKey: ["saved-week"] }), queryClient.invalidateQueries({ queryKey: ["daily-plan"] }), queryClient.invalidateQueries({ queryKey: ["meal-episodes"] })]); }, onSuccess: () => router.replace("/today") });
   const days = query.data?.days ?? []; const visibleNames = period === "weekdays" ? WEEKDAYS : WEEKEND; const visibleDays = useMemo(() => days.filter((day) => visibleNames.includes(day.weekday)), [days, period]);
   const totalSlots = days.length * SLOTS.length; const chosenCount = Object.values(selected).reduce((n, slots) => n + Object.keys(slots).length, 0);
-  const choose = (weekday: string, slot: SlotName, code: string) => setSelected((old) => ({ ...old, [weekday]: { ...old[weekday], [slot]: code } }));
-  const toggleLock = (weekday: string, slot: SlotName) => { const value = !locked[weekday]?.[slot]; setLocked((old) => ({ ...old, [weekday]: { ...old[weekday], [slot]: value } })); lockMutation.mutate({ weekday, slot, value }); };
+  const choose = (weekday: string, slot: SlotName, code: string) => { const previousCode = selected[weekday]?.[slot]; if (previousCode === code) return; const classes = days.find((day) => day.weekday === weekday)?.slots[slot] ?? []; const selectedClass = classes.find((item) => item.class_code === code); const previousClass = classes.find((item) => item.class_code === previousCode); setSelected((old) => ({ ...old, [weekday]: { ...old[weekday], [slot]: code } })); classInteraction.mutate({ weekday, slot, code, displayName: selectedClass?.class_name ?? code, previousCode, previousDisplayName: previousClass?.class_name, eventType: previousCode ? "replaced" : "selected" }); };
+  const toggleLock = (weekday: string, slot: SlotName) => { const value = !locked[weekday]?.[slot]; const code = selected[weekday]?.[slot]; const displayName = days.find((day) => day.weekday === weekday)?.slots[slot].find((item) => item.class_code === code)?.class_name; setLocked((old) => ({ ...old, [weekday]: { ...old[weekday], [slot]: value } })); lockMutation.mutate({ weekday, slot, value, code, displayName }); };
   const flash = (message: string) => { setToast(message); setTimeout(() => setToast(""), 1800); };
   const copyForward = (weekday: string) => { const order = [...WEEKDAYS, ...WEEKEND]; const next = order[order.indexOf(weekday) + 1]; if (!next) return; setSelected((old) => ({ ...old, [next]: { ...old[weekday] } })); setSnacks((old) => ({ ...old, [next]: old[weekday] ?? 0 })); flash(`${weekday} → ${next}`); };
 

@@ -42,6 +42,7 @@ const PLAN_CONTROL_EVENTS = new Set([
   "add_to_date",
   "make_this",
   "replaced",
+  "selected",
   "never",
   "not_today",
 ]);
@@ -99,6 +100,14 @@ export function makeFeedbackHandler(deps: FeedbackDeps = {}): Handler {
       dishName: feedbackReq.dishName,
       slot: feedbackReq.slot,
       detail: feedbackReq.detail,
+      schemaVersion: feedbackReq.schemaVersion,
+      idempotencyKey: feedbackReq.idempotencyKey,
+      target: feedbackReq.target,
+      replacement: feedbackReq.replacement,
+      moment: feedbackReq.moment,
+      evidence: feedbackReq.evidence,
+      reasonCode: feedbackReq.reasonCode,
+      versions: feedbackReq.versions,
     });
 
     UserJourney.logFeedbackRecorded(claims.userId, feedbackReq.eventType, result.dishResolved);

@@ -34,9 +34,38 @@ export const FEEDBACK_EVENT_TYPES = [
   "replaced",
   "completed",
   "regretted",
+  "opened",
+  "search",
+  "selected",
 ] as const;
 
 export type FeedbackEventType = typeof FEEDBACK_EVENT_TYPES[number];
+
+export const INTERACTION_TARGET_TYPES = [
+  "dish", "meal_episode", "meal_class", "ingredient", "query", "plan_slot",
+] as const;
+export type InteractionTargetType = typeof INTERACTION_TARGET_TYPES[number];
+export interface InteractionTarget {
+  readonly type: InteractionTargetType;
+  readonly id: string;
+  readonly identityStatus: "resolved" | "unresolved";
+  readonly displayName?: string;
+  readonly snapshot?: Record<string, unknown>;
+}
+export interface InteractionMoment {
+  readonly occurredAt: string;
+  readonly localTimezone: string;
+  readonly intendedMealDate?: string;
+  readonly mealSlot: "breakfast" | "lunch" | "dinner" | "snacks";
+  readonly weekday?: string;
+  readonly dayType?: "weekday" | "weekend";
+}
+export interface InteractionEvidence {
+  readonly kind: "explicit" | "inferred" | "integration" | "operator";
+  readonly sourceSurface: string;
+  readonly shownRank?: number;
+  readonly selectionPropensity?: number;
+}
 
 export interface FeedbackRequest {
   /** Household whose served recommendation is being acted on. Defaults to the caller's
@@ -53,7 +82,38 @@ export interface FeedbackRequest {
   readonly dishName?: string;
   readonly slot?: string;
   readonly detail?: Record<string, unknown>;
+  readonly schemaVersion: "1" | "2";
+  readonly idempotencyKey?: string;
+  readonly target?: InteractionTarget;
+  readonly replacement?: { readonly from: InteractionTarget; readonly to: InteractionTarget };
+  readonly moment?: InteractionMoment;
+  readonly evidence?: InteractionEvidence;
+  readonly reasonCode?: string;
+  readonly versions?: {
+    readonly catalog?: string; readonly config?: string; readonly feature?: string;
+    readonly policy?: string; readonly model?: string;
+  };
 }
+
+const targetSchema = z.object({
+  type: z.enum(INTERACTION_TARGET_TYPES), id: z.string().min(1).max(300),
+  identity_status: z.enum(["resolved", "unresolved"]),
+  display_name: z.string().min(1).max(300).optional(),
+  snapshot: z.record(z.unknown()).optional(),
+});
+const momentSchema = z.object({
+  occurred_at: z.string().datetime(), local_timezone: z.string().min(1).max(100),
+  intended_meal_date: z.string().date().optional(),
+  meal_slot: z.enum(["breakfast", "lunch", "dinner", "snacks"]),
+  weekday: z.enum(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]).optional(),
+  day_type: z.enum(["weekday", "weekend"]).optional(),
+});
+const evidenceSchema = z.object({
+  kind: z.enum(["explicit", "inferred", "integration", "operator"]),
+  source_surface: z.string().min(1).max(100),
+  shown_rank: z.number().int().positive().optional(),
+  selection_propensity: z.number().positive().max(1).optional(),
+});
 
 const feedbackEnvelope = z.object({
   household_id: z.string().uuid().optional(),
@@ -61,6 +121,18 @@ const feedbackEnvelope = z.object({
   event_type: z.string(),
   dish_name: z.string().min(1).optional(),
   slot: z.string().optional(),
+  schema_version: z.enum(["1", "2"]).optional(),
+  idempotency_key: z.string().min(1).max(200).optional(),
+  target: targetSchema.optional(),
+  replacement: z.object({ from: targetSchema, to: targetSchema }).optional(),
+  moment: momentSchema.optional(),
+  evidence: evidenceSchema.optional(),
+  reason: z.object({ code: z.string().min(1).max(100).optional(), detail: z.record(z.unknown()).optional() }).optional(),
+  versions: z.object({
+    catalog: z.string().max(200).optional(), config: z.string().max(200).optional(),
+    feature: z.string().max(200).optional(), policy: z.string().max(200).optional(),
+    model: z.string().max(200).optional(),
+  }).optional(),
   detail: z.record(z.unknown()).optional(),
 });
 
@@ -92,12 +164,51 @@ export function parseFeedbackRequest(body: unknown): FeedbackRequest {
     });
   }
 
+  const schemaVersion = parsed.data.schema_version ?? "1";
+  if (schemaVersion === "2" && (!parsed.data.idempotency_key || !parsed.data.target ||
+      !parsed.data.moment || !parsed.data.evidence)) {
+    throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
+      detail: "schema_version 2 requires idempotency_key, target, moment, and evidence",
+    });
+  }
+  if (parsed.data.evidence && parsed.data.evidence.kind !== "explicit") {
+    throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
+      detail: "POST /feedback accepts explicit evidence only",
+    });
+  }
+  const toTarget = (target: z.infer<typeof targetSchema>): InteractionTarget => ({
+    type: target.type, id: target.id, identityStatus: target.identity_status,
+    displayName: target.display_name, snapshot: target.snapshot,
+  });
+
   return {
     householdId: parsed.data.household_id,
     requestId: parsed.data.request_id,
     eventType: parsed.data.event_type,
-    dishName: parsed.data.dish_name,
-    slot: parsed.data.slot,
-    detail: parsed.data.detail,
+    dishName: parsed.data.dish_name ??
+      (parsed.data.target?.type === "dish" ? parsed.data.target.display_name : undefined),
+    slot: parsed.data.slot ?? parsed.data.moment?.meal_slot,
+    detail: { ...(parsed.data.detail ?? {}), ...(parsed.data.reason?.detail ?? {}) },
+    schemaVersion,
+    idempotencyKey: parsed.data.idempotency_key,
+    target: parsed.data.target ? toTarget(parsed.data.target) : undefined,
+    replacement: parsed.data.replacement
+      ? { from: toTarget(parsed.data.replacement.from), to: toTarget(parsed.data.replacement.to) }
+      : undefined,
+    moment: parsed.data.moment ? {
+      occurredAt: parsed.data.moment.occurred_at,
+      localTimezone: parsed.data.moment.local_timezone,
+      intendedMealDate: parsed.data.moment.intended_meal_date,
+      mealSlot: parsed.data.moment.meal_slot,
+      weekday: parsed.data.moment.weekday,
+      dayType: parsed.data.moment.day_type,
+    } : undefined,
+    evidence: parsed.data.evidence ? {
+      kind: parsed.data.evidence.kind, sourceSurface: parsed.data.evidence.source_surface,
+      shownRank: parsed.data.evidence.shown_rank,
+      selectionPropensity: parsed.data.evidence.selection_propensity,
+    } : undefined,
+    reasonCode: parsed.data.reason?.code,
+    versions: parsed.data.versions,
   };
 }

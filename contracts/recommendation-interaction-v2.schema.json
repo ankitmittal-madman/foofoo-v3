@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foofoo.app/contracts/recommendation-interaction-v2.schema.json",
+  "title": "FooFoo Recommendation Interaction v2",
+  "description": "Canonical, retry-safe interaction envelope shared by mobile, Edge, Ghar RE feature replay, and Aux RE training/export.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "idempotency_key",
+    "request_id",
+    "event_type",
+    "target",
+    "moment",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": { "const": "2" },
+    "idempotency_key": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "household_id": { "type": "string", "format": "uuid" },
+    "request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "event_type": {
+      "enum": [
+        "accept",
+        "edit",
+        "swap",
+        "like",
+        "dislike",
+        "shown_not_tapped",
+        "never",
+        "not_today",
+        "lock",
+        "unlock",
+        "add_to_date",
+        "make_this",
+        "too_much_work",
+        "missing_ingredient",
+        "member_objection",
+        "cooked",
+        "ordered",
+        "replaced",
+        "completed",
+        "regretted",
+        "opened",
+        "search",
+        "selected"
+      ]
+    },
+    "target": { "$ref": "#/$defs/target" },
+    "replacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "$ref": "#/$defs/target" },
+        "to": { "$ref": "#/$defs/target" }
+      }
+    },
+    "moment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["occurred_at", "local_timezone", "meal_slot"],
+      "properties": {
+        "occurred_at": { "type": "string", "format": "date-time" },
+        "local_timezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "intended_meal_date": { "type": "string", "format": "date" },
+        "meal_slot": { "enum": ["breakfast", "lunch", "dinner", "snacks"] },
+        "weekday": {
+          "enum": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ]
+        },
+        "day_type": { "enum": ["weekday", "weekend"] }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "source_surface"],
+      "properties": {
+        "kind": { "enum": ["explicit", "inferred", "integration", "operator"] },
+        "source_surface": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "shown_rank": { "type": "integer", "minimum": 1 },
+        "selection_propensity": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "detail": { "type": "object" }
+      }
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "catalog": { "type": "string", "maxLength": 200 },
+        "config": { "type": "string", "maxLength": 200 },
+        "feature": { "type": "string", "maxLength": 200 },
+        "policy": { "type": "string", "maxLength": 200 },
+        "model": { "type": "string", "maxLength": 200 }
+      }
+    },
+    "detail": { "type": "object" }
+  },
+  "$defs": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "identity_status"],
+      "properties": {
+        "type": {
+          "enum": [
+            "dish",
+            "meal_episode",
+            "meal_class",
+            "ingredient",
+            "query",
+            "plan_slot"
+          ]
+        },
+        "id": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "identity_status": { "enum": ["resolved", "unresolved"] },
+        "display_name": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "snapshot": { "type": "object" }
+      }
+    }
+  }
+}

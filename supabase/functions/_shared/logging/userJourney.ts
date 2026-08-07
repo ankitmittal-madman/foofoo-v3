@@ -29,6 +29,7 @@
  * used as either the log key or appearing in a narrative string; no email, JWT, or raw answer
  * free-text is ever interpolated into a narrative.
  */
+import type { FeedbackEventType } from "../validation/feedback-schema.ts";
 import { createLogger, type Logger } from "./logger.ts";
 
 const journeyLog: Logger = createLogger("info", { event: "user_journey" });
@@ -150,27 +151,7 @@ export const UserJourney = {
    */
   logFeedbackRecorded(
     profileId: string,
-    eventType:
-      | "accept"
-      | "edit"
-      | "swap"
-      | "like"
-      | "dislike"
-      | "shown_not_tapped"
-      | "never"
-      | "not_today"
-      | "lock"
-      | "unlock"
-      | "add_to_date"
-      | "make_this"
-      | "too_much_work"
-      | "missing_ingredient"
-      | "member_objection"
-      | "cooked"
-      | "ordered"
-      | "replaced"
-      | "completed"
-      | "regretted",
+    eventType: FeedbackEventType,
     dishResolved: boolean,
   ): void {
     const verb: Record<typeof eventType, string> = {
@@ -194,6 +175,9 @@ export const UserJourney = {
       replaced: "replaced an earlier choice",
       completed: "completed the meal",
       regretted: "reported regret after choosing the meal",
+      opened: "opened recommendation details",
+      search: "searched for a meal or dish",
+      selected: "selected a recommendation target",
     };
     const narrative = `Household ${verb[eventType]}` +
       (dishResolved ? "." : " (dish not yet matched to the catalogue — recorded anyway).");

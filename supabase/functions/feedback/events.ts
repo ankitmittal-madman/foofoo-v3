@@ -27,7 +27,7 @@ import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
-import type { FeedbackEventType } from "../_shared/validation/feedback-schema.ts";
+import type { FeedbackEventType, InteractionEvidence, InteractionMoment, InteractionTarget } from "../_shared/validation/feedback-schema.ts";
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 
 export interface FeedbackEventInput {
@@ -41,6 +41,17 @@ export interface FeedbackEventInput {
   dishName?: string;
   slot?: string;
   detail?: Record<string, unknown>;
+  schemaVersion: "1" | "2";
+  idempotencyKey?: string;
+  target?: InteractionTarget;
+  replacement?: { readonly from: InteractionTarget; readonly to: InteractionTarget };
+  moment?: InteractionMoment;
+  evidence?: InteractionEvidence;
+  reasonCode?: string;
+  versions?: {
+    readonly catalog?: string; readonly config?: string; readonly feature?: string;
+    readonly policy?: string; readonly model?: string;
+  };
 }
 
 export interface FeedbackEventResult {
@@ -61,7 +72,28 @@ const OUTCOME_BY_FEEDBACK: Partial<Record<FeedbackEventType, string>> = {
   replaced: "replaced",
   completed: "completed",
   regretted: "regretted",
+  selected: "chosen",
 };
+
+function targetSnapshot(target: InteractionTarget | undefined): Record<string, unknown> {
+  if (!target) return {};
+  return {
+    target_type: target.type, target_id: target.id,
+    target_identity_status: target.identityStatus,
+    ...(target.displayName ? { target_display_name: target.displayName } : {}),
+    ...(target.snapshot ? { target_snapshot: target.snapshot } : {}),
+  };
+}
+
+function typedEventDetail(ev: FeedbackEventInput): Record<string, unknown> {
+  return {
+    ...(ev.detail ?? {}), ...targetSnapshot(ev.target),
+    ...(ev.replacement ? { replacement: {
+      from: targetSnapshot(ev.replacement.from), to: targetSnapshot(ev.replacement.to),
+    } } : {}),
+    ...(ev.reasonCode ? { reason_code: ev.reasonCode } : {}),
+  };
+}
 
 export function slateItemMatchesDish(
   decisionTrace: unknown,
@@ -140,7 +172,7 @@ async function syncTypedIntelligence(
         slate_id: slateId,
         episode_hash: episodeHash,
         outcome_type: outcomeType,
-        value: ev.detail ?? {},
+        value: typedEventDetail(ev),
         source: "explicit",
         confidence: 1,
         occurred_at: occurredAt,
@@ -256,18 +288,34 @@ export async function recordFeedbackEvent(
     }
   }
 
+  if (ev.target?.type === "meal_class") {
+    const { data: mealClass, error: classError } = await withTimeout(
+      db.from("meal_classes").select("class_code,display_name").eq("class_code", ev.target.id)
+        .eq("is_active", true).maybeSingle(),
+      "feedback.events.resolve_meal_class",
+    );
+    if (classError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: classError.message });
+    if (!mealClass) {
+      throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
+        detail: "target meal_class is not active", context: { target_id: ev.target.id },
+      });
+    }
+  }
+
   // Client retries are safe: one intent per served recommendation/dish/event. Return the original
   // result without applying its affinity delta twice.
-  const existingQuery = db.from("feedback_events").select("id,created_at").eq(
-    "profile_id",
-    ev.actorProfileId,
-  ).eq("recommendation_event_id", recRow.id).eq("event_type", ev.eventType);
+  const existingQuery = db.from("feedback_events").select("id,created_at");
   const { data: existing, error: existingError } = await withTimeout(
-    dishId === null
-      ? existingQuery.is("dish_id", null)
+    ev.idempotencyKey
+      ? existingQuery.eq("household_id", ev.householdId).eq("profile_id", ev.actorProfileId)
+        .eq("idempotency_key", ev.idempotencyKey).maybeSingle()
+      : dishId === null
+      ? existingQuery.eq("profile_id", ev.actorProfileId).eq("recommendation_event_id", recRow.id)
+        .eq("event_type", ev.eventType).is("dish_id", null)
         .contains("detail", ev.dishName ? { dish_name: ev.dishName } : {})
         .maybeSingle()
-      : existingQuery.eq("dish_id", dishId).maybeSingle(),
+      : existingQuery.eq("profile_id", ev.actorProfileId).eq("recommendation_event_id", recRow.id)
+        .eq("event_type", ev.eventType).eq("dish_id", dishId).maybeSingle(),
     "feedback.events.idempotency_lookup",
   );
   if (existingError) {
@@ -294,8 +342,36 @@ export async function recordFeedbackEvent(
         dish_id: dishId,
         event_type: ev.eventType,
         slot: ev.slot ?? null,
+        schema_version: ev.schemaVersion,
+        idempotency_key: ev.idempotencyKey ?? null,
+        target_type: ev.target?.type ?? (ev.dishName ? "dish" : null),
+        target_id: ev.target?.type === "dish" ? dishId : ev.target?.id ?? dishId,
+        target_identity_status: ev.target?.type === "dish"
+          ? (dishResolved ? "resolved" : "unresolved")
+          : ev.target ? "resolved" : dishId ? "resolved" : "unresolved",
+        target_snapshot: ev.target ? {
+          ...(ev.target.snapshot ?? {}),
+          ...(ev.target.displayName ? { display_name: ev.target.displayName } : {}),
+        } : ev.dishName ? { display_name: ev.dishName } : {},
+        replacement_target_type: ev.replacement?.to.type ?? null,
+        replacement_target_id: ev.replacement?.to.id ?? null,
+        occurred_at: ev.moment?.occurredAt ?? new Date().toISOString(),
+        local_timezone: ev.moment?.localTimezone ?? null,
+        intended_meal_date: ev.moment?.intendedMealDate ?? null,
+        weekday: ev.moment?.weekday ?? null,
+        day_type: ev.moment?.dayType ?? null,
+        source_surface: ev.evidence?.sourceSurface ?? null,
+        evidence_kind: ev.evidence?.kind ?? "explicit",
+        shown_rank: ev.evidence?.shownRank ?? null,
+        selection_propensity: ev.evidence?.selectionPropensity ?? null,
+        reason_code: ev.reasonCode ?? null,
+        catalog_version: ev.versions?.catalog ?? null,
+        config_version: ev.versions?.config ?? null,
+        feature_version: ev.versions?.feature ?? null,
+        policy_version: ev.versions?.policy ?? null,
+        model_version: ev.versions?.model ?? null,
         detail: {
-          ...(ev.detail ?? {}),
+          ...typedEventDetail(ev),
           ...(ev.dishName ? { dish_name: ev.dishName } : {}),
           ...(canonicalDishName && canonicalDishName !== ev.dishName
             ? { canonical_dish_name: canonicalDishName }
@@ -378,6 +454,10 @@ export async function recordFeedbackEvent(
       slot: ev.slot ?? null,
       dish_name: ev.dishName ?? null,
       canonical_dish_name: canonicalDishName ?? null,
+      schema_version: ev.schemaVersion,
+      target_type: ev.target?.type ?? (ev.dishName ? "dish" : null),
+      target_id: ev.target?.id ?? null,
+      source_surface: ev.evidence?.sourceSurface ?? null,
     },
   });
 

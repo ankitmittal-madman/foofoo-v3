@@ -137,7 +137,17 @@ export type FeedbackEventType =
   | "accept" | "edit" | "swap" | "like" | "dislike" | "shown_not_tapped"
   | "never" | "not_today" | "lock" | "unlock" | "add_to_date"
   | "make_this" | "too_much_work" | "missing_ingredient" | "member_objection"
-  | "cooked" | "ordered" | "replaced" | "completed" | "regretted";
+  | "cooked" | "ordered" | "replaced" | "completed" | "regretted"
+  | "opened" | "search" | "selected";
+
+export type InteractionTargetType = "dish" | "meal_episode" | "meal_class" | "ingredient" | "query" | "plan_slot";
+export interface InteractionTarget { type: InteractionTargetType; id: string; identity_status: "resolved" | "unresolved"; display_name?: string; snapshot?: Record<string, unknown> }
+export interface InteractionMoment {
+  occurred_at: string; local_timezone: string; intended_meal_date?: string;
+  meal_slot: "breakfast" | "lunch" | "dinner" | "snacks";
+  weekday?: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+  day_type?: "weekday" | "weekend";
+}
 
 export interface FeedbackRequest {
   household_id?: string;
@@ -148,6 +158,14 @@ export interface FeedbackRequest {
   /** plate.hero_dish_names[i] — resolved server-side to public.dishes.id by name. */
   dish_name?: string;
   slot?: string;
+  schema_version?: "1" | "2";
+  idempotency_key?: string;
+  target?: InteractionTarget;
+  replacement?: { from: InteractionTarget; to: InteractionTarget };
+  moment?: InteractionMoment;
+  evidence?: { kind: "explicit"; source_surface: string; shown_rank?: number; selection_propensity?: number };
+  reason?: { code?: string; detail?: Record<string, unknown> };
+  versions?: { catalog?: string; config?: string; feature?: string; policy?: string; model?: string };
   detail?: Record<string, unknown>;
 }
 

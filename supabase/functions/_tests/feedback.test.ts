@@ -63,6 +63,26 @@ Deno.test("parseFeedbackRequest accepts a well-formed body", () => {
   assertEquals(req.requestId, REQUEST_ID);
   assertEquals(req.eventType, "like");
   assertEquals(req.dishName, "Masala Dosa");
+  assertEquals(req.schemaVersion, "1");
+});
+
+Deno.test("parseFeedbackRequest accepts canonical meal-class interaction v2", () => {
+  const req = parseFeedbackRequest({ schema_version: "2", idempotency_key: "weekly-1:event-1",
+    request_id: REQUEST_ID, event_type: "selected",
+    target: { type: "meal_class", id: "LD_DAL_ROTI", identity_status: "resolved", display_name: "Dal + Roti" },
+    moment: { occurred_at: "2026-08-07T10:00:00.000Z", local_timezone: "Asia/Kolkata", intended_meal_date: "2026-08-12", meal_slot: "lunch", weekday: "Wednesday", day_type: "weekday" },
+    evidence: { kind: "explicit", source_surface: "weekly_plan", shown_rank: 2 },
+    versions: { catalog: "catalogue-v1", config: "config-v1", feature: "event-v2" } });
+  assertEquals(req.schemaVersion, "2"); assertEquals(req.target?.id, "LD_DAL_ROTI");
+  assertEquals(req.moment?.intendedMealDate, "2026-08-12");
+});
+
+Deno.test("parseFeedbackRequest rejects incomplete or forged v2 evidence", () => {
+  assertEquals(assertThrows(() => parseFeedbackRequest({ ...validBody(), schema_version: "2" }), AppError).httpStatus, 400);
+  assertEquals(assertThrows(() => parseFeedbackRequest({ ...validBody(), schema_version: "2", idempotency_key: "event-1",
+    target: { type: "dish", id: "dish-1", identity_status: "unresolved" },
+    moment: { occurred_at: "2026-08-07T10:00:00.000Z", local_timezone: "Asia/Kolkata", meal_slot: "breakfast" },
+    evidence: { kind: "inferred", source_surface: "weekly_plan" } }), AppError).httpStatus, 400);
 });
 
 Deno.test("served dish feedback resolves both dish-card and episode decision traces", () => {
@@ -114,7 +134,7 @@ Deno.test("parseFeedbackRequest rejects an unknown event_type with ERR_FEEDBACK_
   assertEquals(e.httpStatus, 422);
 });
 
-Deno.test("FEEDBACK_EVENT_TYPES matches the feedback_events CHECK constraint (migration 053)", () => {
+Deno.test("FEEDBACK_EVENT_TYPES matches the feedback_events CHECK constraint (migration 092)", () => {
   assertEquals(
     [...FEEDBACK_EVENT_TYPES].sort(),
     [
@@ -131,9 +151,12 @@ Deno.test("FEEDBACK_EVENT_TYPES matches the feedback_events CHECK constraint (mi
       "missing_ingredient",
       "never",
       "not_today",
+      "opened",
       "ordered",
       "regretted",
       "replaced",
+      "search",
+      "selected",
       "shown_not_tapped",
       "swap",
       "too_much_work",
@@ -279,6 +302,7 @@ Deno.test("POST /v1/feedback returns 401 when unauthenticated", async () => {
 
 Deno.test("feedback role matrix keeps viewers read-only and plan control owner/planner-only", () => {
   assertEquals(feedbackAllowedRoles("lock"), ["owner", "planner"]);
+  assertEquals(feedbackAllowedRoles("selected"), ["owner", "planner"]);
   assertEquals(feedbackAllowedRoles("missing_ingredient"), ["owner", "planner", "cook"]);
   assertEquals(feedbackAllowedRoles("like"), ["owner", "planner", "cook", "member"]);
 });

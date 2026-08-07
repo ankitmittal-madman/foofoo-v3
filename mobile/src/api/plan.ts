@@ -261,6 +261,9 @@ export interface WeeklyDay {
 
 export interface WeeklyPlanResponse {
   kind: string;
+  request_id?: string;
+  config_version?: string;
+  catalog_version?: string;
   days: WeeklyDay[];
 }
 

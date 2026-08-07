@@ -370,8 +370,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       // feedback/events.ts) has something to resolve against. Widened 2026-08 (P0-4) from
       // cold_start/calibration-only to also cover meal_plan/class_dishes -- those are the surfaces
       // the actively-routed Home tab (today.tsx) actually calls, so a like/dislike tap there had
-      // nothing to resolve against before this change. weekly_plan/recipe are deliberately excluded:
-      // weekly_plan returns classes, not scored dishes, and recipe isn't a recommendation at all.
+      // nothing to resolve against before this change. weekly_plan is now included so a direct
+      // class selection has request lineage; recipe remains excluded because it is content detail.
       // Best-effort (recordRecommendationEvent never throws/never blocks the response, same as
       // recommendations/handler.ts's own call site); skipped for a stubbed (no-profile-yet)
       // household, same guard recordRecommendationEvent already applies itself.
@@ -381,6 +381,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         "meal_plan",
         "class_dishes",
         "meal_episodes",
+        "weekly_plan",
       ]);
       let slateId: string | undefined;
       if (surface === "meal_episodes" && resolvedHouseholdId) {
@@ -442,6 +443,13 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           ? Object.values((body.slots as Record<string, unknown[]>) ?? {}).flat()
           : surface === "meal_episodes"
           ? body.episodes
+          : surface === "weekly_plan" && Array.isArray(body.days)
+          ? (body.days as Array<Record<string, unknown>>).flatMap((day) => {
+            const slots = day.slots && typeof day.slots === "object"
+              ? day.slots as Record<string, unknown>
+              : {};
+            return Object.values(slots).flatMap((classes) => Array.isArray(classes) ? classes : []);
+          })
           : (body.dishes ?? body.options);
         const dishCount = Array.isArray(dishes) ? dishes.length : 0;
         await recordRecommendationEvent(ctx, {
