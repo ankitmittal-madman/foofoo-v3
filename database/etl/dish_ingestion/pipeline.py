@@ -395,9 +395,15 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                     n["name"], n["cuisine_raw"], n["course_raw"], n["ingredients"]
                 )
                 prompt_text = assemble_prompt(n["name"], fields)
+                # HF fallback intentionally not passed here (Founder directive): chaining
+                # Pollinations' full retry cycle + an HF attempt inside one open DB transaction
+                # was long enough to trip Supabase's idle-in-transaction/statement timeout,
+                # aborting every row in the run (see import_row_errors: "current transaction is
+                # aborted"). HFImageClient stays available on image_ctx for a future fix that
+                # moves generation outside the transaction, but is not invoked for now.
                 image_result = images.generate_and_upload(
                     n["name"], prompt_text, fields.source, fields.model_name,
-                    image_ctx.pollinations, image_ctx.uploader, image_ctx.hf_image,
+                    image_ctx.pollinations, image_ctx.uploader,
                 )
                 logger.info("dish %s: image_result fetch_status=%s storage_path=%s",
                             dish_id, image_result.fetch_status, image_result.storage_path)
