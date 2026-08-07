@@ -33,19 +33,48 @@ class ReadinessSnapshot:
     attributed_to_slate_events: int
     identity_coverage: float
     slate_attribution_coverage: float
+    eligible_training_events: int
+    eligible_training_households: int
+    eligible_positive_events: int
+    eligible_negative_events: int
     is_ready: bool
 
     @classmethod
     def from_mapping(cls, row: Mapping[str, Any]) -> ReadinessSnapshot:
+        total = int(row["real_labeled_events"])
+        attributed = int(row["attributed_to_slate_events"])
+        exact_legacy_corpus = attributed == total
         return cls(
-            real_labeled_events=int(row["real_labeled_events"]),
+            real_labeled_events=total,
             positive_events=int(row["positive_events"]),
             negative_events=int(row["negative_events"]),
             distinct_households=int(row["distinct_households"]),
             identity_resolved_events=int(row["identity_resolved_events"]),
-            attributed_to_slate_events=int(row["attributed_to_slate_events"]),
+            attributed_to_slate_events=attributed,
             identity_coverage=float(row["identity_coverage"]),
             slate_attribution_coverage=float(row["slate_attribution_coverage"]),
+            # Rolling deployments may briefly run this code before migration 090. V1 can only be
+            # considered eligible when its entire corpus is exact; partial legacy attribution is
+            # reported but remains closed until v2 is available.
+            eligible_training_events=int(row.get("eligible_training_events", attributed)),
+            eligible_training_households=int(
+                row.get(
+                    "eligible_training_households",
+                    row["distinct_households"] if exact_legacy_corpus else 0,
+                )
+            ),
+            eligible_positive_events=int(
+                row.get(
+                    "eligible_positive_events",
+                    row["positive_events"] if exact_legacy_corpus else 0,
+                )
+            ),
+            eligible_negative_events=int(
+                row.get(
+                    "eligible_negative_events",
+                    row["negative_events"] if exact_legacy_corpus else 0,
+                )
+            ),
             is_ready=bool(row["is_ready"]),
         )
 
@@ -65,7 +94,20 @@ def database_url(environ: Mapping[str, str] | None = None) -> str:
 def fetch_readiness(connection: Any) -> ReadinessSnapshot:
     with connection.cursor() as cursor:
         cursor.execute(
-            "select * from ml.preference_training_readiness(%s, %s)",
+            "select to_regprocedure(%s) is not null as available",
+            ("ml.preference_training_readiness_v2(integer,integer)",),
+        )
+        availability = cursor.fetchone()
+        v2_available = bool(
+            availability.get("available") if isinstance(availability, Mapping) else availability[0]
+        )
+        function_name = (
+            "ml.preference_training_readiness_v2"
+            if v2_available
+            else "ml.preference_training_readiness"
+        )
+        cursor.execute(
+            f"select * from {function_name}(%s, %s)",  # noqa: S608 — fixed allowlisted names
             (CONFIG.pref_training_min_events, CONFIG.pref_training_min_households),
         )
         row = cursor.fetchone()
@@ -148,7 +190,7 @@ def run(
     with tempfile.TemporaryDirectory(prefix="foofoo-pref-training-") as private_dir:
         export_path = Path(private_dir) / "private-feedback-export.jsonl"
         exported = export_rows(connection, export_path)
-        if exported != readiness.real_labeled_events:
+        if exported != readiness.eligible_training_events:
             raise RuntimeError(
                 "Readiness/export count changed during the read-only snapshot; refusing a "
                 "non-reproducible training run"
