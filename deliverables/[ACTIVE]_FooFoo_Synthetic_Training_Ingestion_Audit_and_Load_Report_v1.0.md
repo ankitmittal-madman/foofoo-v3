@@ -233,6 +233,15 @@ An earlier attempt, run `31166273820`, correctly rolled back its data transactio
 collapse those duplicates; the successful run above is the committed batch. Migrations are
 additive and idempotent, so the earlier schema application did not duplicate data.
 
+### 10.4 Storage relocation completed
+
+On 2026-08-07 the normalized batch was copied to a dedicated private training Supabase project,
+with only the 45 rejected raw rows retained in PostgreSQL. Protected cleanup then removed all
+132,586 raw source rows and all 113,868 workbook-seed normalized records from production while
+preserving 461 later research records. Production database size fell from 563,186,835 bytes to
+376,728,723 bytes. Full evidence, secret boundaries and recovery instructions are recorded in
+`deliverables/[ACTIVE]_FooFoo_Synthetic_Training_Storage_Relocation_Report_v1.0.md`.
+
 ## 11. Remaining Gaps
 
 - The 45 rejected workbook rows require source-data repair before they can enter normalized
