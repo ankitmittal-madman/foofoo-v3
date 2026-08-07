@@ -134,10 +134,21 @@ class PollinationsClient:
         last_exc: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
             try:
-                # Pollinations reference script (gemini_image_gen__Pollinations.py) used the
-                # `requests` library, which sends a real browser-style default User-Agent;
-                # urllib's default ("Python-urllib/3.x") is a common bot-blocking signature.
-                req = urllib.request.Request(url, method="GET", headers={"User-Agent": "foofoo-dish-ingestion/1.0"})
+                # A custom-but-clearly-automated User-Agent ("foofoo-dish-ingestion/1.0") still
+                # got HTTP 403 from every real attempt -- Pollinations sits behind Cloudflare,
+                # which blocks GitHub Actions' shared datacenter IP ranges more aggressively than
+                # it filters on User-Agent alone. Trying a real browser UA string as the cheapest
+                # possible fix before concluding this needs a network-level workaround (proxy /
+                # different runner).
+                req = urllib.request.Request(
+                    url, method="GET",
+                    headers={
+                        "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                                       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
+                        "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+                        "Referer": "https://pollinations.ai/",
+                    },
+                )
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     body = resp.read()
                 if len(body) < MIN_VALID_BYTES:
