@@ -120,6 +120,21 @@ Never fabricate execution, versions, commit history, or content that wasn't
 actually provided. If required input (a template, a section, a file) is
 missing, stop and report the gap rather than inventing placeholder content.
 
+### Synthetic training placement — mandatory
+
+- Synthetic, generated, expert-template, shadow, QA, and research-training records must be
+  written only to the dedicated training Supabase project through `TRAINING_DATABASE_URL`.
+- Never use `FOOFOO_SUPABASE_URI`, `DATABASE_URL`, or `SUPABASE_DB_URL` as a fallback write target
+  for `research.auto_training_records`, `research.training_source_rows`, or `ml.auto_training_*`.
+- Production may be queried read-only for aggregate readiness signals. Transfer only bounded,
+  non-identifying audit snapshots across the boundary; never copy production identities or raw
+  behavioral events into training storage without a separately approved consented-data design.
+- Every database-writing workflow must verify its expected Supabase project reference and record
+  an application/run actor. If the target cannot be proved, fail closed before opening a write
+  transaction.
+- Moving or deleting research records requires copy → checksum/count verification → exact-source
+  cleanup. Never truncate a mixed research table.
+
 ## "Read" Means Complete Read (non-negotiable, never relaxed)
 When the Founder asks Claude (in any session — claude.ai or Claude Code)
 to "read" a file or document, this means reading it completely, start to

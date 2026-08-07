@@ -15,12 +15,18 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from .auto_engine_inspector import inspect_database
+from .auto_engine_inspector import (
+    PRODUCTION_ENTITY_NAMES,
+    RESEARCH_ENTITY_NAMES,
+    build_inspection,
+    inspect_database,
+    inspect_entities,
+)
 from .auto_engine_ontology import load_ontology, map_and_score_records
 from .auto_engine_research import generate_research_records
 from .auto_engine_store import DryRunTrainingStore, MemoryTrainingStore, PostgresTrainingStore
 from .auto_engine_training import train_and_evaluate
-from .auto_engine_types import AutoEngineConfig
+from .auto_engine_types import AuditRow, AutoEngineConfig, InspectionReport
 
 ROOT = Path(__file__).parents[2]
 DEFAULT_ONTOLOGY = ROOT / "aux_re_service/data/training/v1/canonical_food_ontology.json"
@@ -84,12 +90,14 @@ def run_auto_engine(
     ontology_path: Path,
     output_dir: Path,
     config: AutoEngineConfig | None = None,
+    inspection: InspectionReport | None = None,
+    real_data_connection: Any | None = None,
 ) -> dict[str, Any]:
     if mode not in {"audit", "dry_run", "execute"}:
         raise ValueError("mode must be audit, dry_run, or execute")
     selected = config or AutoEngineConfig()
     ontology = load_ontology(ontology_path)
-    inspection = inspect_database(connection, selected)
+    inspection = inspection or inspect_database(connection, selected)
     inspection_report = inspection.as_report()
     batch_id = _batch_id(inspection_report, ontology, selected)
     run_id, _ = store.begin_run(batch_id, selected.engine_version, mode, selected.as_dict())
@@ -141,6 +149,7 @@ def run_auto_engine(
         ontology_path=ontology_path,
         output_dir=output_dir / batch_id.replace(":", "-"),
         execute=mode == "execute",
+        real_data_connection=real_data_connection,
     )
     readiness = {
         "production_ready": False,
@@ -179,27 +188,96 @@ def run_auto_engine(
     return report
 
 
-def connect(dsn: str) -> Any:
-    import psycopg2  # type: ignore[import-untyped]
+def connect(dsn: str, *, read_only: bool, application_name: str) -> Any:
+    import psycopg2
 
-    return psycopg2.connect(
+    connection = psycopg2.connect(
         dsn,
         connect_timeout=15,
-        application_name="foofoo-recommendation-auto-engine",
+        application_name=application_name,
+    )
+    connection.set_session(readonly=read_only, autocommit=False)
+    return connection
+
+
+def _database_url(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise RuntimeError(f"Required database connection {name} is not configured")
+    return value
+
+
+def _write_production_snapshot(path: Path, connection: Any) -> None:
+    rows = inspect_entities(connection, PRODUCTION_ENTITY_NAMES)
+    _atomic_json(
+        path,
+        {
+            "format": "foofoo-production-audit-v1",
+            "entities": [row.as_report() for row in rows],
+        },
     )
 
 
-def main(argv: list[str] | None = None) -> int:
-    from .preference_training import database_url
+def _load_production_snapshot(path: Path) -> tuple[AuditRow, ...]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("format") != "foofoo-production-audit-v1":
+        raise RuntimeError("unsupported production audit snapshot format")
+    rows = tuple(
+        AuditRow(
+            entity_type=str(row["entity_type"]),
+            source_table=str(row["source_table"]),
+            total_records=int(row["total_records"]),
+            usable_records=int(row["usable_records"]),
+            missing_fields=int(row.get("missing_fields", 0)),
+            duplicate_records=int(row.get("duplicate_records", 0)),
+            orphan_records=int(row.get("orphan_records", 0)),
+            low_confidence_records=int(row.get("low_confidence_records", 0)),
+            details=dict(row.get("details", {})),
+        )
+        for row in value.get("entities", [])
+    )
+    if tuple(row.entity_type for row in rows) != PRODUCTION_ENTITY_NAMES:
+        raise RuntimeError("production audit snapshot has missing, extra, or reordered entities")
+    return rows
 
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("audit", "dry_run", "execute"), default="audit")
     parser.add_argument("--ontology", type=Path, default=DEFAULT_ONTOLOGY)
     parser.add_argument("--output-dir", type=Path, default=Path("auto-engine-runs"))
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--production-snapshot", type=Path)
+    parser.add_argument("--write-production-snapshot", type=Path)
     args = parser.parse_args(argv)
 
-    connection = connect(database_url())
+    if args.write_production_snapshot:
+        if args.production_snapshot:
+            parser.error("snapshot input and output modes are mutually exclusive")
+        production = connect(
+            _database_url("FOOFOO_SUPABASE_URI"),
+            read_only=True,
+            application_name="foofoo-auto-engine-production-audit",
+        )
+        try:
+            _write_production_snapshot(args.write_production_snapshot, production)
+            production.rollback()
+        finally:
+            production.close()
+        _atomic_json(args.report, {"status": "audited", "writes": 0})
+        return 0
+
+    if not args.production_snapshot:
+        parser.error("--production-snapshot is required for training-project runs")
+
+    connection = connect(
+        _database_url("TRAINING_DATABASE_URL"),
+        read_only=args.mode != "execute",
+        application_name="foofoo-auto-engine-training-store",
+    )
+    production_rows = _load_production_snapshot(args.production_snapshot)
+    research_rows = inspect_entities(connection, RESEARCH_ENTITY_NAMES)
+    inspection = build_inspection(production_rows + research_rows, AutoEngineConfig())
     store: Any
     if args.mode == "execute":
         store = PostgresTrainingStore(connection)
@@ -214,6 +292,8 @@ def main(argv: list[str] | None = None) -> int:
             mode=args.mode,
             ontology_path=args.ontology,
             output_dir=args.output_dir,
+            inspection=inspection,
+            real_data_connection=None,
         )
         if args.mode == "execute":
             connection.commit()

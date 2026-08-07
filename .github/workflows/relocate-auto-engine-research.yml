@@ -1,0 +1,191 @@
+name: Relocate Auto Engine research to training
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Audit/export first; execute imports, verifies, and removes the production copy
+        required: true
+        default: audit
+        type: choice
+        options:
+          - audit
+          - execute
+      confirm:
+        description: For execute, type relocate-auto-engine-research
+        required: false
+        type: string
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: auto-engine-research-relocation
+  cancel-in-progress: false
+
+jobs:
+  export-production:
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      REQUESTED_MODE: ${{ inputs.mode }}
+      EXECUTE_CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Require the protected production source
+        run: |
+          if [ -z "$FOOFOO_SUPABASE_URI" ] || [ -z "$PRODUCTION_PROJECT_REF" ]; then
+            echo "Configure the production connection and project reference." >&2
+            exit 1
+          fi
+          case "$FOOFOO_SUPABASE_URI" in
+            *"postgres.$PRODUCTION_PROJECT_REF"*|*"db.$PRODUCTION_PROJECT_REF.supabase.co"*) ;;
+            *) echo "Production URL does not match the production project reference." >&2; exit 1 ;;
+          esac
+          if [ "$REQUESTED_MODE" = "execute" ] && [ "$EXECUTE_CONFIRM" != "relocate-auto-engine-research" ]; then
+            echo "Execute mode requires the exact confirmation phrase." >&2
+            exit 1
+          fi
+      - name: Install transfer runtime
+        run: python -m pip install "psycopg2-binary>=2.9,<3"
+      - name: Export the exact synthetic research set
+        run: |
+          python -m ops.recommendation.relocate_auto_engine_research export \
+            --transfer "${RUNNER_TEMP}/auto-engine-research.jsonl.gz" \
+            --manifest "${RUNNER_TEMP}/auto-engine-research-manifest.json" \
+            --report "${RUNNER_TEMP}/production-export-report.json" \
+            --expected-count 461
+      - name: Upload short-lived private transfer
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-engine-research-transfer-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/auto-engine-research.jsonl.gz
+            ${{ runner.temp }}/auto-engine-research-manifest.json
+          if-no-files-found: error
+          retention-days: 1
+      - name: Upload non-sensitive export evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-engine-research-export-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/production-export-report.json
+          if-no-files-found: error
+          retention-days: 30
+
+  import-training:
+    if: inputs.mode == 'execute'
+    needs: export-production
+    environment: training
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TRAINING_DATABASE_URL: ${{ secrets.TRAINING_DATABASE_URL }}
+      TRAINING_PROJECT_REF: ${{ secrets.TRAINING_PROJECT_REF }}
+      PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: auto-engine-research-transfer-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/transfer
+      - name: Require the isolated training destination
+        run: |
+          if [ -z "$TRAINING_DATABASE_URL" ] || [ -z "$TRAINING_PROJECT_REF" ] || [ -z "$PRODUCTION_PROJECT_REF" ]; then
+            echo "Configure training connection and both project references." >&2
+            exit 1
+          fi
+          if [ "$TRAINING_PROJECT_REF" = "$PRODUCTION_PROJECT_REF" ]; then
+            echo "Training and production project references must differ." >&2
+            exit 1
+          fi
+          case "$TRAINING_DATABASE_URL" in
+            *"postgres.$TRAINING_PROJECT_REF"*|*"db.$TRAINING_PROJECT_REF.supabase.co"*) ;;
+            *) echo "Training URL does not match the training project reference." >&2; exit 1 ;;
+          esac
+      - name: Install transfer runtime
+        run: python -m pip install "psycopg2-binary>=2.9,<3"
+      - name: Import and verify every record in training
+        run: |
+          python -m ops.recommendation.relocate_auto_engine_research import \
+            --transfer "${RUNNER_TEMP}/transfer/auto-engine-research.jsonl.gz" \
+            --manifest "${RUNNER_TEMP}/transfer/auto-engine-research-manifest.json" \
+            --report "${RUNNER_TEMP}/training-import-report.json" \
+            --expected-count 461
+          psql "$TRAINING_DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/939_auto_training_control_plane_validation.sql
+          psql "$TRAINING_DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -f database/validation/940_govern_synthetic_training_ingestion_validation.sql
+      - name: Upload non-sensitive import evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-engine-research-import-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/training-import-report.json
+          if-no-files-found: error
+          retention-days: 30
+
+  clean-production:
+    if: inputs.mode == 'execute'
+    needs: import-training
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      GH_TOKEN: ${{ github.token }}
+      TRANSFER_ARTIFACT: auto-engine-research-transfer-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: auto-engine-research-transfer-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/transfer
+      - name: Recheck the protected production source
+        run: |
+          if [ -z "$FOOFOO_SUPABASE_URI" ] || [ -z "$PRODUCTION_PROJECT_REF" ]; then
+            echo "Configure the production connection and project reference." >&2
+            exit 1
+          fi
+          case "$FOOFOO_SUPABASE_URI" in
+            *"postgres.$PRODUCTION_PROJECT_REF"*|*"db.$PRODUCTION_PROJECT_REF.supabase.co"*) ;;
+            *) echo "Production URL does not match the production project reference." >&2; exit 1 ;;
+          esac
+      - name: Install transfer runtime
+        run: python -m pip install "psycopg2-binary>=2.9,<3"
+      - name: Remove only unchanged verified source records
+        run: |
+          python -m ops.recommendation.relocate_auto_engine_research delete \
+            --transfer "${RUNNER_TEMP}/transfer/auto-engine-research.jsonl.gz" \
+            --manifest "${RUNNER_TEMP}/transfer/auto-engine-research-manifest.json" \
+            --report "${RUNNER_TEMP}/production-cleanup-report.json" \
+            --expected-count 461
+      - name: Upload non-sensitive cleanup evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-engine-research-cleanup-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/production-cleanup-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Delete the private transfer artifact
+        run: |
+          artifact_id="$(gh api \
+            "repos/${GITHUB_REPOSITORY}/actions/artifacts?name=${TRANSFER_ARTIFACT}" \
+            --jq '.artifacts[] | select(.workflow_run.id == ${{ github.run_id }}) | .id' | head -1)"
+          if [ -z "$artifact_id" ]; then
+            echo "Private transfer artifact was not found for deletion." >&2
+            exit 1
+          fi
+          gh api --method DELETE "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}"

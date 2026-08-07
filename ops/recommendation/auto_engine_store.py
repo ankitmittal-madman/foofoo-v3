@@ -395,9 +395,7 @@ class DryRunTrainingStore(MemoryTrainingStore):
         self.source = PostgresTrainingStore(connection)
 
     def _load_keys(self, target_table: str, record_keys: list[str]) -> None:
-        missing = [
-            key for key in record_keys if (target_table, key) not in self.records
-        ]
+        missing = [key for key in record_keys if (target_table, key) not in self.records]
         for value in self.source.fetch_research_records_by_keys(target_table, missing):
             self.records[(target_table, value["record_key"])] = value
 
