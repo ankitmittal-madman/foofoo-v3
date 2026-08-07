@@ -21,6 +21,7 @@ LOGGING-ONLY, non-negotiable: this module must never influence scoring, ranking,
 the plates returned by assemble_7 — it only ever *reads* the already-decided result. See the
 call site in pairing.assemble_7 for the one-line wiring and its own comment confirming this.
 """
+
 from __future__ import annotations
 
 import json
@@ -37,6 +38,7 @@ def _plate_label(p) -> str:
     # Imported lazily (not at module top) to avoid a circular import: pairing.py imports this
     # module at top level to make the one-line call at the end of assemble_7.
     from ghar_re_core.pairing import plate_label
+
     return plate_label(p)
 
 
@@ -62,10 +64,13 @@ def build_decision_trace(
     for p in chosen:
         chosen_heroes |= p["heroes"]
 
-    winners = [
-        {"rank": i, "plate": _plate_label(p), "score": round(p["score"], 4)}
-        for i, p in enumerate(chosen, 1)
-    ]
+    winners = []
+    for i, plate in enumerate(chosen, 1):
+        winner = {"rank": i, "plate": _plate_label(plate), "score": round(plate["score"], 4)}
+        if "_selection_score" in plate:
+            winner["selection_score"] = round(plate["_selection_score"], 6)
+            winner["historical_similarity"] = round(plate.get("_historical_similarity", 0.0), 6)
+        winners.append(winner)
     # Additive-only, per-winner structured explanation (eligibility/rejected-filters, BASE
     # contributors, Q15 contribution, weather contribution, pairing contribution) — the six
     # categories the Founder-directed RE compliance review (2026-08) requires be explainable.
@@ -75,11 +80,10 @@ def build_decision_trace(
     if theta is not None and idf is not None:
         from ghar_re_core import scoring as _S
         from ghar_re_core.pairing import _plate_dishes, explain_pairing
+
         for i, p in enumerate(chosen):
             dishes = _plate_dishes(p)
-            explanation = {
-                "dishes": [_S.explain_dish(d, theta, ctx, objective) for d in dishes]
-            }
+            explanation = {"dishes": [_S.explain_dish(d, theta, ctx, objective) for d in dishes]}
             if p["form"] == "pair":
                 explanation["pairing"] = explain_pairing(p["dry"], p["liquid"], idf)
             winners[i]["explanation"] = explanation
@@ -98,18 +102,24 @@ def build_decision_trace(
             reason = "discovery-dial cap reached for experimental/exploratory plates (§S4.6)"
         else:
             reason = "scored lower than the plates that were served"
-        alternatives.append({
-            "plate": _plate_label(p),
-            "score": round(p["score"], 4),
-            "why_it_lost": reason,
-        })
+        alternatives.append(
+            {
+                "plate": _plate_label(p),
+                "score": round(p["score"], 4),
+                "why_it_lost": reason,
+            }
+        )
 
     if winners:
+        ranking_basis = (
+            "post-eligibility adaptive diversity reranking over plate_score"
+            if any("_selection_score" in plate for plate in chosen)
+            else "plate_score (BASE x GAIN_Q15, pairing-adjusted)"
+        )
         reasoning = (
             f"Served {len(chosen)} plate(s) for "
             f"{household_label or 'household'} ({ctx.get('slot', 'unknown slot')}, "
-            f"objective={objective}), ranked by plate_score (BASE x GAIN_Q15, "
-            f"pairing-adjusted). Top choice: {winners[0]['plate']} "
+            f"objective={objective}), ranked by {ranking_basis}. Top choice: {winners[0]['plate']} "
             f"(score {winners[0]['score']})."
         )
     else:
@@ -132,7 +142,9 @@ def build_decision_trace(
     return trace
 
 
-def log_assemble7_decision(household_label, ctx, objective, all_plates, chosen, funnel=None) -> None:
+def log_assemble7_decision(
+    household_label, ctx, objective, all_plates, chosen, funnel=None
+) -> None:
     """Log one Assemble-7 decision via build_decision_trace() above. Call AFTER assemble_7 has
     already picked `chosen` from `all_plates`. A no-op unless a handler is attached to the
     "ghar_re_core.decision" logger (Python's standard "logging is a no-op until configured"

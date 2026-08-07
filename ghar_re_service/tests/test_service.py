@@ -58,6 +58,7 @@ def test_legacy_run_consumes_name_suppression_and_preference(monkeypatch):
     assert captured["exclude_dish_names"] == ["Moong Dal Khichdi"]
     assert captured["preference_by_dish"]["Moong Dal Khichdi"] == 1.0
     assert captured["preference_by_dish"]["Lauki Khichdi"] > 0
+    assert captured["diversity_policy"] == "home_v2"
 
 
 def test_legacy_run_consumes_class_and_tag_affinity_without_exact_dish_seed(monkeypatch):

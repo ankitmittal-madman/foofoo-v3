@@ -6,6 +6,7 @@ negative_priors (the in_spine=yes rows ARE what pairing_rules.yaml encodes — s
 source). Standalone bypass, plate_score formula, greedy assemble-7 (no-duplicate guard +
 discovery-dial cap), default carb attach (§S4.4 + KB §R2a).
 """
+
 from ghar_re_core.config import CONFIG
 from ghar_re_core import scoring as S
 from ghar_re_core import decision_log
@@ -32,13 +33,88 @@ def _plate_cuisines(plate):
     return {dish.cuisine for dish in _plate_dishes(plate) if dish.cuisine}
 
 
-def _assemble_diverse(plates, n, disc_cap):
+def _bounded_history_counts(value):
+    if not isinstance(value, dict):
+        return {}
+    result = {}
+    for raw_key, raw_count in list(value.items())[:100]:
+        try:
+            count = int(raw_count)
+        except (TypeError, ValueError):
+            continue
+        key = str(raw_key).strip()
+        if key and count > 0:
+            result[key] = min(1000, count)
+    return result
+
+
+def _plate_history_similarity(plate, ctx, class_counts=None, cuisine_counts=None):
+    """Bounded seven-day class/cuisine repetition pressure for a complete plate."""
+    if class_counts is None:
+        class_counts = _bounded_history_counts(ctx.get("recent_class_counts"))
+    if cuisine_counts is None:
+        cuisine_counts = {
+            key.casefold(): count
+            for key, count in _bounded_history_counts(ctx.get("recent_cuisine_counts")).items()
+        }
+    class_pressure = max(
+        (min(1.0, class_counts.get(code, 0) / 3.0) for code in _plate_classes(plate)),
+        default=0.0,
+    )
+    cuisine_pressure = max(
+        (
+            min(1.0, cuisine_counts.get(cuisine.casefold(), 0) / 2.0)
+            for cuisine in _plate_cuisines(plate)
+        ),
+        default=0.0,
+    )
+    return max(class_pressure, cuisine_pressure)
+
+
+def _history_reranked_plates(plates, ctx):
+    """Apply bounded post-eligibility history pressure while preserving frozen plate scores."""
+    class_counts = _bounded_history_counts(ctx.get("recent_class_counts"))
+    cuisine_counts = {
+        key.casefold(): count
+        for key, count in _bounded_history_counts(ctx.get("recent_cuisine_counts")).items()
+    }
+    if not plates or not (class_counts or cuisine_counts):
+        return plates
+    scores = [float(plate["score"]) for plate in plates]
+    low, high = min(scores), max(scores)
+    novelty = max(0.0, min(1.0, float(ctx.get("novelty_budget", 0.15) or 0.0)))
+    relevance_lambda = max(0.50, min(0.85, 0.75 - 0.40 * (novelty - 0.15)))
+    for plate in plates:
+        relevance = (plate["score"] - low) / (high - low) if high > low else 1.0
+        history_similarity = _plate_history_similarity(
+            plate,
+            ctx,
+            class_counts=class_counts,
+            cuisine_counts=cuisine_counts,
+        )
+        plate["_historical_similarity"] = history_similarity
+        plate["_selection_score"] = (
+            relevance_lambda * relevance - (1.0 - relevance_lambda) * history_similarity
+        )
+    return sorted(
+        plates,
+        key=lambda plate: (
+            plate["_selection_score"],
+            plate["score"],
+            sorted(plate["heroes"]),
+        ),
+        reverse=True,
+    )
+
+
+def _assemble_diverse(plates, n, disc_cap, ctx=None):
     """Prefix-aware slate re-ranker for Home.
 
     Every visible prefix is limited to roughly half rich plates, two uses of one cuisine, and two
     uses of one meal class. Rejected candidates are reconsidered for later positions, and a final
     relaxed backfill preserves availability if the eligible catalogue is unusually small.
     """
+    plates = _history_reranked_plates(plates, ctx or {})
     chosen, used_heroes, used_plate_ids = [], set(), set()
     class_counts, cuisine_counts = {}, {}
     rich_count = disc_used = 0
@@ -61,10 +137,16 @@ def _assemble_diverse(plates, n, disc_cap):
             break
         if picked is None:
             # Availability backfill: retain hard hero uniqueness and discovery cap only.
-            picked = next((plate for plate in plates
-                           if id(plate) not in used_plate_ids
-                           and not (plate["heroes"] & used_heroes)
-                           and (not plate["experimental"] or disc_used < disc_cap)), None)
+            picked = next(
+                (
+                    plate
+                    for plate in plates
+                    if id(plate) not in used_plate_ids
+                    and not (plate["heroes"] & used_heroes)
+                    and (not plate["experimental"] or disc_used < disc_cap)
+                ),
+                None,
+            )
         if picked is None:
             break
         chosen.append(picked)
@@ -200,22 +282,28 @@ def default_carb(plate, theta):
     plate, decided first by the liquid hero's own type (e.g. sambar -> Rice) and falling back to
     the household's region. Standalone plates (already a complete meal) get no support."""
     if plate["form"] == "standalone":
-        return None                            # standalone gets NO support
+        return None  # standalone gets NO support
     # hero used for the by-type rule = the liquid hero (pair) or the single hero
     hero = plate.get("liquid") or plate.get("hero")
     name = hero.name.lower()
     # by liquid-hero type (strongest signal) — §S4.4 by-type table / KB §R2a
-    if "rajma" in name or "sambar" in name or "rasam" in name or "kadhi" in name or "macher jhol" in name:
+    if (
+        "rajma" in name
+        or "sambar" in name
+        or "rasam" in name
+        or "kadhi" in name
+        or "macher jhol" in name
+    ):
         return "Rice"
     if "chole" in name:
-        return "Poori"                          # festive/specific pairing (chole-poori)
+        return "Poori"  # festive/specific pairing (chole-poori)
     # by region fallback (§S4.4 region table)
     region = theta["region"]["value"]
     rice_regions = {"South", "East"}
     if region in rice_regions:
         return "Rice"
     # KB §R2a ⚑ Gujarati/Rajasthani = Roti·Rice SPLIT — tie-break to Roti (same as North tie-break).
-    return "Roti"                               # Punjab-North / Gujarat / Rajasthan / MH / Bihar -> roti
+    return "Roti"  # Punjab-North / Gujarat / Rajasthan / MH / Bihar -> roti
 
 
 # ---------------------------------------------------------------------------
@@ -226,8 +314,11 @@ def build_plates(catalogue, theta, ctx, objective):
     # score every eligible SHARED-hero dish
     elig = [d for d in catalogue if S.eligible(d, theta, ctx, shared_hero=True)]
     # pools by hero_role (snacks/accompaniments excluded from B/L/D plates; supports not scored)
-    poolable = [d for d in elig if d.hero_role in ("dry", "liquid", "single", "standalone")
-                and S.m_slot(d, ctx) > 0]
+    poolable = [
+        d
+        for d in elig
+        if d.hero_role in ("dry", "liquid", "single", "standalone") and S.m_slot(d, ctx) > 0
+    ]
     scores = {d.name: S.score(d, theta, ctx, objective) for d in poolable}
     # catalogue-wide IDF, built once per call (not per pair) for the same_base() cosine gate.
     idf = SIM.build_idf(catalogue)
@@ -251,8 +342,8 @@ def build_plates(catalogue, theta, ctx, objective):
     for p in plates:
         p["score"] = plate_score(p, scores)
         p["experimental"] = any(
-            (getattr(h, "scope_tier", None) == "experimental")
-            for h in _plate_dishes(p))
+            (getattr(h, "scope_tier", None) == "experimental") for h in _plate_dishes(p)
+        )
     return plates, scores
 
 
@@ -275,9 +366,9 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None, with
     plates.sort(key=lambda p: p["score"], reverse=True)
 
     rho = theta["rho_disc"]["value"]
-    disc_cap = int(rho * n)                     # v1 ~0 (familiarity-first)
+    disc_cap = int(rho * n)  # v1 ~0 (familiarity-first)
     if ctx.get("diversity_policy") == "home_v2":
-        chosen = _assemble_diverse(plates, n, disc_cap)
+        chosen = _assemble_diverse(plates, n, disc_cap, ctx)
     else:
         chosen, used_heroes, disc_used = [], set(), 0
         for p in plates:
@@ -317,8 +408,14 @@ def assemble_7(catalogue, theta, ctx, objective, n=7, household_label=None, with
     if with_trace:
         idf = SIM.build_idf(catalogue)
         trace = decision_log.build_decision_trace(
-            household_label, ctx, objective, plates, chosen, funnel,
-            theta=theta, idf=idf,
+            household_label,
+            ctx,
+            objective,
+            plates,
+            chosen,
+            funnel,
+            theta=theta,
+            idf=idf,
         )
         # Additive-only: exploration_trace is empty ([]) whenever exploration didn't fire (the
         # golden-master/every-live-household case), so this never changes existing trace shape

@@ -90,7 +90,9 @@ def test_vegan_diet_filter_rejects_dairy_accepts_known_vegan_dish():
 
     # any golden-sample dish containing a dairy ingredient must be rejected
     dairy_dish = next(
-        d for d in CAT if any(C.ingredient_info(i).get("category") == "dairy" for i in d.ingredient_names)
+        d
+        for d in CAT
+        if any(C.ingredient_info(i).get("category") == "dairy" for i in d.ingredient_names)
     )
     assert dairy_dish.vegan_compatible is False
     assert S.pass_diet(dairy_dish, theta, ctx) is False
@@ -123,13 +125,23 @@ def test_allergen_filter_catches_hidden_derivative_gluten():
     assert sambar is not None, "golden-master fixture 'Sambar' missing — test fixture drifted"
     assert "sambar_powder" in sambar.ingredient_names
     assert not any(
-        C.ingredient_info(ing).get("allergen_type") == "gluten"
-        for ing in sambar.ingredient_names
+        C.ingredient_info(ing).get("allergen_type") == "gluten" for ing in sambar.ingredient_names
     ), "test assumption broken: an ingredient now carries an explicit gluten flag"
-    assert "gluten" in C.dish_allergens(sambar), "hidden-derivative gluten (via sambar_powder/hing) not detected"
+    assert "gluten" in C.dish_allergens(sambar), (
+        "hidden-derivative gluten (via sambar_powder/hing) not detected"
+    )
 
-    gluten_free_hh = {"allergens": {"value": ["gluten"], "confidence": "explicit", "reason": "explicit", "band": "stable"}}
-    assert not S.pass_allergen(sambar, gluten_free_hh, {}), "gluten-allergic household must not pass Sambar"
+    gluten_free_hh = {
+        "allergens": {
+            "value": ["gluten"],
+            "confidence": "explicit",
+            "reason": "explicit",
+            "band": "stable",
+        }
+    }
+    assert not S.pass_allergen(sambar, gluten_free_hh, {}), (
+        "gluten-allergic household must not pass Sambar"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -168,8 +180,9 @@ def test_pairing_guardrails_hold_on_chosen_pairs():
                 d, l = p["dry"], p["liquid"]
                 assert not P.both_rich(d, l), f"{k}: both_rich {d.name}+{l.name}"
                 assert not P.same_base(d, l, idf), f"{k}: same_base {d.name}+{l.name}"
-                assert P.cuisine_dist(d, l) <= S.CONFIG.theta_region, \
+                assert P.cuisine_dist(d, l) <= S.CONFIG.theta_region, (
                     f"{k}: cuisine incoherent {d.name}+{l.name}"
+                )
                 assert P.allowed(d, l, idf)
 
 
@@ -181,9 +194,18 @@ def test_pairing_guardrails_hold_on_chosen_pairs():
 # ---------------------------------------------------------------------------
 def _real_catalogue():
     import json, os
-    path = os.path.normpath(os.path.join(
-        os.path.dirname(__file__), "..", "..", "ghar_re_service", "data", "bundle", "catalogue.json"
-    ))
+
+    path = os.path.normpath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "..",
+            "ghar_re_service",
+            "data",
+            "bundle",
+            "catalogue.json",
+        )
+    )
     with open(path) as f:
         return Catalogue(json.load(f))
 
@@ -192,7 +214,9 @@ def test_cuis_same_parent_cuisine_tier():
     real_cat = _real_catalogue()
     d = next(d for d in real_cat if d.cuisine == "malabar")
     assert d.state_origin != "Kerala"  # confirms this dish does NOT hit the 1.00 exact-match tier
-    assert S._cuis(d, "Kerala") == 0.70, "malabar (parent=kerala) vs state Kerala must hit the 0.70 tier"
+    assert S._cuis(d, "Kerala") == 0.70, (
+        "malabar (parent=kerala) vs state Kerala must hit the 0.70 tier"
+    )
 
 
 def test_cuis_exact_state_still_beats_parent_tier():
@@ -246,7 +270,15 @@ def test_explain_dish_matches_live_score_computation():
     assert explanation["weather_contribution"] == round(S.m_weather(dish, theta, ctx), 4)
     # every named BASE module from the registry must appear as a contributor
     contributor_names = {c["module"] for c in explanation["base_contributors"]}
-    assert {"m_palette", "m_slot", "m_season", "sig", "m_age", "m_household", "m_weather"} <= contributor_names
+    assert {
+        "m_palette",
+        "m_slot",
+        "m_season",
+        "sig",
+        "m_age",
+        "m_household",
+        "m_weather",
+    } <= contributor_names
 
 
 def test_explain_pairing_matches_live_compat_and_gates():
@@ -273,10 +305,41 @@ def test_decision_trace_winners_carry_structured_explanations_when_requested():
             assert "weather_contribution" in dish_explanation
 
 
+def test_persisted_history_reranks_complete_landing_plates_without_changing_base_scores():
+    hh = HH["single_professional_blr"]
+    theta = derive_theta(hh)
+    baseline_ctx = {
+        **make_context(slot="dinner", season="transitional"),
+        "diversity_policy": "home_v2",
+    }
+    baseline = P.assemble_7(CAT, theta, baseline_ctx, "awesome_taste")
+    top = baseline[0]
+    history_ctx = {
+        **baseline_ctx,
+        "novelty_budget": 0.6,
+        "recent_class_counts": dict.fromkeys(P._plate_classes(top), 3),
+        "recent_cuisine_counts": dict.fromkeys(P._plate_cuisines(top), 2),
+    }
+    reranked, trace = P.assemble_7(
+        CAT,
+        theta,
+        history_ctx,
+        "awesome_taste",
+        with_trace=True,
+    )
+
+    assert reranked[0]["heroes"] != top["heroes"]
+    assert reranked[0]["score"] in {plate["score"] for plate in baseline}
+    assert reranked[0]["_historical_similarity"] < P._plate_history_similarity(top, history_ctx)
+    assert "adaptive diversity reranking" in trace["reasoning"]
+    assert "selection_score" in trace["winners"][0]
+
+
 def test_guardrails_match_kb_negative_priors():
     # The KB §N1 in_spine=yes structural rows must be exactly the pairing hard gates we enforce.
     active_structural = {
-        n[0] for n in K.NEGATIVE_PRIORS
+        n[0]
+        for n in K.NEGATIVE_PRIORS
         if n[3] and n[5] == "active" and n[4] == "pairing_rules.yaml"
     }
     assert active_structural == {
@@ -298,20 +361,30 @@ def test_q15_shifts_ranking_expected_direction():
     hh = HH["single_professional_blr"]
     theta = derive_theta(hh)
     ctx = make_context(slot="dinner", season="transitional")
-    pool = [d for d in CAT if S.eligible(d, theta, ctx) and S.m_slot(d, ctx) > 0
-            and d.hero_role in ("dry", "liquid", "single", "standalone")]
+    pool = [
+        d
+        for d in CAT
+        if S.eligible(d, theta, ctx)
+        and S.m_slot(d, ctx) > 0
+        and d.hero_role in ("dry", "liquid", "single", "standalone")
+    ]
 
     def rank(objective):
-        return [d.name for d in sorted(pool, key=lambda d: S.score(d, theta, ctx, objective), reverse=True)]
+        return [
+            d.name
+            for d in sorted(pool, key=lambda d: S.score(d, theta, ctx, objective), reverse=True)
+        ]
 
     at = rank("awesome_taste")
     hl = rank("healthy_living")
     assert at != hl, "Q15 produced no ranking change"
 
     # direction: an indulgent dish rises under Awesome Taste; a light dish rises under Healthy Living.
-    indulgent = "Chettinad Chicken"   # oily, heavy, high gs_indulgence
-    light = "Rasam"                    # light, boiled, high gs_light
-    assert at.index(indulgent) < hl.index(indulgent), "indulgent dish should rank higher under Awesome Taste"
+    indulgent = "Chettinad Chicken"  # oily, heavy, high gs_indulgence
+    light = "Rasam"  # light, boiled, high gs_light
+    assert at.index(indulgent) < hl.index(indulgent), (
+        "indulgent dish should rank higher under Awesome Taste"
+    )
     assert hl.index(light) < at.index(light), "light dish should rank higher under Healthy Living"
 
     # and the per-dish gain moves the right way
@@ -328,9 +401,13 @@ def _rain_ranked(id_key):
     theta = derive_theta(hh)
     ctx = make_context(slot="dinner", season="monsoon", is_raining=True)
     rows = sorted(
-        ((S.base(d, theta, ctx), d.name) for d in CAT
-         if "rainy" in d.weather_affinity and S.eligible(d, theta, ctx)),
-        reverse=True)
+        (
+            (S.base(d, theta, ctx), d.name)
+            for d in CAT
+            if "rainy" in d.weather_affinity and S.eligible(d, theta, ctx)
+        ),
+        reverse=True,
+    )
     return theta, [n for _, n in rows], recommend(hh, ctx, CAT)
 
 
@@ -380,6 +457,7 @@ def test_weather_is_zone_specific_not_generic():
 def test_sample_dataset_data_source_integrity():
     from ghar_re_core.seedgen import gen_golden
     import re
+
     sql = gen_golden()
     tags = re.findall(r"'(real|ai_generated|stub)'", sql)
     assert tags, "no data_source literals found in golden seed"
@@ -403,7 +481,9 @@ def test_community_prior_vs_kb_c1_conflict_report(capsys):
     conflicts = K.community_vs_kb_conflicts()
     print("\n=== community_priors.csv vs KB §C1 conflict report ===")
     if not conflicts:
-        print("  NONE — the two sources are consistent (Punjab 'veg_leaning' ~ KB 'strongly veg(veg-lean)').")
+        print(
+            "  NONE — the two sources are consistent (Punjab 'veg_leaning' ~ KB 'strongly veg(veg-lean)')."
+        )
     else:
         for c in conflicts:
             print(f"  {c['state']}: {c['kind']}  (KB={c['kb']} / CSV={c['csv']})")
@@ -474,12 +554,16 @@ def test_state_origin_prefers_dict_value_but_falls_back_for_golden_sample():
     raw = dict(F.DISHES[0])
     assert "state_origin" not in raw, "golden-sample fixture dict unexpectedly carries state_origin"
     d = Dish(raw)
-    assert d.state_origin == _CUISINE_STATE.get(raw["cuisine"]), "golden sample must use the legacy lookup"
+    assert d.state_origin == _CUISINE_STATE.get(raw["cuisine"]), (
+        "golden sample must use the legacy lookup"
+    )
 
     raw2 = dict(F.DISHES[0])
     raw2["state_origin"] = "Test State"
     d2 = Dish(raw2)
-    assert d2.state_origin == "Test State", "an already-resolved state_origin must not be overwritten"
+    assert d2.state_origin == "Test State", (
+        "an already-resolved state_origin must not be overwritten"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -500,7 +584,9 @@ def test_decision_trace_funnel_is_monotonically_non_increasing_and_ends_at_eligi
         assert funnel[0]["stage"] == "catalogue_total"
         assert funnel[0]["count"] == len(list(CAT))
         counts = [stage["count"] for stage in funnel]
-        assert counts == sorted(counts, reverse=True), f"{k}: funnel counts must never increase stage-to-stage"
+        assert counts == sorted(counts, reverse=True), (
+            f"{k}: funnel counts must never increase stage-to-stage"
+        )
 
         # The funnel's last stage must agree exactly with eligible()'s own count for this
         # household+context — eligibility_funnel() must never silently drift from eligible().
@@ -533,8 +619,12 @@ def test_decision_trace_never_changes_which_plates_are_served():
             ctx2 = make_context(slot="dinner", season="transitional")
             plain = recommend(hh, ctx1, CAT)
             traced = recommend(hh, ctx2, CAT, with_trace=True)
-            plain_ids = [p["dry"].name if p["form"] == "pair" else p["hero"].name for p in plain["plates"]]
-            traced_ids = [p["dry"].name if p["form"] == "pair" else p["hero"].name for p in traced["plates"]]
+            plain_ids = [
+                p["dry"].name if p["form"] == "pair" else p["hero"].name for p in plain["plates"]
+            ]
+            traced_ids = [
+                p["dry"].name if p["form"] == "pair" else p["hero"].name for p in traced["plates"]
+            ]
             assert plain_ids == traced_ids, f"{k}: with_trace changed which plates were served"
     finally:
         cfgmod.active_config().bandit = orig

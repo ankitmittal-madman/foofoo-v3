@@ -541,6 +541,10 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
         exclude_dish_names=excluded,
         preference_by_dish=preferences,
     )
+    # Every production landing slate gets within-response diversity. Returning households also
+    # get bounded seven-day class/cuisine pressure through pairing._assemble_diverse; empty
+    # history remains an exact no-op for the historical term.
+    ctx["diversity_policy"] = "home_v2"
     ctx["_rng_seed"] = _request_rng_seed(hh, request["context"])
     objective = hh.get("q15_objective") or config.default_objective
     want_trace = bool(request.get("include_decision_trace"))
@@ -569,6 +573,11 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
                 "base_total": round(base_total, 6),  # fixed aggregate
                 "gain_multiplier": round(gain, 6),  # fixed aggregate
                 "final_score": round(p["score"], 6),  # fixed aggregate
+                "selection_score": round(p.get("_selection_score", p["score"]), 6),
+                "historical_similarity": round(p.get("_historical_similarity", 0.0), 6),
+                "selection_policy": "adaptive_history_v1"
+                if "_selection_score" in p
+                else "home_diversity_v2",
                 "contributions": contributions,  # OPEN list (RE-DOC-11 §6)
             }
         )
