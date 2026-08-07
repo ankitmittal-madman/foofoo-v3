@@ -20,7 +20,7 @@ from pathlib import Path
 from . import images
 from .dedupe import DedupeDecision, DedupeIndex
 from .groq_adapter import GroqAdapter
-from .image_prompt import ImagePromptGenerator, assemble_prompt
+from .image_prompt import ImagePromptGenerator, assemble_prompt, clean_dish_name_for_prompt
 from .images import CloudinaryUploader, HFImageClient, PollinationsClient
 from .normalize import SourceRow, load_and_normalize
 from .ontology_adapter import get_adapter
@@ -125,10 +125,11 @@ def process_row(row: SourceRow, dedupe_index: DedupeIndex, ontology, groq: GroqA
         if not image_ctx.generate_images:
             outcome.image = images.not_applicable(n["name"])
         elif image_ctx.dry_run:
+            clean_name = clean_dish_name_for_prompt(n["name"])
             fields = image_ctx.prompt_gen.resolve_fields(
-                n["name"], n["cuisine_raw"], n["course_raw"], n["ingredients"], force_heuristic=True
+                clean_name, n["cuisine_raw"], n["course_raw"], n["ingredients"], force_heuristic=True
             )
-            prompt_text = assemble_prompt(n["name"], fields)
+            prompt_text = assemble_prompt(clean_name, fields)
             outcome.image = images.planned_dry_run(n["name"], prompt_text, fields.source, fields.model_name)
         else:
             outcome.image = None  # resolved for real in _persist_row once dish_id is known
@@ -390,11 +391,12 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
             if dish_id in image_ctx.existing_dish_ids_with_image:
                 logger.info("dish %s already has an image; skipping generation (idempotent)", dish_id)
             else:
-                logger.info("dish %s (%s): attempting real image generation", dish_id, n["name"])
+                clean_name = clean_dish_name_for_prompt(n["name"])
+                logger.info("dish %s (%s -> %s): attempting real image generation", dish_id, n["name"], clean_name)
                 fields = image_ctx.prompt_gen.resolve_fields(
-                    n["name"], n["cuisine_raw"], n["course_raw"], n["ingredients"]
+                    clean_name, n["cuisine_raw"], n["course_raw"], n["ingredients"]
                 )
-                prompt_text = assemble_prompt(n["name"], fields)
+                prompt_text = assemble_prompt(clean_name, fields)
                 # HF fallback intentionally not passed here (Founder directive): chaining
                 # Pollinations' full retry cycle + an HF attempt inside one open DB transaction
                 # was long enough to trip Supabase's idle-in-transaction/statement timeout,
@@ -402,7 +404,7 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                 # aborted"). HFImageClient stays available on image_ctx for a future fix that
                 # moves generation outside the transaction, but is not invoked for now.
                 image_result = images.generate_and_upload(
-                    n["name"], prompt_text, fields.source, fields.model_name,
+                    clean_name, prompt_text, fields.source, fields.model_name,
                     image_ctx.pollinations, image_ctx.uploader,
                 )
                 logger.info("dish %s: image_result fetch_status=%s storage_path=%s",

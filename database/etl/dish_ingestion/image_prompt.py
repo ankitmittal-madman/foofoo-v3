@@ -54,6 +54,30 @@ PROMPT_TEMPLATE = (
 )
 
 
+def clean_dish_name_for_prompt(raw_name: str) -> str:
+    """Strips CSV article-title cruft down to a plain dish name for image-prompt use, matching
+    the Founder-supplied reference (FooFoo_Dish_Image_Prompts_v2.xlsx): its dish_name column is
+    always a clean name like "Butter Chicken" or "Tomato Rice", never a raw recipe-article title.
+
+    The raw CSV RecipeName/TranslatedRecipeName are article titles, not dish names, and often
+    carry both: a bilingual "<Devanagari> - <English>" pairing (e.g. "टमाटर पुलियोगरे रेसिपी -
+    Spicy Tomato Rice (Recipe In Hindi)") and/or a trailing "Recipe" / "(Recipe In Hindi)" /
+    "(Recipe)" suffix (e.g. "Masala Karela Recipe", "Maa Ki Dal Recipe"). Sent verbatim into an
+    English-centric text-to-image model, both confuse it -- this is applied only to the string
+    used inside the image prompt, never to the dish's canonical/database name.
+    """
+    import re
+
+    name = raw_name.strip()
+    if " - " in name:
+        left, right = name.split(" - ", 1)
+        if any(ord(ch) > 127 for ch in left):  # left side is non-Latin script -> keep the English side
+            name = right
+    name = re.sub(r"\s*\(recipe[^)]*\)\s*$", "", name, flags=re.IGNORECASE)
+    name = re.sub(r"\s+recipe\s*$", "", name, flags=re.IGNORECASE)
+    return name.strip() or raw_name.strip()
+
+
 @dataclass
 class PromptFields:
     category: str
@@ -189,15 +213,55 @@ class ImagePromptGenerator:
         )
 
 
+_FIELD_METHOD_INSTRUCTIONS = """You are filling in 4 blanks for a food-photography prompt template. Study this method,
+learned from 867 professionally hand-written examples for this same product, before answering:
+
+1. visual_description opens with the dish's PHYSICAL FORM + PRECISE COLOR + TEXTURE of its main
+   component, derived from what the ingredients/cooking method actually produce -- never a vague
+   "delicious" or "tasty". Turmeric/gram-flour dishes are yellow; tomato-butter gravies are
+   orange-red; slow-cooked dals are dark brown; coconut-based preparations are pale
+   white/cream; charred/tandoor items are red-orange or dark with visible char marks.
+2. It then names ONE OR TWO visible cues that prove HOW it was cooked -- a glossy sheen, char
+   marks, froth, a crisp/flaky edge, steam, spiraled/folded shape -- specific to this dish's real
+   preparation, not generic.
+3. It then names the REAL, traditional garnish and the REAL, traditional accompaniment for this
+   exact dish by name (e.g. "buttered naan alongside", "raita alongside", "appam alongside") --
+   never invent one; if you are not confident of a traditional accompaniment for this dish, omit
+   that clause rather than guessing.
+4. vessel_type is the culturally-authentic serving vessel for this dish's real regional cuisine
+   (steel tumbler+dabarah for filter coffee, banana leaf for a South Indian meal, copper handi for
+   a slow-cooked North Indian gravy, bamboo steamer for momos) -- default to "steel plate" or
+   "steel bowl" only when no more specific vessel is traditional.
+5. color_focal_point is 3-6 words naming the single most eye-catching visual element with its
+   color, e.g. "the rich orange-red gravy and golden chicken pieces" or "the yellow spiraled
+   rolls with sesame-coconut topping" -- not a generic restatement of the dish name.
+
+Two real examples of the expected depth and style (for calibration only, not this dish):
+
+Example 1 -- Dal Makhani (North Indian Dal, copper handi):
+"Rich dark brown creamy lentil preparation made with whole black urad dal and rajma, slow-cooked
+to a thick glossy consistency. A generous swirl of fresh cream on top with a pat of golden butter
+melting. Garnished with coriander. Buttered naan alongside." focal: "the dark rich dal with cream
+and butter contrast"
+
+Example 2 -- Khandvi (Gujarati, steel plate):
+"Thin yellow rolled gram flour sheets tightly rolled into small spirals, topped with tempering of
+mustard seeds, sesame seeds, curry leaves, and grated coconut. Neat and uniform." focal: "the
+yellow spiraled rolls with sesame-coconut topping"
+"""
+
+
 def _fields_prompt(dish_name: str, cuisine_raw: str | None, course_raw: str | None, ingredients: list[str]) -> str:
     ing_text = ", ".join(ingredients[:12]) if ingredients else "unknown"
     return (
-        f"Indian dish '{dish_name}' (cuisine: '{cuisine_raw or 'unknown'}', course: '{course_raw or 'unknown'}', "
-        f"key ingredients: {ing_text}). Respond with JSON only, exactly these keys: "
+        _FIELD_METHOD_INSTRUCTIONS +
+        f"\nNow apply this method to: Indian dish '{dish_name}' (cuisine: '{cuisine_raw or 'unknown'}', "
+        f"course: '{course_raw or 'unknown'}', key ingredients: {ing_text}).\n"
+        "Respond with JSON only, exactly these keys: "
         '"category" (short cuisine/course label, e.g. "North Indian Gravy"), '
-        '"vessel_type" (traditional serving vessel, e.g. "copper bowl"), '
-        '"visual_description" (2-3 sentences describing appearance, colors, texture, garnish, and typical '
-        'accompaniment), "color_focal_point" (2-3 words naming the dominant color/visual focal point). '
+        '"vessel_type" (culturally-authentic traditional serving vessel per rule 4 above), '
+        '"visual_description" (2-3 sentences following rules 1-3 above), '
+        '"color_focal_point" (3-6 words per rule 5 above). '
         "No prose outside the JSON object."
     )
 
