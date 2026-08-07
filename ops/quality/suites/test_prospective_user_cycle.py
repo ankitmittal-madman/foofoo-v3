@@ -48,7 +48,10 @@ def test_refresh_cycle_reports_aggregate_change_without_dish_names_or_tokens():
             {
                 "slate_id": f"slate-{slot}-{generation}",
                 "episodes": [
-                    {"episode_hash": f"{slot}-{generation}-{index}", "display_name": f"Dish {index}"}
+                    {
+                        "episode_hash": f"{slot}-{generation}-{index}",
+                        "display_name": f"Dish {index}",
+                    }
                     for index in range(4)
                 ],
             }
@@ -78,7 +81,15 @@ def test_report_writer_is_private(tmp_path):
 
 
 def test_http_error_diagnostics_only_admit_bounded_machine_codes():
-    safe = HTTPError("https://example.test", 400, "bad", {}, BytesIO(b'{"code":"invalid_credentials","message":"secret detail"}'))
-    unsafe = HTTPError("https://example.test", 400, "bad", {}, BytesIO(b'{"code":"bad code: leaked"}'))
+    safe = HTTPError(
+        "https://example.test",
+        400,
+        "bad",
+        {},
+        BytesIO(b'{"code":"invalid_credentials","message":"secret detail"}'),
+    )
+    unsafe = HTTPError(
+        "https://example.test", 400, "bad", {}, BytesIO(b'{"code":"bad code: leaked"}')
+    )
     assert cycle.safe_http_error_code(safe) == "invalid_credentials"
     assert cycle.safe_http_error_code(unsafe) is None

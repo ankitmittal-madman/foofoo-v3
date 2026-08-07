@@ -5,7 +5,13 @@ from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 
-from ghar_re_core.catalogue import Catalogue, dish_allergens
+from ghar_re_core.catalogue import (
+    HIDDEN_DERIVATIVE_ALLERGENS,
+    Catalogue,
+    canonical_allergen,
+    dish_allergens,
+    ingredient_info,
+)
 from ghar_re_core.substitution import find_substitutes
 
 
@@ -73,12 +79,14 @@ class FoodGraph:
             return {}
         allergens = dish_allergens(dish)
         result: dict[str, list[str]] = {allergen: [] for allergen in allergens}
-        from ghar_re_core.catalogue import HIDDEN_DERIVATIVE_ALLERGENS, ingredient_info
-
         for ingredient in dish.ingredient_names:
             info = ingredient_info(ingredient)
-            allergen = info.get("allergen_type") if info.get("is_allergen") else None
-            hidden = HIDDEN_DERIVATIVE_ALLERGENS.get(ingredient)
+            allergen = (
+                canonical_allergen(info.get("allergen_type"))
+                if info.get("is_allergen") and info.get("allergen_type")
+                else None
+            )
+            hidden = canonical_allergen(HIDDEN_DERIVATIVE_ALLERGENS.get(ingredient, "")) or None
             for value in (allergen, hidden):
                 if value in result:
                     result[value].append(f"ingredient:{ingredient}")

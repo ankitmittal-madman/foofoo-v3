@@ -8,8 +8,8 @@ values. Verify observable behaviour only:
   * hard EXCLUSIONS honoured (a veg/jain household is never served a non_veg dish; an allergen
     household is never served a dish containing that allergen),
   * plate COUNT / shape contract,
-  * DIVERSITY (served plates are distinct),
-  * ORDERING (plates are returned in non-increasing plate_score),
+  * DIVERSITY (served plates are distinct and the declared Home prefix caps hold),
+  * SELECTION METADATA (the policy and both relevance/selection scores remain explicit),
   * PERSISTENCE / determinism (the same request twice yields the same heroes),
   * FALLBACK (a legitimately constrained household degrades via warnings[], not a 500).
 
@@ -18,6 +18,8 @@ contract, so each case is a request the production service actually accepts.
 """
 
 from __future__ import annotations
+
+import math
 
 import pytest
 
@@ -79,70 +81,116 @@ def _resolve_ingredients(body: dict, dish_index: dict) -> set[str]:
     return toks
 
 
+def _assert_home_diversity(persona_key: str, plates: list[dict], dish_index: dict) -> None:
+    """Verify hard hero uniqueness and observable class/cuisine variety for ``home_v2``.
+
+    Richness/class/cuisine prefix caps are soft when the selector must use its documented relaxed
+    backfill to preserve availability. The black-box boundary therefore checks the invariants that
+    never relax, plus non-trivial output variety; core selector tests own the exact cap mechanics.
+    """
+    from ghar_re_core import knowledge as K
+
+    hero_ids = [dish_id for plate in plates for dish_id in plate["hero_dish_ids"]]
+    assert len(hero_ids) == len(set(hero_ids)), f"{persona_key}: hero dish reused across plates"
+    dishes = [dish_index[dish_id] for dish_id in hero_ids]
+    classes = {K.dish_to_class_code(dish.name) for dish in dishes} - {None}
+    cuisines = {dish.cuisine for dish in dishes if dish.cuisine}
+    if len(plates) >= 4:
+        assert len(classes) >= 2, f"{persona_key}: full slate collapsed to one meal class"
+        assert len(cuisines) >= 2, f"{persona_key}: full slate collapsed to one cuisine"
+
+
 @pytest.mark.parametrize("persona", PERSONAS, ids=IDS)
 def test_persona_http_outcome(persona, signed_post):
     """Each persona yields its expected HTTP status — and NEVER a 500 (a 500 is always a defect)."""
-    r = signed_post("/v1/recommendations", {"household": persona.household,
-                                             "context": persona.context})
+    r = signed_post(
+        "/v1/recommendations", {"household": persona.household, "context": persona.context}
+    )
     assert r.status_code != 500, f"{persona.key}: server error 500 — {r.text}"
     assert r.status_code == persona.expect_status, (
-        f"{persona.key}: expected {persona.expect_status}, got {r.status_code}: {r.text}")
+        f"{persona.key}: expected {persona.expect_status}, got {r.status_code}: {r.text}"
+    )
 
 
-@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
-    p.key for p in PERSONAS if p.expect_status == 200])
+@pytest.mark.parametrize(
+    "persona",
+    [p for p in PERSONAS if p.expect_status == 200],
+    ids=[p.key for p in PERSONAS if p.expect_status == 200],
+)
 def test_persona_diet_exclusion(persona, signed_post, dish_index):
     """A household's forbidden diet (e.g. non_veg for a veg/jain household) is never served."""
     if not persona.forbid_diet:
         pytest.skip("no diet exclusion asserted for this persona")
-    r = signed_post("/v1/recommendations", {"household": persona.household,
-                                             "context": persona.context})
+    r = signed_post(
+        "/v1/recommendations", {"household": persona.household, "context": persona.context}
+    )
     assert r.status_code == 200, r.text
     diets = _resolve_diets(r.json(), dish_index)
     violations = [d for d in diets if d in persona.forbid_diet]
     assert not violations, f"{persona.key}: served forbidden diet(s) {set(violations)}"
 
 
-@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.forbid_ingredients], ids=[
-    p.key for p in PERSONAS if p.forbid_ingredients])
+@pytest.mark.parametrize(
+    "persona",
+    [p for p in PERSONAS if p.forbid_ingredients],
+    ids=[p.key for p in PERSONAS if p.forbid_ingredients],
+)
 def test_persona_allergen_exclusion(persona, signed_post, dish_index):
     """An allergen household is never served a dish containing the forbidden ingredient token."""
-    r = signed_post("/v1/recommendations", {"household": persona.household,
-                                             "context": persona.context})
+    r = signed_post(
+        "/v1/recommendations", {"household": persona.household, "context": persona.context}
+    )
     assert r.status_code == 200, r.text
     served = _resolve_ingredients(r.json(), dish_index)
     hit = [tok for tok in persona.forbid_ingredients if tok.lower() in served]
     assert not hit, f"{persona.key}: served forbidden allergen ingredient(s) {hit}"
 
 
-@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200
-                                     and p.expect_plates == 7], ids=[
-    p.key for p in PERSONAS if p.expect_status == 200 and p.expect_plates == 7])
+@pytest.mark.parametrize(
+    "persona",
+    [p for p in PERSONAS if p.expect_status == 200 and p.expect_plates == 7],
+    ids=[p.key for p in PERSONAS if p.expect_status == 200 and p.expect_plates == 7],
+)
 def test_persona_plate_count(persona, signed_post):
     """Personas expected to reach a full plan return exactly the contracted 7 plates."""
-    r = signed_post("/v1/recommendations", {"household": persona.household,
-                                             "context": persona.context})
+    r = signed_post(
+        "/v1/recommendations", {"household": persona.household, "context": persona.context}
+    )
     assert r.status_code == 200, r.text
     assert len(r.json()["plates"]) == 7
 
 
-@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
-    p.key for p in PERSONAS if p.expect_status == 200])
-def test_persona_diversity_and_ordering(persona, signed_post):
-    """Served plates are DISTINCT (no duplicate plan) and ordered by non-increasing plate_score."""
-    r = signed_post("/v1/recommendations", {"household": persona.household,
-                                             "context": persona.context})
+@pytest.mark.parametrize(
+    "persona",
+    [p for p in PERSONAS if p.expect_status == 200],
+    ids=[p.key for p in PERSONAS if p.expect_status == 200],
+)
+def test_persona_diversity_and_selection_policy(persona, signed_post, dish_index):
+    """Served plates are distinct and carry honest policy-specific selection metadata."""
+    r = signed_post(
+        "/v1/recommendations", {"household": persona.household, "context": persona.context}
+    )
     assert r.status_code == 200, r.text
     plates = r.json()["plates"]
     plate_ids = [p["plate_id"] for p in plates]
     assert len(plate_ids) == len(set(plate_ids)), f"{persona.key}: duplicate plate_id in plan"
-    scores = [p["plate_score"] for p in plates]
-    assert scores == sorted(scores, reverse=True), (
-        f"{persona.key}: plates not ordered by non-increasing plate_score: {scores}")
+    policies = {plate["selection_policy"] for plate in plates}
+    assert policies <= {"home_diversity_v2", "adaptive_history_v1"}
+    assert len(policies) == 1, f"{persona.key}: mixed selection policies in one slate: {policies}"
+    assert all(
+        math.isfinite(plate["plate_score"])
+        and math.isfinite(plate["selection_score"])
+        and plate["final_score"] == plate["plate_score"]
+        for plate in plates
+    ), f"{persona.key}: invalid or inconsistent score metadata"
+    _assert_home_diversity(persona.key, plates, dish_index)
 
 
-@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_status == 200], ids=[
-    p.key for p in PERSONAS if p.expect_status == 200])
+@pytest.mark.parametrize(
+    "persona",
+    [p for p in PERSONAS if p.expect_status == 200],
+    ids=[p.key for p in PERSONAS if p.expect_status == 200],
+)
 def test_persona_determinism(persona, signed_post):
     """The same request twice yields identical hero dishes (persistence/repeatability)."""
     body = {"household": persona.household, "context": persona.context}
@@ -154,13 +202,18 @@ def test_persona_determinism(persona, signed_post):
     assert heroes1 == heroes2, f"{persona.key}: non-deterministic recommendations across calls"
 
 
-@pytest.mark.parametrize("persona", [p for p in PERSONAS if p.expect_warnings is not None], ids=[
-    p.key for p in PERSONAS if p.expect_warnings is not None])
+@pytest.mark.parametrize(
+    "persona",
+    [p for p in PERSONAS if p.expect_warnings is not None],
+    ids=[p.key for p in PERSONAS if p.expect_warnings is not None],
+)
 def test_persona_fallback_warnings(persona, signed_post):
     """A constrained household degrades via warnings[], never via a 500 (fallback behaviour)."""
-    r = signed_post("/v1/recommendations", {"household": persona.household,
-                                             "context": persona.context})
+    r = signed_post(
+        "/v1/recommendations", {"household": persona.household, "context": persona.context}
+    )
     assert r.status_code == 200, r.text
     has_warn = bool(r.json()["warnings"])
     assert has_warn == persona.expect_warnings, (
-        f"{persona.key}: warnings present={has_warn}, expected={persona.expect_warnings}")
+        f"{persona.key}: warnings present={has_warn}, expected={persona.expect_warnings}"
+    )

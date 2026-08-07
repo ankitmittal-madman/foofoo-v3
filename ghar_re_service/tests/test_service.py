@@ -140,9 +140,7 @@ def test_meta_returns_versions(client):
         "model_version": None,
         "weight": 0.0,
     }
-    assert body["catalogue_identity"] == lifecycle.catalogue_identity_summary(
-        main.state.catalogue
-    )
+    assert body["catalogue_identity"] == lifecycle.catalogue_identity_summary(main.state.catalogue)
     assert body["catalogue_identity"]["canonical_dishes"] > 0
 
 

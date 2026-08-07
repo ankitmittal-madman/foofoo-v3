@@ -63,5 +63,5 @@ jobs:
       # rebuilds from data/source and compares the content hash; it writes nothing.
       - name: Catalogue/config bundle is current
         run: python3 -m ghar_re_service.scripts.export_bundle --check
-      - name: pytest — ghar_re_core (17, incl. golden-master) + ghar_re_service (60)
-        run: python3 -m pytest ghar_re_core/tests/ ghar_re_service/tests/ ops/quality/suites/test_preference_training_operations.py ops/quality/suites/test_recommendation_user_audit.py -v
+      - name: pytest — core, service, training/audit, and credential-rotation safety boundaries
+        run: python3 -m pytest ghar_re_core/tests/ ghar_re_service/tests/ ops/quality/suites/test_preference_training_operations.py ops/quality/suites/test_recommendation_user_audit.py ops/quality/suites/test_rotate_prospective_credential.py -v

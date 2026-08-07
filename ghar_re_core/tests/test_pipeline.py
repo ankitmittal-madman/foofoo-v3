@@ -3,6 +3,8 @@ End-to-end tests: run the golden households through the full Ghar RE v1.0 pipeli
 the behaviours the Core Spine / D1-D7 / Final_RE / KB require (Task 4).
 """
 
+from types import SimpleNamespace
+
 from ghar_re_core import config as cfgmod
 from ghar_re_core import fixtures as F
 from ghar_re_core import knowledge as K
@@ -142,6 +144,31 @@ def test_allergen_filter_catches_hidden_derivative_gluten():
     assert not S.pass_allergen(sambar, gluten_free_hh, {}), (
         "gluten-allergic household must not pass Sambar"
     )
+
+
+def test_allergen_filter_normalizes_household_and_ingredient_vocabularies():
+    """Profile bitfield and ingredient-master aliases must converge before the A3 hard filter."""
+    peanut_dish = SimpleNamespace(name="Peanut fixture", ingredient_names=["peanut"])
+    egg_dish = SimpleNamespace(name="Egg fixture", ingredient_names=["egg"])
+
+    assert "nuts" in C.dish_allergens(peanut_dish)
+    assert "egg" in C.dish_allergens(egg_dish)
+    for household_token, dish in (
+        ("nuts", peanut_dish),
+        ("peanut", peanut_dish),
+        ("peanuts", peanut_dish),
+        ("egg", egg_dish),
+        ("egg_allergen", egg_dish),
+    ):
+        theta = {
+            "allergens": {
+                "value": [household_token],
+                "confidence": "explicit",
+                "reason": "explicit",
+                "band": "stable",
+            }
+        }
+        assert not S.pass_allergen(dish, theta, {}), f"{household_token} must exclude {dish.name}"
 
 
 # ---------------------------------------------------------------------------

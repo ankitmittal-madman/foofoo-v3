@@ -224,6 +224,33 @@ HIDDEN_DERIVATIVE_ALLERGENS = {
     "chaat_masala": "gluten",
 }
 
+# The profile bitfield exposes the nine household-facing categories used by
+# supabase/functions/recommendations/compose.ts. The ingredient master retains more specific
+# provenance labels for nuts and the historical ``egg_allergen`` label. All safety comparisons
+# pass through this map so a vocabulary spelling difference can never bypass A3.
+ALLERGEN_ALIASES = {
+    "nut": "nuts",
+    "nuts": "nuts",
+    "peanut": "nuts",
+    "peanuts": "nuts",
+    "tree_nut": "nuts",
+    "tree_nuts": "nuts",
+    "egg": "egg",
+    "eggs": "egg",
+    "egg_allergen": "egg",
+}
+
+
+def canonical_allergen(value):
+    """Return the household-facing allergen category for an input or ingredient-master token.
+
+    Unknown tokens remain normalized rather than being discarded, preserving fail-closed exact
+    matching for future categories while known vocabulary variants converge on the production
+    bitfield categories.
+    """
+    token = str(value).strip().casefold().replace("-", "_").replace(" ", "_")
+    return ALLERGEN_ALIASES.get(token, token)
+
 
 def dish_allergens(dish):
     """Explicit-ingredient allergen set (A3 BASIC pass), plus the known hidden-derivative carriers
@@ -234,8 +261,8 @@ def dish_allergens(dish):
     for ing in dish.ingredient_names:
         info = ingredient_info(ing)
         if info.get("is_allergen") and info.get("allergen_type"):
-            out.add(info["allergen_type"])
+            out.add(canonical_allergen(info["allergen_type"]))
         hidden = HIDDEN_DERIVATIVE_ALLERGENS.get(ing)
         if hidden:
-            out.add(hidden)
+            out.add(canonical_allergen(hidden))
     return out

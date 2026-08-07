@@ -64,7 +64,7 @@ def pass_allergen(dish, theta, ctx):
     cross-contamination/hidden-derivative layer covering every possible commercial-product risk,
     only the specific, sourced cases catalogued so far."""
     # A3 allergen (Q9/Q10) — SAFETY-CRITICAL basic pass + known hidden-derivative carriers.
-    hh_allergens = set(theta["allergens"]["value"])
+    hh_allergens = {C.canonical_allergen(allergen) for allergen in theta["allergens"]["value"]}
     return not (C.dish_allergens(dish) & hh_allergens)
 
 
@@ -98,8 +98,7 @@ def pass_exclude_dish_ids(dish, theta, ctx):
     §1 Option A."""
     excluded_ids = set(ctx.get("exclude_dish_ids") or [])
     excluded_names = {
-        " ".join(str(name).casefold().split())
-        for name in (ctx.get("exclude_dish_names") or [])
+        " ".join(str(name).casefold().split()) for name in (ctx.get("exclude_dish_names") or [])
     }
     canonical_name = " ".join(dish.name.casefold().split())
     return dish.id not in excluded_ids and canonical_name not in excluded_names
@@ -504,7 +503,9 @@ def score(dish, theta, ctx, objective):
     # Same bounded online-affinity coefficient used by meal_planner._ranked. This makes the
     # complete-meal pipeline respond immediately to explicit feedback while the learned model is
     # still disabled, without weakening any eligibility gate.
-    return base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val + pref_val + 0.35 * affinity
+    return (
+        base(dish, theta, ctx) * gain_q15(dish, objective) + cohort_val + pref_val + 0.35 * affinity
+    )
 
 
 # ---------------------------------------------------------------------------
