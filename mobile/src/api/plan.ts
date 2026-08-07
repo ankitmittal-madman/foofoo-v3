@@ -16,12 +16,18 @@ export interface PlanDish {
   spice_level: number | null;
   heaviness: number | null;
   total_mins: number | null;
+  richness?: string[];
+  cooking_method?: string[];
   score: number;
   image_url: string | null;
   explanation?: {
     base_total: number;
     q15_contribution: number;
     weather_contribution: number;
+    temporal_contribution?: number;
+    temporal_explicit_contribution?: number;
+    temporal_due_contribution?: number;
+    temporal_exposure_contribution?: number;
     top_contributors: Array<{
       module: string;
       value: number;
@@ -78,6 +84,10 @@ export interface MealEpisodeComponent {
   grammar_role: "primary" | "side";
   is_required: boolean;
   image_url?: string | null;
+  cuisine?: string;
+  richness?: string[];
+  cooking_method?: string[];
+  heaviness?: number | null;
 }
 
 export interface MealEpisode {
@@ -103,6 +113,11 @@ export interface MealEpisode {
   };
   cadence_tier: string;
   richness_score: number;
+  temporal_contribution?: number;
+  temporal_explanation?: {
+    total: number; explicit: number; due: number; exposure: number;
+    dimensions: Array<{ dimension: string; entity: string; contribution: number }>;
+  };
   predictions: {
     p_choose: number | null;
     p_execute: number | null;

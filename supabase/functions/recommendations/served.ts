@@ -20,6 +20,8 @@ export interface ServedDish {
   heaviness?: number;
   totalMins?: number;
   richnessScore?: number;
+  richness?: string[];
+  cookingMethod?: string[];
 }
 
 export interface ServedMealClass {
@@ -40,6 +42,12 @@ function text(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   const normalized = value.trim();
   return normalized || undefined;
+}
+
+function textArray(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const values = value.map(text).filter((item): item is string => item !== undefined).slice(0, 20);
+  return values.length ? values : undefined;
 }
 
 /**
@@ -151,6 +159,8 @@ export function flattenServedDishes(plates: unknown): ServedDish[] {
         heaviness: boundedNumber(row.heaviness, 0, 3),
         totalMins: boundedNumber(row.total_mins, 0),
         richnessScore: boundedNumber(row.richness_score, 0, 1),
+        richness: textArray(row.richness),
+        cookingMethod: textArray(row.cooking_method),
       });
     }
     if (Array.isArray(row.hero_dish_names)) {
@@ -174,6 +184,8 @@ export function flattenServedDishes(plates: unknown): ServedDish[] {
             cuisineFamily: text(item.cuisine_family) ?? text(item.cuisine),
             totalMins: boundedNumber(practicality.active_minutes, 0),
             richnessScore: boundedNumber(row.richness_score, 0, 1),
+            richness: textArray(item.richness),
+            cookingMethod: textArray(item.cooking_method),
           });
         }
       }
@@ -231,5 +243,27 @@ export function toExposureItems(served: ServedDish[]): Array<Record<string, stri
     ...(item.heaviness !== undefined ? { heaviness: item.heaviness } : {}),
     ...(item.totalMins !== undefined ? { total_mins: item.totalMins } : {}),
     ...(item.richnessScore !== undefined ? { richness_score: item.richnessScore } : {}),
+  }));
+}
+
+export interface ServedMealMoment {
+  mealSlot: "breakfast" | "lunch" | "dinner";
+  intendedMealDate: string;
+  dayType: "weekday" | "weekend";
+}
+
+/** Add the requested meal moment to point-in-time dish attributes for temporal exposure replay. */
+export function toMealAttributeExposureItems(
+  served: ServedDish[],
+  moment: ServedMealMoment,
+): Array<Record<string, unknown>> {
+  return served.map((item) => ({
+    dish_name: item.dishName,
+    meal_slot: moment.mealSlot,
+    intended_meal_date: moment.intendedMealDate,
+    day_type: moment.dayType,
+    ...(item.cuisineFamily ? { cuisine: item.cuisineFamily } : {}),
+    ...(item.richness ? { richness: item.richness } : {}),
+    ...(item.cookingMethod ? { cooking_method: item.cookingMethod } : {}),
   }));
 }

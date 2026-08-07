@@ -20,6 +20,20 @@ export interface OnlineRecommendationState {
   noveltyBudget: number;
   richnessDebt: number;
   temporalClassState: Array<Record<string, unknown>>;
+  temporalAttributeState: Array<Record<string, unknown>>;
+}
+
+export function extractTemporalAttributeState(value: unknown): Array<Record<string, unknown>> {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is Record<string, unknown> => {
+    if (!item || typeof item !== "object") return false;
+    const row = item as Record<string, unknown>;
+    return ["breakfast", "lunch", "dinner"].includes(String(row.meal_slot)) &&
+      ["weekday", "weekend"].includes(String(row.day_type)) &&
+      ["dish", "cuisine", "richness", "cooking_method"].includes(
+        String(row.dimension_code),
+      ) && typeof row.entity_key === "string";
+  }).slice(0, 1_000);
 }
 
 export function extractTemporalClassState(value: unknown): Array<Record<string, unknown>> {
@@ -185,7 +199,8 @@ export async function loadOnlineRecommendationState(
       feedbackRes,
       varietyRes,
       exposureRes,
-      temporalRes,
+      classTemporalRes,
+      attributeTemporalRes,
     ] = await Promise.all([
       withTimeout(
         db.from("feedback_events").select("id", { count: "exact", head: true })
@@ -233,6 +248,10 @@ export async function loadOnlineRecommendationState(
         db.rpc("get_meal_class_temporal_state", { p_household_id: profileId }),
         "personalization.meal_class_temporal_state",
       ),
+      withTimeout(
+        db.rpc("get_meal_attribute_temporal_state", { p_household_id: profileId }),
+        "personalization.meal_attribute_temporal_state",
+      ),
     ]);
     for (const result of [countRes, neverRes, todayRes, tasteRes, feedbackRes, exposureRes]) {
       if (result.error) throw result.error;
@@ -243,10 +262,16 @@ export async function loadOnlineRecommendationState(
         detail: varietyRes.error.message,
       });
     }
-    if (temporalRes.error) {
-      ctx.logger.warn("personalization.temporal_state_unavailable", {
+    if (classTemporalRes.error) {
+      ctx.logger.warn("personalization.class_temporal_state_unavailable", {
         profile_id: profileId,
-        detail: temporalRes.error.message,
+        detail: classTemporalRes.error.message,
+      });
+    }
+    if (attributeTemporalRes.error) {
+      ctx.logger.warn("personalization.attribute_temporal_state_unavailable", {
+        profile_id: profileId,
+        detail: attributeTemporalRes.error.message,
       });
     }
     const cadence = extractPersistedCadence(varietyRes.data);
@@ -335,7 +360,8 @@ export async function loadOnlineRecommendationState(
       })(),
       ...variety,
       ...cadence,
-      temporalClassState: extractTemporalClassState(temporalRes.data),
+      temporalClassState: extractTemporalClassState(classTemporalRes.data),
+      temporalAttributeState: extractTemporalAttributeState(attributeTemporalRes.data),
     };
   } catch (error) {
     ctx.logger.warn("personalization.load_failed", {
@@ -357,6 +383,7 @@ export async function loadOnlineRecommendationState(
       noveltyBudget: 0.15,
       richnessDebt: 0,
       temporalClassState: [],
+      temporalAttributeState: [],
     };
   }
 }

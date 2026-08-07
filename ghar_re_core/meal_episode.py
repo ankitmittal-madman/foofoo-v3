@@ -185,7 +185,17 @@ def build_meal_episodes(
     ctx: dict[str, Any],
 ) -> list[dict[str, Any]]:
     """Project safe plates to versioned episodes and re-rank by predicted successful execution."""
-    choose_probs = _softmax([float(plate["score"]) for plate in plates])
+    choose_probs = _softmax(
+        [
+            float(plate["score"])
+            + (
+                0.0
+                if plate.get("_score_includes_temporal")
+                else float(plate.get("_temporal_contribution", 0.0))
+            )
+            for plate in plates
+        ]
+    )
     intent = infer_intent(household, ctx)
     episodes: list[dict[str, Any]] = []
     for plate, p_choose in zip(plates, choose_probs, strict=True):
@@ -205,6 +215,10 @@ def build_meal_episodes(
                 ),
                 "grammar_role": "primary" if dish_index == 0 else "side",
                 "is_required": True,
+                "cuisine": dish.cuisine,
+                "richness": list(dish.richness or []),
+                "cooking_method": list(dish.cooking_method or []),
+                "heaviness": dish.heaviness,
             }
             for dish_index, dish in enumerate(dishes)
         ]
@@ -254,6 +268,13 @@ def build_meal_episodes(
         ]
         if support:
             reasons.append(f"complete plate with {support}")
+        temporal_explanation = plate.get("_temporal_explanation") or {
+            "total": 0.0, "explicit": 0.0, "due": 0.0, "exposure": 0.0, "dimensions": []
+        }
+        if float(temporal_explanation.get("due", 0.0) or 0.0) > 0:
+            reasons.insert(0, "fits this meal moment's learned rotation")
+        elif float(temporal_explanation.get("total", 0.0) or 0.0) < -0.02:
+            reasons.append("spaced against recent similar meals")
         episodes.append(
             {
                 "episode_hash": episode_hash,
@@ -267,6 +288,10 @@ def build_meal_episodes(
                 "practicality": work,
                 "cadence_tier": cadence_tier,
                 "richness_score": round(richness, 6),
+                "temporal_contribution": round(
+                    float(temporal_explanation.get("total", 0.0) or 0.0), 6
+                ),
+                "temporal_explanation": temporal_explanation,
                 "predictions": {
                     "p_choose": round(p_choose, 6),
                     "p_execute": round(p_execute, 6),
@@ -335,6 +360,27 @@ def build_class_meal_episodes(
             "heroes": {dish.name},
             "score": float(option["score"]),
             "experimental": getattr(dish, "scope_tier", None) == "experimental",
+            "_temporal_contribution": float(
+                option.get("explanation", {}).get("temporal_contribution", 0.0) or 0.0
+            ),
+            "_temporal_explanation": {
+                "total": float(
+                    option.get("explanation", {}).get("temporal_contribution", 0.0) or 0.0
+                ),
+                "explicit": float(
+                    option.get("explanation", {}).get("temporal_explicit_contribution", 0.0)
+                    or 0.0
+                ),
+                "due": float(
+                    option.get("explanation", {}).get("temporal_due_contribution", 0.0) or 0.0
+                ),
+                "exposure": float(
+                    option.get("explanation", {}).get("temporal_exposure_contribution", 0.0)
+                    or 0.0
+                ),
+                "dimensions": option.get("explanation", {}).get("temporal_dimensions", []),
+            },
+            "_score_includes_temporal": True,
         }
         plate["support"] = pairing.default_carb(plate, theta)
         plates.append(plate)

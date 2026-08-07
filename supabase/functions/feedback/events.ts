@@ -150,6 +150,23 @@ async function syncTypedIntelligence(
     }
   }
 
+  if (
+    ev.moment?.intendedMealDate &&
+    (["dish", "meal_episode"].includes(ev.target?.type ?? "") ||
+      ev.replacement?.from.type === "dish" || ev.replacement?.from.type === "meal_episode")
+  ) {
+    const { error: temporalAttributeError } = await withTimeout(
+      db.rpc("refresh_meal_attribute_temporal_state", { p_household_id: ev.householdId }),
+      "feedback.events.refresh_meal_attribute_temporal_state",
+    );
+    if (temporalAttributeError) {
+      ctx.logger.warn("feedback.events.attribute_temporal_state_refresh_failed", {
+        household_id: ev.householdId,
+        detail: temporalAttributeError.message,
+      });
+    }
+  }
+
   const outcomeType = OUTCOME_BY_FEEDBACK[ev.eventType];
   if (outcomeType) {
     let episodeHash = typeof ev.detail?.episode_hash === "string" ? ev.detail.episode_hash : null;

@@ -109,6 +109,7 @@ const EMPTY_ONLINE_STATE: OnlineRecommendationState = {
   noveltyBudget: 0.15,
   richnessDebt: 0,
   temporalClassState: [],
+  temporalAttributeState: [],
 };
 
 /** A no-op Logger for the re-client tests. */
@@ -259,6 +260,12 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
             day_type: "weekday",
             class_code: "BF_POHA_UPMA",
           }],
+          temporalAttributeState: [{
+            meal_slot: "lunch",
+            day_type: "weekday",
+            dimension_code: "cuisine",
+            entity_key: "punjabi",
+          }],
         }),
       callRe: (payload, requestId) => {
         sentPayload = payload;
@@ -290,6 +297,12 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
       meal_slot: "lunch",
       day_type: "weekday",
       class_code: "BF_POHA_UPMA",
+    }]);
+    assertEquals(sentContext.temporal_attribute_state, [{
+      meal_slot: "lunch",
+      day_type: "weekday",
+      dimension_code: "cuisine",
+      entity_key: "punjabi",
     }]);
     assertEquals(sentContext.recent_cuisine_counts, { "Madhya Pradesh": 3 });
     assertEquals(sentContext.novelty_budget, 0.42);

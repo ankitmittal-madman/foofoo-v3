@@ -13,6 +13,7 @@ from ghar_re_core import decision_log
 from ghar_re_core import exploration
 from ghar_re_core import knowledge as K
 from ghar_re_core import similarity as SIM
+from ghar_re_core import temporal
 
 
 RICH_TAGS = {"buttery", "creamy", "ghee_rich", "coconut_rich"}
@@ -72,13 +73,15 @@ def _plate_history_similarity(plate, ctx, class_counts=None, cuisine_counts=None
 
 
 def _history_reranked_plates(plates, ctx):
-    """Apply bounded post-eligibility history pressure while preserving frozen plate scores."""
+    """Apply bounded post-eligibility history and dated rhythm without changing frozen scores."""
     class_counts = _bounded_history_counts(ctx.get("recent_class_counts"))
     cuisine_counts = {
         key.casefold(): count
         for key, count in _bounded_history_counts(ctx.get("recent_cuisine_counts")).items()
     }
-    if not plates or not (class_counts or cuisine_counts):
+    temporal.prepare_context(ctx)
+    has_temporal = bool(ctx.get("_temporal_attribute_index")) and bool(ctx.get("_planned_meal_date"))
+    if not plates or not (class_counts or cuisine_counts or has_temporal):
         return plates
     scores = [float(plate["score"]) for plate in plates]
     low, high = min(scores), max(scores)
@@ -92,9 +95,13 @@ def _history_reranked_plates(plates, ctx):
             class_counts=class_counts,
             cuisine_counts=cuisine_counts,
         )
+        temporal_parts = temporal.plate_contribution(_plate_dishes(plate), ctx)
         plate["_historical_similarity"] = history_similarity
+        plate["_temporal_contribution"] = temporal_parts["total"]
+        plate["_temporal_explanation"] = temporal_parts
         plate["_selection_score"] = (
             relevance_lambda * relevance - (1.0 - relevance_lambda) * history_similarity
+            + temporal_parts["total"]
         )
     return sorted(
         plates,

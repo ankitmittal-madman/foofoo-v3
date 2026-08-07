@@ -6,12 +6,69 @@ import { describeApiError } from "@/api/errorMessages";
 import { postFeedback } from "@/api/feedback";
 import { fetchMealEpisodes, setPlanSlotLock } from "@/api/plan";
 import type { MealEpisode, Slot } from "@/api/plan";
-import type { FeedbackEventType } from "@/api/types";
+import type { FeedbackEventType, FeedbackRequest } from "@/api/types";
 import { useI18n } from "@/i18n";
 import { palette, Skeleton } from "@/ui/foofoo";
 
 const FOOD = require("../../assets/images/poha-idli-fruit.png");
 interface Props { slot: Slot; weekday: string; slotDate: string; classCode?: string; initiallyLocked: boolean; refreshNonce: number; enabled?: boolean; excludeDishNames?: string[]; onEpisodes?: (names: string[]) => void }
+
+function deviceTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+}
+
+function dayType(weekday: string): "weekday" | "weekend" {
+  return weekday === "Saturday" || weekday === "Sunday" ? "weekend" : "weekday";
+}
+
+export function mealEpisodeFeedbackRequest(input: {
+  requestId: string;
+  episode: MealEpisode;
+  slot: Slot;
+  weekday: string;
+  slotDate: string;
+  eventType: FeedbackEventType;
+  reasonCode?: string;
+  detail?: Record<string, unknown>;
+  occurredAt?: string;
+}): FeedbackRequest {
+  const occurredAt = input.occurredAt ?? new Date().toISOString();
+  const primaryDish = input.episode.components.find((component) => component.dish_id !== null);
+  return {
+    schema_version: "2",
+    idempotency_key: [input.requestId, input.episode.episode_hash, input.eventType, input.reasonCode ?? "none"].join(":"),
+    request_id: input.requestId,
+    event_type: input.eventType,
+    dish_name: primaryDish?.dish_name,
+    target: {
+      type: "meal_episode",
+      id: input.episode.episode_hash,
+      identity_status: "resolved",
+      display_name: input.episode.display_name,
+      snapshot: {
+        components: input.episode.components,
+        richness_score: input.episode.richness_score,
+        cadence_tier: input.episode.cadence_tier,
+      },
+    },
+    moment: {
+      occurred_at: occurredAt,
+      local_timezone: deviceTimezone(),
+      intended_meal_date: input.slotDate,
+      meal_slot: input.slot,
+      weekday: input.weekday as "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday",
+      day_type: dayType(input.weekday),
+    },
+    evidence: { kind: "explicit", source_surface: "today_meal_episode" },
+    reason: input.reasonCode ? { code: input.reasonCode } : undefined,
+    versions: {
+      feature: input.episode.practicality.feature_version,
+      model: input.episode.predictions.model_version,
+      policy: "episode-success-v1",
+    },
+    detail: { episode_hash: input.episode.episode_hash, ...input.detail },
+  };
+}
 
 export function MealEpisodeSection({ slot, weekday, slotDate, classCode, initiallyLocked, refreshNonce, enabled = true, excludeDishNames = [], onEpisodes }: Props) {
   const { t } = useI18n(); const [locked, setLocked] = useState(initiallyLocked); const [showAlternatives, setShowAlternatives] = useState(false);
@@ -46,16 +103,20 @@ export function MealEpisodeSection({ slot, weekday, slotDate, classCode, initial
 
   const episodes = query.data?.episodes ?? []; const primary = episodes[0];
   return <View style={styles.section} testID={`episode-section-${slot}`}>{query.isError ? <View testID={`episode-${slot}-cached-fallback`} style={styles.cachedNotice}><Text style={styles.cachedNoticeText}>{t("savedMealFallback")}</Text><Pressable onPress={() => query.refetch()}><Text style={styles.cachedRetry}>{t("tryAgain")}</Text></Pressable></View> : null}<View style={styles.slotHeader}><View><Text style={styles.slot}>{t(slot)}</Text><Text style={styles.slotIntent}>{slot === "breakfast" ? t("lightStart") : slot === "lunch" ? t("balanced") : t("satisfying")}</Text></View><View style={[styles.fitPill, { flexDirection: "row", gap: 4 }]}><Text style={styles.fitText}>●</Text><Text style={styles.fitText}>{primary?.predictions.calibration_status === "calibrated" ? t("strongFit") : t("safeStart")}</Text></View></View>
-    {primary ? <><EpisodeCard episode={primary} requestId={query.data?.request_id} slot={slot} onMakeThis={() => { if (classCode && !locked) lock.mutate(true); }} onReasonedReplacement={() => query.refetch()} />
+    {primary ? <><EpisodeCard episode={primary} requestId={query.data?.request_id} slot={slot} weekday={weekday} slotDate={slotDate} onMakeThis={() => { if (classCode && !locked) lock.mutate(true); }} onReasonedReplacement={() => query.refetch()} />
       <View style={styles.controlRow}><Pressable testID={`episode-${slot}-alternatives`} style={({ pressed }) => [styles.alternativeButton, pressed && styles.pressed]} onPress={() => setShowAlternatives((v) => !v)}><Text style={styles.alternativeText}>{showAlternatives ? t("hideAlternatives") : t("showAlternatives")}</Text><Text style={styles.chevron}>{showAlternatives ? "⌃" : "⌄"}</Text></Pressable>{classCode ? <Pressable testID={`episode-${slot}-lock`} style={[styles.lockButton, locked && styles.locked]} disabled={lock.isPending} onPress={() => lock.mutate(!locked)}><Text style={[styles.lockText, locked && styles.lockTextActive]}>{locked ? "▣" : "▢"} {locked ? t("locked") : t("lock")}</Text></Pressable> : null}</View>
-      {showAlternatives ? <View style={styles.alternatives}>{episodes.slice(1, 4).map((episode) => <EpisodeCard compact key={episode.episode_hash} episode={episode} requestId={query.data?.request_id} slot={slot} onReasonedReplacement={() => query.refetch()} />)}</View> : null}</> : <View style={styles.errorCard}><Text style={styles.error}>{t("noSafeMeal")}</Text></View>}
+      {showAlternatives ? <View style={styles.alternatives}>{episodes.slice(1, 4).map((episode) => <EpisodeCard compact key={episode.episode_hash} episode={episode} requestId={query.data?.request_id} slot={slot} weekday={weekday} slotDate={slotDate} onReasonedReplacement={() => query.refetch()} />)}</View> : null}</> : <View style={styles.errorCard}><Text style={styles.error}>{t("noSafeMeal")}</Text></View>}
   </View>;
 }
 
-function EpisodeCard({ episode, requestId, slot, compact = false, onMakeThis, onReasonedReplacement }: { episode: MealEpisode; requestId?: string; slot: Slot; compact?: boolean; onMakeThis?: () => void; onReasonedReplacement: () => void }) {
+function EpisodeCard({ episode, requestId, slot, weekday, slotDate, compact = false, onMakeThis, onReasonedReplacement }: { episode: MealEpisode; requestId?: string; slot: Slot; weekday: string; slotDate: string; compact?: boolean; onMakeThis?: () => void; onReasonedReplacement: () => void }) {
   const { t } = useI18n(); const [askReason, setAskReason] = useState(false); const [saved, setSaved] = useState(false); const primaryDish = episode.components.find((x) => x.dish_id !== null);
-  const feedback = useMutation({ mutationFn: (input: { eventType: FeedbackEventType; detail?: Record<string, unknown> }) => { if (!requestId) return Promise.reject(new Error("no request_id on this episode slate")); return postFeedback({ request_id: requestId, event_type: input.eventType, dish_name: primaryDish?.dish_name, slot, detail: { episode_hash: episode.episode_hash, ...input.detail } }); } });
-  const replace = (eventType: FeedbackEventType) => feedback.mutate({ eventType }, { onSuccess: onReasonedReplacement });
+  const feedback = useMutation({ mutationFn: (input: { eventType: FeedbackEventType; reasonCode?: string; detail?: Record<string, unknown> }) => {
+    if (!requestId) return Promise.reject(new Error("no request_id on this episode slate"));
+    return postFeedback(mealEpisodeFeedbackRequest({
+      requestId, episode, slot, weekday, slotDate, ...input,
+    }));
+  } });
   const detail = () => router.push({ pathname: "/meal-detail", params: { meal: episode.display_name, slot } });
 
   return <View style={[styles.card, compact && styles.compactCard]} testID={compact ? undefined : `episode-${slot}-primary`}>
@@ -63,7 +124,7 @@ function EpisodeCard({ episode, requestId, slot, compact = false, onMakeThis, on
     <View style={styles.cardBody}><Text style={styles.practicality}>{episode.practicality.active_minutes} active min · {episode.practicality.burner_peak} burner{episode.practicality.burner_peak === 1 ? "" : "s"} · {episode.practicality.vessel_count} vessels</Text>{episode.reasons.slice(0, compact ? 1 : 2).map((reason) => <Text key={reason} numberOfLines={1} style={styles.reason}>✓  {reason}</Text>)}
       {!compact ? <><View style={styles.socialRow}><Social icon={saved ? "♥" : "♡"} label={saved ? t("saved") : t("save")} onPress={() => setSaved(!saved)} active={saved} /><Social testID={`episode-${slot}-not-today`} icon="×" label={t("notToday")} onPress={() => setAskReason(!askReason)} /><Social icon="↗" label={t("share")} onPress={() => Share.share({ message: `${episode.display_name} · FooFoo` })} /><Social icon="ⓘ" label={t("details")} onPress={detail} /></View>
         <Pressable testID={`episode-${slot}-make-this`} disabled={feedback.isPending || !requestId} style={({ pressed }) => [styles.makeButton, pressed && styles.pressed, (!requestId || feedback.isPending) && styles.disabled]} onPress={() => feedback.mutate({ eventType: "make_this" }, { onSuccess: onMakeThis })}><Text style={styles.makeText}>＋ {t("makeThis")}</Text></Pressable></> : <Pressable style={styles.swapButton} disabled={feedback.isPending || !requestId} onPress={() => feedback.mutate({ eventType: "make_this" })}><Text style={styles.swapText}>✓ {t("selectThis")}</Text></Pressable>}
-      {askReason ? <View style={styles.reasonRow}><Reason testID={`episode-${slot}-reason-too-much-work`} label={t("tooMuchWork")} onPress={() => replace("too_much_work")} /><Reason testID={`episode-${slot}-reason-missing-ingredient`} label={t("missingItem")} onPress={() => replace("missing_ingredient")} /><Reason testID={`episode-${slot}-reason-member-objection`} label={t("memberObjected")} onPress={() => replace("member_objection")} /><Reason testID={`episode-${slot}-reason-different-mood`} label={t("differentMood")} onPress={() => replace("not_today")} /></View> : null}
+      {askReason ? <View style={styles.reasonRow}><Reason testID={`episode-${slot}-reason-too-much-work`} label={t("tooMuchWork")} onPress={() => feedback.mutate({ eventType: "too_much_work", reasonCode: "too_much_work" }, { onSuccess: onReasonedReplacement })} /><Reason testID={`episode-${slot}-reason-missing-ingredient`} label={t("missingItem")} onPress={() => feedback.mutate({ eventType: "missing_ingredient", reasonCode: "missing_ingredient" }, { onSuccess: onReasonedReplacement })} /><Reason testID={`episode-${slot}-reason-member-objection`} label={t("memberObjected")} onPress={() => feedback.mutate({ eventType: "member_objection", reasonCode: "member_objection" }, { onSuccess: onReasonedReplacement })} /><Reason testID={`episode-${slot}-reason-different-mood`} label={t("differentMood")} onPress={() => feedback.mutate({ eventType: "not_today", reasonCode: "different_mood" }, { onSuccess: onReasonedReplacement })} /></View> : null}
       {primaryDish ? <Pressable testID={`episode-${slot}-recipe`} onPress={() => router.push({ pathname: "/recipe/[dish]", params: { dish: primaryDish.dish_name } })}><Text style={styles.recipeLink}>{t("cookingDetails")}  ›</Text></Pressable> : null}
     </View>
   </View>;

@@ -47,6 +47,12 @@ import { maybeLogSummary, recordRequest } from "./metrics.ts";
 
 const SERVICE_NAME = "recommendations";
 
+function dayTypeForDate(value: unknown): "weekday" | "weekend" | undefined {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  const day = new Date(`${value}T12:00:00Z`).getUTCDay();
+  return day === 0 || day === 6 ? "weekend" : "weekday";
+}
+
 export interface RecommendationDeps {
   authorizeHousehold?: HouseholdRoleLookup;
   loadHousehold?: (
@@ -204,6 +210,8 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     payload.preference_by_projected_class = online.preferenceByProjectedClass;
     payload.preference_by_tag = online.preferenceByTag;
     (payload.context as Record<string, unknown>).temporal_class_state = online.temporalClassState;
+    (payload.context as Record<string, unknown>).temporal_attribute_state =
+      online.temporalAttributeState;
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext
@@ -257,6 +265,13 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
           latencyMs,
           stubbed,
           plates: result.body.plates,
+          slot: typeof (payload.context as Record<string, unknown>).slot === "string"
+            ? String((payload.context as Record<string, unknown>).slot)
+            : undefined,
+          intendedMealDate: typeof (payload.context as Record<string, unknown>).date === "string"
+            ? String((payload.context as Record<string, unknown>).date)
+            : undefined,
+          dayType: dayTypeForDate((payload.context as Record<string, unknown>).date),
           engineVersion: typeof result.body.engine_version === "string"
             ? result.body.engine_version
             : undefined,

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
-import { MealEpisodeSection } from "../MealEpisodeSection";
+import { MealEpisodeSection, mealEpisodeFeedbackRequest } from "../MealEpisodeSection";
 import { fetchMealEpisodes } from "@/api/plan";
 
 const mockMutate = jest.fn();
@@ -16,10 +16,12 @@ const mockResponse = {
     episode_hash: "hash-1",
     rank: 1,
     plate_form: "pair" as const,
+    grammar_code: "PAIR_PRIMARY_STAPLE",
+    grammar_version: 1,
     display_name: "Tori chana dal + phulka",
     components: [
-      { dish_id: "dish-1", dish_name: "Tori chana dal", component_role: "hero", is_required: true },
-      { dish_id: null, dish_name: "Phulka", component_role: "staple", is_required: true },
+      { dish_id: "dish-1", dish_name: "Tori chana dal", component_role: "hero", grammar_role: "primary" as const, is_required: true },
+      { dish_id: null, dish_name: "Phulka", component_role: "staple", grammar_role: "side" as const, is_required: true },
     ],
     intent: "routine",
     intent_posterior: { routine: 0.7 },
@@ -72,6 +74,37 @@ describe("MealEpisodeSection", () => {
     mockMutate.mockClear();
     mockedFetchMealEpisodes.mockClear();
     mockQueryState = { data: mockResponse, isLoading: false, isError: false, error: null };
+  });
+
+  it("builds a canonical dated episode feedback envelope", () => {
+    const body = mealEpisodeFeedbackRequest({
+      requestId: "request-episode-1",
+      episode: mockResponse.episodes[0],
+      slot: "dinner",
+      weekday: "Monday",
+      slotDate: "2026-08-10",
+      eventType: "make_this",
+      occurredAt: "2026-08-07T18:00:00.000Z",
+    });
+    expect(body).toEqual(expect.objectContaining({
+      schema_version: "2",
+      idempotency_key: "request-episode-1:hash-1:make_this:none",
+      request_id: "request-episode-1",
+      event_type: "make_this",
+      dish_name: "Tori chana dal",
+      target: expect.objectContaining({
+        type: "meal_episode",
+        id: "hash-1",
+        snapshot: expect.objectContaining({ components: mockResponse.episodes[0].components }),
+      }),
+      moment: expect.objectContaining({
+        intended_meal_date: "2026-08-10",
+        meal_slot: "dinner",
+        weekday: "Monday",
+        day_type: "weekday",
+      }),
+      evidence: { kind: "explicit", source_surface: "today_meal_episode" },
+    }));
   });
 
   it("sends the selected meal date into recommendation context", () => {

@@ -84,6 +84,12 @@ def build_context(
     for field in ("recent_class_counts", "recent_cuisine_counts"):
         counts = ctx.get(field)
         core_ctx[field] = counts if isinstance(counts, dict) else {}
+    core_ctx["date"] = ctx.get("date")
+    core_ctx["day_type"] = ctx.get("day_type")
+    temporal_state = ctx.get("temporal_attribute_state")
+    core_ctx["temporal_attribute_state"] = (
+        temporal_state if isinstance(temporal_state, list) else []
+    )
     # Episode/practicality inputs are additive v1 context. They do not alter hard eligibility;
     # ghar_re_core.meal_episode consumes them only after the safe plate pool has been formed.
     if ctx.get("time_budget_minutes") is not None:
@@ -578,6 +584,11 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
                 "final_score": round(p["score"], 6),  # fixed aggregate
                 "selection_score": round(p.get("_selection_score", p["score"]), 6),
                 "historical_similarity": round(p.get("_historical_similarity", 0.0), 6),
+                "temporal_contribution": round(p.get("_temporal_contribution", 0.0), 6),
+                "temporal_explanation": p.get("_temporal_explanation", {
+                    "total": 0.0, "explicit": 0.0, "due": 0.0,
+                    "exposure": 0.0, "dimensions": [],
+                }),
                 "selection_policy": "adaptive_history_v1"
                 if "_selection_score" in p
                 else "home_diversity_v2",

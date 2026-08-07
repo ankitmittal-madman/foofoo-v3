@@ -54,6 +54,12 @@ import {
 
 const SERVICE_NAME = "plan";
 
+function plannedDayType(value: unknown): "weekday" | "weekend" | undefined {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  const day = new Date(`${value}T12:00:00Z`).getUTCDay();
+  return day === 0 || day === 6 ? "weekend" : "weekday";
+}
+
 export interface PlanDeps {
   authorizeHousehold?: HouseholdRoleLookup;
 }
@@ -301,6 +307,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         novelty_budget: online.noveltyBudget,
         richness_debt: online.richnessDebt,
         temporal_class_state: online.temporalClassState,
+        temporal_attribute_state: online.temporalAttributeState,
         // The v1 contract types `weather` as an object when present. Provider configuration is
         // optional, so omit the field when weather is unavailable instead of sending `null`,
         // which the stricter meal-episode request validator correctly rejects with HTTP 422.
@@ -477,6 +484,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           latencyMs,
           stubbed: stubbedHousehold,
           slot: typeof body.slot === "string" ? body.slot : undefined,
+          intendedMealDate: typeof body.date === "string" ? body.date : undefined,
+          dayType: plannedDayType(body.date),
           engineVersion: typeof body.engine_version === "string"
             ? body.engine_version
             : typeof body.model_version === "string"

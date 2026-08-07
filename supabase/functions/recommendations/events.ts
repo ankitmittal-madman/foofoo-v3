@@ -18,6 +18,7 @@ import {
   flattenServedMealClasses,
   resolveDishIdsByName,
   toExposureItems,
+  toMealAttributeExposureItems,
   toMealClassExposureItems,
 } from "./served.ts";
 
@@ -39,6 +40,8 @@ export interface RecommendationEventInput {
   detail?: string;
   latencyMs?: number; // RE call latency, measured edge-function-side (Phase D Task 2)
   slot?: string;
+  intendedMealDate?: string;
+  dayType?: "weekday" | "weekend";
   plates?: unknown; // the served set, stored as jsonb for audit/replay
   engineVersion?: string;
   configVersion?: string;
@@ -171,6 +174,34 @@ export async function recordRecommendationEvent(
           household_id: ev.householdId,
           detail: e instanceof Error ? e.message : String(e),
         });
+      }
+
+      // Dated item/attribute impressions remain separate from feedback and from the undated
+      // rolling variety model. Only surfaces that know the intended meal moment write this state.
+      if (
+        (ev.slot === "breakfast" || ev.slot === "lunch" || ev.slot === "dinner") &&
+        ev.intendedMealDate && ev.dayType
+      ) {
+        try {
+          const { error: temporalError } = await withTimeout(
+            db.rpc("record_meal_attribute_exposure_state", {
+              p_recommendation_event_id: insertedId,
+              p_items: toMealAttributeExposureItems(served, {
+                mealSlot: ev.slot,
+                intendedMealDate: ev.intendedMealDate,
+                dayType: ev.dayType,
+              }),
+            }),
+            "recommendations.events.record_meal_attribute_exposure_state",
+          );
+          if (temporalError) throw temporalError;
+        } catch (e) {
+          ctx.logger.warn("meal_attribute_exposure_state.persist_failed", {
+            request_id: ev.requestId,
+            household_id: ev.householdId,
+            detail: e instanceof Error ? e.message : String(e),
+          });
+        }
       }
     }
   }

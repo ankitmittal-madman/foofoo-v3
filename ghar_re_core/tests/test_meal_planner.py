@@ -416,3 +416,32 @@ def test_cold_start_top15_variety_never_changes_the_underlying_scores():
         for d in varied["dishes"]:
             if d["name"] in baseline_scores:
                 assert d["score"] == baseline_scores[d["name"]]
+
+
+def test_dated_dish_rhythm_changes_score_and_is_explained_without_changing_eligibility():
+    hh = _hh()
+    moment = {"date": "2026-08-07", "day_type": "weekday"}
+    baseline = MP.slot_options(hh, "lunch", n=100, weekday="Friday", context=moment)
+    target = baseline["options"][0]
+    state = [{
+        "meal_slot": "lunch",
+        "day_type": "weekday",
+        "dimension_code": "dish",
+        "entity_key": target["name"].casefold(),
+        "explicit_positive_count_28d": 1,
+        "positive_meal_dates_28d": ["2026-08-06"],
+        "negative_meal_dates_28d": [],
+        "exposure_meal_dates_14d": [],
+    }]
+    adjusted = MP.slot_options(
+        hh,
+        "lunch",
+        n=100,
+        weekday="Friday",
+        context={**moment, "temporal_attribute_state": state},
+    )
+    baseline_view = next(item for item in baseline["options"] if item["name"] == target["name"])
+    adjusted_view = next(item for item in adjusted["options"] if item["name"] == target["name"])
+    assert adjusted_view["score"] < baseline_view["score"]
+    assert adjusted_view["explanation"]["temporal_contribution"] < 0
+    assert adjusted_view["name"] in {item["name"] for item in baseline["options"]}

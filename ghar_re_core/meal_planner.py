@@ -26,6 +26,7 @@ import random
 from ghar_re_core import scoring as S
 from ghar_re_core import cohort_plan as CP
 from ghar_re_core import knowledge as K
+from ghar_re_core import temporal
 from ghar_re_core.catalogue import Catalogue
 from ghar_re_core.config import CONFIG
 from ghar_re_core.derivation import derive_theta
@@ -59,10 +60,13 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
     the class the user finalized it under. Falls back to the dish's primary class otherwise."""
     code = label_class or K.dish_to_class_code(d.name)
     explanation = S.explain_dish(d, theta, ctx, objective)
+    temporal_parts = temporal.dish_contribution(d, ctx)
     return {
         "name": d.name,
         "cuisine": d.cuisine,
         "diet": d.diet,
+        "cooking_method": list(d.cooking_method or []),
+        "richness": list(d.richness or []),
         "meal_class_code": code,
         "meal_class_name": _class_names().get(code),
         "spice_level": d.spice_level,
@@ -73,6 +77,11 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
             "base_total": explanation["base_total"],
             "q15_contribution": explanation["q15_contribution"],
             "weather_contribution": explanation["weather_contribution"],
+            "temporal_contribution": round(temporal_parts["total"], 4),
+            "temporal_explicit_contribution": round(temporal_parts["explicit"], 4),
+            "temporal_due_contribution": round(temporal_parts["due"], 4),
+            "temporal_exposure_contribution": round(temporal_parts["exposure"], 4),
+            "temporal_dimensions": temporal_parts["dimensions"],
             "top_contributors": sorted(
                 explanation["base_contributors"],
                 key=lambda item: abs(item["weighted"]),
@@ -82,13 +91,15 @@ def _dish_view(d, theta, ctx, objective, score=None, label_class=None):
     }
 
 
-def _candidate_lineage(d, score, slot):
+def _candidate_lineage(d, score, slot, ctx=None):
     """Private core→Edge candidate evidence; stripped before any client response."""
+    temporal_parts = temporal.dish_contribution(d, ctx or {})
     return {
         "name": d.name,
         "score": round(float(score), 6),
         "slot": slot,
         "meal_class_code": K.dish_to_class_code(d.name),
+        "temporal_contribution": round(temporal_parts["total"], 6),
     }
 
 
@@ -108,7 +119,8 @@ def _ranked(cat, theta, ctx, objective, predicate=None, preference_by_dish=None)
         # through exclude_dish_names before this function is called.
         affinity = float((preference_by_dish or {}).get(d.name, 0.0) or 0.0)
         affinity = max(-1.0, min(1.0, affinity))
-        out.append((S.score(d, theta, ctx, objective) + 0.35 * affinity, d))
+        temporal_adjustment = temporal.dish_contribution(d, ctx)["total"]
+        out.append((S.score(d, theta, ctx, objective) + 0.35 * affinity + temporal_adjustment, d))
     out.sort(key=lambda x: -x[0])
     return out
 
@@ -463,6 +475,10 @@ def slot_options(
     ctx["richness_debt"] = max(0.0, min(1.0, float(context.get("richness_debt", 0) or 0)))
     ctx["recent_class_counts"] = context.get("recent_class_counts") or {}
     ctx["recent_cuisine_counts"] = context.get("recent_cuisine_counts") or {}
+    ctx["date"] = context.get("date")
+    ctx["day_type"] = context.get("day_type")
+    ctx["temporal_attribute_state"] = context.get("temporal_attribute_state") or []
+    temporal.prepare_context(ctx)
     excluded = set(exclude_dish_names or [])
 
     # multi-membership (WP-17.1): a dish is eligible for a class if that class is ANY of its classes
@@ -498,7 +514,7 @@ def slot_options(
             _dish_view(d, theta, ctx, objective, score, label_class=class_code)
             for score, d in picked
         ],
-        "_candidate_lineage": [_candidate_lineage(d, score, slot) for score, d in ranked],
+        "_candidate_lineage": [_candidate_lineage(d, score, slot, ctx) for score, d in ranked],
     }
 
 

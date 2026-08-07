@@ -12,6 +12,7 @@ import {
   flattenServedDishes,
   flattenServedMealClasses,
   toExposureItems,
+  toMealAttributeExposureItems,
   toMealClassExposureItems,
 } from "../recommendations/served.ts";
 
@@ -104,6 +105,30 @@ Deno.test("toExposureItems: episode cadence metadata is copied to displayed comp
     dish_name: "Pav Bhaji",
     total_mins: 35,
     richness_score: 0.8,
+  }]);
+});
+
+Deno.test("dated attribute exposure preserves the served catalogue snapshot and meal moment", () => {
+  const served = flattenServedDishes([{
+    components: [{
+      dish_name: "Paneer Butter Masala",
+      cuisine: "punjabi",
+      richness: ["creamy", "buttery"],
+      cooking_method: ["simmered"],
+    }],
+  }]);
+  assertEquals(toMealAttributeExposureItems(served, {
+    mealSlot: "lunch",
+    intendedMealDate: "2026-08-07",
+    dayType: "weekday",
+  }), [{
+    dish_name: "Paneer Butter Masala",
+    meal_slot: "lunch",
+    intended_meal_date: "2026-08-07",
+    day_type: "weekday",
+    cuisine: "punjabi",
+    richness: ["creamy", "buttery"],
+    cooking_method: ["simmered"],
   }]);
 });
 
