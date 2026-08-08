@@ -61,14 +61,14 @@ MIN_VALID_BYTES = 5000       # reference script's own sanity floor for "not an e
 
 CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/{cloud}/image/upload"
 
-# Fallback text-to-image backend, tried only when Pollinations exhausts its retries. Every real
-# generation attempt from this ETL so far has come back HTTP 403 Forbidden from Pollinations
-# despite a non-default User-Agent (see PollinationsClient docstring) -- most consistent with
-# Pollinations blocking GitHub Actions' shared runner IP ranges specifically, not a request-shape
-# problem, so a different provider is the practical fix rather than more urllib tuning.
+# Alternate text-to-image backend. FLUX.1-dev (not -schnell, the faster/lower-quality distilled
+# variant) is currently the strongest openly-available, genuinely-free-tier model -- Founder
+# decision to test it directly against Pollinations (flux-pro/flux-realism both produced wrong
+# shapes/compositions for unfamiliar regional dishes despite accurate prompt text; see git
+# history). Overridable via env without another deploy.
 HF_ROUTER_IMAGE_URL = "https://router.huggingface.co/hf-inference/models/{model}"
-HF_IMAGE_MODEL = "black-forest-labs/FLUX.1-schnell"
-HF_IMAGE_BACKEND_LABEL = "hf_flux_schnell"  # image_assets.image_gen_backend CHECK value, migration 089
+HF_IMAGE_MODEL = os.environ.get("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-dev")
+HF_IMAGE_BACKEND_LABEL = "hf_flux_dev"  # image_assets.image_gen_backend CHECK value, migration 089/090
 
 
 @dataclass
@@ -282,45 +282,47 @@ def _build_multipart(fields: dict, file_field: str, filename: str, file_bytes: b
 
 def generate_and_upload(dish_name: str, prompt_text: str, prompt_backend: str, prompt_model_name: str | None,
                          pollinations: PollinationsClient, uploader: CloudinaryUploader,
-                         hf_image: "HFImageClient | None" = None) -> ImageResult:
+                         hf_image: "HFImageClient | None" = None,
+                         primary_backend: str = "pollinations") -> ImageResult:
     """Real generation + upload path — only ever called from apply mode for a dish that does not
     already have an image (idempotency check happens in pipeline.py, before this is called).
 
-    Tries Pollinations first; if it raises (every live attempt so far has come back HTTP 403,
-    consistent with Pollinations blocking GitHub Actions' shared runner IPs -- see images.py
-    module docstring), falls back to the Hugging Face image client when one is configured, rather
-    than failing the row outright on a provider-specific block.
+    primary_backend: 'pollinations' (default) or 'huggingface' -- picks which generator is tried
+    first; the other (when configured) is the fallback if the first raises. Founder is comparing
+    HF FLUX.1-dev against Pollinations directly for quality on dishes Pollinations rendered wrong
+    (correct prompt text, wrong shape/composition) -- see images.py module docstring.
     """
     slug = slugify(dish_name)
     random_suffix = "".join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=6))
     public_id = f"{slug}_hero_01_{random_suffix}"
 
-    image_gen_backend = "pollinations_flux_pro"
-    try:
-        png_bytes, request_url, seed = pollinations.generate_png(prompt_text)
-    except Exception as pollinations_exc:
-        logger.warning("pollinations generation failed for %s, trying HF fallback: %s", dish_name, pollinations_exc)
-        if hf_image is None or not hf_image.configured():
-            logger.error("image generation failed for %s: %s", dish_name, pollinations_exc)
-            return ImageResult(
-                source_url=None, storage_path=None, checksum_sha256=None, fetch_status="failed",
-                alt_text=f"{dish_name} (generation failed: {pollinations_exc})", is_primary=False,
-                source_type="ai_generated", confidence=None, prompt_text=prompt_text, prompt_backend=prompt_backend,
-                prompt_model_name=prompt_model_name, image_gen_backend=image_gen_backend, image_gen_seed=None,
-            )
+    generators = [("pollinations_flux_pro", lambda: pollinations.generate_png(prompt_text))]
+    if hf_image is not None and hf_image.configured():
+        generators.append((HF_IMAGE_BACKEND_LABEL, lambda: hf_image.generate_png(prompt_text)))
+    if primary_backend == "huggingface":
+        generators.reverse()
+
+    png_bytes = request_url = seed = None
+    image_gen_backend = generators[0][0]
+    errors: list[str] = []
+    for backend_label, call in generators:
         try:
-            png_bytes, request_url, seed = hf_image.generate_png(prompt_text)
-            image_gen_backend = HF_IMAGE_BACKEND_LABEL
-        except Exception as hf_exc:
-            logger.error("image generation failed for %s (pollinations: %s; hf fallback: %s)",
-                         dish_name, pollinations_exc, hf_exc)
-            return ImageResult(
-                source_url=None, storage_path=None, checksum_sha256=None, fetch_status="failed",
-                alt_text=f"{dish_name} (generation failed: pollinations={pollinations_exc}; hf={hf_exc})",
-                is_primary=False, source_type="ai_generated", confidence=None,
-                prompt_text=prompt_text, prompt_backend=prompt_backend, prompt_model_name=prompt_model_name,
-                image_gen_backend=HF_IMAGE_BACKEND_LABEL, image_gen_seed=None,
-            )
+            png_bytes, request_url, seed = call()
+            image_gen_backend = backend_label
+            break
+        except Exception as exc:
+            errors.append(f"{backend_label}={exc}")
+            logger.warning("%s generation failed for %s: %s", backend_label, dish_name, exc)
+
+    if png_bytes is None:
+        detail = "; ".join(errors) if errors else "no image backend configured"
+        logger.error("image generation failed for %s: %s", dish_name, detail)
+        return ImageResult(
+            source_url=None, storage_path=None, checksum_sha256=None, fetch_status="failed",
+            alt_text=f"{dish_name} (generation failed: {detail})", is_primary=False,
+            source_type="ai_generated", confidence=None, prompt_text=prompt_text, prompt_backend=prompt_backend,
+            prompt_model_name=prompt_model_name, image_gen_backend=image_gen_backend, image_gen_seed=None,
+        )
 
     checksum = hashlib.sha256(png_bytes).hexdigest()
 

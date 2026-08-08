@@ -438,15 +438,15 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                     instructions=row.raw.get("Instructions", ""),
                 )
                 prompt_text = assemble_prompt(clean_name, fields)
-                # HF fallback intentionally not passed here (Founder directive): chaining
-                # Pollinations' full retry cycle + an HF attempt inside one open DB transaction
-                # was long enough to trip Supabase's idle-in-transaction/statement timeout,
-                # aborting every row in the run (see import_row_errors: "current transaction is
-                # aborted"). HFImageClient stays available on image_ctx for a future fix that
-                # moves generation outside the transaction, but is not invoked for now.
+                # Founder is A/B testing HF FLUX.1-dev directly against Pollinations for quality
+                # (see images.py module docstring) -- primary_backend="huggingface" tries HF
+                # first; on success Pollinations is never called, so this doesn't reintroduce the
+                # earlier chained-retry transaction-timeout risk (HF has no retry loop, one call,
+                # 60s timeout ceiling vs Pollinations' up to ~90s of retries+backoff).
                 image_result = images.generate_and_upload(
                     clean_name, prompt_text, fields.source, fields.model_name,
-                    image_ctx.pollinations, image_ctx.uploader,
+                    image_ctx.pollinations, image_ctx.uploader, image_ctx.hf_image,
+                    primary_backend="huggingface",
                 )
                 logger.info("dish %s: image_result fetch_status=%s storage_path=%s",
                             dish_id, image_result.fetch_status, image_result.storage_path)
