@@ -127,7 +127,9 @@ def test_user_audit_measures_served_regional_naming_and_richness_quality():
     sql = user_audit.AUDIT_SQL
     assert sql.count("%s") == 2
     assert "recent_served_components" in sql
-    assert "re_engine.re_dish_regional_affinity" in sql
+    assert "public.dish_regional_affinities" in sql
+    assert "home.review_status <> 'rejected'" in sql
+    assert "local.review_status <> 'rejected'" in sql
     assert "home_or_local_affinity_count" in sql
     assert "regional_affinity_coverage" in sql
     assert "canonical_name_match_count" in sql

@@ -22,7 +22,7 @@ AUDIT_SQL = """
 WITH u AS (
   SELECT id, home_state, current_city, diet_type, cook_capability,
          onboarding_completed, city_overlay_weight, migration_duration_band, last_active_at,
-         (SELECT state_code FROM re_engine.re_states
+         (SELECT state_code FROM public.re_states
           WHERE lower(state_name) = lower(%s) LIMIT 1) AS local_state_code
   FROM public.profiles WHERE id = %s
 ), recent_recs AS (
@@ -187,12 +187,16 @@ WITH u AS (
   CROSS JOIN u
   LEFT JOIN public.dishes dish ON dish.id = component.dish_id
   LEFT JOIN public.cuisines cuisine ON cuisine.id = dish.cuisine_id
-  LEFT JOIN re_engine.re_states home_state ON home_state.state_code = u.home_state
-  LEFT JOIN re_engine.re_states local_state ON local_state.state_code = u.local_state_code
-  LEFT JOIN re_engine.re_dish_regional_affinity home
-    ON home.dish_id = dish.id AND home.state_code = u.home_state
-  LEFT JOIN re_engine.re_dish_regional_affinity local
-    ON local.dish_id = dish.id AND local.state_code = u.local_state_code
+  LEFT JOIN public.re_states home_state ON home_state.state_code = u.home_state
+  LEFT JOIN public.re_states local_state ON local_state.state_code = u.local_state_code
+  LEFT JOIN public.dish_regional_affinities home
+    ON home.dish_id = dish.id
+    AND home.region_code = regexp_replace(lower(home_state.state_name), '[^a-z0-9]+', '_', 'g')
+    AND home.review_status <> 'rejected'
+  LEFT JOIN public.dish_regional_affinities local
+    ON local.dish_id = dish.id
+    AND local.region_code = regexp_replace(lower(local_state.state_name), '[^a-z0-9]+', '_', 'g')
+    AND local.review_status <> 'rejected'
 ), served_catalogue_quality AS (
   SELECT
     count(*) AS component_count,
