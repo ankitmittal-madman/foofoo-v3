@@ -67,6 +67,18 @@ MEAL_SLOT_ROLLBACK = Path(
 MEAL_SLOT_WORKFLOW = Path(
     ".github/workflows/recommendation-meal-slot-remediation-audit.yml"
 )
+MEAL_SLOT_PROPOSAL_MIGRATION = Path(
+    "database/migrations/109_govern_direct_meal_slot_proposals.sql"
+)
+MEAL_SLOT_PROPOSAL_VALIDATION = Path(
+    "database/validation/961_govern_direct_meal_slot_proposals_validation.sql"
+)
+MEAL_SLOT_PROPOSAL_ROLLBACK = Path(
+    "database/rollback/109_govern_direct_meal_slot_proposals_rollback.sql"
+)
+MEAL_SLOT_PROPOSAL_WORKFLOW = Path(
+    ".github/workflows/recommendation-meal-slot-proposals.yml"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -434,5 +446,69 @@ def test_meal_slot_audit_is_protected_read_only_and_keeps_aux_untouched():
     assert "--single-transaction" in text
     assert "SET TRANSACTION READ ONLY" in text
     assert "recommendation-meal-slot-remediation-report.json" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
+
+
+def test_direct_meal_slot_proposals_are_evidence_linked_pending_and_non_serving():
+    """Exact course evidence may create a proposal but cannot mutate serving truth."""
+    text = MEAL_SLOT_PROPOSAL_MIGRATION.read_text()
+
+    assert "ops.dish_meal_slot_proposals" in text
+    assert "ops.dish_meal_slot_proposal_evidence" in text
+    assert "DEFERRABLE INITIALLY DEFERRED" in text
+    assert "meal-slot proposal requires at least one direct evidence row" in text
+    assert "meal-slot proposal identity and evidence are immutable" in text
+    assert "invalid meal-slot proposal lifecycle transition" in text
+    assert "automatic_acceptance_allowed', false" in text
+    assert "serving_changed', false" in text
+    assert "publication_changed', false" in text
+    assert "UPDATE public.dishes" not in text
+    assert "INSERT INTO public.dish_meal_class_mappings" not in text
+
+
+def test_direct_proposal_generator_is_idempotent_count_bound_and_service_only():
+    """Generation must stop on drift and reruns must reuse the exact proposal version."""
+    migration = MEAL_SLOT_PROPOSAL_MIGRATION.read_text()
+    validation = MEAL_SLOT_PROPOSAL_VALIDATION.read_text()
+
+    assert "direct meal-slot candidate count drift" in migration
+    assert "ON CONFLICT (dish_id, proposed_slot, proposal_method, proposal_version) DO NOTHING" in migration
+    assert "materialized meal-slot proposals do not match candidate count" in migration
+    assert "FROM PUBLIC, anon, authenticated" in migration
+    for invariant in (
+        "governed meal-slot proposal tables must enforce RLS",
+        "governed meal-slot proposals must remain service-only",
+        "direct proposal table writes must remain function-gated",
+        "governed meal-slot proposal is missing evidence",
+        "governed meal-slot proposal evidence does not match dish and slot",
+        "governed meal-slot proposal review provenance is incomplete",
+    ):
+        assert invariant in validation
+
+
+def test_direct_proposal_rollback_preserves_evidence_and_disables_generation():
+    """Rollback must retain generated review records while removing further mutation paths."""
+    text = MEAL_SLOT_PROPOSAL_ROLLBACK.read_text()
+
+    assert "REVOKE INSERT, UPDATE ON ops.dish_meal_slot_proposals" in text
+    assert "REVOKE EXECUTE ON FUNCTION re_engine.direct_slot_from_import_course" in text
+    assert "DROP FUNCTION IF EXISTS ops.generate_direct_meal_slot_proposals" in text
+    assert "DROP FUNCTION IF EXISTS re_engine.direct_slot_from_import_course" not in text
+    assert "DROP TABLE" not in text
+
+
+def test_direct_proposal_workflow_is_protected_exact_count_and_aux_free():
+    """Only the audited direct count may become pending proposals; no serving system is touched."""
+    text = MEAL_SLOT_PROPOSAL_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "expected_candidate_count" in text
+    assert "catalogue_meal_slot_remediation_report" in text
+    assert "pg_advisory_xact_lock" in text
+    assert "--single-transaction" in text
+    assert "pending_review" in text
+    assert "recommendation-meal-slot-proposal-generation.json" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text

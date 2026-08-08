@@ -127,7 +127,8 @@ No shadow or active transition was requested or executed.
 | Meal-class provenance audit | Run `31257875325` | 255 low-confidence mappings, all provisional internal research; zero curated, human-reviewed or accepted evidence; no serving change |
 | Primary/component readiness v1 | Run `31258906340` | Migration 106 live; 1,402 canonical dish-slot routes split into 603 primary-ready, 262 primary review and 537 component review; zero proposals/facts; no serving change |
 | Full-inventory serving-role coverage | Run `31259220512` | Migration 107 live; all 3,402 active dishes reconcile: 802 with canonical slots, 2,600 without, 2,596 missing hero roles and 918 with unrecognized slot labels; no serving change |
-| Meal-slot source-evidence audit | Not run | Migration 108 is repository-ready to split the 2,600 slotless dishes into fixed direct, contextual, conflicting or missing-evidence categories without exporting raw text or creating proposals |
+| Meal-slot source-evidence audit | Run `31267459809` | Migration 108 live; 1,802 single-direct candidates (667 lunch, 566 snacks, 294 dinner, 275 breakfast), 797 contextual review and one conflict; no raw text, proposals or serving change |
+| Governed direct-slot proposals | Repository checkpoint only | Migration 109 plus validation 961 and the protected generation workflow pass 25 focused tests, parsing and isolated PostgreSQL positive/negative/rollback execution; production installation and generation remain pending, and Aux remains off |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a

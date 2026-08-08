@@ -41,10 +41,21 @@ state only; deployment run IDs and rollback instructions live in the active runb
 
 > **Meal-slot remediation evidence:** protected run `31259220512` installed the v2 report and
 > reconciled all 3,402 active dishes. Exactly 802 have a canonical slot and 2,600 do not; 2,596
-> lack a hero role and 918 carry at least one unrecognized slot label. Migration 108 and its
-> protected workflow are repository-ready to classify those 2,600 rows using only fixed aggregate
-> import-course evidence categories. It creates no proposal, exposes no raw source text and makes
-> no serving change.
+> lack a hero role and 918 carry at least one unrecognized slot label. Protected run `31267459809`
+> installed migration 108 and split the 2,600 slotless dishes into 1,802 single-direct proposals
+> (667 lunch, 566 snacks, 294 dinner and 275 breakfast), 797 contextual-review rows and one direct
+> conflict. Contextual rows comprise 394 side dishes, 247 desserts, 120 main courses, 22 diet
+> values misplaced in the course field, 12 one-pot dishes and two brunch dishes. The audit created
+> no proposal, exposed no raw source text and made no serving change.
+>
+> **Governed direct meal-slot proposals:** migration 109, validation 961, its evidence-preserving
+> rollback and the protected generation workflow are repository-ready. The design binds each
+> proposal to immutable import rows, requires the exact audited candidate count, creates only
+> `pending` records, blocks automatic acceptance and performs no serving or publication write.
+> Twenty-five focused tests, SQL/YAML parsing and an isolated PostgreSQL execution prove exact
+> candidate filtering, idempotency, evidence enforcement, forward-only review state and rollback
+> preservation. This foundation is not yet installed in production and the 1,802 proposals have
+> not yet been generated. Aux remains off.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,
