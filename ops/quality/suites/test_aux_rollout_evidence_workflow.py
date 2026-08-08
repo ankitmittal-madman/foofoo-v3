@@ -18,6 +18,7 @@ def test_evidence_workflow_requires_three_same_repo_successful_inputs():
 
     assert '--repo "$GITHUB_REPOSITORY"' in text
     assert 'test "$conclusion" = "success"' in text
+    assert 'test "$workflow_name" = "Aux RE governed rollout inputs"' in text
     assert "--name aux-rollout-inputs" in text
     assert 'wc -l)" -eq 3' in text
     for name in ("offline.json", "load.json", "targets.json"):

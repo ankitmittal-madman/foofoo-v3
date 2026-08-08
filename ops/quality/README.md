@@ -134,6 +134,22 @@ The live/source intermediate files remain ephemeral. The workflow has no Supabas
 mutation command; activation remains outside automation and a later proven active breach is
 handled by the separate protected off-switch workflow.
 
+The source artifact is created only by the manual, production-environment-protected
+`Aux RE governed rollout inputs` workflow. It downloads one `aux-offline-report/offline.json` and
+one `aux-load-report/load.json` from successful same-repository runs. The packager rejects raw
+holdout cases, identity fields, unknown aggregate fields, non-passing or measurement-only load
+evidence, and publication mismatch. It creates `targets.json` from these protected environment
+variables—there are deliberately no repository-default product thresholds:
+
+- `AUX_ROLLOUT_APPROVAL_REFERENCE`, `AUX_ROLLOUT_APPROVED_AT`
+- `AUX_ROLLOUT_MIN_SHADOW_EVENTS`, `AUX_ROLLOUT_MIN_RETRIEVAL_RATE`
+- `AUX_ROLLOUT_MAX_TIMEOUT_RATE`, `AUX_ROLLOUT_MIN_COMPARABLE_EVENT_RATE`
+- `AUX_ROLLOUT_MIN_SERVED_CANDIDATE_COVERAGE`, `AUX_ROLLOUT_MAX_P95_AUX_LATENCY_MS`
+
+The artifact contains exactly `offline.json`, `load.json`, and `targets.json`. The S117 workflow
+checks that its source run's workflow name is exactly `Aux RE governed rollout inputs`; a generic
+successful artifact cannot be substituted.
+
 `ops/recommendation/rollout_decision.py` consumes four privacy-minimized inputs: a passing governed
 offline report, a passing gated Aux load report, rows from `re_engine.aux_shadow_health`, and zero
 hard-guardrail counters. Its evidence document must also contain the full publication hash and all

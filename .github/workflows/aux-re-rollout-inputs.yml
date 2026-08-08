@@ -1,0 +1,98 @@
+name: Aux RE governed rollout inputs
+
+on:
+  workflow_dispatch:
+    inputs:
+      offline_run_id:
+        description: Successful same-repository run containing aux-offline-report/offline.json
+        required: true
+        type: string
+      load_run_id:
+        description: Successful same-repository run containing aux-load-report/load.json
+        required: true
+        type: string
+      publication_version:
+        description: Full sha256 recommendation catalogue publication
+        required: true
+        type: string
+      confirm:
+        description: Type package-aux-rollout-inputs
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: production-aux-re-rollout-inputs
+  cancel-in-progress: false
+
+jobs:
+  package:
+    if: inputs.confirm == 'package-aux-rollout-inputs'
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      AUX_ROLLOUT_APPROVAL_REFERENCE: ${{ vars.AUX_ROLLOUT_APPROVAL_REFERENCE }}
+      AUX_ROLLOUT_APPROVED_AT: ${{ vars.AUX_ROLLOUT_APPROVED_AT }}
+      AUX_ROLLOUT_MIN_SHADOW_EVENTS: ${{ vars.AUX_ROLLOUT_MIN_SHADOW_EVENTS }}
+      AUX_ROLLOUT_MIN_RETRIEVAL_RATE: ${{ vars.AUX_ROLLOUT_MIN_RETRIEVAL_RATE }}
+      AUX_ROLLOUT_MAX_TIMEOUT_RATE: ${{ vars.AUX_ROLLOUT_MAX_TIMEOUT_RATE }}
+      AUX_ROLLOUT_MIN_COMPARABLE_EVENT_RATE: ${{ vars.AUX_ROLLOUT_MIN_COMPARABLE_EVENT_RATE }}
+      AUX_ROLLOUT_MIN_SERVED_CANDIDATE_COVERAGE: ${{ vars.AUX_ROLLOUT_MIN_SERVED_CANDIDATE_COVERAGE }}
+      AUX_ROLLOUT_MAX_P95_AUX_LATENCY_MS: ${{ vars.AUX_ROLLOUT_MAX_P95_AUX_LATENCY_MS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate source run identities
+        env:
+          OFFLINE_RUN_ID: ${{ inputs.offline_run_id }}
+          LOAD_RUN_ID: ${{ inputs.load_run_id }}
+        run: |
+          for run_id in "$OFFLINE_RUN_ID" "$LOAD_RUN_ID"; do
+            case "$run_id" in
+              *[!0-9]*|'') echo "source run IDs must be numeric" >&2; exit 1 ;;
+            esac
+            conclusion="$(gh run view "$run_id" --repo "$GITHUB_REPOSITORY" \
+              --json conclusion --jq '.conclusion')"
+            test "$conclusion" = "success"
+          done
+
+      - name: Download aggregate offline quality report
+        env:
+          OFFLINE_RUN_ID: ${{ inputs.offline_run_id }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/offline-source"
+          gh run download "$OFFLINE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name aux-offline-report --dir "$RUNNER_TEMP/offline-source"
+          test -f "$RUNNER_TEMP/offline-source/offline.json"
+          test "$(find "$RUNNER_TEMP/offline-source" -type f | wc -l)" -eq 1
+
+      - name: Download gated Aux load report
+        env:
+          LOAD_RUN_ID: ${{ inputs.load_run_id }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/load-source"
+          gh run download "$LOAD_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name aux-load-report --dir "$RUNNER_TEMP/load-source"
+          test -f "$RUNNER_TEMP/load-source/load.json"
+          test "$(find "$RUNNER_TEMP/load-source" -type f | wc -l)" -eq 1
+
+      - name: Validate and package aggregate-only inputs
+        env:
+          PUBLICATION_VERSION: ${{ inputs.publication_version }}
+        run: |
+          python -m ops.recommendation.rollout_inputs \
+            --offline "$RUNNER_TEMP/offline-source/offline.json" \
+            --load "$RUNNER_TEMP/load-source/load.json" \
+            --publication-version "$PUBLICATION_VERSION" \
+            --output-dir "$RUNNER_TEMP/aux-rollout-inputs"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aux-rollout-inputs
+          path: ${{ runner.temp }}/aux-rollout-inputs
+          retention-days: 30
+          if-no-files-found: error

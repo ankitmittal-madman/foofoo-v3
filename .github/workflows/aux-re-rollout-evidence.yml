@@ -53,7 +53,10 @@ jobs:
           esac
           conclusion="$(gh run view "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --json conclusion --jq '.conclusion')"
+          workflow_name="$(gh run view "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json workflowName --jq '.workflowName')"
           test "$conclusion" = "success"
+          test "$workflow_name" = "Aux RE governed rollout inputs"
 
       - name: Download independently approved source reports
         env:
