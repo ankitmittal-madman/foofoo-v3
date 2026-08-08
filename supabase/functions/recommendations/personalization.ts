@@ -71,6 +71,39 @@ export function extractExposureDishNames(plates: unknown): string[] {
   return names;
 }
 
+/** Extract one visible lead dish per plate so a bounded exclusion can block whole episodes. */
+export function extractExposurePrimaryNames(plates: unknown): string[] {
+  if (!Array.isArray(plates)) return [];
+  const names: string[] = [];
+  for (const item of plates) {
+    if (!item || typeof item !== "object") continue;
+    const row = item as Record<string, unknown>;
+    if (typeof row.name === "string") {
+      names.push(row.name);
+      continue;
+    }
+    if (Array.isArray(row.hero_dish_names)) {
+      const firstHero = row.hero_dish_names.find((value) => typeof value === "string");
+      if (typeof firstHero === "string") {
+        names.push(firstHero);
+        continue;
+      }
+    }
+    if (!Array.isArray(row.components)) continue;
+    const components = row.components.filter(
+      (component): component is Record<string, unknown> =>
+        Boolean(component) && typeof component === "object",
+    );
+    const primary = components.find((component) => component.grammar_role === "primary") ??
+      components.find((component) =>
+        typeof component.component_role === "string" &&
+        component.component_role.endsWith("_hero")
+      );
+    if (typeof primary?.dish_name === "string") names.push(primary.dish_name);
+  }
+  return names;
+}
+
 export function extractPersistedExposureDishNames(value: unknown): string[] {
   if (!value || typeof value !== "object") return [];
   const names = (value as Record<string, unknown>).recent_dish_names;
@@ -78,20 +111,45 @@ export function extractPersistedExposureDishNames(value: unknown): string[] {
   return names.filter((name): name is string => typeof name === "string" && name.length > 0);
 }
 
-/** Choose the bounded hard-exclusion set used for an immediate refresh.
+/** Choose the bounded hard-exclusion set used for immediate refresh and adjacent meal slots.
  *
  * The materialized seven-day dish window is useful history, but hard-excluding all of it can
  * exhaust a meal slot after repeated refreshes. Class/cuisine history already remains active as
- * a soft diversity penalty. Hard suppression therefore uses only the latest served slate, with a
- * small persisted fallback for accounts that predate recommendation-event storage. */
+ * a soft diversity penalty. Hard suppression therefore uses the latest successful slate for each
+ * recently served meal slot. Lead dishes are selected first so the bounded list blocks every
+ * visible episode before remaining component names are filled fairly across slots. */
 export function selectImmediateRefreshExclusions(
   persisted: string[],
-  latestExposureRows: Array<{ plates?: unknown }>,
+  latestExposureRows: Array<{ plates?: unknown; slot?: unknown }>,
   limit = 16,
 ): string[] {
-  const fromLatestSlate = latestExposureRows.flatMap((row) => extractExposureDishNames(row.plates));
-  const source = fromLatestSlate.length > 0 ? fromLatestSlate : persisted;
-  return [...new Set(source)].slice(0, Math.max(0, Math.min(16, Math.trunc(limit))));
+  const boundedLimit = Math.max(0, Math.min(16, Math.trunc(limit)));
+  const latestBySlot = new Map<string, { plates?: unknown; slot?: unknown }>();
+  latestExposureRows.forEach((row, index) => {
+    const slot = typeof row.slot === "string" && row.slot.trim()
+      ? row.slot.trim().toLowerCase()
+      : `unknown-${index}`;
+    if (!latestBySlot.has(slot)) latestBySlot.set(slot, row);
+  });
+  const rows = [...latestBySlot.values()];
+  const selected = new Set<string>();
+  for (const row of rows) {
+    for (const name of extractExposurePrimaryNames(row.plates)) {
+      if (selected.size >= boundedLimit) break;
+      selected.add(name);
+    }
+  }
+  const componentBuckets = rows.map((row) => [...new Set(extractExposureDishNames(row.plates))]);
+  const bucketDepth = Math.max(0, ...componentBuckets.map((bucket) => bucket.length));
+  for (let depth = 0; depth < bucketDepth && selected.size < boundedLimit; depth++) {
+    for (const bucket of componentBuckets) {
+      const name = bucket[depth];
+      if (name) selected.add(name);
+      if (selected.size >= boundedLimit) break;
+    }
+  }
+  const source = selected.size > 0 ? [...selected] : persisted;
+  return [...new Set(source)].slice(0, boundedLimit);
 }
 
 export function extractPersistedCadence(value: unknown): {
@@ -242,9 +300,9 @@ export async function loadOnlineRecommendationState(
         "personalization.variety_state",
       ),
       withTimeout(
-        db.from("recommendation_events").select("plates").eq("household_id", profileId)
+        db.from("recommendation_events").select("plates,slot").eq("household_id", profileId)
           .in("outcome", ["success", "partial"]).order("created_at", { ascending: false })
-          .limit(1),
+          .limit(12),
         "personalization.recent_exposures",
       ),
       withTimeout(
@@ -368,7 +426,7 @@ export async function loadOnlineRecommendationState(
         const persisted = extractPersistedExposureDishNames(varietyRes.data);
         return selectImmediateRefreshExclusions(
           persisted,
-          (exposureRes.data ?? []) as Array<{ plates?: unknown }>,
+          (exposureRes.data ?? []) as Array<{ plates?: unknown; slot?: unknown }>,
         );
       })(),
       ...variety,

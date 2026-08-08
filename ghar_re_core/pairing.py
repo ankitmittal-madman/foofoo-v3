@@ -81,7 +81,9 @@ def _history_reranked_plates(plates, ctx):
         for key, count in _bounded_history_counts(ctx.get("recent_cuisine_counts")).items()
     }
     temporal.prepare_context(ctx)
-    has_temporal = bool(ctx.get("_temporal_attribute_index")) and bool(ctx.get("_planned_meal_date"))
+    has_temporal = bool(ctx.get("_temporal_attribute_index")) and bool(
+        ctx.get("_planned_meal_date")
+    )
     has_context = bool(ctx.get("governed_context_signals"))
     if not plates or not (class_counts or cuisine_counts or has_temporal or has_context):
         return plates
@@ -105,7 +107,8 @@ def _history_reranked_plates(plates, ctx):
         plate["_governed_context_contribution"] = context_parts["total"]
         plate["_governed_context_explanation"] = context_parts
         plate["_selection_score"] = (
-            relevance_lambda * relevance - (1.0 - relevance_lambda) * history_similarity
+            relevance_lambda * relevance
+            - (1.0 - relevance_lambda) * history_similarity
             + temporal_parts["total"]
             + context_parts["total"]
         )
@@ -293,9 +296,13 @@ def plate_score(plate, scores):
 def default_carb(plate, theta):
     """Which carb/support ('Rice', 'Roti', 'Poori', or None) should be attached to a served
     plate, decided first by the liquid hero's own type (e.g. sambar -> Rice) and falling back to
-    the household's region. Standalone plates (already a complete meal) get no support."""
+    the household's region. Standalone plates and heroes that already contain a staple category
+    get no additional support."""
     if plate["form"] == "standalone":
         return None  # standalone gets NO support
+    self_stapling = {"bread", "dosa_idli", "paratha_roti", "rice"}
+    if any(set(dish.dish_category) & self_stapling for dish in _plate_dishes(plate)):
+        return None
     # hero used for the by-type rule = the liquid hero (pair) or the single hero
     hero = plate.get("liquid") or plate.get("hero")
     name = hero.name.lower()

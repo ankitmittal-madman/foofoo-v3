@@ -168,6 +168,26 @@ def test_bundle_catalogue_has_full_state_origin_coverage(built):
     assert missing == [], f"{len(missing)}/810 dishes have no state_origin: {missing[:10]}..."
 
 
+def test_authored_staple_and_liquid_combinations_are_standalone(built):
+    """Complete named combinations must not be nested inside another generated plate."""
+    out, _ = built
+    catalogue = providers.BundleCatalogueProvider(out).load()
+    expected = {
+        "Aloo Puri",
+        "Appam with Stew",
+        "Chholar Dal with Luchi",
+        "Dal Pakwan",
+        "Kombdi Vade (Malvani)",
+        "Nahari Kulcha",
+        "Pithla Bhakri",
+        "Sheermal with Nihari",
+    }
+
+    assert {
+        dish.name for dish in catalogue if dish.name in expected and dish.hero_role == "standalone"
+    } == expected
+
+
 def test_named_animal_dishes_cannot_be_derived_as_vegetarian(built):
     """Missing spreadsheet ingredients must fail safe at the catalogue build boundary."""
     out, _ = built

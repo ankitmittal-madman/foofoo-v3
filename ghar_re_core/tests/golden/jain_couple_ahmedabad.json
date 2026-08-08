@@ -74,7 +74,7 @@
       "liquid": null,
       "plate_calories": 260,
       "score": 1.779241,
-      "support": "Roti"
+      "support": null
     },
     {
       "dry": null,
@@ -86,7 +86,7 @@
       "liquid": null,
       "plate_calories": 320,
       "score": 1.565505,
-      "support": "Roti"
+      "support": null
     }
   ]
 }

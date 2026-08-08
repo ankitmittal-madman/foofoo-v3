@@ -186,13 +186,29 @@ def test_standalone_appears_alone_no_support():
 
 
 # ---------------------------------------------------------------------------
-# 7. a non-standalone plate has a support/carb from the fixed set {Roti,Paratha,Poori,Rice}
+# 7. a non-standalone plate gets a support unless one of its heroes is already a staple
 # ---------------------------------------------------------------------------
 def test_non_standalone_gets_valid_support():
     for k, res in _all_default_runs().items():
         for p in res["plates"]:
             if p["form"] in ("pair", "single"):
-                assert p["support"] in CARB_SET, f"{k}: bad support {p['support']}"
+                has_staple_hero = any(
+                    set(dish.dish_category) & {"bread", "dosa_idli", "paratha_roti", "rice"}
+                    for dish in P._plate_dishes(p)
+                )
+                if has_staple_hero:
+                    assert p["support"] is None, f"{k}: redundant support {p['support']}"
+                else:
+                    assert p["support"] in CARB_SET, f"{k}: bad support {p['support']}"
+
+
+def test_uttapam_pair_does_not_receive_redundant_roti():
+    """A fermented-crepe hero is already the staple in its plate."""
+    uttapam = SimpleNamespace(name="Uttapam", dish_category=["dosa_idli"])
+    saagu = SimpleNamespace(name="Saagu", dish_category=["curry"])
+    plate = {"form": "pair", "dry": uttapam, "liquid": saagu}
+
+    assert P.default_carb(plate, {"region": {"value": "West"}}) is None
 
 
 # ---------------------------------------------------------------------------

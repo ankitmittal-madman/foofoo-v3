@@ -315,8 +315,15 @@ def _hero_role(cats: set[str], name: str, has_protein_centre: bool) -> str:
     with paneer listed second/third (not the dish's first ingredient token) was silently
     under-classified as 'liquid' instead of 'single'."""
     STAPLE_ONLY = {"paratha_roti", "bread", "rice"}
+    SELF_STAPLING = STAPLE_ONLY | {"dosa_idli"}
+    LIQUID_CENTRE = {"curry", "dal_lentil"}
     if cats and cats <= STAPLE_ONLY:
         return "support"
+    # An authored staple-plus-liquid dish is already a complete plate (for example Dal Pakwan or
+    # Pithla Bhakri). Treating it as a liquid/single hero lets the assembler nest that complete
+    # meal inside another pair and attach a second staple.
+    if cats & SELF_STAPLING and cats & LIQUID_CENTRE:
+        return "standalone"
     if cats & {"snack_starter", "egg_dish"}:
         return "dry"
     if "biryani_pulao" in cats:
