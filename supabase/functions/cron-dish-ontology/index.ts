@@ -16,6 +16,25 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
   async (_req, ctx) => {
     const db = createServiceRoleClient(ctx.config);
     await db.rpc("reconcile_dish_enrichment_jobs");
+
+    // Deterministic, non-AI safety-field correctness pass (migration 103): runs on every
+    // invocation so newly-ingested dishes get the same is_jain/diet_type/allergen_flags check as
+    // the 2026-08-08 backlog pass, without waiting for a human to notice bad data. Best-effort —
+    // a failure here must not block the AI enrichment work below.
+    let safetyFieldCorrections: Record<string, number> = {};
+    let safetyFieldError: string | null = null;
+    try {
+      const { data: safetyRows, error: safetyError } = await db.rpc(
+        "dish_safety_field_autocorrect",
+      );
+      if (safetyError) throw safetyError;
+      for (const row of safetyRows ?? []) {
+        safetyFieldCorrections[String(row.violation)] = Number(row.rows_corrected ?? 0);
+      }
+    } catch (error) {
+      safetyFieldError = error instanceof Error ? error.message.slice(0, 120) : "unknown_error";
+    }
+
     const workerId = `edge:${ctx.traceId}`;
     const { data: jobs, error } = await db.rpc("claim_dish_enrichment_jobs", {
       p_worker_id: workerId,
@@ -215,6 +234,8 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
         ontologyTerms,
         nutrients,
         providerFailures,
+        safetyFieldCorrections,
+        safetyFieldError,
         ai: {
           claimed: aiClaimed,
           complete: aiComplete,

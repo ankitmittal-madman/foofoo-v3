@@ -149,3 +149,24 @@ REVOKE ALL ON FUNCTION re_engine.dish_safety_field_violations() FROM PUBLIC;
 REVOKE ALL ON FUNCTION re_engine.dish_safety_field_autocorrect() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION re_engine.dish_safety_field_violations() TO service_role, authenticated;
 GRANT EXECUTE ON FUNCTION re_engine.dish_safety_field_autocorrect() TO service_role;
+
+-- PostgREST only exposes the `public` schema by default; supabase/functions/cron-dish-ontology
+-- calls RPCs through the Supabase JS client (db.rpc(...)), so the re_engine function above needs
+-- a public-schema wrapper to be callable from there.
+CREATE OR REPLACE FUNCTION public.dish_safety_field_autocorrect()
+RETURNS TABLE (violation text, rows_corrected bigint)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path TO 'public', 're_engine', 'pg_temp'
+AS $$
+  SELECT * FROM re_engine.dish_safety_field_autocorrect();
+$$;
+
+COMMENT ON FUNCTION public.dish_safety_field_autocorrect() IS
+  'PostgREST-reachable wrapper for re_engine.dish_safety_field_autocorrect(). Called by '
+  'supabase/functions/cron-dish-ontology on every scheduled run so newly-ingested and existing '
+  'dishes both get the deterministic is_jain/diet_type/allergen_flags correctness check, not just '
+  'the 2026-08-08 backlog pass.';
+
+REVOKE ALL ON FUNCTION public.dish_safety_field_autocorrect() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.dish_safety_field_autocorrect() TO service_role;

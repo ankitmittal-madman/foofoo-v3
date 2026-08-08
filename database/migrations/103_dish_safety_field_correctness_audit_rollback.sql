@@ -6,5 +6,6 @@
 -- them would reintroduce a known food-safety defect. If a genuine revert of the data itself is
 -- ever required, it must be a separate, explicitly-reviewed migration, not this rollback.
 
+DROP FUNCTION IF EXISTS public.dish_safety_field_autocorrect();
 DROP FUNCTION IF EXISTS re_engine.dish_safety_field_autocorrect();
 DROP FUNCTION IF EXISTS re_engine.dish_safety_field_violations();
