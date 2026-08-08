@@ -5,11 +5,11 @@
     "class_first_v1/class_dish_options.csv"
   ],
   "promotion_mode": "immutable_bundle",
-  "dish_count": 810,
-  "source_mapping_count": 1500,
-  "mapping_count": 1516,
+  "dish_count": 809,
+  "source_mapping_count": 1498,
+  "mapping_count": 1514,
   "lookup_entry_count": 789,
-  "runtime_lookup_count": 1599,
+  "runtime_lookup_count": 1598,
   "unmatched_source_dishes": [
     "Lauki Khichdi",
     "Moong Dal Khichdi",
@@ -16512,30 +16512,6 @@
           "method": "chef_rubric",
           "confidence": 0.819,
           "review_status": "accepted",
-          "source": "class_first_v1/dish_class_map.csv"
-        }
-      ]
-    },
-    {
-      "name": "Pesarattu MLC",
-      "primary_class_code": "BF_FERMENTED_CREPE_PAN",
-      "mappings": [
-        {
-          "class_code": "BF_FERMENTED_CREPE_PAN",
-          "slot_group": "Breakfast",
-          "planning_role": "MAIN_PRIMARY",
-          "method": "chef_rubric",
-          "confidence": 0.821,
-          "review_status": "accepted",
-          "source": "class_first_v1/dish_class_map.csv"
-        },
-        {
-          "class_code": "BF_CHILLA_PROTEIN",
-          "slot_group": "Breakfast",
-          "planning_role": "MAIN_PRIMARY",
-          "method": "chef_rubric_secondary",
-          "confidence": 0.74,
-          "review_status": "provisional",
           "source": "class_first_v1/dish_class_map.csv"
         }
       ]

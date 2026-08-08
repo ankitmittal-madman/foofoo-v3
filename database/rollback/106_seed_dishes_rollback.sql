@@ -720,7 +720,6 @@ DELETE FROM public.dishes WHERE name IN (
   'Pootharekulu',
   'Borugu Undalu',
   'Mamsam Pulusu',
-  'Pesarattu MLC',
   'Chettinad Fish Curry',
   'Chettinad Mutton',
   'Athirasam',

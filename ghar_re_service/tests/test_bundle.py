@@ -139,7 +139,7 @@ def test_shadow_preference_artifact_is_also_bundled(tmp_path):
 
 def test_bundle_catalogue_matches_build_catalogue_output(built):
     """The bundled catalogue must reconstruct the same dish set build_catalogue.py produces — the
-    bundle is a snapshot of the real 810-dish catalogue (Phase G), not a lossy re-encoding of it.
+    bundle is a snapshot of the canonical catalogue (Phase G), not a lossy re-encoding of it.
 
     Superseded from comparing against the 39-dish golden-sample fixtures: export_bundle.py was
     wired to build_catalogue.py (Phase G Task 2), so the bundle no longer sources from
@@ -152,6 +152,24 @@ def test_bundle_catalogue_matches_build_catalogue_output(built):
     fresh_dishes, _report = build_catalogue.build_catalogue()
     assert len(bundled.dishes) == len(fresh_dishes)
     assert {d.name for d in bundled.dishes} == {d["name"] for d in fresh_dishes}
+
+
+def test_governed_duplicate_dish_identity_is_merged_and_aliases_are_retained(built):
+    """The authored MLC typo must not remain a second served dish or lose name resolution."""
+    out, _ = built
+    from ghar_re_service.scripts import build_catalogue
+
+    catalogue = providers.BundleCatalogueProvider(out).load()
+    _fresh_dishes, report = build_catalogue.build_catalogue()
+    canonical = catalogue.get("Pesarattu Upma")
+
+    assert len(catalogue.dishes) == 809
+    assert report.identity_merges == [("Pesarattu MLC", "Pesarattu Upma")]
+    assert "Pesarattu MLC" not in {dish.name for dish in catalogue.dishes}
+    assert canonical is not None
+    assert {"Pesarattu MLC", "MLA Pesarattu"}.issubset(set(canonical.synonyms))
+    assert catalogue.get("Pesarattu MLC") is canonical
+    assert catalogue.get("MLA Pesarattu") is canonical
 
 
 def test_bundle_catalogue_has_full_state_origin_coverage(built):

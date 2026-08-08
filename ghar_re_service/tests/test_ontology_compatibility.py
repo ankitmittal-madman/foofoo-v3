@@ -38,11 +38,11 @@ def _snapshot() -> dict:
 def test_snapshot_covers_every_runtime_dish_and_preserves_source_gaps():
     snapshot = _snapshot()
     assert snapshot["schema_version"] == 2
-    assert snapshot["dish_count"] == 810
-    assert snapshot["source_mapping_count"] == 1500
-    assert snapshot["mapping_count"] == 1516
+    assert snapshot["dish_count"] == 809
+    assert snapshot["source_mapping_count"] == 1498
+    assert snapshot["mapping_count"] == 1514
     assert snapshot["lookup_entry_count"] == 789
-    assert snapshot["runtime_lookup_count"] == 1599
+    assert snapshot["runtime_lookup_count"] == 1598
     assert snapshot["unmatched_source_dishes"] == [
         "Lauki Khichdi",
         "Moong Dal Khichdi",
