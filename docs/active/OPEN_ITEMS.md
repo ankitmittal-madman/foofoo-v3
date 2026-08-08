@@ -50,10 +50,12 @@ findings are retained under `docs/archive/`.
 ## P3 — Product and intelligence evolution
 
 - Complete WP-23 after its deployed-OFF Phase A foundation: run authenticated cold-start and
-  experienced-user smoke on an explicitly selected test household; close the measured
-  642-of-3,402 catalogue enrichment/class-mapping gaps; ratify and run load gates; then collect
-  consented real-outcome and shadow evidence before separately approving any canary. Aux remains
-  off until those gates pass.
+  experienced-user smoke on an explicitly selected test household; remediate the 255
+  low-confidence provisional meal-class mappings without relabelling their confidence; enrich and
+  map the remaining expanded inventory; publish one quality-closed immutable generation; ratify and
+  run load gates; then collect consented real-outcome and shadow evidence before separately
+  approving any canary. Aux remains off until those gates pass. Protected runs `31257431526` and
+  `31257875325` own the current aggregate counts and provenance split.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.

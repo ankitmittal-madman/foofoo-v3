@@ -123,6 +123,8 @@ No shadow or active transition was requested or executed.
 | 9 | Run `31253527126` | `plan` and `recommendations` deployed after 151 Edge tests passed |
 | Boundary smoke | Run `31253604331` | Fly health/meta and unauthenticated Edge boundaries passed |
 | Aux model quality | Run `31256081581` | 86 tests, model gate, local Qdrant and signed packaged-service shadow flow passed; active promotion remained prohibited |
+| Catalogue quality audit | Run `31257431526` | 3,410 stored, 3,402 active, 646 presence-eligible and 547 strict-quality-ready; no serving change |
+| Meal-class provenance audit | Run `31257875325` | 255 low-confidence mappings, all provisional internal research; zero curated, human-reviewed or accepted evidence; no serving change |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
@@ -134,6 +136,14 @@ The 642 count is the actual safety-closed publication, not the full active dish 
 publication time the coverage report showed 3,402 active dishes, 1,719 class-mapped dishes and 642
 fully enriched/safety-closed/publishable dishes. These coverage gaps remain data work; they must not
 be bypassed by publishing incomplete rows.
+
+The later audits do not replace that deployed-generation count. They show that the live database
+has moved to 646 presence-eligible rows, but only 547 meet the stricter evidence policy. The 255
+weak meal-class mappings comprise 99 of those presence-eligible rows plus 156 otherwise-complete
+rows still in ontology review. Because none has curated, human-reviewed or accepted evidence, do
+not raise confidence or republish them merely by rerunning the legacy classifier. Generate
+independently evaluated proposals, route unresolved items to review, then publish a new immutable
+generation only after the quality report passes.
 
 ### Phase A stop conditions
 
@@ -261,10 +271,11 @@ Until then, describe the state precisely as “implemented”, “deployed off�
   offline evaluator correctly fails closed, so promotion evidence cannot yet be complete.
 - Numerical targets exist as governed inputs but require a Product/Founder approval reference;
   engineering defaults are not product ratification.
-- The production publication is known: 642 of 3,402 active dishes passed every enrichment,
-  safety, ingredient, cuisine, taxonomy and meal-class gate. The remaining rows require governed
-  data completion; the legacy `810` bundle and total database inventory are not substitutes for
-  the publication count.
+- The production publication is known: 642 of 3,402 active dishes are deployed. A later audit found
+  646 presence-eligible database rows but only 547 strict-quality-ready; a separate provenance
+  audit found 255 weak provisional class mappings with no curated or human evidence. The remaining
+  rows require governed data completion; the legacy `810` bundle and total database inventory are
+  not substitutes for the publication count.
 - A protected workflow does not prove backup health, secret correctness or on-call readiness;
   those remain operator assertions with external evidence.
 

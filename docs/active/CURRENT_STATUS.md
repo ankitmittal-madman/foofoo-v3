@@ -18,6 +18,17 @@ state only; deployment run IDs and rollback instructions live in the active runb
 > its evidence explicitly prohibits active promotion because training is synthetic and online
 > shadow/real-outcome evidence does not exist.
 
+> **Catalogue expansion audit:** the deployed immutable generation remains 642 dishes. Protected
+> aggregate run `31257431526` measured 3,410 stored rows, 3,402 active rows and 646 rows passing
+> the existing presence-based publication gates; only 547 of those 646 also passed the stricter
+> confidence policy. Run `31257875325` then proved the complete meal-class remediation cohort is
+> 255 dishes: 99 are presence-eligible but below the class-confidence gate and 156 have complete
+> serving facts but remain in ontology review. All 255 mappings are provisional internal-research
+> outputs (238 `chef_rubric`, 17 `chef_rubric_secondary`), with zero curated-exact, human-reviewed
+> or accepted evidence. They must receive new independent evidence or human review; confidence
+> cannot be raised mechanically. Aux remains off and no catalogue or mapping changed in either
+> audit.
+
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,
 > lifecycle-add-on, analytics/experiment and notification-worker gaps. Migration 053, plan,
@@ -29,9 +40,10 @@ state only; deployment run IDs and rollback instructions live in the active runb
 > credentials are configured; a physical-device native build remains the final push-delivery test.
 
 > **Production ontology/recommendation release:** migrations 054, 055 and 056 plus seed 146 are
-> live on `cmkswalqpmmqojwdmqbv`. All 802 production dishes are mapped to usable meal classes:
-> 547 are enriched and 255 are explicitly in review, with no pending enrichment jobs. The
-> The ontology rollout initially activated `dish-ontology` v1, `plan` v9 and `feedback` v6;
+> live on `cmkswalqpmmqojwdmqbv`. The original 802-dish ontology cohort has a meal-class mapping
+> for every dish: 547 meet the current strict confidence policy and 255 require class-evidence
+> remediation. The later expanded inventory is not fully mapped or enriched. The ontology rollout
+> initially activated `dish-ontology` v1, `plan` v9 and `feedback` v6;
 > current Edge versions are recorded in the production-hardening block below. Fly.io release v125
 > is healthy on both checks and serves immutable RE bundle `sha256:3d4cf579d1cf2565`. Snapshot v2
 > now preserves all 1,599 canonical/compatibility class lookups. Production workflow 31013721486
@@ -151,9 +163,10 @@ state only; deployment run IDs and rollback instructions live in the active runb
   DPDP export/delete UI added 2026-08-04 (P0-2/P0-4/P1-2/P1-3/P1-4); jest infra stood up with 9
   pure-logic tests; Expo SDK 53 + OneSignal SDK integration passes typecheck, Expo Doctor, and an
   Android production bundle export; no component-render or physical-device tests yet (P1-5 partial).
-- **Database:** production contained 3,409 dish rows in the later inventory view; the governed
-  publication audit measured 3,402 active dishes, 1,719 with usable class mappings and 642 passing
-  every publication gate. Earlier continuity evidence recorded 77 profiles on 2026-08-05.
+- **Database:** protected run `31257431526` measured 3,410 stored dish rows, 3,402 active dishes,
+  1,719 with usable class mappings and 646 passing the current presence-based publication gates.
+  Of those 646, 547 meet the stricter confidence policy; the deployed immutable generation remains
+  642. Earlier continuity evidence recorded 77 profiles on 2026-08-05.
   RLS enabled; household context writes and tenant continuity are fixed and live. All profiles have
   a household and active owner membership, all scoped household IDs are non-null, advisor-reported
   missing FK indexes/duplicate indexes are resolved, and partition creation is automated.
@@ -161,9 +174,11 @@ state only; deployment run IDs and rollback instructions live in the active runb
   validation reports zero invalid households. Migration 075 adds private normalized festival
   identities/occurrences under `food`; validation 930 confirms table privacy and RPC results.
 - **Knowledge layer:** normalized ontology and provenance structures are live, but coverage is not
-  complete across the expanded inventory. Only 642 active dishes currently satisfy the complete
-  serving contract; 1,719 have usable meal-class mappings. Missing ingredient, cuisine, safety,
-  taxonomy and class facts must be completed under the existing review rules rather than bypassed.
+  complete across the expanded inventory. The database currently has 646 presence-eligible rows,
+  only 547 meet the stricter confidence policy, and 1,719 active dishes have any usable meal-class
+  mapping. Run `31257875325` shows all 255 weak mappings lack curated or human evidence. Missing
+  ingredient, cuisine, safety, taxonomy and class facts must be completed under the existing review
+  rules rather than bypassed.
   USDA remains exact-match provisional evidence, Groq remains limited to governed low-risk fields,
   and clinically governed health-condition suitability remains pending.
 

@@ -24,6 +24,8 @@ Only future work is listed here. Evidence and acceptance detail are in `OPEN_ITE
 11. Activate preference personalization after a real training threshold is met.
 12. Expand and safety-review the bounded food graph.
 13. Finish WP-23 from its deployed-OFF foundation: authenticated test-household smoke; read-only
-    catalogue gap measurement and governed enrichment/class mapping beyond the current 642 rows;
+    independent evidence or human review for 255 provisional low-confidence class mappings,
+    governed enrichment/class mapping across the expanded inventory, and a quality-closed
+    immutable publication beyond the current 642 deployed rows;
     ratified load gates; consented real-outcome evaluation; shadow observation; then a separately
     approved, household-stable canary. Do not enable Aux while these remain incomplete.
