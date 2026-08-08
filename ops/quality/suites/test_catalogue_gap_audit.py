@@ -767,6 +767,9 @@ def test_direct_proposal_source_integrity_workflow_hashes_checked_in_source_only
     assert "database_identifies_project" in text
     assert "database/seeds/IndianFoodDatasetCSV.csv" in text
     assert "sha256sum -- \"$source_path\"" in text
+    assert "\\getenv expected_source_name EXPECTED_SOURCE_NAME" in text
+    assert "\\getenv expected_source_checksum EXPECTED_SOURCE_CHECKSUM" in text
+    assert '-v expected_source_name="$expected_source_name"' not in text
     assert "expected_proposal_count" in text
     assert "expected_evidence_link_count" in text
     assert "pg_advisory_xact_lock" in text

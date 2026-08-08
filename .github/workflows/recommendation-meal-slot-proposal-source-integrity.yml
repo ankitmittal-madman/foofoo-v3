@@ -87,15 +87,20 @@ jobs:
           expected_source_checksum="$(sha256sum -- "$source_path" | cut -d ' ' -f 1)"
           test -n "$expected_source_name"
           [[ "$expected_source_checksum" =~ ^[0-9a-f]{64}$ ]]
+          export EXPECTED_SOURCE_NAME="$expected_source_name"
+          export EXPECTED_SOURCE_CHECKSUM="$expected_source_checksum"
 
           report="$RUNNER_TEMP/recommendation-meal-slot-proposal-source-integrity.json"
           raw="$report.raw"
           psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 --single-transaction \
-            -v expected_source_name="$expected_source_name" \
-            -v expected_source_checksum="$expected_source_checksum" \
-            -c "SET TRANSACTION READ ONLY" \
-            -c "SELECT re_engine.direct_meal_slot_proposal_source_integrity_report(:'expected_source_name', :'expected_source_checksum')" \
-            > "$raw"
+            > "$raw" <<'SQL'
+          \getenv expected_source_name EXPECTED_SOURCE_NAME
+          \getenv expected_source_checksum EXPECTED_SOURCE_CHECKSUM
+          SET TRANSACTION READ ONLY;
+          SELECT re_engine.direct_meal_slot_proposal_source_integrity_report(
+            :'expected_source_name', :'expected_source_checksum'
+          );
+          SQL
           tail -n 1 "$raw" > "$report"
           jq --arg commit "$GITHUB_SHA" --arg run_id "$GITHUB_RUN_ID" '. + {
             commit_sha: $commit,
