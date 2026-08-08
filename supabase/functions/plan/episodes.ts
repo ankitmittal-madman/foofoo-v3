@@ -29,6 +29,7 @@ interface EpisodeResult {
 export interface DishSlateItem {
   name: string;
   score: number;
+  selectionPropensity?: number;
   slot?: string;
   mealClassCode?: string | null;
   reasons: string[];
@@ -80,6 +81,10 @@ export function extractDishSlateItems(
     const name = typeof dish.name === "string" ? dish.name.trim() : "";
     const score = typeof dish.score === "number" ? dish.score : Number.NaN;
     if (!name || !Number.isFinite(score)) return [];
+    const selectionPropensity = typeof dish.selection_propensity === "number" &&
+        dish.selection_propensity > 0 && dish.selection_propensity <= 1
+      ? dish.selection_propensity
+      : undefined;
     const explanation = dish.explanation && typeof dish.explanation === "object"
       ? dish.explanation as Record<string, unknown>
       : {};
@@ -93,6 +98,7 @@ export function extractDishSlateItems(
     return [{
       name,
       score,
+      selectionPropensity,
       slot: slot ?? (typeof dish.slot === "string" ? dish.slot : undefined),
       mealClassCode: typeof dish.meal_class_code === "string" ? dish.meal_class_code : null,
       reasons: [...new Set(reasons)],
@@ -140,6 +146,7 @@ export async function buildDishLineageCandidates(
       generator_scores: {
         point_score: item.score,
         rerank_score: item.score,
+        selection_propensity: item.selectionPropensity ?? null,
         shadow_preference_score: typeof item.snapshot.shadow_preference_score === "number"
           ? item.snapshot.shadow_preference_score
           : null,
@@ -163,6 +170,18 @@ export function stripPrivateCandidateLineage(
   return Object.fromEntries(
     Object.entries(response).filter(([key]) => key !== "_candidate_lineage"),
   );
+}
+
+/** Return the truthful displayed-item inclusion probability for one dish slate.
+ * Direct recommendations fail closed when an older Ghar response lacks its randomized-policy
+ * probability. Planning dish surfaces are deterministic conditional on their persisted request,
+ * so each displayed winner has probability 1 and unselected candidates have no policy support. */
+export function dishSlateSelectionPropensity(
+  surface: string,
+  item: DishSlateItem,
+): number | null {
+  if (item.selectionPropensity !== undefined) return item.selectionPropensity;
+  return surface === "recommendations" ? null : 1;
 }
 
 function hex(bytes: ArrayBuffer): string {
@@ -260,9 +279,10 @@ async function persistDishRecommendationSlate(
     rank: index + 1,
     point_score: item.score,
     rerank_score: item.score,
-    // The seeded exploration/diversification policy is not probability-calibrated. Null is the
-    // truthful value; writing 1 would falsely claim deterministic inclusion for IPS evaluation.
-    selection_propensity: null,
+    // Direct recommendations carry the exact epsilon-greedy design probability from Ghar. Other
+    // dish surfaces are deterministic conditional on their persisted request snapshot, so their
+    // displayed items have inclusion probability 1 (and no support for unselected alternatives).
+    selection_propensity: dishSlateSelectionPropensity(input.surface, item),
     generator_codes: [input.surface, item.mealClassCode].filter(
       (value): value is string => typeof value === "string" && value.length > 0,
     ),

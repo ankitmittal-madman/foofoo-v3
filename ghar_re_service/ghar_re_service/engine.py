@@ -699,6 +699,10 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
                 "selection_policy": "adaptive_history_v1"
                 if "_selection_score" in p
                 else "home_diversity_v2",
+                "selection_propensity": float(p.get("_selection_propensity", 1.0)),
+                "randomized_selection_policy": p.get(
+                    "_selection_policy", "epsilon_greedy_class_v1"
+                ),
                 "contributions": contributions,  # OPEN list (RE-DOC-11 §6)
             }
         )

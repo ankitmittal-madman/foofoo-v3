@@ -115,6 +115,9 @@ export interface Plate {
   support?: string | null;
   is_standalone?: boolean;
   plate_score: number;
+  /** Exact serving-policy inclusion probability, not a predicted preference score. */
+  selection_propensity?: number;
+  randomized_selection_policy?: string;
   base_total: number;
   gain_multiplier: number;
   final_score: number;

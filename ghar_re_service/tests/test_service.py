@@ -264,6 +264,8 @@ def test_recommendations_end_to_end(client):
     top = body["plates"][0]
     assert len(top["contributions"]) > 3
     assert {"base_total", "gain_multiplier", "final_score"} <= set(top)
+    assert 0 < top["selection_propensity"] <= 1
+    assert top["randomized_selection_policy"] == "epsilon_greedy_class_v1"
     # NOTE: this used to also assert West-MH rain's KB §R3 comfort hero (Kanda Bhaji) was served.
     # Removed — root-caused, not just deleted: "Kanda Bhaji" does not exist anywhere in the real
     # 810-dish catalogue this service actually loads (ghar_re_service/data/bundle/catalogue.json);
