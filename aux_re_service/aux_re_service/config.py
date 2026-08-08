@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import os
 import re
-from dataclasses import dataclass
+import urllib.parse
+from dataclasses import dataclass, field
 from enum import StrEnum
+
+from .qdrant_endpoint import FLY_PRIVATE_HOST, LOCAL_HOSTS, qdrant_base
 
 
 class Mode(StrEnum):
@@ -42,11 +45,13 @@ class Settings:
     log_all: bool
     allow_override: bool
     qdrant_url: str | None
+    qdrant_allowed_host: str | None
+    qdrant_api_key: str | None = field(repr=False)
     qdrant_collection: str
     candidate_pool_path: str | None
     model_artifact_dir: str | None
     catalogue_publication_version: str | None = None
-    service_secret: str | None = None
+    service_secret: str | None = field(default=None, repr=False)
     knowledge_graph_path: str | None = None
     retrieval_timeout_seconds: float = 1.5
     qdrant_enabled: bool = True
@@ -81,6 +86,8 @@ class Settings:
             log_all=_bool("AUX_REC_LOG_ALL", True),
             allow_override=_bool("AUX_REC_ALLOW_OVERRIDE", False),
             qdrant_url=os.getenv("AUX_REC_QDRANT_URL") or None,
+            qdrant_allowed_host=os.getenv("AUX_REC_QDRANT_ALLOWED_HOST") or None,
+            qdrant_api_key=os.getenv("AUX_REC_QDRANT_API_KEY") or None,
             qdrant_collection=os.getenv("AUX_REC_QDRANT_COLLECTION", "foofoo_recipes"),
             catalogue_publication_version=(
                 os.getenv("AUX_REC_CATALOGUE_PUBLICATION_VERSION") or None
@@ -113,6 +120,16 @@ class Settings:
             raise ValueError("AUX_REC_SERVICE_SECRET is required when Aux is enabled")
         if re.fullmatch(r"[A-Za-z0-9_-]+", settings.qdrant_collection) is None:
             raise ValueError("AUX_REC_QDRANT_COLLECTION contains unsupported characters")
+        if settings.qdrant_url:
+            hostname = urllib.parse.urlparse(
+                qdrant_base(settings.qdrant_url, settings.qdrant_allowed_host)
+            ).hostname
+            if (
+                hostname not in LOCAL_HOSTS
+                and not FLY_PRIVATE_HOST.fullmatch(hostname or "")
+                and not settings.qdrant_api_key
+            ):
+                raise ValueError("AUX_REC_QDRANT_API_KEY is required for governed HTTPS Qdrant")
         if settings.catalogue_publication_version:
             match = re.fullmatch(r"sha256:([0-9a-f]{64})", settings.catalogue_publication_version)
             if match is None:

@@ -11,6 +11,8 @@ def test_safe_environment_defaults(monkeypatch):
         "AUX_REC_MODE",
         "AUX_REC_ALLOW_OVERRIDE",
         "AUX_REC_QDRANT_URL",
+        "AUX_REC_QDRANT_ALLOWED_HOST",
+        "AUX_REC_QDRANT_API_KEY",
         "AUX_REC_SERVICE_SECRET",
     ):
         monkeypatch.delenv(name, raising=False)
@@ -55,6 +57,25 @@ def test_catalogue_publication_configuration_is_version_bound(monkeypatch):
 
     monkeypatch.setenv("AUX_REC_QDRANT_COLLECTION", "foofoo_recipes__wrong")
     with pytest.raises(ValueError, match="hash prefix"):
+        Settings.from_env()
+
+
+def test_governed_https_qdrant_requires_exact_host_and_api_key(monkeypatch):
+    digest = "a" * 64
+    monkeypatch.setenv("AUX_REC_QDRANT_URL", "https://cluster.example.qdrant.io:6333")
+    monkeypatch.setenv("AUX_REC_QDRANT_ALLOWED_HOST", "cluster.example.qdrant.io")
+    monkeypatch.setenv("AUX_REC_QDRANT_COLLECTION", f"foofoo_recipes__{digest[:12]}")
+    monkeypatch.setenv("AUX_REC_CATALOGUE_PUBLICATION_VERSION", f"sha256:{digest}")
+    with pytest.raises(ValueError, match="API_KEY"):
+        Settings.from_env()
+
+    monkeypatch.setenv("AUX_REC_QDRANT_API_KEY", "protected")
+    settings = Settings.from_env()
+    assert settings.qdrant_api_key == "protected"
+    assert "protected" not in repr(settings)
+
+    monkeypatch.setenv("AUX_REC_QDRANT_ALLOWED_HOST", "other.example.qdrant.io")
+    with pytest.raises(ValueError, match="approved"):
         Settings.from_env()
 
 

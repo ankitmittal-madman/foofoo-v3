@@ -25,6 +25,8 @@ def settings(**overrides) -> Settings:
         log_all=False,
         allow_override=True,
         qdrant_url=None,
+        qdrant_allowed_host=None,
+        qdrant_api_key=None,
         qdrant_collection="recipes",
         candidate_pool_path=None,
         model_artifact_dir=None,

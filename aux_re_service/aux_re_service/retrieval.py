@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import urllib.parse
 import urllib.request
 import uuid
 from dataclasses import dataclass
@@ -14,6 +13,7 @@ from typing import Any
 
 from .config import Settings
 from .knowledge_graph import LocalFoodKnowledgeGraph
+from .qdrant_endpoint import qdrant_base
 from .safety import canonical_tokens
 from .schemas import Candidate, RecommendationRequest
 
@@ -93,15 +93,7 @@ class CandidateRetriever:
         return [Candidate.model_validate(row) for row in rows]
 
     def _from_qdrant(self, request: RecommendationRequest) -> list[Candidate]:
-        base = self.settings.qdrant_url or ""
-        parsed = urllib.parse.urlparse(base)
-        if parsed.scheme not in {"http", "https"} or parsed.hostname not in {
-            "localhost",
-            "127.0.0.1",
-            "::1",
-            "qdrant",
-        }:
-            raise ValueError("AUX_REC_QDRANT_URL must point to the local Qdrant service")
+        base = qdrant_base(self.settings.qdrant_url or "", self.settings.qdrant_allowed_host)
         query = " ".join(
             [
                 request.meal_slot,
@@ -167,7 +159,10 @@ class CandidateRetriever:
             }
         ).encode()
         url = f"{base.rstrip('/')}/collections/{self.settings.qdrant_collection}/points/query"
-        req = urllib.request.Request(url, data=body, headers={"content-type": "application/json"})
+        headers = {"content-type": "application/json"}
+        if self.settings.qdrant_api_key:
+            headers["api-key"] = self.settings.qdrant_api_key
+        req = urllib.request.Request(url, data=body, headers=headers)
         with urllib.request.urlopen(
             req, timeout=self.settings.retrieval_timeout_seconds
         ) as response:  # noqa: S310 - local URL checked

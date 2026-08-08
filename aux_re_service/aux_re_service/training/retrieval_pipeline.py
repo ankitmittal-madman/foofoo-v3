@@ -7,13 +7,13 @@ import hashlib
 import json
 import re
 import urllib.error
-import urllib.parse
 import urllib.request
 import uuid
 from collections.abc import Iterator, Mapping
 from pathlib import Path
 from typing import Any
 
+from ..qdrant_endpoint import qdrant_base
 from ..retrieval import local_embedding
 
 PUBLICATION_SCHEMA_VERSION = "recommendation-catalogue-publication-v1"
@@ -284,18 +284,6 @@ def build(ontology_path: Path, output_dir: Path) -> dict[str, int]:
     }
 
 
-def _local_base(url: str) -> str:
-    parsed = urllib.parse.urlparse(url)
-    if parsed.scheme not in {"http", "https"} or parsed.hostname not in {
-        "localhost",
-        "127.0.0.1",
-        "::1",
-        "qdrant",
-    }:
-        raise ValueError("Qdrant URL must reference a local service")
-    return url.rstrip("/")
-
-
 def _request(url: str, method: str, payload: dict[str, Any], timeout: float) -> dict[str, Any]:
     request = urllib.request.Request(
         url,
@@ -308,7 +296,7 @@ def _request(url: str, method: str, payload: dict[str, Any], timeout: float) -> 
 
 
 def upload(points_path: Path, qdrant_url: str, collection: str, *, timeout: float = 5.0) -> int:
-    base = _local_base(qdrant_url)
+    base = qdrant_base(qdrant_url)
     artifact = json.loads(points_path.read_text())
     try:
         _request(
@@ -347,7 +335,7 @@ def upload_publication(
         raise ValueError("Qdrant collection contains unsupported characters")
     if version_token not in collection:
         raise ValueError("Qdrant collection name must include the publication hash prefix")
-    base = _local_base(qdrant_url)
+    base = qdrant_base(qdrant_url)
     _request(
         f"{base}/collections/{collection}",
         "PUT",

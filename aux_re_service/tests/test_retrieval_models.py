@@ -5,7 +5,9 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
+import pytest
 from aux_re_service.config import Settings
+from aux_re_service.qdrant_endpoint import qdrant_base
 from aux_re_service.retrieval import CandidateRetriever, local_embedding
 from aux_re_service.schemas import RecommendationRequest
 
@@ -37,6 +39,26 @@ def test_local_embedding_is_deterministic_normalized_and_context_sensitive():
     assert abs(sum(value * value for value in first) - 1.0) < 1e-9
 
 
+def test_qdrant_endpoint_accepts_fly_private_dns_and_rejects_public_or_ambiguous_urls():
+    assert (
+        qdrant_base("http://foofoo-aux-qdrant.internal:6333")
+        == "http://foofoo-aux-qdrant.internal:6333"
+    )
+    assert (
+        qdrant_base("https://cluster.example.qdrant.io:6333", "cluster.example.qdrant.io")
+        == "https://cluster.example.qdrant.io:6333"
+    )
+    for unsafe in (
+        "https://qdrant.example.com:6333",
+        "http://qdrant.internal.evil.example:6333",
+        "http://user:qdrant@qdrant:6333",
+        "http://qdrant:6333/collections",
+        "http://qdrant:6334",
+    ):
+        with pytest.raises(ValueError):
+            qdrant_base(unsafe)
+
+
 def test_qdrant_query_and_structured_output(monkeypatch):
     captured = {}
 
@@ -50,6 +72,7 @@ def test_qdrant_query_and_structured_output(monkeypatch):
     def fake_urlopen(req, timeout):
         captured["url"] = req.full_url
         captured["body"] = json.loads(req.data)
+        captured["headers"] = dict(req.header_items())
         captured["timeout"] = timeout
         return Response(
             json.dumps(
@@ -71,7 +94,11 @@ def test_qdrant_query_and_structured_output(monkeypatch):
 
     monkeypatch.setattr("aux_re_service.retrieval.urllib.request.urlopen", fake_urlopen)
     result = CandidateRetriever(
-        config(qdrant_url="http://localhost:6333", qdrant_enabled=True)
+        config(
+            qdrant_url="http://localhost:6333",
+            qdrant_api_key="protected",
+            qdrant_enabled=True,
+        )
     ).retrieve(request())
     assert captured["url"].endswith("/collections/foofoo_recipes/points/query")
     assert len(captured["body"]["query"]) == 64
@@ -80,6 +107,7 @@ def test_qdrant_query_and_structured_output(monkeypatch):
         "key": "regions",
         "match": {"any": ["maharashtra", "west"]},
     }
+    assert captured["headers"]["Api-key"] == "protected"
     assert result.candidates[0].id == "q-1"
     assert result.failures == {}
 

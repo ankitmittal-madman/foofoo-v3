@@ -1,0 +1,107 @@
+name: Deploy Aux RE in shadow mode
+
+on:
+  workflow_dispatch:
+    inputs:
+      publication_version:
+        description: Full sha256 catalogue publication already loaded in Qdrant
+        required: true
+        type: string
+      expected_row_count:
+        description: Exact point count from the immutable publication manifest
+        required: true
+        type: string
+      confirm:
+        description: Type deploy-aux-shadow
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-aux-re-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: inputs.confirm == 'deploy-aux-shadow'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      FLY_AUX_APP: ${{ vars.FLY_AUX_APP }}
+      AUX_RE_SERVICE_SECRET: ${{ secrets.AUX_RE_SERVICE_SECRET }}
+      AUX_RE_QDRANT_URL: ${{ vars.AUX_RE_QDRANT_URL }}
+      AUX_RE_QDRANT_ALLOWED_HOST: ${{ vars.AUX_RE_QDRANT_ALLOWED_HOST }}
+      AUX_RE_QDRANT_API_KEY: ${{ secrets.AUX_RE_QDRANT_API_KEY }}
+      PUBLICATION_VERSION: ${{ inputs.publication_version }}
+      EXPECTED_ROW_COUNT: ${{ inputs.expected_row_count }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Validate protected target and immutable publication inputs
+        run: |
+          test -n "$FLY_API_TOKEN"
+          test -n "$FLY_AUX_APP"
+          test -n "$AUX_RE_SERVICE_SECRET"
+          test -n "$AUX_RE_QDRANT_URL"
+          test -n "$AUX_RE_QDRANT_ALLOWED_HOST"
+          test -n "$AUX_RE_QDRANT_API_KEY"
+          case "$PUBLICATION_VERSION" in
+            sha256:????????????????????????????????????????????????????????????????) ;;
+            *) echo "publication_version must be a full sha256 digest" >&2; exit 1 ;;
+          esac
+          digest="${PUBLICATION_VERSION#sha256:}"
+          case "$digest" in *[!0-9a-f]*) echo "publication digest must be lowercase hex" >&2; exit 1 ;; esac
+          case "$EXPECTED_ROW_COUNT" in
+            *[!0-9]*|'') echo "expected_row_count must be a positive integer" >&2; exit 1 ;;
+          esac
+          test "$EXPECTED_ROW_COUNT" -gt 0
+          PYTHONPATH=aux_re_service python -c \
+            'import os; from aux_re_service.qdrant_endpoint import qdrant_base; qdrant_base(os.environ["AUX_RE_QDRANT_URL"], os.environ["AUX_RE_QDRANT_ALLOWED_HOST"])'
+
+      - name: Verify exact immutable collection is already loaded in governed Qdrant
+        run: |
+          digest="${PUBLICATION_VERSION#sha256:}"
+          collection="foofoo_recipes__${digest:0:12}"
+          umask 077
+          printf 'header = "api-key: %s"\n' "$AUX_RE_QDRANT_API_KEY" \
+            > "$RUNNER_TEMP/qdrant-curl.conf"
+          curl --fail --silent --config "$RUNNER_TEMP/qdrant-curl.conf" \
+            "${AUX_RE_QDRANT_URL%/}/collections/$collection" \
+            --output "$RUNNER_TEMP/qdrant-collection.json"
+          jq --exit-status --argjson count "$EXPECTED_ROW_COUNT" '
+            .status == "ok"
+            and .result.status == "green"
+            and .result.points_count == $count
+          ' "$RUNNER_TEMP/qdrant-collection.json" >/dev/null
+
+      - name: Install service and Qdrant secrets without exposing them in Fly configuration
+        run: |
+          flyctl config validate --strict --config aux_re_service/fly.toml --app "$FLY_AUX_APP"
+          printf 'AUX_REC_SERVICE_SECRET=%s\nAUX_REC_QDRANT_API_KEY=%s\n' \
+            "$AUX_RE_SERVICE_SECRET" "$AUX_RE_QDRANT_API_KEY" \
+            | flyctl secrets import --app "$FLY_AUX_APP" --stage
+
+      - name: Deploy Aux with shadow-only policy and exact catalogue identity
+        run: |
+          digest="${PUBLICATION_VERSION#sha256:}"
+          collection="foofoo_recipes__${digest:0:12}"
+          flyctl deploy --config aux_re_service/fly.toml --app "$FLY_AUX_APP" --remote-only \
+            --env "AUX_REC_QDRANT_URL=$AUX_RE_QDRANT_URL" \
+            --env "AUX_REC_QDRANT_ALLOWED_HOST=$AUX_RE_QDRANT_ALLOWED_HOST" \
+            --env "AUX_REC_QDRANT_COLLECTION=$collection" \
+            --env "AUX_REC_CATALOGUE_PUBLICATION_VERSION=$PUBLICATION_VERSION"
+          curl --fail --retry 10 --retry-delay 3 \
+            "https://${FLY_AUX_APP}.fly.dev/readyz" >/dev/null
+          curl --fail --silent "https://${FLY_AUX_APP}.fly.dev/v1/meta" \
+            --output "$RUNNER_TEMP/aux-meta.json"
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .enabled == true
+            and .mode == "shadow"
+            and .catalogue_publication.version == $version
+          ' "$RUNNER_TEMP/aux-meta.json" >/dev/null
