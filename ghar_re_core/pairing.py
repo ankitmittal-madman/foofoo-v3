@@ -461,14 +461,14 @@ def _plate_calories(p):
 
 
 def plate_label(p):
-    """A short human-readable name for plate `p` (e.g. 'Rajma + Steamed Rice  (+ Rice)') used in
+    """A short human-readable name for plate `p` (e.g. 'Rajma + Steamed Rice (+ Rice)') used in
     the CLI demo output and decision-log entries — never used in scoring."""
     if p["form"] == "pair":
         s = f"{p['dry'].name} + {p['liquid'].name}"
     else:
         s = p["hero"].name
     if p.get("support"):
-        s += f"  (+ {p['support']})"
+        s += f" (+ {p['support']})"
     return s
 
 

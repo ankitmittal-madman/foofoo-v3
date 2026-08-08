@@ -333,6 +333,16 @@ def test_explain_pairing_matches_live_compat_and_gates():
     assert explanation["hard_gates"]["same_base"] == P.same_base(dry, liquid, idf)
 
 
+def test_plate_label_uses_single_separator_space_before_support():
+    plate = {
+        "form": "single",
+        "hero": SimpleNamespace(name="Paneer Bhurji"),
+        "support": "Roti",
+    }
+
+    assert P.plate_label(plate) == "Paneer Bhurji (+ Roti)"
+
+
 def test_decision_trace_winners_carry_structured_explanations_when_requested():
     hh = HH["single_professional_blr"]
     theta = derive_theta(hh)

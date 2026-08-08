@@ -237,7 +237,7 @@ def test_visible_episode_prefix_caps_rich_and_repeated_soup_options():
         return {
             "display_name": name,
             "richness_score": richness,
-            "components": [{"dish_name": name}],
+            "components": [{"dish_name": name, "grammar_role": "primary"}],
         }
 
     ranked = [
@@ -251,6 +251,53 @@ def test_visible_episode_prefix_caps_rich_and_repeated_soup_options():
     visible = engine._select_visible_episode_diversity(ranked, 4)
     assert sum(item["richness_score"] >= 0.6 for item in visible) <= 2
     assert sum("soup" in item["display_name"].casefold() for item in visible) <= 1
+
+
+def test_visible_episode_prefix_defers_repeated_primary_meal_classes():
+    def episode(name):
+        return {
+            "display_name": name,
+            "richness_score": 0.1,
+            "components": [{"dish_name": name, "grammar_role": "primary"}],
+        }
+
+    ranked = [
+        episode("Mysore Masala Dosa"),
+        episode("Masala Dosa"),
+        episode("Set Dosa"),
+        episode("Poha"),
+        episode("Upma"),
+        episode("Misal Pav"),
+    ]
+
+    visible = engine._select_visible_episode_diversity(ranked, 4)
+
+    assert [item["display_name"] for item in visible] == [
+        "Mysore Masala Dosa",
+        "Poha",
+        "Upma",
+        "Misal Pav",
+    ]
+
+
+def test_visible_episode_prefix_backfills_repeated_classes_when_pool_is_thin():
+    def episode(name):
+        return {
+            "display_name": name,
+            "richness_score": 0.1,
+            "components": [{"dish_name": name, "grammar_role": "primary"}],
+        }
+
+    ranked = [episode("Mysore Masala Dosa"), episode("Masala Dosa"), episode("Poha")]
+
+    visible = engine._select_visible_episode_diversity(ranked, 3)
+
+    assert len(visible) == 3
+    assert [item["display_name"] for item in visible] == [
+        "Mysore Masala Dosa",
+        "Poha",
+        "Masala Dosa",
+    ]
 
 
 def test_weekly_plan_shape(client):
