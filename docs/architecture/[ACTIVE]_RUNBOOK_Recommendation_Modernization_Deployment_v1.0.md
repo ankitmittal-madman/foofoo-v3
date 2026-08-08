@@ -4,6 +4,8 @@ Date: 2026-08-08
 Placement: docs/architecture (production deployment and rollback runbook)
 Supersedes: None
 Dependencies: `.github/workflows/deploy-recommendation-modernization.yml`,
+  `.github/workflows/recommendation-modernization-readiness.yml`,
+  `.github/workflows/provision-aux-re-fly-app.yml`,
   `.github/workflows/recommendation-catalogue-publication.yml`,
   `.github/workflows/recommendation-catalogue-qdrant.yml`,
   `.github/workflows/recommendation-catalogue-ghar-deploy.yml`,
@@ -85,15 +87,16 @@ Run each step separately. Save its successful run ID before continuing.
 
 | Order | Action | Workflow / check | Required result |
 |---:|---|---|---|
-| 1 | Verify/set Edge mode off | `Aux RE off and shadow mode control` with desired mode `off` | The protected transition artifact records `off`; Today/Week remains Ghar-visible |
-| 2 | Apply schema 092–101 | `Deploy recommendation modernization schema` | One transaction passes validations 944–953; artifact records `apply` or read-only `validate` |
-| 3 | Publish catalogue | `Recommendation catalogue publication` | Exactly three user-free files; manifest has full SHA-256 version, positive row count and closed coverage gates |
-| 4 | Upload same version to Qdrant | `Publish recommendation catalogue to Qdrant` using the publication run ID and full version | New hash-named collection is green; point count equals manifest row count |
-| 5 | Deploy same version to Ghar | `Deploy Ghar with recommendation catalogue` using the same publication run and version | Ghar `/readyz` passes; `/v1/meta` reports the exact version and positive row count |
-| 6 | Deploy Aux shadow service | `Deploy Aux RE in shadow mode` using the Qdrant run ID, same version and exact row count | Aux `/readyz` passes; `/v1/meta` says enabled, shadow and exact version |
-| 7 | Prove signed Aux capacity | `Aux RE deployed load report` for the exact publication | Gated, passing, publication-bound load artifact exists |
-| 8 | Deploy Edge code | `Deploy recommendation Edge Functions` while `AUX_RE_MODE` is still `off` | Both `plan` and `recommendations` deploy; Ghar response remains authoritative |
-| 9 | Smoke test | Authenticated synthetic/test household only | Cold-start and experienced-user requests succeed; hard diet/allergen exclusions hold; canonical IDs, selected date and meal class survive end to end |
+| 1 | Audit Phase A configuration | `Recommendation modernization production readiness` with target `foundation` | Name-only evidence says foundation ready; it does not authorize a deployment |
+| 2 | Create/verify Aux Fly app | `Provision Aux RE Fly app` | Exact app exists in Ghar's Fly organization; no Machine or code is deployed by this step |
+| 3 | Verify/set Edge mode off | `Aux RE off and shadow mode control` with desired mode `off` | The protected transition artifact records `off`; Today/Week remains Ghar-visible |
+| 4 | Apply schema 092–101 | `Deploy recommendation modernization schema` | One transaction passes validations 944–953; artifact records `apply` or read-only `validate` |
+| 5 | Publish catalogue | `Recommendation catalogue publication` | Exactly three user-free files; manifest has full SHA-256 version, positive row count and closed coverage gates |
+| 6 | Upload same version to Qdrant | `Publish recommendation catalogue to Qdrant` using the publication run ID and full version | New hash-named collection is green; point count equals manifest row count |
+| 7 | Deploy same version to Ghar | `Deploy Ghar with recommendation catalogue` using the same publication run and version | Ghar `/readyz` passes; `/v1/meta` reports the exact version and positive row count |
+| 8 | Deploy isolated Aux service | `Deploy Aux RE in shadow mode` using the Qdrant run ID, same version and exact row count | Aux `/readyz` passes and reports the exact version; Edge remains `off`, so Aux cannot influence a response |
+| 9 | Deploy Edge code | `Deploy recommendation Edge Functions` while `AUX_RE_MODE` is still `off` | Both `plan` and `recommendations` deploy; Ghar response remains authoritative |
+| 10 | Smoke test | Authenticated synthetic/test household only | Cold-start and experienced-user requests succeed; hard diet/allergen exclusions hold; canonical IDs, selected date and meal class survive end to end |
 
 The publication artifact is one generation of catalogue facts, not a database replacement. It
 must not contain user profiles, history or events. Edge reads the user's governed database context
@@ -109,7 +112,9 @@ Qdrant collection. Publish a new immutable generation instead.
 
 ## 4. Phase B — shadow observation
 
-Only after Phase A passes, run `Aux RE off and shadow mode control` with desired mode `shadow`, the
+Only after Phase A passes, configure and ratify the protected load thresholds, run `Recommendation
+modernization production readiness` with target `shadow`, and run `Aux RE deployed load report`
+for the exact deployed publication. Then run `Aux RE off and shadow mode control` with desired mode `shadow`, the
 successful Aux/Ghar deploy run IDs, the signed load run ID, full publication version and exact row
 count. The workflow first forces `off`, verifies every source came from `main`, rechecks both live
 engines and only then sets the Supabase Edge secrets to `shadow`. Supabase makes updated Edge

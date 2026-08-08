@@ -1,0 +1,102 @@
+name: Provision Aux RE Fly app
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type create-foofoo-aux-re
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-aux-re-fly-provision
+  cancel-in-progress: false
+
+jobs:
+  provision:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'create-foofoo-aux-re'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      FLY_GHAR_APP: ${{ vars.FLY_GHAR_APP }}
+      FLY_AUX_APP: ${{ vars.FLY_AUX_APP }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Validate exact protected target
+        run: |
+          test -n "$FLY_API_TOKEN"
+          test "$FLY_GHAR_APP" = "ghar-re"
+          test "$FLY_AUX_APP" = "foofoo-aux-re"
+          test "$(sed -n 's/^primary_region = "\([a-z0-9]*\)"$/\1/p' aux_re_service/fly.toml)" = "bom"
+
+      - name: Resolve the existing Ghar organization without exposing credentials
+        run: |
+          flyctl apps list --json > "$RUNNER_TEMP/fly-apps-before.json"
+          owner="$(jq --exit-status --raw-output --arg app "$FLY_GHAR_APP" '
+            [ .[]
+              | select((.Name // .name) == $app)
+              | (.Owner // .owner // .Organization.Slug // .organization.slug)
+            ]
+            | unique
+            | if length == 1 and .[0] != null and .[0] != ""
+              then .[0]
+              else error("existing Ghar app owner could not be resolved uniquely")
+              end
+          ' "$RUNNER_TEMP/fly-apps-before.json")"
+          echo "owner=$owner" >> "$GITHUB_ENV"
+
+      - name: Create the Aux app only when absent
+        run: |
+          existing_owner="$(jq --raw-output --arg app "$FLY_AUX_APP" '
+            [ .[]
+              | select((.Name // .name) == $app)
+              | (.Owner // .owner // .Organization.Slug // .organization.slug)
+            ]
+            | unique
+            | if length == 0 then "" elif length == 1 then .[0]
+              else error("Aux app name resolved to multiple owners") end
+          ' "$RUNNER_TEMP/fly-apps-before.json")"
+          created=false
+          if [ -z "$existing_owner" ]; then
+            flyctl apps create "$FLY_AUX_APP" --org "$owner" --yes >/dev/null
+            created=true
+          else
+            test "$existing_owner" = "$owner"
+          fi
+          echo "created=$created" >> "$GITHUB_ENV"
+
+      - name: Verify identity and record non-secret evidence
+        run: |
+          flyctl apps list --json > "$RUNNER_TEMP/fly-apps-after.json"
+          jq --exit-status --arg app "$FLY_AUX_APP" --arg owner "$owner" '
+            [ .[]
+              | select((.Name // .name) == $app)
+              | (.Owner // .owner // .Organization.Slug // .organization.slug)
+            ] == [$owner]
+          ' "$RUNNER_TEMP/fly-apps-after.json" >/dev/null
+          jq --null-input \
+            --arg app "$FLY_AUX_APP" \
+            --arg owner "$owner" \
+            --argjson created "$created" \
+            '{schema_version:"aux-re-fly-provision-v1", app:$app, owner:$owner,
+              created:$created, expected_primary_region:"bom", deployed:false,
+              aux_influence_enabled:false}' \
+            > "$RUNNER_TEMP/aux-re-fly-provision.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aux-re-fly-provision
+          path: ${{ runner.temp }}/aux-re-fly-provision.json
+          retention-days: 30
+          if-no-files-found: error
+

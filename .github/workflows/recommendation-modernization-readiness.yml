@@ -1,0 +1,105 @@
+name: Recommendation modernization production readiness
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_phase:
+        description: Configuration scope to audit (this does not authorize deployment)
+        required: true
+        default: foundation
+        type: choice
+        options:
+          - foundation
+          - shadow
+          - rollout
+      confirm:
+        description: Type audit-recommendation-readiness
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-readiness
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-recommendation-readiness'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      AUX_RE_SERVICE_SECRET: ${{ secrets.AUX_RE_SERVICE_SECRET }}
+      AUX_RE_QDRANT_API_KEY: ${{ secrets.AUX_RE_QDRANT_API_KEY }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      FLY_GHAR_APP: ${{ vars.FLY_GHAR_APP }}
+      FLY_AUX_APP: ${{ vars.FLY_AUX_APP }}
+      AUX_RE_QDRANT_URL: ${{ vars.AUX_RE_QDRANT_URL }}
+      AUX_RE_QDRANT_ALLOWED_HOST: ${{ vars.AUX_RE_QDRANT_ALLOWED_HOST }}
+      AUX_RE_SERVICE_URL: ${{ vars.AUX_RE_SERVICE_URL }}
+      AUX_LOAD_REQUESTS: ${{ vars.AUX_LOAD_REQUESTS }}
+      AUX_LOAD_CONCURRENCY: ${{ vars.AUX_LOAD_CONCURRENCY }}
+      AUX_LOAD_TIMEOUT_SECONDS: ${{ vars.AUX_LOAD_TIMEOUT_SECONDS }}
+      AUX_LOAD_MAX_P95_MS: ${{ vars.AUX_LOAD_MAX_P95_MS }}
+      AUX_LOAD_MAX_ERROR_RATE: ${{ vars.AUX_LOAD_MAX_ERROR_RATE }}
+      AUX_LOAD_MIN_THROUGHPUT_RPS: ${{ vars.AUX_LOAD_MIN_THROUGHPUT_RPS }}
+      AUX_ROLLOUT_APPROVAL_REFERENCE: ${{ vars.AUX_ROLLOUT_APPROVAL_REFERENCE }}
+      AUX_ROLLOUT_APPROVED_AT: ${{ vars.AUX_ROLLOUT_APPROVED_AT }}
+      AUX_ROLLOUT_MAX_P95_AUX_LATENCY_MS: ${{ vars.AUX_ROLLOUT_MAX_P95_AUX_LATENCY_MS }}
+      AUX_ROLLOUT_MAX_TIMEOUT_RATE: ${{ vars.AUX_ROLLOUT_MAX_TIMEOUT_RATE }}
+      AUX_ROLLOUT_MIN_COMPARABLE_EVENT_RATE: ${{ vars.AUX_ROLLOUT_MIN_COMPARABLE_EVENT_RATE }}
+      AUX_ROLLOUT_MIN_RETRIEVAL_RATE: ${{ vars.AUX_ROLLOUT_MIN_RETRIEVAL_RATE }}
+      AUX_ROLLOUT_MIN_SERVED_CANDIDATE_COVERAGE: ${{ vars.AUX_ROLLOUT_MIN_SERVED_CANDIDATE_COVERAGE }}
+      AUX_ROLLOUT_MIN_SHADOW_EVENTS: ${{ vars.AUX_ROLLOUT_MIN_SHADOW_EVENTS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Produce name-only configuration readiness
+        id: readiness
+        run: |
+          set +e
+          python -m ops.recommendation.deployment_prerequisites \
+            --target-phase "${{ inputs.target_phase }}" \
+            --output "$RUNNER_TEMP/recommendation-modernization-readiness.json"
+          code=$?
+          set -e
+          test "$code" -eq 0 -o "$code" -eq 2
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: Add name-only summary
+        run: |
+          jq --exit-status '
+            .schema_version == "recommendation-modernization-readiness-v1"
+            and .validation_scope == "configuration-name-presence-only"
+            and .deployment_authorized == false
+            and .contains_values == false
+            and .target_phase == "${{ inputs.target_phase }}"
+            and .required_name_count > 0
+          ' "$RUNNER_TEMP/recommendation-modernization-readiness.json" >/dev/null
+          jq --raw-output '
+            "## Recommendation deployment readiness\n\n" +
+            "- Target phase: `" + .target_phase + "`\n" +
+            "- Ready: `" + (.ready | tostring) + "`\n" +
+            "- Configured names: `" + (.configured_name_count | tostring) +
+            "/" + (.required_name_count | tostring) + "`\n" +
+            "- Missing names: `" + (.missing_names | join(", ")) + "`\n"
+          ' "$RUNNER_TEMP/recommendation-modernization-readiness.json" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recommendation-modernization-readiness-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/recommendation-modernization-readiness.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Fail when configuration is incomplete
+        if: steps.readiness.outputs.exit_code == '2'
+        run: exit 1
