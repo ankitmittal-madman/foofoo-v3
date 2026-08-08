@@ -56,13 +56,13 @@ state only; deployment run IDs and rollback instructions live in the active runb
 > serving change. No proposal is approved or applied; the other 798 ambiguous/conflicting dishes
 > remain excluded. Aux remains off.
 >
-> **Proposal quality-review gate:** migration 110, validation 962, exact rollback and the protected
-> review workflow are repository-ready. They produce reconciled status/evidence/freshness counts
-> plus a deterministic sample of at most 25 catalogue names per slot. The sample contains no dish
-> or source-row identifiers, raw import text or user data, and the workflow runs the report in a
-> read-only transaction. Twenty-eight focused tests, parsing and isolated PostgreSQL bounds,
-> privacy and rollback checks pass. Production review-report installation/execution is pending;
-> no proposal review decision or canonical dish write is authorized by this gate.
+> **Proposal quality-review gate:** protected run `31270121136` installed migration 110 and
+> validation 962, then produced a read-only deterministic 40-name review pack. All 1,802 proposals
+> remain pending and fresh, all 7,222 evidence links reconcile, and each proposal has 4–8 links.
+> The sample contains no identifiers, raw import text or user data. It includes both complete dishes
+> and components (for example breads/condiments), confirming that accepting a meal slot must never
+> imply hero-role or complete-meal eligibility. No proposal was approved/applied and no catalogue,
+> publication, serving or Aux routing changed.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,

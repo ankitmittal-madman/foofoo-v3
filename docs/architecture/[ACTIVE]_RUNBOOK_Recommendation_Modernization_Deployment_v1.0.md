@@ -129,7 +129,7 @@ No shadow or active transition was requested or executed.
 | Full-inventory serving-role coverage | Run `31259220512` | Migration 107 live; all 3,402 active dishes reconcile: 802 with canonical slots, 2,600 without, 2,596 missing hero roles and 918 with unrecognized slot labels; no serving change |
 | Meal-slot source-evidence audit | Run `31267459809` | Migration 108 live; 1,802 single-direct candidates (667 lunch, 566 snacks, 294 dinner, 275 breakfast), 797 contextual review and one conflict; no raw text, proposals or serving change |
 | Governed direct-slot proposals | Run `31269668506` | Migration 109 live; exactly 1,802 pending proposals and 7,222 evidence links created (667 lunch, 566 snacks, 294 dinner, 275 breakfast); zero automatic acceptance, publication or serving change; Aux remains off |
-| Bounded direct-slot review pack | Repository checkpoint only | Migration 110 plus validation 962 and the protected read-only review workflow pass 28 focused tests, parsing and isolated PostgreSQL sampling/bounds/privacy/rollback execution; no proposal decision or serving change |
+| Bounded direct-slot review pack | Run `31270121136` | Migration 110 live; all 1,802 proposals fresh/pending, 7,222 evidence links reconciled (4–8 each), deterministic 10-name-per-slot sample produced with no identifiers/raw source/user data; no proposal decision or serving change |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
