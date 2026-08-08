@@ -289,10 +289,11 @@ no production application has run.
 ### Final deferred meal-slot evidence audit — prepared, not run in production
 
 The remaining source-evidence denominator contains 23 active dishes with no canonical meal slot:
-22 whose imported `Course` value is actually a diet label and one whose source rows conflict between
-`Lunch` and `Dinner`. The repository now contains a report-only shifted-field audit for this exact
-cohort. It uses the adjacent imported `Cuisine` field only where the checked-in row structure proves
-that value was shifted; it never infers from a dish name or exposes dish identity or raw source text.
+22 whose imported `Course` value is actually a diet label and one whose source rows contain two
+conflicting direct slots. The repository now contains a report-only shifted-field audit for this
+exact cohort. It uses the adjacent imported `Cuisine` field only where the checked-in row structure
+proves that value was shifted; it never infers from a dish name or exposes dish identity or raw
+source text.
 
 The fixed source policy covers 62 malformed rows. It classifies 12 source rows as possible slot
 evidence—ten direct and two contextual—and leaves 50 source rows as `unresolved_food_role`. Those
@@ -314,8 +315,33 @@ stopped before query execution because PostgreSQL CSV COPY interpreted an unquot
 `NULL`. It produced no accepted artifact and made no dish, proposal, publication or serving change.
 The manifest writer now quotes every field; a regression and direct PostgreSQL COPY proof verify all
 62 rows load, all 50 unresolved rows retain an empty string and zero slot keys become null. After
-reconciling concurrent audit tests, the full local gate remains at 331 tests with one expected skip.
-A new protected production run remains required.
+reconciling concurrent audit tests, the full local gate remained at 331 tests with one expected skip
+before the protected retry.
+
+Protected retry `31276594131` then passed the exact production audit. Its aggregate-only artifact
+proved 22 diet-deferred dishes and one `dinner,snacks` direct conflict. Within the 22, three are
+shifted-direct candidates (two breakfast and one dinner), two are shifted-contextual
+`lunch,dinner` candidates and 17 require food-role review. All 88 diet-evidence links matched the
+checked-in manifest; zero failed source identity or fingerprint validation. The artifact again
+records `automatic_acceptance_allowed=false` and zero dish, proposal, publication or serving
+change.
+
+### Final deferred case boundary — prepared, not installed
+
+Migration 123 and validation 975 define a private, RLS-enabled case ledger for the exact 23-dish
+result. The five candidate cases retain proposed slot arrays only as pending review evidence; the 17
+food-role cases and one direct conflict retain no proposed mapping. A separate immutable evidence
+table preserves every source-row fingerprint. The boundary cannot write `public.dishes`, either
+existing proposal table, a publication or serving configuration, and it grants clients no access.
+
+`Govern deferred meal-slot cases` separates `install_only` from `generate`. Generation binds the
+production project, both policy hashes, 62-row manifest, exact 23-case route distribution, five
+candidate slot distribution and 88 diet-evidence links. It also compares full dish meal-slot and
+existing proposal-table signatures before and after. Reconciled local evidence includes 339 passing
+recommendation tests with one expected skip plus a disposable PostgreSQL proof: 23 pending cases,
+92 synthetic evidence links, zero duplicate rows on retry, immutable evidence, unchanged dishes and
+rollback that disabled generation while retaining all case history. Production install/generation
+and every review decision remain pending.
 
 ### Phase A stop conditions
 
