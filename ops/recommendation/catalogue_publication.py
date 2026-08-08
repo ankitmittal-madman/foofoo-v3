@@ -21,6 +21,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from ops.recommendation.protected_identity import database_identifies_project
+
 DATABASE_ENV_NAMES = ("DATABASE_URL", "SUPABASE_DB_URL", "FOOFOO_SUPABASE_URI")
 ROW_SCHEMA_VERSION = "recommendation-catalogue-row-v1"
 MANIFEST_SCHEMA_VERSION = "recommendation-catalogue-publication-v1"
@@ -53,6 +55,16 @@ def database_url(environ: Mapping[str, str] | None = None) -> str:
         "No production database connection configured; set DATABASE_URL, SUPABASE_DB_URL, "
         "or FOOFOO_SUPABASE_URI."
     )
+
+
+def production_database_url(environ: Mapping[str, str] | None = None) -> str:
+    """Resolve only a connection that cryptographically names the protected production project."""
+    values = environ or os.environ
+    value = database_url(values)
+    project_ref = values.get("PRODUCTION_PROJECT_REF", "")
+    if not project_ref or not database_identifies_project(value, project_ref):
+        raise RuntimeError("production database identity is missing or ambiguous")
+    return value
 
 
 def _mapping(cursor: Any, row: Any) -> Mapping[str, Any]:
@@ -221,14 +233,14 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
             shutil.rmtree(stage)
 
 
-def connect_read_only(dsn: str) -> Any:
+def connect_read_only(dsn: str, *, application_name: str = "foofoo-catalogue-publication") -> Any:
     """Open a repeatable, read-only production snapshot with a bounded statement timeout."""
     import psycopg2
 
     connection = psycopg2.connect(
         dsn,
         connect_timeout=15,
-        application_name="foofoo-catalogue-publication",
+        application_name=application_name[:63],
     )
     connection.set_session(readonly=True, autocommit=False, isolation_level="REPEATABLE READ")
     with connection.cursor() as cursor:
@@ -243,7 +255,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--page-size", type=int, default=500)
     args = parser.parse_args(argv)
 
-    connection = connect_read_only(database_url())
+    application_name = f"foofoo-catalogue-{os.environ.get('GITHUB_RUN_ID', 'local')}"
+    connection = connect_read_only(production_database_url(), application_name=application_name)
     try:
         manifest = publish(connection, args.output_dir, page_size=args.page_size)
         connection.rollback()

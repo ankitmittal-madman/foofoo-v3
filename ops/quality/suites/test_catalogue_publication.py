@@ -66,6 +66,21 @@ def test_database_url_fails_closed_without_an_explicit_production_read_target():
         publication.database_url({})
 
 
+def test_production_database_url_requires_exact_project_identity():
+    project_ref = "abcdefghijklmnopqrst"
+    direct = f"postgresql://postgres:secret@db.{project_ref}.supabase.co:5432/postgres"
+    assert (
+        publication.production_database_url(
+            {"FOOFOO_SUPABASE_URI": direct, "PRODUCTION_PROJECT_REF": project_ref}
+        )
+        == direct
+    )
+    with pytest.raises(RuntimeError, match="identity"):
+        publication.production_database_url(
+            {"FOOFOO_SUPABASE_URI": direct, "PRODUCTION_PROJECT_REF": "otherprojectrefvalue"}
+        )
+
+
 def test_publication_streams_bounded_pages_and_writes_content_addressed_manifest(tmp_path):
     rows = [row("0001", "Poha"), row("0002", "Idli"), row("0003", "Dosa")]
     target = tmp_path / "publication"

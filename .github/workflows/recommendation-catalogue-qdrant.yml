@@ -1,0 +1,99 @@
+name: Publish recommendation catalogue to Qdrant
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful catalogue-publication run containing the immutable artifact
+        required: true
+        type: string
+      publication_version:
+        description: Full sha256 publication expected in the source manifest
+        required: true
+        type: string
+      confirm:
+        description: Type upload-catalogue-to-qdrant
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: production-recommendation-catalogue-qdrant
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    if: inputs.confirm == 'upload-catalogue-to-qdrant'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      AUX_RE_QDRANT_URL: ${{ vars.AUX_RE_QDRANT_URL }}
+      AUX_RE_QDRANT_ALLOWED_HOST: ${{ vars.AUX_RE_QDRANT_ALLOWED_HOST }}
+      AUX_RE_QDRANT_API_KEY: ${{ secrets.AUX_RE_QDRANT_API_KEY }}
+      PUBLICATION_VERSION: ${{ inputs.publication_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate immutable publication source run
+        env:
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          case "$SOURCE_RUN_ID" in
+            *[!0-9]*|'') echo "source_run_id must be numeric" >&2; exit 1 ;;
+          esac
+          conclusion="$(gh run view "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json conclusion --jq '.conclusion')"
+          workflow_name="$(gh run view "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json workflowName --jq '.workflowName')"
+          test "$conclusion" = "success"
+          test "$workflow_name" = "Recommendation catalogue publication"
+
+      - name: Download one exact publication artifact
+        env:
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/publication"
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name recommendation-catalogue-publication --dir "$RUNNER_TEMP/publication"
+          test -f "$RUNNER_TEMP/publication/manifest.json"
+          test -f "$RUNNER_TEMP/publication/catalogue.jsonl"
+          test -f "$RUNNER_TEMP/publication/catalogue.sqlite3"
+          test "$(find "$RUNNER_TEMP/publication" -type f | wc -l)" -eq 3
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .publication_version == $version
+            and .row_count > 0
+            and .coverage.publishable_dishes == .row_count
+          ' "$RUNNER_TEMP/publication/manifest.json" >/dev/null
+
+      - name: Upload new hash-named collection and verify exact count
+        run: |
+          test -n "$AUX_RE_QDRANT_URL"
+          test -n "$AUX_RE_QDRANT_ALLOWED_HOST"
+          test -n "$AUX_RE_QDRANT_API_KEY"
+          digest="${PUBLICATION_VERSION#sha256:}"
+          collection="foofoo_recipes__${digest:0:12}"
+          PYTHONPATH=aux_re_service python -m aux_re_service.training.retrieval_pipeline \
+            --upload-publication "$RUNNER_TEMP/publication" \
+            --qdrant-url "$AUX_RE_QDRANT_URL" \
+            --qdrant-allowed-host "$AUX_RE_QDRANT_ALLOWED_HOST" \
+            --qdrant-api-key-env AUX_RE_QDRANT_API_KEY \
+            --collection "$collection" \
+            > "$RUNNER_TEMP/qdrant-upload.json"
+          jq --exit-status --arg version "$PUBLICATION_VERSION" --arg collection "$collection" '
+            .publication_version == $version
+            and .collection == $collection
+            and .uploaded > 0
+            and .verified_count == .uploaded
+          ' "$RUNNER_TEMP/qdrant-upload.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-catalogue-qdrant-report
+          path: ${{ runner.temp }}/qdrant-upload.json
+          retention-days: 30
+          if-no-files-found: error

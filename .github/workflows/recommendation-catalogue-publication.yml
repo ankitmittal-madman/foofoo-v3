@@ -1,0 +1,61 @@
+name: Recommendation catalogue publication
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type publish-recommendation-catalogue
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-catalogue-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: inputs.confirm == 'publish-recommendation-catalogue'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install read-only database client
+        run: python -m pip install "psycopg2-binary>=2.9,<3"
+
+      - name: Build immutable user-free publication
+        run: |
+          python -m ops.recommendation.catalogue_publication \
+            --output-dir "$RUNNER_TEMP/recommendation-catalogue-publication"
+
+      - name: Validate publication manifest and aggregate coverage
+        run: |
+          manifest="$RUNNER_TEMP/recommendation-catalogue-publication/manifest.json"
+          test -f "$manifest"
+          test -f "$RUNNER_TEMP/recommendation-catalogue-publication/catalogue.jsonl"
+          test -f "$RUNNER_TEMP/recommendation-catalogue-publication/catalogue.sqlite3"
+          test "$(find "$RUNNER_TEMP/recommendation-catalogue-publication" -type f | wc -l)" -eq 3
+          jq --exit-status '
+            .schema_version == "recommendation-catalogue-publication-v1"
+            and (.publication_version | test("^sha256:[0-9a-f]{64}$"))
+            and .row_count > 0
+            and .coverage.publishable_dishes == .row_count
+            and .coverage.publishable_dishes <= .coverage.class_mapped_dishes
+            and .coverage.publishable_dishes <= .coverage.safety_closed_dishes
+            and .coverage.publishable_dishes <= .coverage.enriched_dishes
+            and .coverage.enriched_dishes <= .coverage.active_dishes
+          ' "$manifest" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-catalogue-publication
+          path: ${{ runner.temp }}/recommendation-catalogue-publication
+          retention-days: 30
+          if-no-files-found: error

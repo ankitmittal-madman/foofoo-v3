@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import urllib.error
 import urllib.request
@@ -284,19 +285,36 @@ def build(ontology_path: Path, output_dir: Path) -> dict[str, int]:
     }
 
 
-def _request(url: str, method: str, payload: dict[str, Any], timeout: float) -> dict[str, Any]:
+def _request(
+    url: str,
+    method: str,
+    payload: dict[str, Any],
+    timeout: float,
+    api_key: str | None = None,
+) -> dict[str, Any]:
+    headers = {"content-type": "application/json"}
+    if api_key:
+        headers["api-key"] = api_key
     request = urllib.request.Request(
         url,
         data=json.dumps(payload).encode(),
-        headers={"content-type": "application/json"},
+        headers=headers,
         method=method,
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 local URL only
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 -- caller validates the exact governed endpoint
         return json.load(response)
 
 
-def upload(points_path: Path, qdrant_url: str, collection: str, *, timeout: float = 5.0) -> int:
-    base = qdrant_base(qdrant_url)
+def upload(
+    points_path: Path,
+    qdrant_url: str,
+    collection: str,
+    *,
+    timeout: float = 5.0,
+    allowed_host: str | None = None,
+    api_key: str | None = None,
+) -> int:
+    base = qdrant_base(qdrant_url, allowed_host)
     artifact = json.loads(points_path.read_text())
     try:
         _request(
@@ -304,6 +322,7 @@ def upload(points_path: Path, qdrant_url: str, collection: str, *, timeout: floa
             "PUT",
             {"vectors": {"size": artifact["vector_size"], "distance": "Cosine"}},
             timeout,
+            api_key,
         )
     except urllib.error.HTTPError as exc:
         if exc.code != 409:
@@ -315,6 +334,7 @@ def upload(points_path: Path, qdrant_url: str, collection: str, *, timeout: floa
             "PUT",
             {"points": points[start : start + 128]},
             timeout,
+            api_key,
         )
     return len(points)
 
@@ -326,6 +346,8 @@ def upload_publication(
     *,
     timeout: float = 5.0,
     batch_size: int = 128,
+    allowed_host: str | None = None,
+    api_key: str | None = None,
 ) -> dict[str, Any]:
     """Stream one immutable publication into a new, explicitly versioned Qdrant collection."""
     manifest = _publication_manifest(publication_dir)
@@ -335,12 +357,13 @@ def upload_publication(
         raise ValueError("Qdrant collection contains unsupported characters")
     if version_token not in collection:
         raise ValueError("Qdrant collection name must include the publication hash prefix")
-    base = qdrant_base(qdrant_url)
+    base = qdrant_base(qdrant_url, allowed_host)
     _request(
         f"{base}/collections/{collection}",
         "PUT",
         {"vectors": {"size": 64, "distance": "Cosine"}},
         timeout,
+        api_key,
     )
     uploaded = 0
     batch: list[dict[str, Any]] = []
@@ -353,6 +376,7 @@ def upload_publication(
             "PUT",
             {"points": batch},
             timeout,
+            api_key,
         )
         uploaded += len(batch)
         batch = []
@@ -362,6 +386,7 @@ def upload_publication(
             "PUT",
             {"points": batch},
             timeout,
+            api_key,
         )
         uploaded += len(batch)
     verified_manifest = _publication_manifest(publication_dir)
@@ -372,6 +397,7 @@ def upload_publication(
         "POST",
         {"exact": True},
         timeout,
+        api_key,
     )
     indexed = int((count_result.get("result") or {}).get("count", -1))
     if uploaded != int(manifest["row_count"]) or indexed != uploaded:
@@ -391,13 +417,30 @@ def main() -> None:
     parser.add_argument("--upload-points", type=Path)
     parser.add_argument("--upload-publication", type=Path)
     parser.add_argument("--qdrant-url", default="http://127.0.0.1:6333")
+    parser.add_argument("--qdrant-allowed-host")
+    parser.add_argument("--qdrant-api-key-env")
     parser.add_argument("--collection", default="foofoo_recipes")
     args = parser.parse_args()
+    api_key = None
+    if args.qdrant_api_key_env:
+        api_key = os.environ.get(args.qdrant_api_key_env)
+        if not api_key:
+            parser.error("the selected Qdrant API key environment variable is empty")
     if args.ontology and args.output_dir:
         print(json.dumps(build(args.ontology, args.output_dir), indent=2))
     elif args.upload_points:
         print(
-            json.dumps({"uploaded": upload(args.upload_points, args.qdrant_url, args.collection)})
+            json.dumps(
+                {
+                    "uploaded": upload(
+                        args.upload_points,
+                        args.qdrant_url,
+                        args.collection,
+                        allowed_host=args.qdrant_allowed_host,
+                        api_key=api_key,
+                    )
+                }
+            )
         )
     elif args.upload_publication:
         print(
@@ -406,6 +449,8 @@ def main() -> None:
                     args.upload_publication,
                     args.qdrant_url,
                     args.collection,
+                    allowed_host=args.qdrant_allowed_host,
+                    api_key=api_key,
                 ),
                 indent=2,
             )

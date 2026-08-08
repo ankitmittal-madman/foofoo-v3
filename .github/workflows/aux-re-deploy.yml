@@ -3,6 +3,10 @@ name: Deploy Aux RE in shadow mode
 on:
   workflow_dispatch:
     inputs:
+      qdrant_run_id:
+        description: Successful governed Qdrant upload run for this publication
+        required: true
+        type: string
       publication_version:
         description: Full sha256 catalogue publication already loaded in Qdrant
         required: true
@@ -17,6 +21,7 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -31,6 +36,7 @@ jobs:
     timeout-minutes: 30
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
       FLY_AUX_APP: ${{ vars.FLY_AUX_APP }}
       AUX_RE_SERVICE_SECRET: ${{ secrets.AUX_RE_SERVICE_SECRET }}
       AUX_RE_QDRANT_URL: ${{ vars.AUX_RE_QDRANT_URL }}
@@ -42,6 +48,25 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Validate governed Qdrant upload lineage
+        env:
+          QDRANT_RUN_ID: ${{ inputs.qdrant_run_id }}
+        run: |
+          case "$QDRANT_RUN_ID" in
+            *[!0-9]*|'') echo "qdrant_run_id must be numeric" >&2; exit 1 ;;
+          esac
+          conclusion="$(gh run view "$QDRANT_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json conclusion --jq '.conclusion')"
+          workflow_name="$(gh run view "$QDRANT_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json workflowName --jq '.workflowName')"
+          test "$conclusion" = "success"
+          test "$workflow_name" = "Publish recommendation catalogue to Qdrant"
+          mkdir -p "$RUNNER_TEMP/qdrant-source"
+          gh run download "$QDRANT_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name recommendation-catalogue-qdrant-report --dir "$RUNNER_TEMP/qdrant-source"
+          test -f "$RUNNER_TEMP/qdrant-source/qdrant-upload.json"
+          test "$(find "$RUNNER_TEMP/qdrant-source" -type f | wc -l)" -eq 1
 
       - name: Validate protected target and immutable publication inputs
         run: |
@@ -63,6 +88,14 @@ jobs:
           test "$EXPECTED_ROW_COUNT" -gt 0
           PYTHONPATH=aux_re_service python -c \
             'import os; from aux_re_service.qdrant_endpoint import qdrant_base; qdrant_base(os.environ["AUX_RE_QDRANT_URL"], os.environ["AUX_RE_QDRANT_ALLOWED_HOST"])'
+          collection="foofoo_recipes__${digest:0:12}"
+          jq --exit-status --arg version "$PUBLICATION_VERSION" \
+            --arg collection "$collection" --argjson count "$EXPECTED_ROW_COUNT" '
+              .publication_version == $version
+              and .collection == $collection
+              and .uploaded == $count
+              and .verified_count == $count
+            ' "$RUNNER_TEMP/qdrant-source/qdrant-upload.json" >/dev/null
 
       - name: Verify exact immutable collection is already loaded in governed Qdrant
         run: |

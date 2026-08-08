@@ -22,6 +22,9 @@ def test_deploy_requires_governed_qdrant_and_exact_loaded_publication():
     text = WORKFLOW.read_text()
 
     assert "environment: production" in text
+    assert 'test "$workflow_name" = "Publish recommendation catalogue to Qdrant"' in text
+    assert "--name recommendation-catalogue-qdrant-report" in text
+    assert 'wc -l)" -eq 1' in text
     assert 'test "$EXPECTED_ROW_COUNT" -gt 0' in text
     assert "AUX_RE_QDRANT_ALLOWED_HOST" in text
     assert "AUX_RE_QDRANT_API_KEY" in text

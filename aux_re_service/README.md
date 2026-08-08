@@ -79,6 +79,16 @@ Then set `AUX_REC_QDRANT_COLLECTION` to that immutable collection and
 queries filter on that version and reject a mismatched or non-UUID result. Switching both values
 back to the prior collection is the rollback; activation remains an operator action.
 
+The governed production sequence uses GitHub Actions rather than a workstation:
+
+1. `Recommendation catalogue publication` opens a project-verified read-only production
+   transaction and uploads exactly `manifest.json`, `catalogue.jsonl`, and `catalogue.sqlite3`.
+2. `Publish recommendation catalogue to Qdrant` accepts that artifact only from the named
+   successful producer, creates the hash-named collection over approved HTTPS with the API key
+   resolved from an environment variable, and uploads only its aggregate count/version report.
+3. `Deploy Aux RE in shadow mode` accepts that exact Qdrant report, rechecks the live collection,
+   and then deploys the stateless service. Artifact names alone are insufficient at every handoff.
+
 Run the complete local stack with `docker compose -f aux_re_service/compose.local.yml up --build`.
 It starts pinned Qdrant, uploads all canonical dish vectors, and starts the service in shadow mode.
 The current evidence and exact schemas are in `DATASET_AND_MODEL_REPORT.md`; the machine-readable

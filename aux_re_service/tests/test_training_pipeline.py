@@ -189,19 +189,26 @@ def test_publication_upload_uses_new_versioned_collection_and_verifies_count(tmp
     directory, version = _publication(tmp_path)
     calls = []
 
-    def fake_request(url, method, payload, timeout):
-        calls.append((url, method, payload, timeout))
+    def fake_request(url, method, payload, timeout, api_key=None):
+        calls.append((url, method, payload, timeout, api_key))
         if url.endswith("/points/count"):
             return {"result": {"count": 1}}
         return {"result": True}
 
     monkeypatch.setattr("aux_re_service.training.retrieval_pipeline._request", fake_request)
     collection = f"foofoo_recipes__{version.removeprefix('sha256:')[:12]}"
-    report = upload_publication(directory, "http://localhost:6333", collection)
+    report = upload_publication(
+        directory,
+        "https://cluster.example.qdrant.io:6333",
+        collection,
+        allowed_host="cluster.example.qdrant.io",
+        api_key="protected",
+    )
     assert report["uploaded"] == report["verified_count"] == 1
     assert calls[0][0].endswith(f"/collections/{collection}")
     assert calls[0][1] == "PUT"
     assert calls[1][2]["points"][0]["payload"]["publication_version"] == version
+    assert all(call[4] == "protected" for call in calls)
 
 
 def test_ranking_metrics_cover_quality_diversity_repetition_and_safety():

@@ -71,6 +71,7 @@ COPY --from=builder /opt/venv /opt/venv
 # env vars rather than relying on relative walks from the installed package — those walks resolve
 # against site-packages in a container and are exactly what would break at startup otherwise.
 COPY ghar_re_service/data/bundle /srv/ghar-re/bundle
+COPY ghar_re_service/runtime-publication /srv/ghar-re/publication
 COPY contracts/ghar-re-v1.schema.json /srv/ghar-re/contracts/ghar-re-v1.schema.json
 
 # GHAR_RE_CONFIG_DIR is set here, not left to the provider at startup, because
@@ -88,6 +89,16 @@ RUN test -f /srv/ghar-re/bundle/manifest.json \
       && test -f /srv/ghar-re/bundle/catalogue.json \
       && test -f /srv/ghar-re/contracts/ghar-re-v1.schema.json \
       || (echo "FATAL: bundle or contract missing from image" && exit 1)
+
+# Modernized deployments inject one immutable DB publication into the build context and set this
+# argument. Ordinary/local builds retain the 810-row fallback and do not pretend a publication is
+# present. Runtime still verifies the SQLite checksum before becoming ready.
+ARG GHAR_RE_PUBLICATION_REQUIRED=false
+RUN if [ "$GHAR_RE_PUBLICATION_REQUIRED" = "true" ]; then \
+      test -f /srv/ghar-re/publication/manifest.json \
+      && test -f /srv/ghar-re/publication/catalogue.jsonl \
+      && test -f /srv/ghar-re/publication/catalogue.sqlite3; \
+    fi
 
 # Non-root. The service writes nothing to disk — it loads its snapshot into memory at startup and
 # serves from there — so it has no reason to run with write access to anything.

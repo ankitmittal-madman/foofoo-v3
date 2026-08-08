@@ -1,0 +1,90 @@
+name: Deploy Ghar with recommendation catalogue
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful catalogue-publication run containing the immutable artifact
+        required: true
+        type: string
+      publication_version:
+        description: Full sha256 publication expected in the source manifest
+        required: true
+        type: string
+      confirm:
+        description: Type deploy-ghar-catalogue
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: production-ghar-catalogue-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: inputs.confirm == 'deploy-ghar-catalogue'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      FLY_GHAR_APP: ${{ vars.FLY_GHAR_APP }}
+      PUBLICATION_VERSION: ${{ inputs.publication_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Validate immutable publication source run
+        env:
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          test -n "$FLY_API_TOKEN"
+          test -n "$FLY_GHAR_APP"
+          case "$SOURCE_RUN_ID" in
+            *[!0-9]*|'') echo "source_run_id must be numeric" >&2; exit 1 ;;
+          esac
+          conclusion="$(gh run view "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json conclusion --jq '.conclusion')"
+          workflow_name="$(gh run view "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json workflowName --jq '.workflowName')"
+          test "$conclusion" = "success"
+          test "$workflow_name" = "Recommendation catalogue publication"
+
+      - name: Download exact publication into immutable image context
+        env:
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name recommendation-catalogue-publication \
+            --dir ghar_re_service/runtime-publication
+          test -f ghar_re_service/runtime-publication/manifest.json
+          test -f ghar_re_service/runtime-publication/catalogue.jsonl
+          test -f ghar_re_service/runtime-publication/catalogue.sqlite3
+          test "$(find ghar_re_service/runtime-publication -type f ! -name .gitkeep | wc -l)" -eq 3
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .publication_version == $version
+            and .row_count > 0
+            and .coverage.publishable_dishes == .row_count
+          ' ghar_re_service/runtime-publication/manifest.json >/dev/null
+
+      - name: Deploy Ghar with publication configured but Edge influence unchanged
+        run: |
+          flyctl config validate --strict --config ghar_re_service/fly.toml --app "$FLY_GHAR_APP"
+          flyctl deploy --config ghar_re_service/fly.toml --app "$FLY_GHAR_APP" --remote-only \
+            --build-arg GHAR_RE_PUBLICATION_REQUIRED=true \
+            --env GHAR_RE_PUBLISHED_CATALOGUE_DIR=/srv/ghar-re/publication
+          curl --fail --retry 10 --retry-delay 3 \
+            "https://${FLY_GHAR_APP}.fly.dev/readyz" >/dev/null
+          curl --fail --silent "https://${FLY_GHAR_APP}.fly.dev/v1/meta" \
+            --output "$RUNNER_TEMP/ghar-meta.json"
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .published_catalogue.configured == true
+            and .published_catalogue.publication_version == $version
+            and .published_catalogue.row_count > 0
+          ' "$RUNNER_TEMP/ghar-meta.json" >/dev/null

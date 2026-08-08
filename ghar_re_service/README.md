@@ -79,10 +79,16 @@ identical version, so comparing two images' `/v1/meta` output is a real answer t
 catalogue?". It is surfaced at `/v1/meta` alongside `config_version`, and logged at startup
 (`startup.source_resolved`).
 
-**Source:** the golden-sample fixtures (`ghar_re_core.fixtures.DISHES`, 39 dishes) plus the YAML
-config layer. RE-DOC-10 §8 describes the eventual export as pulling from Postgres; that swap is
-Phase G and deliberately out of scope. The bundle *format* is identical either way — swapping the
-source later changes `export_bundle.py` only, and nothing in the service or the engine.
+**Fallback source:** the committed bundle remains the deterministic 810-dish safety fallback. A
+modernized deployment additionally bakes the governed database publication into
+`/srv/ghar-re/publication`; Ghar verifies its manifest and SQLite checksum at startup, then hydrates
+only the bounded canonical IDs supplied by Aux. It never scans the full publication per request.
+
+Use the protected `Deploy Ghar with recommendation catalogue` workflow for this path. It accepts
+the three-file artifact only from a successful `Recommendation catalogue publication` run, builds
+with `GHAR_RE_PUBLICATION_REQUIRED=true`, sets the runtime directory, and requires `/v1/meta` to
+report the exact publication hash. This alone does not change user-visible results: with Edge Aux
+mode off or shadow, no candidate shortlist is sent to Ghar and the existing bundle remains active.
 
 ## Step-by-step deploy
 
