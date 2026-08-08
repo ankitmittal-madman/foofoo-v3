@@ -286,6 +286,29 @@ mechanism only. Production run `31275561817` subsequently installed migration 12
 `publication_changed=false` and `serving_changed=false`. The five mappings remain unapproved and
 no production application has run.
 
+### Final deferred meal-slot evidence audit — prepared, not run in production
+
+The remaining source-evidence denominator contains 23 active dishes with no canonical meal slot:
+22 whose imported `Course` value is actually a diet label and one whose source rows conflict between
+`Lunch` and `Dinner`. The repository now contains a report-only shifted-field audit for this exact
+cohort. It uses the adjacent imported `Cuisine` field only where the checked-in row structure proves
+that value was shifted; it never infers from a dish name or exposes dish identity or raw source text.
+
+The fixed source policy covers 62 malformed rows. It classifies 12 source rows as possible slot
+evidence—ten direct and two contextual—and leaves 50 source rows as `unresolved_food_role`. Those
+source-row totals are not assumed to equal production dish totals: the protected database report
+must independently reconcile the exact 22 deferred dishes, the one direct conflict and every
+source-row fingerprint before returning aggregate route counts.
+
+Migration 121, validation 973 and the protected `Audit deferred meal-slot shifted-field evidence`
+workflow are additive and service-only. The workflow installs or revalidates the aggregate report,
+runs it inside a read-only transaction and uploads one identity-free JSON artifact. It contains no
+Aux mode change, catalogue publication or Fly deployment step. Local evidence includes 329 passing
+recommendation tests with one expected skip, SQL/YAML/lint gates and a disposable PostgreSQL proof
+that returned the exact 22+1 scope, zero manifest failures and then removed the function cleanly.
+Production execution and the resulting remediation cohort remain pending; no mapping is approved or
+applied by this audit.
+
 ### Phase A stop conditions
 
 Stop and roll back serving if any service is unhealthy, any version/count differs, a safety gate

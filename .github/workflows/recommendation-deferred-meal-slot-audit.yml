@@ -1,0 +1,147 @@
+name: Audit deferred meal-slot shifted-field evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type audit-deferred-meal-slot-shifted-field-v1
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deferred-meal-slot-shifted-field-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-deferred-meal-slot-shifted-field-v1'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-deferred-slot-audit-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=10min -c lock_timeout=10s
+      SOURCE_PATH: database/seeds/IndianFoodDatasetCSV.csv
+      POLICY_PATH: ops/recommendation/policies/deferred_meal_slot_shifted_field_policy_v1.json
+      POLICY_SHA256: 94d5f198bbb1244d631a23c5dc95200a6be860d6609dfc6a6bb0c1a7cb5717ac
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify report code and tests
+        run: |
+          python -m pip install "pytest>=8,<9" "ruff>=0.9,<1" "PyYAML>=6,<7"
+          python -m ruff check \
+            ops/recommendation/deferred_meal_slot_evidence.py \
+            ops/quality/suites/test_deferred_meal_slot_evidence.py
+          python -m pytest -q \
+            ops/quality/suites/test_deferred_meal_slot_evidence.py \
+            ops/quality/suites/test_contextual_meal_slot_proposals.py
+
+      - name: Verify production identity and policy
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test "$(sha256sum -- "$POLICY_PATH" | cut -d ' ' -f 1)" = "$POLICY_SHA256"
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.contextual_slot_set_from_import_course(text)') IS NOT NULL")" = "t"
+
+      - name: Build identity-free shifted-field manifest
+        run: |
+          manifest="$RUNNER_TEMP/deferred-meal-slot-shifted-field.tsv"
+          summary="$RUNNER_TEMP/deferred-meal-slot-shifted-field-summary.json"
+          python -m ops.recommendation.deferred_meal_slot_evidence \
+            --source "$SOURCE_PATH" --policy "$POLICY_PATH" --output "$manifest" > "$summary"
+          jq --exit-status '
+            .schema_version == "deferred-meal-slot-shifted-field-manifest-summary-v1"
+            and .policy_version == "deferred-course-shifted-field-audit-v1"
+            and .policy_sha256 == "94d5f198bbb1244d631a23c5dc95200a6be860d6609dfc6a6bb0c1a7cb5717ac"
+            and .manifest_row_count == 62
+            and .route_row_counts == {
+              "shifted_contextual:lunch,dinner":2,
+              "shifted_direct:breakfast":6,
+              "shifted_direct:dinner":1,
+              "shifted_direct:lunch":1,
+              "shifted_direct:snacks":2,
+              "unresolved_food_role":50
+            }
+            and .report_only == true
+            and .identity_exposed == false
+            and .raw_source_text_exposed == false
+          ' "$summary" >/dev/null
+          test "$(wc -l < "$manifest")" -eq 62
+
+      - name: Classify report schema state
+        id: state
+        run: |
+          report_fn="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.deferred_meal_slot_shifted_field_report(text,text,text,text,integer,integer,integer)') IS NOT NULL")"
+          case "$report_fn" in
+            f) echo "action=install" >> "$GITHUB_OUTPUT" ;;
+            t) echo "action=validate" >> "$GITHUB_OUTPUT" ;;
+            *) echo "unsafe deferred report state" >&2; exit 1 ;;
+          esac
+
+      - name: Atomically install read-only report
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/121_audit_deferred_meal_slot_shifted_field_evidence.sql \
+            -f database/validation/973_audit_deferred_meal_slot_shifted_field_evidence_validation.sql
+
+      - name: Revalidate existing report read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/973_audit_deferred_meal_slot_shifted_field_evidence_validation.sql
+
+      - name: Run aggregate production audit read-only
+        run: |
+          export EXPECTED_SOURCE_NAME="$(basename -- "$SOURCE_PATH")"
+          export EXPECTED_SOURCE_CHECKSUM="$(sha256sum -- "$SOURCE_PATH" | cut -d ' ' -f 1)"
+          export EXPECTED_MANIFEST_PATH="$RUNNER_TEMP/deferred-meal-slot-shifted-field.tsv"
+          case "$EXPECTED_MANIFEST_PATH" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          report="$RUNNER_TEMP/deferred-meal-slot-shifted-field-report.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 > "$report.raw" <<SQL
+          CREATE TEMP TABLE expected_deferred_course_manifest (
+            source_srno integer PRIMARY KEY,
+            row_fingerprint text NOT NULL CHECK (row_fingerprint ~ '^[0-9a-f]{64}$'),
+            repair_route text NOT NULL,
+            proposed_slots_key text NOT NULL
+          );
+          BEGIN TRANSACTION READ ONLY;
+          \copy expected_deferred_course_manifest FROM '$EXPECTED_MANIFEST_PATH' WITH (FORMAT csv, DELIMITER E'\t')
+          SELECT re_engine.deferred_meal_slot_shifted_field_report(
+            '$EXPECTED_SOURCE_NAME', '$EXPECTED_SOURCE_CHECKSUM',
+            'deferred-course-shifted-field-audit-v1', '$POLICY_SHA256', 62, 22, 1
+          );
+          COMMIT;
+          SQL
+          grep -E '^\{' "$report.raw" | tail -n 1 > "$report"
+          jq --exit-status '
+            .schema_version == "deferred-meal-slot-shifted-field-report-v1"
+            and .diet_deferred_dish_count == 22
+            and .direct_conflict_dish_count == 1
+            and .evidence_link_counts.manifest_failure == 0
+            and .policy.report_only == true
+            and .policy.identity_exposed == false
+            and .policy.raw_source_text_exposed == false
+            and .policy.name_inference_used == false
+            and .policy.automatic_acceptance_allowed == false
+            and .policy.proposal_changed == false
+            and .policy.dish_changed == false
+            and .policy.publication_changed == false
+            and .policy.serving_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deferred-meal-slot-shifted-field-${{ github.run_id }}
+          path: ${{ runner.temp }}/deferred-meal-slot-shifted-field-report.json
+          retention-days: 90
+          if-no-files-found: error

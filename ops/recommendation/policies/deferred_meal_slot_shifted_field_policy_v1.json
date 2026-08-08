@@ -1,0 +1,74 @@
+{
+  "contextual_mappings": {
+    "brunch": [
+      "breakfast",
+      "lunch"
+    ],
+    "dessert": [
+      "lunch",
+      "dinner"
+    ],
+    "main course": [
+      "lunch",
+      "dinner"
+    ],
+    "one pot dish": [
+      "lunch",
+      "dinner"
+    ],
+    "side dish": [
+      "lunch",
+      "dinner"
+    ]
+  },
+  "diet_values_in_course": [
+    "eggetarian",
+    "high protein vegetarian",
+    "no onion no garlic (sattvic)",
+    "non vegeterian",
+    "sugar free diet",
+    "vegan",
+    "vegetarian"
+  ],
+  "direct_mappings": {
+    "appetizer": [
+      "snacks"
+    ],
+    "dinner": [
+      "dinner"
+    ],
+    "indian breakfast": [
+      "breakfast"
+    ],
+    "lunch": [
+      "lunch"
+    ],
+    "north indian breakfast": [
+      "breakfast"
+    ],
+    "snack": [
+      "snacks"
+    ],
+    "south indian breakfast": [
+      "breakfast"
+    ],
+    "world breakfast": [
+      "breakfast"
+    ]
+  },
+  "policy_version": "deferred-course-shifted-field-audit-v1",
+  "report_only": true,
+  "schema_version": "deferred-meal-slot-shifted-field-policy-v1",
+  "source_scope": {
+    "manifest_row_count": 62,
+    "route_row_counts": {
+      "shifted_contextual:lunch,dinner": 2,
+      "shifted_direct:breakfast": 6,
+      "shifted_direct:dinner": 1,
+      "shifted_direct:lunch": 1,
+      "shifted_direct:snacks": 2,
+      "unresolved_food_role": 50
+    }
+  },
+  "shifted_field": "cuisine_raw"
+}
