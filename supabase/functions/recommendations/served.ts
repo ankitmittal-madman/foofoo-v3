@@ -123,13 +123,18 @@ export function buildShownNotTappedRows(
   return served.map((s) => {
     const dishId = dishIds.get(s.dishName) ?? null;
     return {
-      profile_id: profileId, household_id: profileId,
-      recommendation_event_id: recommendationEventId, dish_id: dishId,
-      event_type: "shown_not_tapped" as const, schema_version: "1" as const,
-      target_type: "dish" as const, target_id: dishId ?? s.dishName,
+      profile_id: profileId,
+      household_id: profileId,
+      recommendation_event_id: recommendationEventId,
+      dish_id: dishId,
+      event_type: "shown_not_tapped" as const,
+      schema_version: "1" as const,
+      target_type: "dish" as const,
+      target_id: dishId ?? s.dishName,
       target_identity_status: dishId ? "resolved" as const : "unresolved" as const,
       target_snapshot: { display_name: s.dishName },
-      evidence_kind: "integration" as const, source_surface: "recommendation_served" as const,
+      evidence_kind: "integration" as const,
+      source_surface: "recommendation_served" as const,
       data_source: "real" as const,
     };
   });

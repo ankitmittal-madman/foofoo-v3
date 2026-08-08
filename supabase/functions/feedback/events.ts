@@ -27,7 +27,12 @@ import { API_ERRORS } from "../_shared/errors/api-catalogue.ts";
 import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
-import type { FeedbackEventType, InteractionEvidence, InteractionMoment, InteractionTarget } from "../_shared/validation/feedback-schema.ts";
+import type {
+  FeedbackEventType,
+  InteractionEvidence,
+  InteractionMoment,
+  InteractionTarget,
+} from "../_shared/validation/feedback-schema.ts";
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 
 export interface FeedbackEventInput {
@@ -49,8 +54,11 @@ export interface FeedbackEventInput {
   evidence?: InteractionEvidence;
   reasonCode?: string;
   versions?: {
-    readonly catalog?: string; readonly config?: string; readonly feature?: string;
-    readonly policy?: string; readonly model?: string;
+    readonly catalog?: string;
+    readonly config?: string;
+    readonly feature?: string;
+    readonly policy?: string;
+    readonly model?: string;
   };
 }
 
@@ -78,7 +86,8 @@ const OUTCOME_BY_FEEDBACK: Partial<Record<FeedbackEventType, string>> = {
 function targetSnapshot(target: InteractionTarget | undefined): Record<string, unknown> {
   if (!target) return {};
   return {
-    target_type: target.type, target_id: target.id,
+    target_type: target.type,
+    target_id: target.id,
     target_identity_status: target.identityStatus,
     ...(target.displayName ? { target_display_name: target.displayName } : {}),
     ...(target.snapshot ? { target_snapshot: target.snapshot } : {}),
@@ -87,10 +96,16 @@ function targetSnapshot(target: InteractionTarget | undefined): Record<string, u
 
 function typedEventDetail(ev: FeedbackEventInput): Record<string, unknown> {
   return {
-    ...(ev.detail ?? {}), ...targetSnapshot(ev.target),
-    ...(ev.replacement ? { replacement: {
-      from: targetSnapshot(ev.replacement.from), to: targetSnapshot(ev.replacement.to),
-    } } : {}),
+    ...(ev.detail ?? {}),
+    ...targetSnapshot(ev.target),
+    ...(ev.replacement
+      ? {
+        replacement: {
+          from: targetSnapshot(ev.replacement.from),
+          to: targetSnapshot(ev.replacement.to),
+        },
+      }
+      : {}),
     ...(ev.reasonCode ? { reason_code: ev.reasonCode } : {}),
   };
 }
@@ -329,7 +344,8 @@ export async function recordFeedbackEvent(
     if (classError) throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail: classError.message });
     if (!mealClass) {
       throw new AppError(API_ERRORS.ERR_VALIDATION_FAILED, {
-        detail: "target meal_class is not active", context: { target_id: ev.target.id },
+        detail: "target meal_class is not active",
+        context: { target_id: ev.target.id },
       });
     }
   }
@@ -380,11 +396,19 @@ export async function recordFeedbackEvent(
         target_id: ev.target?.type === "dish" ? dishId : ev.target?.id ?? dishId,
         target_identity_status: ev.target?.type === "dish"
           ? (dishResolved ? "resolved" : "unresolved")
-          : ev.target ? "resolved" : dishId ? "resolved" : "unresolved",
-        target_snapshot: ev.target ? {
-          ...(ev.target.snapshot ?? {}),
-          ...(ev.target.displayName ? { display_name: ev.target.displayName } : {}),
-        } : ev.dishName ? { display_name: ev.dishName } : {},
+          : ev.target
+          ? "resolved"
+          : dishId
+          ? "resolved"
+          : "unresolved",
+        target_snapshot: ev.target
+          ? {
+            ...(ev.target.snapshot ?? {}),
+            ...(ev.target.displayName ? { display_name: ev.target.displayName } : {}),
+          }
+          : ev.dishName
+          ? { display_name: ev.dishName }
+          : {},
         replacement_target_type: ev.replacement?.to.type ?? null,
         replacement_target_id: ev.replacement?.to.id ?? null,
         occurred_at: ev.moment?.occurredAt ?? new Date().toISOString(),

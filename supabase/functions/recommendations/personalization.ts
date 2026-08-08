@@ -2,10 +2,7 @@
 import { createServiceRoleClient } from "../_shared/db/client.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
-import {
-  extractGovernedContextSignals,
-  type GovernedContextSignal,
-} from "./governed-context.ts";
+import { extractGovernedContextSignals, type GovernedContextSignal } from "./governed-context.ts";
 
 export interface OnlineRecommendationState {
   interactionCount: number;

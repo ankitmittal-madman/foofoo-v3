@@ -67,22 +67,55 @@ Deno.test("parseFeedbackRequest accepts a well-formed body", () => {
 });
 
 Deno.test("parseFeedbackRequest accepts canonical meal-class interaction v2", () => {
-  const req = parseFeedbackRequest({ schema_version: "2", idempotency_key: "weekly-1:event-1",
-    request_id: REQUEST_ID, event_type: "selected",
-    target: { type: "meal_class", id: "LD_DAL_ROTI", identity_status: "resolved", display_name: "Dal + Roti" },
-    moment: { occurred_at: "2026-08-07T10:00:00.000Z", local_timezone: "Asia/Kolkata", intended_meal_date: "2026-08-12", meal_slot: "lunch", weekday: "Wednesday", day_type: "weekday" },
+  const req = parseFeedbackRequest({
+    schema_version: "2",
+    idempotency_key: "weekly-1:event-1",
+    request_id: REQUEST_ID,
+    event_type: "selected",
+    target: {
+      type: "meal_class",
+      id: "LD_DAL_ROTI",
+      identity_status: "resolved",
+      display_name: "Dal + Roti",
+    },
+    moment: {
+      occurred_at: "2026-08-07T10:00:00.000Z",
+      local_timezone: "Asia/Kolkata",
+      intended_meal_date: "2026-08-12",
+      meal_slot: "lunch",
+      weekday: "Wednesday",
+      day_type: "weekday",
+    },
     evidence: { kind: "explicit", source_surface: "weekly_plan", shown_rank: 2 },
-    versions: { catalog: "catalogue-v1", config: "config-v1", feature: "event-v2" } });
-  assertEquals(req.schemaVersion, "2"); assertEquals(req.target?.id, "LD_DAL_ROTI");
+    versions: { catalog: "catalogue-v1", config: "config-v1", feature: "event-v2" },
+  });
+  assertEquals(req.schemaVersion, "2");
+  assertEquals(req.target?.id, "LD_DAL_ROTI");
   assertEquals(req.moment?.intendedMealDate, "2026-08-12");
 });
 
 Deno.test("parseFeedbackRequest rejects incomplete or forged v2 evidence", () => {
-  assertEquals(assertThrows(() => parseFeedbackRequest({ ...validBody(), schema_version: "2" }), AppError).httpStatus, 400);
-  assertEquals(assertThrows(() => parseFeedbackRequest({ ...validBody(), schema_version: "2", idempotency_key: "event-1",
-    target: { type: "dish", id: "dish-1", identity_status: "unresolved" },
-    moment: { occurred_at: "2026-08-07T10:00:00.000Z", local_timezone: "Asia/Kolkata", meal_slot: "breakfast" },
-    evidence: { kind: "inferred", source_surface: "weekly_plan" } }), AppError).httpStatus, 400);
+  assertEquals(
+    assertThrows(() => parseFeedbackRequest({ ...validBody(), schema_version: "2" }), AppError)
+      .httpStatus,
+    400,
+  );
+  assertEquals(
+    assertThrows(() =>
+      parseFeedbackRequest({
+        ...validBody(),
+        schema_version: "2",
+        idempotency_key: "event-1",
+        target: { type: "dish", id: "dish-1", identity_status: "unresolved" },
+        moment: {
+          occurred_at: "2026-08-07T10:00:00.000Z",
+          local_timezone: "Asia/Kolkata",
+          meal_slot: "breakfast",
+        },
+        evidence: { kind: "inferred", source_surface: "weekly_plan" },
+      }), AppError).httpStatus,
+    400,
+  );
 });
 
 Deno.test("served dish feedback resolves both dish-card and episode decision traces", () => {

@@ -117,19 +117,22 @@ Deno.test("dated attribute exposure preserves the served catalogue snapshot and 
       cooking_method: ["simmered"],
     }],
   }]);
-  assertEquals(toMealAttributeExposureItems(served, {
-    mealSlot: "lunch",
-    intendedMealDate: "2026-08-07",
-    dayType: "weekday",
-  }), [{
-    dish_name: "Paneer Butter Masala",
-    meal_slot: "lunch",
-    intended_meal_date: "2026-08-07",
-    day_type: "weekday",
-    cuisine: "punjabi",
-    richness: ["creamy", "buttery"],
-    cooking_method: ["simmered"],
-  }]);
+  assertEquals(
+    toMealAttributeExposureItems(served, {
+      mealSlot: "lunch",
+      intendedMealDate: "2026-08-07",
+      dayType: "weekday",
+    }),
+    [{
+      dish_name: "Paneer Butter Masala",
+      meal_slot: "lunch",
+      intended_meal_date: "2026-08-07",
+      day_type: "weekday",
+      cuisine: "punjabi",
+      richness: ["creamy", "buttery"],
+      cooking_method: ["simmered"],
+    }],
+  );
 });
 
 Deno.test("flattenServedDishes: non-array / malformed input yields zero served dishes, never throws", () => {

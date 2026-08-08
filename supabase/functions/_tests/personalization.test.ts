@@ -5,8 +5,8 @@ import {
   extractPersistedCadence,
   extractPersistedExposureDishNames,
   extractPersistedVarietyCounts,
-  extractTemporalClassState,
   extractTemporalAttributeState,
+  extractTemporalClassState,
   selectImmediateRefreshExclusions,
 } from "../recommendations/personalization.ts";
 
@@ -23,23 +23,34 @@ Deno.test("extractTemporalClassState: keeps canonical slot and rhythm rows", () 
 });
 
 Deno.test("extractTemporalAttributeState: keeps only bounded supported dimensions", () => {
-  assertEquals(extractTemporalAttributeState([
-    {
-      meal_slot: "lunch", day_type: "weekday", dimension_code: "richness",
+  assertEquals(
+    extractTemporalAttributeState([
+      {
+        meal_slot: "lunch",
+        day_type: "weekday",
+        dimension_code: "richness",
+        entity_key: "creamy",
+      },
+      {
+        meal_slot: "snacks",
+        day_type: "weekday",
+        dimension_code: "dish",
+        entity_key: "poha",
+      },
+      {
+        meal_slot: "dinner",
+        day_type: "weekend",
+        dimension_code: "nutrition",
+        entity_key: "protein",
+      },
+    ]),
+    [{
+      meal_slot: "lunch",
+      day_type: "weekday",
+      dimension_code: "richness",
       entity_key: "creamy",
-    },
-    {
-      meal_slot: "snacks", day_type: "weekday", dimension_code: "dish",
-      entity_key: "poha",
-    },
-    {
-      meal_slot: "dinner", day_type: "weekend", dimension_code: "nutrition",
-      entity_key: "protein",
-    },
-  ]), [{
-    meal_slot: "lunch", day_type: "weekday", dimension_code: "richness",
-    entity_key: "creamy",
-  }]);
+    }],
+  );
 });
 
 Deno.test("aggregateAffinityMaps combines only members with evidence", () => {

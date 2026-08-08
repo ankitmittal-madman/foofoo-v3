@@ -14,7 +14,10 @@ export type GovernedContextSignal = {
 };
 
 const OBJECTIVES = new Set([
-  "awesome_taste", "healthy_living", "into_fitness", "protein_calculator",
+  "awesome_taste",
+  "healthy_living",
+  "into_fitness",
+  "protein_calculator",
 ]);
 
 function bounded(value: number): number {
