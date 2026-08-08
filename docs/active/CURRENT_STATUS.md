@@ -1,6 +1,22 @@
 # Current Status
 
-**As of:** 2026-08-05. Source: `docs/archive/audits/re_audit_v2/` (fresh clean-room audit, live-verified where noted). This file states current state only — no history. See `docs/archive/audits/` for how these numbers were derived.
+**As of:** 2026-08-08. Sources: the active recommendation modernization deployment runbook plus
+`docs/archive/audits/re_audit_v2/` for the earlier clean-room baseline. This file states current
+state only; deployment run IDs and rollback instructions live in the active runbook.
+
+> **Recommendation modernization Phase A:** production migrations 092–101 and validations
+> 944–953 are live. Publication
+> `sha256:e9c7b524dc5480895d5b675caaa88a51788980cbfb3e1aea95bc5994a7ce3269`
+> contains 642 fully enriched, safety-closed and meal-class-mapped dishes from 3,402 active dishes;
+> the same generation is present in Ghar, Qdrant and one isolated Aux Machine. `plan` and
+> `recommendations` are deployed, and the final protected transition records production Edge
+> `AUX_RE_MODE=off`, so no user request is sent to Aux. The default Ghar request path therefore
+> remains authoritative and may use its 810-dish deterministic fallback when no canonical
+> shortlist is supplied. Authenticated cold-start/experienced-user smoke is still pending an
+> explicitly selected test household. Aux quality run `31256081581` passed installation, all 86
+> service tests, model gates, local Qdrant and an exact-body signed packaged-service request;
+> its evidence explicitly prohibits active promotion because training is synthetic and online
+> shadow/real-outcome evidence does not exist.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,
@@ -118,9 +134,11 @@
 | Observability | 60% (scheduled production smoke/issue alerting added; application 500-level webhook destination remains unconfigured) |
 
 ## One-line state per major component
-- **RE core/service:** implemented, repository Python suite green (720 passed, 27 skipped), Fly
-  image `deployment-01KZ945DR0VDXVEZBG3Y34H6KT` live-healthy with snapshot-v2 bundle
-  `sha256:ffad5c55384244e3`.
+- **RE core/service:** Ghar is the only user-authoritative engine. It exposes the immutable
+  642-row production publication but keeps the 810-dish deterministic fallback for requests that
+  arrive without a canonical shortlist. Aux is deployed on one isolated Machine against the same
+  publication and Qdrant generation, but Edge routing is off. The independent Aux quality run
+  `31256081581` is green and remains shadow-only/not active-eligible.
 - **Edge Functions:** implemented and tested (108 tests); membership-aware authorization is live
   in `household-access` v2, `recommendations` v18, `plan` v19 and `feedback` v14. The backend
   supports governed invitations, owner transfer and lifecycle history, and enforces distinct
@@ -133,22 +151,21 @@
   DPDP export/delete UI added 2026-08-04 (P0-2/P0-4/P1-2/P1-3/P1-4); jest infra stood up with 9
   pure-logic tests; Expo SDK 53 + OneSignal SDK integration passes typecheck, Expo Doctor, and an
   Android production bundle export; no component-render or physical-device tests yet (P1-5 partial).
-- **Database:** real production data (802 dishes, 77 profiles at the 2026-08-05 continuity audit),
+- **Database:** production contained 3,409 dish rows in the later inventory view; the governed
+  publication audit measured 3,402 active dishes, 1,719 with usable class mappings and 642 passing
+  every publication gate. Earlier continuity evidence recorded 77 profiles on 2026-08-05.
   RLS enabled; household context writes and tenant continuity are fixed and live. All profiles have
   a household and active owner membership, all scoped household IDs are non-null, advisor-reported
   missing FK indexes/duplicate indexes are resolved, and partition creation is automated.
   Migration 073 adds membership history and guarantees exactly one active owner; the live
   validation reports zero invalid households. Migration 075 adds private normalized festival
   identities/occurrences under `food`; validation 930 confirms table privacy and RPC results.
-- **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; a normalized,
-  provenance-backed dish enrichment layer and class-bound candidate view are live for all 802
-  production dishes;
-  every production dish now has constraint, regional, nutrition-estimate, recipe and published
-  episode coverage. The production relational graph connects dishes, aliases, ingredients,
-  classes and catalogue features with provenance. USDA is active only as exact-match provisional
-  evidence after a labelled demo-key evaluation showed poor broad Indian-dish matching. Groq
-  low-risk enrichment is live under strict budgets and database field policies. Normalized
-  festival mapping is live; clinically governed health-condition suitability remains pending.
+- **Knowledge layer:** normalized ontology and provenance structures are live, but coverage is not
+  complete across the expanded inventory. Only 642 active dishes currently satisfy the complete
+  serving contract; 1,719 have usable meal-class mappings. Missing ingredient, cuisine, safety,
+  taxonomy and class facts must be completed under the existing review rules rather than bypassed.
+  USDA remains exact-match provisional evidence, Groq remains limited to governed low-risk fields,
+  and clinically governed health-condition suitability remains pending.
 
 See `docs/active/OPEN_ITEMS.md` for what's actionable, `docs/active/LAUNCH_BLOCKERS.md` for what
 gates a public launch, `docs/active/ROADMAP.md` for sequencing.

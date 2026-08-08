@@ -271,6 +271,13 @@ Founder acceptance: _______________________ Date: ___________
 
 ## Implementation Checkpoints
 
+The S100–S124 rows preserve the deployment status at the time each checkpoint was written. They
+are historical checkpoint evidence, not the current production state. S130 supersedes those
+pre-deployment status cells: migrations 092–101, the 642-dish publication, matching Qdrant/Ghar/Aux
+foundations and Edge code are deployed with production Aux routing off. Run 31256081581 later
+closed the independent Aux model-quality CI gate. Authenticated test-household smoke, catalogue
+gap closure, ratified load/shadow evidence and any canary remain open.
+
 | Checkpoint | Repository evidence | Deployment status |
 |---|---|---|
 | S99 — program start | Selected Today date reaches the Plan request; this work package defines the shared program | Committed; no DB change |

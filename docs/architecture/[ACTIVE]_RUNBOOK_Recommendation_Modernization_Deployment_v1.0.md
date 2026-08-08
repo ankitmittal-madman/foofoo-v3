@@ -38,9 +38,11 @@ OFF -> schema -> publish once -> Ghar + Qdrant/Aux -> Edge deploy -> smoke
 requests but cannot change the response. A canary means a stable, approved subset of households
 may receive Aux influence. No existing workflow automatically changes `AUX_RE_MODE` to `active`.
 
-This document does not claim that production has been migrated. A database row count of 3,409 is
-not the serving count: the immutable publication manifest supplies the exact number of active,
-safety-closed, enriched and class-mapped dishes that are eligible to serve.
+Phase A has now been executed in production with Aux routing kept off. This is a deployed
+foundation, not a completed rollout: authenticated test-household smoke, load targets, real-outcome
+evaluation, shadow observation and any approved canary remain outstanding. A database row count of
+3,409 is not the serving count: the immutable publication manifest supplies the exact number and
+currently proves 642 active, safety-closed, enriched and class-mapped dishes.
 
 ## 1. Roles and evidence record
 
@@ -120,6 +122,7 @@ No shadow or active transition was requested or executed.
 | 8 | Run `31253301316` | One isolated Aux Machine healthy on the same Qdrant generation; Edge still off |
 | 9 | Run `31253527126` | `plan` and `recommendations` deployed after 151 Edge tests passed |
 | Boundary smoke | Run `31253604331` | Fly health/meta and unauthenticated Edge boundaries passed |
+| Aux model quality | Run `31256081581` | 86 tests, model gate, local Qdrant and signed packaged-service shadow flow passed; active promotion remained prohibited |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
@@ -258,8 +261,10 @@ Until then, describe the state precisely as “implemented”, “deployed off�
   offline evaluator correctly fails closed, so promotion evidence cannot yet be complete.
 - Numerical targets exist as governed inputs but require a Product/Founder approval reference;
   engineering defaults are not product ratification.
-- The live publishable count is unknown until the production publication workflow runs. `3,409`
-  database rows and the legacy `810` bundle are inventory observations, not the new serving count.
+- The production publication is known: 642 of 3,402 active dishes passed every enrichment,
+  safety, ingredient, cuisine, taxonomy and meal-class gate. The remaining rows require governed
+  data completion; the legacy `810` bundle and total database inventory are not substitutes for
+  the publication count.
 - A protected workflow does not prove backup health, secret correctness or on-call readiness;
   those remain operator assertions with external evidence.
 

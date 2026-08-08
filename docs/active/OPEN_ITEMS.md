@@ -49,9 +49,11 @@ findings are retained under `docs/archive/`.
 
 ## P3 — Product and intelligence evolution
 
-- Execute WP-23's shared Ghar/Aux recommendation modernization program: canonical class/episode/
-  dish events, temporal sequencing and spacing, governed contextual inference, scalable catalogue
-  retrieval, shadow integration and measurable promotion gates.
+- Complete WP-23 after its deployed-OFF Phase A foundation: run authenticated cold-start and
+  experienced-user smoke on an explicitly selected test household; close the measured
+  642-of-3,402 catalogue enrichment/class-mapping gaps; ratify and run load gates; then collect
+  consented real-outcome and shadow evidence before separately approving any canary. Aux remains
+  off until those gates pass.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
