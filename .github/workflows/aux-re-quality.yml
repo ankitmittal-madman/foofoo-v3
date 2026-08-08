@@ -37,7 +37,9 @@ jobs:
       - name: Install local ML and test runtime
         run: |
           python -m pip install "setuptools==79.0.1" "wheel==0.45.1"
-          python -m pip install -e "./aux_re_service[test,models]"
+          python -m pip install -e "./aux_re_service[test]"
+          python -m pip install "joblib>=1.4"
+          python -m pip install --no-build-isolation "lightfm==1.17"
       - name: Run auxiliary tests
         run: python -m pytest aux_re_service/tests -q
       - name: Enforce artifact and model quality gates
