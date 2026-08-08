@@ -80,7 +80,7 @@ COMMENT ON FUNCTION re_engine.dish_safety_field_violations() IS
   'Read-only. Every currently-active dish whose stored is_jain/diet_type/allergen_flags '
   'contradicts its own mapped ingredient text. One row per violation (a dish may appear more '
   'than once). Never guesses missing data — only flags contradictions against real ingredient '
-  'text already in the DB. See migration 103 header for the exact keyword set and its two '
+  'text already in the DB. See migration 125 header for the exact keyword set and its two '
   'known-excluded false-positive patterns (bare "meat", bare "goat").';
 
 CREATE OR REPLACE FUNCTION re_engine.dish_safety_field_autocorrect()

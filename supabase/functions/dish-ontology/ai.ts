@@ -45,7 +45,7 @@ export interface GroqDishEnrichment {
   }>;
   // Meal-class and cuisine are structural catalogue-membership facts, not taxonomy descriptors —
   // kept as separate arrays/fields so the DB promotion policy (record_ai_low_risk_enrichment,
-  // migration 104) can validate each against its own closed vocabulary (public.meal_classes,
+  // migration 126) can validate each against its own closed vocabulary (public.meal_classes,
   // public.cuisines) rather than inserting free-text into a foreign-keyed column. Like taxonomy,
   // this is deliberately non-safety: no diet/Jain/allergen inference, matching the ai.ts header.
   meal_class: Array<{
@@ -264,7 +264,7 @@ export interface ClosedVocabulary {
  * `vocabulary` (when supplied) is listed verbatim in the prompt so the model selects meal_class
  * and cuisine values from the real closed vocabulary instead of inventing plausible-looking codes
  * that would never match public.meal_classes/public.cuisines — record_ai_low_risk_enrichment
- * (migration 104) still re-validates against the live tables regardless, since this list can go
+ * (migration 126) still re-validates against the live tables regardless, since this list can go
  * stale between calls, but an unlisted model has near-zero chance of guessing a real class_code.
  */
 export async function generateGroqDishEnrichment(

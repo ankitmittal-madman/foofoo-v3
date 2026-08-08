@@ -18,7 +18,7 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
     const db = createServiceRoleClient(ctx.config);
     await db.rpc("reconcile_dish_enrichment_jobs");
 
-    // Deterministic, non-AI safety-field correctness pass (migration 103): runs on every
+    // Deterministic, non-AI safety-field correctness pass (migration 125): runs on every
     // invocation so newly-ingested dishes get the same is_jain/diet_type/allergen_flags check as
     // the 2026-08-08 backlog pass, without waiting for a human to notice bad data. Best-effort —
     // a failure here must not block the AI enrichment work below.
@@ -124,7 +124,7 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
       aiClaimed = aiJobs?.length ?? 0;
 
       // Fetched once per invocation (not once per dish) so the Groq prompt lists the real
-      // meal_class/cuisine closed vocabulary — see migration 104's ai_enrichment_closed_vocabulary()
+      // meal_class/cuisine closed vocabulary — see migration 126's ai_enrichment_closed_vocabulary()
       // and ai.ts's ClosedVocabulary doc comment for why this can't be hardcoded in this file.
       // Best-effort: if this fails, enrichment still runs for aliases/taxonomy/regional_affinities,
       // just without meal_class/cuisine candidates for this batch.

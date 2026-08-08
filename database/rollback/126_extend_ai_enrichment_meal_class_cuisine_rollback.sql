@@ -1,4 +1,4 @@
--- Rollback for 104_extend_ai_enrichment_meal_class_cuisine.sql.
+-- Rollback for 126_extend_ai_enrichment_meal_class_cuisine.sql.
 -- Restores record_ai_low_risk_enrichment to its pre-104 (066) body and drops the vocabulary helper.
 -- Does not revert any meal_class mappings or cuisine_id values already published by the extended
 -- function while it was active — those are real, validated-against-closed-vocabulary data, not

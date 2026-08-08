@@ -1,7 +1,7 @@
 -- Extends public.record_ai_low_risk_enrichment (066) to promote meal_class and cuisine
 -- candidates from supabase/functions/dish-ontology/ai.ts's extended Groq schema.
 --
--- Why this was needed: migration 103's audit found the safety fields were wrong on many dishes,
+-- Why this was needed: migration 125's audit found the safety fields were wrong on many dishes,
 -- but a separate investigation (2026-08-08) found the *structural* blocker for the largest gap
 -- bucket (1,683 dishes missing meal-class mapping, per ops/recommendation/catalogue_gap_report.py)
 -- is that this AI pipeline's schema never had meal_class or cuisine fields at all — every one of
@@ -208,7 +208,7 @@ END $$;
 
 COMMENT ON FUNCTION public.record_ai_low_risk_enrichment(uuid,uuid,text,jsonb,numeric,numeric) IS
   'Publishes only non-safety ontology fields at founder thresholds; nutrition/constraints are '
-  'absent by design. Extended in migration 104 to also promote meal_class (public.meal_classes, '
+  'absent by design. Extended in migration 126 to also promote meal_class (public.meal_classes, '
   'closed vocabulary, never invents a new class_code) and cuisine (public.cuisines, closed '
   'vocabulary, only ever fills a NULL dishes.cuisine_id, never overwrites).';
 

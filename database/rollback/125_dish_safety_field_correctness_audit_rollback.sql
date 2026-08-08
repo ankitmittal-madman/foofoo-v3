@@ -1,4 +1,4 @@
--- Rollback for 103_dish_safety_field_correctness_audit.sql.
+-- Rollback for 125_dish_safety_field_correctness_audit.sql.
 -- Drops the audit/autocorrect functions only. Does NOT revert the is_jain/diet_type/allergen_flags
 -- corrections already applied to production on 2026-08-08 (1,040 is_jain, 220 diet_type->non_veg,
 -- 97 diet_type->egg, 395 nuts + 47 fish allergen_flags rows) — those corrections fixed real,
