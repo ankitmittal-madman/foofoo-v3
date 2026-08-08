@@ -6,7 +6,7 @@ name: dish-image-generation
 # fires when a human explicitly dispatches it with eyes-open inputs.
 #
 # Required repository secrets (Settings > Secrets and variables > Actions):
-#   DATABASE_URL, SUPABASE_DB_URL, or FOOFOO_SUPABASE_URI   — required whenever apply=true
+#   FOOFOO_SUPABASE_URI                 — exact production database; required when apply=true
 #   CLOUDINARY_CLOUD_NAME
 #   CLOUDINARY_API_KEY
 #   CLOUDINARY_API_SECRET
@@ -36,8 +36,16 @@ on:
         type: string
         default: ""
 
+permissions:
+  contents: read
+
+concurrency:
+  group: production-dish-ingestion
+  cancel-in-progress: false
+
 jobs:
   run-pipeline:
+    environment: production
     runs-on: ubuntu-latest
     # Sequential Groq calls (infer_regional_affinity, per row whenever the CSV cuisine text
     # doesn't hit the small local keyword map) dominate a full-dataset run's wall time far more
@@ -45,7 +53,10 @@ jobs:
     # headroom for the full ~6,871-row CSV. GitHub Actions caps a single job at 360 min (6h).
     timeout-minutes: 340
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL || secrets.FOOFOO_SUPABASE_URI }}
+      DATABASE_URL: ${{ inputs.apply && secrets.FOOFOO_SUPABASE_URI || '' }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      FOOFOO_IMPORT_ACTOR: github-actions:${{ github.run_id }}:${{ github.run_attempt }}
+      PGAPPNAME: foofoo-dish-ingestion-${{ github.run_id }}-${{ github.run_attempt }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
@@ -68,20 +79,37 @@ jobs:
           done
 
       - name: Fail fast if apply=true but no database connection is configured
-        if: ${{ inputs.apply == 'true' && env.DATABASE_URL == '' }}
+        if: ${{ inputs.apply && env.DATABASE_URL == '' }}
         run: |
-          echo "apply=true requires DATABASE_URL, SUPABASE_DB_URL, or FOOFOO_SUPABASE_URI to be set as a repository secret." >&2
+          echo "apply=true requires FOOFOO_SUPABASE_URI in the production environment." >&2
           exit 1
 
-      - name: Run dish ingestion pipeline
+      - name: Verify exact production database identity before apply
+        if: ${{ inputs.apply }}
         run: |
-          ARGS="database/etl/ingest_dish_dataset.py"
-          if [ "${{ inputs.apply }}" = "true" ]; then ARGS="$ARGS --apply"; else ARGS="$ARGS --dry-run"; fi
-          if [ "${{ inputs.generate_images }}" != "true" ]; then ARGS="$ARGS --skip-images"; fi
-          if [ "${{ inputs.limit }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit }}"; fi
-          if [ -n "${{ inputs.only_srno }}" ]; then ARGS="$ARGS --only-srno ${{ inputs.only_srno }}"; fi
-          echo "Running: python $ARGS"
-          python $ARGS
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["DATABASE_URL"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+
+      - name: Run dish ingestion pipeline
+        env:
+          APPLY_INPUT: ${{ inputs.apply }}
+          LIMIT_INPUT: ${{ inputs.limit }}
+          GENERATE_IMAGES_INPUT: ${{ inputs.generate_images }}
+          ONLY_SRNO_INPUT: ${{ inputs.only_srno }}
+        run: |
+          [[ "$LIMIT_INPUT" =~ ^[0-9]+$ ]]
+          if [ -n "$ONLY_SRNO_INPUT" ]; then
+            [[ "$ONLY_SRNO_INPUT" =~ ^[0-9]+(,[0-9]+)*$ ]]
+          fi
+          args=(database/etl/ingest_dish_dataset.py)
+          if [ "$APPLY_INPUT" = "true" ]; then args+=(--apply); else args+=(--dry-run); fi
+          if [ "$GENERATE_IMAGES_INPUT" != "true" ]; then args+=(--skip-images); fi
+          if [ "$LIMIT_INPUT" != "0" ]; then args+=(--limit "$LIMIT_INPUT"); fi
+          if [ -n "$ONLY_SRNO_INPUT" ]; then args+=(--only-srno "$ONLY_SRNO_INPUT"); fi
+          args+=(--report-out "$RUNNER_TEMP/dish-ingestion-report.json")
+          printf 'Running:'
+          printf ' %q' python "${args[@]}"
+          printf '\n'
+          timeout --signal=TERM --kill-after=30s 330m python "${args[@]}"
 
       - name: Upload import summary report
         if: always()
@@ -89,6 +117,7 @@ jobs:
         with:
           name: dish-ingestion-report
           path: |
+            ${{ runner.temp }}/dish-ingestion-report.json
             database/etl/**/*.log
             database/etl/**/import_report*.json
           if-no-files-found: ignore

@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import signal
 import sys
 from pathlib import Path
 
@@ -25,7 +26,13 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CSV = ROOT / "database" / "seeds" / "IndianFoodDatasetCSV.csv"
 
 
+def _handle_termination(signum: int, _frame: object) -> None:
+    """Convert a workflow termination request into a catchable pipeline interruption."""
+    raise InterruptedError(f"ingestion terminated by signal {signum}")
+
+
 def main() -> int:
+    """Validate CLI inputs, run one ingestion, and return a process exit code."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--dry-run", action="store_true", help="Parse/dedupe/map/enrich in memory; write nothing.")
@@ -47,6 +54,7 @@ def main() -> int:
                          help="Seconds to sleep between real Pollinations.ai calls (default: 3, rate-limit discipline).")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
+    signal.signal(signal.SIGTERM, _handle_termination)
 
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,

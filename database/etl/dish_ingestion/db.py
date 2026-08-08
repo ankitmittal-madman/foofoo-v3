@@ -90,17 +90,27 @@ class Database:
         return [dict(row) for row in cur.fetchall()]
 
     # -- import_runs ----------------------------------------------------------------------------
-    def start_import_run(self, cur, source_name: str, source_checksum: str, run_mode: str) -> str:
+    def start_import_run(
+        self,
+        cur,
+        source_name: str,
+        source_checksum: str,
+        run_mode: str,
+        triggered_by: str,
+    ) -> str:
+        """Create one auditable running import owned by the current execution actor."""
         cur.execute(
             """
-            INSERT INTO public.import_runs (source_name, source_checksum, run_mode, status)
-            VALUES (%s, %s, %s, 'running') RETURNING id
+            INSERT INTO public.import_runs
+              (source_name, source_checksum, run_mode, status, triggered_by)
+            VALUES (%s, %s, %s, 'running', %s) RETURNING id
             """,
-            (source_name, source_checksum, run_mode),
+            (source_name, source_checksum, run_mode, triggered_by),
         )
         return str(cur.fetchone()["id"])
 
     def complete_import_run(self, cur, run_id: str, counters: dict, summary_report: dict) -> None:
+        """Close a running import as completed without permitting terminal-state rewrites."""
         cur.execute(
             """
             UPDATE public.import_runs
@@ -108,7 +118,7 @@ class Database:
                    rows_matched_existing = %(matched)s, rows_created_dish = %(created)s,
                    rows_routed_review = %(review)s, rows_errored = %(errored)s,
                    summary_report = %(summary)s
-             WHERE id = %(run_id)s
+             WHERE id = %(run_id)s AND status = 'running'
             """,
             {
                 "run_id": run_id,
@@ -120,12 +130,20 @@ class Database:
                 "summary": json.dumps(summary_report),
             },
         )
+        if cur.rowcount != 1:
+            raise RuntimeError("import run completion requires one running row")
 
-    def fail_import_run(self, cur, run_id: str, summary_report: dict) -> None:
+    def fail_import_run(self, cur, run_id: str, summary_report: dict) -> bool:
+        """Close a running import as failed; return false if it was already terminal or absent."""
         cur.execute(
-            "UPDATE public.import_runs SET status = 'failed', completed_at = now(), summary_report = %s WHERE id = %s",
+            """
+            UPDATE public.import_runs
+               SET status = 'failed', completed_at = now(), summary_report = %s
+             WHERE id = %s AND status = 'running'
+            """,
             (json.dumps(summary_report), run_id),
         )
+        return cur.rowcount == 1
 
     # -- per-row persistence --------------------------------------------------------------------
     def insert_source_row(self, cur, run_id: str, srno: int, fingerprint: str, raw: dict, normalized: dict) -> str:
