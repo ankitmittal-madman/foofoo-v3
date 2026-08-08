@@ -1,4 +1,4 @@
--- Disable further final-cohort generation while retaining private cases and immutable evidence.
+-- Rollback 123: disable further final-cohort generation while retaining private cases and immutable evidence.
 -- Existing review history must survive rollback; this does not touch public.dishes or serving.
 
 REVOKE ALL ON FUNCTION ops.generate_deferred_meal_slot_cases(
@@ -10,4 +10,4 @@ DROP FUNCTION IF EXISTS ops.generate_deferred_meal_slot_cases(
 );
 
 COMMENT ON TABLE ops.deferred_meal_slot_cases IS
-  'Retained private deferred meal-slot case ledger; generation disabled by rollback 122.';
+  'Retained private deferred meal-slot case ledger; generation disabled by rollback 123.';

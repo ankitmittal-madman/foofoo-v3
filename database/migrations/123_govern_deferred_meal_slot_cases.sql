@@ -1,4 +1,4 @@
--- Materialize the final deferred meal-slot denominator as private pending-review cases.
+-- Migration 123: materialize the final deferred meal-slot denominator as private pending-review cases.
 --
 -- The source audit proved 23 active dishes remain outside the direct/contextual proposal cohorts:
 -- five have exact shifted-field candidates, 17 need food-role review and one has conflicting direct

@@ -1,3 +1,4 @@
+-- Validation 975 for migration 123.
 DO $$
 DECLARE
   v_case_count integer;

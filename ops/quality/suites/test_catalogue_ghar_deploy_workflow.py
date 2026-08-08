@@ -30,6 +30,7 @@ def test_ghar_deploy_requires_publication_in_image_and_verifies_live_identity():
     assert "--build-arg GHAR_RE_PUBLICATION_REQUIRED=true" in text
     assert "GHAR_RE_PUBLISHED_CATALOGUE_DIR=/srv/ghar-re/publication" in text
     assert ".published_catalogue.publication_version == $version" in text
+    assert ".published_catalogue.identity_row_count >= .published_catalogue.row_count" in text
     assert "AUX_RE_MODE" not in text
     assert "supabase secrets set" not in text
 

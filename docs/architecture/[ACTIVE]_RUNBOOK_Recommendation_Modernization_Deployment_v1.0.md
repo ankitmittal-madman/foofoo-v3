@@ -328,7 +328,7 @@ change.
 
 ### Final deferred case boundary — prepared, not installed
 
-Migration 122 and validation 974 define a private, RLS-enabled case ledger for the exact 23-dish
+Migration 123 and validation 975 define a private, RLS-enabled case ledger for the exact 23-dish
 result. The five candidate cases retain proposed slot arrays only as pending review evidence; the 17
 food-role cases and one direct conflict retain no proposed mapping. A separate immutable evidence
 table preserves every source-row fingerprint. The boundary cannot write `public.dishes`, either
@@ -337,7 +337,7 @@ existing proposal table, a publication or serving configuration, and it grants c
 `Govern deferred meal-slot cases` separates `install_only` from `generate`. Generation binds the
 production project, both policy hashes, 62-row manifest, exact 23-case route distribution, five
 candidate slot distribution and 88 diet-evidence links. It also compares full dish meal-slot and
-existing proposal-table signatures before and after. Local evidence includes 335 passing
+existing proposal-table signatures before and after. Reconciled local evidence includes 339 passing
 recommendation tests with one expected skip plus a disposable PostgreSQL proof: 23 pending cases,
 92 synthetic evidence links, zero duplicate rows on retry, immutable evidence, unchanged dishes and
 rollback that disabled generation while retaining all case history. Production install/generation

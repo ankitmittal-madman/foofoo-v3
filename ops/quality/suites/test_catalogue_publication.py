@@ -25,17 +25,28 @@ class FakeCursor:
         self.params = params or ()
 
     def fetchone(self):
+        if "catalogue_identity_coverage" in self.query:
+            return {"identity_count": len(self.connection.identity_rows)}
         return self.connection.coverage
 
     def fetchall(self):
         after, limit = self.params
+        if "catalogue_identity_rows" in self.query:
+            return [
+                identity
+                for identity in self.connection.identity_rows
+                if after is None or identity["dish_id"] > after
+            ][:limit]
         rows = [row for row in self.connection.rows if after is None or row["id"] > after][:limit]
         return [{"publication_row": row} for row in rows]
 
 
 class FakeConnection:
-    def __init__(self, rows, publishable=None):
+    def __init__(self, rows, publishable=None, identity_rows=None):
         self.rows = rows
+        self.identity_rows = identity_rows or [
+            {"dish_id": item["id"], "name": item["name"]} for item in rows
+        ]
         count = len(rows) if publishable is None else publishable
         self.coverage = {
             "active_dishes": count,
@@ -90,6 +101,7 @@ def test_publication_streams_bounded_pages_and_writes_content_addressed_manifest
     exported = [json.loads(line) for line in (target / "catalogue.jsonl").read_text().splitlines()]
     assert exported == rows
     assert manifest["row_count"] == 3
+    assert manifest["identity_row_count"] == 3
     assert manifest["publication_version"].startswith("sha256:")
     assert manifest["catalogue_sqlite_sha256"]
     assert json.loads((target / "manifest.json").read_text()) == manifest
@@ -102,12 +114,28 @@ def test_publication_streams_bounded_pages_and_writes_content_addressed_manifest
         assert index.execute("SELECT count(*) FROM dish_slots WHERE slot='lunch'").fetchone() == (
             3,
         )
+        assert index.execute(
+            "SELECT dish_id, name FROM catalogue_identity ORDER BY dish_id"
+        ).fetchall() == [("0001", "Poha"), ("0002", "Idli"), ("0003", "Dosa")]
 
 
 def test_publication_refuses_count_drift_and_leaves_no_partial_target(tmp_path):
     target = tmp_path / "publication"
     with pytest.raises(RuntimeError, match="count mismatch"):
         publication.publish(FakeConnection([row("0001", "Poha")], publishable=2), target)
+    assert not target.exists()
+
+
+def test_publication_refuses_identity_count_or_name_drift(tmp_path):
+    target = tmp_path / "publication"
+    with pytest.raises(RuntimeError, match="identity is incomplete"):
+        publication.publish(
+            FakeConnection(
+                [row("0001", "Poha")],
+                identity_rows=[{"dish_id": "0001", "name": "Different"}],
+            ),
+            target,
+        )
     assert not target.exists()
 
 
@@ -127,3 +155,12 @@ def test_sql_boundary_is_service_only_and_does_not_reference_user_tables():
     assert "feedback_events" not in sql
     assert "profiles" not in sql
     assert "households" not in sql
+
+    identity_sql = Path(
+        "database/migrations/122_publish_canonical_catalogue_identity.sql"
+    ).read_text()
+    assert "catalogue_identity_rows" in identity_sql
+    assert "FROM PUBLIC, anon, authenticated" in identity_sql
+    assert "feedback_events" not in identity_sql
+    assert "profiles" not in identity_sql
+    assert "households" not in identity_sql

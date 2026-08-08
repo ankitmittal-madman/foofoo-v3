@@ -11,6 +11,7 @@ import os
 import sys
 import time
 from dataclasses import dataclass, field
+from uuid import UUID
 
 from ghar_re_core import config as core_config
 from ghar_re_core import model_provider as core_model
@@ -25,7 +26,11 @@ from ghar_re_service.providers import (
     RateLimitConfigProvider,
     resolve_providers,
 )
-from ghar_re_service.published_catalogue import PublishedCatalogueStore, load_from_environment
+from ghar_re_service.published_catalogue import (
+    PublishedCatalogueStore,
+    load_from_environment,
+    reconcile_fallback_identities,
+)
 from ghar_re_service.ratelimit import SlidingWindowRateLimiter
 
 SERVICE_NAME = "ghar_re_service"
@@ -85,12 +90,27 @@ def catalogue_identity_summary(catalogue: object | None) -> dict[str, int]:
     if catalogue is None:
         return {
             "canonical_dishes": 0,
+            "canonical_uuid_dishes": 0,
+            "legacy_id_dishes": 0,
             "resolvable_names": 0,
             "ambiguous_aliases": 0,
             "shadowed_aliases": 0,
         }
+    dishes = list(getattr(catalogue, "dishes", ()) or ())
+
+    def has_canonical_uuid(dish: object) -> bool:
+        """Return whether one loaded dish exposes an RFC UUID without revealing the value."""
+        try:
+            UUID(str(getattr(dish, "id", "")))
+            return True
+        except ValueError:
+            return False
+
+    canonical_uuid_dishes = sum(has_canonical_uuid(dish) for dish in dishes)
     return {
-        "canonical_dishes": len(getattr(catalogue, "dishes", ()) or ()),
+        "canonical_dishes": len(dishes),
+        "canonical_uuid_dishes": canonical_uuid_dishes,
+        "legacy_id_dishes": len(dishes) - canonical_uuid_dishes,
         "resolvable_names": len(getattr(catalogue, "by_normalized_name", {}) or {}),
         "ambiguous_aliases": len(getattr(catalogue, "ambiguous_aliases", {}) or {}),
         "shadowed_aliases": len(getattr(catalogue, "shadowed_aliases", {}) or {}),
@@ -277,12 +297,17 @@ def startup(state: AppState) -> AppState:
 
     # 2. catalogue
     state.catalogue = state.catalogue_provider.load()
-    log_event("startup.catalogue_loaded", **catalogue_identity_summary(state.catalogue))
 
     # Optional scalable publication: verified once at startup, hydrated only for bounded IDs on a
     # request. Absence leaves the immutable bundle path exactly unchanged; a configured but corrupt
     # artifact fails startup rather than silently serving unverified database candidates.
     state.published_catalogue = load_from_environment()
+    fallback_identity = reconcile_fallback_identities(state.catalogue, state.published_catalogue)
+    log_event(
+        "startup.catalogue_loaded",
+        **catalogue_identity_summary(state.catalogue),
+        identity_resolution=fallback_identity,
+    )
     log_event(
         "startup.published_catalogue_loaded",
         configured=state.published_catalogue is not None,

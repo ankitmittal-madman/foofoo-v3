@@ -7,9 +7,9 @@ import json
 from pathlib import Path
 
 POLICY = Path("ops/recommendation/policies/deferred_meal_slot_case_policy_v1.json")
-MIGRATION = Path("database/migrations/122_govern_deferred_meal_slot_cases.sql")
-VALIDATION = Path("database/validation/974_govern_deferred_meal_slot_cases_validation.sql")
-ROLLBACK = Path("database/rollback/122_govern_deferred_meal_slot_cases_rollback.sql")
+MIGRATION = Path("database/migrations/123_govern_deferred_meal_slot_cases.sql")
+VALIDATION = Path("database/validation/975_govern_deferred_meal_slot_cases_validation.sql")
+ROLLBACK = Path("database/rollback/123_govern_deferred_meal_slot_cases_rollback.sql")
 WORKFLOW = Path(".github/workflows/recommendation-deferred-meal-slot-cases.yml")
 POLICY_SHA256 = "339916734763f073080cec4079f51401955da7af5df996076c1cc851b92b68da"
 

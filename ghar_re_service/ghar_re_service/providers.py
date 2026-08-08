@@ -48,6 +48,7 @@ class CatalogueSnapshot(Protocol):
     satisfies this.)"""
 
     dishes: list[Any]
+    by_id: dict[str, Dish]
 
     def get_dish(self, dish_id: str) -> Dish | None: ...
     def by_zone(self, zone: str) -> list[Dish]: ...

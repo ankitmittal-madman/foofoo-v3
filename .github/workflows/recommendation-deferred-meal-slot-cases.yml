@@ -102,15 +102,15 @@ jobs:
         run: |
           psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
             -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
-            -f database/migrations/122_govern_deferred_meal_slot_cases.sql \
-            -f database/validation/974_govern_deferred_meal_slot_cases_validation.sql
+            -f database/migrations/123_govern_deferred_meal_slot_cases.sql \
+            -f database/validation/975_govern_deferred_meal_slot_cases_validation.sql
 
       - name: Revalidate existing boundary read-only
         if: steps.state.outputs.action == 'validate'
         run: |
           psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
             -c "SET TRANSACTION READ ONLY" \
-            -f database/validation/974_govern_deferred_meal_slot_cases_validation.sql
+            -f database/validation/975_govern_deferred_meal_slot_cases_validation.sql
 
       - name: Stop after install-only verification
         if: inputs.action == 'install_only'
@@ -174,7 +174,7 @@ jobs:
           ' "$result" >/dev/null
           psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
             -c "SET TRANSACTION READ ONLY" \
-            -f database/validation/974_govern_deferred_meal_slot_cases_validation.sql
+            -f database/validation/975_govern_deferred_meal_slot_cases_validation.sql
 
       - uses: actions/upload-artifact@v4
         with:
