@@ -12,6 +12,7 @@ import { researchDish } from "../dish-ontology/research.ts";
 import { promoteExternalEvidence, storeResearchRecordsForSubject } from "../dish-ontology/store.ts";
 import type { ClosedVocabulary } from "../dish-ontology/ai.ts";
 import { generateGroqDishEnrichment } from "../dish-ontology/ai.ts";
+import { embedText, toVectorLiteral } from "../dish-ontology/embeddings.ts";
 
 const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
   async (_req, ctx) => {
@@ -62,7 +63,12 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
           records: research.records,
         });
         if (job.dish_id) {
-          const promoted = await promoteExternalEvidence(ctx, String(job.dish_id), stored);
+          const promoted = await promoteExternalEvidence(
+            ctx,
+            String(job.dish_id),
+            stored,
+            String(job.query_text),
+          );
           ontologyTerms += promoted.ontologyTerms;
           nutrients += promoted.nutrients;
         }
@@ -132,9 +138,28 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
         // without meal_class/cuisine candidates for this dish.
         let vocabulary: ClosedVocabulary | undefined;
         try {
-          const { data: vocabRow } = await db.rpc("ai_enrichment_closed_vocabulary", {
-            p_dish_name: String(aiJob.query_text),
-          });
+          // migration 128: try the semantic (embedding cosine-similarity) vocabulary first --
+          // it catches dishes whose class shares no literal word with the dish name, which
+          // migration 127's word-overlap filter (the fallback below) structurally cannot. The RPC
+          // itself returns NULL (not an empty list) until the one-time embeddings backfill has
+          // run, so an untouched deployment transparently keeps using the word-overlap version.
+          let vocabRow: unknown = null;
+          try {
+            const embedding = await embedText(String(aiJob.query_text));
+            const { data } = await db.rpc("ai_enrichment_closed_vocabulary_by_embedding", {
+              p_query_embedding: toVectorLiteral(embedding),
+              p_match_count: 40,
+            });
+            vocabRow = data;
+          } catch {
+            // gte-small unavailable or embeddings not backfilled yet -- fall through below.
+          }
+          if (!vocabRow) {
+            const { data } = await db.rpc("ai_enrichment_closed_vocabulary", {
+              p_dish_name: String(aiJob.query_text),
+            });
+            vocabRow = data;
+          }
           if (vocabRow && typeof vocabRow === "object") {
             const raw = vocabRow as Record<string, unknown>;
             vocabulary = {
