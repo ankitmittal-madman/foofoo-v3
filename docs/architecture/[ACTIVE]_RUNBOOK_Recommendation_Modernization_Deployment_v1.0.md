@@ -215,6 +215,46 @@ using the full 1,802/7,222/4,806 cohort. The proof applied exactly, treated the 
 idempotent, rejected rollback after deliberate post-apply drift and restored all original arrays
 after the drift was removed. This is implementation evidence only, not product approval.
 
+### Contextual multi-slot proposals — prepared, not installed
+
+The remaining contextual course cohort is deliberately separate from the 1,802 direct proposals.
+`Side Dish`, `Main Course`, `One Pot Dish`, `Dessert` and `Brunch` do not identify one exact meal
+moment. The candidate policy therefore proposes slot **sets** for review and contains no apply
+function:
+
+| Exact checked-in source course | Candidate slot set | Audited dishes |
+|---|---|---:|
+| `Side Dish` | `lunch,dinner` | 394 |
+| `Dessert` | `lunch,dinner` | 247 |
+| `Main Course` | `lunch,dinner` | 120 |
+| `One Pot Dish` | `lunch,dinner` | 12 |
+| `Brunch` | `breakfast,lunch` | 2 |
+
+The exact proposal-only scope is 775 dishes: 773 possible lunch+dinner dishes and two possible
+breakfast+lunch dishes. Another 22 dishes whose course field contains a diet value and one dish
+with conflicting direct evidence remain deferred. The policy
+`contextual-import-course-slot-set-v1` is pinned to SHA-256
+`5afca8a6da05a6070abc6678d0a4f73924cafad62835e9152916efe6e7596154` and a deterministic
+2,003-row checked-in source manifest. The `Dessert` mapping is explicitly a candidate Product
+decision, not accepted food truth.
+
+Use `Generate contextual meal-slot set proposals` only from `main` in the protected production
+environment:
+
+1. `install_only` requires confirmation `install-contextual-meal-slot-proposals`. It installs
+   migration 118 and validation 970 but creates no proposal or dish fact.
+2. `generate` requires confirmation `generate-contextual-meal-slot-proposals-v1`. It verifies the
+   production project, exact policy hash, 797 contextual-review denominator, source checksum,
+   2,003-row manifest and 775-dish category/slot-set distribution. It may create only pending,
+   service-only proposals plus immutable evidence links. It cannot update `public.dishes`, publish
+   a catalogue, deploy a service or change Aux mode.
+3. Rollback 118 disables further generation while retaining every proposal and evidence row.
+
+Local evidence covers 45 focused tests, SQL/YAML parsing, the broader 318-pass recommendation gate
+(one expected skip), and a disposable PostgreSQL proof. The proof generated all 775 pending
+proposals, inserted zero duplicates on retry, retained proposal/evidence history after disabling
+the generator and changed zero dish rows. Production installation and generation have not yet run.
+
 ### Phase A stop conditions
 
 Stop and roll back serving if any service is unhealthy, any version/count differs, a safety gate
