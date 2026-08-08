@@ -5,8 +5,8 @@
  * Flow (RE-DOC-10 §9): authenticate (middleware) → verify ownership of the target household
  * (DOC-P3-06 §05, same boundary as consent/handler.ts) → fetch household+context → compose +
  * validate the ghar-re-v1 request → signed call to the RE (timeout/retry) → pass the response
- * through as-is (RE-DOC-11 §6) → log the outcome. On any RE failure, return a fallback plate as a
- * valid 200.
+ * through as-is (RE-DOC-11 §6) → log the outcome. On any RE failure, return a retryable error
+ * without inventing a household-safe fallback plate.
  *
  * No recommendation math here. Deps are injectable so the handler is unit-testable without a live
  * RE (default deps use the real client/loader/event-writer).
