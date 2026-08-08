@@ -10,7 +10,8 @@ import {
 } from "../_shared/middleware/index.ts";
 import { researchDish } from "../dish-ontology/research.ts";
 import { promoteExternalEvidence, storeResearchRecordsForSubject } from "../dish-ontology/store.ts";
-import { ClosedVocabulary, generateGroqDishEnrichment } from "../dish-ontology/ai.ts";
+import type { ClosedVocabulary } from "../dish-ontology/ai.ts";
+import { generateGroqDishEnrichment } from "../dish-ontology/ai.ts";
 
 const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
   async (_req, ctx) => {
