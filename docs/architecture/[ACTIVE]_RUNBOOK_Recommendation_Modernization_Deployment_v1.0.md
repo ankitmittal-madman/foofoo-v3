@@ -131,6 +131,9 @@ No shadow or active transition was requested or executed.
 | Governed direct-slot proposals | Run `31269668506` | Migration 109 live; exactly 1,802 pending proposals and 7,222 evidence links created (667 lunch, 566 snacks, 294 dinner, 275 breakfast); zero automatic acceptance, publication or serving change; Aux remains off |
 | Bounded direct-slot review pack | Run `31270121136` | Migration 110 live; all 1,802 proposals fresh/pending, 7,222 evidence links reconciled (4–8 each), deterministic 10-name-per-slot sample produced with no identifiers/raw source/user data; no proposal decision or serving change |
 | Direct-slot proposal provenance | Run `31270627753` | Migration 111 live; all 7,222 links are apply-mode lineage, but every one of the 1,802 proposals reduces to one logical source row from one source file/version repeated across 4–8 runs; repetition is not independent evidence, so every proposal remains pending and no confidence, publication or serving state changed |
+| Direct-slot source integrity | Run `31271426471` | Migration 112 live; all 7,222 links identify the exact checked-in source and apply mode, but 7,204 links point to stale `running` imports and only 18 to completed imports; 1,801 proposals therefore fail the run-completion health gate and no decision or serving state changed |
+| Dish-import lifecycle correction | Commit `6fa17e0` | Future imports record their actor and close from `running` to exactly one terminal status on success, failure or interruption; historical run statuses were deliberately not rewritten |
+| Direct-slot row-manifest integrity | Run `31272114382` | Migration 114 live; a 4,806-row direct-course manifest independently matched every one of the 7,222 proposal links by source row, fingerprint, checked-in file identity and proposed slot, so all 1,802 proposals may enter mapping-policy review; this is evidence verification, not approval or application |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
@@ -153,10 +156,18 @@ generation only after the quality report passes.
 
 The 7,222 direct-slot evidence links must not be read as 7,222 independent confirmations. The
 provenance report proves that all 1,802 pending proposals have one distinct logical source row and
-one source file/version; each was repeated through four to eight apply-mode import runs. Run mode
-alone does not prove that those runs completed successfully, and repeated ingestion must not raise
-confidence. Verify final run status and exact checked-in source identity, then review the source
-mapping policy as one governed cohort before any per-dish slot fact is accepted or applied.
+one source file/version; each was repeated through four to eight apply-mode import runs. The source
+integrity report then proved the exact checked-in file identity while exposing a separate import
+health defect: 7,204 links reference historical runs left in `running`, while only 18 reference
+completed runs. The ingestion lifecycle now closes future runs safely, but historical status is not
+rewritten or treated as proof.
+
+The independent row-manifest report recovered the per-row integrity question without rewriting
+history: all 7,222 links match the checked-in source row, row fingerprint and exact proposed slot,
+covering all 1,802 proposals. This permits the cohort to enter explicit source-to-slot mapping-policy
+review. It does not accept a proposal, mutate `public.dishes`, republish the catalogue or change
+serving. Product must still approve the mapping policy—particularly `Appetizer` to `snacks`—before
+any reversible application workflow is allowed to run.
 
 ### Phase A stop conditions
 
