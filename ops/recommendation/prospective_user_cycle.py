@@ -56,6 +56,7 @@ def post_json(
     payload: Mapping[str, Any],
     headers: Mapping[str, str],
     *,
+    require_no_store: bool = False,
     opener: OpenUrl = urlopen,
 ) -> dict[str, Any]:
     request = Request(
@@ -66,6 +67,8 @@ def post_json(
     )
     try:
         with opener(request, timeout=45) as response:
+            if require_no_store:
+                assert_no_store_policy(response.headers)
             body = json.loads(response.read().decode())
     except HTTPError as error:
         provider_code = safe_http_error_code(error)
@@ -74,6 +77,21 @@ def post_json(
     if not isinstance(body, dict):
         raise RuntimeError("Endpoint returned a non-object JSON response")
     return body
+
+
+def assert_no_store_policy(headers: Mapping[str, str]) -> None:
+    """Fail closed unless a personalized response is explicitly non-storable end to end."""
+    cache_control = {
+        directive.strip().lower()
+        for directive in headers.get("Cache-Control", "").split(",")
+        if directive.strip()
+    }
+    if not {"no-store", "private"}.issubset(cache_control):
+        raise RuntimeError("Personalized response is missing the mandatory no-store policy")
+    if headers.get("Pragma", "").strip().lower() != "no-cache":
+        raise RuntimeError("Personalized response is missing the legacy no-cache policy")
+    if headers.get("Expires", "").strip() != "0":
+        raise RuntimeError("Personalized response is missing the immediate-expiry policy")
 
 
 def authenticate(
@@ -155,6 +173,7 @@ def run_refresh_cycle(
                     "request_id": str(uuid4()),
                 },
                 headers,
+                require_no_store=True,
                 opener=opener,
             )
             try:
@@ -179,7 +198,11 @@ def run_refresh_cycle(
         for index, left in enumerate(SLOTS)
         for right in SLOTS[index + 1 :]
     }
-    return {"slots": report, "refreshed_cross_slot_overlap": cross_slot}
+    return {
+        "response_cache_policy_verified": True,
+        "slots": report,
+        "refreshed_cross_slot_overlap": cross_slot,
+    }
 
 
 def write_report(path: Path, report: Mapping[str, Any]) -> None:
