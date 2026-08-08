@@ -1,0 +1,104 @@
+name: Audit preference attribution recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type audit-preference-attribution-recovery
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-preference-attribution-recovery
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-preference-attribution-recovery'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-preference-attribution-recovery-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify production database identity
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+
+      - name: Classify recovery-report state
+        id: state
+        run: |
+          report="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('ml.preference_attribution_recovery_report()') IS NOT NULL")"
+          if [ "$report" = "f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$report" = "t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe preference attribution recovery schema state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install recovery report
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/113_measure_preference_attribution_recovery.sql \
+            -f database/validation/965_measure_preference_attribution_recovery_validation.sql
+
+      - name: Revalidate existing recovery report read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/965_measure_preference_attribution_recovery_validation.sql
+
+      - name: Produce aggregate recovery audit
+        run: |
+          report="$RUNNER_TEMP/recommendation-preference-attribution-recovery.json"
+          raw="$report.raw"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 --single-transaction \
+            > "$raw" <<'SQL'
+          SET TRANSACTION READ ONLY;
+          SELECT ml.preference_attribution_recovery_report();
+          SQL
+          tail -n 1 "$raw" > "$report"
+          jq --arg commit "$GITHUB_SHA" --arg run_id "$GITHUB_RUN_ID" '. + {
+            commit_sha: $commit,
+            workflow_run_id: $run_id
+          }' "$report" > "$report.checked"
+          mv "$report.checked" "$report"
+          jq --exit-status '
+            .schema_version == "preference-attribution-recovery-v1"
+            and .labeled_event_count == ([.route_counts[]] | add // 0)
+            and .labeled_event_count == (
+              .already_exact_event_count + .recoverable_event_count + .unrecoverable_event_count
+            )
+            and .policy.identity_exposed == false
+            and .policy.event_identity_exposed == false
+            and .policy.raw_feedback_exposed == false
+            and .policy.point_in_time_features_required == true
+            and .policy.unique_served_item_required == true
+            and .policy.automatic_recovery_allowed == false
+            and .policy.feedback_changed == false
+            and .policy.outcome_changed == false
+            and .policy.training_changed == false
+            and .policy.serving_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-preference-attribution-recovery
+          path: ${{ runner.temp }}/recommendation-preference-attribution-recovery.json
+          retention-days: 90
+          if-no-files-found: error

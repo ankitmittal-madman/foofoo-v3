@@ -1,10 +1,22 @@
 from datetime import UTC, datetime
 from decimal import Decimal
+from pathlib import Path
 from uuid import UUID
 
 import pytest
 
 from ops.recommendation import user_audit
+
+RECOVERY_MIGRATION = Path("database/migrations/113_measure_preference_attribution_recovery.sql")
+RECOVERY_VALIDATION = Path(
+    "database/validation/965_measure_preference_attribution_recovery_validation.sql"
+)
+RECOVERY_ROLLBACK = Path(
+    "database/rollback/113_measure_preference_attribution_recovery_rollback.sql"
+)
+RECOVERY_WORKFLOW = Path(
+    ".github/workflows/recommendation-preference-attribution-recovery-audit.yml"
+)
 
 PROFILE_ID = UUID("621a406a-1778-4951-b1a2-8e05c09449c8")
 
@@ -95,3 +107,47 @@ def test_audit_writer_uses_private_permissions(tmp_path):
     user_audit.write_audit(output, {"profile": {"home_state": "MP"}})
     assert output.stat().st_mode & 0o777 == 0o600
     assert '"home_state": "MP"' in output.read_text()
+
+
+def test_preference_recovery_report_requires_exact_point_in_time_evidence():
+    text = RECOVERY_MIGRATION.read_text()
+
+    assert "preference_attribution_recovery_report" in text
+    assert "SECURITY DEFINER" in text
+    assert "jsonb_typeof(fs.values->'household') = 'object'" in text
+    assert "fs.values->'household' <> '{}'::jsonb" in text
+    assert "count(*)::integer AS match_count" in text
+    assert "WHEN match_count > 1 THEN 'ambiguous_served_item_match'" in text
+    assert "unique_served_item_required', true" in text
+    assert "automatic_recovery_allowed', false" in text
+    for mutation in ("INSERT INTO", "UPDATE public", "DELETE FROM"):
+        assert mutation not in text
+
+
+def test_preference_recovery_report_is_private_reconciled_and_reversible():
+    migration = RECOVERY_MIGRATION.read_text()
+    validation = RECOVERY_VALIDATION.read_text()
+    rollback = RECOVERY_ROLLBACK.read_text()
+
+    assert "FROM PUBLIC, anon, authenticated" in migration
+    assert "TO service_role" in migration
+    assert "routes do not reconcile" in validation
+    assert "outcome counts do not reconcile" in validation
+    assert "DROP FUNCTION IF EXISTS ml.preference_attribution_recovery_report()" in rollback
+    assert "feedback_events" not in rollback
+    assert "outcome_events" not in rollback
+
+
+def test_preference_recovery_workflow_is_protected_and_read_only_after_install():
+    text = RECOVERY_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "database_identifies_project" in text
+    assert "pg_advisory_xact_lock" in text
+    assert "--single-transaction" in text
+    assert "SET TRANSACTION READ ONLY" in text
+    assert "recommendation-preference-attribution-recovery.json" in text
+    assert "automatic_recovery_allowed == false" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
