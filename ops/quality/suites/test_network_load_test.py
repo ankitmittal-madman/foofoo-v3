@@ -5,7 +5,13 @@ import hmac
 
 import pytest
 
-from ops.quality.runner.network_load_test import assess, run, signed_headers, summarize
+from ops.quality.runner.network_load_test import (
+    assess,
+    resolve_secret,
+    run,
+    signed_headers,
+    summarize,
+)
 
 
 def report(*, p95: float = 100, errors: float = 0, throughput: float = 50) -> dict:
@@ -25,6 +31,14 @@ def test_signer_uses_service_specific_header_and_exact_raw_body():
 
     assert headers["X-Aux-Signature"] == f"t=100,v1={expected}"
     assert "X-Ghar-Signature" not in headers
+
+
+def test_signing_secret_can_be_resolved_without_a_command_line_value():
+    assert resolve_secret(None, "AUX_SECRET", {"AUX_SECRET": "protected"}) == "protected"
+    with pytest.raises(ValueError, match="exactly one"):
+        resolve_secret("explicit", "AUX_SECRET", {"AUX_SECRET": "protected"})
+    with pytest.raises(ValueError, match="empty"):
+        resolve_secret(None, "AUX_SECRET", {})
 
 
 def test_summary_counts_transport_failures_and_http_errors():
@@ -54,9 +68,7 @@ def test_aux_load_report_is_bound_to_publication_returned_by_service():
 
         def read(self):
             return (
-                '{"model_metadata":{"catalogue_publication":{"version":"'
-                + version
-                + '"}}}'
+                '{"model_metadata":{"catalogue_publication":{"version":"' + version + '"}}}'
             ).encode()
 
     result = run(

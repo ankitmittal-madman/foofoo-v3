@@ -1,0 +1,38 @@
+{
+  "user_id": "load-test-user-v1",
+  "household_id": "load-test-household-v1",
+  "meal_slot": "dinner",
+  "region": "Maharashtra",
+  "preferences": ["home-style", "vegetables", "paneer"],
+  "restrictions": ["veg"],
+  "allergies": [],
+  "pantry_items": ["onion", "tomato", "atta", "rice", "toor dal"],
+  "leftover_items": [],
+  "recent_meals": ["Poha", "Bhindi Roti", "Dal Rice"],
+  "governed_context_signals": [],
+  "preference_by_class": {
+    "LD_DRY_VEG_ROTI": 0.6,
+    "LD_DAL_RICE": 0.4
+  },
+  "preference_by_direct_class": {
+    "LD_DRY_VEG_ROTI": 0.7
+  },
+  "preference_by_projected_class": {
+    "LD_DAL_RICE": 0.3
+  },
+  "plan_date": "2026-08-10",
+  "day_type": "weekday",
+  "available_cook_minutes": 45,
+  "candidate_limit": 100,
+  "existing_result": {
+    "items": [],
+    "metrics": {
+      "quality_score": 0,
+      "confidence": 0,
+      "diversity_score": 0,
+      "safety_score": 1,
+      "alignment_score": 0
+    }
+  },
+  "candidates": []
+}

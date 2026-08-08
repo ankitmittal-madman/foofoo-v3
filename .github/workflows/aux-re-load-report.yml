@@ -1,0 +1,106 @@
+name: Aux RE deployed load report
+
+on:
+  workflow_dispatch:
+    inputs:
+      publication_version:
+        description: Full sha256 recommendation catalogue publication expected from Aux
+        required: true
+        type: string
+      confirm:
+        description: Type run-aux-load-gate
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-aux-re-load-report
+  cancel-in-progress: false
+
+jobs:
+  load:
+    if: inputs.confirm == 'run-aux-load-gate'
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      AUX_RE_SERVICE_URL: ${{ vars.AUX_RE_SERVICE_URL }}
+      AUX_RE_SERVICE_SECRET: ${{ secrets.AUX_RE_SERVICE_SECRET }}
+      AUX_LOAD_REQUESTS: ${{ vars.AUX_LOAD_REQUESTS }}
+      AUX_LOAD_CONCURRENCY: ${{ vars.AUX_LOAD_CONCURRENCY }}
+      AUX_LOAD_TIMEOUT_SECONDS: ${{ vars.AUX_LOAD_TIMEOUT_SECONDS }}
+      AUX_LOAD_MAX_P95_MS: ${{ vars.AUX_LOAD_MAX_P95_MS }}
+      AUX_LOAD_MAX_ERROR_RATE: ${{ vars.AUX_LOAD_MAX_ERROR_RATE }}
+      AUX_LOAD_MIN_THROUGHPUT_RPS: ${{ vars.AUX_LOAD_MIN_THROUGHPUT_RPS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify deployed publication and HTTPS endpoint
+        env:
+          PUBLICATION_VERSION: ${{ inputs.publication_version }}
+        run: |
+          case "$AUX_RE_SERVICE_URL" in
+            https://*) ;;
+            *) echo "AUX_RE_SERVICE_URL must use HTTPS" >&2; exit 1 ;;
+          esac
+          test -n "$AUX_RE_SERVICE_SECRET"
+          curl --fail --silent --show-error \
+            "${AUX_RE_SERVICE_URL%/}/v1/meta" --output "$RUNNER_TEMP/aux-meta.json"
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .enabled == true
+            and .catalogue_publication.version == $version
+          ' "$RUNNER_TEMP/aux-meta.json" >/dev/null
+
+      - name: Run signed aggregate load gate
+        id: probe
+        run: |
+          set +e
+          python ops/quality/runner/network_load_test.py \
+            --service aux \
+            --url "${AUX_RE_SERVICE_URL%/}/v1/recommendations" \
+            --secret-env AUX_RE_SERVICE_SECRET \
+            --payload ops/quality/fixtures/aux_load_request.json \
+            --requests "$AUX_LOAD_REQUESTS" \
+            --concurrency "$AUX_LOAD_CONCURRENCY" \
+            --timeout-seconds "$AUX_LOAD_TIMEOUT_SECONDS" \
+            --max-p95-ms "$AUX_LOAD_MAX_P95_MS" \
+            --max-error-rate "$AUX_LOAD_MAX_ERROR_RATE" \
+            --min-throughput-rps "$AUX_LOAD_MIN_THROUGHPUT_RPS" \
+            > "$RUNNER_TEMP/load.json"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: Validate passing aggregate report
+        if: steps.probe.outputs.exit_code == '0'
+        env:
+          PUBLICATION_VERSION: ${{ inputs.publication_version }}
+        run: |
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .schema_version == "recommendation-load-report-v2"
+            and .service == "aux"
+            and .publication_versions == [$version]
+            and .evaluation.mode == "gated"
+            and .evaluation.passed == true
+          ' "$RUNNER_TEMP/load.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: steps.probe.outputs.exit_code == '0'
+        with:
+          name: aux-load-report
+          path: ${{ runner.temp }}/load.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: steps.probe.outputs.exit_code != '0'
+        with:
+          name: aux-load-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/load.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Fail a breached or unavailable load gate
+        if: steps.probe.outputs.exit_code != '0'
+        run: exit 1

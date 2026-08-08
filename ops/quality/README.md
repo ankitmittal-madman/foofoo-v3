@@ -98,6 +98,20 @@ python3 ops/quality/runner/network_load_test.py \
   --max-error-rate 0.005 --min-throughput-rps 40
 ```
 
+For a governed deployed-Aux result, use the manual `Aux RE deployed load report` workflow. It uses
+the fixed, non-user `ops/quality/fixtures/aux_load_request.json`, requires an HTTPS endpoint whose
+`/v1/meta` returns the requested full publication hash, and reads the signing secret by environment
+variable name rather than putting it in the command line. Configure these protected production
+environment values before approval:
+
+- `AUX_RE_SERVICE_URL` and secret `AUX_RE_SERVICE_SECRET`
+- `AUX_LOAD_REQUESTS`, `AUX_LOAD_CONCURRENCY`, `AUX_LOAD_TIMEOUT_SECONDS`
+- `AUX_LOAD_MAX_P95_MS`, `AUX_LOAD_MAX_ERROR_RATE`, `AUX_LOAD_MIN_THROUGHPUT_RPS`
+
+Only a report with `service=aux`, the exact publication, `evaluation.mode=gated`, and
+`evaluation.passed=true` is uploaded as `aux-load-report/load.json`. A failed or unavailable run
+uses a distinct diagnostics artifact and the workflow concludes failure, so S118 cannot consume it.
+
 The JSON report contains only endpoint origin, status counts and aggregate timings. It never emits
 the secret or request payload. A gated run exits non-zero when any supplied target fails; an
 ungated run records `passed: null` so a measurement cannot be mistaken for launch approval.

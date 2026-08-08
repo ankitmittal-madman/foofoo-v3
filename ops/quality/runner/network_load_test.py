@@ -11,18 +11,31 @@ import concurrent.futures
 import hashlib
 import hmac
 import json
+import os
 import statistics
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any
 
 REPORT_SCHEMA = "recommendation-load-report-v2"
 SIGNATURE_HEADERS = {"ghar": "X-Ghar-Signature", "aux": "X-Aux-Signature"}
+
+
+def resolve_secret(
+    explicit: str | None, environment_name: str | None, environ: Mapping[str, str]
+) -> str:
+    """Resolve one signing secret without requiring it in the command-line process list."""
+    if bool(explicit) == bool(environment_name):
+        raise ValueError("exactly one of --secret or --secret-env is required")
+    secret = explicit or environ.get(str(environment_name), "")
+    if not secret:
+        raise ValueError("the selected signing secret is empty")
+    return secret
 
 
 def percentile(values: list[float], pct: float) -> float:
@@ -37,9 +50,7 @@ def signed_headers(service: str, secret: str, raw: bytes, timestamp: int) -> dic
         header = SIGNATURE_HEADERS[service]
     except KeyError as exc:
         raise ValueError("service must be ghar or aux") from exc
-    digest = hmac.new(
-        secret.encode(), f"{timestamp}.".encode() + raw, hashlib.sha256
-    ).hexdigest()
+    digest = hmac.new(secret.encode(), f"{timestamp}.".encode() + raw, hashlib.sha256).hexdigest()
     return {
         "content-type": "application/json",
         header: f"t={timestamp},v1={digest}",
@@ -185,7 +196,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://127.0.0.1:8000/v1/recommendations")
     parser.add_argument("--service", choices=sorted(SIGNATURE_HEADERS), default="ghar")
-    parser.add_argument("--secret", required=True)
+    secret_group = parser.add_mutually_exclusive_group(required=True)
+    secret_group.add_argument("--secret")
+    secret_group.add_argument("--secret-env")
     parser.add_argument("--payload", type=Path, required=True)
     parser.add_argument("--requests", type=int, default=500)
     parser.add_argument("--concurrency", type=int, default=20)
@@ -196,12 +209,13 @@ def main() -> int:
     parser.add_argument("--min-throughput-rps", type=float)
     parser.add_argument("--max-p95-regression-pct", type=float)
     args = parser.parse_args()
+    secret = resolve_secret(args.secret, args.secret_env, os.environ)
     payload = json.loads(args.payload.read_text(encoding="utf-8"))
     baseline = json.loads(args.baseline.read_text(encoding="utf-8")) if args.baseline else None
     report = assess(
         run(
             args.url,
-            args.secret,
+            secret,
             payload,
             args.requests,
             args.concurrency,
