@@ -1,0 +1,115 @@
+name: Aux RE rollout control
+
+on:
+  workflow_dispatch:
+    inputs:
+      evidence_run_id:
+        description: Same-repository workflow run containing aux-rollout-evidence artifact
+        required: true
+        type: string
+      enforce_kill_switch:
+        description: Permit this run to set AUX_RE_MODE=off when the evaluator exits 2
+        required: true
+        default: true
+        type: boolean
+      confirm:
+        description: Type evaluate-aux-rollout
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: production-aux-re-rollout-control
+  cancel-in-progress: false
+
+jobs:
+  decide:
+    if: inputs.confirm == 'evaluate-aux-rollout'
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate evidence run identity
+        env:
+          EVIDENCE_RUN_ID: ${{ inputs.evidence_run_id }}
+        run: |
+          case "$EVIDENCE_RUN_ID" in
+            *[!0-9]*|'') echo "evidence_run_id must be numeric" >&2; exit 1 ;;
+          esac
+          conclusion="$(gh run view "$EVIDENCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json conclusion --jq '.conclusion')"
+          test "$conclusion" = "success"
+
+      - name: Download privacy-minimized rollout evidence
+        env:
+          EVIDENCE_RUN_ID: ${{ inputs.evidence_run_id }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/aux-rollout-evidence"
+          gh run download "$EVIDENCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name aux-rollout-evidence --dir "$RUNNER_TEMP/aux-rollout-evidence"
+          test -f "$RUNNER_TEMP/aux-rollout-evidence/rollout-evidence.json"
+          test "$(find "$RUNNER_TEMP/aux-rollout-evidence" -type f | wc -l)" -eq 1
+
+      - name: Evaluate promotion and kill-switch gates
+        id: decision
+        run: |
+          set +e
+          python3 ops/recommendation/rollout_decision.py \
+            "$RUNNER_TEMP/aux-rollout-evidence/rollout-evidence.json" \
+            --output "$RUNNER_TEMP/rollout-decision.json"
+          code=$?
+          set -e
+          test -f "$RUNNER_TEMP/rollout-decision.json"
+          if [ "$code" -ne 0 ] && [ "$code" -ne 1 ] && [ "$code" -ne 2 ]; then
+            exit "$code"
+          fi
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          decision = json.loads(Path(os.environ["RUNNER_TEMP"]).joinpath("rollout-decision.json").read_text())
+          summary = os.environ["GITHUB_STEP_SUMMARY"]
+          with open(summary, "a", encoding="utf-8") as handle:
+              handle.write(f"## Aux rollout decision\n\n- Decision: `{decision['decision']}`\n")
+              handle.write(f"- Publication: `{decision['publication_version']}`\n")
+              handle.write(f"- Kill switch required: `{decision['kill_switch_required']}`\n")
+          PY
+
+      - uses: supabase/setup-cli@v1
+        if: steps.decision.outputs.exit_code == '2' && inputs.enforce_kill_switch
+        with:
+          version: latest
+
+      - name: Enforce fail-safe off mode
+        if: steps.decision.outputs.exit_code == '2' && inputs.enforce_kill_switch
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$PRODUCTION_PROJECT_REF"
+          supabase secrets set AUX_RE_MODE=off --project-ref "$PRODUCTION_PROJECT_REF"
+
+      - name: Refuse active promotion from automation
+        if: steps.decision.outputs.exit_code == '0'
+        run: |
+          echo "Evidence is eligible for controlled canary review; this workflow never sets AUX_RE_MODE=active."
+
+      - name: Require kill-switch enforcement when breached
+        if: steps.decision.outputs.exit_code == '2' && !inputs.enforce_kill_switch
+        run: |
+          echo "Kill switch was required but enforcement was not authorized for this run." >&2
+          exit 1
+
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.decision.outputs.exit_code != ''
+        with:
+          name: aux-rollout-decision-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/rollout-decision.json
+          retention-days: 90
+          if-no-files-found: error
