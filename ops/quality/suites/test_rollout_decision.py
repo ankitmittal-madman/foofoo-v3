@@ -30,6 +30,7 @@ def evidence(mode: str = "shadow") -> dict:
         },
         "load_report": {
             "service": "aux",
+            "publication_versions": [VERSION],
             "evaluation": {"mode": "gated", "passed": True},
         },
         "shadow_health": [
@@ -68,6 +69,12 @@ def test_all_ratified_gates_make_shadow_eligible_for_controlled_canary():
     [
         (lambda value: value["offline_report"].update(eligible_for_active_evaluation=False), "offline_quality"),
         (lambda value: value["load_report"]["evaluation"].update(passed=False), "gated_load"),
+        (
+            lambda value: value["load_report"].update(
+                publication_versions=["sha256:" + "b" * 64]
+            ),
+            "gated_load",
+        ),
         (lambda value: value["shadow_health"][0].update(retrieved_count=90), "retrieval_availability"),
         (lambda value: value["shadow_health"][0].update(comparable_event_count=80), "canonical_comparability"),
         (lambda value: value["shadow_health"][0].update(avg_served_candidate_coverage=0.7), "served_candidate_coverage"),

@@ -105,6 +105,7 @@ def evaluate(document: dict[str, Any]) -> dict[str, Any]:
     offline_ok = offline.get("eligible_for_active_evaluation") is True and offline_version_ok
     load_ok = (
         load.get("service") == "aux"
+        and load.get("publication_versions") == [expected_version]
         and isinstance(load.get("evaluation"), dict)
         and load["evaluation"].get("mode") == "gated"
         and load["evaluation"].get("passed") is True

@@ -104,6 +104,19 @@ ungated run records `passed: null` so a measurement cannot be mistaken for launc
 
 ## Aux promotion and kill-switch decision
 
+`ops/recommendation/rollout_evidence.py` composes the decision input from five independent JSON
+reports. It requires governed schemas, one publication hash, matching shadow/guardrail windows,
+measured (not assumed) production guardrails, ratified targets with an approval reference, and a
+gated load report whose successful Aux responses returned the same publication. The output embeds
+SHA-256 lineage for every source and is written atomically without overwriting prior evidence.
+
+```bash
+python3 ops/recommendation/rollout_evidence.py \
+  --current-mode shadow --offline /path/to/offline.json --load /path/to/load.json \
+  --health /path/to/shadow-health.json --guardrails /path/to/guardrails.json \
+  --targets /path/to/ratified-targets.json --output /path/to/rollout-evidence.json
+```
+
 `ops/recommendation/rollout_decision.py` consumes four privacy-minimized inputs: a passing governed
 offline report, a passing gated Aux load report, rows from `re_engine.aux_shadow_health`, and zero
 hard-guardrail counters. Its evidence document must also contain the full publication hash and all

@@ -5,7 +5,7 @@ import hmac
 
 import pytest
 
-from ops.quality.runner.network_load_test import assess, signed_headers, summarize
+from ops.quality.runner.network_load_test import assess, run, signed_headers, summarize
 
 
 def report(*, p95: float = 100, errors: float = 0, throughput: float = 50) -> dict:
@@ -28,12 +28,48 @@ def test_signer_uses_service_specific_header_and_exact_raw_body():
 
 
 def test_summary_counts_transport_failures_and_http_errors():
-    metrics = summarize([(10, 200), (20, 503), (30, 0), (40, 200)], 2, 1)
+    version = "sha256:" + "a" * 64
+    metrics = summarize(
+        [(10, 200, version), (20, 503, None), (30, 0, None), (40, 200, version)], 2, 1
+    )
 
     assert metrics["errors"] == 2
     assert metrics["error_rate"] == 0.5
     assert metrics["status_counts"] == {"0": 1, "200": 2, "503": 1}
+    assert metrics["publication_versions"] == [version]
     assert metrics["throughput_rps"] == 4
+
+
+def test_aux_load_report_is_bound_to_publication_returned_by_service():
+    version = "sha256:" + "a" * 64
+
+    class Response:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def read(self):
+            return (
+                '{"model_metadata":{"catalogue_publication":{"version":"'
+                + version
+                + '"}}}'
+            ).encode()
+
+    result = run(
+        "http://aux.local/v1/recommendations",
+        "secret",
+        {},
+        2,
+        1,
+        service="aux",
+        opener=lambda *_args, **_kwargs: Response(),
+    )
+
+    assert result["publication_versions"] == [version]
 
 
 def test_measurement_only_mode_never_invents_a_pass_threshold():

@@ -46,11 +46,14 @@ def signed_headers(service: str, secret: str, raw: bytes, timestamp: int) -> dic
     }
 
 
-def summarize(samples: list[tuple[float, int]], concurrency: int, elapsed_s: float) -> dict[str, Any]:
+def summarize(
+    samples: list[tuple[float, int, str | None]], concurrency: int, elapsed_s: float
+) -> dict[str, Any]:
     if not samples or concurrency <= 0 or elapsed_s <= 0:
         raise ValueError("samples, positive concurrency and elapsed time are required")
-    latencies = [latency for latency, _ in samples]
-    statuses = Counter(status for _, status in samples)
+    latencies = [latency for latency, _, _ in samples]
+    statuses = Counter(status for _, status, _ in samples)
+    versions = sorted({version for _, _, version in samples if version is not None})
     errors = sum(count for status, count in statuses.items() if status == 0 or status >= 400)
     return {
         "requests": len(samples),
@@ -58,6 +61,7 @@ def summarize(samples: list[tuple[float, int]], concurrency: int, elapsed_s: flo
         "errors": errors,
         "error_rate": round(errors / len(samples), 6),
         "status_counts": {str(key): statuses[key] for key in sorted(statuses)},
+        "publication_versions": versions,
         "throughput_rps": round(len(samples) / elapsed_s, 3),
         "p50_ms": round(percentile(latencies, 50), 2),
         "p95_ms": round(percentile(latencies, 95), 2),
@@ -82,7 +86,7 @@ def run(
         raise ValueError("requests, concurrency and timeout must be positive")
     raw = json.dumps(payload, separators=(",", ":")).encode()
 
-    def call(_: int) -> tuple[float, int]:
+    def call(_: int) -> tuple[float, int, str | None]:
         timestamp = int(time.time())
         request = urllib.request.Request(
             url,
@@ -91,15 +95,30 @@ def run(
             headers=signed_headers(service, secret, raw, timestamp),
         )
         started = time.perf_counter()
+        publication_version: str | None = None
         try:
             with opener(request, timeout=timeout_s) as response:
                 status = int(response.status)
-                response.read()
+                response_body = response.read()
+                try:
+                    parsed = json.loads(response_body)
+                    if service == "aux":
+                        publication_version = parsed["model_metadata"]["catalogue_publication"][
+                            "version"
+                        ]
+                    else:
+                        publication_version = parsed.get("catalogue_selection", {}).get(
+                            "publication_version"
+                        )
+                    if not isinstance(publication_version, str):
+                        publication_version = None
+                except (json.JSONDecodeError, KeyError, TypeError, AttributeError):
+                    publication_version = None
         except urllib.error.HTTPError as error:
             status = error.code
         except (urllib.error.URLError, TimeoutError):
             status = 0
-        return (time.perf_counter() - started) * 1000, status
+        return (time.perf_counter() - started) * 1000, status, publication_version
 
     started = time.perf_counter()
     with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
@@ -113,6 +132,7 @@ def run(
         "schema_version": REPORT_SCHEMA,
         "service": service,
         "url_origin": origin,
+        "publication_versions": metrics.pop("publication_versions"),
         "metrics": metrics,
     }
 
