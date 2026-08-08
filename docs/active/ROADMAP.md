@@ -25,7 +25,9 @@ Only future work is listed here. Evidence and acceptance detail are in `OPEN_ITE
 12. Expand and safety-review the bounded food graph.
 13. Finish WP-23 from its deployed-OFF foundation: authenticated test-household smoke; read-only
     independent evidence or human review for 255 provisional low-confidence class mappings,
-    governed enrichment/class mapping across the expanded inventory, and a quality-closed
-    immutable publication beyond the current 642 deployed rows;
+    deploy the governed primary/component readiness model and audit, review slot-aware component
+    proposals, then integrate accepted component compatibility into both engines and publication;
+    governed enrichment/class mapping across the expanded inventory, and a quality-closed immutable
+    publication beyond the current 642 deployed rows;
     ratified load gates; consented real-outcome evaluation; shadow observation; then a separately
     approved, household-stable canary. Do not enable Aux while these remain incomplete.

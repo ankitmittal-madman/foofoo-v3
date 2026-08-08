@@ -125,6 +125,7 @@ No shadow or active transition was requested or executed.
 | Aux model quality | Run `31256081581` | 86 tests, model gate, local Qdrant and signed packaged-service shadow flow passed; active promotion remained prohibited |
 | Catalogue quality audit | Run `31257431526` | 3,410 stored, 3,402 active, 646 presence-eligible and 547 strict-quality-ready; no serving change |
 | Meal-class provenance audit | Run `31257875325` | 255 low-confidence mappings, all provisional internal research; zero curated, human-reviewed or accepted evidence; no serving change |
+| Primary/component readiness | Not run | Migration 106 and the protected aggregate audit are repository-ready; publication remains unchanged until production validation and accepted component evidence exist |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a

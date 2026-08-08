@@ -34,6 +34,18 @@ REMEDIATION_ROLLBACK = Path(
 REMEDIATION_WORKFLOW = Path(
     ".github/workflows/recommendation-meal-class-remediation-audit.yml"
 )
+COMPONENT_MIGRATION = Path(
+    "database/migrations/106_govern_dish_component_compatibility.sql"
+)
+COMPONENT_VALIDATION = Path(
+    "database/validation/958_govern_dish_component_compatibility_validation.sql"
+)
+COMPONENT_ROLLBACK = Path(
+    "database/rollback/106_govern_dish_component_compatibility_rollback.sql"
+)
+COMPONENT_WORKFLOW = Path(
+    ".github/workflows/recommendation-component-compatibility-audit.yml"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -237,5 +249,85 @@ def test_meal_class_remediation_workflow_is_protected_and_keeps_aux_untouched():
     assert "--single-transaction" in text
     assert "SET TRANSACTION READ ONLY" in text
     assert "recommendation-meal-class-remediation-report.json" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
+
+
+def test_component_compatibility_is_slot_aware_reviewed_and_separate_from_class_identity():
+    """Supporting dishes need governed grammar compatibility, not invented primary classes."""
+    text = COMPONENT_MIGRATION.read_text()
+
+    assert "food.dish_component_compatibility" in text
+    assert "ops.dish_component_compatibility_proposals" in text
+    assert "canonical_meal_slot" in text
+    assert "WHEN 'snack' THEN 'snacks'" in text
+    assert "grammar_role = 'side'" in text
+    assert "component_role IN ('staple','side','accompaniment')" in text
+    assert "review_status IN ('accepted','superseded')" in text
+    assert "reviewed_by text NOT NULL" in text
+    assert "automatic_proposal_acceptance_allowed', false" in text
+    assert "publication_gate_changed', false" in text
+    assert "UPDATE public.dishes" not in text
+    assert "INSERT INTO public.dish_meal_class_mappings" not in text
+
+
+def test_component_grammar_guard_fails_closed_and_tables_are_service_only():
+    """A component assertion must match a grammar slot/role and stay off client APIs."""
+    migration = COMPONENT_MIGRATION.read_text()
+    validation = COMPONENT_VALIDATION.read_text()
+
+    assert "validate_dish_component_grammar" in migration
+    assert "NEW.meal_slot = ANY(v_meal_slots)" in migration
+    assert "v_required_roles ? NEW.grammar_role" in migration
+    assert "component compatibility requires a published grammar" in migration
+    assert "accepted component compatibility may only be superseded" in migration
+    assert "component proposal evidence is immutable" in migration
+    assert "invalid component proposal lifecycle transition" in migration
+    assert "applied proposal must reference its matching accepted compatibility fact" in migration
+    assert "ENABLE ROW LEVEL SECURITY" in migration
+    assert "FROM PUBLIC, anon, authenticated" in migration
+    for invariant in (
+        "dish component compatibility tables must enforce RLS",
+        "dish component compatibility data must remain service-only",
+        "accepted component compatibility violates grammar or review provenance",
+        "component proposal lifecycle provenance is invalid",
+        "applied component proposal does not match its accepted fact",
+        "catalogue serving routes do not reconcile",
+        "catalogue serving hero roles do not reconcile",
+    ):
+        assert invariant in validation
+
+
+def test_component_compatibility_has_exact_rollback_boundary():
+    """The additive component foundation must be removable without touching catalogue facts."""
+    rollback = COMPONENT_ROLLBACK.read_text()
+
+    for statement in (
+        "DROP FUNCTION IF EXISTS re_engine.catalogue_serving_role_readiness_report()",
+        "DROP TABLE IF EXISTS ops.dish_component_compatibility_proposals",
+        "DROP TABLE IF EXISTS food.dish_component_compatibility",
+        "DROP FUNCTION IF EXISTS ops.validate_component_proposal_application()",
+        "DROP FUNCTION IF EXISTS ops.protect_component_proposal_lifecycle()",
+        "DROP FUNCTION IF EXISTS food.protect_dish_component_compatibility()",
+        "DROP FUNCTION IF EXISTS food.validate_dish_component_grammar()",
+        "DROP FUNCTION IF EXISTS re_engine.canonical_meal_slot(text)",
+    ):
+        assert statement in rollback
+    assert "DROP TABLE IF EXISTS public.dishes" not in rollback
+    assert "DROP TABLE IF EXISTS public.dish_meal_class_mappings" not in rollback
+
+
+def test_component_audit_workflow_is_protected_atomic_and_keeps_aux_off():
+    """Production measurement installs atomically and cannot deploy or route either RE service."""
+    text = COMPONENT_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "database_identifies_project" in text
+    assert "unsafe partial component compatibility state" in text
+    assert "pg_advisory_xact_lock" in text
+    assert "--single-transaction" in text
+    assert "SET TRANSACTION READ ONLY" in text
+    assert "recommendation-component-compatibility-report.json" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text

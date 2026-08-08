@@ -51,11 +51,15 @@ findings are retained under `docs/archive/`.
 
 - Complete WP-23 after its deployed-OFF Phase A foundation: run authenticated cold-start and
   experienced-user smoke on an explicitly selected test household; remediate the 255
-  low-confidence provisional meal-class mappings without relabelling their confidence; enrich and
-  map the remaining expanded inventory; publish one quality-closed immutable generation; ratify and
-  run load gates; then collect consented real-outcome and shadow evidence before separately
-  approving any canary. Aux remains off until those gates pass. Protected runs `31257431526` and
-  `31257875325` own the current aggregate counts and provenance split.
+  low-confidence provisional meal-class mappings without relabelling their confidence; deploy and
+  run the protected primary/component readiness audit; review slot-aware component proposals for
+  staples, sides and accompaniments; enrich and map the remaining expanded inventory; update Ghar,
+  Aux and publication eligibility only after accepted compatibility evidence and runtime tests
+  prove parity; publish one quality-closed immutable generation; ratify and run load gates; then
+  collect consented real-outcome and shadow evidence before separately approving any canary. Aux
+  remains off until those gates pass. Protected runs `31257431526` and `31257875325` own the
+  current aggregate counts and provenance split; migration 106 is repository-ready but not yet
+  installed in production.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
