@@ -55,6 +55,8 @@ export interface RecommendationEventInput {
   decisionTrace?: unknown;
   /** Count-only serving source/version returned by Ghar after independent candidate hydration. */
   catalogueSelection?: unknown;
+  /** Count-only Aux observation; never stores candidate IDs, dishes or user history. */
+  auxShadowObservation?: unknown;
   /** Authority-labelled request context used for this serving decision. */
   governedContextSignals?: GovernedContextSignal[];
 }
@@ -105,6 +107,7 @@ export async function recordRecommendationEvent(
         config_version: ev.configVersion ?? null,
         decision_trace: ev.decisionTrace ?? null,
         catalogue_selection: ev.catalogueSelection ?? null,
+        aux_shadow_observation: ev.auxShadowObservation ?? null,
         data_source: "real",
       }).select("id").single(),
       "recommendations.events.record",

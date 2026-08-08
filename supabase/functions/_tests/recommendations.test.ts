@@ -379,9 +379,13 @@ Deno.test("POST /v1/recommendations shadow mode observes Aux without changing Gh
     AUX_RE_SERVICE_SECRET: "test-secret",
   }, async () => {
     let gharPayload: Record<string, unknown> | undefined;
+    let recordedEvent: Record<string, unknown> | undefined;
     const deps: RecommendationDeps = {
       loadHousehold: loadTestHousehold,
-      recordEvent: () => Promise.resolve(),
+      recordEvent: (_ctx, event) => {
+        recordedEvent = event as unknown as Record<string, unknown>;
+        return Promise.resolve();
+      },
       recordContext: () => Promise.resolve(),
       callAux: () =>
         Promise.resolve({
@@ -400,6 +404,16 @@ Deno.test("POST /v1/recommendations shadow mode observes Aux without changing Gh
 
     assertEquals(response.status, 200);
     assertEquals("candidate_dish_ids" in (gharPayload ?? {}), false);
+    assertEquals(recordedEvent?.auxShadowObservation, {
+      mode: "shadow",
+      outcome: "retrieved",
+      publication_version: `sha256:${"a".repeat(64)}`,
+      candidate_count: 1,
+      aux_latency_ms: 12,
+      comparable_served_count: 0,
+      served_in_candidates_count: 0,
+      served_candidate_coverage: null,
+    });
   });
 });
 

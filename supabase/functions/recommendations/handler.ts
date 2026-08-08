@@ -45,7 +45,11 @@ import { buildFallbackResponse } from "./fallback.ts";
 import { recordRecommendationEvent } from "./events.ts";
 import { maybeLogSummary, recordRequest } from "./metrics.ts";
 import { deriveGovernedContextSignals, mergeGovernedContextSignals } from "./governed-context.ts";
-import { buildAuxiliaryRequest, callAuxiliaryEngine } from "./aux-client.ts";
+import {
+  buildAuxiliaryRequest,
+  buildAuxShadowObservation,
+  callAuxiliaryEngine,
+} from "./aux-client.ts";
 
 const SERVICE_NAME = "recommendations";
 
@@ -311,6 +315,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
             : undefined,
           decisionTrace: result.body.decision_trace,
           catalogueSelection: result.body.catalogue_selection,
+          auxShadowObservation: buildAuxShadowObservation(aux, ctx.config.auxReMode, result.body),
           governedContextSignals: derivedGovernedContextSignals,
         });
         recordRequest(outcome);

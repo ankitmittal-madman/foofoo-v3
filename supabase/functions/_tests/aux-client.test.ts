@@ -1,7 +1,11 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
 import type { AppConfig } from "../_shared/config/config.ts";
 import type { Logger } from "../_shared/logging/logger.ts";
-import { buildAuxiliaryRequest, callAuxiliaryEngine } from "../recommendations/aux-client.ts";
+import {
+  buildAuxiliaryRequest,
+  buildAuxShadowObservation,
+  callAuxiliaryEngine,
+} from "../recommendations/aux-client.ts";
 
 const DISH_ID = "11111111-1111-4111-8111-111111111111";
 const VERSION = `sha256:${"a".repeat(64)}`;
@@ -175,4 +179,52 @@ Deno.test("Aux network failure makes one attempt and fails open", async () => {
   if (result.ok) throw new Error("expected network failure");
   assertEquals(result.reason, "network");
   assertEquals(calls, 1);
+});
+
+Deno.test("Aux shadow observation stores only aggregate canonical overlap", () => {
+  const observation = buildAuxShadowObservation(
+    { ok: true, candidateIds: [DISH_ID], publicationVersion: VERSION, latencyMs: 17 },
+    "shadow",
+    {
+      episodes: [{
+        components: [
+          { dish_id: DISH_ID, name: "private dish text is ignored" },
+          { dish_id: "legacy-name-key" },
+        ],
+      }],
+    },
+  );
+
+  assertEquals(observation, {
+    mode: "shadow",
+    outcome: "retrieved",
+    publication_version: VERSION,
+    candidate_count: 1,
+    aux_latency_ms: 17,
+    comparable_served_count: 1,
+    served_in_candidates_count: 1,
+    served_candidate_coverage: 1,
+  });
+  assertEquals(JSON.stringify(observation).includes(DISH_ID), false);
+  assertEquals(JSON.stringify(observation).includes("private dish text"), false);
+});
+
+Deno.test("Aux failure observation records reason without candidate or publication data", () => {
+  assertEquals(
+    buildAuxShadowObservation(
+      { ok: false, reason: "timeout", latencyMs: 801 },
+      "shadow",
+      { plates: [{ hero_dish_ids: [DISH_ID] }] },
+    ),
+    {
+      mode: "shadow",
+      outcome: "unavailable",
+      failure_reason: "timeout",
+      candidate_count: 0,
+      aux_latency_ms: 801,
+      comparable_served_count: 1,
+      served_in_candidates_count: 0,
+      served_candidate_coverage: null,
+    },
+  );
 });

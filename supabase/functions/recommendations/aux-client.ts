@@ -14,6 +14,18 @@ export type AuxResult =
     latencyMs: number;
   };
 
+export interface AuxShadowObservation {
+  mode: "shadow" | "active";
+  outcome: "retrieved" | "unavailable";
+  failure_reason?: "timeout" | "network" | "http" | "bad_body";
+  publication_version?: string;
+  candidate_count: number;
+  aux_latency_ms: number;
+  comparable_served_count: number;
+  served_in_candidates_count: number;
+  served_candidate_coverage: number | null;
+}
+
 function strings(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
@@ -30,6 +42,65 @@ function dayType(date: unknown): "weekday" | "weekend" | undefined {
   if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return undefined;
   const day = new Date(`${date}T12:00:00Z`).getUTCDay();
   return day === 0 || day === 6 ? "weekend" : "weekday";
+}
+
+function canonicalServedIds(body: Record<string, unknown>): string[] {
+  const ids: string[] = [];
+  const visit = (value: unknown): void => {
+    if (Array.isArray(value)) {
+      value.forEach(visit);
+      return;
+    }
+    if (!value || typeof value !== "object") return;
+    const item = value as Record<string, unknown>;
+    if (typeof item.dish_id === "string" && UUID.test(item.dish_id)) ids.push(item.dish_id);
+    if (Array.isArray(item.hero_dish_ids)) {
+      ids.push(...item.hero_dish_ids.filter(
+        (id): id is string => typeof id === "string" && UUID.test(id),
+      ));
+    }
+    for (const [key, nested] of Object.entries(item)) {
+      if (key !== "dish_id" && key !== "hero_dish_ids") visit(nested);
+    }
+  };
+  visit(body.plates);
+  visit(body.episodes);
+  return [...new Set(ids)];
+}
+
+/** Build privacy-minimized shadow evidence: counts and ratios only, never candidate/user data. */
+export function buildAuxShadowObservation(
+  result: AuxResult,
+  mode: AppConfig["auxReMode"],
+  gharBody: Record<string, unknown>,
+): AuxShadowObservation | undefined {
+  if (mode === "off") return undefined;
+  const servedIds = canonicalServedIds(gharBody);
+  if (!result.ok) {
+    if (result.reason === "disabled") return undefined;
+    return {
+      mode,
+      outcome: "unavailable",
+      failure_reason: result.reason,
+      candidate_count: 0,
+      aux_latency_ms: result.latencyMs,
+      comparable_served_count: servedIds.length,
+      served_in_candidates_count: 0,
+      served_candidate_coverage: null,
+    };
+  }
+  const candidates = new Set(result.candidateIds);
+  const overlap = servedIds.filter((id) => candidates.has(id)).length;
+  return {
+    mode,
+    outcome: "retrieved",
+    publication_version: result.publicationVersion,
+    candidate_count: result.candidateIds.length,
+    aux_latency_ms: result.latencyMs,
+    comparable_served_count: servedIds.length,
+    served_in_candidates_count: overlap,
+    served_candidate_coverage: servedIds.length ? overlap / servedIds.length : null,
+  };
 }
 
 export function buildAuxiliaryRequest(

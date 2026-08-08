@@ -48,7 +48,12 @@ import {
   type GovernedContextSignal,
   mergeGovernedContextSignals,
 } from "../recommendations/governed-context.ts";
-import { buildAuxiliaryRequest, callAuxiliaryEngine } from "../recommendations/aux-client.ts";
+import {
+  type AuxResult,
+  buildAuxiliaryRequest,
+  buildAuxShadowObservation,
+  callAuxiliaryEngine,
+} from "../recommendations/aux-client.ts";
 import { addDishToDate, loadSavedWeek, saveWeek, setSlotLock } from "./state.ts";
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 import { loadWeatherContext } from "../_shared/services/weather.ts";
@@ -379,6 +384,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
 
     // Meal episodes are the user-visible dish-composition surface covered by the bounded Ghar
     // contract. Aux runs only as optional shadow retrieval; all errors preserve bundle serving.
+    let auxResult: AuxResult | null = null;
     if (surface === "meal_episodes" && resolvedHouseholdId) {
       const aux = await callAux(
         buildAuxiliaryRequest(payload, claims.userId, resolvedHouseholdId),
@@ -386,6 +392,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         ctx.config,
         log,
       );
+      auxResult = aux;
       if (aux.ok) {
         if (ctx.config.auxReMode === "active") payload.candidate_dish_ids = aux.candidateIds;
         log.info("aux_re.candidates_retrieved", {
@@ -554,6 +561,9 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
             : undefined,
           configVersion: typeof body.config_version === "string" ? body.config_version : undefined,
           catalogueSelection: body.catalogue_selection,
+          auxShadowObservation: auxResult
+            ? buildAuxShadowObservation(auxResult, ctx.config.auxReMode, body)
+            : undefined,
           governedContextSignals: derivedGovernedContextSignals,
         });
         await recordProductEvent(ctx, {
