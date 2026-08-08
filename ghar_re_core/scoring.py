@@ -176,7 +176,8 @@ def _cuis(dish, state):
     """§B1 cuis(x, state): how well a dish's cuisine matches a given state, from 1.00 (exact same
     state of origin) down through 0.70 (same parent cuisine) to 0.40 (same broad zone) to 0.0
     (no relation) — the core regional-fit building block m_palette() blends across a household's
-    home and local state.
+    home and local state. A confidence-weighted governed dish-region affinity may strengthen any
+    heuristic tier, but never weaken a stronger cuisine-origin fact.
 
     The spec's fourth tier, 0.15 for "adjacent zone", is NOT implemented: no zone-adjacency table
     exists anywhere in this codebase or any frozen source document, and inventing one (which
@@ -185,16 +186,19 @@ def _cuis(dish, state):
     silently applied."""
     # §B1 cuis(x,S): 1.00 same state, 0.70 same parent cuisine, 0.40 same group/zone, else 0.
     # (0.15 adjacent-zone tier not implemented — see docstring.)
+    governed_affinity = getattr(dish, "regional_affinities", {}).get(
+        C.normalize_region_code(state), 0.0
+    )
     if dish.state_origin == state:
-        return 1.00
+        return max(1.00, governed_affinity)
     parent = K.CUISINE_PARENT.get(dish.cuisine)
     if parent and K.CUISINE_STATE_ORIGIN.get(parent) == state:
-        return 0.70
+        return max(0.70, governed_affinity)
     dish_zone = dish.zone
     state_zone = K.STATE_ZONE.get(state)
     if dish_zone and state_zone and dish_zone == state_zone:
-        return 0.40
-    return 0.0
+        return max(0.40, governed_affinity)
+    return governed_affinity
 
 
 def m_palette(dish, theta, ctx=None):

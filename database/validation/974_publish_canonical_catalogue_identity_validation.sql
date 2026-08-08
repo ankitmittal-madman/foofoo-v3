@@ -2,6 +2,7 @@ DO $$
 DECLARE
   v_identity_count bigint;
   v_publication_mismatch bigint;
+  v_bad_regional_metadata bigint;
 BEGIN
   IF to_regprocedure('re_engine.catalogue_identity_coverage()') IS NULL
      OR to_regprocedure('re_engine.catalogue_identity_rows(uuid,integer)') IS NULL THEN
@@ -31,11 +32,26 @@ BEGIN
 
   SELECT count(*) INTO v_publication_mismatch
   FROM re_engine.catalogue_publication_rows(NULL, 2000) AS published(row_data)
-  LEFT JOIN re_engine.catalogue_identity_rows(NULL, 2000) identities
-    ON identities.dish_id = (published.row_data->>'id')::uuid
-   AND identities.name = published.row_data->>'name'
-  WHERE identities.dish_id IS NULL;
+  LEFT JOIN public.dishes identity
+    ON identity.id = (published.row_data->>'id')::uuid
+   AND identity.name = published.row_data->>'name'
+  WHERE identity.id IS NULL;
   IF v_publication_mismatch <> 0 THEN
     RAISE EXCEPTION 'safety-closed catalogue rows are missing canonical identity';
+  END IF;
+
+  SELECT count(*) INTO v_bad_regional_metadata
+  FROM re_engine.catalogue_identity_rows(NULL, 2000) identities
+  WHERE jsonb_typeof(identities.regional_affinities) <> 'array'
+     OR EXISTS (
+       SELECT 1
+       FROM jsonb_array_elements(identities.regional_affinities) item
+       WHERE nullif(item->>'region_code', '') IS NULL
+          OR (item->>'affinity_score')::numeric NOT BETWEEN 0 AND 1
+          OR (item->>'confidence')::numeric NOT BETWEEN 0 AND 1
+          OR item->>'review_status' = 'rejected'
+     );
+  IF v_bad_regional_metadata <> 0 THEN
+    RAISE EXCEPTION 'canonical catalogue regional metadata is invalid';
   END IF;
 END $$;

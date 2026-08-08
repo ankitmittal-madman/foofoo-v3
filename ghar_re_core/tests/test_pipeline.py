@@ -274,6 +274,23 @@ def test_cuis_no_relation_is_zero():
     assert S._cuis(d, "Punjab") == 0.0
 
 
+def test_cuis_uses_confidence_weighted_governed_regional_affinity():
+    real_cat = _real_catalogue()
+    dish = next(d for d in real_cat if d.cuisine == "japanese")
+    dish.regional_affinities = {"madhya_pradesh": 0.72, "maharashtra": 0.54}
+
+    assert S._cuis(dish, "Madhya Pradesh") == 0.72
+    assert S._cuis(dish, "Maharashtra") == 0.54
+
+
+def test_cuis_governed_affinity_never_weakens_stronger_cuisine_origin():
+    real_cat = _real_catalogue()
+    dish = next(d for d in real_cat if d.cuisine == "punjabi")
+    dish.regional_affinities = {"punjab": 0.3}
+
+    assert S._cuis(dish, "Punjab") == 1.0
+
+
 def test_theta_base_config_matches_frozen_spec():
     # Core Spine FROZEN §S4 line 641: theta_base default 0.6.
     assert S.CONFIG.theta_base == 0.6
