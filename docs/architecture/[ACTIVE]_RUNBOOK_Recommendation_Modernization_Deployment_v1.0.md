@@ -103,6 +103,35 @@ must not contain user profiles, history or events. Edge reads the user's governe
 and sends request-scoped features; Ghar and Aux use those features against the same catalogue
 version.
 
+### Phase A production execution — 08 August 2026
+
+Founder-approved execution completed Orders 1–9 with production Edge routing kept `off` throughout.
+No shadow or active transition was requested or executed.
+
+| Order | Evidence | Result |
+|---:|---|---|
+| 1 | Run `31252583245` | Foundation configuration ready |
+| 2 | Run `31252605522` | `foofoo-aux-re` created in the governed Fly organization |
+| 3 | Runs `31252632149` and final reassertion `31253563043` | Production `AUX_RE_MODE=off`; every shadow-only step skipped |
+| 4 | Run `31252653075` | Migrations 092–101 and validations 944–953 passed atomically |
+| 5 | Run `31252699487` | Publication `sha256:e9c7b524dc5480895d5b675caaa88a51788980cbfb3e1aea95bc5994a7ce3269`; 642 publishable dishes |
+| 6 | Run `31252998303` | Exact 642-point Qdrant collection verified |
+| 7 | Run `31253028990` | Ghar healthy and exposes the same 642-row publication |
+| 8 | Run `31253301316` | One isolated Aux Machine healthy on the same Qdrant generation; Edge still off |
+| 9 | Run `31253527126` | `plan` and `recommendations` deployed after 151 Edge tests passed |
+| Boundary smoke | Run `31253604331` | Fly health/meta and unauthenticated Edge boundaries passed |
+| 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
+
+The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
+non-authoritative candidate list. This is not the production traffic switch. The Edge secret is the
+traffic switch, and the final protected transition evidence records it as `off`; therefore no live
+recommendation request is sent to Aux.
+
+The 642 count is the actual safety-closed publication, not the full active dish inventory. At
+publication time the coverage report showed 3,402 active dishes, 1,719 class-mapped dishes and 642
+fully enriched/safety-closed/publishable dishes. These coverage gaps remain data work; they must not
+be bypassed by publishing incomplete rows.
+
 ### Phase A stop conditions
 
 Stop and roll back serving if any service is unhealthy, any version/count differs, a safety gate
