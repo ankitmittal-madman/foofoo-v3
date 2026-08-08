@@ -116,13 +116,13 @@ MEAL_SLOT_SOURCE_INTEGRITY_WORKFLOW = Path(
     ".github/workflows/recommendation-meal-slot-proposal-source-integrity.yml"
 )
 MEAL_SLOT_ROW_MANIFEST_MIGRATION = Path(
-    "database/migrations/113_verify_direct_meal_slot_proposal_row_manifest.sql"
+    "database/migrations/114_verify_direct_meal_slot_proposal_row_manifest.sql"
 )
 MEAL_SLOT_ROW_MANIFEST_VALIDATION = Path(
-    "database/validation/965_verify_direct_meal_slot_proposal_row_manifest_validation.sql"
+    "database/validation/966_verify_direct_meal_slot_proposal_row_manifest_validation.sql"
 )
 MEAL_SLOT_ROW_MANIFEST_ROLLBACK = Path(
-    "database/rollback/113_verify_direct_meal_slot_proposal_row_manifest_rollback.sql"
+    "database/rollback/114_verify_direct_meal_slot_proposal_row_manifest_rollback.sql"
 )
 MEAL_SLOT_ROW_MANIFEST_WORKFLOW = Path(
     ".github/workflows/recommendation-meal-slot-proposal-row-manifest.yml"
