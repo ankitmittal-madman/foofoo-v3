@@ -91,6 +91,18 @@ MEAL_SLOT_REVIEW_ROLLBACK = Path(
 MEAL_SLOT_REVIEW_WORKFLOW = Path(
     ".github/workflows/recommendation-meal-slot-proposal-review.yml"
 )
+MEAL_SLOT_PROVENANCE_MIGRATION = Path(
+    "database/migrations/111_measure_direct_meal_slot_proposal_provenance.sql"
+)
+MEAL_SLOT_PROVENANCE_VALIDATION = Path(
+    "database/validation/963_measure_direct_meal_slot_proposal_provenance_validation.sql"
+)
+MEAL_SLOT_PROVENANCE_ROLLBACK = Path(
+    "database/rollback/111_measure_direct_meal_slot_proposal_provenance_rollback.sql"
+)
+MEAL_SLOT_PROVENANCE_WORKFLOW = Path(
+    ".github/workflows/recommendation-meal-slot-proposal-provenance.yml"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -573,5 +585,95 @@ def test_direct_proposal_review_workflow_is_read_only_bounded_and_aux_free():
     assert "recommendation-meal-slot-proposal-review.json" in text
     assert "catalogue_names_exposed_for_review" in text
     assert "automatic_acceptance_allowed == false" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
+
+
+def test_direct_proposal_provenance_distinguishes_applied_and_repeated_lineage():
+    """Evidence-link multiplicity must not be represented as independent source proof."""
+    text = MEAL_SLOT_PROVENANCE_MIGRATION.read_text()
+
+    assert "direct_meal_slot_proposal_provenance_report" in text
+    assert "public.import_runs" in text
+    assert "r.run_mode = 'apply'" in text
+    assert "r.run_mode = 'dry_run'" in text
+    assert "s.row_fingerprint" in text
+    assert "(r.source_name, r.source_checksum)" in text
+    for route in (
+        "no_applied_source_evidence",
+        "repeated_same_logical_source_row",
+        "multiple_rows_same_applied_source_file",
+        "multiple_versions_same_source_name",
+        "multiple_source_names_not_independence_proof",
+    ):
+        assert route in text
+    assert "'evidence_link_is_independent_source_proof', false" in text
+    assert "'automatic_confidence_upgrade_allowed', false" in text
+
+
+def test_direct_proposal_provenance_is_aggregate_private_and_non_mutating():
+    """The lineage audit may count source structure but cannot expose it or change facts."""
+    migration = MEAL_SLOT_PROVENANCE_MIGRATION.read_text()
+    validation = MEAL_SLOT_PROVENANCE_VALIDATION.read_text()
+
+    assert "RETURNS jsonb" in migration
+    assert "SECURITY DEFINER" in migration
+    assert "FROM PUBLIC, anon, authenticated" in migration
+    for policy in (
+        "'identity_exposed', false",
+        "'source_name_exposed', false",
+        "'source_checksum_exposed', false",
+        "'raw_source_text_exposed', false",
+        "'proposal_changed', false",
+        "'serving_changed', false",
+        "'publication_changed', false",
+    ):
+        assert policy in migration
+    for forbidden in (
+        "UPDATE ops.dish_meal_slot_proposals",
+        "INSERT INTO ops.dish_meal_slot_proposals",
+        "UPDATE public.",
+        "INSERT INTO public.",
+        "raw_payload",
+        "normalized_payload",
+    ):
+        assert forbidden not in migration
+    for invariant in (
+        "direct meal-slot proposal provenance report must remain service-only",
+        "direct meal-slot proposal provenance routes do not reconcile",
+        "direct meal-slot proposal provenance links do not reconcile",
+        "direct meal-slot proposal provenance policy is invalid",
+    ):
+        assert invariant in validation
+
+
+def test_direct_proposal_provenance_has_exact_non_destructive_rollback():
+    """Rollback removes only the report and preserves proposals and source evidence."""
+    text = MEAL_SLOT_PROVENANCE_ROLLBACK.read_text()
+
+    assert (
+        "DROP FUNCTION IF EXISTS re_engine.direct_meal_slot_proposal_provenance_report()"
+        in text
+    )
+    assert "DROP TABLE" not in text
+    assert "ops.dish_meal_slot_proposals" not in text
+    assert "public.dish_source_rows" not in text
+
+
+def test_direct_proposal_provenance_workflow_is_read_only_count_bound_and_aux_free():
+    """The protected production audit must reconcile exact evidence without routing traffic."""
+    text = MEAL_SLOT_PROVENANCE_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "database_identifies_project" in text
+    assert "expected_proposal_count" in text
+    assert "expected_evidence_link_count" in text
+    assert "pg_advisory_xact_lock" in text
+    assert "--single-transaction" in text
+    assert "SET TRANSACTION READ ONLY" in text
+    assert "recommendation-meal-slot-proposal-provenance.json" in text
+    assert "evidence_link_is_independent_source_proof == false" in text
+    assert "automatic_confidence_upgrade_allowed == false" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text
