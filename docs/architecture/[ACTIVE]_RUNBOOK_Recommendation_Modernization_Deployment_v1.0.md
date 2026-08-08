@@ -215,7 +215,7 @@ using the full 1,802/7,222/4,806 cohort. The proof applied exactly, treated the 
 idempotent, rejected rollback after deliberate post-apply drift and restored all original arrays
 after the drift was removed. This is implementation evidence only, not product approval.
 
-### Contextual multi-slot proposals — prepared, not installed
+### Contextual multi-slot proposals — generated for review, not applied
 
 The remaining contextual course cohort is deliberately separate from the 1,802 direct proposals.
 `Side Dish`, `Main Course`, `One Pot Dish`, `Dessert` and `Brunch` do not identify one exact meal
@@ -253,7 +253,13 @@ environment:
 Local evidence covers 45 focused tests, SQL/YAML parsing, the broader 318-pass recommendation gate
 (one expected skip), and a disposable PostgreSQL proof. The proof generated all 775 pending
 proposals, inserted zero duplicates on retry, retained proposal/evidence history after disabling
-the generator and changed zero dish rows. Production installation and generation have not yet run.
+the generator and changed zero dish rows.
+
+Production run `31274648925` installed migration 118 and validation 970, then generated exactly
+775 pending proposals and 3,121 immutable evidence links from the 2,003-row manifest. The artifact
+reported `dishes_changed=false`, `serving_changed=false`, `publication_changed=false` and
+`pending_review`. Product approval and a separate reversible application design are still required
+before any candidate can become a dish fact. Aux remained OFF.
 
 ### Phase A stop conditions
 
