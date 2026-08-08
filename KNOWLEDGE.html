@@ -1068,18 +1068,18 @@ function deepDiveFeature(featureLabel){
     <div class="sidebar-section-label">Reference</div>
     <div class="nav-item" onclick="showPage('modules')">
       <span class="nav-icon">🧩</span> Modules
-      <span class="nav-badge">88</span>
+      <span class="nav-badge">89</span>
     </div>
     <div class="nav-item" onclick="showPage('files')">
       <span class="nav-icon">📁</span> Files register
-      <span class="nav-badge">1103</span>
+      <span class="nav-badge">1113</span>
     </div>
     <div class="nav-item" onclick="showPage('db')">
       <span class="nav-icon">🗄</span> Database schema
     </div>
     <div class="nav-item" onclick="showPage('decisions')">
       <span class="nav-icon">💡</span> Key decisions
-      <span class="nav-badge">319</span>
+      <span class="nav-badge">324</span>
     </div>
   </div>
 </nav>
@@ -4941,6 +4941,16 @@ function deepDiveFeature(featureLabel){
   <tr><td class="fr-file mono">supabase/functions/_tests/foundation.test.ts</td><td><span class="tag tag-mod">Test</span></td><td class="fr-session">S156</td><td class="fr-desc">Pins non-cacheable success and error responses and prevents handler overrides</td></tr>
   <tr><td class="fr-file mono">supabase/functions/recommendations/handler.ts</td><td><span class="tag tag-mod">Docs</span></td><td class="fr-session">S156</td><td class="fr-desc">Corrects the orchestration contract to describe retryable errors instead of an unsafe fallback plate</td></tr>
   <tr><td class="fr-file mono">KNOWLEDGE.html</td><td><span class="tag tag-mod">Docs</span></td><td class="fr-session">S156</td><td class="fr-desc">Records the explicit personalized-response cache boundary and verification status</td></tr>
+  <tr><td class="fr-file mono">ops/recommendation/prospective_user_cycle.py</td><td><span class="tag tag-mod">Audit</span></td><td class="fr-session">S156</td><td class="fr-desc">Fails live personalized refresh proof when any response can be stored or replayed</td></tr>
+  <tr><td class="fr-file mono">ops/quality/suites/test_prospective_user_cycle.py</td><td><span class="tag tag-mod">Test</span></td><td class="fr-session">S156</td><td class="fr-desc">Pins complete cache-policy acceptance and each incomplete-header failure route</td></tr>
+  <tr><td class="fr-file mono">database/migrations/120_govern_contextual_meal_slot_policy_application.sql</td><td><span class="tag tag-db">DB</span></td><td class="fr-session">S157</td><td class="fr-desc">Adds approval-bound apply/restore functions and an exact before/after ledger</td></tr>
+  <tr><td class="fr-file mono">database/validation/972_govern_contextual_meal_slot_policy_application_validation.sql</td><td><span class="tag tag-db">Validation</span></td><td class="fr-session">S157</td><td class="fr-desc">Reconciles RLS, privileges, proposal state, dish arrays and ledger status</td></tr>
+  <tr><td class="fr-file mono">database/rollback/120_govern_contextual_meal_slot_policy_application_rollback.sql</td><td><span class="tag tag-db">Rollback</span></td><td class="fr-session">S157</td><td class="fr-desc">Disables cohort mutation while retaining every approval and before/after record</td></tr>
+  <tr><td class="fr-file mono">.github/workflows/recommendation-contextual-meal-slot-policy-application.yml</td><td><span class="tag tag-cfg">Workflow</span></td><td class="fr-session">S157</td><td class="fr-desc">Runs protected install, explicit apply or drift-safe restore with Aux off</td></tr>
+  <tr><td class="fr-file mono">ops/quality/suites/test_contextual_meal_slot_policy_application.py</td><td><span class="tag tag-new">Test</span></td><td class="fr-session">S157</td><td class="fr-desc">Pins counts, approval, RLS, recovery and no-serving guarantees</td></tr>
+  <tr><td class="fr-file mono">.github/workflows/re-ci.yml</td><td><span class="tag tag-mod">CI</span></td><td class="fr-session">S157</td><td class="fr-desc">Adds contextual application regressions to the main recommendation gate</td></tr>
+  <tr><td class="fr-file mono">docs/architecture/[ACTIVE]_RUNBOOK_Recommendation_Modernization_Deployment_v1.0.md</td><td><span class="tag tag-mod">Docs</span></td><td class="fr-session">S157</td><td class="fr-desc">Records confirmations, local proof and the unapproved production boundary</td></tr>
+  <tr><td class="fr-file mono">KNOWLEDGE.html</td><td><span class="tag tag-mod">Docs</span></td><td class="fr-session">S157</td><td class="fr-desc">Explains the approval and recovery boundary in Product language</td></tr>
   <!-- FILES_INJECT -->
       </tbody>
     </table>
@@ -5842,6 +5852,11 @@ function deepDiveFeature(featureLabel){
   <div class="decision-item"><div class="decision-q">Is disabling mobile recommendation persistence enough to guarantee a real refresh?</div><div class="decision-a">No. Client persistence was already restricted to saved plans, but intermediaries could still apply their own cache policy unless authenticated Edge responses explicitly forbid storage.</div><div class="decision-meta">S156 · 08 Aug</div></div>
   <div class="decision-item"><div class="decision-q">Should only recommendation success responses be non-cacheable?</div><div class="decision-a">No. Every authenticated Edge success and error can reveal household-scoped state, so the shared post-pipeline boundary applies the same policy consistently.</div><div class="decision-meta">S156 · 08 Aug</div></div>
   <div class="decision-item"><div class="decision-q">Can an endpoint opt back into public caching?</div><div class="decision-a">Not through the shared authenticated handler. It overwrites weaker business-handler cache headers after the response returns; any future public cacheable endpoint needs a separately reviewed boundary.</div><div class="decision-meta">S156 · 08 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">Is source code and unit coverage enough to prove refresh responses are not cached in production?</div><div class="decision-a">No. The identity-bound prospective user cycle must observe the complete policy on every live authenticated plan response and emits only a boolean proof; one missing directive fails the run.</div><div class="decision-meta">S156 · 08 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">Does building this boundary approve the five contextual mappings?</div><div class="decision-a">No. Installation and local proof establish only a safe mechanism. A durable Product/Founder approval reference is still mandatory before any proposal or dish can change.</div><div class="decision-meta">S157 · 08 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">What exact evidence must an application bind?</div><div class="decision-a">The existing candidate-policy hash, 775 proposals, 3,121 production evidence links, 2,003 checked-in manifest rows and the exact 2 breakfast+lunch / 773 lunch+dinner distribution.</div><div class="decision-meta">S157 · 08 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">What happens to invalid old meal-slot strings during an approved application?</div><div class="decision-a">The applied dish receives exactly its reviewed canonical slot set, while the ledger preserves the complete previous array for safe restoration.</div><div class="decision-meta">S157 · 08 Aug</div></div>
+  <div class="decision-item"><div class="decision-q">Can rollback overwrite a later dish correction?</div><div class="decision-a">No. Every current dish and proposal must still equal the recorded applied state; one drift refuses the entire rollback transaction.</div><div class="decision-meta">S157 · 08 Aug</div></div>
   <!-- DECISIONS_INJECT -->
   </div>
 
