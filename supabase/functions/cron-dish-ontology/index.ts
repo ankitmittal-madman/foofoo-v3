@@ -123,23 +123,28 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
       if (aiClaimError) throw aiClaimError;
       aiClaimed = aiJobs?.length ?? 0;
 
-      // Fetched once per invocation (not once per dish) so the Groq prompt lists the real
-      // meal_class/cuisine closed vocabulary — see migration 126's ai_enrichment_closed_vocabulary()
-      // and ai.ts's ClosedVocabulary doc comment for why this can't be hardcoded in this file.
-      // Best-effort: if this fails, enrichment still runs for aliases/taxonomy/regional_affinities,
-      // just without meal_class/cuisine candidates for this batch.
-      let vocabulary: ClosedVocabulary | undefined;
-      if (aiClaimed > 0) {
-        const { data: vocabRow } = await db.rpc("ai_enrichment_closed_vocabulary");
-        if (vocabRow && typeof vocabRow === "object") {
-          const raw = vocabRow as Record<string, unknown>;
-          vocabulary = {
-            classCodes: Array.isArray(raw.class_codes) ? raw.class_codes.map(String) : [],
-            cuisineNames: Array.isArray(raw.cuisine_names) ? raw.cuisine_names.map(String) : [],
-          };
-        }
-      }
       for (const aiJob of aiJobs ?? []) {
+        // Fetched per dish (not once per batch) so migration 127's word-overlap filter can trim
+        // the class_codes list to what's actually relevant to this dish name, cutting prompt token
+        // weight — a live 429 rate limit from Groq on every call since the unfiltered migration 126
+        // vocabulary shipped is the reason this exists (see migration 127's header). Best-effort:
+        // if this fails, enrichment still runs for aliases/taxonomy/regional_affinities, just
+        // without meal_class/cuisine candidates for this dish.
+        let vocabulary: ClosedVocabulary | undefined;
+        try {
+          const { data: vocabRow } = await db.rpc("ai_enrichment_closed_vocabulary", {
+            p_dish_name: String(aiJob.query_text),
+          });
+          if (vocabRow && typeof vocabRow === "object") {
+            const raw = vocabRow as Record<string, unknown>;
+            vocabulary = {
+              classCodes: Array.isArray(raw.class_codes) ? raw.class_codes.map(String) : [],
+              cuisineNames: Array.isArray(raw.cuisine_names) ? raw.cuisine_names.map(String) : [],
+            };
+          }
+        } catch {
+          // Best-effort, per the comment above.
+        }
         // The prompt is ~600 tokens and GPT-OSS may use reasoning tokens. Reserve the full
         // request envelope atomically; settlement replaces it with actual provider usage.
         const reservedTokens = 2_000;
