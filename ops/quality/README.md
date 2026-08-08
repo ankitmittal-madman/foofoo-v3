@@ -125,6 +125,15 @@ python3 ops/recommendation/rollout_evidence.py \
   --targets /path/to/ratified-targets.json --output /path/to/rollout-evidence.json
 ```
 
+The manual `Aux RE rollout evidence` workflow is the protected producer. Its source run must be a
+successful run in this repository containing exactly `offline.json`, `load.json`, and
+`targets.json` in the `aux-rollout-inputs` artifact. It verifies the production project reference,
+uses a read-only database transaction to call only the two aggregate functions, derives the
+current `shadow`/`active` mode from live health rows, and uploads only `rollout-evidence.json`.
+The live/source intermediate files remain ephemeral. The workflow has no Supabase configuration
+mutation command; activation remains outside automation and a later proven active breach is
+handled by the separate protected off-switch workflow.
+
 `ops/recommendation/rollout_decision.py` consumes four privacy-minimized inputs: a passing governed
 offline report, a passing gated Aux load report, rows from `re_engine.aux_shadow_health`, and zero
 hard-guardrail counters. Its evidence document must also contain the full publication hash and all

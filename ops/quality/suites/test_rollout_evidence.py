@@ -33,16 +33,18 @@ def sources() -> dict:
             "source": "re_engine.aux_shadow_health",
             "publication_version": VERSION,
             "window": WINDOW,
-            "rows": [{
-                "mode": "shadow",
-                "publication_version": VERSION,
-                "event_count": 100,
-                "retrieved_count": 99,
-                "timeout_count": 1,
-                "comparable_event_count": 98,
-                "p95_aux_latency_ms": 180,
-                "avg_served_candidate_coverage": 0.85,
-            }],
+            "rows": [
+                {
+                    "mode": "shadow",
+                    "publication_version": VERSION,
+                    "event_count": 100,
+                    "retrieved_count": 99,
+                    "timeout_count": 1,
+                    "comparable_event_count": 98,
+                    "p95_aux_latency_ms": 180,
+                    "avg_served_candidate_coverage": 0.85,
+                }
+            ],
         },
         "guardrails": {
             "schema_version": GUARDRAIL_SCHEMA,
@@ -87,12 +89,25 @@ def test_composer_binds_all_aggregate_sources_and_previews_a_valid_decision():
     assert "household_id" not in str(evidence)
 
 
+def test_composer_can_derive_but_not_misstate_the_live_rollout_mode():
+    automatic = sources()
+    automatic["current_mode"] = "auto"
+    assert compose(**automatic)["current_mode"] == "shadow"
+
+    incorrect = sources()
+    incorrect["current_mode"] = "active"
+    with pytest.raises(RolloutEvidenceError, match="does not match live health"):
+        compose(**incorrect)
+
+
 @pytest.mark.parametrize(
     "mutate",
     [
         lambda value: value["targets"].update(ratified=False),
         lambda value: value["guardrails"].update(measurement_status="assumed"),
-        lambda value: value["guardrails"].update(window={**WINDOW, "until": "2026-08-09T00:00:00Z"}),
+        lambda value: value["guardrails"].update(
+            window={**WINDOW, "until": "2026-08-09T00:00:00Z"}
+        ),
         lambda value: value["load"].update(publication_versions=["sha256:" + "c" * 64]),
         lambda value: value["health"].update(source="manual_query"),
     ],

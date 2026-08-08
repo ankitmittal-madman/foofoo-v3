@@ -109,6 +109,14 @@ def compose(
     _timestamp(targets["approved_at"], "approved_at")
     if not isinstance(health["rows"], list) or not health["rows"]:
         raise RolloutEvidenceError("shadow health contains no aggregate rows")
+    observed_modes = {row.get("mode") for row in health["rows"] if isinstance(row, dict)}
+    if observed_modes not in ({"shadow"}, {"active"}):
+        raise RolloutEvidenceError("live health must contain exactly one rollout mode")
+    observed_mode = next(iter(observed_modes))
+    if current_mode == "auto":
+        current_mode = observed_mode
+    elif current_mode != observed_mode:
+        raise RolloutEvidenceError("declared rollout mode does not match live health")
     if not isinstance(health["window"], dict) or set(health["window"]) != {"since", "until"}:
         raise RolloutEvidenceError("shadow health window is invalid")
     if guardrails["window"] != health["window"]:
@@ -125,10 +133,9 @@ def compose(
     version = health["publication_version"]
     if guardrails["publication_version"] != version or targets["publication_version"] != version:
         raise RolloutEvidenceError("health, guardrail and target publications do not match")
-    if (
-        offline.get("publication_versions") != [version]
-        or load.get("publication_versions") != [version]
-    ):
+    if offline.get("publication_versions") != [version] or load.get("publication_versions") != [
+        version
+    ]:
         raise RolloutEvidenceError("offline or load publication does not match live evidence")
     required_sources = {"offline", "load", "health", "guardrails", "targets"}
     if set(source_sha256) != required_sources or not all(
@@ -172,7 +179,9 @@ def _load(path: Path) -> tuple[dict[str, Any], str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--current-mode", required=True, choices=("off", "shadow", "active"))
+    parser.add_argument(
+        "--current-mode", required=True, choices=("auto", "off", "shadow", "active")
+    )
     parser.add_argument("--offline", type=Path, required=True)
     parser.add_argument("--load", type=Path, required=True)
     parser.add_argument("--health", type=Path, required=True)
