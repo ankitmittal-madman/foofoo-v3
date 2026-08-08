@@ -65,6 +65,21 @@ def _served_counts_by_class(dish_feedback_counts):
     return counts
 
 
+def _mark_served_propensities(chosen, *, swap_target=None, epsilon=0.0):
+    """Attach exact inclusion probabilities for plates served by this selection policy.
+
+    The greedy prefix is deterministic, so every retained plate has probability 1. When a valid
+    epsilon-greedy replacement exists, only the lowest-ranked target is uncertain: it remains with
+    probability ``1 - epsilon``. The replacement receives ``epsilon`` if it is actually served.
+    These private fields are serialized by the service but never enter ranking mathematics.
+    """
+    for plate in chosen:
+        plate["_selection_propensity"] = round(
+            1.0 - epsilon if plate is swap_target else 1.0, 6
+        )
+        plate["_selection_policy"] = "epsilon_greedy_class_v1"
+
+
 def epsilon_greedy_select(chosen, candidate_plates, ctx):
     """Epsilon-greedy class-level exploration over an already-ranked/selected plate list.
 
@@ -85,18 +100,21 @@ def epsilon_greedy_select(chosen, candidate_plates, ctx):
     (returns `chosen` unchanged, empty trace) if epsilon is 0, the dice roll lands on "exploit", or
     no such candidate exists.
 
+    Every served plate receives a private ``_selection_propensity`` carrying its exact inclusion
+    probability under this policy. Deterministic winners receive 1.0; when a valid swap exists,
+    the swap target receives ``1 - epsilon`` on exploit and the replacement receives ``epsilon``
+    on explore. This is policy probability, not a predicted user preference.
+
     Returns (new_chosen, exploration_trace) — `exploration_trace` is a list of phase="explore"
     trace dicts (never a Contribution — this is not a ScoringModule) describing any swap made, for
     observability/decision-trace purposes only."""
     chosen = list(chosen)
     epsilon = CONFIG.bandit_epsilon
-    if not chosen or not epsilon or epsilon <= 0:
+    if not chosen:
         return chosen, []
-
-    seed = ctx.get("_rng_seed")
-    rng = random.Random(seed) if seed is not None else random.Random()
-    if rng.random() >= epsilon:
-        return chosen, []                              # exploit — no swap this call
+    if not epsilon or epsilon <= 0:
+        _mark_served_propensities(chosen)
+        return chosen, []
 
     served_counts = _served_counts_by_class(ctx.get("dish_feedback_counts"))
 
@@ -139,13 +157,27 @@ def epsilon_greedy_select(chosen, candidate_plates, ctx):
             best, best_key = cand, key
 
     if best is None:
+        _mark_served_propensities(chosen)
         return chosen, []
 
+    # The valid policy has exactly two possible slates. Mark the exploit slate before the stable
+    # draw; if exploration fires, the target disappears and the replacement gets probability ε.
+    _mark_served_propensities(chosen, swap_target=swap_target, epsilon=epsilon)
+    seed = ctx.get("_rng_seed")
+    rng = random.Random(seed) if seed is not None else random.Random()
+    if rng.random() >= epsilon:
+        return chosen, []                              # exploit — no swap this call
+
     new_chosen = remaining + [best]
+    _mark_served_propensities(remaining)
+    best["_selection_propensity"] = round(epsilon, 6)
+    best["_selection_policy"] = "epsilon_greedy_class_v1"
     trace = [{
         "phase": "explore",
         "module": "epsilon_greedy_select",
         "epsilon": epsilon,
+        "swapped_out_propensity": round(1.0 - epsilon, 6),
+        "swapped_in_propensity": round(epsilon, 6),
         "swapped_out": _plate_label(swap_target),
         "swapped_out_class": target_class,
         "swapped_in": _plate_label(best),

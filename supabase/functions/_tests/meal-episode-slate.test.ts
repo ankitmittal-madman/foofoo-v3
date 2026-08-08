@@ -1,6 +1,7 @@
 import { assertEquals, assertNotEquals, assertRejects } from "@std/assert";
 import {
   buildDishLineageCandidates,
+  dishSlateSelectionPropensity,
   eligibleSetHash,
   extractDishCandidateItems,
   extractDishSlateItems,
@@ -41,12 +42,29 @@ Deno.test("dish slate normalization covers every served hero on the direct home 
       plate_id: "p1",
       hero_dish_names: ["Dal", "Bhindi"],
       plate_score: 4.2,
+      selection_propensity: 0.15,
     }],
   });
   assertEquals(items.map((item) => [item.name, item.score, item.slot]), [
     ["Dal", 4.2, "dinner"],
     ["Bhindi", 4.2, "dinner"],
   ]);
+  assertEquals(items.map((item) => item.selectionPropensity), [0.15, 0.15]);
+});
+
+Deno.test("dish slate propensities are exact and fail closed across policy types", () => {
+  const item = {
+    name: "Poha",
+    score: 4.2,
+    reasons: [],
+    snapshot: {},
+  };
+  assertEquals(dishSlateSelectionPropensity("meal_plan", item), 1);
+  assertEquals(dishSlateSelectionPropensity("recommendations", item), null);
+  assertEquals(
+    dishSlateSelectionPropensity("recommendations", { ...item, selectionPropensity: 0.15 }),
+    0.15,
+  );
 });
 
 Deno.test("private candidate lineage keeps the full eligible pool separate from served items", () => {
@@ -86,6 +104,7 @@ Deno.test("dish lineage supports a larger private candidate pool than the served
   assertEquals(candidates.map((candidate) => candidate.rank), [1, 2]);
   assertEquals(candidates[1].generator_codes, ["calibration", "INDIAN_BREAKFAST"]);
   assertEquals(candidates[1].generator_scores.point_score, 3.9);
+  assertEquals(candidates[1].generator_scores.selection_propensity, null);
 });
 
 Deno.test("calibration slate preserves each cell slot in one globally ordered slate", () => {

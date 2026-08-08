@@ -30,3 +30,12 @@
 - Re-verification: 28 focused service tests passed. A replay against production publication run `31252699487` resolved 641/809 fallback identities with candidate names unchanged. Full identity coverage remains pending an identity-only publication index for the 168 safety-incomplete rows.
 - CI follow-up: `re-ci` run `31276920811` caught that the provider protocol did not declare the mutable ID index required by startup reconciliation. The minimal identity protocol and provider contract now agree; the exact CI mypy command passes across 72 source files and 42 focused tests pass.
 - Pattern risk elsewhere: any serving path that manufactures a non-UUID dish identifier cannot support canonical feedback lineage; remaining legacy coverage is tracked explicitly rather than hidden.
+
+## 2026-08-08 — User_50 exposures had no selection propensities
+
+- Symptom: the live User_50 audit counted zero displayed slate items with a non-null `selection_propensity`, preventing supported inverse-propensity evaluation of the serving policy.
+- Confirmed root cause: Ghar already made a seeded epsilon-greedy class swap, but `ghar_re_core.exploration.epsilon_greedy_select` returned only the realized slate and trace; the service exposed no inclusion probability, and `supabase/functions/plan/episodes.ts` therefore hardcoded every persisted dish-slate propensity to null.
+- Layer: recommendation selection policy, service contract, and Edge exposure persistence.
+- Fix applied: calculate the exact two-outcome policy probability at selection time (1 for unaffected deterministic winners, `1 - epsilon` for the exploit target, and `epsilon` for an explored replacement), expose it through the additive Ghar v1 contract, and persist direct-recommendation probabilities fail-closed. Deterministic planning dish slates record 1 while retaining zero support for unselected alternatives.
+- Re-verification: focused probability tests exercised both exploit and explore outcomes; 290 core/service tests passed with one intentional skip; the complete Edge verification passed format, lint, type-check, and 156 tests. Live User_50 verification remains pending deployment.
+- Pattern risk elsewhere: meal-episode slate propensities remain null because final episode visibility is a separate reranking policy whose marginal probability is not yet exposed; no probability was invented for that path.

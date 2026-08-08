@@ -126,6 +126,55 @@ def test_cold_start_zero_history_is_not_permanently_inert_to_exploration():
         )
         assert trace, "expected a swap for a cold-start household with zero feedback history"
         assert [p["hero"].name for p in new_chosen] == [candidate.name]
+        assert new_chosen[0]["_selection_propensity"] == 1.0
+    finally:
+        cfgmod.active_config().bandit = orig
+
+
+def test_epsilon_policy_records_exact_exploit_and_explore_propensities():
+    """The persisted probability must describe the policy draw, not the realized rank score."""
+    from ghar_re_core import exploration as EXP
+
+    cat = {d.name: d for d in CAT}
+    fixed = cat["Dal Tadka"]
+    target = cat["Onion Pakora"]
+    candidate = cat["Sarson Ka Saag"]
+
+    def plates():
+        chosen = [
+            {"form": "standalone", "hero": fixed, "heroes": {fixed.name}, "score": 2.0},
+            {"form": "standalone", "hero": target, "heroes": {target.name}, "score": 1.0},
+        ]
+        return chosen, chosen + [
+            {
+                "form": "standalone",
+                "hero": candidate,
+                "heroes": {candidate.name},
+                "score": 0.5,
+            }
+        ]
+
+    orig = cfgmod.active_config().bandit
+    try:
+        cfgmod.active_config().bandit = {
+            "exploration": {"epsilon": 0.25, "exploration_boost": 0.0}
+        }
+        exploit_chosen, exploit_pool = plates()
+        exploit, exploit_trace = EXP.epsilon_greedy_select(
+            exploit_chosen, exploit_pool, {"_rng_seed": 2, "dish_feedback_counts": []}
+        )
+        assert not exploit_trace
+        assert [p["_selection_propensity"] for p in exploit] == [1.0, 0.75]
+
+        explore_chosen, explore_pool = plates()
+        explore, explore_trace = EXP.epsilon_greedy_select(
+            explore_chosen, explore_pool, {"_rng_seed": 1, "dish_feedback_counts": []}
+        )
+        assert explore_trace
+        assert [p["hero"].name for p in explore] == [fixed.name, candidate.name]
+        assert [p["_selection_propensity"] for p in explore] == [1.0, 0.25]
+        assert explore_trace[0]["swapped_out_propensity"] == 0.75
+        assert explore_trace[0]["swapped_in_propensity"] == 0.25
     finally:
         cfgmod.active_config().bandit = orig
 

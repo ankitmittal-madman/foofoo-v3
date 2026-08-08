@@ -148,6 +148,8 @@
         "support": { "type": ["string", "null"], "description": "editable default carb from {Roti,Paratha,Poori,Rice}; null for standalone" },
         "is_standalone": { "type": "boolean" },
         "plate_score": { "type": "number" },
+        "selection_propensity": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Exact inclusion probability under the serving policy. Deterministic winners are 1; an epsilon-greedy target/replacement is 1-epsilon/epsilon." },
+        "randomized_selection_policy": { "type": "string", "description": "Versioned policy that produced selection_propensity; additive v1 observability only." },
         "base_total": { "type": "number", "description": "FIXED aggregate: Σ of contributions (before Q15 gain)" },
         "gain_multiplier": { "type": "number", "description": "FIXED aggregate: GAIN_Q15 multiplier" },
         "final_score": { "type": "number", "description": "FIXED aggregate: the plate's final rank score" },
