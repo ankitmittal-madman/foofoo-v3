@@ -130,6 +130,7 @@ jobs:
           digest="${PUBLICATION_VERSION#sha256:}"
           collection="foofoo_recipes__${digest:0:12}"
           flyctl deploy --config aux_re_service/fly.toml --app "$FLY_AUX_APP" --remote-only \
+            --ha=false \
             --env "AUX_REC_QDRANT_URL=$AUX_RE_QDRANT_URL" \
             --env "AUX_REC_QDRANT_ALLOWED_HOST=$AUX_RE_QDRANT_ALLOWED_HOST" \
             --env "AUX_REC_QDRANT_COLLECTION=$collection" \

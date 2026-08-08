@@ -44,3 +44,9 @@ def test_deploy_cannot_enable_aux_override_or_edge_active_mode():
     assert "flyctl secrets import" in text
     assert "flyctl config validate --strict" in text
     assert "qdrant.fly.toml" not in text
+
+
+def test_phase_a_deploy_uses_one_explicit_machine_topology():
+    text = WORKFLOW.read_text()
+
+    assert "--ha=false" in text
