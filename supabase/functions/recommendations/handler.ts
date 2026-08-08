@@ -48,6 +48,7 @@ import { deriveGovernedContextSignals, mergeGovernedContextSignals } from "./gov
 import {
   buildAuxiliaryRequest,
   buildAuxShadowObservation,
+  buildProductionGuardrailObservation,
   callAuxiliaryEngine,
 } from "./aux-client.ts";
 
@@ -316,6 +317,12 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
           decisionTrace: result.body.decision_trace,
           catalogueSelection: result.body.catalogue_selection,
           auxShadowObservation: buildAuxShadowObservation(aux, ctx.config.auxReMode, result.body),
+          productionGuardrailObservation: buildProductionGuardrailObservation(
+            aux,
+            ctx.config.auxReMode,
+            result.body,
+            (payload.context as Record<string, unknown>).date,
+          ),
           governedContextSignals: derivedGovernedContextSignals,
         });
         recordRequest(outcome);
@@ -339,6 +346,12 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
         detail: respCheck.errors.join("; "),
         latencyMs,
         stubbed,
+        productionGuardrailObservation: buildProductionGuardrailObservation(
+          aux,
+          ctx.config.auxReMode,
+          result.body,
+          (payload.context as Record<string, unknown>).date,
+        ),
         governedContextSignals: derivedGovernedContextSignals,
       });
       recordRequest("fallback");
@@ -368,6 +381,12 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
       detail: result.detail,
       latencyMs,
       stubbed,
+      productionGuardrailObservation: buildProductionGuardrailObservation(
+        aux,
+        ctx.config.auxReMode,
+        undefined,
+        (payload.context as Record<string, unknown>).date,
+      ),
       governedContextSignals: derivedGovernedContextSignals,
     });
     recordRequest(result.kind === "timeout" ? "timeout_fallback" : "fallback");

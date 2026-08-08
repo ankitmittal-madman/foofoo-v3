@@ -26,6 +26,19 @@ export interface AuxShadowObservation {
   served_candidate_coverage: number | null;
 }
 
+export interface ProductionGuardrailObservation {
+  schema_version: "recommendation-serving-guardrail-observation-v1";
+  measurement_status: "measured" | "unavailable";
+  mode: "shadow" | "active";
+  publication_version: string;
+  served_dish_count: number;
+  hard_constraint_violations: number;
+  catalogue_version_mismatches: number;
+  canonical_identity_failures: number;
+  intended_date_integrity_failures: number;
+  ghar_fallback_failures: number;
+}
+
 function strings(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
@@ -100,6 +113,53 @@ export function buildAuxShadowObservation(
     comparable_served_count: servedIds.length,
     served_in_candidates_count: overlap,
     served_candidate_coverage: servedIds.length ? overlap / servedIds.length : null,
+  };
+}
+
+/**
+ * Convert Ghar's independent final-response audit into privacy-safe rollout counters.
+ *
+ * Shadow mode intentionally does not claim to validate published-candidate identity because its
+ * candidates do not affect the user-visible Ghar request. The offline publication gate covers
+ * that identity path before canary; active mode then requires Ghar to hydrate the exact Aux
+ * publication and treats any fallback as a hard failure. Missing/malformed Ghar audit evidence is
+ * retained as `unavailable`, never converted to zero by the aggregate producer.
+ */
+export function buildProductionGuardrailObservation(
+  aux: AuxResult,
+  mode: AppConfig["auxReMode"],
+  gharBody: Record<string, unknown> | undefined,
+  requestedIntendedDate: unknown,
+): ProductionGuardrailObservation | undefined {
+  if (mode === "off" || !aux.ok) return undefined;
+  const body = gharBody ?? {};
+  const audit = record(body.guardrail_audit);
+  const selection = record(body.catalogue_selection);
+  const nonnegativeInteger = (value: unknown): value is number =>
+    typeof value === "number" && Number.isInteger(value) && value >= 0;
+  const measured = audit.schema_version === "ghar-final-guardrail-audit-v1" &&
+    audit.measurement_status === "measured" &&
+    nonnegativeInteger(audit.served_dish_count) &&
+    nonnegativeInteger(audit.hard_constraint_violations) &&
+    nonnegativeInteger(audit.canonical_identity_failures);
+  const active = mode === "active";
+  const publicationMatches = selection.source === "published_candidates" &&
+    selection.publication_version === aux.publicationVersion;
+  const expectedDate = typeof requestedIntendedDate === "string" ? requestedIntendedDate : null;
+  const observedDate = typeof audit.intended_meal_date === "string"
+    ? audit.intended_meal_date
+    : null;
+  return {
+    schema_version: "recommendation-serving-guardrail-observation-v1",
+    measurement_status: measured ? "measured" : "unavailable",
+    mode,
+    publication_version: aux.publicationVersion,
+    served_dish_count: measured ? Number(audit.served_dish_count) : 0,
+    hard_constraint_violations: measured ? Number(audit.hard_constraint_violations) : 0,
+    catalogue_version_mismatches: active && !publicationMatches ? 1 : 0,
+    canonical_identity_failures: active && measured ? Number(audit.canonical_identity_failures) : 0,
+    intended_date_integrity_failures: expectedDate !== observedDate ? 1 : 0,
+    ghar_fallback_failures: active && !publicationMatches ? 1 : 0,
   };
 }
 

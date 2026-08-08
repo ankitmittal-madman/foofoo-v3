@@ -508,6 +508,9 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
         ]
         if shadow_scores:
             episode["shadow_preference_mean"] = round(sum(shadow_scores) / len(shadow_scores), 6)
+    guardrail_audit = _meal_episode_guardrail_audit(
+        episodes, household, context, catalogue, raw_context.get("date")
+    )
     return {
         "kind": "meal_episode_slate",
         "slot": context["slot"],
@@ -518,6 +521,61 @@ def plan_meal_episodes(request: dict[str, Any], catalogue, config) -> dict[str, 
         "policy_code": "episode_success_rule_v1",
         "model_version": meal_episode.EPISODE_MODEL_VERSION,
         "warnings": [] if episodes else ["no safe meal episode could be formed"],
+        "guardrail_audit": guardrail_audit,
+    }
+
+
+def _meal_episode_guardrail_audit(
+    episodes: list[dict],
+    household: dict[str, Any],
+    context: dict[str, Any],
+    catalogue,
+    intended_meal_date: Any,
+) -> dict[str, Any]:
+    """Recheck the final dish-bearing components without retaining household or dish identity.
+
+    This is deliberately independent of the ranking loop. A future regression that surfaces an
+    unknown canonical ID or bypasses the hard eligibility predicate is therefore observable at
+    the service boundary instead of being reported as an assumed zero by rollout tooling.
+    Staples such as Roti have no catalogue dish ID and are excluded from this dish guardrail.
+    """
+    dish_ids = []
+    for episode in episodes:
+        for component in episode.get("components", []):
+            dish_id = component.get("dish_id")
+            if dish_id is not None:
+                dish_ids.append(dish_id)
+    return _final_dish_guardrail_audit(dish_ids, household, context, catalogue, intended_meal_date)
+
+
+def _final_dish_guardrail_audit(
+    dish_ids: list[Any],
+    household: dict[str, Any],
+    context: dict[str, Any],
+    catalogue,
+    intended_meal_date: Any,
+) -> dict[str, Any]:
+    """Count post-selection identity and hard-filter failures for one final response."""
+    theta = derive_theta(household)
+    canonical_identity_failures = hard_constraint_violations = 0
+    for dish_id in dish_ids:
+        dish = catalogue.get_dish(dish_id) if isinstance(dish_id, str) else None
+        try:
+            canonical_uuid = str(uuid.UUID(dish_id)) if isinstance(dish_id, str) else None
+        except ValueError:
+            canonical_uuid = None
+        if dish is None or canonical_uuid != dish_id.casefold():
+            canonical_identity_failures += 1
+            continue
+        if not S.eligible(dish, theta, context):
+            hard_constraint_violations += 1
+    return {
+        "schema_version": "ghar-final-guardrail-audit-v1",
+        "measurement_status": "measured",
+        "served_dish_count": len(dish_ids),
+        "hard_constraint_violations": hard_constraint_violations,
+        "canonical_identity_failures": canonical_identity_failures,
+        "intended_meal_date": intended_meal_date if isinstance(intended_meal_date, str) else None,
     }
 
 
@@ -645,6 +703,13 @@ def run(request: dict[str, Any], catalogue, config, registry) -> dict[str, Any]:
         "config_version": config.versions["config"],
         "plates": plates_out,
         "warnings": warnings,
+        "guardrail_audit": _final_dish_guardrail_audit(
+            [dish_id for plate in plates_out for dish_id in plate["hero_dish_ids"]],
+            hh,
+            ctx,
+            catalogue,
+            request["context"].get("date"),
+        ),
     }
     if want_trace and result.get("decision_trace") is not None:
         response["decision_trace"] = result["decision_trace"]

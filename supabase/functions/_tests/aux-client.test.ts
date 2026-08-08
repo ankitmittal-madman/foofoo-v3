@@ -4,6 +4,7 @@ import type { Logger } from "../_shared/logging/logger.ts";
 import {
   buildAuxiliaryRequest,
   buildAuxShadowObservation,
+  buildProductionGuardrailObservation,
   callAuxiliaryEngine,
 } from "../recommendations/aux-client.ts";
 
@@ -227,4 +228,61 @@ Deno.test("Aux failure observation records reason without candidate or publicati
       served_candidate_coverage: null,
     },
   );
+});
+
+Deno.test("production guardrails bind active Ghar audit to the exact publication and date", () => {
+  const result = {
+    ok: true as const,
+    candidateIds: [DISH_ID],
+    publicationVersion: VERSION,
+    latencyMs: 5,
+  };
+  const observation = buildProductionGuardrailObservation(result, "active", {
+    catalogue_selection: {
+      source: "published_candidates",
+      publication_version: VERSION,
+    },
+    guardrail_audit: {
+      schema_version: "ghar-final-guardrail-audit-v1",
+      measurement_status: "measured",
+      served_dish_count: 3,
+      hard_constraint_violations: 0,
+      canonical_identity_failures: 0,
+      intended_meal_date: "2026-08-08",
+    },
+  }, "2026-08-08");
+
+  assertEquals(observation, {
+    schema_version: "recommendation-serving-guardrail-observation-v1",
+    measurement_status: "measured",
+    mode: "active",
+    publication_version: VERSION,
+    served_dish_count: 3,
+    hard_constraint_violations: 0,
+    catalogue_version_mismatches: 0,
+    canonical_identity_failures: 0,
+    intended_date_integrity_failures: 0,
+    ghar_fallback_failures: 0,
+  });
+});
+
+Deno.test("missing active Ghar evidence is unavailable and records fallback failures", () => {
+  const result = {
+    ok: true as const,
+    candidateIds: [DISH_ID],
+    publicationVersion: VERSION,
+    latencyMs: 5,
+  };
+  assertEquals(buildProductionGuardrailObservation(result, "active", undefined, "2026-08-08"), {
+    schema_version: "recommendation-serving-guardrail-observation-v1",
+    measurement_status: "unavailable",
+    mode: "active",
+    publication_version: VERSION,
+    served_dish_count: 0,
+    hard_constraint_violations: 0,
+    catalogue_version_mismatches: 1,
+    canonical_identity_failures: 0,
+    intended_date_integrity_failures: 1,
+    ghar_fallback_failures: 1,
+  });
 });

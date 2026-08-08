@@ -110,6 +110,14 @@ measured (not assumed) production guardrails, ratified targets with an approval 
 gated load report whose successful Aux responses returned the same publication. The output embeds
 SHA-256 lineage for every source and is written atomically without overwriting prior evidence.
 
+The guardrail source is produced by the service-only
+`re_engine.production_guardrail_aggregate(since, until, publication_version)` function from
+migration 101. Ghar rechecks final dish-bearing responses after selection; Edge persists only ten
+allowlisted count/version fields. The aggregate returns `measurement_status: unavailable` when the
+window has no matching observations or any matching request lacks a valid final Ghar audit. It
+never exposes household, request, candidate or dish identity, and callers other than
+`service_role` cannot execute it.
+
 ```bash
 python3 ops/recommendation/rollout_evidence.py \
   --current-mode shadow --offline /path/to/offline.json --load /path/to/load.json \

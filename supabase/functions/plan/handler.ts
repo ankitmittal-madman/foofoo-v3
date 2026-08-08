@@ -52,6 +52,7 @@ import {
   type AuxResult,
   buildAuxiliaryRequest,
   buildAuxShadowObservation,
+  buildProductionGuardrailObservation,
   callAuxiliaryEngine,
 } from "../recommendations/aux-client.ts";
 import { addDishToDate, loadSavedWeek, saveWeek, setSlotLock } from "./state.ts";
@@ -564,6 +565,14 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           auxShadowObservation: auxResult
             ? buildAuxShadowObservation(auxResult, ctx.config.auxReMode, body)
             : undefined,
+          productionGuardrailObservation: auxResult
+            ? buildProductionGuardrailObservation(
+              auxResult,
+              ctx.config.auxReMode,
+              body,
+              (payload.context as Record<string, unknown> | undefined)?.date,
+            )
+            : undefined,
           governedContextSignals: derivedGovernedContextSignals,
         });
         await recordProductEvent(ctx, {
@@ -605,6 +614,29 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       detail: result.detail,
       latency_ms: latencyMs,
     });
+    if (surface === "meal_episodes" && resolvedHouseholdId && auxResult) {
+      await recordRecommendationEvent(ctx, {
+        requestId,
+        householdId: resolvedHouseholdId,
+        outcome: result.kind,
+        plateCount: 0,
+        reServed: false,
+        detail: result.detail,
+        latencyMs,
+        stubbed: stubbedHousehold,
+        slot: typeof body.slot === "string" ? body.slot : undefined,
+        intendedMealDate: typeof body.date === "string" ? body.date : undefined,
+        dayType: plannedDayType(body.date),
+        auxShadowObservation: buildAuxShadowObservation(auxResult, ctx.config.auxReMode, {}),
+        productionGuardrailObservation: buildProductionGuardrailObservation(
+          auxResult,
+          ctx.config.auxReMode,
+          undefined,
+          (payload.context as Record<string, unknown> | undefined)?.date,
+        ),
+        governedContextSignals: derivedGovernedContextSignals,
+      });
+    }
     return jsonContract(
       { error: "planning_unavailable", detail: result.detail, surface },
       ctx.traceId,

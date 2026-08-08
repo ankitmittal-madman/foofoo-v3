@@ -158,6 +158,39 @@ def test_meal_episode_surface_preserves_finalized_class(client):
                 assert class_code in K.dish_to_class_codes(component["dish_name"])
 
 
+def test_final_meal_episode_guardrail_audit_rechecks_identity_and_safety(monkeypatch):
+    canonical_id = "00000000-0000-4000-8000-000000000001"
+    canonical_dish = object()
+
+    class Catalogue:
+        def get_dish(self, dish_id):
+            return canonical_dish if dish_id == canonical_id else None
+
+    monkeypatch.setattr(engine.S, "eligible", lambda dish, theta, context: dish is canonical_dish)
+    episodes = [
+        {
+            "components": [
+                {"dish_id": canonical_id, "dish_name": "Known"},
+                {"dish_id": "not-a-canonical-id", "dish_name": "Unknown"},
+                {"dish_id": None, "dish_name": "Roti"},
+            ]
+        }
+    ]
+
+    audit = engine._meal_episode_guardrail_audit(
+        episodes, _hh(), {"slot": "dinner"}, Catalogue(), "2026-08-08"
+    )
+
+    assert audit == {
+        "schema_version": "ghar-final-guardrail-audit-v1",
+        "measurement_status": "measured",
+        "served_dish_count": 2,
+        "hard_constraint_violations": 0,
+        "canonical_identity_failures": 1,
+        "intended_meal_date": "2026-08-08",
+    }
+
+
 def test_search_is_filtered_ranked_and_safety_aware(client):
     r = _post(
         client,

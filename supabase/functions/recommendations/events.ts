@@ -22,6 +22,7 @@ import {
   toMealClassExposureItems,
 } from "./served.ts";
 import type { GovernedContextSignal } from "./governed-context.ts";
+import type { ProductionGuardrailObservation } from "./aux-client.ts";
 
 export type RecommendationOutcome =
   | "success"
@@ -57,6 +58,8 @@ export interface RecommendationEventInput {
   catalogueSelection?: unknown;
   /** Count-only Aux observation; never stores candidate IDs, dishes or user history. */
   auxShadowObservation?: unknown;
+  /** Count-only final-serving guardrails; never stores dish, request-context or user identity. */
+  productionGuardrailObservation?: ProductionGuardrailObservation;
   /** Authority-labelled request context used for this serving decision. */
   governedContextSignals?: GovernedContextSignal[];
 }
@@ -108,6 +111,9 @@ export async function recordRecommendationEvent(
         decision_trace: ev.decisionTrace ?? null,
         catalogue_selection: ev.catalogueSelection ?? null,
         aux_shadow_observation: ev.auxShadowObservation ?? null,
+        ...(ev.productionGuardrailObservation
+          ? { production_guardrail_observation: ev.productionGuardrailObservation }
+          : {}),
         data_source: "real",
       }).select("id").single(),
       "recommendations.events.record",
