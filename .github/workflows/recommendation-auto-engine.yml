@@ -143,11 +143,11 @@ jobs:
           fi
       - name: Install operational runtime
         run: |
-          python -m pip install "setuptools==79.0.1" "wheel==0.45.1"
+          python -m pip install "pip==25.2" "setuptools==79.0.1" "wheel==0.45.1"
           python -m pip install -e ".[training]"
           python -m pip install -e "./aux_re_service"
           python -m pip install "joblib>=1.4"
-          python -m pip install --no-build-isolation "lightfm==1.17"
+          python -m pip install --no-use-pep517 "lightfm==1.17"
           python -m pip install "psycopg2-binary>=2.9,<3"
       - name: Run against dedicated training storage
         run: |

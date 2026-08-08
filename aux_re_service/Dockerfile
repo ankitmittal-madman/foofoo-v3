@@ -8,12 +8,12 @@ RUN apt-get update \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN pip install --no-cache-dir "setuptools==79.0.1" "wheel==0.45.1"
+RUN pip install --no-cache-dir "pip==25.2" "setuptools==79.0.1" "wheel==0.45.1"
 RUN pip install --no-cache-dir \
     "joblib==1.5.3" \
-    "lightfm==1.17" \
     "numpy==2.4.6" \
     "scipy==1.17.1"
+RUN pip install --no-cache-dir --no-use-pep517 "lightfm==1.17"
 
 RUN pip install --no-cache-dir \
     "annotated-doc==0.0.5" \
