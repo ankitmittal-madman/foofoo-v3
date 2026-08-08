@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 MIGRATION = Path("database/migrations/102_expose_recommendation_catalogue_gaps.sql")
 VALIDATION = Path("database/validation/954_expose_recommendation_catalogue_gaps_validation.sql")
 ROLLBACK = Path("database/rollback/102_expose_recommendation_catalogue_gaps_rollback.sql")
@@ -22,6 +21,18 @@ QUALITY_VALIDATION = Path(
 )
 QUALITY_ROLLBACK = Path(
     "database/rollback/104_measure_published_catalogue_quality_rollback.sql"
+)
+REMEDIATION_MIGRATION = Path(
+    "database/migrations/105_measure_meal_class_remediation.sql"
+)
+REMEDIATION_VALIDATION = Path(
+    "database/validation/957_measure_meal_class_remediation_validation.sql"
+)
+REMEDIATION_ROLLBACK = Path(
+    "database/rollback/105_measure_meal_class_remediation_rollback.sql"
+)
+REMEDIATION_WORKFLOW = Path(
+    ".github/workflows/recommendation-meal-class-remediation-audit.yml"
 )
 
 
@@ -174,3 +185,57 @@ def test_published_quality_report_reconciles_with_live_publication_and_rolls_bac
     ):
         assert invariant in validation
     assert "DROP FUNCTION IF EXISTS re_engine.catalogue_published_quality_report()" in rollback
+
+
+def test_meal_class_remediation_report_is_aggregate_read_only_and_provenance_aware():
+    """Weak mappings must be explained by evidence source without exposing dish identity."""
+    text = REMEDIATION_MIGRATION.read_text()
+
+    assert "catalogue_meal_class_remediation_report" in text
+    assert "best_meal_class_confidence_below_0_700" in text
+    assert "classification_method" in text
+    assert "source_type" in text
+    assert "has_curated_exact" in text
+    assert "has_human_review" in text
+    assert "'identity_exposed', false" in text
+    assert "'automatic_confidence_upgrade_allowed', false" in text
+    assert "UPDATE public." not in text
+    assert "INSERT INTO public." not in text
+    for forbidden_table in ("profiles", "households", "feedback_events", "recommendation_events"):
+        assert forbidden_table not in text
+
+
+def test_meal_class_remediation_report_reconciles_and_rolls_back_cleanly():
+    """All candidates must reconcile across cohort, evidence and confidence summaries."""
+    validation = REMEDIATION_VALIDATION.read_text()
+    rollback = REMEDIATION_ROLLBACK.read_text()
+
+    for invariant in (
+        "catalogue meal-class remediation cohorts do not reconcile",
+        "catalogue meal-class remediation ontology states do not reconcile",
+        "catalogue meal-class remediation methods do not reconcile",
+        "catalogue meal-class remediation sources do not reconcile",
+        "catalogue meal-class remediation review states do not reconcile",
+        "catalogue meal-class remediation confidence does not reconcile",
+        "catalogue meal-class remediation mapping cardinality does not reconcile",
+    ):
+        assert invariant in validation
+    assert (
+        "DROP FUNCTION IF EXISTS re_engine.catalogue_meal_class_remediation_report()"
+        in rollback
+    )
+
+
+def test_meal_class_remediation_workflow_is_protected_and_keeps_aux_untouched():
+    """The diagnostic must prove DB identity, serialize install and never route Aux."""
+    text = REMEDIATION_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "database_identifies_project" in text
+    assert "pg_advisory_xact_lock" in text
+    assert "--single-transaction" in text
+    assert "SET TRANSACTION READ ONLY" in text
+    assert "recommendation-meal-class-remediation-report.json" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
