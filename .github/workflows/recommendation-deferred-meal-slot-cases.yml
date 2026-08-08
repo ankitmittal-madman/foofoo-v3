@@ -1,0 +1,186 @@
+name: Govern deferred meal-slot cases
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Install the boundary or generate the exact private 23-case cohort
+        required: true
+        type: choice
+        options:
+          - install_only
+          - generate
+      confirm:
+        description: Type the action-specific confirmation phrase
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deferred-meal-slot-cases
+  cancel-in-progress: false
+
+jobs:
+  govern:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      ((inputs.action == 'install_only' &&
+        inputs.confirm == 'install-deferred-meal-slot-case-boundary') ||
+       (inputs.action == 'generate' &&
+        inputs.confirm == 'generate-deferred-meal-slot-cases-v1'))
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-deferred-slot-cases-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=10min -c lock_timeout=10s
+      SOURCE_PATH: database/seeds/IndianFoodDatasetCSV.csv
+      SOURCE_POLICY_PATH: ops/recommendation/policies/deferred_meal_slot_shifted_field_policy_v1.json
+      SOURCE_POLICY_SHA256: 94d5f198bbb1244d631a23c5dc95200a6be860d6609dfc6a6bb0c1a7cb5717ac
+      CASE_POLICY_PATH: ops/recommendation/policies/deferred_meal_slot_case_policy_v1.json
+      CASE_POLICY_SHA256: 339916734763f073080cec4079f51401955da7af5df996076c1cc851b92b68da
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify boundary code and tests
+        run: |
+          python -m pip install "pytest>=8,<9" "ruff>=0.9,<1" "PyYAML>=6,<7"
+          python -m ruff check \
+            ops/recommendation/deferred_meal_slot_evidence.py \
+            ops/quality/suites/test_deferred_meal_slot_evidence.py
+          python -m pytest -q \
+            ops/quality/suites/test_deferred_meal_slot_evidence.py \
+            ops/quality/suites/test_contextual_meal_slot_proposals.py
+
+      - name: Verify production and policy identities
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test "$(sha256sum -- "$SOURCE_POLICY_PATH" | cut -d ' ' -f 1)" = "$SOURCE_POLICY_SHA256"
+          test "$(sha256sum -- "$CASE_POLICY_PATH" | cut -d ' ' -f 1)" = "$CASE_POLICY_SHA256"
+          jq --exit-status '
+            .schema_version == "deferred-meal-slot-case-policy-v1"
+            and .policy_version == "deferred-meal-slot-case-generation-v1"
+            and .case_count == 23
+            and .diet_evidence_link_count == 88
+            and .case_route_counts == {
+              "conflicting_direct_slots":1,
+              "requires_food_role_review":17,
+              "shifted_contextual_slot_candidate":2,
+              "shifted_direct_slot_candidate":3
+            }
+            and .candidate_slot_set_counts == {
+              "breakfast":2,"dinner":1,"lunch,dinner":2
+            }
+            and .serving_mutation_allowed == false
+          ' "$CASE_POLICY_PATH" >/dev/null
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.deferred_meal_slot_shifted_field_report(text,text,text,text,integer,integer,integer)') IS NOT NULL")" = "t"
+
+      - name: Build identity-free source manifest
+        run: |
+          manifest="$RUNNER_TEMP/deferred-meal-slot-shifted-field.tsv"
+          python -m ops.recommendation.deferred_meal_slot_evidence \
+            --source "$SOURCE_PATH" --policy "$SOURCE_POLICY_PATH" --output "$manifest" \
+            > "$RUNNER_TEMP/deferred-meal-slot-manifest-summary.json"
+          test "$(wc -l < "$manifest")" -eq 62
+
+      - name: Classify case boundary state
+        id: state
+        run: |
+          state="$(psql "$FOOFOO_SUPABASE_URI" -At -F '|' -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ops.deferred_meal_slot_cases') IS NOT NULL, to_regclass('ops.deferred_meal_slot_case_evidence') IS NOT NULL, to_regprocedure('ops.generate_deferred_meal_slot_cases(text,text,text,text,text,integer,integer,integer)') IS NOT NULL")"
+          case "$state" in
+            'f|f|f') echo "action=install" >> "$GITHUB_OUTPUT" ;;
+            't|t|t') echo "action=validate" >> "$GITHUB_OUTPUT" ;;
+            *) echo "unsafe partial deferred case boundary: $state" >&2; exit 1 ;;
+          esac
+
+      - name: Atomically install private case boundary
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/122_govern_deferred_meal_slot_cases.sql \
+            -f database/validation/974_govern_deferred_meal_slot_cases_validation.sql
+
+      - name: Revalidate existing boundary read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/974_govern_deferred_meal_slot_cases_validation.sql
+
+      - name: Stop after install-only verification
+        if: inputs.action == 'install_only'
+        run: |
+          test "${{ steps.state.outputs.action }}" = "install" -o "${{ steps.state.outputs.action }}" = "validate"
+          printf '%s\n' '{"schema_version":"deferred-meal-slot-case-install-v1","installed":true,"cases_generated":false,"dish_changed":false,"proposal_changed":false,"publication_changed":false,"serving_changed":false}' \
+            > "$RUNNER_TEMP/deferred-meal-slot-case-install.json"
+
+      - name: Generate exact private review cohort
+        if: inputs.action == 'generate'
+        run: |
+          export EXPECTED_SOURCE_NAME="$(basename -- "$SOURCE_PATH")"
+          export EXPECTED_SOURCE_CHECKSUM="$(sha256sum -- "$SOURCE_PATH" | cut -d ' ' -f 1)"
+          export EXPECTED_MANIFEST_PATH="$RUNNER_TEMP/deferred-meal-slot-shifted-field.tsv"
+          case "$EXPECTED_MANIFEST_PATH" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          before_dishes="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT count(*)::text || ':' || md5(string_agg(id::text || ':' || coalesce(meal_occasion::text,''), ',' ORDER BY id)) FROM public.dishes")"
+          before_proposals="$(psql "$FOOFOO_SUPABASE_URI" -At -F ':' -v ON_ERROR_STOP=1 -c "SELECT (SELECT count(*) FROM ops.dish_meal_slot_proposals), (SELECT count(*) FROM ops.dish_meal_slot_set_proposals)")"
+          result="$RUNNER_TEMP/deferred-meal-slot-case-generation.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 > "$result.raw" <<SQL
+          CREATE TEMP TABLE expected_deferred_course_manifest (
+            source_srno integer PRIMARY KEY,
+            row_fingerprint text NOT NULL CHECK (row_fingerprint ~ '^[0-9a-f]{64}$'),
+            repair_route text NOT NULL,
+            proposed_slots_key text NOT NULL
+          );
+          \copy expected_deferred_course_manifest FROM '$EXPECTED_MANIFEST_PATH' WITH (FORMAT csv, DELIMITER E'\t')
+          BEGIN;
+          SELECT pg_advisory_xact_lock(hashtext('foofoo-deferred-meal-slot-cases'));
+          SELECT ops.generate_deferred_meal_slot_cases(
+            '${{ github.run_id }}', '$EXPECTED_SOURCE_NAME', '$EXPECTED_SOURCE_CHECKSUM',
+            '$SOURCE_POLICY_SHA256', '$CASE_POLICY_SHA256', 62, 23, 88
+          );
+          COMMIT;
+          SQL
+          grep -E '^\{' "$result.raw" | tail -n 1 > "$result"
+          after_dishes="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT count(*)::text || ':' || md5(string_agg(id::text || ':' || coalesce(meal_occasion::text,''), ',' ORDER BY id)) FROM public.dishes")"
+          after_proposals="$(psql "$FOOFOO_SUPABASE_URI" -At -F ':' -v ON_ERROR_STOP=1 -c "SELECT (SELECT count(*) FROM ops.dish_meal_slot_proposals), (SELECT count(*) FROM ops.dish_meal_slot_set_proposals)")"
+          test "$before_dishes" = "$after_dishes"
+          test "$before_proposals" = "$after_proposals"
+          jq --exit-status '
+            .schema_version == "deferred-meal-slot-case-generation-result-v1"
+            and (.outcome == "generated" or .outcome == "already_generated")
+            and .total_cases == 23
+            and .diet_evidence_links == 88
+            and .conflict_evidence_links >= 2
+            and .route_counts == {
+              "conflicting_direct_slots":1,
+              "requires_food_role_review":17,
+              "shifted_contextual_slot_candidate":2,
+              "shifted_direct_slot_candidate":3
+            }
+            and .candidate_slot_set_counts == {
+              "breakfast":2,"dinner":1,"lunch,dinner":2
+            }
+            and .case_status == "pending_review"
+            and .automatic_acceptance_allowed == false
+            and .dish_changed == false
+            and .proposal_changed == false
+            and .publication_changed == false
+            and .serving_changed == false
+          ' "$result" >/dev/null
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/974_govern_deferred_meal_slot_cases_validation.sql
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deferred-meal-slot-cases-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/deferred-meal-slot-case-install.json
+            ${{ runner.temp }}/deferred-meal-slot-case-generation.json
+          retention-days: 90
+          if-no-files-found: error
