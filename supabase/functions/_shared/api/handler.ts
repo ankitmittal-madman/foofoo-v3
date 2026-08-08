@@ -43,6 +43,13 @@ export function defineHandler(
     const ctx = buildContext(req);
     const res = await pipeline(req, ctx);
     const headers = new Headers(res.headers);
+    // Every non-preflight Edge response can contain household-scoped state or reveal whether a
+    // protected operation succeeded. Make the privacy/freshness boundary explicit instead of
+    // relying on POST's usual cache behavior: browsers, service workers, CDNs and reverse proxies
+    // must not retain or replay personalized success or error bodies.
+    headers.set("Cache-Control", "no-store, private");
+    headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
     for (const [k, v] of Object.entries(corsHeaders(req))) headers.set(k, v);
     return new Response(res.body, { status: res.status, headers });
   };

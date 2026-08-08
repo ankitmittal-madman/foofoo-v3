@@ -138,8 +138,36 @@ Deno.test("middleware pipeline composes and error boundary maps AppError to stat
     const res = await fetchHandler(new Request("http://localhost/v1/anything"));
     assertEquals(res.status, 404);
     assertEquals(res.headers.get("x-trace-id") !== null, true);
+    assertEquals(res.headers.get("cache-control"), "no-store, private");
+    assertEquals(res.headers.get("pragma"), "no-cache");
+    assertEquals(res.headers.get("expires"), "0");
     const body = await res.json();
     assertEquals(body.error.code, "NOT_FOUND");
+  });
+});
+
+Deno.test("authenticated Edge success responses are explicitly non-cacheable", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    const fetchHandler = defineHandler(() =>
+      new Response(JSON.stringify({ household_scoped: true }), {
+        status: 200,
+        headers: {
+          "content-type": "application/json",
+          // A business handler cannot accidentally weaken the shared privacy boundary.
+          "cache-control": "public, max-age=3600",
+        },
+      })
+    );
+    const res = await fetchHandler(
+      new Request("http://localhost/v1/recommendations", {
+        method: "POST",
+      }),
+    );
+    assertEquals(res.status, 200);
+    assertEquals(res.headers.get("cache-control"), "no-store, private");
+    assertEquals(res.headers.get("pragma"), "no-cache");
+    assertEquals(res.headers.get("expires"), "0");
   });
 });
 
