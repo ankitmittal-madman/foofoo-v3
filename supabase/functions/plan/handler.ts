@@ -444,9 +444,8 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       // the actively-routed Home tab (today.tsx) actually calls, so a like/dislike tap there had
       // nothing to resolve against before this change. weekly_plan is now included so a direct
       // class selection has request lineage; recipe remains excluded because it is content detail.
-      // Best-effort (recordRecommendationEvent never throws/never blocks the response, same as
-      // recommendations/handler.ts's own call site); skipped for a stubbed (no-profile-yet)
-      // household, same guard recordRecommendationEvent already applies itself.
+      // Durable event lineage is required for non-stubbed feedback-capable responses. Stubbed
+      // households still have no referentially valid profile row, so the writer skips them.
       const FEEDBACK_ELIGIBLE_SURFACES = new Set([
         "cold_start",
         "calibration",
@@ -574,6 +573,10 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
             )
             : undefined,
           governedContextSignals: derivedGovernedContextSignals,
+          // These surfaces accept explicit feedback by request_id. Do not return a response whose
+          // recommendation event is missing, because the subsequent feedback could not be joined
+          // to its exact served slate.
+          lineageRequired: !stubbedHousehold,
         });
         await recordProductEvent(ctx, {
           profileId: claims.userId,

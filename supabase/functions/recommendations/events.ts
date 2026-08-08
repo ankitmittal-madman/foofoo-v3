@@ -10,6 +10,8 @@
  * Function's service-role client. The RE never sees it and gains no database dependency from it.
  */
 import { createServiceRoleClient } from "../_shared/db/client.ts";
+import { AppError } from "../_shared/errors/app-error.ts";
+import { ERROR_CATALOGUE } from "../_shared/errors/catalogue.ts";
 import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
 import {
@@ -62,6 +64,10 @@ export interface RecommendationEventInput {
   productionGuardrailObservation?: ProductionGuardrailObservation;
   /** Authority-labelled request context used for this serving decision. */
   governedContextSignals?: GovernedContextSignal[];
+  /** Fail the request when the durable event cannot be written. Feedback-capable surfaces set
+   * this because returning an untraceable slate would accept UI actions that can never be joined
+   * to the served decision. Observational callers retain the historical fail-open default. */
+  lineageRequired?: boolean;
 }
 
 /**
@@ -121,12 +127,16 @@ export async function recordRecommendationEvent(
     if (error) throw error;
     insertedId = (data as { id: string } | null)?.id ?? null;
   } catch (e) {
+    const detail = e instanceof Error ? e.message : String(e);
     ctx.logger.warn("recommendation_event.persist_failed", {
       request_id: ev.requestId,
       household_id: ev.householdId,
       outcome: ev.outcome,
-      detail: e instanceof Error ? e.message : String(e),
+      detail,
     });
+    if (ev.lineageRequired) {
+      throw new AppError(ERROR_CATALOGUE.INTERNAL, { detail });
+    }
     return;
   }
 

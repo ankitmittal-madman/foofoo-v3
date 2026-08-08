@@ -27,6 +27,15 @@ FRESH_ATTRIBUTION_ROLLBACK = Path(
     "database/rollback/117_measure_fresh_preference_attribution_rollback.sql"
 )
 FRESH_ATTRIBUTION_WORKFLOW = Path(".github/workflows/recommendation-fresh-attribution-slo.yml")
+FRESH_ATTRIBUTION_SCOPE_MIGRATION = Path(
+    "database/migrations/119_scope_fresh_preference_attribution.sql"
+)
+FRESH_ATTRIBUTION_SCOPE_VALIDATION = Path(
+    "database/validation/971_scope_fresh_preference_attribution_validation.sql"
+)
+FRESH_ATTRIBUTION_SCOPE_ROLLBACK = Path(
+    "database/rollback/119_scope_fresh_preference_attribution_rollback.sql"
+)
 
 PROFILE_ID = UUID("621a406a-1778-4951-b1a2-8e05c09449c8")
 
@@ -218,6 +227,8 @@ def test_fresh_attribution_workflow_is_bounded_protected_and_actionable():
     assert 'case "$WINDOW_HOURS" in 24|168|720)' in text
     assert "pg_advisory_xact_lock" in text
     assert "--single-transaction" in text
+    assert "119_scope_fresh_preference_attribution.sql" in text
+    assert "971_scope_fresh_preference_attribution_validation.sql" in text
     assert "SET TRANSACTION READ ONLY" in text
     assert "recommendation-fresh-attribution-slo.json" in text
     assert 'test "$status" != "fail"' in text
@@ -225,3 +236,22 @@ def test_fresh_attribution_workflow_is_bounded_protected_and_actionable():
     assert "policy.training_changed == false" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text
+
+
+def test_fresh_attribution_v2_is_cutover_aware_and_dish_scoped():
+    """Legacy and meal-class evidence cannot pollute the repaired dish writer's SLO."""
+    migration = FRESH_ATTRIBUTION_SCOPE_MIGRATION.read_text()
+    validation = FRESH_ATTRIBUTION_SCOPE_VALIDATION.read_text()
+    rollback = FRESH_ATTRIBUTION_SCOPE_ROLLBACK.read_text()
+
+    assert "preference_attribution_slo_control" in migration
+    assert "v_effective_since := greatest(p_since, v_monitoring_started_at)" in migration
+    assert "f.target_type = 'dish'" in migration
+    assert "excluded_non_dish_event_count" in migration
+    assert "'cutover_aware', true" in migration
+    assert "'dish_preference_targets_only', true" in migration
+    assert "fresh-preference-attribution-v2" in validation
+    assert "application roles" in validation
+    assert "DROP TABLE IF EXISTS ml.preference_attribution_slo_control" in rollback
+    for mutation in ("UPDATE public.feedback_events", "DELETE FROM", "TRUNCATE"):
+        assert mutation not in migration

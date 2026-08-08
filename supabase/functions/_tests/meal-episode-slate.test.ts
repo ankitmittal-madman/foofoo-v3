@@ -1,4 +1,4 @@
-import { assertEquals, assertNotEquals } from "@std/assert";
+import { assertEquals, assertNotEquals, assertRejects } from "@std/assert";
 import {
   buildDishLineageCandidates,
   eligibleSetHash,
@@ -32,6 +32,21 @@ Deno.test("dish slate normalization covers landing-page options without inventin
   });
   assertEquals(items.map((item) => item.name), ["Poha", "Upma"]);
   assertEquals(items.map((item) => item.score), [4.2, 3.8]);
+});
+
+Deno.test("dish slate normalization covers every served hero on the direct home endpoint", () => {
+  const items = extractDishSlateItems("recommendations", {
+    slot: "dinner",
+    plates: [{
+      plate_id: "p1",
+      hero_dish_names: ["Dal", "Bhindi"],
+      plate_score: 4.2,
+    }],
+  });
+  assertEquals(items.map((item) => [item.name, item.score, item.slot]), [
+    ["Dal", 4.2, "dinner"],
+    ["Bhindi", 4.2, "dinner"],
+  ]);
 });
 
 Deno.test("private candidate lineage keeps the full eligible pool separate from served items", () => {
@@ -88,7 +103,7 @@ Deno.test("calibration slate preserves each cell slot in one globally ordered sl
   ]);
 });
 
-Deno.test("calibration remains available when optional slate persistence fails", async () => {
+Deno.test("feedback-capable calibration fails closed when slate persistence fails", async () => {
   const warnings: Array<{ message: string; fields?: Record<string, unknown> }> = [];
   const logger = {
     debug: () => {},
@@ -101,24 +116,27 @@ Deno.test("calibration remains available when optional slate persistence fails",
   };
   const ctx = { logger } as unknown as RequestContext;
 
-  const slateId = await recordDishRecommendationSlate(
-    ctx,
-    {
-      householdId: "11111111-1111-1111-1111-111111111111",
-      requestId: "calibration-request",
-      surface: "calibration",
-      modelVersion: "test",
-      configVersion: "test",
-      policyCode: "test",
-      latencyMs: 1,
-      householdSnapshot: {},
-      requestContext: {},
-      response: { slots: {} },
-    },
-    () => Promise.reject(new Error("lineage RPC is not deployed")),
+  await assertRejects(
+    () =>
+      recordDishRecommendationSlate(
+        ctx,
+        {
+          householdId: "11111111-1111-1111-1111-111111111111",
+          requestId: "calibration-request",
+          surface: "calibration",
+          modelVersion: "test",
+          configVersion: "test",
+          policyCode: "test",
+          latencyMs: 1,
+          householdSnapshot: {},
+          requestContext: {},
+          response: { slots: {} },
+        },
+        () => Promise.reject(new Error("lineage RPC is not deployed")),
+      ),
+    Error,
+    "lineage RPC is not deployed",
   );
-
-  assertEquals(slateId, undefined);
   assertEquals(warnings, [{
     message: "plan.dishes.persist_failed",
     fields: {

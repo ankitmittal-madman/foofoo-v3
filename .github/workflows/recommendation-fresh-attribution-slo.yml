@@ -49,8 +49,8 @@ jobs:
       - name: Classify report state
         id: state
         run: |
-          report="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('ml.fresh_preference_attribution_report(timestamptz)') IS NOT NULL")"
-          case "$report" in
+          control="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ml.preference_attribution_slo_control') IS NOT NULL")"
+          case "$control" in
             f) echo "action=install" >> "$GITHUB_OUTPUT" ;;
             t) echo "action=validate" >> "$GITHUB_OUTPUT" ;;
             *) exit 1 ;;
@@ -62,14 +62,15 @@ jobs:
           psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
             -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
             -f database/migrations/117_measure_fresh_preference_attribution.sql \
-            -f database/validation/969_measure_fresh_preference_attribution_validation.sql
+            -f database/migrations/119_scope_fresh_preference_attribution.sql \
+            -f database/validation/971_scope_fresh_preference_attribution_validation.sql
 
       - name: Revalidate installed SLO read-only
         if: steps.state.outputs.action == 'validate'
         run: |
           psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
             -c "SET TRANSACTION READ ONLY" \
-            -f database/validation/969_measure_fresh_preference_attribution_validation.sql
+            -f database/validation/971_scope_fresh_preference_attribution_validation.sql
 
       - name: Produce aggregate SLO report
         run: |
@@ -82,10 +83,13 @@ jobs:
           SQL
           grep -E '^\{' "$report.raw" | tail -n 1 > "$report"
           jq --exit-status '
-            .schema_version == "fresh-preference-attribution-v1"
+            .schema_version == "fresh-preference-attribution-v2"
             and .labeled_event_count == ([.route_counts[]] | add // 0)
             and .labeled_event_count == (.exact_event_count + .inexact_event_count)
+            and .excluded_non_dish_event_count >= 0
             and (.slo.status | IN("insufficient_sample", "pass", "fail"))
+            and .policy.cutover_aware == true
+            and .policy.dish_preference_targets_only == true
             and .policy.identity_exposed == false
             and .policy.event_identity_exposed == false
             and .policy.raw_feedback_exposed == false
