@@ -64,4 +64,4 @@ jobs:
       - name: Catalogue/config bundle is current
         run: python3 -m ghar_re_service.scripts.export_bundle --check
       - name: pytest — core, service, training/audit, and credential-rotation safety boundaries
-        run: python3 -m pytest ghar_re_core/tests/ ghar_re_service/tests/ ops/quality/suites/test_catalogue_ghar_deploy_workflow.py ops/quality/suites/test_preference_training_operations.py ops/quality/suites/test_recommendation_user_audit.py ops/quality/suites/test_pesarattu_canonicalization.py ops/quality/suites/test_rotate_prospective_credential.py -v
+        run: python3 -m pytest ghar_re_core/tests/ ghar_re_service/tests/ ops/quality/suites/test_catalogue_ghar_deploy_workflow.py ops/quality/suites/test_contextual_meal_slot_proposals.py ops/quality/suites/test_preference_training_operations.py ops/quality/suites/test_recommendation_user_audit.py ops/quality/suites/test_pesarattu_canonicalization.py ops/quality/suites/test_rotate_prospective_credential.py -v

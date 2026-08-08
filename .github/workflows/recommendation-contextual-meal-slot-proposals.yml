@@ -1,0 +1,196 @@
+name: Generate contextual meal-slot set proposals
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Install the review boundary or generate the exact pending cohort
+        required: true
+        default: install_only
+        type: choice
+        options:
+          - install_only
+          - generate
+      confirm:
+        description: Type the exact action-specific confirmation from the runbook
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-contextual-meal-slot-proposals
+  cancel-in-progress: false
+
+jobs:
+  govern:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      ((inputs.action == 'install_only' &&
+        inputs.confirm == 'install-contextual-meal-slot-proposals') ||
+       (inputs.action == 'generate' &&
+        inputs.confirm == 'generate-contextual-meal-slot-proposals-v1'))
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-contextual-slot-proposals-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=10min -c lock_timeout=10s
+      SOURCE_PATH: database/seeds/IndianFoodDatasetCSV.csv
+      POLICY_PATH: ops/recommendation/policies/contextual_meal_slot_candidate_policy_v1.json
+      POLICY_SHA256: 5afca8a6da05a6070abc6678d0a4f73924cafad62835e9152916efe6e7596154
+      EXPECTED_CANDIDATE_COUNT: "775"
+      EXPECTED_MANIFEST_ROW_COUNT: "2003"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify proposal boundary code and tests
+        run: |
+          python -m pip install "pytest>=8,<9" "ruff>=0.9,<1" "PyYAML>=6,<7"
+          python -m ruff check \
+            ops/recommendation/contextual_meal_slot_policy.py \
+            ops/quality/suites/test_contextual_meal_slot_proposals.py
+          python -m pytest -q \
+            ops/quality/suites/test_contextual_meal_slot_proposals.py \
+            ops/quality/suites/test_catalogue_gap_audit.py
+
+      - name: Verify production identity and candidate policy
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test -f "$SOURCE_PATH"
+          test -f "$POLICY_PATH"
+          test "$(sha256sum -- "$POLICY_PATH" | cut -d ' ' -f 1)" = "$POLICY_SHA256"
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_meal_slot_remediation_report()') IS NOT NULL")" = "t"
+          actual="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT re_engine.catalogue_meal_slot_remediation_report()->'remediation_routes'->>'contextual_course_review'")"
+          test "$actual" = "797"
+
+      - name: Classify contextual proposal schema state
+        id: state
+        run: |
+          proposals="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ops.dish_meal_slot_set_proposals') IS NOT NULL")"
+          evidence="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ops.dish_meal_slot_set_proposal_evidence') IS NOT NULL")"
+          generator="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('ops.generate_contextual_meal_slot_set_proposals(text,integer,integer,text,text,text,text)') IS NOT NULL")"
+          if [ "$proposals:$evidence:$generator" = "f:f:f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$proposals:$evidence:$generator" = "t:t:t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe partial contextual meal-slot proposal state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install contextual proposal boundary
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/118_govern_contextual_meal_slot_set_proposals.sql \
+            -f database/validation/970_govern_contextual_meal_slot_set_proposals_validation.sql
+
+      - name: Revalidate existing contextual proposal boundary read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/970_govern_contextual_meal_slot_set_proposals_validation.sql
+
+      - name: Build policy-bound ephemeral contextual manifest
+        if: inputs.action == 'generate'
+        run: |
+          manifest="$RUNNER_TEMP/contextual-meal-slot-candidate-manifest.tsv"
+          summary="$RUNNER_TEMP/contextual-meal-slot-candidate-summary.json"
+          python -m ops.recommendation.contextual_meal_slot_policy \
+            --source "$SOURCE_PATH" --policy "$POLICY_PATH" --output "$manifest" > "$summary"
+          jq --arg policy_sha "$POLICY_SHA256" \
+             --argjson candidates "$EXPECTED_CANDIDATE_COUNT" \
+             --argjson manifest_rows "$EXPECTED_MANIFEST_ROW_COUNT" --exit-status '
+            .schema_version == "contextual-meal-slot-candidate-manifest-summary-v1"
+            and .policy_version == "contextual-import-course-slot-set-v1"
+            and .policy_sha256 == $policy_sha
+            and .mapping_count == 5
+            and .manifest_candidate_rows == $manifest_rows
+            and .candidate_scope.proposal_count == $candidates
+            and .candidate_scope.manifest_candidate_row_count == $manifest_rows
+            and .candidate_scope.slot_set_dish_counts == {"breakfast,lunch":2,"lunch,dinner":773}
+            and .proposal_only == true
+            and .requires_explicit_approval == true
+          ' "$summary" >/dev/null
+          test "$(wc -l < "$manifest")" -eq "$EXPECTED_MANIFEST_ROW_COUNT"
+
+      - name: Generate exact pending contextual cohort atomically
+        if: inputs.action == 'generate'
+        run: |
+          export EXPECTED_SOURCE_NAME="$(basename -- "$SOURCE_PATH")"
+          export EXPECTED_SOURCE_CHECKSUM="$(sha256sum -- "$SOURCE_PATH" | cut -d ' ' -f 1)"
+          export EXPECTED_MANIFEST_PATH="$RUNNER_TEMP/contextual-meal-slot-candidate-manifest.tsv"
+          [[ "$EXPECTED_SOURCE_NAME" =~ ^[A-Za-z0-9._-]+$ ]]
+          [[ "$EXPECTED_SOURCE_CHECKSUM" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$EXPECTED_MANIFEST_PATH" =~ ^[A-Za-z0-9_./-]+$ ]]
+          case "$EXPECTED_MANIFEST_PATH" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+
+          report="$RUNNER_TEMP/contextual-meal-slot-proposal-generation.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 > "$report.raw" <<SQL
+          CREATE TEMP TABLE expected_contextual_source_manifest (
+            source_srno integer PRIMARY KEY,
+            row_fingerprint text NOT NULL CHECK (row_fingerprint ~ '^[0-9a-f]{64}$'),
+            evidence_category text NOT NULL CHECK (evidence_category IN (
+              'brunch_candidate','dessert_candidate','main_course_candidate',
+              'one_pot_candidate','side_dish_candidate'
+            )),
+            proposed_slots_key text NOT NULL CHECK (
+              proposed_slots_key IN ('breakfast,lunch','lunch,dinner')
+            )
+          );
+          BEGIN;
+          \copy expected_contextual_source_manifest FROM '$EXPECTED_MANIFEST_PATH' WITH (FORMAT csv, DELIMITER E'\t')
+          SELECT ops.generate_contextual_meal_slot_set_proposals(
+            '$GITHUB_RUN_ID', $EXPECTED_CANDIDATE_COUNT, $EXPECTED_MANIFEST_ROW_COUNT,
+            '$EXPECTED_SOURCE_NAME', '$EXPECTED_SOURCE_CHECKSUM',
+            'contextual-import-course-slot-set-v1', '$POLICY_SHA256'
+          );
+          \i database/validation/970_govern_contextual_meal_slot_set_proposals_validation.sql
+          COMMIT;
+          SQL
+          grep -E '^\{' "$report.raw" | tail -n 1 > "$report"
+          jq --arg policy_sha "$POLICY_SHA256" \
+             --argjson expected "$EXPECTED_CANDIDATE_COUNT" --exit-status '
+            .schema_version == "contextual-meal-slot-set-proposal-generation-v1"
+            and .policy_sha256 == $policy_sha
+            and .candidate_count == $expected
+            and .total_versioned_proposals == $expected
+            and .candidate_count == (.inserted_count + .existing_count)
+            and .manifest_candidate_row_count == 2003
+            and .status == "pending_review"
+            and .slot_set_counts == {"breakfast,lunch":2,"lunch,dinner":773}
+            and .policy.proposal_only == true
+            and .policy.requires_explicit_approval_before_apply == true
+            and .policy.identity_exposed == false
+            and .policy.raw_source_text_exposed == false
+            and .policy.dishes_changed == false
+            and .policy.publication_changed == false
+            and .policy.serving_changed == false
+          ' "$report" >/dev/null
+
+      - name: Produce install-only evidence
+        if: inputs.action == 'install_only'
+        run: |
+          jq --null-input --arg run_id "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" '{
+            schema_version: "contextual-meal-slot-proposal-boundary-install-v1",
+            workflow_run_id: $run_id,
+            commit_sha: $commit,
+            installed: true,
+            proposals_changed: false,
+            dishes_changed: false,
+            publication_changed: false,
+            serving_changed: false
+          }' > "$RUNNER_TEMP/contextual-meal-slot-proposal-boundary-install.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: contextual-meal-slot-proposals-${{ inputs.action }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/contextual-meal-slot-*.json
+          retention-days: 90
+          if-no-files-found: error
