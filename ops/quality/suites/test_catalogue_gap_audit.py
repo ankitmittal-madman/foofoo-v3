@@ -14,6 +14,15 @@ TRANCHE_VALIDATION = Path(
 TRANCHE_ROLLBACK = Path(
     "database/rollback/103_measure_catalogue_enrichment_tranche_rollback.sql"
 )
+QUALITY_MIGRATION = Path(
+    "database/migrations/104_measure_published_catalogue_quality.sql"
+)
+QUALITY_VALIDATION = Path(
+    "database/validation/956_measure_published_catalogue_quality_validation.sql"
+)
+QUALITY_ROLLBACK = Path(
+    "database/rollback/104_measure_published_catalogue_quality_rollback.sql"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -83,6 +92,7 @@ def test_gap_audit_workflow_is_protected_bounded_and_does_not_route_aux():
     assert "SET TRANSACTION READ ONLY" in text
     assert "recommendation-catalogue-gap-report.json" in text
     assert "recommendation-catalogue-enrichment-tranche-report.json" in text
+    assert "recommendation-catalogue-published-quality-report.json" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text
 
@@ -124,9 +134,43 @@ def test_workflow_handles_clean_install_extension_and_read_only_revalidation():
     text = WORKFLOW.read_text()
 
     assert "action=apply_all" in text
-    assert "action=apply_tranche" in text
+    assert "action=apply_tranche_and_quality" in text
+    assert "action=apply_quality" in text
     assert "action=validate" in text
     assert "unsafe partial catalogue audit boundary" in text
     assert "database/migrations/103_measure_catalogue_enrichment_tranche.sql" in text
     assert "database/validation/955_measure_catalogue_enrichment_tranche_validation.sql" in text
     assert text.count("          path:") == 1
+
+
+def test_published_quality_report_is_count_only_and_does_not_change_eligibility():
+    """Republishing must be preceded by aggregate quality proof, not a hidden gate mutation."""
+    text = QUALITY_MIGRATION.read_text()
+
+    assert "catalogue_published_quality_report" in text
+    assert "eligible_count" in text
+    assert "strict_quality_ready" in text
+    assert "quality_review_required" in text
+    assert "class_confidence_minimum', 0.700" in text
+    assert "UPDATE public.dishes" not in text
+    assert "INSERT INTO public.dishes" not in text
+    assert "catalogue_publication_rows" not in text
+    for forbidden_table in ("profiles", "households", "feedback_events", "recommendation_events"):
+        assert forbidden_table not in text
+
+
+def test_published_quality_report_reconciles_with_live_publication_and_rolls_back_cleanly():
+    """The quality cohort must equal the existing publication cohort and remain reversible."""
+    validation = QUALITY_VALIDATION.read_text()
+    rollback = QUALITY_ROLLBACK.read_text()
+
+    for invariant in (
+        "catalogue published quality count does not match publication eligibility",
+        "catalogue published quality readiness does not reconcile",
+        "catalogue published ontology confidence does not reconcile",
+        "catalogue published class confidence does not reconcile",
+        "catalogue published taxonomy confidence does not reconcile",
+        "catalogue published ingredient confidence does not reconcile",
+    ):
+        assert invariant in validation
+    assert "DROP FUNCTION IF EXISTS re_engine.catalogue_published_quality_report()" in rollback
