@@ -112,7 +112,14 @@ def build_manifest(source_path: Path, policy_path: Path, output_path: Path) -> d
         raise ValueError("deferred shifted-field manifest distribution drifted")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as handle:
-        csv.writer(handle, delimiter="\t", lineterminator="\n").writerows(rows)
+        # Quote every field so PostgreSQL CSV COPY preserves the intentional empty slot key as
+        # an empty string. An unquoted trailing empty field is PostgreSQL's CSV NULL marker.
+        csv.writer(
+            handle,
+            delimiter="\t",
+            lineterminator="\n",
+            quoting=csv.QUOTE_ALL,
+        ).writerows(rows)
     return {
         "schema_version": "deferred-meal-slot-shifted-field-manifest-summary-v1",
         "policy_version": POLICY_VERSION,

@@ -303,11 +303,19 @@ source-row fingerprint before returning aggregate route counts.
 Migration 121, validation 973 and the protected `Audit deferred meal-slot shifted-field evidence`
 workflow are additive and service-only. The workflow installs or revalidates the aggregate report,
 runs it inside a read-only transaction and uploads one identity-free JSON artifact. It contains no
-Aux mode change, catalogue publication or Fly deployment step. Local evidence includes 329 passing
+Aux mode change, catalogue publication or Fly deployment step. Local evidence includes 331 passing
 recommendation tests with one expected skip, SQL/YAML/lint gates and a disposable PostgreSQL proof
 that returned the exact 22+1 scope, zero manifest failures and then removed the function cleanly.
-Production execution and the resulting remediation cohort remain pending; no mapping is approved or
-applied by this audit.
+Successful production aggregate execution and the resulting remediation cohort remain pending; no
+mapping is approved or applied by this audit.
+
+The first protected attempt, run `31276361197`, installed and validated the report function but
+stopped before query execution because PostgreSQL CSV COPY interpreted an unquoted empty slot key as
+`NULL`. It produced no accepted artifact and made no dish, proposal, publication or serving change.
+The manifest writer now quotes every field; a regression and direct PostgreSQL COPY proof verify all
+62 rows load, all 50 unresolved rows retain an empty string and zero slot keys become null. After
+reconciling concurrent audit tests, the full local gate remains at 331 tests with one expected skip.
+A new protected production run remains required.
 
 ### Phase A stop conditions
 

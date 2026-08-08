@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 from pathlib import Path
@@ -47,6 +48,11 @@ def test_manifest_is_deterministic_complete_and_identity_free(tmp_path: Path) ->
     assert first_summary["manifest_row_count"] == 62
     assert len(first.read_text(encoding="utf-8").splitlines()) == 62
     assert all(len(line.split("\t")) == 4 for line in first.read_text().splitlines())
+    with first.open(encoding="utf-8", newline="") as handle:
+        parsed = list(csv.reader(handle, delimiter="\t"))
+    assert all(len(row) == 4 for row in parsed)
+    assert any(row[2] == "unresolved_food_role" and row[3] == "" for row in parsed)
+    assert '\t""\n' in first.read_text(encoding="utf-8")
     assert "dish_name" not in first_summary
     assert "url" not in first_summary
 
