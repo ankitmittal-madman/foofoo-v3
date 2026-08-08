@@ -6,6 +6,7 @@ import pytest
 from ghar_re_service.published_catalogue import (
     PublishedCatalogueError,
     PublishedCatalogueStore,
+    reconcile_fallback_identities,
     select_for_request,
 )
 
@@ -142,3 +143,45 @@ def test_request_selection_uses_bounded_publication_when_all_ids_resolve(tmp_pat
         "publication_version": "sha256:test-publication",
         "candidate_count": 1,
     }
+
+
+def test_fallback_identity_reconciliation_preserves_candidates_and_attaches_exact_uuid(tmp_path):
+    canonical_id = "00000000-0000-0000-0000-000000000001"
+    store = PublishedCatalogueStore(
+        build_publication(tmp_path, [publication_row(canonical_id, "Rajma")])
+    )
+    fallback = Catalogue()
+    before_names = [dish.name for dish in fallback]
+
+    coverage = reconcile_fallback_identities(fallback, store)
+
+    assert [dish.name for dish in fallback] == before_names
+    assert fallback.get("Rajma").id == canonical_id
+    assert fallback.get_dish(canonical_id) is fallback.get("Rajma")
+    assert coverage == {
+        "total": len(before_names),
+        "resolved": 1,
+        "unresolved": len(before_names) - 1,
+    }
+
+
+def test_fallback_identity_reconciliation_never_uses_aliases(tmp_path):
+    canonical_id = "00000000-0000-0000-0000-000000000001"
+    row = publication_row(canonical_id, "Published Poha")
+    row["aliases"] = ["Rajma"]
+    store = PublishedCatalogueStore(build_publication(tmp_path, [row]))
+    fallback = Catalogue()
+
+    coverage = reconcile_fallback_identities(fallback, store)
+
+    assert fallback.get("Rajma").id.startswith("md5:")
+    assert coverage["resolved"] == 0
+
+
+def test_publication_identity_index_rejects_invalid_uuid(tmp_path):
+    store = PublishedCatalogueStore(
+        build_publication(tmp_path, [publication_row("not-a-uuid", "Rajma")])
+    )
+
+    with pytest.raises(PublishedCatalogueError, match="invalid dish id"):
+        store.canonical_ids_by_name()

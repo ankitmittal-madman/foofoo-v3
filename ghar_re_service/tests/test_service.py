@@ -142,6 +142,8 @@ def test_meta_returns_versions(client):
     }
     assert body["catalogue_identity"] == lifecycle.catalogue_identity_summary(main.state.catalogue)
     assert body["catalogue_identity"]["canonical_dishes"] > 0
+    assert body["catalogue_identity"]["canonical_uuid_dishes"] == 0
+    assert body["catalogue_identity"]["legacy_id_dishes"] > 0
     assert body["published_catalogue"] == {
         "configured": False,
         "publication_version": None,
@@ -152,6 +154,8 @@ def test_meta_returns_versions(client):
 def test_catalogue_identity_summary_is_safe_before_startup():
     assert lifecycle.catalogue_identity_summary(None) == {
         "canonical_dishes": 0,
+        "canonical_uuid_dishes": 0,
+        "legacy_id_dishes": 0,
         "resolvable_names": 0,
         "ambiguous_aliases": 0,
         "shadowed_aliases": 0,

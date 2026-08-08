@@ -14,6 +14,7 @@ import sqlite3
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
+from uuid import UUID
 
 from ghar_re_core.catalogue import Catalogue, allergens_from_flags
 
@@ -182,6 +183,69 @@ class PublishedCatalogueStore:
                 f"{len(missing)} candidate ids are absent from publication"
             )
         return Catalogue([to_ghar_dish(payload_by_id[dish_id]) for dish_id in unique_ids])
+
+    def canonical_ids_by_name(self) -> dict[str, str]:
+        """Return the verified publication's canonical UUID keyed by normalized canonical name.
+
+        This startup-only identity index reads no user data and does not hydrate taxonomy or alter
+        the serving candidate pool. It exists so the immutable fallback can preserve its ranking
+        while emitting the same canonical dish identity as database-backed candidates.
+        """
+        uri = f"file:{self.index_path}?mode=ro"
+        with sqlite3.connect(uri, uri=True) as database:
+            rows = database.execute("SELECT dish_id, name FROM catalogue").fetchall()
+
+        identities: dict[str, str] = {}
+        for raw_id, raw_name in rows:
+            dish_id = str(raw_id)
+            try:
+                canonical_id = str(UUID(dish_id))
+            except ValueError as exc:
+                raise PublishedCatalogueError(
+                    "published catalogue contains an invalid dish id"
+                ) from exc
+            if canonical_id != dish_id.casefold():
+                raise PublishedCatalogueError(
+                    "published catalogue contains a non-canonical dish id"
+                )
+            name_key = " ".join(str(raw_name).casefold().split())
+            if not name_key:
+                raise PublishedCatalogueError("published catalogue contains an empty dish name")
+            prior = identities.get(name_key)
+            if prior is not None and prior != canonical_id:
+                raise PublishedCatalogueError("published catalogue contains a dish-name collision")
+            identities[name_key] = canonical_id
+        return identities
+
+
+def reconcile_fallback_identities(
+    catalogue: Catalogue, store: PublishedCatalogueStore | None
+) -> dict[str, int]:
+    """Attach exact canonical UUIDs to matching fallback dishes without changing candidates.
+
+    Only normalized canonical-name equality is accepted; aliases and fuzzy matching are excluded
+    because either could silently attach feedback to the wrong dish. Unmatched fallback dishes keep
+    their legacy identifiers and remain measurable in the returned aggregate coverage counts.
+    """
+    dishes = list(catalogue.dishes)
+    if store is None:
+        return {"total": len(dishes), "resolved": 0, "unresolved": len(dishes)}
+
+    identities = store.canonical_ids_by_name()
+    resolved = 0
+    for dish in dishes:
+        canonical_id = identities.get(" ".join(str(dish.name).casefold().split()))
+        if canonical_id is None:
+            continue
+        dish.id = canonical_id
+        resolved += 1
+
+    # Catalogue constructed this index before publication loading. Rebuild it atomically after all
+    # exact matches are attached so get_dish() and response serialization observe the same IDs.
+    catalogue.by_id = {dish.id: dish for dish in dishes}
+    if len(catalogue.by_id) != len(dishes):
+        raise PublishedCatalogueError("canonical identity reconciliation produced a collision")
+    return {"total": len(dishes), "resolved": resolved, "unresolved": len(dishes) - resolved}
 
 
 def load_from_environment(
