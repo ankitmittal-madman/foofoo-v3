@@ -103,6 +103,18 @@ MEAL_SLOT_PROVENANCE_ROLLBACK = Path(
 MEAL_SLOT_PROVENANCE_WORKFLOW = Path(
     ".github/workflows/recommendation-meal-slot-proposal-provenance.yml"
 )
+MEAL_SLOT_SOURCE_INTEGRITY_MIGRATION = Path(
+    "database/migrations/112_measure_direct_meal_slot_proposal_source_integrity.sql"
+)
+MEAL_SLOT_SOURCE_INTEGRITY_VALIDATION = Path(
+    "database/validation/964_measure_direct_meal_slot_proposal_source_integrity_validation.sql"
+)
+MEAL_SLOT_SOURCE_INTEGRITY_ROLLBACK = Path(
+    "database/rollback/112_measure_direct_meal_slot_proposal_source_integrity_rollback.sql"
+)
+MEAL_SLOT_SOURCE_INTEGRITY_WORKFLOW = Path(
+    ".github/workflows/recommendation-meal-slot-proposal-source-integrity.yml"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -675,5 +687,93 @@ def test_direct_proposal_provenance_workflow_is_read_only_count_bound_and_aux_fr
     assert "recommendation-meal-slot-proposal-provenance.json" in text
     assert "evidence_link_is_independent_source_proof == false" in text
     assert "automatic_confidence_upgrade_allowed == false" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
+
+
+def test_direct_proposal_source_integrity_checks_exact_source_and_completed_apply():
+    """Every accepted source link must match the runtime source and a completed apply run."""
+    text = MEAL_SLOT_SOURCE_INTEGRITY_MIGRATION.read_text()
+
+    assert "direct_meal_slot_proposal_source_integrity_report" in text
+    assert "p_expected_source_name" in text
+    assert "p_expected_source_checksum" in text
+    assert "r.run_mode = 'apply'" in text
+    assert "r.status = 'completed'" in text
+    for route in (
+        "no_evidence",
+        "missing_import_lineage",
+        "unexpected_source_identity",
+        "expected_source_non_apply",
+        "expected_source_incomplete_run",
+        "expected_completed_apply_only",
+    ):
+        assert route in text
+    assert "'source_integrity_gate_is_approval', false" in text
+    assert "'automatic_acceptance_allowed', false" in text
+
+
+def test_direct_proposal_source_integrity_is_private_aggregate_and_non_mutating():
+    """The exact source may be compared in memory but cannot be exposed or change facts."""
+    migration = MEAL_SLOT_SOURCE_INTEGRITY_MIGRATION.read_text()
+    validation = MEAL_SLOT_SOURCE_INTEGRITY_VALIDATION.read_text()
+
+    assert "SECURITY DEFINER" in migration
+    assert "FROM PUBLIC, anon, authenticated" in migration
+    for policy in (
+        "'identity_exposed', false",
+        "'expected_source_name_exposed', false",
+        "'expected_source_checksum_exposed', false",
+        "'raw_source_text_exposed', false",
+        "'proposal_changed', false",
+        "'serving_changed', false",
+        "'publication_changed', false",
+    ):
+        assert policy in migration
+    for forbidden in (
+        "UPDATE ops.dish_meal_slot_proposals",
+        "INSERT INTO ops.dish_meal_slot_proposals",
+        "UPDATE public.",
+        "INSERT INTO public.",
+        "raw_payload",
+        "normalized_payload",
+    ):
+        assert forbidden not in migration
+    for invariant in (
+        "direct meal-slot proposal source-integrity report must remain service-only",
+        "direct meal-slot proposal source-integrity routes do not reconcile",
+        "direct meal-slot proposal source-integrity links do not reconcile",
+        "direct meal-slot proposal source-integrity policy is invalid",
+    ):
+        assert invariant in validation
+
+
+def test_direct_proposal_source_integrity_has_exact_non_destructive_rollback():
+    """Rollback removes only the audit function and preserves all proposal lineage."""
+    text = MEAL_SLOT_SOURCE_INTEGRITY_ROLLBACK.read_text()
+
+    assert "direct_meal_slot_proposal_source_integrity_report(text, text)" in text
+    assert "DROP TABLE" not in text
+    assert "ops.dish_meal_slot_proposals" not in text
+    assert "public.dish_source_rows" not in text
+
+
+def test_direct_proposal_source_integrity_workflow_hashes_checked_in_source_only():
+    """The protected audit derives source identity from Git and never routes Aux traffic."""
+    text = MEAL_SLOT_SOURCE_INTEGRITY_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "database_identifies_project" in text
+    assert "database/seeds/IndianFoodDatasetCSV.csv" in text
+    assert "sha256sum -- \"$source_path\"" in text
+    assert "expected_proposal_count" in text
+    assert "expected_evidence_link_count" in text
+    assert "pg_advisory_xact_lock" in text
+    assert "--single-transaction" in text
+    assert "SET TRANSACTION READ ONLY" in text
+    assert "recommendation-meal-slot-proposal-source-integrity.json" in text
+    assert "expected_source_name_exposed == false" in text
+    assert "automatic_acceptance_allowed == false" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text
