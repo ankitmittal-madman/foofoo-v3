@@ -1,0 +1,104 @@
+name: Recommendation meal-class remediation audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type audit-meal-class-remediation
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-meal-class-remediation-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-meal-class-remediation'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-meal-class-remediation-audit-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify exact production project and prerequisite audit boundary
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_published_quality_report()') IS NOT NULL")" = "t"
+
+      - name: Classify remediation audit state
+        id: state
+        run: |
+          present="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_meal_class_remediation_report()') IS NOT NULL")"
+          if [ "$present" = "f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$present" = "t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe meal-class remediation audit state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install aggregate remediation audit
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/105_measure_meal_class_remediation.sql \
+            -f database/validation/954_expose_recommendation_catalogue_gaps_validation.sql \
+            -f database/validation/955_measure_catalogue_enrichment_tranche_validation.sql \
+            -f database/validation/956_measure_published_catalogue_quality_validation.sql \
+            -f database/validation/957_measure_meal_class_remediation_validation.sql
+
+      - name: Revalidate existing remediation audit read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/954_expose_recommendation_catalogue_gaps_validation.sql \
+            -f database/validation/955_measure_catalogue_enrichment_tranche_validation.sql \
+            -f database/validation/956_measure_published_catalogue_quality_validation.sql \
+            -f database/validation/957_measure_meal_class_remediation_validation.sql
+
+      - name: Capture aggregate remediation report
+        env:
+          ACTION_TAKEN: ${{ steps.state.outputs.action }}
+        run: |
+          report="$RUNNER_TEMP/recommendation-meal-class-remediation-report.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 \
+            -c "SELECT re_engine.catalogue_meal_class_remediation_report()" > "$report"
+          jq --arg action "$ACTION_TAKEN" --arg commit "$GITHUB_SHA" \
+            --arg run_id "$GITHUB_RUN_ID" '. + {
+              audit_action: $action,
+              commit_sha: $commit,
+              workflow_run_id: $run_id
+            }' "$report" > "$report.checked"
+          mv "$report.checked" "$report"
+          jq --exit-status '
+            .schema_version == "recommendation-catalogue-meal-class-remediation-v1"
+            and .candidate_count == ([.cohorts[]] | add // 0)
+            and .candidate_count == ([.ontology_status[]] | add // 0)
+            and .candidate_count == ([.classification_method[]] | add // 0)
+            and .candidate_count == ([.source_type[]] | add // 0)
+            and .candidate_count == ([.review_status[]] | add // 0)
+            and .candidate_count == ([.confidence[]] | add // 0)
+            and .policy.identity_exposed == false
+            and .policy.automatic_confidence_upgrade_allowed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-meal-class-remediation-report
+          path: ${{ runner.temp }}/recommendation-meal-class-remediation-report.json
+          retention-days: 90
+          if-no-files-found: error

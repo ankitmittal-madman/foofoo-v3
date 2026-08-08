@@ -1,0 +1,47 @@
+{
+  "candidate_scope": {
+    "category_dish_counts": {
+      "brunch": 2,
+      "dessert": 247,
+      "main course": 120,
+      "one pot dish": 12,
+      "side dish": 394
+    },
+    "deferred_dish_counts": {
+      "conflicting_direct_evidence": 1,
+      "diet_value_in_course_field": 22
+    },
+    "manifest_candidate_row_count": 2003,
+    "proposal_count": 775,
+    "slot_set_dish_counts": {
+      "breakfast,lunch": 2,
+      "lunch,dinner": 773
+    }
+  },
+  "mappings": {
+    "brunch": [
+      "breakfast",
+      "lunch"
+    ],
+    "dessert": [
+      "lunch",
+      "dinner"
+    ],
+    "main course": [
+      "lunch",
+      "dinner"
+    ],
+    "one pot dish": [
+      "lunch",
+      "dinner"
+    ],
+    "side dish": [
+      "lunch",
+      "dinner"
+    ]
+  },
+  "policy_version": "contextual-import-course-slot-set-v1",
+  "proposal_only": true,
+  "requires_explicit_approval": true,
+  "schema_version": "contextual-meal-slot-candidate-policy-v1"
+}

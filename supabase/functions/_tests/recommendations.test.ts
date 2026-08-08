@@ -163,6 +163,7 @@ function pipeline(deps: RecommendationDeps) {
   const handler = makeRecommendationsHandler({
     authorizeHousehold: () => Promise.resolve("owner"),
     loadOnlineStateFn: () => Promise.resolve(EMPTY_ONLINE_STATE),
+    recordSlate: () => Promise.resolve("slate-test"),
     ...deps,
   });
   const verifier = () => Promise.resolve({ userId: USER_ID, role: "authenticated" } as AuthClaims);
@@ -199,7 +200,29 @@ Deno.test("POST /v1/recommendations success passes RE plates[]/contributions[] t
     assertEquals(json.plates.length, 1);
     assertEquals(json.plates[0].contributions.length, 4); // passed through unchanged (>3 fixed fields)
     assertEquals(json.plates[0].hero_dish_names[0], "Onion Pakora");
+    assertEquals(json.slate_id, "slate-test");
     assertEquals(typeof json.trace_id, "string");
+  });
+});
+
+Deno.test("POST /v1/recommendations does not serve a feedback-capable slate without lineage", async () => {
+  await withEnv(REQUIRED_ENV, async () => {
+    resetConfigCacheForTests();
+    let eventCalled = false;
+    const res = await pipeline({
+      loadHousehold: loadTestHousehold,
+      recordSlate: () => Promise.reject(new Error("lineage unavailable")),
+      recordEvent: () => {
+        eventCalled = true;
+        return Promise.resolve();
+      },
+      recordContext: () => Promise.resolve(),
+      callRe: (_payload, requestId) =>
+        Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) }),
+    })(post());
+
+    assertEquals(res.status, 500);
+    assertEquals(eventCalled, false);
   });
 });
 
@@ -414,6 +437,7 @@ Deno.test("POST /v1/recommendations shadow mode observes Aux without changing Gh
       served_in_candidates_count: 0,
       served_candidate_coverage: null,
     });
+    assertEquals(recordedEvent?.lineageRequired, true);
   });
 });
 

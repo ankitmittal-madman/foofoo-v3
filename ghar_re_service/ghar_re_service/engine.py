@@ -17,6 +17,7 @@ import uuid
 from typing import Any
 
 from ghar_re_core import calibration as calib
+from ghar_re_core import knowledge as K
 from ghar_re_core import meal_episode, preference, taste
 from ghar_re_core import meal_planner as planner
 from ghar_re_core import model_provider as preference_models
@@ -580,8 +581,14 @@ def _final_dish_guardrail_audit(
 
 
 def _select_visible_episode_diversity(episodes: list[dict], count: int) -> list[dict]:
+    """Select a diverse visible prefix while preserving the relevance-ordered fallback pool.
+
+    Meal-class identity comes from the reviewed ontology snapshot. Class repeats are deferred,
+    not removed, so a thin candidate pool still returns the requested number of safe episodes.
+    """
     selected, deferred = [], []
     rich_count = soup_count = 0
+    selected_primary_classes: set[str] = set()
     rich_cap = max(1, (count + 1) // 2)
     for episode in episodes:
         is_rich = float(episode.get("richness_score", 0.0) or 0.0) >= 0.6
@@ -589,12 +596,32 @@ def _select_visible_episode_diversity(episodes: list[dict], count: int) -> list[
             "soup" in str(component.get("dish_name", "")).casefold()
             for component in episode.get("components", [])
         )
-        if (is_rich and rich_count >= rich_cap) or (is_soup and soup_count >= 1):
+        primary_component = next(
+            (
+                component
+                for component in episode.get("components", [])
+                if component.get("grammar_role") == "primary"
+            ),
+            None,
+        )
+        primary_class = (
+            K.dish_to_class_code(str(primary_component.get("dish_name", "")))
+            if primary_component
+            else None
+        )
+        repeats_primary_class = bool(primary_class and primary_class in selected_primary_classes)
+        if (
+            (is_rich and rich_count >= rich_cap)
+            or (is_soup and soup_count >= 1)
+            or repeats_primary_class
+        ):
             deferred.append(episode)
             continue
         selected.append(episode)
         rich_count += int(is_rich)
         soup_count += int(is_soup)
+        if primary_class:
+            selected_primary_classes.add(primary_class)
         if len(selected) >= count:
             return selected
     for episode in deferred:

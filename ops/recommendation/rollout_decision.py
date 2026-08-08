@@ -147,9 +147,7 @@ def evaluate(document: dict[str, Any]) -> dict[str, Any]:
     retrieval_rate = retrieved_count / event_count
     timeout_rate = timeout_count / event_count
     comparable_rate = comparable_count / event_count
-    average_coverage = (
-        coverage_numerator / coverage_denominator if coverage_denominator else None
-    )
+    average_coverage = coverage_numerator / coverage_denominator if coverage_denominator else None
     publication_ok = observed_versions == {expected_version}
     no_guardrail_breach = all(value == 0 for value in guardrail_values.values())
     gates = {

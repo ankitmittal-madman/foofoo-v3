@@ -1,0 +1,119 @@
+name: Audit governed meal-slot proposal provenance
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type audit-direct-meal-slot-proposal-provenance
+        required: true
+        type: string
+      expected_proposal_count:
+        description: Exact proposal count from generation evidence
+        required: true
+        type: number
+      expected_evidence_link_count:
+        description: Exact evidence-link count from generation evidence
+        required: true
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-meal-slot-proposal-provenance
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-direct-meal-slot-proposal-provenance' &&
+      inputs.expected_proposal_count > 0 &&
+      inputs.expected_evidence_link_count > 0
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-meal-slot-proposal-provenance-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify production identity and review prerequisite
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.direct_meal_slot_proposal_review_report(integer)') IS NOT NULL")" = "t"
+
+      - name: Classify provenance-report state
+        id: state
+        run: |
+          report="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.direct_meal_slot_proposal_provenance_report()') IS NOT NULL")"
+          if [ "$report" = "f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$report" = "t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe proposal-provenance schema state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install proposal-provenance report
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/111_measure_direct_meal_slot_proposal_provenance.sql \
+            -f database/validation/962_report_direct_meal_slot_proposal_review_validation.sql \
+            -f database/validation/963_measure_direct_meal_slot_proposal_provenance_validation.sql
+
+      - name: Revalidate existing provenance report read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/962_report_direct_meal_slot_proposal_review_validation.sql \
+            -f database/validation/963_measure_direct_meal_slot_proposal_provenance_validation.sql
+
+      - name: Produce count-only provenance audit
+        env:
+          EXPECTED_PROPOSAL_COUNT: ${{ inputs.expected_proposal_count }}
+          EXPECTED_EVIDENCE_LINK_COUNT: ${{ inputs.expected_evidence_link_count }}
+        run: |
+          report="$RUNNER_TEMP/recommendation-meal-slot-proposal-provenance.json"
+          raw="$report.raw"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -c "SELECT re_engine.direct_meal_slot_proposal_provenance_report()" \
+            > "$raw"
+          tail -n 1 "$raw" > "$report"
+          jq --arg commit "$GITHUB_SHA" --arg run_id "$GITHUB_RUN_ID" '. + {
+            commit_sha: $commit,
+            workflow_run_id: $run_id
+          }' "$report" > "$report.checked"
+          mv "$report.checked" "$report"
+          jq --argjson proposals "$EXPECTED_PROPOSAL_COUNT" \
+             --argjson evidence "$EXPECTED_EVIDENCE_LINK_COUNT" --exit-status '
+            .schema_version == "recommendation-meal-slot-proposal-provenance-v1"
+            and .proposal_count == $proposals
+            and .evidence_link_count == $evidence
+            and .evidence_link_count == ([.run_mode_link_counts[]] | add // 0)
+            and .proposal_count == ([.provenance_routes[]] | add // 0)
+            and .policy.identity_exposed == false
+            and .policy.source_name_exposed == false
+            and .policy.source_checksum_exposed == false
+            and .policy.raw_source_text_exposed == false
+            and .policy.evidence_link_is_independent_source_proof == false
+            and .policy.automatic_confidence_upgrade_allowed == false
+            and .policy.proposal_changed == false
+            and .policy.serving_changed == false
+            and .policy.publication_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-meal-slot-proposal-provenance
+          path: ${{ runner.temp }}/recommendation-meal-slot-proposal-provenance.json
+          retention-days: 90
+          if-no-files-found: error

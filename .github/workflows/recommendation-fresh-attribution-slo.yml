@@ -1,0 +1,112 @@
+name: Audit fresh recommendation attribution SLO
+
+on:
+  workflow_dispatch:
+    inputs:
+      window_hours:
+        description: Recent real-feedback window to audit
+        required: true
+        default: "168"
+        type: choice
+        options:
+          - "24"
+          - "168"
+          - "720"
+      confirm:
+        description: Type audit-fresh-attribution
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-fresh-attribution-slo
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-fresh-attribution'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      WINDOW_HOURS: ${{ inputs.window_hours }}
+      PGAPPNAME: foofoo-fresh-attribution-slo-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify production identity and bounded window
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          case "$WINDOW_HOURS" in 24|168|720) ;; *) exit 1 ;; esac
+
+      - name: Classify report state
+        id: state
+        run: |
+          control="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ml.preference_attribution_slo_control') IS NOT NULL")"
+          case "$control" in
+            f) echo "action=install" >> "$GITHUB_OUTPUT" ;;
+            t) echo "action=validate" >> "$GITHUB_OUTPUT" ;;
+            *) exit 1 ;;
+          esac
+
+      - name: Atomically install attribution SLO
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/117_measure_fresh_preference_attribution.sql \
+            -f database/migrations/119_scope_fresh_preference_attribution.sql \
+            -f database/validation/971_scope_fresh_preference_attribution_validation.sql
+
+      - name: Revalidate installed SLO read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/971_scope_fresh_preference_attribution_validation.sql
+
+      - name: Produce aggregate SLO report
+        run: |
+          report="$RUNNER_TEMP/recommendation-fresh-attribution-slo.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 \
+            -v window_hours="$WINDOW_HOURS" > "$report.raw" <<'SQL'
+          SELECT ml.fresh_preference_attribution_report(
+            statement_timestamp() - make_interval(hours => :'window_hours')
+          );
+          SQL
+          grep -E '^\{' "$report.raw" | tail -n 1 > "$report"
+          jq --exit-status '
+            .schema_version == "fresh-preference-attribution-v2"
+            and .labeled_event_count == ([.route_counts[]] | add // 0)
+            and .labeled_event_count == (.exact_event_count + .inexact_event_count)
+            and .excluded_non_dish_event_count >= 0
+            and (.slo.status | IN("insufficient_sample", "pass", "fail"))
+            and .policy.cutover_aware == true
+            and .policy.dish_preference_targets_only == true
+            and .policy.identity_exposed == false
+            and .policy.event_identity_exposed == false
+            and .policy.raw_feedback_exposed == false
+            and .policy.feedback_changed == false
+            and .policy.outcome_changed == false
+            and .policy.training_changed == false
+            and .policy.serving_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-fresh-attribution-slo
+          path: ${{ runner.temp }}/recommendation-fresh-attribution-slo.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Enforce SLO when the sample is sufficient
+        run: |
+          status="$(jq -r '.slo.status' "$RUNNER_TEMP/recommendation-fresh-attribution-slo.json")"
+          test "$status" != "fail"

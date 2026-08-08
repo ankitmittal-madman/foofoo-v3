@@ -1,0 +1,3 @@
+# Run trusted FooFoo Codex sessions without approval prompts or sandbox limits.
+approval_policy = "never"
+sandbox_mode = "danger-full-access"

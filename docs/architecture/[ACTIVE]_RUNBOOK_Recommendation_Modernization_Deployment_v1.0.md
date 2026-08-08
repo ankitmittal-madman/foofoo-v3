@@ -38,9 +38,11 @@ OFF -> schema -> publish once -> Ghar + Qdrant/Aux -> Edge deploy -> smoke
 requests but cannot change the response. A canary means a stable, approved subset of households
 may receive Aux influence. No existing workflow automatically changes `AUX_RE_MODE` to `active`.
 
-This document does not claim that production has been migrated. A database row count of 3,409 is
-not the serving count: the immutable publication manifest supplies the exact number of active,
-safety-closed, enriched and class-mapped dishes that are eligible to serve.
+Phase A has now been executed in production with Aux routing kept off. This is a deployed
+foundation, not a completed rollout: authenticated test-household smoke, load targets, real-outcome
+evaluation, shadow observation and any approved canary remain outstanding. A database row count of
+3,409 is not the serving count: the immutable publication manifest supplies the exact number and
+currently proves 642 active, safety-closed, enriched and class-mapped dishes.
 
 ## 1. Roles and evidence record
 
@@ -120,6 +122,19 @@ No shadow or active transition was requested or executed.
 | 8 | Run `31253301316` | One isolated Aux Machine healthy on the same Qdrant generation; Edge still off |
 | 9 | Run `31253527126` | `plan` and `recommendations` deployed after 151 Edge tests passed |
 | Boundary smoke | Run `31253604331` | Fly health/meta and unauthenticated Edge boundaries passed |
+| Aux model quality | Run `31256081581` | 86 tests, model gate, local Qdrant and signed packaged-service shadow flow passed; active promotion remained prohibited |
+| Catalogue quality audit | Run `31257431526` | 3,410 stored, 3,402 active, 646 presence-eligible and 547 strict-quality-ready; no serving change |
+| Meal-class provenance audit | Run `31257875325` | 255 low-confidence mappings, all provisional internal research; zero curated, human-reviewed or accepted evidence; no serving change |
+| Primary/component readiness v1 | Run `31258906340` | Migration 106 live; 1,402 canonical dish-slot routes split into 603 primary-ready, 262 primary review and 537 component review; zero proposals/facts; no serving change |
+| Full-inventory serving-role coverage | Run `31259220512` | Migration 107 live; all 3,402 active dishes reconcile: 802 with canonical slots, 2,600 without, 2,596 missing hero roles and 918 with unrecognized slot labels; no serving change |
+| Meal-slot source-evidence audit | Run `31267459809` | Migration 108 live; 1,802 single-direct candidates (667 lunch, 566 snacks, 294 dinner, 275 breakfast), 797 contextual review and one conflict; no raw text, proposals or serving change |
+| Governed direct-slot proposals | Run `31269668506` | Migration 109 live; exactly 1,802 pending proposals and 7,222 evidence links created (667 lunch, 566 snacks, 294 dinner, 275 breakfast); zero automatic acceptance, publication or serving change; Aux remains off |
+| Bounded direct-slot review pack | Run `31270121136` | Migration 110 live; all 1,802 proposals fresh/pending, 7,222 evidence links reconciled (4–8 each), deterministic 10-name-per-slot sample produced with no identifiers/raw source/user data; no proposal decision or serving change |
+| Direct-slot proposal provenance | Run `31270627753` | Migration 111 live; all 7,222 links are apply-mode lineage, but every one of the 1,802 proposals reduces to one logical source row from one source file/version repeated across 4–8 runs; repetition is not independent evidence, so every proposal remains pending and no confidence, publication or serving state changed |
+| Direct-slot source integrity | Run `31271426471` | Migration 112 live; all 7,222 links identify the exact checked-in source and apply mode, but 7,204 links point to stale `running` imports and only 18 to completed imports; 1,801 proposals therefore fail the run-completion health gate and no decision or serving state changed |
+| Dish-import lifecycle correction | Commit `6fa17e0` | Future imports record their actor and close from `running` to exactly one terminal status on success, failure or interruption; historical run statuses were deliberately not rewritten |
+| Direct-slot row-manifest integrity | Run `31272114382` | Migration 114 live; a 4,806-row direct-course manifest independently matched every one of the 7,222 proposal links by source row, fingerprint, checked-in file identity and proposed slot, so all 1,802 proposals may enter mapping-policy review; this is evidence verification, not approval or application |
+| Direct-slot application boundary | Run `31273351076` | Migration 116 and validation 968 live from commit `314948c`; protected tests and exact production identity passed, while every apply/rollback/Aux-mode step was skipped; the artifact records zero dish, proposal, publication or serving change |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
@@ -131,6 +146,210 @@ The 642 count is the actual safety-closed publication, not the full active dish 
 publication time the coverage report showed 3,402 active dishes, 1,719 class-mapped dishes and 642
 fully enriched/safety-closed/publishable dishes. These coverage gaps remain data work; they must not
 be bypassed by publishing incomplete rows.
+
+The later audits do not replace that deployed-generation count. They show that the live database
+has moved to 646 presence-eligible rows, but only 547 meet the stricter evidence policy. The 255
+weak meal-class mappings comprise 99 of those presence-eligible rows plus 156 otherwise-complete
+rows still in ontology review. Because none has curated, human-reviewed or accepted evidence, do
+not raise confidence or republish them merely by rerunning the legacy classifier. Generate
+independently evaluated proposals, route unresolved items to review, then publish a new immutable
+generation only after the quality report passes.
+
+The 7,222 direct-slot evidence links must not be read as 7,222 independent confirmations. The
+provenance report proves that all 1,802 pending proposals have one distinct logical source row and
+one source file/version; each was repeated through four to eight apply-mode import runs. The source
+integrity report then proved the exact checked-in file identity while exposing a separate import
+health defect: 7,204 links reference historical runs left in `running`, while only 18 reference
+completed runs. The ingestion lifecycle now closes future runs safely, but historical status is not
+rewritten or treated as proof.
+
+The independent row-manifest report recovered the per-row integrity question without rewriting
+history: all 7,222 links match the checked-in source row, row fingerprint and exact proposed slot,
+covering all 1,802 proposals. This permits the cohort to enter explicit source-to-slot mapping-policy
+review. It does not accept a proposal, mutate `public.dishes`, republish the catalogue or change
+serving. Product must still approve the mapping policy—particularly `Appetizer` to `snacks`—before
+any reversible application workflow is allowed to run.
+
+### Direct-slot application boundary — installed, policy not applied
+
+The repository now contains a count-bound candidate policy and a protected reversible workflow.
+Run `31273351076` installed and validated the additive boundary only. It did not approve the policy,
+change a proposal or dish, rebuild a publication, alter serving or touch Aux mode. The exact policy
+identity is `direct-import-course-slot-v1` with SHA-256
+`2dda4d35c8ab9314c89b6e56ab2d637eb9e7ba1fce9d3f113242813bdb01d3db`.
+
+| Exact checked-in source course | Candidate canonical slot |
+|---|---|
+| `Lunch` | `lunch` |
+| `Dinner` | `dinner` |
+| `Snack` | `snacks` |
+| `Appetizer` | `snacks` |
+| `South Indian Breakfast` | `breakfast` |
+| `World Breakfast` | `breakfast` |
+| `North Indian Breakfast` | `breakfast` |
+| `Indian Breakfast` | `breakfast` |
+
+The policy is valid only for exactly 1,802 proposals, 7,222 evidence links, 4,806 direct manifest
+rows and the recorded slot distribution: 275 breakfast, 667 lunch, 294 dinner and 566 snacks. Any
+count, row fingerprint, source identity, slot distribution or policy hash drift aborts before a
+dish write.
+
+Use `Govern direct meal-slot policy application` only from `main` in the protected production
+environment:
+
+1. `install_only` requires confirmation `install-direct-meal-slot-policy-boundary`. It installs
+   migration 116 and validation 968 but changes no proposal or dish.
+2. `apply` requires confirmation `apply-direct-meal-slot-policy-v1`, a durable Product/Founder
+   approval reference and a safe reviewer identifier. The workflow first forces Aux routing off,
+   rebuilds the exact policy-bound manifest, then approves and applies the entire cohort in one
+   transaction. Every prior and resulting `meal_occasion` array is retained in the service-only
+   ledger. This changes database facts but does not alter the existing immutable publication.
+3. `rollback` requires confirmation `rollback-direct-meal-slot-policy-v1` and a durable rollback
+   reference. It restores all 1,802 arrays only when every current dish still exactly equals its
+   recorded applied value. Any later edit makes rollback fail closed. Proposal history remains
+   `applied`; the ledger records the active application as `rolled_back`.
+
+Local evidence covers 55 focused tests, the broader 315-pass recommendation gate (one expected
+skip), SQL/YAML/shell parsing and a disposable PostgreSQL proof
+using the full 1,802/7,222/4,806 cohort. The proof applied exactly, treated the second apply as
+idempotent, rejected rollback after deliberate post-apply drift and restored all original arrays
+after the drift was removed. This is implementation evidence only, not product approval.
+
+### Contextual multi-slot proposals — generated for review, not applied
+
+The remaining contextual course cohort is deliberately separate from the 1,802 direct proposals.
+`Side Dish`, `Main Course`, `One Pot Dish`, `Dessert` and `Brunch` do not identify one exact meal
+moment. The candidate policy therefore proposes slot **sets** for review and contains no apply
+function:
+
+| Exact checked-in source course | Candidate slot set | Audited dishes |
+|---|---|---:|
+| `Side Dish` | `lunch,dinner` | 394 |
+| `Dessert` | `lunch,dinner` | 247 |
+| `Main Course` | `lunch,dinner` | 120 |
+| `One Pot Dish` | `lunch,dinner` | 12 |
+| `Brunch` | `breakfast,lunch` | 2 |
+
+The exact proposal-only scope is 775 dishes: 773 possible lunch+dinner dishes and two possible
+breakfast+lunch dishes. Another 22 dishes whose course field contains a diet value and one dish
+with conflicting direct evidence remain deferred. The policy
+`contextual-import-course-slot-set-v1` is pinned to SHA-256
+`5afca8a6da05a6070abc6678d0a4f73924cafad62835e9152916efe6e7596154` and a deterministic
+2,003-row checked-in source manifest. The `Dessert` mapping is explicitly a candidate Product
+decision, not accepted food truth.
+
+Use `Generate contextual meal-slot set proposals` only from `main` in the protected production
+environment:
+
+1. `install_only` requires confirmation `install-contextual-meal-slot-proposals`. It installs
+   migration 118 and validation 970 but creates no proposal or dish fact.
+2. `generate` requires confirmation `generate-contextual-meal-slot-proposals-v1`. It verifies the
+   production project, exact policy hash, 797 contextual-review denominator, source checksum,
+   2,003-row manifest and 775-dish category/slot-set distribution. It may create only pending,
+   service-only proposals plus immutable evidence links. It cannot update `public.dishes`, publish
+   a catalogue, deploy a service or change Aux mode.
+3. Rollback 118 disables further generation while retaining every proposal and evidence row.
+
+Local evidence covers 45 focused tests, SQL/YAML parsing, the broader 318-pass recommendation gate
+(one expected skip), and a disposable PostgreSQL proof. The proof generated all 775 pending
+proposals, inserted zero duplicates on retry, retained proposal/evidence history after disabling
+the generator and changed zero dish rows.
+
+Production run `31274648925` installed migration 118 and validation 970, then generated exactly
+775 pending proposals and 3,121 immutable evidence links from the 2,003-row manifest. The artifact
+reported `dishes_changed=false`, `serving_changed=false`, `publication_changed=false` and
+`pending_review`. Product approval and a separate reversible application design are still required
+before any candidate can become a dish fact. Governed mode-control run `31274851421` then recorded
+`mode=off` and passed; neither shadow nor active serving is enabled.
+
+### Contextual application boundary — installed, not applied
+
+Migration 120 and validation 972 add the separately governed application boundary. Installation
+only extends the private proposal lifecycle and creates a service-only before/after ledger; it
+does not review a proposal or update `public.dishes`. The protected workflow supports:
+
+1. `install_only` with confirmation `install-contextual-meal-slot-policy-boundary`.
+2. `apply` with confirmation `apply-contextual-meal-slot-policy-v1`, plus a durable Product/Founder
+   approval reference and safe reviewer identifier. Application is pinned to exactly 775 proposals,
+   3,121 evidence links, the 2,003-row manifest, the existing candidate-policy hash and the 2/773
+   slot-set distribution. It forces Aux routing OFF before opening the mutation transaction.
+3. `rollback` with confirmation `rollback-contextual-meal-slot-policy-v1` and a durable rollback
+   reference. It restores all 775 previous arrays only if every dish and proposal still equals the
+   recorded applied state; one later edit refuses the whole rollback.
+
+Local proof covers 324 passing recommendation tests with one expected skip, SQL and YAML parsing,
+and a disposable PostgreSQL execution. That execution applied 775, returned `already_applied` on
+retry, refused rollback after one deliberate dish drift, restored all 775 after the drift was
+removed, and retained all ledger rows when the mutation functions were disabled. This proves the
+mechanism only. Production run `31275561817` subsequently installed migration 120 and validation
+972. Its install-only artifact records `dishes_changed=false`, `proposals_changed=false`,
+`publication_changed=false` and `serving_changed=false`. The five mappings remain unapproved and
+no production application has run.
+
+### Final deferred meal-slot evidence audit — prepared, not run in production
+
+The remaining source-evidence denominator contains 23 active dishes with no canonical meal slot:
+22 whose imported `Course` value is actually a diet label and one whose source rows contain two
+conflicting direct slots. The repository now contains a report-only shifted-field audit for this
+exact cohort. It uses the adjacent imported `Cuisine` field only where the checked-in row structure
+proves that value was shifted; it never infers from a dish name or exposes dish identity or raw
+source text.
+
+The fixed source policy covers 62 malformed rows. It classifies 12 source rows as possible slot
+evidence—ten direct and two contextual—and leaves 50 source rows as `unresolved_food_role`. Those
+source-row totals are not assumed to equal production dish totals: the protected database report
+must independently reconcile the exact 22 deferred dishes, the one direct conflict and every
+source-row fingerprint before returning aggregate route counts.
+
+Migration 121, validation 973 and the protected `Audit deferred meal-slot shifted-field evidence`
+workflow are additive and service-only. The workflow installs or revalidates the aggregate report,
+runs it inside a read-only transaction and uploads one identity-free JSON artifact. It contains no
+Aux mode change, catalogue publication or Fly deployment step. Local evidence includes 331 passing
+recommendation tests with one expected skip, SQL/YAML/lint gates and a disposable PostgreSQL proof
+that returned the exact 22+1 scope, zero manifest failures and then removed the function cleanly.
+Successful production aggregate execution and the resulting remediation cohort remain pending; no
+mapping is approved or applied by this audit.
+
+The first protected attempt, run `31276361197`, installed and validated the report function but
+stopped before query execution because PostgreSQL CSV COPY interpreted an unquoted empty slot key as
+`NULL`. It produced no accepted artifact and made no dish, proposal, publication or serving change.
+The manifest writer now quotes every field; a regression and direct PostgreSQL COPY proof verify all
+62 rows load, all 50 unresolved rows retain an empty string and zero slot keys become null. After
+reconciling concurrent audit tests, the full local gate remained at 331 tests with one expected skip
+before the protected retry.
+
+Protected retry `31276594131` then passed the exact production audit. Its aggregate-only artifact
+proved 22 diet-deferred dishes and one `dinner,snacks` direct conflict. Within the 22, three are
+shifted-direct candidates (two breakfast and one dinner), two are shifted-contextual
+`lunch,dinner` candidates and 17 require food-role review. All 88 diet-evidence links matched the
+checked-in manifest; zero failed source identity or fingerprint validation. The artifact again
+records `automatic_acceptance_allowed=false` and zero dish, proposal, publication or serving
+change.
+
+### Final deferred case boundary — installed and generated, decisions pending
+
+Migration 123 and validation 975 define a private, RLS-enabled case ledger for the exact 23-dish
+result. The five candidate cases retain proposed slot arrays only as pending review evidence; the 17
+food-role cases and one direct conflict retain no proposed mapping. A separate immutable evidence
+table preserves every source-row fingerprint. The boundary cannot write `public.dishes`, either
+existing proposal table, a publication or serving configuration, and it grants clients no access.
+
+`Govern deferred meal-slot cases` separates `install_only` from `generate`. Generation binds the
+production project, both policy hashes, 62-row manifest, exact 23-case route distribution, five
+candidate slot distribution and 88 diet-evidence links. It also compares full dish meal-slot and
+existing proposal-table signatures before and after. Reconciled local evidence includes 339 passing
+recommendation tests with one expected skip plus a disposable PostgreSQL proof: 23 pending cases,
+92 synthetic evidence links, zero duplicate rows on retry, immutable evidence, unchanged dishes and
+rollback that disabled generation while retaining all case history.
+
+Protected install-only run `31277318434` installed migration 123 and validation 975, produced
+`cases_generated=false` and recorded zero dish, proposal, publication or serving change. Separate
+generation run `31277357323` then created exactly 23 private `pending_review` cases and 96 immutable
+evidence links: 88 shifted-manifest links and eight direct-conflict links. The stored routes are
+three shifted-direct candidates, two shifted-contextual candidates, 17 food-role reviews and one
+direct conflict; candidate slots remain two breakfast, one dinner and two `lunch,dinner`. The
+artifact records `automatic_acceptance_allowed=false` and zero dish, existing-proposal, publication
+or serving change. Product review and a separately approved reversible application remain pending.
 
 ### Phase A stop conditions
 
@@ -258,8 +477,11 @@ Until then, describe the state precisely as “implemented”, “deployed off�
   offline evaluator correctly fails closed, so promotion evidence cannot yet be complete.
 - Numerical targets exist as governed inputs but require a Product/Founder approval reference;
   engineering defaults are not product ratification.
-- The live publishable count is unknown until the production publication workflow runs. `3,409`
-  database rows and the legacy `810` bundle are inventory observations, not the new serving count.
+- The production publication is known: 642 of 3,402 active dishes are deployed. A later audit found
+  646 presence-eligible database rows but only 547 strict-quality-ready; a separate provenance
+  audit found 255 weak provisional class mappings with no curated or human evidence. The remaining
+  rows require governed data completion; the legacy `810` bundle and total database inventory are
+  not substitutes for the publication count.
 - A protected workflow does not prove backup health, secret correctness or on-call readiness;
   those remain operator assertions with external evidence.
 

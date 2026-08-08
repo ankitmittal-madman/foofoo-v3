@@ -14,6 +14,7 @@ Every tunable the engine reads lives here — NOT hard-coded. Tuning = edit conf
 | derivation_params.yaml | D1-D7 FROZEN - S4-5 (all D1-D7 params) |
 | community_priors.csv | KB v0.2 - C1 (soft, decays v2) |
 | ../sig_scores_v1.csv | KB v0.2 - S1/S2 (signature scores; 58 curated / 744 draft) |
+| dish_identity_corrections_v1.csv | Reviewed duplicate-to-canonical overlays; raw workbook rows remain recoverable and historical aliases remain resolvable |
 
 ## Rules
 1. No parameter appears in code that isn't here.

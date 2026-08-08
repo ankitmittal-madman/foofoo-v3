@@ -1,6 +1,68 @@
 # Current Status
 
-**As of:** 2026-08-05. Source: `docs/archive/audits/re_audit_v2/` (fresh clean-room audit, live-verified where noted). This file states current state only — no history. See `docs/archive/audits/` for how these numbers were derived.
+**As of:** 2026-08-08. Sources: the active recommendation modernization deployment runbook plus
+`docs/archive/audits/re_audit_v2/` for the earlier clean-room baseline. This file states current
+state only; deployment run IDs and rollback instructions live in the active runbook.
+
+> **Recommendation modernization Phase A:** production migrations 092–101 and validations
+> 944–953 are live. Publication
+> `sha256:e9c7b524dc5480895d5b675caaa88a51788980cbfb3e1aea95bc5994a7ce3269`
+> contains 642 fully enriched, safety-closed and meal-class-mapped dishes from 3,402 active dishes;
+> the same generation is present in Ghar, Qdrant and one isolated Aux Machine. `plan` and
+> `recommendations` are deployed, and the final protected transition records production Edge
+> `AUX_RE_MODE=off`, so no user request is sent to Aux. The default Ghar request path therefore
+> remains authoritative and may use its 810-dish deterministic fallback when no canonical
+> shortlist is supplied. Authenticated cold-start/experienced-user smoke is still pending an
+> explicitly selected test household. Aux quality run `31256081581` passed installation, all 86
+> service tests, model gates, local Qdrant and an exact-body signed packaged-service request;
+> its evidence explicitly prohibits active promotion because training is synthetic and online
+> shadow/real-outcome evidence does not exist.
+
+> **Catalogue expansion audit:** the deployed immutable generation remains 642 dishes. Protected
+> aggregate run `31257431526` measured 3,410 stored rows, 3,402 active rows and 646 rows passing
+> the existing presence-based publication gates; only 547 of those 646 also passed the stricter
+> confidence policy. Run `31257875325` then proved the complete meal-class remediation cohort is
+> 255 dishes: 99 are presence-eligible but below the class-confidence gate and 156 have complete
+> serving facts but remain in ontology review. All 255 mappings are provisional internal-research
+> outputs (238 `chef_rubric`, 17 `chef_rubric_secondary`), with zero curated-exact, human-reviewed
+> or accepted evidence. They must receive new independent evidence or human review; confidence
+> cannot be raised mechanically. Aux remains off and no catalogue or mapping changed in either
+> audit.
+
+> **Primary versus component serving model:** migration 106 is live through protected run
+> `31258906340`. It models reviewed, slot-aware compatibility for staples, sides and accompaniments
+> separately from primary meal-class identity, normalizes the legacy `snack` alias to canonical
+> `snacks`, and keeps machine/rule proposals non-serving until reviewed. The first aggregate
+> baseline found 1,402 canonical dish-slot routes: 603 primary-ready, 262 needing primary-class
+> review and 537 needing component review; there are zero proposals and zero accepted component
+> facts. That v1 report is slot-only; the additive v2 report described below now closes its
+> active-dish denominator gap. Neither migration changes the 642-row publication gate or either
+> engine. Aux remains off.
+
+> **Meal-slot remediation evidence:** protected run `31259220512` installed the v2 report and
+> reconciled all 3,402 active dishes. Exactly 802 have a canonical slot and 2,600 do not; 2,596
+> lack a hero role and 918 carry at least one unrecognized slot label. Protected run `31267459809`
+> installed migration 108 and split the 2,600 slotless dishes into 1,802 single-direct proposals
+> (667 lunch, 566 snacks, 294 dinner and 275 breakfast), 797 contextual-review rows and one direct
+> conflict. Contextual rows comprise 394 side dishes, 247 desserts, 120 main courses, 22 diet
+> values misplaced in the course field, 12 one-pot dishes and two brunch dishes. The audit created
+> no proposal, exposed no raw source text and made no serving change.
+>
+> **Governed direct meal-slot proposals:** protected run `31269668506` installed migration 109 and
+> validation 961, then created exactly 1,802 `pending` proposals with 7,222 immutable source-row
+> links: 667 lunch, 566 snacks, 294 dinner and 275 breakfast. The exact-count and idempotency gates,
+> function-only writes, evidence checks and forward-only lifecycle all passed. The aggregate
+> artifact confirms zero identity/raw-text exposure, automatic acceptance, publication change or
+> serving change. No proposal is approved or applied; the other 798 ambiguous/conflicting dishes
+> remain excluded. Aux remains off.
+>
+> **Proposal quality-review gate:** protected run `31270121136` installed migration 110 and
+> validation 962, then produced a read-only deterministic 40-name review pack. All 1,802 proposals
+> remain pending and fresh, all 7,222 evidence links reconcile, and each proposal has 4–8 links.
+> The sample contains no identifiers, raw import text or user data. It includes both complete dishes
+> and components (for example breads/condiments), confirming that accepting a meal slot must never
+> imply hero-role or complete-meal eligibility. No proposal was approved/applied and no catalogue,
+> publication, serving or Aux routing changed.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,
@@ -13,9 +75,10 @@
 > credentials are configured; a physical-device native build remains the final push-delivery test.
 
 > **Production ontology/recommendation release:** migrations 054, 055 and 056 plus seed 146 are
-> live on `cmkswalqpmmqojwdmqbv`. All 802 production dishes are mapped to usable meal classes:
-> 547 are enriched and 255 are explicitly in review, with no pending enrichment jobs. The
-> The ontology rollout initially activated `dish-ontology` v1, `plan` v9 and `feedback` v6;
+> live on `cmkswalqpmmqojwdmqbv`. The original 802-dish ontology cohort has a meal-class mapping
+> for every dish: 547 meet the current strict confidence policy and 255 require class-evidence
+> remediation. The later expanded inventory is not fully mapped or enriched. The ontology rollout
+> initially activated `dish-ontology` v1, `plan` v9 and `feedback` v6;
 > current Edge versions are recorded in the production-hardening block below. Fly.io release v125
 > is healthy on both checks and serves immutable RE bundle `sha256:3d4cf579d1cf2565`. Snapshot v2
 > now preserves all 1,599 canonical/compatibility class lookups. Production workflow 31013721486
@@ -118,9 +181,11 @@
 | Observability | 60% (scheduled production smoke/issue alerting added; application 500-level webhook destination remains unconfigured) |
 
 ## One-line state per major component
-- **RE core/service:** implemented, repository Python suite green (720 passed, 27 skipped), Fly
-  image `deployment-01KZ945DR0VDXVEZBG3Y34H6KT` live-healthy with snapshot-v2 bundle
-  `sha256:ffad5c55384244e3`.
+- **RE core/service:** Ghar is the only user-authoritative engine. It exposes the immutable
+  642-row production publication but keeps the 810-dish deterministic fallback for requests that
+  arrive without a canonical shortlist. Aux is deployed on one isolated Machine against the same
+  publication and Qdrant generation, but Edge routing is off. The independent Aux quality run
+  `31256081581` is green and remains shadow-only/not active-eligible.
 - **Edge Functions:** implemented and tested (108 tests); membership-aware authorization is live
   in `household-access` v2, `recommendations` v18, `plan` v19 and `feedback` v14. The backend
   supports governed invitations, owner transfer and lifecycle history, and enforces distinct
@@ -133,22 +198,24 @@
   DPDP export/delete UI added 2026-08-04 (P0-2/P0-4/P1-2/P1-3/P1-4); jest infra stood up with 9
   pure-logic tests; Expo SDK 53 + OneSignal SDK integration passes typecheck, Expo Doctor, and an
   Android production bundle export; no component-render or physical-device tests yet (P1-5 partial).
-- **Database:** real production data (802 dishes, 77 profiles at the 2026-08-05 continuity audit),
+- **Database:** protected run `31257431526` measured 3,410 stored dish rows, 3,402 active dishes,
+  1,719 with usable class mappings and 646 passing the current presence-based publication gates.
+  Of those 646, 547 meet the stricter confidence policy; the deployed immutable generation remains
+  642. Earlier continuity evidence recorded 77 profiles on 2026-08-05.
   RLS enabled; household context writes and tenant continuity are fixed and live. All profiles have
   a household and active owner membership, all scoped household IDs are non-null, advisor-reported
   missing FK indexes/duplicate indexes are resolved, and partition creation is automated.
   Migration 073 adds membership history and guarantees exactly one active owner; the live
   validation reports zero invalid households. Migration 075 adds private normalized festival
   identities/occurrences under `food`; validation 930 confirms table privacy and RPC results.
-- **Knowledge layer:** ingredient/cuisine/meal-class ontologies complete; a normalized,
-  provenance-backed dish enrichment layer and class-bound candidate view are live for all 802
-  production dishes;
-  every production dish now has constraint, regional, nutrition-estimate, recipe and published
-  episode coverage. The production relational graph connects dishes, aliases, ingredients,
-  classes and catalogue features with provenance. USDA is active only as exact-match provisional
-  evidence after a labelled demo-key evaluation showed poor broad Indian-dish matching. Groq
-  low-risk enrichment is live under strict budgets and database field policies. Normalized
-  festival mapping is live; clinically governed health-condition suitability remains pending.
+- **Knowledge layer:** normalized ontology and provenance structures are live, but coverage is not
+  complete across the expanded inventory. The database currently has 646 presence-eligible rows,
+  only 547 meet the stricter confidence policy, and 1,719 active dishes have any usable meal-class
+  mapping. Run `31257875325` shows all 255 weak mappings lack curated or human evidence. Missing
+  ingredient, cuisine, safety, taxonomy and class facts must be completed under the existing review
+  rules rather than bypassed.
+  USDA remains exact-match provisional evidence, Groq remains limited to governed low-risk fields,
+  and clinically governed health-condition suitability remains pending.
 
 See `docs/active/OPEN_ITEMS.md` for what's actionable, `docs/active/LAUNCH_BLOCKERS.md` for what
 gates a public launch, `docs/active/ROADMAP.md` for sequencing.

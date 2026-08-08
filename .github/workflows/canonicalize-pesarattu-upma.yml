@@ -1,0 +1,117 @@
+name: Canonicalize Pesarattu Upma identity
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type canonicalize-pesarattu-upma
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-canonicalize-pesarattu-upma
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'canonicalize-pesarattu-upma'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-canonicalize-pesarattu-upma-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify production identity
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+
+      - name: Classify canonicalization state
+        id: state
+        run: |
+          state="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 <<'SQL'
+          SELECT CASE
+            WHEN EXISTS (SELECT 1 FROM public.dishes WHERE name = 'Pesarattu Upma')
+             AND EXISTS (SELECT 1 FROM public.dishes WHERE name = 'Pesarattu MLC')
+             AND NOT EXISTS (
+               SELECT 1 FROM public.dishes
+               WHERE name = 'Pesarattu MLC [retired duplicate]'
+             ) THEN 'install'
+            WHEN EXISTS (SELECT 1 FROM public.dishes WHERE name = 'Pesarattu Upma')
+             AND NOT EXISTS (SELECT 1 FROM public.dishes WHERE name = 'Pesarattu MLC')
+             AND EXISTS (
+               SELECT 1 FROM public.dishes
+               WHERE name = 'Pesarattu MLC [retired duplicate]' AND NOT is_active
+             ) THEN 'validate'
+            ELSE 'unsafe'
+          END;
+          SQL
+          )"
+          test "$state" != "unsafe"
+          echo "action=$state" >> "$GITHUB_OUTPUT"
+
+      - name: Atomically install canonical identity correction
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/115_canonicalize_pesarattu_upma_identity.sql \
+            -f database/validation/967_canonicalize_pesarattu_upma_identity_validation.sql
+
+      - name: Revalidate installed correction read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/967_canonicalize_pesarattu_upma_identity_validation.sql
+
+      - name: Record count-only deployment evidence
+        run: |
+          report="$RUNNER_TEMP/pesarattu-canonicalization.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 > "$report.raw" <<'SQL'
+          SELECT jsonb_build_object(
+            'schema_version', 'pesarattu-canonicalization-v1',
+            'canonical_active_count', count(*) FILTER (
+              WHERE name = 'Pesarattu Upma' AND is_active
+            ),
+            'legacy_canonical_count', count(*) FILTER (
+              WHERE name = 'Pesarattu MLC'
+            ),
+            'retired_inactive_count', count(*) FILTER (
+              WHERE name = 'Pesarattu MLC [retired duplicate]' AND NOT is_active
+            ),
+            'identity_exposed', false,
+            'feedback_changed', false,
+            'recommendation_history_changed', false
+          )
+          FROM public.dishes
+          WHERE name IN (
+            'Pesarattu Upma', 'Pesarattu MLC', 'Pesarattu MLC [retired duplicate]'
+          );
+          SQL
+          grep -E '^\{' "$report.raw" | tail -n 1 > "$report"
+          jq --exit-status '
+            .schema_version == "pesarattu-canonicalization-v1"
+            and .canonical_active_count == 1
+            and .legacy_canonical_count == 0
+            and .retired_inactive_count == 1
+            and .identity_exposed == false
+            and .feedback_changed == false
+            and .recommendation_history_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pesarattu-canonicalization
+          path: ${{ runner.temp }}/pesarattu-canonicalization.json
+          retention-days: 90
+          if-no-files-found: error

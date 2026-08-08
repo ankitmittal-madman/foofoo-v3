@@ -1,0 +1,98 @@
+name: Deploy canonical catalogue identity boundary
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type apply-catalogue-identity-boundary
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'apply-catalogue-identity-boundary'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-catalogue-identity-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify exact production project
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+
+      - name: Classify complete, absent, or unsafe partial state
+        id: state
+        run: |
+          read -r present total <<EOF
+          $(psql "$FOOFOO_SUPABASE_URI" -At -F ' ' -v ON_ERROR_STOP=1 <<'SQL'
+          WITH checks(present) AS (VALUES
+            (to_regprocedure('re_engine.catalogue_identity_coverage()') IS NOT NULL),
+            (to_regprocedure('re_engine.catalogue_identity_rows(uuid,integer)') IS NOT NULL)
+          )
+          SELECT count(*) FILTER (WHERE present), count(*) FROM checks;
+          SQL
+          )
+          EOF
+          if [ "$present" = "0" ] && [ "$total" = "2" ]; then
+            echo "action=apply" >> "$GITHUB_OUTPUT"
+          elif [ "$present" = "$total" ] && [ "$total" = "2" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe partial catalogue identity state: $present of $total sentinels present" >&2
+            exit 1
+          fi
+
+      - name: Atomically apply identity boundary
+        if: steps.state.outputs.action == 'apply'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/122_publish_canonical_catalogue_identity.sql \
+            -f database/validation/974_publish_canonical_catalogue_identity_validation.sql
+
+      - name: Revalidate installed identity boundary read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/974_publish_canonical_catalogue_identity_validation.sql
+
+      - name: Produce aggregate deployment evidence
+        env:
+          ACTION_TAKEN: ${{ steps.state.outputs.action }}
+        run: |
+          identity_count="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 \
+            -c 'SELECT re_engine.catalogue_identity_coverage()')"
+          jq --null-input --arg action "$ACTION_TAKEN" --arg commit "$GITHUB_SHA" \
+            --arg run_id "$GITHUB_RUN_ID" --argjson identity_count "$identity_count" '{
+              schema_version: "canonical-catalogue-identity-deploy-v1",
+              migration: "122",
+              validation: "974",
+              action: $action,
+              identity_count: $identity_count,
+              commit_sha: $commit,
+              workflow_run_id: $run_id,
+              passed: true
+            }' > "$RUNNER_TEMP/canonical-catalogue-identity-deploy.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: canonical-catalogue-identity-deploy
+          path: ${{ runner.temp }}/canonical-catalogue-identity-deploy.json
+          retention-days: 90
+          if-no-files-found: error

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import os
 import time
 from collections import Counter
 from pathlib import Path
@@ -179,24 +180,28 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
         from .db import Database  # deferred import, see db.py docstring
 
         db = Database()
-        with db.transaction() as cur:
-            cuisines = db.load_cuisines(cur)
-            meal_classes = db.load_meal_classes(cur)
-            existing = db.load_existing_dishes(cur)
-            dedupe_index.seed_existing(
-                [{"name": e["name"], "fingerprint": e.get("fingerprint")} for e in existing]
-            )
-            image_ctx.existing_dish_ids_with_image = db.load_dish_ids_with_image(cur)
-            run_id = db.start_import_run(cur, csv_path.name, checksum, "apply")
+        try:
+            with db.transaction() as cur:
+                cuisines = db.load_cuisines(cur)
+                meal_classes = db.load_meal_classes(cur)
+                existing = db.load_existing_dishes(cur)
+                dedupe_index.seed_existing(
+                    [{"name": e["name"], "fingerprint": e.get("fingerprint")} for e in existing]
+                )
+                image_ctx.existing_dish_ids_with_image = db.load_dish_ids_with_image(cur)
+                actor = os.environ.get("FOOFOO_IMPORT_ACTOR", "etl_script")
+                run_id = db.start_import_run(
+                    cur, csv_path.name, checksum, "apply", actor
+                )
+        except BaseException:
+            db.close()
+            raise
     else:
         # Dry-run: no DB, no reference-table reads. Ontology adapter runs against an empty
         # reference set so every match is reported as 'no_match' — this is expected and is
         # exactly why the report clearly labels dry-run output as "unverified against live DB".
         logger.warning("dry-run mode: no DB connection opened; ontology/meal-class matches are "
                         "reported against an EMPTY reference set and are illustrative only")
-
-    ontology = get_adapter(cuisines, meal_classes)
-    groq = GroqAdapter()
 
     batch: list[RowOutcome] = []
     total = 0
@@ -213,40 +218,69 @@ def run_pipeline(csv_path: Path, dry_run: bool, batch_size: int = BATCH_SIZE,
                 _persist_row(cur, db, run_id, o, counters, match_method_counts, confidence_buckets,
                              review_reasons, image_ctx)
 
-    for row in load_and_normalize(csv_path):
-        if row_limit and total >= row_limit:
-            logger.info("row_limit=%s reached, stopping read early", row_limit)
-            break
-        if only_srno is not None and row.srno not in only_srno:
-            continue
-        total += 1
-        outcome = process_row(row, dedupe_index, ontology, groq, image_ctx)
-        batch.append(outcome)
-        if len(batch) >= batch_size:
-            flush(batch)
-            batch = []
-    flush(batch)
+    try:
+        ontology = get_adapter(cuisines, meal_classes)
+        groq = GroqAdapter()
 
-    elapsed = time.monotonic() - started
-    report = {
-        "source_file": str(csv_path),
-        "source_checksum_sha256": checksum,
-        "run_mode": "dry_run" if dry_run else "apply",
-        "total_rows_processed": total,
-        "elapsed_seconds": round(elapsed, 2),
-        "outcome_counts": dict(counters),
-        "match_method_counts": dict(match_method_counts),
-        "ontology_confidence_distribution": dict(confidence_buckets),
-        "review_reason_counts": dict(review_reasons),
-        "verified_against_live_db": not dry_run,
-    }
+        for row in load_and_normalize(csv_path):
+            if row_limit and total >= row_limit:
+                logger.info("row_limit=%s reached, stopping read early", row_limit)
+                break
+            if only_srno is not None and row.srno not in only_srno:
+                continue
+            total += 1
+            outcome = process_row(row, dedupe_index, ontology, groq, image_ctx)
+            batch.append(outcome)
+            if len(batch) >= batch_size:
+                flush(batch)
+                batch = []
+        flush(batch)
 
-    if not dry_run:
-        with db.transaction() as cur:
-            db.complete_import_run(cur, run_id, counters, report)
-        db.close()
+        elapsed = time.monotonic() - started
+        report = {
+            "source_file": str(csv_path),
+            "source_checksum_sha256": checksum,
+            "run_mode": "dry_run" if dry_run else "apply",
+            "total_rows_processed": total,
+            "elapsed_seconds": round(elapsed, 2),
+            "outcome_counts": dict(counters),
+            "match_method_counts": dict(match_method_counts),
+            "ontology_confidence_distribution": dict(confidence_buckets),
+            "review_reason_counts": dict(review_reasons),
+            "verified_against_live_db": not dry_run,
+        }
 
-    return report
+        if not dry_run:
+            completion_counters = dict(counters)
+            completion_counters["total_rows"] = total
+            with db.transaction() as cur:
+                db.complete_import_run(cur, run_id, completion_counters, report)
+
+        return report
+    except BaseException as exc:
+        if not dry_run and db is not None and run_id is not None:
+            failure_report = {
+                "schema_version": "dish-ingestion-failure-v1",
+                "status": "failed",
+                "source_file": str(csv_path),
+                "source_checksum_sha256": checksum,
+                "run_mode": "apply",
+                "total_rows_processed": total,
+                "outcome_counts": dict(counters),
+                "failure_type": type(exc).__name__,
+                "verified_against_live_db": False,
+            }
+            try:
+                with db.transaction() as cur:
+                    changed = db.fail_import_run(cur, run_id, failure_report)
+                if not changed:
+                    logger.error("failed import could not close its running lineage row")
+            except Exception:
+                logger.exception("failed to close import lineage after pipeline error")
+        raise
+    finally:
+        if db is not None:
+            db.close()
 
 
 def _confidence_bucket(score: float | None) -> str:

@@ -63,5 +63,6 @@ def test_runbook_discloses_unclosed_operational_gaps():
     assert "no automated user-visible activation path" in normalized
     assert "household-stable canary mechanism" in normalized
     assert "consented real-outcome replay producer" in text
-    assert "live publishable count is unknown" in text
+    assert "642 of 3,402 active dishes" in text
+    assert "live publishable count is unknown" not in text
     assert "## Founder Sign-off" in text

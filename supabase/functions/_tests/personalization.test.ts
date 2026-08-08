@@ -2,6 +2,7 @@ import { assertEquals } from "@std/assert";
 import {
   aggregateAffinityMaps,
   extractExposureDishNames,
+  extractExposurePrimaryNames,
   extractPersistedCadence,
   extractPersistedExposureDishNames,
   extractPersistedVarietyCounts,
@@ -139,20 +140,67 @@ Deno.test("extractExposureDishNames: event-history fallback supports every servi
   );
 });
 
+Deno.test("extractExposurePrimaryNames: selects one lead dish for every serving shape", () => {
+  assertEquals(
+    extractExposurePrimaryNames([
+      { name: "Indori Poha" },
+      { hero_dish_names: ["Daal Bafla", "Mawa Bati"] },
+      {
+        components: [
+          { dish_name: "Roti", grammar_role: "side", component_role: "staple" },
+          { dish_name: "Bhindi", grammar_role: "primary", component_role: "dry_hero" },
+        ],
+      },
+    ]),
+    ["Indori Poha", "Daal Bafla", "Bhindi"],
+  );
+});
+
 Deno.test(
-  "selectImmediateRefreshExclusions: latest slate wins over long history and stays bounded",
+  "selectImmediateRefreshExclusions: latest slate per slot wins and stays bounded",
   () => {
     const persisted = Array.from({ length: 50 }, (_, index) => `Old ${index}`);
-    const selected = selectImmediateRefreshExclusions(persisted, [{
-      plates: [{
-        components: [
-          { dish_name: "Latest Dry" },
-          { dish_name: "Latest Liquid" },
-          { dish_name: "Latest Dry" },
-        ],
-      }],
-    }]);
-    assertEquals(selected, ["Latest Dry", "Latest Liquid"]);
+    const selected = selectImmediateRefreshExclusions(persisted, [
+      {
+        slot: "dinner",
+        plates: [{
+          components: [
+            { dish_name: "Latest Dinner", grammar_role: "primary" },
+            { dish_name: "Dinner Side", grammar_role: "side" },
+          ],
+        }],
+      },
+      {
+        slot: "dinner",
+        plates: [{ components: [{ dish_name: "Stale Dinner", grammar_role: "primary" }] }],
+      },
+      {
+        slot: "lunch",
+        plates: [{
+          components: [
+            { dish_name: "Latest Lunch", grammar_role: "primary" },
+            { dish_name: "Lunch Side", grammar_role: "side" },
+          ],
+        }],
+      },
+      {
+        slot: "breakfast",
+        plates: [{
+          components: [
+            { dish_name: "Latest Breakfast", grammar_role: "primary" },
+            { dish_name: "Breakfast Side", grammar_role: "side" },
+          ],
+        }],
+      },
+    ]);
+    assertEquals(selected, [
+      "Latest Dinner",
+      "Latest Lunch",
+      "Latest Breakfast",
+      "Dinner Side",
+      "Lunch Side",
+      "Breakfast Side",
+    ]);
     assertEquals(selectImmediateRefreshExclusions(persisted, [], 16).length, 16);
   },
 );

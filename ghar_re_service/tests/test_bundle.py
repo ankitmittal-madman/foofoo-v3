@@ -139,7 +139,7 @@ def test_shadow_preference_artifact_is_also_bundled(tmp_path):
 
 def test_bundle_catalogue_matches_build_catalogue_output(built):
     """The bundled catalogue must reconstruct the same dish set build_catalogue.py produces — the
-    bundle is a snapshot of the real 810-dish catalogue (Phase G), not a lossy re-encoding of it.
+    bundle is a snapshot of the canonical catalogue (Phase G), not a lossy re-encoding of it.
 
     Superseded from comparing against the 39-dish golden-sample fixtures: export_bundle.py was
     wired to build_catalogue.py (Phase G Task 2), so the bundle no longer sources from
@@ -154,6 +154,24 @@ def test_bundle_catalogue_matches_build_catalogue_output(built):
     assert {d.name for d in bundled.dishes} == {d["name"] for d in fresh_dishes}
 
 
+def test_governed_duplicate_dish_identity_is_merged_and_aliases_are_retained(built):
+    """The authored MLC typo must not remain a second served dish or lose name resolution."""
+    out, _ = built
+    from ghar_re_service.scripts import build_catalogue
+
+    catalogue = providers.BundleCatalogueProvider(out).load()
+    _fresh_dishes, report = build_catalogue.build_catalogue()
+    canonical = catalogue.get("Pesarattu Upma")
+
+    assert len(catalogue.dishes) == 809
+    assert report.identity_merges == [("Pesarattu MLC", "Pesarattu Upma")]
+    assert "Pesarattu MLC" not in {dish.name for dish in catalogue.dishes}
+    assert canonical is not None
+    assert {"Pesarattu MLC", "MLA Pesarattu"}.issubset(set(canonical.synonyms))
+    assert catalogue.get("Pesarattu MLC") is canonical
+    assert catalogue.get("MLA Pesarattu") is canonical
+
+
 def test_bundle_catalogue_has_full_state_origin_coverage(built):
     """Regression guard for the archived RE audit's state_origin gap (§P2-9) and
     WP-14 §3.2 both flagged (536/810 dishes, 66%, had no state_origin, silently zeroing
@@ -166,6 +184,26 @@ def test_bundle_catalogue_has_full_state_origin_coverage(built):
     bundled = providers.BundleCatalogueProvider(out).load()
     missing = [d.name for d in bundled.dishes if d.state_origin is None]
     assert missing == [], f"{len(missing)}/810 dishes have no state_origin: {missing[:10]}..."
+
+
+def test_authored_staple_and_liquid_combinations_are_standalone(built):
+    """Complete named combinations must not be nested inside another generated plate."""
+    out, _ = built
+    catalogue = providers.BundleCatalogueProvider(out).load()
+    expected = {
+        "Aloo Puri",
+        "Appam with Stew",
+        "Chholar Dal with Luchi",
+        "Dal Pakwan",
+        "Kombdi Vade (Malvani)",
+        "Nahari Kulcha",
+        "Pithla Bhakri",
+        "Sheermal with Nihari",
+    }
+
+    assert {
+        dish.name for dish in catalogue if dish.name in expected and dish.hero_role == "standalone"
+    } == expected
 
 
 def test_named_animal_dishes_cannot_be_derived_as_vegetarian(built):

@@ -1,0 +1,129 @@
+name: Review governed meal-slot proposals
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type review-direct-meal-slot-proposals
+        required: true
+        type: string
+      expected_proposal_count:
+        description: Exact proposal count from the generation artifact
+        required: true
+        type: number
+      expected_evidence_link_count:
+        description: Exact evidence-link count from the generation artifact
+        required: true
+        type: number
+      sample_per_slot:
+        description: Deterministic catalogue-name sample per slot (1-25)
+        required: true
+        default: 10
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-meal-slot-proposal-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'review-direct-meal-slot-proposals' &&
+      inputs.expected_proposal_count > 0 &&
+      inputs.expected_evidence_link_count > 0 &&
+      inputs.sample_per_slot >= 1 && inputs.sample_per_slot <= 25
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-meal-slot-proposal-review-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify production identity and proposal foundation
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('ops.generate_direct_meal_slot_proposals(text,integer)') IS NOT NULL")" = "t"
+
+      - name: Classify bounded review-report state
+        id: state
+        run: |
+          report="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.direct_meal_slot_proposal_review_report(integer)') IS NOT NULL")"
+          if [ "$report" = "f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$report" = "t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe review-report schema state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install bounded review report
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/110_report_direct_meal_slot_proposal_review.sql \
+            -f database/validation/961_govern_direct_meal_slot_proposals_validation.sql \
+            -f database/validation/962_report_direct_meal_slot_proposal_review_validation.sql
+
+      - name: Revalidate existing review report read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/961_govern_direct_meal_slot_proposals_validation.sql \
+            -f database/validation/962_report_direct_meal_slot_proposal_review_validation.sql
+
+      - name: Produce bounded deterministic review pack
+        env:
+          EXPECTED_PROPOSAL_COUNT: ${{ inputs.expected_proposal_count }}
+          EXPECTED_EVIDENCE_LINK_COUNT: ${{ inputs.expected_evidence_link_count }}
+          SAMPLE_PER_SLOT: ${{ inputs.sample_per_slot }}
+        run: |
+          report="$RUNNER_TEMP/recommendation-meal-slot-proposal-review.json"
+          raw="$report.raw"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -c "SELECT re_engine.direct_meal_slot_proposal_review_report($SAMPLE_PER_SLOT)" \
+            > "$raw"
+          tail -n 1 "$raw" > "$report"
+          jq --arg commit "$GITHUB_SHA" --arg run_id "$GITHUB_RUN_ID" '. + {
+            commit_sha: $commit,
+            workflow_run_id: $run_id
+          }' "$report" > "$report.checked"
+          mv "$report.checked" "$report"
+          jq --argjson proposals "$EXPECTED_PROPOSAL_COUNT" \
+             --argjson evidence "$EXPECTED_EVIDENCE_LINK_COUNT" \
+             --argjson sample "$SAMPLE_PER_SLOT" --exit-status '
+            .schema_version == "recommendation-meal-slot-proposal-review-v1"
+            and .proposal_count == $proposals
+            and .evidence_link_count == $evidence
+            and .status_counts.pending == $proposals
+            and .freshness.current_candidate_count == $proposals
+            and .freshness.stale_proposal_count == 0
+            and .evidence_links_per_proposal.zero_link_proposals == 0
+            and .sample_per_slot == $sample
+            and (.sample | length) <= (4 * $sample)
+            and .policy.read_only == true
+            and .policy.user_data_exposed == false
+            and .policy.raw_source_text_exposed == false
+            and .policy.catalogue_names_exposed_for_review == true
+            and .policy.automatic_acceptance_allowed == false
+            and .policy.serving_changed == false
+            and .policy.publication_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-meal-slot-proposal-review
+          path: ${{ runner.temp }}/recommendation-meal-slot-proposal-review.json
+          retention-days: 30
+          if-no-files-found: error

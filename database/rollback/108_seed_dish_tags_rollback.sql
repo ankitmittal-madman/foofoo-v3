@@ -714,7 +714,6 @@ DELETE FROM public.dish_tags WHERE dish_id IN (SELECT id FROM public.dishes WHER
   'Pootharekulu',
   'Borugu Undalu',
   'Mamsam Pulusu',
-  'Pesarattu MLC',
   'Chettinad Fish Curry',
   'Chettinad Mutton',
   'Athirasam',

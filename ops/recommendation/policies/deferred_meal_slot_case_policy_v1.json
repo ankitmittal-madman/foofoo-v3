@@ -1,0 +1,20 @@
+{
+  "audit_policy_sha256": "94d5f198bbb1244d631a23c5dc95200a6be860d6609dfc6a6bb0c1a7cb5717ac",
+  "candidate_slot_set_counts": {
+    "breakfast": 2,
+    "dinner": 1,
+    "lunch,dinner": 2
+  },
+  "case_count": 23,
+  "case_route_counts": {
+    "conflicting_direct_slots": 1,
+    "requires_food_role_review": 17,
+    "shifted_contextual_slot_candidate": 2,
+    "shifted_direct_slot_candidate": 3
+  },
+  "diet_evidence_link_count": 88,
+  "policy_version": "deferred-meal-slot-case-generation-v1",
+  "report_only_source_policy": "deferred-course-shifted-field-audit-v1",
+  "schema_version": "deferred-meal-slot-case-policy-v1",
+  "serving_mutation_allowed": false
+}

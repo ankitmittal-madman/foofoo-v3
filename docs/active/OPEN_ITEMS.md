@@ -49,9 +49,29 @@ findings are retained under `docs/archive/`.
 
 ## P3 — Product and intelligence evolution
 
-- Execute WP-23's shared Ghar/Aux recommendation modernization program: canonical class/episode/
-  dish events, temporal sequencing and spacing, governed contextual inference, scalable catalogue
-  retrieval, shadow integration and measurable promotion gates.
+- Complete WP-23 after its deployed-OFF Phase A foundation: run authenticated cold-start and
+  experienced-user smoke on an explicitly selected test household; remediate the 255
+  low-confidence provisional meal-class mappings without relabelling their confidence; deploy and
+  run the protected primary/component readiness audit; review slot-aware component proposals for
+  staples, sides and accompaniments; enrich and map the remaining expanded inventory; update Ghar,
+  Aux and publication eligibility only after accepted compatibility evidence and runtime tests
+  prove parity; publish one quality-closed immutable generation; ratify and run load gates; then
+  collect consented real-outcome and shadow evidence before separately approving any canary. Aux
+  remains off until those gates pass. Protected runs `31257431526` and `31257875325` own the
+  current aggregate counts and provenance split. Run `31258906340` installed migration 106 and
+  measured 603 primary-ready, 262 primary-review and 537 component-review dish-slot routes with
+  no accepted component facts. Run `31259220512` completed migration 107's full-inventory
+  extension: 802 active dishes
+  have canonical slots, 2,600 do not, 2,596 lack hero roles and 918 contain unrecognized slot
+  labels. Run `31267459809` found 1,802 single-direct slot candidates, 797 contextual-review cases
+  and one conflict. Run `31269668506` materialized exactly those 1,802 direct rows as pending
+  proposals with 7,222 evidence links and no serving/publication change; the other 798 rows remain
+  excluded. Run `31270121136` proved all 1,802 proposals are fresh with 7,222 links and produced a
+  deterministic 40-name sample. The sample includes both heroes and meal components, so slot review
+  must remain independent from hero/class review. Request an explicit cohort decision and build a
+  separately authorized apply boundary that records named provenance, changes only canonical meal
+  slots, preserves prior arrays for rollback and cannot alter hero role, class, publication or
+  serving. Hero-role evidence and contextual slot review remain distinct unresolved gaps.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.

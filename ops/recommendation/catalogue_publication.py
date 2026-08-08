@@ -85,6 +85,16 @@ def fetch_coverage(connection: Any) -> PublicationCoverage:
         return PublicationCoverage.from_row(_mapping(cursor, row))
 
 
+def fetch_identity_count(connection: Any) -> int:
+    """Read the governed count of canonical dish identities, independent of eligibility."""
+    with connection.cursor() as cursor:
+        cursor.execute("select re_engine.catalogue_identity_coverage() as identity_count")
+        row = cursor.fetchone()
+        if row is None:
+            raise RuntimeError("Catalogue identity coverage returned no row")
+        return int(_mapping(cursor, row)["identity_count"])
+
+
 def iter_publication_rows(connection: Any, *, page_size: int = 500) -> Iterator[dict[str, Any]]:
     """Yield deterministic UUID-keyset pages without loading the full catalogue into memory."""
     if not 1 <= page_size <= 2000:
@@ -118,6 +128,42 @@ def iter_publication_rows(connection: Any, *, page_size: int = 500) -> Iterator[
             return
 
 
+def iter_identity_rows(connection: Any, *, page_size: int = 500) -> Iterator[dict[str, Any]]:
+    """Yield deterministic canonical UUID/name pages without asserting serving eligibility."""
+    if not 1 <= page_size <= 2000:
+        raise ValueError("page_size must be between 1 and 2000")
+    after: str | None = None
+    while True:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "select dish_id::text, name, regional_affinities "
+                "from re_engine.catalogue_identity_rows(%s, %s)",
+                (after, page_size),
+            )
+            batch = cursor.fetchall()
+            mapped_batch = [_mapping(cursor, result) for result in batch]
+        if not mapped_batch:
+            return
+        for row in mapped_batch:
+            dish_id = str(row.get("dish_id") or "")
+            name = str(row.get("name") or "").strip()
+            regional_affinities = row.get("regional_affinities")
+            if not dish_id or not name:
+                raise RuntimeError("Catalogue identity row is incomplete")
+            if after is not None and dish_id <= after:
+                raise RuntimeError("Catalogue identity rows are not strictly ordered")
+            after = dish_id
+            if not isinstance(regional_affinities, list):
+                raise RuntimeError("Catalogue identity regional affinities are not an array")
+            yield {
+                "dish_id": dish_id,
+                "name": name,
+                "regional_affinities": regional_affinities,
+            }
+        if len(mapped_batch) < page_size:
+            return
+
+
 def _create_hydration_index(path: Path) -> sqlite3.Connection:
     """Create the disk-backed canonical-ID/slot/class index used by bounded engine retrieval."""
     database = sqlite3.connect(path)
@@ -130,6 +176,12 @@ def _create_hydration_index(path: Path) -> sqlite3.Connection:
           dish_id TEXT PRIMARY KEY,
           name TEXT NOT NULL,
           payload TEXT NOT NULL
+        ) WITHOUT ROWID;
+        CREATE TABLE catalogue_identity (
+          dish_id TEXT PRIMARY KEY,
+          normalized_name TEXT NOT NULL UNIQUE,
+          name TEXT NOT NULL,
+          regional_affinities TEXT NOT NULL
         ) WITHOUT ROWID;
         CREATE TABLE dish_slots (
           slot TEXT NOT NULL,
@@ -163,14 +215,19 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
     stage = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}.", dir=output_dir.parent))
     rows_path = stage / "catalogue.jsonl"
     index_path = stage / "catalogue.sqlite3"
-    digest = hashlib.sha256()
+    rows_digest = hashlib.sha256()
+    publication_digest = hashlib.sha256()
     count = 0
+    identity_count = 0
     first_id: str | None = None
     last_id: str | None = None
     try:
         coverage = fetch_coverage(connection)
+        expected_identity_count = fetch_identity_count(connection)
         if coverage.publishable_dishes <= 0:
             raise RuntimeError("No safety-closed, class-mapped dishes are publishable")
+        if expected_identity_count <= 0:
+            raise RuntimeError("No canonical dish identities are publishable")
         with (
             rows_path.open("x", encoding="utf-8") as output,
             _create_hydration_index(index_path) as index,
@@ -179,7 +236,9 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
                 canonical = json.dumps(row, sort_keys=True, separators=(",", ":"))
                 encoded = (canonical + "\n").encode()
                 output.write(encoded.decode())
-                digest.update(encoded)
+                rows_digest.update(encoded)
+                publication_digest.update(b"catalogue:")
+                publication_digest.update(encoded)
                 dish_id = str(row["id"])
                 index.execute(
                     "INSERT INTO catalogue(dish_id, name, payload) VALUES (?, ?, ?)",
@@ -200,7 +259,39 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
                 first_id = first_id or dish_id
                 last_id = dish_id
                 count += 1
+            for identity in iter_identity_rows(connection, page_size=page_size):
+                dish_id = identity["dish_id"]
+                name = identity["name"]
+                normalized_name = " ".join(name.casefold().split())
+                regional_affinities = json.dumps(
+                    identity["regional_affinities"], sort_keys=True, separators=(",", ":")
+                )
+                try:
+                    index.execute(
+                        "INSERT INTO catalogue_identity"
+                        "(dish_id, normalized_name, name, regional_affinities) "
+                        "VALUES (?, ?, ?, ?)",
+                        (dish_id, normalized_name, name, regional_affinities),
+                    )
+                except sqlite3.IntegrityError as exc:
+                    raise RuntimeError("Canonical catalogue identity is not unique") from exc
+                identity_encoded = (
+                    f"{dish_id}\t{normalized_name}\t{name}\t{regional_affinities}\n".encode()
+                )
+                publication_digest.update(b"identity:")
+                publication_digest.update(identity_encoded)
+                identity_count += 1
             index.commit()
+            mismatch_count = index.execute(
+                """
+                SELECT count(*)
+                FROM catalogue c
+                LEFT JOIN catalogue_identity i ON i.dish_id = c.dish_id AND i.name = c.name
+                WHERE i.dish_id IS NULL
+                """
+            ).fetchone()[0]
+            if mismatch_count:
+                raise RuntimeError("Safety-closed catalogue identity is incomplete")
             index.execute("VACUUM")
 
         if count != coverage.publishable_dishes:
@@ -208,15 +299,25 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
                 "Catalogue coverage/export count mismatch inside the read-only snapshot: "
                 f"{coverage.publishable_dishes} != {count}"
             )
+        if identity_count != expected_identity_count:
+            raise RuntimeError(
+                "Catalogue identity coverage/export count mismatch inside the read-only snapshot: "
+                f"{expected_identity_count} != {identity_count}"
+            )
 
-        content_sha256 = digest.hexdigest()
+        content_sha256 = rows_digest.hexdigest()
+        publication_sha256 = publication_digest.hexdigest()
         index_sha256 = _sha256_file(index_path)
         manifest = {
             "schema_version": MANIFEST_SCHEMA_VERSION,
-            "publication_version": f"sha256:{content_sha256}",
-            "source": "re_engine.catalogue_publication_rows",
+            "publication_version": f"sha256:{publication_sha256}",
+            "source": {
+                "catalogue": "re_engine.catalogue_publication_rows",
+                "identity": "re_engine.catalogue_identity_rows",
+            },
             "generated_at": datetime.now(UTC).isoformat(),
             "row_count": count,
+            "identity_row_count": identity_count,
             "first_dish_id": first_id,
             "last_dish_id": last_id,
             "catalogue_jsonl_sha256": content_sha256,

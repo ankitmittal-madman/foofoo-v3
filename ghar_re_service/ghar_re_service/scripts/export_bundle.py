@@ -11,7 +11,7 @@ service would fail at startup. RE-DOC-10 §8 answers this with an immutable, ver
 into the image at build time, loaded once at startup, never fetched from a database at runtime.
 
 SOURCE OF TRUTH FOR THIS BUNDLE
-The real 810-dish catalogue (data/source/dishes.xlsx, transformed by
+The real 809-canonical-dish catalogue (810 authored workbook rows, transformed by
 ghar_re_service.scripts.build_catalogue — Phase G Task 1) plus the YAML/CSV config layer — NOT the
 39-dish golden-sample fixtures (ghar_re_core.fixtures.DISHES) and NOT Postgres. RE-DOC-10 §8
 describes the eventual export as pulling from Postgres; that swap remains a separate, later task.
@@ -117,7 +117,8 @@ DEFAULT_OUT_DIR = os.path.join(_SERVICE_ROOT, "data", "bundle")
 
 BUNDLE_FORMAT_VERSION = 1
 CATALOGUE_SOURCE = (
-    "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue (real 810-dish catalogue)"
+    "data/source/dishes.xlsx via ghar_re_service.scripts.build_catalogue "
+    "(810 authored rows; 809 canonical dishes after governed identity merge)"
 )
 
 

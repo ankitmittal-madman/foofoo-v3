@@ -186,13 +186,29 @@ def test_standalone_appears_alone_no_support():
 
 
 # ---------------------------------------------------------------------------
-# 7. a non-standalone plate has a support/carb from the fixed set {Roti,Paratha,Poori,Rice}
+# 7. a non-standalone plate gets a support unless one of its heroes is already a staple
 # ---------------------------------------------------------------------------
 def test_non_standalone_gets_valid_support():
     for k, res in _all_default_runs().items():
         for p in res["plates"]:
             if p["form"] in ("pair", "single"):
-                assert p["support"] in CARB_SET, f"{k}: bad support {p['support']}"
+                has_staple_hero = any(
+                    set(dish.dish_category) & {"bread", "dosa_idli", "paratha_roti", "rice"}
+                    for dish in P._plate_dishes(p)
+                )
+                if has_staple_hero:
+                    assert p["support"] is None, f"{k}: redundant support {p['support']}"
+                else:
+                    assert p["support"] in CARB_SET, f"{k}: bad support {p['support']}"
+
+
+def test_uttapam_pair_does_not_receive_redundant_roti():
+    """A fermented-crepe hero is already the staple in its plate."""
+    uttapam = SimpleNamespace(name="Uttapam", dish_category=["dosa_idli"])
+    saagu = SimpleNamespace(name="Saagu", dish_category=["curry"])
+    plate = {"form": "pair", "dry": uttapam, "liquid": saagu}
+
+    assert P.default_carb(plate, {"region": {"value": "West"}}) is None
 
 
 # ---------------------------------------------------------------------------
@@ -258,6 +274,23 @@ def test_cuis_no_relation_is_zero():
     assert S._cuis(d, "Punjab") == 0.0
 
 
+def test_cuis_uses_confidence_weighted_governed_regional_affinity():
+    real_cat = _real_catalogue()
+    dish = next(d for d in real_cat if d.cuisine == "japanese")
+    dish.regional_affinities = {"madhya_pradesh": 0.72, "maharashtra": 0.54}
+
+    assert S._cuis(dish, "Madhya Pradesh") == 0.72
+    assert S._cuis(dish, "Maharashtra") == 0.54
+
+
+def test_cuis_governed_affinity_never_weakens_stronger_cuisine_origin():
+    real_cat = _real_catalogue()
+    dish = next(d for d in real_cat if d.cuisine == "punjabi")
+    dish.regional_affinities = {"punjab": 0.3}
+
+    assert S._cuis(dish, "Punjab") == 1.0
+
+
 def test_theta_base_config_matches_frozen_spec():
     # Core Spine FROZEN §S4 line 641: theta_base default 0.6.
     assert S.CONFIG.theta_base == 0.6
@@ -315,6 +348,16 @@ def test_explain_pairing_matches_live_compat_and_gates():
     explanation = P.explain_pairing(dry, liquid, idf)
     assert explanation["compat_total"] == round(P.compat(dry, liquid), 4)
     assert explanation["hard_gates"]["same_base"] == P.same_base(dry, liquid, idf)
+
+
+def test_plate_label_uses_single_separator_space_before_support():
+    plate = {
+        "form": "single",
+        "hero": SimpleNamespace(name="Paneer Bhurji"),
+        "support": "Roti",
+    }
+
+    assert P.plate_label(plate) == "Paneer Bhurji (+ Roti)"
 
 
 def test_decision_trace_winners_carry_structured_explanations_when_requested():

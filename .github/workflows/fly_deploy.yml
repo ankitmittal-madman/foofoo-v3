@@ -7,10 +7,10 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: Deployment target
+        description: Generic deployment target; production uses the governed catalogue workflow
         required: true
         type: choice
-        options: [staging, production]
+        options: [staging]
         default: staging
 
 jobs:
@@ -35,17 +35,3 @@ jobs:
         run: |
           flyctl deploy --config ghar_re_service/fly.toml --app "$FLY_STAGING_APP"
           curl --fail --retry 10 --retry-delay 3 "https://${FLY_STAGING_APP}.fly.dev/readyz"
-
-  production:
-    if: github.event_name == 'workflow_dispatch' && inputs.target == 'production'
-    environment: production
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Deploy and smoke-test production after environment approval
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        run: |
-          flyctl deploy --config ghar_re_service/fly.toml
-          curl --fail --retry 10 --retry-delay 3 https://ghar-re.fly.dev/readyz

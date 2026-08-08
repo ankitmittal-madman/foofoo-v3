@@ -1,0 +1,120 @@
+name: Recommendation component compatibility audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type audit-component-compatibility
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-component-compatibility-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-component-compatibility'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-component-compatibility-audit-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify exact production project and prerequisite audit boundary
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_meal_class_remediation_report()') IS NOT NULL")" = "t"
+
+      - name: Classify component compatibility state
+        id: state
+        run: |
+          facts="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('food.dish_component_compatibility') IS NOT NULL")"
+          proposals="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ops.dish_component_compatibility_proposals') IS NOT NULL")"
+          report="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_serving_role_readiness_report()') IS NOT NULL")"
+          complete_report="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_serving_role_readiness_report_v2()') IS NOT NULL")"
+          if [ "$facts:$proposals:$report:$complete_report" = "f:f:f:f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$facts:$proposals:$report:$complete_report" = "t:t:t:f" ]; then
+            echo "action=extend_coverage" >> "$GITHUB_OUTPUT"
+          elif [ "$facts:$proposals:$report:$complete_report" = "t:t:t:t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe partial component compatibility state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install governed component compatibility
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/106_govern_dish_component_compatibility.sql \
+            -f database/migrations/107_complete_serving_role_readiness_coverage.sql \
+            -f database/validation/957_measure_meal_class_remediation_validation.sql \
+            -f database/validation/958_govern_dish_component_compatibility_validation.sql \
+            -f database/validation/959_complete_serving_role_readiness_coverage_validation.sql
+
+      - name: Atomically extend readiness coverage to every active dish
+        if: steps.state.outputs.action == 'extend_coverage'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/107_complete_serving_role_readiness_coverage.sql \
+            -f database/validation/957_measure_meal_class_remediation_validation.sql \
+            -f database/validation/958_govern_dish_component_compatibility_validation.sql \
+            -f database/validation/959_complete_serving_role_readiness_coverage_validation.sql
+
+      - name: Revalidate existing component compatibility read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/957_measure_meal_class_remediation_validation.sql \
+            -f database/validation/958_govern_dish_component_compatibility_validation.sql \
+            -f database/validation/959_complete_serving_role_readiness_coverage_validation.sql
+
+      - name: Capture aggregate serving-role readiness report
+        env:
+          ACTION_TAKEN: ${{ steps.state.outputs.action }}
+        run: |
+          report="$RUNNER_TEMP/recommendation-component-compatibility-report.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 \
+            -c "SELECT re_engine.catalogue_serving_role_readiness_report_v2()" > "$report"
+          jq --arg action "$ACTION_TAKEN" --arg commit "$GITHUB_SHA" \
+            --arg run_id "$GITHUB_RUN_ID" '. + {
+              audit_action: $action,
+              commit_sha: $commit,
+              workflow_run_id: $run_id
+            }' "$report" > "$report.checked"
+          mv "$report.checked" "$report"
+          jq --exit-status '
+            .schema_version == "recommendation-catalogue-serving-role-readiness-v2"
+            and .active_dishes == ([.dish_routes[]] | add // 0)
+            and .active_dishes == ([.hero_roles[]] | add // 0)
+            and .active_dish_slots == ([.slot_routes[]] | add // 0)
+            and .active_dishes == (
+              .active_dishes_with_canonical_slot + .active_dishes_without_canonical_slot
+            )
+            and .policy.all_active_dishes_reconciled == true
+            and .policy.identity_exposed == false
+            and .policy.automatic_proposal_acceptance_allowed == false
+            and .policy.publication_gate_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-component-compatibility-report
+          path: ${{ runner.temp }}/recommendation-component-compatibility-report.json
+          retention-days: 90
+          if-no-files-found: error

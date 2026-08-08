@@ -11,8 +11,13 @@ PROFILE_ID = UUID("621a406a-1778-4951-b1a2-8e05c09449c8")
 
 
 class Response:
-    def __init__(self, body):
+    def __init__(self, body, headers=None):
         self.body = json.dumps(body).encode()
+        self.headers = headers or {
+            "Cache-Control": "no-store, private",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
 
     def __enter__(self):
         return self
@@ -60,6 +65,7 @@ def test_refresh_cycle_reports_aggregate_change_without_dish_names_or_tokens():
     report = cycle.run_refresh_cycle("https://example.test", "anon", "token", opener=opener)
     serialized = json.dumps(report)
     assert len(calls) == 6
+    assert report["response_cache_policy_verified"] is True
     assert all(result["set_changed"] for result in report["slots"].values())
     assert "Dish" not in serialized
     assert "token" not in serialized
@@ -80,6 +86,32 @@ def test_refresh_cycle_reports_safe_slot_and_generation_when_a_slate_is_empty():
         return Response({"slate_id": "empty", "episodes": []})
 
     with pytest.raises(RuntimeError, match="breakfast refresh generation 0"):
+        cycle.run_refresh_cycle("https://example.test", "anon", "token", opener=opener)
+
+
+@pytest.mark.parametrize(
+    ("headers", "message"),
+    [
+        ({"Cache-Control": "private", "Pragma": "no-cache", "Expires": "0"}, "no-store"),
+        (
+            {"Cache-Control": "no-store, private", "Pragma": "", "Expires": "0"},
+            "legacy no-cache",
+        ),
+        (
+            {"Cache-Control": "no-store, private", "Pragma": "no-cache", "Expires": "soon"},
+            "immediate-expiry",
+        ),
+    ],
+)
+def test_refresh_cycle_fails_closed_when_transport_cache_policy_is_incomplete(headers, message):
+    def opener(_request, *, timeout):
+        assert timeout == 45
+        return Response(
+            {"slate_id": "slate", "episodes": [{"episode_hash": "one"}]},
+            headers=headers,
+        )
+
+    with pytest.raises(RuntimeError, match=message):
         cycle.run_refresh_cycle("https://example.test", "anon", "token", opener=opener)
 
 

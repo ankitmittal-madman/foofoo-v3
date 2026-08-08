@@ -21,4 +21,5 @@ def test_publication_artifact_has_exact_files_and_aggregate_coverage_gate():
     for name in ("manifest.json", "catalogue.jsonl", "catalogue.sqlite3"):
         assert name in text
     assert ".coverage.publishable_dishes == .row_count" in text
+    assert ".identity_row_count >= .row_count" in text
     assert "name: recommendation-catalogue-publication" in text

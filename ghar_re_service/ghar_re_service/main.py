@@ -245,6 +245,9 @@ def meta():
                 state.published_catalogue.version if state.published_catalogue else None
             ),
             "row_count": state.published_catalogue.row_count if state.published_catalogue else 0,
+            "identity_row_count": (
+                state.published_catalogue.identity_row_count if state.published_catalogue else 0
+            ),
         },
         "metrics": state.counters.as_dict(),
     }

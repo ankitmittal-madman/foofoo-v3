@@ -4,6 +4,7 @@ WORKFLOW = Path(".github/workflows/aux-re-quality.yml")
 AUTO_ENGINE_WORKFLOW = Path(".github/workflows/recommendation-auto-engine.yml")
 RUNTIME_DOCKERFILE = Path("aux_re_service/Dockerfile")
 TRAINING_DOCKERFILE = Path("aux_re_service/Dockerfile.train")
+LOCAL_COMPOSE = Path("aux_re_service/compose.local.yml")
 
 
 def test_lightfm_uses_the_pinned_legacy_build_environment():
@@ -41,3 +42,15 @@ def test_aux_quality_commands_resolve_the_inner_python_package():
     assert (
         "PYTHONPATH=aux_re_service python -m aux_re_service.training.quality_gate" in text
     )
+
+
+def test_live_quality_probe_preserves_aux_service_authentication():
+    """The local shadow proof must configure auth and sign the exact request bytes."""
+    workflow = WORKFLOW.read_text()
+    compose = LOCAL_COMPOSE.read_text()
+    assert "AUX_REC_SERVICE_SECRET must be set" in compose
+    assert 'AUX_REC_SERVICE_SECRET="$(openssl rand -hex 32)"' in workflow
+    assert "printf '%s.' \"${request_timestamp}\"" in workflow
+    assert 'cat "${request_path}"' in workflow
+    assert 'X-Aux-Signature: t=${request_timestamp},v1=${request_signature}' in workflow
+    assert "docker compose -f aux_re_service/compose.local.yml logs --no-color" in workflow

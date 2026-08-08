@@ -5,8 +5,8 @@
  * Flow (RE-DOC-10 §9): authenticate (middleware) → verify ownership of the target household
  * (DOC-P3-06 §05, same boundary as consent/handler.ts) → fetch household+context → compose +
  * validate the ghar-re-v1 request → signed call to the RE (timeout/retry) → pass the response
- * through as-is (RE-DOC-11 §6) → log the outcome. On any RE failure, return a fallback plate as a
- * valid 200.
+ * through as-is (RE-DOC-11 §6) → log the outcome. On any RE failure, return a retryable error
+ * without inventing a household-safe fallback plate.
  *
  * No recommendation math here. Deps are injectable so the handler is unit-testable without a live
  * RE (default deps use the real client/loader/event-writer).
@@ -43,6 +43,7 @@ import { validateRequest, validateResponse } from "./contract.ts";
 import { callRecommendationEngine, type ReResult } from "./re-client.ts";
 import { buildFallbackResponse } from "./fallback.ts";
 import { recordRecommendationEvent } from "./events.ts";
+import { recordDishRecommendationSlate } from "../plan/episodes.ts";
 import { maybeLogSummary, recordRequest } from "./metrics.ts";
 import { deriveGovernedContextSignals, mergeGovernedContextSignals } from "./governed-context.ts";
 import {
@@ -73,6 +74,7 @@ export interface RecommendationDeps {
     logger: RequestContext["logger"],
   ) => Promise<ReResult>;
   recordEvent?: typeof recordRecommendationEvent;
+  recordSlate?: typeof recordDishRecommendationSlate;
   /** §0.2 — injectable so tests never need a live household_context table. */
   recordContext?: typeof recordHouseholdContext;
   /** Shared online learning state, injectable so tests never need live personalization tables. */
@@ -101,6 +103,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     ((payload, requestId, cfg, logger) =>
       callRecommendationEngine(payload, requestId, cfg, logger));
   const recordEvent = deps.recordEvent ?? recordRecommendationEvent;
+  const recordSlate = deps.recordSlate ?? recordDishRecommendationSlate;
   const recordContext = deps.recordContext ?? recordHouseholdContext;
   const loadOnlineStateFn = deps.loadOnlineStateFn ?? loadOnlineRecommendationState;
   const buildExcludeDishIdsFn = deps.buildExcludeDishIdsFn ?? buildExcludeDishIds;
@@ -292,6 +295,31 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
           latency_ms: latencyMs,
           warnings: warnings.length,
         });
+        let slateId: string | undefined;
+        if (!stubbed) {
+          slateId = await recordSlate(eventCtx, {
+            householdId: hid,
+            requestId,
+            surface: "recommendations",
+            modelVersion: typeof result.body.engine_version === "string"
+              ? result.body.engine_version
+              : "unknown",
+            configVersion: typeof result.body.config_version === "string"
+              ? result.body.config_version
+              : "unknown",
+            catalogVersion: typeof result.body.catalog_version === "string"
+              ? result.body.catalog_version
+              : null,
+            policyCode: "home-diversity-v2",
+            latencyMs,
+            householdSnapshot: payload.household as Record<string, unknown>,
+            requestContext: payload.context as Record<string, unknown>,
+            response: {
+              ...result.body,
+              slot: (payload.context as Record<string, unknown>).slot,
+            },
+          });
+        }
         await recordEvent(eventCtx, {
           requestId,
           householdId: hid,
@@ -324,6 +352,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
             (payload.context as Record<string, unknown>).date,
           ),
           governedContextSignals: derivedGovernedContextSignals,
+          lineageRequired: !stubbed,
         });
         recordRequest(outcome);
         maybeLogSummary(log);
@@ -333,7 +362,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
         });
         // Pass through plates[]/contributions[] AS-IS (RE-DOC-11 §6 — no second translation layer),
         // additively stamping the trace id.
-        return jsonContract(result.body, ctx.traceId, 200);
+        return jsonContract({ ...result.body, slate_id: slateId }, ctx.traceId, 200);
       }
       log.warn("re_response.invalid", { latency_ms: latencyMs, errors: respCheck.errors });
       const fb = buildFallbackResponse(requestId, "invalid RE response");

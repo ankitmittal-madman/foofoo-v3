@@ -1,0 +1,261 @@
+name: Govern contextual meal-slot policy application
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Install the boundary, apply an approved cohort, or restore it
+        required: true
+        default: install_only
+        type: choice
+        options:
+          - install_only
+          - apply
+          - rollback
+      confirm:
+        description: Type the exact action-specific confirmation shown in the runbook
+        required: true
+        type: string
+      approval_reference:
+        description: Required for apply; durable Product/Founder approval reference
+        required: false
+        type: string
+      reviewed_by:
+        description: Required for apply; safe reviewer identifier, not a display name
+        required: false
+        type: string
+      rollback_reference:
+        description: Required for rollback; durable incident/change reference
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-contextual-meal-slot-policy-application
+  cancel-in-progress: false
+
+jobs:
+  govern:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      ((inputs.action == 'install_only' &&
+        inputs.confirm == 'install-contextual-meal-slot-policy-boundary') ||
+       (inputs.action == 'apply' &&
+        inputs.confirm == 'apply-contextual-meal-slot-policy-v1') ||
+       (inputs.action == 'rollback' &&
+        inputs.confirm == 'rollback-contextual-meal-slot-policy-v1'))
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-contextual-slot-policy-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=10min -c lock_timeout=10s
+      POLICY_PATH: ops/recommendation/policies/contextual_meal_slot_candidate_policy_v1.json
+      SOURCE_PATH: database/seeds/IndianFoodDatasetCSV.csv
+      EXPECTED_PROPOSAL_COUNT: "775"
+      EXPECTED_EVIDENCE_LINK_COUNT: "3121"
+      EXPECTED_MANIFEST_ROW_COUNT: "2003"
+      POLICY_SHA256: 5afca8a6da05a6070abc6678d0a4f73924cafad62835e9152916efe6e7596154
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify application boundary code and tests
+        run: |
+          python -m pip install "pytest>=8,<9" "ruff>=0.9,<1" "PyYAML>=6,<7"
+          python -m ruff check \
+            ops/recommendation/contextual_meal_slot_policy.py \
+            ops/quality/suites/test_contextual_meal_slot_policy_application.py
+          python -m pytest -q \
+            ops/quality/suites/test_contextual_meal_slot_policy_application.py \
+            ops/quality/suites/test_contextual_meal_slot_proposals.py \
+            ops/quality/suites/test_dish_source_manifest.py
+
+      - uses: supabase/setup-cli@v1
+        if: inputs.action != 'install_only'
+        with:
+          version: latest
+
+      - name: Verify production identity and exact candidate policy
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test -f "$POLICY_PATH"
+          test -f "$SOURCE_PATH"
+          test "$(sha256sum -- "$POLICY_PATH" | cut -d ' ' -f 1)" = "$POLICY_SHA256"
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ops.dish_meal_slot_set_proposals') IS NOT NULL")" = "t"
+
+      - name: Validate action provenance
+        env:
+          APPROVAL_REFERENCE: ${{ inputs.approval_reference }}
+          REVIEWED_BY: ${{ inputs.reviewed_by }}
+          ROLLBACK_REFERENCE: ${{ inputs.rollback_reference }}
+        run: |
+          if [ "${{ inputs.action }}" = "apply" ]; then
+            [[ "$APPROVAL_REFERENCE" =~ ^[A-Za-z0-9][A-Za-z0-9._:/#-]{7,199}$ ]]
+            [[ "$REVIEWED_BY" =~ ^[A-Za-z0-9][A-Za-z0-9._:@/-]{2,127}$ ]]
+          elif [ "${{ inputs.action }}" = "rollback" ]; then
+            [[ "$ROLLBACK_REFERENCE" =~ ^[A-Za-z0-9][A-Za-z0-9._:/#-]{7,199}$ ]]
+          fi
+
+      - name: Classify contextual application boundary state
+        id: state
+        run: |
+          ledger="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ops.dish_meal_slot_set_applications') IS NOT NULL")"
+          apply_fn="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('ops.apply_contextual_meal_slot_set_policy(text,integer,integer,integer,text,text,text,text,text,text,text)') IS NOT NULL")"
+          rollback_fn="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('ops.rollback_contextual_meal_slot_set_policy(text,integer,text,text,text,text)') IS NOT NULL")"
+          if [ "$ledger:$apply_fn:$rollback_fn" = "f:f:f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$ledger:$apply_fn:$rollback_fn" = "t:t:t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe partial contextual meal-slot application boundary" >&2
+            exit 1
+          fi
+
+      - name: Atomically install contextual application boundary
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/120_govern_contextual_meal_slot_policy_application.sql \
+            -f database/validation/972_govern_contextual_meal_slot_policy_application_validation.sql
+
+      - name: Revalidate existing contextual application boundary read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/972_govern_contextual_meal_slot_policy_application_validation.sql
+
+      - name: Force Aux routing off before any dish mutation
+        if: inputs.action != 'install_only'
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          case "$PRODUCTION_PROJECT_REF" in
+            ''|*[!a-z0-9]*) echo "invalid production project reference" >&2; exit 1 ;;
+          esac
+          supabase secrets set AUX_RE_MODE=off --project-ref "$PRODUCTION_PROJECT_REF"
+
+      - name: Build policy-bound ephemeral contextual manifest
+        if: inputs.action == 'apply'
+        run: |
+          manifest="$RUNNER_TEMP/approved-contextual-meal-slot-manifest.tsv"
+          summary="$RUNNER_TEMP/approved-contextual-meal-slot-policy-summary.json"
+          python -m ops.recommendation.contextual_meal_slot_policy \
+            --source "$SOURCE_PATH" --policy "$POLICY_PATH" --output "$manifest" > "$summary"
+          jq --argjson proposals "$EXPECTED_PROPOSAL_COUNT" \
+             --argjson manifest_rows "$EXPECTED_MANIFEST_ROW_COUNT" --exit-status '
+            .schema_version == "contextual-meal-slot-candidate-manifest-summary-v1"
+            and .policy_version == "contextual-import-course-slot-set-v1"
+            and .policy_sha256 == "5afca8a6da05a6070abc6678d0a4f73924cafad62835e9152916efe6e7596154"
+            and .mapping_count == 5
+            and .manifest_candidate_rows == $manifest_rows
+            and .candidate_scope.proposal_count == $proposals
+            and .candidate_scope.slot_set_dish_counts == {"breakfast,lunch":2,"lunch,dinner":773}
+            and .proposal_only == true
+            and .requires_explicit_approval == true
+          ' "$summary" >/dev/null
+          test "$(wc -l < "$manifest")" -eq "$EXPECTED_MANIFEST_ROW_COUNT"
+
+      - name: Apply exact approved contextual cohort atomically
+        if: inputs.action == 'apply'
+        env:
+          APPROVAL_REFERENCE: ${{ inputs.approval_reference }}
+          REVIEWED_BY: ${{ inputs.reviewed_by }}
+          APPLIED_BY: github-actions:${{ github.actor }}
+        run: |
+          export EXPECTED_SOURCE_NAME="$(basename -- "$SOURCE_PATH")"
+          export EXPECTED_SOURCE_CHECKSUM="$(sha256sum -- "$SOURCE_PATH" | cut -d ' ' -f 1)"
+          export EXPECTED_MANIFEST_PATH="$RUNNER_TEMP/approved-contextual-meal-slot-manifest.tsv"
+          [[ "$EXPECTED_SOURCE_NAME" =~ ^[A-Za-z0-9._-]+$ ]]
+          [[ "$EXPECTED_SOURCE_CHECKSUM" =~ ^[0-9a-f]{64}$ ]]
+          case "$EXPECTED_MANIFEST_PATH" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+
+          report="$RUNNER_TEMP/contextual-meal-slot-policy-application.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 > "$report.raw" <<SQL
+          CREATE TEMP TABLE expected_contextual_source_manifest (
+            source_srno integer PRIMARY KEY,
+            row_fingerprint text NOT NULL CHECK (row_fingerprint ~ '^[0-9a-f]{64}$'),
+            evidence_category text NOT NULL,
+            proposed_slots_key text NOT NULL
+          );
+          BEGIN;
+          \copy expected_contextual_source_manifest FROM '$EXPECTED_MANIFEST_PATH' WITH (FORMAT csv, DELIMITER E'\t')
+          \getenv approval_reference APPROVAL_REFERENCE
+          \getenv reviewed_by REVIEWED_BY
+          \getenv applied_by APPLIED_BY
+          SELECT ops.apply_contextual_meal_slot_set_policy(
+            '$GITHUB_RUN_ID', $EXPECTED_PROPOSAL_COUNT, $EXPECTED_EVIDENCE_LINK_COUNT,
+            $EXPECTED_MANIFEST_ROW_COUNT, '$EXPECTED_SOURCE_NAME', '$EXPECTED_SOURCE_CHECKSUM',
+            'contextual-import-course-slot-set-v1', '$POLICY_SHA256',
+            :'approval_reference', :'reviewed_by', :'applied_by'
+          );
+          \i database/validation/972_govern_contextual_meal_slot_policy_application_validation.sql
+          COMMIT;
+          SQL
+          grep -E '^\{' "$report.raw" | tail -n 1 > "$report"
+          jq --argjson expected "$EXPECTED_PROPOSAL_COUNT" --exit-status '
+            .schema_version == "contextual-meal-slot-policy-application-v1"
+            and .proposal_count == $expected
+            and .evidence_link_count == 3121
+            and .manifest_candidate_row_count == 2003
+            and (.applied_count + .existing_applied_count) == $expected
+            and (.status == "applied" or .status == "already_applied")
+            and (.slot_set_counts == null or .slot_set_counts == {"breakfast,lunch":2,"lunch,dinner":773})
+            and .publication_changed == false
+            and .serving_changed == false
+          ' "$report" >/dev/null
+
+      - name: Restore exact unchanged contextual cohort atomically
+        if: inputs.action == 'rollback'
+        env:
+          ROLLBACK_REFERENCE: ${{ inputs.rollback_reference }}
+          ROLLED_BACK_BY: github-actions:${{ github.actor }}
+        run: |
+          report="$RUNNER_TEMP/contextual-meal-slot-policy-rollback.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 > "$report.raw" <<SQL
+          BEGIN;
+          \getenv rollback_reference ROLLBACK_REFERENCE
+          \getenv rolled_back_by ROLLED_BACK_BY
+          SELECT ops.rollback_contextual_meal_slot_set_policy(
+            '$GITHUB_RUN_ID', $EXPECTED_PROPOSAL_COUNT,
+            'contextual-import-course-slot-set-v1', '$POLICY_SHA256',
+            :'rollback_reference', :'rolled_back_by'
+          );
+          \i database/validation/972_govern_contextual_meal_slot_policy_application_validation.sql
+          COMMIT;
+          SQL
+          grep -E '^\{' "$report.raw" | tail -n 1 > "$report"
+          jq --exit-status '
+            .schema_version == "contextual-meal-slot-policy-rollback-v1"
+            and .rolled_back_count == 775
+            and .status == "rolled_back"
+            and .proposal_history_retained == true
+            and .publication_changed == false
+            and .serving_changed == false
+          ' "$report" >/dev/null
+
+      - name: Produce install-only evidence
+        if: inputs.action == 'install_only'
+        run: |
+          jq --null-input --arg run_id "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" '{
+            schema_version: "contextual-meal-slot-policy-boundary-install-v1",
+            workflow_run_id: $run_id,
+            commit_sha: $commit,
+            installed: true,
+            dishes_changed: false,
+            proposals_changed: false,
+            publication_changed: false,
+            serving_changed: false
+          }' > "$RUNNER_TEMP/contextual-meal-slot-policy-boundary-install.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: contextual-meal-slot-policy-${{ inputs.action }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/contextual-meal-slot-policy-*.json
+          retention-days: 90
+          if-no-files-found: error

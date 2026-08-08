@@ -1,0 +1,114 @@
+name: Generate governed meal-slot proposals
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type generate-direct-meal-slot-proposals
+        required: true
+        type: string
+      expected_candidate_count:
+        description: Exact direct candidate count from the approved audit
+        required: true
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-meal-slot-proposals
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'generate-direct-meal-slot-proposals' &&
+      inputs.expected_candidate_count > 0
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-meal-slot-proposals-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify production identity and approved audit count
+        env:
+          EXPECTED_CANDIDATE_COUNT: ${{ inputs.expected_candidate_count }}
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_meal_slot_remediation_report()') IS NOT NULL")" = "t"
+          actual="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT re_engine.catalogue_meal_slot_remediation_report()->'remediation_routes'->>'single_direct_slot_proposal'")"
+          test "$actual" = "$EXPECTED_CANDIDATE_COUNT"
+
+      - name: Classify governed proposal schema state
+        id: state
+        run: |
+          proposals="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ops.dish_meal_slot_proposals') IS NOT NULL")"
+          evidence="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regclass('ops.dish_meal_slot_proposal_evidence') IS NOT NULL")"
+          generator="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('ops.generate_direct_meal_slot_proposals(text,integer)') IS NOT NULL")"
+          if [ "$proposals:$evidence:$generator" = "f:f:f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$proposals:$evidence:$generator" = "t:t:t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe partial meal-slot proposal schema state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install governed proposal foundation
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/109_govern_direct_meal_slot_proposals.sql \
+            -f database/validation/960_measure_meal_slot_remediation_validation.sql \
+            -f database/validation/961_govern_direct_meal_slot_proposals_validation.sql
+
+      - name: Revalidate existing proposal foundation read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/960_measure_meal_slot_remediation_validation.sql \
+            -f database/validation/961_govern_direct_meal_slot_proposals_validation.sql
+
+      - name: Generate pending evidence-linked proposals atomically
+        env:
+          EXPECTED_CANDIDATE_COUNT: ${{ inputs.expected_candidate_count }}
+        run: |
+          report="$RUNNER_TEMP/recommendation-meal-slot-proposal-generation.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT ops.generate_direct_meal_slot_proposals('$GITHUB_RUN_ID', $EXPECTED_CANDIDATE_COUNT)" \
+            -f database/validation/961_govern_direct_meal_slot_proposals_validation.sql \
+            > "$report.raw"
+          head -n 1 "$report.raw" > "$report"
+          jq --arg commit "$GITHUB_SHA" --arg run_id "$GITHUB_RUN_ID" '. + {
+            commit_sha: $commit,
+            workflow_run_id: $run_id
+          }' "$report" > "$report.checked"
+          mv "$report.checked" "$report"
+          jq --argjson expected "$EXPECTED_CANDIDATE_COUNT" --exit-status '
+            .schema_version == "recommendation-meal-slot-proposal-generation-v1"
+            and .candidate_count == $expected
+            and .total_versioned_proposals == $expected
+            and .candidate_count == (.inserted_count + .existing_count)
+            and .candidate_count == ([.slot_counts[]] | add // 0)
+            and .status == "pending_review"
+            and .policy.identity_exposed == false
+            and .policy.raw_source_text_exposed == false
+            and .policy.automatic_acceptance_allowed == false
+            and .policy.serving_changed == false
+            and .policy.publication_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-meal-slot-proposal-generation
+          path: ${{ runner.temp }}/recommendation-meal-slot-proposal-generation.json
+          retention-days: 90
+          if-no-files-found: error

@@ -20,3 +20,13 @@
   - The first credential rotation failed closed before any database update because the legacy email secret did not identify the expected Auth row (run `31206387391`).
   - UUID-bound rotation verified the matching project, existing Auth user, linked profile, password update, and live authentication (run `31206717628`).
   - The original prospective-user workflow then passed in read-only identity mode (run `31206770919`).
+
+## 2026-08-08 — User_50 recommendation components lacked canonical identity
+
+- Symptom: the live User_50 audit found zero UUID-resolved recommendation components, so canonical naming and regional-affinity attribution were unmeasurable.
+- Confirmed root cause: the active Ghar fallback bundle assigns `md5:<dish name>` identifiers, Edge omits bounded canonical candidates while Aux is disabled, and meal-episode persistence accepts only UUID dish IDs. The production publication replay resolved 641 of 809 fallback names exactly while preserving the candidate sequence.
+- Layer: recommendation service catalogue startup and serving identity.
+- Fix applied: reconcile exact canonical-name matches from the checksummed, user-free publication into the fallback catalogue at startup; reject invalid UUIDs, fuzzy/alias matching, and identity collisions; expose count-only UUID coverage.
+- Re-verification: 28 focused service tests passed. A replay against production publication run `31252699487` resolved 641/809 fallback identities with candidate names unchanged. Full identity coverage remains pending an identity-only publication index for the 168 safety-incomplete rows.
+- CI follow-up: `re-ci` run `31276920811` caught that the provider protocol did not declare the mutable ID index required by startup reconciliation. The minimal identity protocol and provider contract now agree; the exact CI mypy command passes across 72 source files and 42 focused tests pass.
+- Pattern risk elsewhere: any serving path that manufactures a non-UUID dish identifier cannot support canonical feedback lineage; remaining legacy coverage is tracked explicitly rather than hidden.

@@ -52,15 +52,30 @@ jobs:
       - name: Run live Qdrant and container shadow flow
         run: |
           trap 'docker compose -f aux_re_service/compose.local.yml down --volumes' EXIT
+          AUX_REC_SERVICE_SECRET="$(openssl rand -hex 32)"
+          export AUX_REC_SERVICE_SECRET
           docker compose -f aux_re_service/compose.local.yml up --build --detach auxiliary-recommender
-          for attempt in $(seq 1 30); do
-            if curl --fail --silent http://127.0.0.1:8081/readyz; then break; fi
+          ready=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8081/readyz; then ready=true; break; fi
             sleep 2
           done
-          jq '.household_id="HH-00001" | .user_id="U-00001"' \
-            aux_re_service/examples/request.json \
-            | curl --fail --silent --header 'content-type: application/json' \
-                --data-binary @- http://127.0.0.1:8081/v1/recommendations \
+          if [ "${ready}" != "true" ]; then
+            docker compose -f aux_re_service/compose.local.yml logs --no-color
+            exit 1
+          fi
+          request_path="${RUNNER_TEMP}/aux-re-live-request.json"
+          jq --compact-output '.household_id="HH-00001" | .user_id="U-00001"' \
+            aux_re_service/examples/request.json > "${request_path}"
+          request_timestamp="$(date +%s)"
+          request_signature="$({ printf '%s.' "${request_timestamp}"; cat "${request_path}"; } \
+            | openssl dgst -sha256 -hmac "${AUX_REC_SERVICE_SECRET}" \
+            | awk '{print $NF}')"
+          curl --fail --silent \
+            --header 'content-type: application/json' \
+            --header "X-Aux-Signature: t=${request_timestamp},v1=${request_signature}" \
+            --data-binary "@${request_path}" \
+            http://127.0.0.1:8081/v1/recommendations \
             > "${RUNNER_TEMP}/aux-re-live-response.json"
           jq --exit-status '
             .decision == "existing"

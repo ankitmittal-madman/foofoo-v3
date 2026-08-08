@@ -4,25 +4,28 @@ ghar_re_service.scripts.build_catalogue — real 810-dish catalogue transform (P
 WHAT THIS SOLVES
 export_bundle.py currently bakes ghar_re_core.fixtures.DISHES (a 39-dish invented "golden sample")
 into the deployable image. Phase G swaps that source for the real catalogue authored in
-data/source/dishes.xlsx (sheet "dishes_810", 810 rows) while producing dish dicts in EXACTLY the
+data/source/dishes.xlsx (sheet "dishes_810", 810 authored rows) while producing 809 canonical
+dish dicts after the governed duplicate merge, in EXACTLY the
 shape ghar_re_core.catalogue.Catalogue's constructor already expects (see ghar_re_core/fixtures.py
 _dish() for the canonical shape). Nothing downstream (Catalogue, Dish, the scoring/pairing/
 derivation modules, CatalogueProvider/ConfigProvider) changes because of this module.
 
 THIS MODULE ONLY BUILDS THE LIST OF DISH DICTS (+ a gap report). Wiring it into export_bundle.py
 was Phase G Task 1 proper — DONE (see export_bundle.py's CATALOGUE_SOURCE and
-ghar_re_service/data/bundle/manifest.json, dish_count=810, catalogue_source cites this module).
+ghar_re_service/data/bundle/manifest.json, whose catalogue_source cites this module).
 This module's own docstring above ("Phase G Task 2") predates that wiring landing; kept accurate
 retroactively rather than left to imply the swap is still pending.
 
 SOURCE FILES READ (under data/source/ unless noted, resolved the same way export_bundle.py does)
-  dishes.xlsx                  sheet "dishes_810" — the 810 authored dishes. NOTE: row 1 of the
+  dishes.xlsx                  sheet "dishes_810" — 810 authored rows, normalized to 809 canonical
+                                dishes by the governed identity overlay. NOTE: row 1 of the
                                 sheet is blank; the real header is row 2 (openpyxl 0-indexed: header
                                 = rows[1], data starts at rows[2]).
   ingredients_v5.csv            ingredient master: category / diet_type / allergen / jain flags.
   ingredient_aliases_v2.csv      Hindi/regional alias -> canonical ingredient name.
   cuisines_v4.csv                cuisine -> cuisine_group / state_origin / tier.
   term_synonyms_v2.csv           dish-name-level synonyms (Pani Puri / Gol Gappa / Puchka / ...).
+  dish_identity_corrections_v1.csv governed duplicate-to-canonical merges and retained aliases.
   ../sig_scores_v1.csv           i.e. data/sig_scores_v1.csv (one level ABOVE data/source/, per
                                   data/source/README.md's own config table) — dish_name -> band,
                                   authored separately (KB0.2 §S1/§S2). See load_sig_scores().
@@ -108,6 +111,7 @@ from __future__ import annotations
 import csv
 import os
 from dataclasses import dataclass, field
+from typing import TypedDict
 
 import openpyxl
 
@@ -126,6 +130,7 @@ INGREDIENTS_CSV = "ingredients_v5.csv"
 INGREDIENT_ALIASES_CSV = "ingredient_aliases_v2.csv"
 CUISINES_CSV = "cuisines_v4.csv"
 TERM_SYNONYMS_CSV = "term_synonyms_v2.csv"
+DISH_IDENTITY_CORRECTIONS_CSV = "dish_identity_corrections_v1.csv"
 # Lives at data/sig_scores_v1.csv — ONE LEVEL ABOVE source_dir (data/source/), matching
 # data/source/README.md's own config table entry `../sig_scores_v1.csv` resolved relative to
 # that README's own directory. NOT inside data/source/ like every other file this module reads.
@@ -176,6 +181,7 @@ class BuildReport:
     """Everything this transform found that it will NOT silently paper over."""
 
     dish_count: int = 0
+    identity_merges: list[tuple[str, str]] = field(default_factory=list)
     incomplete_ing_blocks: list[tuple[str, list[str]]] = field(default_factory=list)
     unresolved_cuisines: list[tuple[str, str]] = field(default_factory=list)
     hidden_allergen_risk: list[tuple[str, list[str]]] = field(default_factory=list)
@@ -183,6 +189,14 @@ class BuildReport:
     # names with no resolvable row even after normalization — target is an empty list.
     sig_band_matched: list[tuple[str, str]] = field(default_factory=list)
     sig_band_unmatched: list[str] = field(default_factory=list)
+
+
+class IdentityCorrection(TypedDict):
+    """One governed authored-duplicate merge loaded from the correction overlay."""
+
+    duplicate: str
+    canonical: str
+    aliases: list[str]
 
 
 def _split(cell: str | None) -> list[str]:
@@ -234,7 +248,37 @@ def load_cuisines(source_dir: str) -> dict[str, dict]:
     return out
 
 
-def load_dish_synonyms(source_dir: str) -> dict[str, list[str]]:
+def load_identity_corrections(source_dir: str) -> dict[str, IdentityCorrection]:
+    """Load reviewed duplicate-name merges without mutating the authored XLSX.
+
+    Each duplicate is omitted from serving, while every listed historical/common name is
+    retained on the canonical row. The explicit overlay keeps the raw workbook recoverable and
+    makes each identity decision independently auditable.
+    """
+    path = os.path.join(source_dir, DISH_IDENTITY_CORRECTIONS_CSV)
+    out: dict[str, IdentityCorrection] = {}
+    with open(path, newline="", encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            duplicate = row["duplicate_name"].strip()
+            canonical = row["canonical_name"].strip()
+            if not duplicate or not canonical or duplicate == canonical:
+                raise ValueError("dish identity correction must name two distinct dishes")
+            key = _normalize_name(duplicate)
+            if key in out:
+                raise ValueError(f"duplicate dish identity correction: {duplicate}")
+            raw_aliases = row["retained_aliases"].split("|")
+            aliases = [value.strip() for value in raw_aliases if value.strip()]
+            out[key] = {"duplicate": duplicate, "canonical": canonical, "aliases": aliases}
+    canonical_keys = {_normalize_name(str(row["canonical"])) for row in out.values()}
+    overlap = canonical_keys.intersection(out)
+    if overlap:
+        raise ValueError(f"chained dish identity corrections are not allowed: {sorted(overlap)}")
+    return out
+
+
+def load_dish_synonyms(
+    source_dir: str, identity_corrections: dict[str, IdentityCorrection]
+) -> dict[str, list[str]]:
     """canonical dish name (lowercased) -> [synonym, ...], from term_synonyms_v2.csv."""
     path = os.path.join(source_dir, TERM_SYNONYMS_CSV)
     out: dict[str, list[str]] = {}
@@ -242,6 +286,12 @@ def load_dish_synonyms(source_dir: str) -> dict[str, list[str]]:
         for row in csv.DictReader(fh):
             if row["is_active"] == "Y":
                 out.setdefault(row["canonical_name"].strip().lower(), []).append(row["synonym"])
+    for correction in identity_corrections.values():
+        canonical_key = _normalize_name(str(correction["canonical"]))
+        synonyms = out.setdefault(canonical_key, [])
+        for alias in correction["aliases"]:
+            if alias not in synonyms:
+                synonyms.append(str(alias))
     return out
 
 
@@ -315,8 +365,15 @@ def _hero_role(cats: set[str], name: str, has_protein_centre: bool) -> str:
     with paneer listed second/third (not the dish's first ingredient token) was silently
     under-classified as 'liquid' instead of 'single'."""
     STAPLE_ONLY = {"paratha_roti", "bread", "rice"}
+    SELF_STAPLING = STAPLE_ONLY | {"dosa_idli"}
+    LIQUID_CENTRE = {"curry", "dal_lentil"}
     if cats and cats <= STAPLE_ONLY:
         return "support"
+    # An authored staple-plus-liquid dish is already a complete plate (for example Dal Pakwan or
+    # Pithla Bhakri). Treating it as a liquid/single hero lets the assembler nest that complete
+    # meal inside another pair and attach a second staple.
+    if cats & SELF_STAPLING and cats & LIQUID_CENTRE:
+        return "standalone"
     if cats & {"snack_starter", "egg_dish"}:
         return "dry"
     if "biryani_pulao" in cats:
@@ -532,7 +589,11 @@ def transform_dish_row(
     }
 
 
-def _read_dish_rows(source_dir: str) -> list[dict]:
+def _read_dish_rows(
+    source_dir: str,
+    identity_corrections: dict[str, IdentityCorrection],
+    report: BuildReport,
+) -> list[dict]:
     path = os.path.join(source_dir, DISHES_XLSX)
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     ws = wb[DISHES_SHEET]
@@ -543,7 +604,14 @@ def _read_dish_rows(source_dir: str) -> list[dict]:
     for r in rows[2:]:
         if r[1] is None:  # no dish name -> not a real data row
             continue
-        out.append(dict(zip(header, r, strict=True)))
+        row = dict(zip(header, r, strict=True))
+        correction = identity_corrections.get(_normalize_name(str(row["Dish Name"])))
+        if correction:
+            report.identity_merges.append(
+                (str(correction["duplicate"]), str(correction["canonical"]))
+            )
+            continue
+        out.append(row)
     return out
 
 
@@ -552,7 +620,8 @@ def build_catalogue(source_dir: str = DEFAULT_SOURCE_DIR) -> tuple[list[dict], B
     ing_map = load_ingredients(source_dir)
     alias_map = load_ingredient_aliases(source_dir)
     cuisine_map = load_cuisines(source_dir)
-    dish_synonyms = load_dish_synonyms(source_dir)
+    identity_corrections = load_identity_corrections(source_dir)
+    dish_synonyms = load_dish_synonyms(source_dir, identity_corrections)
     sig_scores_map = load_sig_scores(source_dir)
     dish_macro_map = load_dish_macro(source_dir)
 
@@ -568,7 +637,7 @@ def build_catalogue(source_dir: str = DEFAULT_SOURCE_DIR) -> tuple[list[dict], B
             dish_macro_map,
             report,
         )
-        for row in _read_dish_rows(source_dir)
+        for row in _read_dish_rows(source_dir, identity_corrections, report)
     ]
     report.dish_count = len(dishes)
     return dishes, report
@@ -577,6 +646,7 @@ def build_catalogue(source_dir: str = DEFAULT_SOURCE_DIR) -> tuple[list[dict], B
 if __name__ == "__main__":
     dishes, report = build_catalogue()
     print(f"Built {report.dish_count} dish dicts.")
+    print(f"Governed identity merges: {len(report.identity_merges)}")
     print(f"Incomplete ING-blocks: {len(report.incomplete_ing_blocks)}")
     print(f"Unresolved cuisines: {len(report.unresolved_cuisines)}")
     print(f"Hidden-allergen-risk dishes: {len(report.hidden_allergen_risk)}")
