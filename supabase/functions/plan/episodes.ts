@@ -51,6 +51,24 @@ export function extractDishSlateItems(
         located.push(...values.map((value) => ({ value, slot })));
       }
     }
+  } else if (surface === "recommendations") {
+    const plates = Array.isArray(response.plates) ? response.plates : [];
+    for (const value of plates) {
+      if (!value || typeof value !== "object") continue;
+      const plate = value as Record<string, unknown>;
+      const names = Array.isArray(plate.hero_dish_names) ? plate.hero_dish_names : [];
+      const score = typeof plate.plate_score === "number" ? plate.plate_score : Number.NaN;
+      for (const name of names) {
+        located.push({
+          value: {
+            ...plate,
+            name,
+            score,
+            slot: typeof response.slot === "string" ? response.slot : undefined,
+          },
+        });
+      }
+    }
   } else {
     const values = surface === "cold_start" ? response.dishes : response.options;
     if (Array.isArray(values)) located.push(...values.map((value) => ({ value })));
@@ -182,7 +200,7 @@ async function persistDishRecommendationSlate(
   input: {
     householdId: string;
     requestId: string;
-    surface: "cold_start" | "calibration" | "meal_plan" | "class_dishes";
+    surface: "cold_start" | "calibration" | "meal_plan" | "class_dishes" | "recommendations";
     modelVersion: string;
     configVersion: string;
     catalogVersion?: string | null;
@@ -310,9 +328,10 @@ async function persistDishRecommendationSlate(
 
 type DishSlatePersistence = typeof persistDishRecommendationSlate;
 
-/** Dish-card lineage is observational, not part of the response contract. A schema rollout,
- * timeout, or analytics failure must never hide an otherwise valid calibration or meal-plan
- * response from the user. The warning preserves enough context to diagnose and replay the gap. */
+/** Dish-card lineage is part of the feedback-capable response contract. Returning a dish slate
+ * without this durable point-in-time record would let the UI accept feedback that can never be
+ * attributed to what was served. Log the failure with bounded context and let the handler return
+ * a retryable error instead of silently creating another learning blind spot. */
 export async function recordDishRecommendationSlate(
   ctx: RequestContext,
   input: Parameters<DishSlatePersistence>[1],
@@ -327,7 +346,7 @@ export async function recordDishRecommendationSlate(
       surface: input.surface,
       detail: error instanceof Error ? error.message : String(error),
     });
-    return undefined;
+    throw error;
   }
 }
 
