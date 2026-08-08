@@ -1,0 +1,172 @@
+name: Audit governed meal-slot proposal row manifest
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type audit-direct-meal-slot-proposal-row-manifest
+        required: true
+        type: string
+      expected_proposal_count:
+        description: Exact proposal count from generation evidence
+        required: true
+        type: number
+      expected_evidence_link_count:
+        description: Exact evidence-link count from generation evidence
+        required: true
+        type: number
+      expected_manifest_direct_row_count:
+        description: Exact direct-course row count regenerated from the checked-in source
+        required: true
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-meal-slot-proposal-row-manifest
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-direct-meal-slot-proposal-row-manifest' &&
+      inputs.expected_proposal_count > 0 &&
+      inputs.expected_evidence_link_count > 0 &&
+      inputs.expected_manifest_direct_row_count > 0
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-meal-slot-proposal-row-manifest-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify production identity and source-integrity prerequisite
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test -f database/seeds/IndianFoodDatasetCSV.csv
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.direct_meal_slot_proposal_source_integrity_report(text,text)') IS NOT NULL")" = "t"
+
+      - name: Classify row-manifest report state
+        id: state
+        run: |
+          report="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.direct_meal_slot_proposal_row_manifest_report(text,text)') IS NOT NULL")"
+          if [ "$report" = "f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$report" = "t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe proposal row-manifest schema state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install row-manifest report
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/113_verify_direct_meal_slot_proposal_row_manifest.sql \
+            -f database/validation/964_measure_direct_meal_slot_proposal_source_integrity_validation.sql \
+            -f database/validation/965_verify_direct_meal_slot_proposal_row_manifest_validation.sql
+
+      - name: Revalidate existing row-manifest report read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/964_measure_direct_meal_slot_proposal_source_integrity_validation.sql
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -f database/validation/965_verify_direct_meal_slot_proposal_row_manifest_validation.sql
+
+      - name: Regenerate checked-in direct-row manifest
+        env:
+          EXPECTED_MANIFEST_DIRECT_ROW_COUNT: ${{ inputs.expected_manifest_direct_row_count }}
+        run: |
+          manifest="$RUNNER_TEMP/expected-dish-source-manifest.tsv"
+          summary="$RUNNER_TEMP/expected-dish-source-manifest-summary.json"
+          python -m ops.recommendation.dish_source_manifest \
+            --source database/seeds/IndianFoodDatasetCSV.csv \
+            --output "$manifest" > "$summary"
+          jq --argjson expected "$EXPECTED_MANIFEST_DIRECT_ROW_COUNT" --exit-status '
+            .schema_version == "dish-direct-source-manifest-v1"
+            and .direct_manifest_rows == $expected
+          ' "$summary" >/dev/null
+          test "$(wc -l < "$manifest")" -eq "$EXPECTED_MANIFEST_DIRECT_ROW_COUNT"
+
+      - name: Produce count-only row-manifest audit
+        env:
+          EXPECTED_PROPOSAL_COUNT: ${{ inputs.expected_proposal_count }}
+          EXPECTED_EVIDENCE_LINK_COUNT: ${{ inputs.expected_evidence_link_count }}
+          EXPECTED_MANIFEST_DIRECT_ROW_COUNT: ${{ inputs.expected_manifest_direct_row_count }}
+        run: |
+          source_path="database/seeds/IndianFoodDatasetCSV.csv"
+          export EXPECTED_SOURCE_NAME="$(basename -- "$source_path")"
+          export EXPECTED_SOURCE_CHECKSUM="$(sha256sum -- "$source_path" | cut -d ' ' -f 1)"
+          export EXPECTED_MANIFEST_PATH="$RUNNER_TEMP/expected-dish-source-manifest.tsv"
+          test -n "$EXPECTED_SOURCE_NAME"
+          [[ "$EXPECTED_SOURCE_NAME" =~ ^[A-Za-z0-9._-]+$ ]]
+          [[ "$EXPECTED_SOURCE_CHECKSUM" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$EXPECTED_MANIFEST_PATH" =~ ^[A-Za-z0-9_./-]+$ ]]
+          case "$EXPECTED_MANIFEST_PATH" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          test -f "$EXPECTED_MANIFEST_PATH"
+
+          report="$RUNNER_TEMP/recommendation-meal-slot-proposal-row-manifest.json"
+          raw="$report.raw"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 \
+            > "$raw" <<SQL
+          CREATE TEMP TABLE expected_dish_source_manifest (
+            source_srno integer PRIMARY KEY,
+            row_fingerprint text NOT NULL CHECK (row_fingerprint ~ '^[0-9a-f]{64}$'),
+            direct_slot text NOT NULL CHECK (
+              direct_slot IN ('breakfast','lunch','dinner','snacks')
+            )
+          );
+          BEGIN TRANSACTION READ ONLY;
+          \copy expected_dish_source_manifest FROM '$EXPECTED_MANIFEST_PATH' WITH (FORMAT csv, DELIMITER E'\t')
+          SELECT re_engine.direct_meal_slot_proposal_row_manifest_report(
+            '$EXPECTED_SOURCE_NAME', '$EXPECTED_SOURCE_CHECKSUM'
+          );
+          COMMIT;
+          SQL
+          grep -E '^\{' "$raw" | tail -n 1 > "$report"
+          jq --arg commit "$GITHUB_SHA" --arg run_id "$GITHUB_RUN_ID" '. + {
+            commit_sha: $commit,
+            workflow_run_id: $run_id
+          }' "$report" > "$report.checked"
+          mv "$report.checked" "$report"
+          jq --argjson proposals "$EXPECTED_PROPOSAL_COUNT" \
+             --argjson evidence "$EXPECTED_EVIDENCE_LINK_COUNT" \
+             --argjson manifest "$EXPECTED_MANIFEST_DIRECT_ROW_COUNT" --exit-status '
+            .schema_version == "recommendation-meal-slot-proposal-row-manifest-v1"
+            and .manifest_direct_row_count == $manifest
+            and .proposal_count == $proposals
+            and .evidence_link_count == $evidence
+            and .proposal_count == ([.integrity_routes[]] | add // 0)
+            and .proposal_count == ([.proposal_gate_counts[]] | add // 0)
+            and .evidence_link_count == ([.row_integrity_link_counts[]] | add // 0)
+            and .evidence_link_count == ([.run_status_link_counts[]] | add // 0)
+            and .policy.identity_exposed == false
+            and .policy.source_name_exposed == false
+            and .policy.source_checksum_exposed == false
+            and .policy.manifest_values_exposed == false
+            and .policy.raw_source_text_exposed == false
+            and .policy.row_level_integrity_independent_of_run_completion == true
+            and .policy.run_completion_required_for_import_health == true
+            and .policy.row_manifest_gate_is_approval == false
+            and .policy.automatic_acceptance_allowed == false
+            and .policy.proposal_changed == false
+            and .policy.serving_changed == false
+            and .policy.publication_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-meal-slot-proposal-row-manifest
+          path: ${{ runner.temp }}/recommendation-meal-slot-proposal-row-manifest.json
+          retention-days: 90
+          if-no-files-found: error

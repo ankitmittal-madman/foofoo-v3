@@ -115,6 +115,18 @@ MEAL_SLOT_SOURCE_INTEGRITY_ROLLBACK = Path(
 MEAL_SLOT_SOURCE_INTEGRITY_WORKFLOW = Path(
     ".github/workflows/recommendation-meal-slot-proposal-source-integrity.yml"
 )
+MEAL_SLOT_ROW_MANIFEST_MIGRATION = Path(
+    "database/migrations/113_verify_direct_meal_slot_proposal_row_manifest.sql"
+)
+MEAL_SLOT_ROW_MANIFEST_VALIDATION = Path(
+    "database/validation/965_verify_direct_meal_slot_proposal_row_manifest_validation.sql"
+)
+MEAL_SLOT_ROW_MANIFEST_ROLLBACK = Path(
+    "database/rollback/113_verify_direct_meal_slot_proposal_row_manifest_rollback.sql"
+)
+MEAL_SLOT_ROW_MANIFEST_WORKFLOW = Path(
+    ".github/workflows/recommendation-meal-slot-proposal-row-manifest.yml"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -777,6 +789,83 @@ def test_direct_proposal_source_integrity_workflow_hashes_checked_in_source_only
     assert "SET TRANSACTION READ ONLY" in text
     assert "recommendation-meal-slot-proposal-source-integrity.json" in text
     assert "expected_source_name_exposed == false" in text
+    assert "automatic_acceptance_allowed == false" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
+
+
+def test_direct_proposal_row_manifest_checks_exact_checked_in_rows():
+    """Committed evidence may recover only by exact source row, fingerprint and slot."""
+    text = MEAL_SLOT_ROW_MANIFEST_MIGRATION.read_text()
+
+    assert "pg_temp.expected_dish_source_manifest" in text
+    assert "m.source_srno = s.source_srno" in text
+    assert "m.row_fingerprint = s.row_fingerprint" in text
+    assert "m.direct_slot = p.proposed_slot" in text
+    for route in (
+        "missing_import_lineage",
+        "unexpected_source_identity",
+        "missing_checked_in_manifest_row",
+        "checked_in_fingerprint_mismatch",
+        "checked_in_direct_slot_mismatch",
+        "exact_checked_in_row_only",
+    ):
+        assert route in text
+    assert "'row_level_integrity_independent_of_run_completion', true" in text
+    assert "'run_completion_required_for_import_health', true" in text
+    assert "'row_manifest_gate_is_approval', false" in text
+
+
+def test_direct_proposal_row_manifest_is_private_reconciled_and_non_mutating():
+    """The recovery audit exposes only counts and cannot make proposal or serving decisions."""
+    migration = MEAL_SLOT_ROW_MANIFEST_MIGRATION.read_text()
+    validation = MEAL_SLOT_ROW_MANIFEST_VALIDATION.read_text()
+
+    assert "SECURITY DEFINER" in migration
+    assert "FROM PUBLIC, anon, authenticated" in migration
+    for forbidden in (
+        "UPDATE ops.dish_meal_slot_proposals",
+        "INSERT INTO ops.dish_meal_slot_proposals",
+        "UPDATE public.",
+        "INSERT INTO public.",
+        "raw_payload",
+        "normalized_payload",
+    ):
+        assert forbidden not in migration
+    for invariant in (
+        "direct meal-slot proposal row-manifest report must remain service-only",
+        "direct meal-slot proposal row-manifest routes do not reconcile",
+        "direct meal-slot proposal row-manifest links do not reconcile",
+        "direct meal-slot proposal row-manifest policy is invalid",
+    ):
+        assert invariant in validation
+
+
+def test_direct_proposal_row_manifest_rollback_is_exact_and_non_destructive():
+    """Rollback removes only the verifier and preserves source rows and proposals."""
+    text = MEAL_SLOT_ROW_MANIFEST_ROLLBACK.read_text()
+
+    assert "direct_meal_slot_proposal_row_manifest_report(text, text)" in text
+    assert "DROP TABLE" not in text
+    assert "ops.dish_meal_slot_proposals" not in text
+
+
+def test_direct_proposal_row_manifest_workflow_is_ephemeral_and_aux_free():
+    """The checked-in row manifest exists only in a temporary read-only database session."""
+    text = MEAL_SLOT_ROW_MANIFEST_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "database_identifies_project" in text
+    assert "ops.recommendation.dish_source_manifest" in text
+    assert "CREATE TEMP TABLE expected_dish_source_manifest" in text
+    assert 'case "$EXPECTED_MANIFEST_PATH" in "$RUNNER_TEMP"/*)' in text
+    assert "FROM '$EXPECTED_MANIFEST_PATH'" in text
+    assert "BEGIN TRANSACTION READ ONLY" in text
+    assert "expected-dish-source-manifest.tsv" in text
+    assert "recommendation-meal-slot-proposal-row-manifest.json" in text
+    assert "expected-dish-source-manifest-summary.json" not in text.split(
+        "- uses: actions/upload-artifact@v4"
+    )[-1]
     assert "automatic_acceptance_allowed == false" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text
