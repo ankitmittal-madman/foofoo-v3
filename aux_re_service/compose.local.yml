@@ -37,6 +37,7 @@ services:
       AUX_REC_ENABLED: "true"
       AUX_REC_MODE: shadow
       AUX_REC_ALLOW_OVERRIDE: "false"
+      AUX_REC_SERVICE_SECRET: ${AUX_REC_SERVICE_SECRET:?AUX_REC_SERVICE_SECRET must be set}
       AUX_REC_QDRANT_URL: http://qdrant:6333
       AUX_REC_MODEL_QDRANT_ENABLED: "true"
       AUX_REC_MODEL_LIGHTFM_ENABLED: "true"
