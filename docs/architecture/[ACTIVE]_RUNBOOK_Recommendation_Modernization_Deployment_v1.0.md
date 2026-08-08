@@ -262,7 +262,7 @@ reported `dishes_changed=false`, `serving_changed=false`, `publication_changed=f
 before any candidate can become a dish fact. Governed mode-control run `31274851421` then recorded
 `mode=off` and passed; neither shadow nor active serving is enabled.
 
-### Contextual application boundary — prepared, not installed or applied
+### Contextual application boundary — installed, not applied
 
 Migration 120 and validation 972 add the separately governed application boundary. Installation
 only extends the private proposal lifecycle and creates a service-only before/after ledger; it
@@ -281,8 +281,10 @@ Local proof covers 324 passing recommendation tests with one expected skip, SQL 
 and a disposable PostgreSQL execution. That execution applied 775, returned `already_applied` on
 retry, refused rollback after one deliberate dish drift, restored all 775 after the drift was
 removed, and retained all ledger rows when the mutation functions were disabled. This proves the
-mechanism only. The five mappings remain unapproved and no production installation or application
-has run.
+mechanism only. Production run `31275561817` subsequently installed migration 120 and validation
+972. Its install-only artifact records `dishes_changed=false`, `proposals_changed=false`,
+`publication_changed=false` and `serving_changed=false`. The five mappings remain unapproved and
+no production application has run.
 
 ### Phase A stop conditions
 
