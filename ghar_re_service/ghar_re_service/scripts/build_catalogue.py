@@ -111,6 +111,7 @@ from __future__ import annotations
 import csv
 import os
 from dataclasses import dataclass, field
+from typing import TypedDict
 
 import openpyxl
 
@@ -190,6 +191,14 @@ class BuildReport:
     sig_band_unmatched: list[str] = field(default_factory=list)
 
 
+class IdentityCorrection(TypedDict):
+    """One governed authored-duplicate merge loaded from the correction overlay."""
+
+    duplicate: str
+    canonical: str
+    aliases: list[str]
+
+
 def _split(cell: str | None) -> list[str]:
     """Comma-separated cell -> stripped, non-empty token list."""
     if not cell:
@@ -239,7 +248,7 @@ def load_cuisines(source_dir: str) -> dict[str, dict]:
     return out
 
 
-def load_identity_corrections(source_dir: str) -> dict[str, dict[str, object]]:
+def load_identity_corrections(source_dir: str) -> dict[str, IdentityCorrection]:
     """Load reviewed duplicate-name merges without mutating the authored XLSX.
 
     Each duplicate is omitted from serving, while every listed historical/common name is
@@ -247,7 +256,7 @@ def load_identity_corrections(source_dir: str) -> dict[str, dict[str, object]]:
     makes each identity decision independently auditable.
     """
     path = os.path.join(source_dir, DISH_IDENTITY_CORRECTIONS_CSV)
-    out: dict[str, dict[str, object]] = {}
+    out: dict[str, IdentityCorrection] = {}
     with open(path, newline="", encoding="utf-8") as fh:
         for row in csv.DictReader(fh):
             duplicate = row["duplicate_name"].strip()
@@ -268,7 +277,7 @@ def load_identity_corrections(source_dir: str) -> dict[str, dict[str, object]]:
 
 
 def load_dish_synonyms(
-    source_dir: str, identity_corrections: dict[str, dict[str, object]]
+    source_dir: str, identity_corrections: dict[str, IdentityCorrection]
 ) -> dict[str, list[str]]:
     """canonical dish name (lowercased) -> [synonym, ...], from term_synonyms_v2.csv."""
     path = os.path.join(source_dir, TERM_SYNONYMS_CSV)
@@ -582,7 +591,7 @@ def transform_dish_row(
 
 def _read_dish_rows(
     source_dir: str,
-    identity_corrections: dict[str, dict[str, object]],
+    identity_corrections: dict[str, IdentityCorrection],
     report: BuildReport,
 ) -> list[dict]:
     path = os.path.join(source_dir, DISHES_XLSX)
