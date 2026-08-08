@@ -43,7 +43,8 @@ PROFILE_ID = UUID("621a406a-1778-4951-b1a2-8e05c09449c8")
 class FakeCursor:
     def __init__(self, value):
         self.value = value
-        self.params = None
+        self.params = []
+        self.fetch_count = 0
 
     def __enter__(self):
         return self
@@ -52,9 +53,12 @@ class FakeCursor:
         return None
 
     def execute(self, _query, params):
-        self.params = params
+        self.params.append(params)
 
     def fetchone(self):
+        self.fetch_count += 1
+        if self.fetch_count == 1:
+            return {"current_city": "Mumbai"}
         return {"user_audit": self.value}
 
 
@@ -75,7 +79,10 @@ def test_user_audit_is_parameterized_and_json_safe():
         }
     )
     result = user_audit.fetch_user_audit(connection, PROFILE_ID)
-    assert connection.cursor_value.params == (str(PROFILE_ID),)
+    assert connection.cursor_value.params == [
+        (str(PROFILE_ID),),
+        ("Maharashtra", str(PROFILE_ID)),
+    ]
     assert result["score"] == 0.625
     assert result["updated_at"] == "2026-08-06T00:00:00+00:00"
 
@@ -114,6 +121,30 @@ def test_user_audit_measures_refreshes_with_legacy_and_episode_identities():
     assert "PARTITION BY slot ORDER BY created_at" in sql
     assert "meaningful_refresh_rate" in sql
     assert "'refresh_quality'" in sql
+
+
+def test_user_audit_measures_served_regional_naming_and_richness_quality():
+    sql = user_audit.AUDIT_SQL
+    assert sql.count("%s") == 2
+    assert "recent_served_components" in sql
+    assert "re_engine.re_dish_regional_affinity" in sql
+    assert "home_or_local_affinity_count" in sql
+    assert "regional_affinity_coverage" in sql
+    assert "canonical_name_match_count" in sql
+    assert "canonical_name_mismatch_count" in sql
+    assert "above_neutral_richness_rate" in sql
+    assert "richness_score > 0.5" in sql
+    assert "'served_catalogue_quality'" in sql
+    assert "'served_richness'" in sql
+
+
+def test_user_audit_emits_aggregate_recommendation_evidence_not_raw_plates():
+    sql = user_audit.AUDIT_SQL
+    assert "'recent_recommendation_summary'" in sql
+    assert "'recent_recommendations'" not in sql
+    assert "jsonb_agg(to_jsonb(recent_recs)" not in sql
+    assert "served_success_count" in sql
+    assert "reported_plate_count" in sql
 
 
 def test_user_audit_fails_closed_for_missing_profile():
