@@ -130,6 +130,7 @@ No shadow or active transition was requested or executed.
 | Meal-slot source-evidence audit | Run `31267459809` | Migration 108 live; 1,802 single-direct candidates (667 lunch, 566 snacks, 294 dinner, 275 breakfast), 797 contextual review and one conflict; no raw text, proposals or serving change |
 | Governed direct-slot proposals | Run `31269668506` | Migration 109 live; exactly 1,802 pending proposals and 7,222 evidence links created (667 lunch, 566 snacks, 294 dinner, 275 breakfast); zero automatic acceptance, publication or serving change; Aux remains off |
 | Bounded direct-slot review pack | Run `31270121136` | Migration 110 live; all 1,802 proposals fresh/pending, 7,222 evidence links reconciled (4–8 each), deterministic 10-name-per-slot sample produced with no identifiers/raw source/user data; no proposal decision or serving change |
+| Direct-slot proposal provenance | Run `31270627753` | Migration 111 live; all 7,222 links are apply-mode lineage, but every one of the 1,802 proposals reduces to one logical source row from one source file/version repeated across 4–8 runs; repetition is not independent evidence, so every proposal remains pending and no confidence, publication or serving state changed |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
@@ -149,6 +150,13 @@ rows still in ontology review. Because none has curated, human-reviewed or accep
 not raise confidence or republish them merely by rerunning the legacy classifier. Generate
 independently evaluated proposals, route unresolved items to review, then publish a new immutable
 generation only after the quality report passes.
+
+The 7,222 direct-slot evidence links must not be read as 7,222 independent confirmations. The
+provenance report proves that all 1,802 pending proposals have one distinct logical source row and
+one source file/version; each was repeated through four to eight apply-mode import runs. Run mode
+alone does not prove that those runs completed successfully, and repeated ingestion must not raise
+confidence. Verify final run status and exact checked-in source identity, then review the source
+mapping policy as one governed cohort before any per-dish slot fact is accepted or applied.
 
 ### Phase A stop conditions
 
