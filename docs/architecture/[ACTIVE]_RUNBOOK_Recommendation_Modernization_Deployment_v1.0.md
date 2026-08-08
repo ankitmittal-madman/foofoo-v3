@@ -135,6 +135,10 @@ No shadow or active transition was requested or executed.
 | Dish-import lifecycle correction | Commit `6fa17e0` | Future imports record their actor and close from `running` to exactly one terminal status on success, failure or interruption; historical run statuses were deliberately not rewritten |
 | Direct-slot row-manifest integrity | Run `31272114382` | Migration 114 live; a 4,806-row direct-course manifest independently matched every one of the 7,222 proposal links by source row, fingerprint, checked-in file identity and proposed slot, so all 1,802 proposals may enter mapping-policy review; this is evidence verification, not approval or application |
 | Direct-slot application boundary | Run `31273351076` | Migration 116 and validation 968 live from commit `314948c`; protected tests and exact production identity passed, while every apply/rollback/Aux-mode step was skipped; the artifact records zero dish, proposal, publication or serving change |
+| Canonical identity boundary | Run `31277895025` | Migration 122 and validation 974 installed from commit `201b999`; all 3,410 dish UUID/name identities are available through bounded, service-only pages with governed non-rejected regional metadata |
+| Fresh immutable publication | Run `31277933593` | Publication `sha256:47d316541792776d0a468a3c3aff517e1c72a94e728bcdc9ac375c03f47e4f49`; 661 safety-eligible recommendation rows plus 3,410 canonical identity rows |
+| Exact Ghar release | Run `31277978778` | Fly deployment healthy; live `/v1/meta` exposes the exact 661-row publication and all 3,410 identity rows |
+| Aux OFF reassertion | Run `31278276415`, attempt 2 | Production `AUX_RE_MODE=off` set successfully after the first attempt encountered a transient Supabase 502; all shadow-only and active-mode steps skipped |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
@@ -142,10 +146,11 @@ non-authoritative candidate list. This is not the production traffic switch. The
 traffic switch, and the final protected transition evidence records it as `off`; therefore no live
 recommendation request is sent to Aux.
 
-The 642 count is the actual safety-closed publication, not the full active dish inventory. At
-publication time the coverage report showed 3,402 active dishes, 1,719 class-mapped dishes and 642
-fully enriched/safety-closed/publishable dishes. These coverage gaps remain data work; they must not
-be bypassed by publishing incomplete rows.
+The current safety-closed publication contains 661 recommendation rows, not the full dish
+inventory. Its separate identity index contains all 3,410 stored dishes so feedback and lineage can
+use exact UUIDs even when a dish is not yet recommendation-eligible. The remaining 2,749 dishes are
+database records but still fail one or more publication prerequisites. These coverage gaps remain
+data work; they must not be bypassed by publishing incomplete rows.
 
 The later audits do not replace that deployed-generation count. They show that the live database
 has moved to 646 presence-eligible rows, but only 547 meet the stricter evidence policy. The 255
