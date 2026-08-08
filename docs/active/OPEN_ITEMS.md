@@ -66,9 +66,12 @@ findings are retained under `docs/archive/`.
   labels. Run `31267459809` found 1,802 single-direct slot candidates, 797 contextual-review cases
   and one conflict. Run `31269668506` materialized exactly those 1,802 direct rows as pending
   proposals with 7,222 evidence links and no serving/publication change; the other 798 rows remain
-  excluded. Build a separately authorized review/apply boundary that samples quality, records
-  named review provenance, applies only approved rows to canonical dish truth and supports exact
-  rollback. Hero-role evidence and contextual slot review remain distinct unresolved gaps.
+  excluded. Migration 110 and its protected workflow are repository-ready to produce a bounded,
+  deterministic catalogue-name sample with exact freshness/evidence counts; run that read-only
+  review pack first. Then request an explicit cohort decision and build a separately authorized
+  apply boundary that records named review provenance, applies only approved rows to canonical
+  dish truth and supports exact rollback. Hero-role evidence and contextual slot review remain
+  distinct unresolved gaps.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.

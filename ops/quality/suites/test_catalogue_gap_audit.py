@@ -79,6 +79,18 @@ MEAL_SLOT_PROPOSAL_ROLLBACK = Path(
 MEAL_SLOT_PROPOSAL_WORKFLOW = Path(
     ".github/workflows/recommendation-meal-slot-proposals.yml"
 )
+MEAL_SLOT_REVIEW_MIGRATION = Path(
+    "database/migrations/110_report_direct_meal_slot_proposal_review.sql"
+)
+MEAL_SLOT_REVIEW_VALIDATION = Path(
+    "database/validation/962_report_direct_meal_slot_proposal_review_validation.sql"
+)
+MEAL_SLOT_REVIEW_ROLLBACK = Path(
+    "database/rollback/110_report_direct_meal_slot_proposal_review_rollback.sql"
+)
+MEAL_SLOT_REVIEW_WORKFLOW = Path(
+    ".github/workflows/recommendation-meal-slot-proposal-review.yml"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -510,5 +522,56 @@ def test_direct_proposal_workflow_is_protected_exact_count_and_aux_free():
     assert "--single-transaction" in text
     assert "pending_review" in text
     assert "recommendation-meal-slot-proposal-generation.json" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
+
+
+def test_direct_proposal_review_report_is_bounded_read_only_and_user_free():
+    """The review pack may show catalogue names but no raw import or user information."""
+    migration = MEAL_SLOT_REVIEW_MIGRATION.read_text()
+    validation = MEAL_SLOT_REVIEW_VALIDATION.read_text()
+
+    assert "p_sample_per_slot > 25" in migration
+    assert "md5(p.dish_id::text || ':meal-slot-proposal-v1')" in migration
+    assert "'dish_name', s.dish_name" in migration
+    assert "'catalogue_names_exposed_for_review', true" in migration
+    assert "'user_data_exposed', false" in migration
+    assert "'raw_source_text_exposed', false" in migration
+    assert "'automatic_acceptance_allowed', false" in migration
+    assert "UPDATE public." not in migration
+    assert "INSERT INTO public." not in migration
+    for invariant in (
+        "direct meal-slot proposal review report must remain service-only",
+        "direct meal-slot proposal review counts do not reconcile",
+        "direct meal-slot proposal review evidence does not reconcile",
+        "direct meal-slot proposal review sample exceeds its bound",
+        "direct meal-slot proposal review sample exposes an unapproved field",
+    ):
+        assert invariant in validation
+
+
+def test_direct_proposal_review_report_has_exact_rollback():
+    """Review-report rollback removes only the report and preserves proposal evidence."""
+    text = MEAL_SLOT_REVIEW_ROLLBACK.read_text()
+
+    assert "DROP FUNCTION IF EXISTS re_engine.direct_meal_slot_proposal_review_report" in text
+    assert "DROP TABLE" not in text
+    assert "ops.dish_meal_slot_proposals" not in text
+
+
+def test_direct_proposal_review_workflow_is_read_only_bounded_and_aux_free():
+    """The protected review run cannot approve, apply, publish or deploy anything."""
+    text = MEAL_SLOT_REVIEW_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "database_identifies_project" in text
+    assert "expected_proposal_count" in text
+    assert "expected_evidence_link_count" in text
+    assert "sample_per_slot" in text
+    assert "SET TRANSACTION READ ONLY" in text
+    assert "recommendation-meal-slot-proposal-review.json" in text
+    assert "catalogue_names_exposed_for_review" in text
+    assert "automatic_acceptance_allowed == false" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text

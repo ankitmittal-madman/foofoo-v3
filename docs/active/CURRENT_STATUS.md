@@ -55,6 +55,14 @@ state only; deployment run IDs and rollback instructions live in the active runb
 > artifact confirms zero identity/raw-text exposure, automatic acceptance, publication change or
 > serving change. No proposal is approved or applied; the other 798 ambiguous/conflicting dishes
 > remain excluded. Aux remains off.
+>
+> **Proposal quality-review gate:** migration 110, validation 962, exact rollback and the protected
+> review workflow are repository-ready. They produce reconciled status/evidence/freshness counts
+> plus a deterministic sample of at most 25 catalogue names per slot. The sample contains no dish
+> or source-row identifiers, raw import text or user data, and the workflow runs the report in a
+> read-only transaction. Twenty-eight focused tests, parsing and isolated PostgreSQL bounds,
+> privacy and rollback checks pass. Production review-report installation/execution is pending;
+> no proposal review decision or canonical dish write is authorized by this gate.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,
