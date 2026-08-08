@@ -35,9 +35,16 @@ state only; deployment run IDs and rollback instructions live in the active runb
 > `snacks`, and keeps machine/rule proposals non-serving until reviewed. The first aggregate
 > baseline found 1,402 canonical dish-slot routes: 603 primary-ready, 262 needing primary-class
 > review and 537 needing component review; there are zero proposals and zero accepted component
-> facts. That v1 report is slot-only and does not reconcile active dishes with no canonical slot,
-> so additive migration 107 and validation 959 are repository-ready to close that measurement gap.
-> Neither migration changes the 642-row publication gate or either engine. Aux remains off.
+> facts. That v1 report is slot-only; the additive v2 report described below now closes its
+> active-dish denominator gap. Neither migration changes the 642-row publication gate or either
+> engine. Aux remains off.
+
+> **Meal-slot remediation evidence:** protected run `31259220512` installed the v2 report and
+> reconciled all 3,402 active dishes. Exactly 802 have a canonical slot and 2,600 do not; 2,596
+> lack a hero role and 918 carry at least one unrecognized slot label. Migration 108 and its
+> protected workflow are repository-ready to classify those 2,600 rows using only fixed aggregate
+> import-course evidence categories. It creates no proposal, exposes no raw source text and makes
+> no serving change.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,

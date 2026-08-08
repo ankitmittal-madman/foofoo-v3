@@ -1,0 +1,102 @@
+name: Recommendation meal-slot remediation audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type audit-meal-slot-remediation
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-recommendation-meal-slot-remediation-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'audit-meal-slot-remediation'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-meal-slot-remediation-audit-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=5min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify exact production project and complete-inventory prerequisite
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          test "$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_serving_role_readiness_report_v2()') IS NOT NULL")" = "t"
+
+      - name: Classify meal-slot remediation state
+        id: state
+        run: |
+          present="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_meal_slot_remediation_report()') IS NOT NULL")"
+          if [ "$present" = "f" ]; then
+            echo "action=install" >> "$GITHUB_OUTPUT"
+          elif [ "$present" = "t" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe meal-slot remediation audit state" >&2
+            exit 1
+          fi
+
+      - name: Atomically install aggregate meal-slot remediation audit
+        if: steps.state.outputs.action == 'install'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/108_measure_meal_slot_remediation.sql \
+            -f database/validation/959_complete_serving_role_readiness_coverage_validation.sql \
+            -f database/validation/960_measure_meal_slot_remediation_validation.sql
+
+      - name: Revalidate existing meal-slot remediation audit read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/959_complete_serving_role_readiness_coverage_validation.sql \
+            -f database/validation/960_measure_meal_slot_remediation_validation.sql
+
+      - name: Capture aggregate meal-slot remediation report
+        env:
+          ACTION_TAKEN: ${{ steps.state.outputs.action }}
+        run: |
+          report="$RUNNER_TEMP/recommendation-meal-slot-remediation-report.json"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 \
+            -c "SELECT re_engine.catalogue_meal_slot_remediation_report()" > "$report"
+          jq --arg action "$ACTION_TAKEN" --arg commit "$GITHUB_SHA" \
+            --arg run_id "$GITHUB_RUN_ID" '. + {
+              audit_action: $action,
+              commit_sha: $commit,
+              workflow_run_id: $run_id
+            }' "$report" > "$report.checked"
+          mv "$report.checked" "$report"
+          jq --exit-status '
+            .schema_version == "recommendation-catalogue-meal-slot-remediation-v1"
+            and .active_dishes == ([.current_slot_state[]] | add // 0)
+            and .missing_canonical_slot_dishes == ([.remediation_routes[]] | add // 0)
+            and (
+              (.remediation_routes.single_direct_slot_proposal // 0)
+              == ([.single_direct_slot_proposals[]] | add // 0)
+            )
+            and .policy.identity_exposed == false
+            and .policy.raw_source_text_exposed == false
+            and .policy.automatic_proposal_acceptance_allowed == false
+            and .policy.publication_gate_changed == false
+          ' "$report" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-meal-slot-remediation-report
+          path: ${{ runner.temp }}/recommendation-meal-slot-remediation-report.json
+          retention-days: 90
+          if-no-files-found: error

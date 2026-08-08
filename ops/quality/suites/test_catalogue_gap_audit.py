@@ -55,6 +55,18 @@ COMPLETE_COMPONENT_VALIDATION = Path(
 COMPLETE_COMPONENT_ROLLBACK = Path(
     "database/rollback/107_complete_serving_role_readiness_coverage_rollback.sql"
 )
+MEAL_SLOT_MIGRATION = Path(
+    "database/migrations/108_measure_meal_slot_remediation.sql"
+)
+MEAL_SLOT_VALIDATION = Path(
+    "database/validation/960_measure_meal_slot_remediation_validation.sql"
+)
+MEAL_SLOT_ROLLBACK = Path(
+    "database/rollback/108_measure_meal_slot_remediation_rollback.sql"
+)
+MEAL_SLOT_WORKFLOW = Path(
+    ".github/workflows/recommendation-meal-slot-remediation-audit.yml"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -376,3 +388,51 @@ def test_complete_serving_role_report_is_additive_private_and_reversible():
     assert "INSERT INTO public." not in migration
     assert "DROP FUNCTION IF EXISTS re_engine.catalogue_serving_role_readiness_report_v2()" in rollback
     assert "catalogue_serving_role_readiness_report()" not in rollback
+
+
+def test_meal_slot_remediation_uses_fixed_aggregate_source_evidence_only():
+    """Raw import courses may guide non-serving proposals but must never leave the DB."""
+    text = MEAL_SLOT_MIGRATION.read_text()
+
+    assert "catalogue_meal_slot_remediation_report" in text
+    assert "public.import_row_results" in text
+    assert "public.dish_source_rows" in text
+    assert "single_direct_slot_proposal" in text
+    assert "contextual_course_review" in text
+    assert "conflicting_direct_slot_evidence" in text
+    assert "'raw_source_text_exposed', false" in text
+    assert "'fixed_evidence_categories_only', true" in text
+    assert "'direct_slot_proposal_is_non_serving', true" in text
+    assert "UPDATE public." not in text
+    assert "INSERT INTO public." not in text
+
+
+def test_meal_slot_remediation_reconciles_and_rolls_back_without_touching_v2():
+    """Every slotless dish has one route and every direct proposal has one canonical slot."""
+    validation = MEAL_SLOT_VALIDATION.read_text()
+    rollback = MEAL_SLOT_ROLLBACK.read_text()
+
+    for invariant in (
+        "catalogue current slot states do not reconcile",
+        "catalogue meal-slot remediation routes do not reconcile",
+        "catalogue direct meal-slot proposals do not reconcile",
+    ):
+        assert invariant in validation
+    assert "DROP FUNCTION IF EXISTS re_engine.catalogue_meal_slot_remediation_report()" in rollback
+    assert "catalogue_serving_role_readiness_report_v2" not in rollback
+
+
+def test_meal_slot_audit_is_protected_read_only_and_keeps_aux_untouched():
+    """The evidence run may install one report but cannot create proposals or route traffic."""
+    text = MEAL_SLOT_WORKFLOW.read_text()
+
+    assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "database_identifies_project" in text
+    assert "catalogue_serving_role_readiness_report_v2" in text
+    assert "pg_advisory_xact_lock" in text
+    assert "--single-transaction" in text
+    assert "SET TRANSACTION READ ONLY" in text
+    assert "recommendation-meal-slot-remediation-report.json" in text
+    assert "AUX_RE_MODE" not in text
+    assert "fly deploy" not in text
