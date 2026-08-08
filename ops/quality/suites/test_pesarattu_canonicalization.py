@@ -7,6 +7,7 @@ CORRECTIONS = Path("data/source/dish_identity_corrections_v1.csv")
 MIGRATION = Path("database/migrations/115_canonicalize_pesarattu_upma_identity.sql")
 VALIDATION = Path("database/validation/967_canonicalize_pesarattu_upma_identity_validation.sql")
 ROLLBACK = Path("database/rollback/115_canonicalize_pesarattu_upma_identity_rollback.sql")
+WORKFLOW = Path(".github/workflows/canonicalize-pesarattu-upma.yml")
 
 
 def test_pesarattu_duplicate_merge_is_explicit_and_alias_preserving() -> None:
@@ -50,3 +51,20 @@ def test_database_canonicalization_has_scoped_rollback() -> None:
     assert "MLA Pesarattu" in rollback
     assert "DROP TABLE" not in rollback
     assert "DELETE FROM public.dishes" not in rollback
+
+
+def test_production_canonicalization_workflow_is_protected_and_revalidatable() -> None:
+    """Deployment must prove project identity, serialize writes and emit counts only."""
+    workflow = WORKFLOW.read_text()
+
+    assert "environment: production" in workflow
+    assert "github.ref == 'refs/heads/main'" in workflow
+    assert "database_identifies_project" in workflow
+    assert "pg_advisory_xact_lock" in workflow
+    assert "--single-transaction" in workflow
+    assert "SET TRANSACTION READ ONLY" in workflow
+    assert "115_canonicalize_pesarattu_upma_identity.sql" in workflow
+    assert "967_canonicalize_pesarattu_upma_identity_validation.sql" in workflow
+    assert "identity_exposed', false" in workflow
+    assert "feedback_changed', false" in workflow
+    assert "recommendation_history_changed', false" in workflow
