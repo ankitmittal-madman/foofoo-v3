@@ -13,7 +13,7 @@ import os
 import sqlite3
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 from uuid import UUID
 
 from ghar_re_core.catalogue import Catalogue, allergens_from_flags
@@ -35,6 +35,13 @@ REQUIRED_TAXONOMY_FIELDS = {
 
 class PublishedCatalogueError(RuntimeError):
     """Raised when a publication cannot prove complete, canonical candidate hydration."""
+
+
+class IdentityCatalogue(Protocol):
+    """Minimal mutable catalogue surface required for startup identity reconciliation."""
+
+    dishes: list[Any]
+    by_id: dict[str, Any]
 
 
 def _sha256_file(path: Path) -> str:
@@ -230,7 +237,7 @@ class PublishedCatalogueStore:
 
 
 def reconcile_fallback_identities(
-    catalogue: Catalogue, store: PublishedCatalogueStore | None
+    catalogue: IdentityCatalogue, store: PublishedCatalogueStore | None
 ) -> dict[str, int]:
     """Attach exact canonical UUIDs to matching fallback dishes without changing candidates.
 

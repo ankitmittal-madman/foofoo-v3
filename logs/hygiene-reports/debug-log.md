@@ -28,4 +28,5 @@
 - Layer: recommendation service catalogue startup and serving identity.
 - Fix applied: reconcile exact canonical-name matches from the checksummed, user-free publication into the fallback catalogue at startup; reject invalid UUIDs, fuzzy/alias matching, and identity collisions; expose count-only UUID coverage.
 - Re-verification: 28 focused service tests passed. A replay against production publication run `31252699487` resolved 641/809 fallback identities with candidate names unchanged. Full identity coverage remains pending an identity-only publication index for the 168 safety-incomplete rows.
+- CI follow-up: `re-ci` run `31276920811` caught that the provider protocol did not declare the mutable ID index required by startup reconciliation. The minimal identity protocol and provider contract now agree; the exact CI mypy command passes across 72 source files and 42 focused tests pass.
 - Pattern risk elsewhere: any serving path that manufactures a non-UUID dish identifier cannot support canonical feedback lineage; remaining legacy coverage is tracked explicitly rather than hidden.
