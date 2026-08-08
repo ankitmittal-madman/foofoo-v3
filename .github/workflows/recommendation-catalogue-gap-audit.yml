@@ -39,38 +39,57 @@ jobs:
       - name: Classify audit boundary state
         id: state
         run: |
-          present="$(psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_publication_gap_report()') IS NOT NULL")"
-          if [ "$present" = "f" ]; then
-            echo "action=apply" >> "$GITHUB_OUTPUT"
-          elif [ "$present" = "t" ]; then
+          read -r gap_present tranche_present <<EOF
+          $(psql "$FOOFOO_SUPABASE_URI" -At -F ' ' -v ON_ERROR_STOP=1 -c "SELECT to_regprocedure('re_engine.catalogue_publication_gap_report()') IS NOT NULL, to_regprocedure('re_engine.catalogue_enrichment_tranche_report()') IS NOT NULL")
+          EOF
+          if [ "$gap_present" = "f" ] && [ "$tranche_present" = "f" ]; then
+            echo "action=apply_all" >> "$GITHUB_OUTPUT"
+          elif [ "$gap_present" = "t" ] && [ "$tranche_present" = "f" ]; then
+            echo "action=apply_tranche" >> "$GITHUB_OUTPUT"
+          elif [ "$gap_present" = "t" ] && [ "$tranche_present" = "t" ]; then
             echo "action=validate" >> "$GITHUB_OUTPUT"
           else
-            echo "could not classify catalogue gap audit boundary" >&2
+            echo "unsafe partial catalogue audit boundary" >&2
             exit 1
           fi
 
-      - name: Atomically install aggregate audit boundary
-        if: steps.state.outputs.action == 'apply'
+      - name: Atomically install both aggregate audit boundaries
+        if: steps.state.outputs.action == 'apply_all'
         run: |
           psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
             -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
             -f database/migrations/102_expose_recommendation_catalogue_gaps.sql \
-            -f database/validation/954_expose_recommendation_catalogue_gaps_validation.sql
+            -f database/validation/954_expose_recommendation_catalogue_gaps_validation.sql \
+            -f database/migrations/103_measure_catalogue_enrichment_tranche.sql \
+            -f database/validation/955_measure_catalogue_enrichment_tranche_validation.sql
+
+      - name: Atomically extend existing audit with tranche quality
+        if: steps.state.outputs.action == 'apply_tranche'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/103_measure_catalogue_enrichment_tranche.sql \
+            -f database/validation/954_expose_recommendation_catalogue_gaps_validation.sql \
+            -f database/validation/955_measure_catalogue_enrichment_tranche_validation.sql
 
       - name: Revalidate existing audit boundary read-only
         if: steps.state.outputs.action == 'validate'
         run: |
           psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
             -c "SET TRANSACTION READ ONLY" \
-            -f database/validation/954_expose_recommendation_catalogue_gaps_validation.sql
+            -f database/validation/954_expose_recommendation_catalogue_gaps_validation.sql \
+            -f database/validation/955_measure_catalogue_enrichment_tranche_validation.sql
 
       - name: Capture aggregate production gap report
         env:
           ACTION_TAKEN: ${{ steps.state.outputs.action }}
         run: |
           report="$RUNNER_TEMP/recommendation-catalogue-gap-report.json"
+          tranche="$RUNNER_TEMP/recommendation-catalogue-enrichment-tranche-report.json"
           psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 \
             -c "SELECT re_engine.catalogue_publication_gap_report()" > "$report"
+          psql "$FOOFOO_SUPABASE_URI" -At -v ON_ERROR_STOP=1 \
+            -c "SELECT re_engine.catalogue_enrichment_tranche_report()" > "$tranche"
           jq --arg action "$ACTION_TAKEN" --arg commit "$GITHUB_SHA" \
             --arg run_id "$GITHUB_RUN_ID" '. + {
               audit_action: $action,
@@ -78,6 +97,13 @@ jobs:
               workflow_run_id: $run_id
             }' "$report" > "$report.checked"
           mv "$report.checked" "$report"
+          jq --arg action "$ACTION_TAKEN" --arg commit "$GITHUB_SHA" \
+            --arg run_id "$GITHUB_RUN_ID" '. + {
+              audit_action: $action,
+              commit_sha: $commit,
+              workflow_run_id: $run_id
+            }' "$tranche" > "$tranche.checked"
+          mv "$tranche.checked" "$tranche"
           jq --exit-status '
             .schema_version == "recommendation-catalogue-gap-report-v1"
             and .inventory.stored_dishes == (.inventory.active_dishes + .inventory.inactive_dishes)
@@ -90,10 +116,22 @@ jobs:
               == .serving_readiness.publishable_dishes
             and .serving_readiness.requirements_per_active_dish == 15
           ' "$report" >/dev/null
+          jq --exit-status '
+            .schema_version == "recommendation-catalogue-enrichment-tranche-v1"
+            and .candidate_count == (
+              .readiness.strict_auto_reclose_ready + .readiness.requires_review
+            )
+            and .policy.seed_required_fields == 13
+            and .policy.seed_class_confidence_minimum == 0.700
+            and .policy.strict_taxonomy_confidence_minimum == 0.800
+            and .policy.strict_ingredient_confidence_minimum == 0.800
+          ' "$tranche" >/dev/null
 
       - uses: actions/upload-artifact@v4
         with:
           name: recommendation-catalogue-gap-report
-          path: ${{ runner.temp }}/recommendation-catalogue-gap-report.json
+          path: |
+            ${{ runner.temp }}/recommendation-catalogue-gap-report.json
+            ${{ runner.temp }}/recommendation-catalogue-enrichment-tranche-report.json
           retention-days: 90
           if-no-files-found: error

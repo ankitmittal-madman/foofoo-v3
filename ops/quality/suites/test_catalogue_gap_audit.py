@@ -5,6 +5,15 @@ MIGRATION = Path("database/migrations/102_expose_recommendation_catalogue_gaps.s
 VALIDATION = Path("database/validation/954_expose_recommendation_catalogue_gaps_validation.sql")
 ROLLBACK = Path("database/rollback/102_expose_recommendation_catalogue_gaps_rollback.sql")
 WORKFLOW = Path(".github/workflows/recommendation-catalogue-gap-audit.yml")
+TRANCHE_MIGRATION = Path(
+    "database/migrations/103_measure_catalogue_enrichment_tranche.sql"
+)
+TRANCHE_VALIDATION = Path(
+    "database/validation/955_measure_catalogue_enrichment_tranche_validation.sql"
+)
+TRANCHE_ROLLBACK = Path(
+    "database/rollback/103_measure_catalogue_enrichment_tranche_rollback.sql"
+)
 
 
 def test_gap_report_is_aggregate_service_only_and_user_free():
@@ -73,5 +82,51 @@ def test_gap_audit_workflow_is_protected_bounded_and_does_not_route_aux():
     assert "--single-transaction" in text
     assert "SET TRANSACTION READ ONLY" in text
     assert "recommendation-catalogue-gap-report.json" in text
+    assert "recommendation-catalogue-enrichment-tranche-report.json" in text
     assert "AUX_RE_MODE" not in text
     assert "fly deploy" not in text
+
+
+def test_tranche_report_is_dry_run_aggregate_and_uses_existing_quality_policy():
+    """Potential status reclosure must be measured against governed evidence before any write."""
+    text = TRANCHE_MIGRATION.read_text()
+
+    assert "catalogue_enrichment_tranche_report" in text
+    assert "active_and_publishable_except_ontology_status" in text
+    assert "seed_required_fields', 13" in text
+    assert "seed_class_confidence_minimum', 0.700" in text
+    assert "strict_taxonomy_confidence_minimum', 0.800" in text
+    assert "strict_ingredient_confidence_minimum', 0.800" in text
+    assert "UPDATE public.dishes" not in text
+    assert "INSERT INTO public.dishes" not in text
+    for forbidden_table in ("profiles", "households", "feedback_events", "recommendation_events"):
+        assert forbidden_table not in text
+
+
+def test_tranche_report_has_reconciliation_validation_and_reversible_boundary():
+    """Every candidate must reconcile to either strict readiness or manual review."""
+    validation = TRANCHE_VALIDATION.read_text()
+    rollback = TRANCHE_ROLLBACK.read_text()
+
+    for invariant in (
+        "catalogue enrichment tranche readiness does not reconcile",
+        "catalogue enrichment tranche status counts do not reconcile",
+        "catalogue enrichment tranche class confidence does not reconcile",
+        "catalogue enrichment tranche taxonomy confidence does not reconcile",
+        "catalogue enrichment tranche ingredient confidence does not reconcile",
+    ):
+        assert invariant in validation
+    assert "DROP FUNCTION IF EXISTS re_engine.catalogue_enrichment_tranche_report()" in rollback
+
+
+def test_workflow_handles_clean_install_extension_and_read_only_revalidation():
+    """The already-live gap function must extend safely without pretending partial state is clean."""
+    text = WORKFLOW.read_text()
+
+    assert "action=apply_all" in text
+    assert "action=apply_tranche" in text
+    assert "action=validate" in text
+    assert "unsafe partial catalogue audit boundary" in text
+    assert "database/migrations/103_measure_catalogue_enrichment_tranche.sql" in text
+    assert "database/validation/955_measure_catalogue_enrichment_tranche_validation.sql" in text
+    assert text.count("          path:") == 1
