@@ -1,0 +1,101 @@
+name: Aux RE governed offline report
+
+on:
+  workflow_dispatch:
+    inputs:
+      evidence_run_id:
+        description: Successful consented-holdout replay run containing one evidence.json
+        required: true
+        type: string
+      publication_version:
+        description: Full sha256 recommendation catalogue publication
+        required: true
+        type: string
+      confirm:
+        description: Type evaluate-aux-offline-holdout
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: production-aux-re-offline-report
+  cancel-in-progress: false
+
+jobs:
+  evaluate:
+    if: inputs.confirm == 'evaluate-aux-offline-holdout'
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate consented replay source
+        env:
+          EVIDENCE_RUN_ID: ${{ inputs.evidence_run_id }}
+        run: |
+          case "$EVIDENCE_RUN_ID" in
+            *[!0-9]*|'') echo "evidence_run_id must be numeric" >&2; exit 1 ;;
+          esac
+          conclusion="$(gh run view "$EVIDENCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json conclusion --jq '.conclusion')"
+          workflow_name="$(gh run view "$EVIDENCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json workflowName --jq '.workflowName')"
+          test "$conclusion" = "success"
+          test "$workflow_name" = "Aux RE consented holdout replay"
+
+      - name: Download one privacy-minimized replay evidence file
+        env:
+          EVIDENCE_RUN_ID: ${{ inputs.evidence_run_id }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/offline-evidence"
+          gh run download "$EVIDENCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name aux-offline-evidence --dir "$RUNNER_TEMP/offline-evidence"
+          test -f "$RUNNER_TEMP/offline-evidence/evidence.json"
+          test "$(find "$RUNNER_TEMP/offline-evidence" -type f | wc -l)" -eq 1
+
+      - name: Produce aggregate offline gate report
+        id: evaluator
+        run: |
+          set +e
+          python -m ops.recommendation.offline_candidate_validation \
+            "$RUNNER_TEMP/offline-evidence/evidence.json" \
+            --output "$RUNNER_TEMP/offline.json"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: Validate eligible publication-bound aggregate
+        if: steps.evaluator.outputs.exit_code == '0'
+        env:
+          PUBLICATION_VERSION: ${{ inputs.publication_version }}
+        run: |
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .schema_version == "recommendation-offline-validation-v1"
+            and .publication_versions == [$version]
+            and .eligible_for_active_evaluation == true
+          ' "$RUNNER_TEMP/offline.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: steps.evaluator.outputs.exit_code == '0'
+        with:
+          name: aux-offline-report
+          path: ${{ runner.temp }}/offline.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: steps.evaluator.outputs.exit_code != '0'
+        with:
+          name: aux-offline-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/offline.json
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Fail an ineligible or invalid offline comparison
+        if: steps.evaluator.outputs.exit_code != '0'
+        run: exit 1

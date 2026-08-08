@@ -152,7 +152,9 @@ The source artifact is created only by the manual, production-environment-protec
 `Aux RE governed rollout inputs` workflow. It downloads one `aux-offline-report/offline.json` and
 one `aux-load-report/load.json` from successful same-repository runs. The packager rejects raw
 holdout cases, identity fields, unknown aggregate fields, non-passing or measurement-only load
-evidence, and publication mismatch. It creates `targets.json` from these protected environment
+evidence, publication mismatch, reuse of one run for both sources, and reports from any workflow
+other than `Aux RE governed offline report` and `Aux RE deployed load report`. It creates
+`targets.json` from these protected environment
 variables—there are deliberately no repository-default product thresholds:
 
 - `AUX_ROLLOUT_APPROVAL_REFERENCE`, `AUX_ROLLOUT_APPROVED_AT`
@@ -163,6 +165,19 @@ variables—there are deliberately no repository-default product thresholds:
 The artifact contains exactly `offline.json`, `load.json`, and `targets.json`. The S117 workflow
 checks that its source run's workflow name is exactly `Aux RE governed rollout inputs`; a generic
 successful artifact cannot be substituted.
+
+The manual `Aux RE governed offline report` workflow converts one privacy-minimized replay file
+into the aggregate `aux-offline-report/offline.json` consumed above. It accepts the source artifact
+only from a successful same-repository workflow named exactly `Aux RE consented holdout replay`,
+requires one `evidence.json`, applies the S109 comparison, and gives the accepted artifact name only
+to an eligible report for the operator-supplied immutable publication. Raw replay cases are never
+uploaded by this workflow. The validator permits only fixed aggregate slice labels and exact input
+shapes, so a case ID, arbitrary label, context field, or operator note cannot flow into its report.
+
+The upstream `Aux RE consented holdout replay` producer is intentionally not fabricated here. It
+still requires a separately approved consent policy and an operational replay implementation that
+keeps identities/raw behavior inside the authorized production boundary. Until that producer and a
+real run exist, offline quality remains unproven and Aux cannot be promoted.
 
 `ops/recommendation/rollout_decision.py` consumes four privacy-minimized inputs: a passing governed
 offline report, a passing gated Aux load report, rows from `re_engine.aux_shadow_health`, and zero

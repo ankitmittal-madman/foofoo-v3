@@ -25,7 +25,7 @@ def evidence() -> dict:
         },
         "cases": [
             {
-                "case_id": "holdout-001",
+                "case_id": "case-00000000000000000000000000000001",
                 "baseline_candidate_ids": [IDLI],
                 "aux_candidate_ids": [POHA, IDLI],
                 "relevant_dish_ids": [POHA],
@@ -34,7 +34,7 @@ def evidence() -> dict:
                 "slices": ["veg", "breakfast"],
             },
             {
-                "case_id": "holdout-002",
+                "case_id": "case-00000000000000000000000000000002",
                 "baseline_candidate_ids": [DOSA, IDLI],
                 "aux_candidate_ids": [IDLI, DOSA],
                 "relevant_dish_ids": [IDLI],
@@ -43,9 +43,7 @@ def evidence() -> dict:
                 "slices": ["veg", "lunch"],
             },
         ],
-        "resilience_cases": [
-            {"aux_state": "timeout", "ghar_safe_deterministic_fallback": True}
-        ],
+        "resilience_cases": [{"aux_state": "timeout", "ghar_safe_deterministic_fallback": True}],
     }
 
 
@@ -115,3 +113,20 @@ def test_mixed_publications_cannot_form_one_comparison():
 
     assert result["gates"]["single_publication"] is False
     assert result["eligible_for_active_evaluation"] is False
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda value: value["dataset"].update(operator_note="not aggregate"),
+        lambda value: value["cases"][0].update(extra_context="private"),
+        lambda value: value["cases"][0].update(slices=["household:private"]),
+        lambda value: value["resilience_cases"][0].update(detail="internal"),
+    ],
+)
+def test_non_allowlisted_fields_and_slice_labels_cannot_reach_the_report(mutation):
+    value = evidence()
+    mutation(value)
+
+    with pytest.raises(ValidationInputError):
+        evaluate(value)

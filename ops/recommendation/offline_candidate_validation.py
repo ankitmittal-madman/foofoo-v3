@@ -20,6 +20,34 @@ UUID = re.compile(
     re.IGNORECASE,
 )
 PUBLICATION = re.compile(r"^sha256:[0-9a-f]{64}$")
+CASE_ID = re.compile(r"^case-[0-9a-f]{32}$")
+ALLOWED_SLICES = {
+    "all",
+    "breakfast",
+    "lunch",
+    "dinner",
+    "snack",
+    "weekday",
+    "weekend",
+    "veg",
+    "non_veg",
+    "egg",
+    "vegan",
+    "jain",
+    "cold_start",
+    "experienced",
+}
+DATASET_KEYS = {"consented_real_outcomes", "household_disjoint", "time_split", "synthetic"}
+CASE_KEYS = {
+    "case_id",
+    "baseline_candidate_ids",
+    "aux_candidate_ids",
+    "relevant_dish_ids",
+    "forbidden_dish_ids",
+    "publication_version",
+    "slices",
+}
+RESILIENCE_KEYS = {"aux_state", "ghar_safe_deterministic_fallback"}
 FORBIDDEN_KEYS = {
     "user_id",
     "profile_id",
@@ -50,7 +78,15 @@ def _ids(case: dict[str, Any], field: str) -> list[str]:
     value = case.get(field)
     if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
         raise ValidationInputError(f"{field} must be a string array")
+    if len(value) > 500:
+        raise ValidationInputError(f"{field} exceeds the 500-item bound")
     return list(dict.fromkeys(value))
+
+
+def _exact_keys(value: Any, expected: set[str], label: str) -> dict[str, Any]:
+    if not isinstance(value, dict) or set(value) != expected:
+        raise ValidationInputError(f"{label} has an unsupported shape")
+    return value
 
 
 def _recall(ranked: list[str], relevant: set[str]) -> float:
@@ -74,8 +110,13 @@ def evaluate(document: dict[str, Any]) -> dict[str, Any]:
     resilience = document.get("resilience_cases")
     if not isinstance(dataset, dict) or not isinstance(cases, list) or not cases:
         raise ValidationInputError("dataset and at least one case are required")
+    dataset = _exact_keys(dataset, DATASET_KEYS, "dataset governance")
+    if len(cases) > 50_000:
+        raise ValidationInputError("holdout exceeds the 50000-case bound")
     if not isinstance(resilience, list) or not resilience:
         raise ValidationInputError("at least one Ghar resilience case is required")
+    if len(resilience) > 100:
+        raise ValidationInputError("resilience evidence exceeds the 100-case bound")
 
     versions: set[str] = set()
     baseline_recall = candidate_recall = 0.0
@@ -84,9 +125,15 @@ def evaluate(document: dict[str, Any]) -> dict[str, Any]:
     baseline_violations = candidate_violations = 0
     slices: dict[str, list[tuple[float, float]]] = defaultdict(list)
 
-    for case in cases:
-        if not isinstance(case, dict) or not isinstance(case.get("case_id"), str):
-            raise ValidationInputError("each case requires an opaque case_id")
+    seen_case_ids: set[str] = set()
+    for raw_case in cases:
+        case = _exact_keys(raw_case, CASE_KEYS, "comparison case")
+        case_id = case.get("case_id")
+        if not isinstance(case_id, str) or not CASE_ID.fullmatch(case_id):
+            raise ValidationInputError("each case requires a non-identifying opaque case_id")
+        if case_id in seen_case_ids:
+            raise ValidationInputError("comparison case_id values must be unique")
+        seen_case_ids.add(case_id)
         baseline = _ids(case, "baseline_candidate_ids")
         candidate = _ids(case, "aux_candidate_ids")
         relevant = set(_ids(case, "relevant_dish_ids"))
@@ -111,17 +158,24 @@ def evaluate(document: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(raw_slices, list) or not raw_slices:
             raise ValidationInputError("each case requires at least one aggregate slice")
         for slice_name in raw_slices:
-            if not isinstance(slice_name, str) or not slice_name.strip():
-                raise ValidationInputError("slice names must be non-empty strings")
+            if not isinstance(slice_name, str) or slice_name not in ALLOWED_SLICES:
+                raise ValidationInputError("slice name is not in the aggregate reporting allowlist")
             slices[slice_name].append((base_case_recall, aux_case_recall))
 
     count = len(cases)
-    safe_fallback = all(
-        isinstance(item, dict)
-        and item.get("aux_state") in {"timeout", "unavailable", "rejected"}
-        and item.get("ghar_safe_deterministic_fallback") is True
-        for item in resilience
-    )
+    safe_fallback = True
+    for raw_item in resilience:
+        item = _exact_keys(raw_item, RESILIENCE_KEYS, "resilience case")
+        safe_fallback = (
+            safe_fallback
+            and item.get("aux_state")
+            in {
+                "timeout",
+                "unavailable",
+                "rejected",
+            }
+            and item.get("ghar_safe_deterministic_fallback") is True
+        )
     governance = {
         "consented_real_outcomes": dataset.get("consented_real_outcomes") is True,
         "household_disjoint": dataset.get("household_disjoint") is True,

@@ -17,6 +17,9 @@ def test_input_workflow_accepts_only_two_successful_single_report_artifacts():
 
     assert text.count('--repo "$GITHUB_REPOSITORY"') >= 3
     assert 'test "$conclusion" = "success"' in text
+    assert 'test "$OFFLINE_RUN_ID" != "$LOAD_RUN_ID"' in text
+    assert 'test "$offline_workflow" = "Aux RE governed offline report"' in text
+    assert 'test "$load_workflow" = "Aux RE deployed load report"' in text
     assert "--name aux-offline-report" in text
     assert "--name aux-load-report" in text
     assert text.count('wc -l)" -eq 1') == 2

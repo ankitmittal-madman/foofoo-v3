@@ -51,6 +51,7 @@ jobs:
           OFFLINE_RUN_ID: ${{ inputs.offline_run_id }}
           LOAD_RUN_ID: ${{ inputs.load_run_id }}
         run: |
+          test "$OFFLINE_RUN_ID" != "$LOAD_RUN_ID"
           for run_id in "$OFFLINE_RUN_ID" "$LOAD_RUN_ID"; do
             case "$run_id" in
               *[!0-9]*|'') echo "source run IDs must be numeric" >&2; exit 1 ;;
@@ -59,6 +60,12 @@ jobs:
               --json conclusion --jq '.conclusion')"
             test "$conclusion" = "success"
           done
+          offline_workflow="$(gh run view "$OFFLINE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json workflowName --jq '.workflowName')"
+          load_workflow="$(gh run view "$LOAD_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json workflowName --jq '.workflowName')"
+          test "$offline_workflow" = "Aux RE governed offline report"
+          test "$load_workflow" = "Aux RE deployed load report"
 
       - name: Download aggregate offline quality report
         env:
