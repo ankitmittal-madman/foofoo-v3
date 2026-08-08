@@ -259,7 +259,8 @@ Production run `31274648925` installed migration 118 and validation 970, then ge
 775 pending proposals and 3,121 immutable evidence links from the 2,003-row manifest. The artifact
 reported `dishes_changed=false`, `serving_changed=false`, `publication_changed=false` and
 `pending_review`. Product approval and a separate reversible application design are still required
-before any candidate can become a dish fact. Aux remained OFF.
+before any candidate can become a dish fact. Governed mode-control run `31274851421` then recorded
+`mode=off` and passed; neither shadow nor active serving is enabled.
 
 ### Phase A stop conditions
 
