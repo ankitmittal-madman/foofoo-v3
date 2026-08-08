@@ -134,6 +134,7 @@ No shadow or active transition was requested or executed.
 | Direct-slot source integrity | Run `31271426471` | Migration 112 live; all 7,222 links identify the exact checked-in source and apply mode, but 7,204 links point to stale `running` imports and only 18 to completed imports; 1,801 proposals therefore fail the run-completion health gate and no decision or serving state changed |
 | Dish-import lifecycle correction | Commit `6fa17e0` | Future imports record their actor and close from `running` to exactly one terminal status on success, failure or interruption; historical run statuses were deliberately not rewritten |
 | Direct-slot row-manifest integrity | Run `31272114382` | Migration 114 live; a 4,806-row direct-course manifest independently matched every one of the 7,222 proposal links by source row, fingerprint, checked-in file identity and proposed slot, so all 1,802 proposals may enter mapping-policy review; this is evidence verification, not approval or application |
+| Direct-slot application boundary | Run `31273351076` | Migration 116 and validation 968 live from commit `314948c`; protected tests and exact production identity passed, while every apply/rollback/Aux-mode step was skipped; the artifact records zero dish, proposal, publication or serving change |
 | 10 | Not yet executed | Requires an explicitly selected synthetic/test household; do not substitute a real user implicitly |
 
 The Aux process reports its internal policy as `mode=shadow`, meaning it is built to return a
@@ -169,10 +170,11 @@ review. It does not accept a proposal, mutate `public.dishes`, republish the cat
 serving. Product must still approve the mapping policy—particularly `Appetizer` to `snacks`—before
 any reversible application workflow is allowed to run.
 
-### Direct-slot application boundary — prepared, not executed
+### Direct-slot application boundary — installed, policy not applied
 
 The repository now contains a count-bound candidate policy and a protected reversible workflow.
-Neither the boundary nor the policy has been installed or applied in production. The exact policy
+Run `31273351076` installed and validated the additive boundary only. It did not approve the policy,
+change a proposal or dish, rebuild a publication, alter serving or touch Aux mode. The exact policy
 identity is `direct-import-course-slot-v1` with SHA-256
 `2dda4d35c8ab9314c89b6e56ab2d637eb9e7ba1fce9d3f113242813bdb01d3db`.
 
