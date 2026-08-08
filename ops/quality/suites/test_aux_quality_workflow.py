@@ -32,3 +32,12 @@ def test_all_operational_lightfm_installs_use_the_compatible_pip_path():
         assert '"pip==25.2"' in text, path
         assert '--no-use-pep517 "lightfm==1.17"' in text, path
         assert '--no-build-isolation "lightfm==1.17"' not in text, path
+
+
+def test_aux_quality_commands_resolve_the_inner_python_package():
+    """The repository's outer directory must not shadow the installed Aux package in CI."""
+    text = WORKFLOW.read_text()
+    assert "PYTHONPATH=aux_re_service python -m pytest aux_re_service/tests -q" in text
+    assert (
+        "PYTHONPATH=aux_re_service python -m aux_re_service.training.quality_gate" in text
+    )

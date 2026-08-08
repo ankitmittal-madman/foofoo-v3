@@ -41,10 +41,10 @@ jobs:
           python -m pip install "joblib>=1.4"
           python -m pip install --no-use-pep517 "lightfm==1.17"
       - name: Run auxiliary tests
-        run: python -m pytest aux_re_service/tests -q
+        run: PYTHONPATH=aux_re_service python -m pytest aux_re_service/tests -q
       - name: Enforce artifact and model quality gates
         run: |
-          python -m aux_re_service.training.quality_gate \
+          PYTHONPATH=aux_re_service python -m aux_re_service.training.quality_gate \
             --training-dir aux_re_service/data/training/v1 \
             --retrieval-dir aux_re_service/data/retrieval/v1 \
             --model-report aux_re_service/data/models/lightfm_v2_report.json \
