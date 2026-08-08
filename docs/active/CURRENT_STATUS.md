@@ -48,14 +48,13 @@ state only; deployment run IDs and rollback instructions live in the active runb
 > values misplaced in the course field, 12 one-pot dishes and two brunch dishes. The audit created
 > no proposal, exposed no raw source text and made no serving change.
 >
-> **Governed direct meal-slot proposals:** migration 109, validation 961, its evidence-preserving
-> rollback and the protected generation workflow are repository-ready. The design binds each
-> proposal to immutable import rows, requires the exact audited candidate count, creates only
-> `pending` records, blocks automatic acceptance and performs no serving or publication write.
-> Twenty-five focused tests, SQL/YAML parsing and an isolated PostgreSQL execution prove exact
-> candidate filtering, idempotency, evidence enforcement, forward-only review state and rollback
-> preservation. This foundation is not yet installed in production and the 1,802 proposals have
-> not yet been generated. Aux remains off.
+> **Governed direct meal-slot proposals:** protected run `31269668506` installed migration 109 and
+> validation 961, then created exactly 1,802 `pending` proposals with 7,222 immutable source-row
+> links: 667 lunch, 566 snacks, 294 dinner and 275 breakfast. The exact-count and idempotency gates,
+> function-only writes, evidence checks and forward-only lifecycle all passed. The aggregate
+> artifact confirms zero identity/raw-text exposure, automatic acceptance, publication change or
+> serving change. No proposal is approved or applied; the other 798 ambiguous/conflicting dishes
+> remain excluded. Aux remains off.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,

@@ -64,11 +64,11 @@ findings are retained under `docs/archive/`.
   extension: 802 active dishes
   have canonical slots, 2,600 do not, 2,596 lack hero roles and 918 contain unrecognized slot
   labels. Run `31267459809` found 1,802 single-direct slot candidates, 797 contextual-review cases
-  and one conflict. Migration 109 and its protected workflow are repository-ready to materialize
-  only the 1,802 direct rows as evidence-linked pending proposals after an exact-count check; run
-  that workflow in production, capture its aggregate artifact and keep the other 798 rows out of
-  automated writes. Then design separate domain review. Hero-role evidence remains a distinct
-  unresolved gap.
+  and one conflict. Run `31269668506` materialized exactly those 1,802 direct rows as pending
+  proposals with 7,222 evidence links and no serving/publication change; the other 798 rows remain
+  excluded. Build a separately authorized review/apply boundary that samples quality, records
+  named review provenance, applies only approved rows to canonical dish truth and supports exact
+  rollback. Hero-role evidence and contextual slot review remain distinct unresolved gaps.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.
