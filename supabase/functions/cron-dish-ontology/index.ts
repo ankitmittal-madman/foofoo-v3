@@ -10,12 +10,32 @@ import {
 } from "../_shared/middleware/index.ts";
 import { researchDish } from "../dish-ontology/research.ts";
 import { promoteExternalEvidence, storeResearchRecordsForSubject } from "../dish-ontology/store.ts";
+import type { ClosedVocabulary } from "../dish-ontology/ai.ts";
 import { generateGroqDishEnrichment } from "../dish-ontology/ai.ts";
 
 const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
   async (_req, ctx) => {
     const db = createServiceRoleClient(ctx.config);
     await db.rpc("reconcile_dish_enrichment_jobs");
+
+    // Deterministic, non-AI safety-field correctness pass (migration 125): runs on every
+    // invocation so newly-ingested dishes get the same is_jain/diet_type/allergen_flags check as
+    // the 2026-08-08 backlog pass, without waiting for a human to notice bad data. Best-effort —
+    // a failure here must not block the AI enrichment work below.
+    let safetyFieldCorrections: Record<string, number> = {};
+    let safetyFieldError: string | null = null;
+    try {
+      const { data: safetyRows, error: safetyError } = await db.rpc(
+        "dish_safety_field_autocorrect",
+      );
+      if (safetyError) throw safetyError;
+      for (const row of safetyRows ?? []) {
+        safetyFieldCorrections[String(row.violation)] = Number(row.rows_corrected ?? 0);
+      }
+    } catch (error) {
+      safetyFieldError = error instanceof Error ? error.message.slice(0, 120) : "unknown_error";
+    }
+
     const workerId = `edge:${ctx.traceId}`;
     const { data: jobs, error } = await db.rpc("claim_dish_enrichment_jobs", {
       p_worker_id: workerId,
@@ -102,7 +122,29 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
       );
       if (aiClaimError) throw aiClaimError;
       aiClaimed = aiJobs?.length ?? 0;
+
       for (const aiJob of aiJobs ?? []) {
+        // Fetched per dish (not once per batch) so migration 127's word-overlap filter can trim
+        // the class_codes list to what's actually relevant to this dish name, cutting prompt token
+        // weight — a live 429 rate limit from Groq on every call since the unfiltered migration 126
+        // vocabulary shipped is the reason this exists (see migration 127's header). Best-effort:
+        // if this fails, enrichment still runs for aliases/taxonomy/regional_affinities, just
+        // without meal_class/cuisine candidates for this dish.
+        let vocabulary: ClosedVocabulary | undefined;
+        try {
+          const { data: vocabRow } = await db.rpc("ai_enrichment_closed_vocabulary", {
+            p_dish_name: String(aiJob.query_text),
+          });
+          if (vocabRow && typeof vocabRow === "object") {
+            const raw = vocabRow as Record<string, unknown>;
+            vocabulary = {
+              classCodes: Array.isArray(raw.class_codes) ? raw.class_codes.map(String) : [],
+              cuisineNames: Array.isArray(raw.cuisine_names) ? raw.cuisine_names.map(String) : [],
+            };
+          }
+        } catch {
+          // Best-effort, per the comment above.
+        }
         // The prompt is ~600 tokens and GPT-OSS may use reasoning tokens. Reserve the full
         // request envelope atomically; settlement replaces it with actual provider usage.
         const reservedTokens = 2_000;
@@ -135,6 +177,9 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
             String(aiJob.query_text),
             ctx.config.groqApiKey,
             ctx.config.groqModel,
+            undefined,
+            undefined,
+            vocabulary,
           );
           aiTokens += generated.usage.totalTokens;
           const stored = await storeResearchRecordsForSubject(ctx, {
@@ -215,6 +260,8 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
         ontologyTerms,
         nutrients,
         providerFailures,
+        safetyFieldCorrections,
+        safetyFieldError,
         ai: {
           claimed: aiClaimed,
           complete: aiComplete,

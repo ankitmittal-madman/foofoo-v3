@@ -153,6 +153,56 @@ Deno.test("Groq parsing accepts structured low-risk ontology fields and records 
   assertEquals(result.record.providerRecordId, "chatcmpl-test");
   assertEquals(result.enrichment.aliases[0].name, "Kanda Poha");
   assertEquals(result.usage.totalTokens, 180);
+  // Fields omitted from the mock payload (meal_class/cuisine) must sanitize to safe defaults
+  // rather than throwing, since sanitizeGroqEnrichment runs on every response including ones
+  // from callers that didn't pass a ClosedVocabulary.
+  assertEquals(result.enrichment.meal_class, []);
+  assertEquals(result.enrichment.cuisine, null);
+});
+
+Deno.test("Groq prompt lists the supplied closed vocabulary and sanitizer lowercases cuisine", async () => {
+  let sentPrompt = "";
+  const fetcher = (_input: string, init?: RequestInit) => {
+    const request = JSON.parse(String(init?.body));
+    sentPrompt = request.messages[1].content;
+    return Promise.resolve(
+      new Response(
+        JSON.stringify({
+          id: "chatcmpl-vocab-test",
+          choices: [{
+            message: {
+              content: JSON.stringify({
+                aliases: [],
+                taxonomy: [],
+                regional_affinities: [],
+                meal_class: [
+                  { class_code: "LD_CHICKEN_HOME_CURRY", slot: "lunch", confidence: 0.82 },
+                  { class_code: "LD_CHICKEN_HOME_CURRY", slot: "lunch", confidence: 0.5 },
+                ],
+                cuisine: { cuisine_name: "KERALA", confidence: 0.77 },
+              }),
+            },
+          }],
+          usage: { prompt_tokens: 900, completion_tokens: 60, total_tokens: 960 },
+        }),
+        { status: 200 },
+      ),
+    );
+  };
+  const result = await generateGroqDishEnrichment(
+    "Kerala Chicken Curry",
+    "test-key",
+    "openai/gpt-oss-120b",
+    fetcher,
+    undefined,
+    { classCodes: ["LD_CHICKEN_HOME_CURRY", "LD_FISH_CURRY_RICE"], cuisineNames: ["kerala", "goan"] },
+  );
+  assertEquals(sentPrompt.includes("LD_CHICKEN_HOME_CURRY"), true);
+  assertEquals(sentPrompt.includes("goan"), true);
+  // Duplicate (class_code, slot) pairs collapse to one entry.
+  assertEquals(result.enrichment.meal_class.length, 1);
+  // cuisine_name is normalized to lowercase so it can be matched against public.cuisines.name.
+  assertEquals(result.enrichment.cuisine?.cuisine_name, "kerala");
 });
 
 Deno.test("Groq adapter exposes provider HTTP failures without leaking response content", async () => {
