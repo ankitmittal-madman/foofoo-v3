@@ -29,6 +29,31 @@ ALLERGEN_FLAG_NAMES = {
     128: "fish",
     256: "mustard",
 }
+SPICE_LEVELS = {
+    "low": 1,
+    "low_spice": 1,
+    "spice_low": 1,
+    "spice_level_low": 1,
+    "mild": 2,
+    "mild_spice": 2,
+    "spice_mild": 2,
+    "spice_level_mild": 2,
+    "mild_to_medium": 2,
+    "medium": 3,
+    "medium_spice": 3,
+    "medium_spicy": 3,
+    "moderate": 3,
+    "moderate_spice": 3,
+    "spice_medium": 3,
+    "spice_level_medium": 3,
+    "medium_high": 4,
+    "medium_high_spice": 4,
+    "medium_to_high": 4,
+    "medium_to_hot": 4,
+    "spice_level_medium_high": 4,
+    "high": 5,
+    "spice_high": 5,
+}
 
 
 def _list(value: Any) -> list[Any]:
@@ -49,6 +74,23 @@ def _bounded_score(value: Any, default: float) -> float:
         return max(0.0, min(1.0, float(value)))
     except (TypeError, ValueError):
         return default
+
+
+def _spice_level(value: Any) -> int | None:
+    if value in (None, ""):
+        return None
+    if isinstance(value, bool):
+        raise ValueError("boolean spice level is invalid")
+    if isinstance(value, (int, float)) or str(value).strip().isdigit():
+        level = int(value)
+        if 1 <= level <= 5:
+            return level
+        raise ValueError("numeric spice level must be between 1 and 5")
+    normalized = re.sub(r"[^a-z0-9]+", "_", str(value).strip().lower()).strip("_")
+    try:
+        return SPICE_LEVELS[normalized]
+    except KeyError as exc:
+        raise ValueError(f"unsupported spice level label: {normalized}") from exc
 
 
 def publication_candidate(row: Mapping[str, Any], publication_version: str) -> dict[str, Any]:
@@ -100,7 +142,7 @@ def publication_candidate(row: Mapping[str, Any], publication_version: str) -> d
         "meal_classes": list(dict.fromkeys(meal_classes)),
         "dish_categories": [str(value) for value in _list(taxonomy.get("dish_category"))],
         "spice_profiles": [str(value) for value in _list(taxonomy.get("primary_taste"))],
-        "spice_level": taxonomy.get("spice_level"),
+        "spice_level": _spice_level(taxonomy.get("spice_level")),
         "nutrition_traits": [str(value) for value in _list(taxonomy.get("nutrition_trait"))],
         "seasons": [str(value) for value in _list(taxonomy.get("weather_affinity"))],
         "occasions": [str(value) for value in _list(taxonomy.get("occasion"))],

@@ -4,11 +4,13 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
 from aux_re_service.evaluation import ranking_metrics
 from aux_re_service.training.data_pipeline import canonical_id, normalize_name
 from aux_re_service.training.graph_export import export
 from aux_re_service.training.quality_gate import evaluate
 from aux_re_service.training.retrieval_pipeline import (
+    _spice_level,
     build,
     iter_publication_points,
     publication_candidate,
@@ -165,6 +167,35 @@ def test_publication_projection_preserves_canonical_identity_and_safety():
     assert candidate["allergens"] == ["sesame", "soy"]
     assert candidate["regions"] == ["Maharashtra", "west"]
     assert candidate["meal_classes"] == ["BF_POHA_UPMA"]
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (1, 1),
+        ("2", 2),
+        ("low_spice", 1),
+        ("spice_level_low", 1),
+        ("mild", 2),
+        ("mild_to_medium", 2),
+        ("medium_spicy", 3),
+        ("moderate_spice", 3),
+        ("spice_level_medium", 3),
+        ("medium_high_spice", 4),
+        ("medium_to_hot", 4),
+        ("high", 5),
+        ("spice_high", 5),
+        (None, None),
+    ],
+)
+def test_publication_spice_levels_have_one_explicit_numeric_contract(raw, expected):
+    assert _spice_level(raw) == expected
+
+
+@pytest.mark.parametrize("raw", [True, 0, 6, "unknown-hotness"])
+def test_publication_spice_levels_reject_ambiguous_or_out_of_range_values(raw):
+    with pytest.raises(ValueError):
+        _spice_level(raw)
 
 
 def test_publication_points_are_verified_and_streamed(tmp_path):
