@@ -41,6 +41,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install the Aux publication uploader
+        run: python -m pip install ./aux_re_service
+
       - name: Validate immutable publication source run
         env:
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}

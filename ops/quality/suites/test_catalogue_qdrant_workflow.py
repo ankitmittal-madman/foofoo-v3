@@ -7,6 +7,7 @@ def test_qdrant_upload_accepts_only_the_governed_publication_workflow():
     text = WORKFLOW.read_text()
 
     assert "environment: production" in text
+    assert "python -m pip install ./aux_re_service" in text
     assert 'test "$workflow_name" = "Recommendation catalogue publication"' in text
     assert 'test "$conclusion" = "success"' in text
     assert "--name recommendation-catalogue-publication" in text
