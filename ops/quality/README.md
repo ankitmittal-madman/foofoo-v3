@@ -102,6 +102,23 @@ The JSON report contains only endpoint origin, status counts and aggregate timin
 the secret or request payload. A gated run exits non-zero when any supplied target fails; an
 ungated run records `passed: null` so a measurement cannot be mistaken for launch approval.
 
+## Aux promotion and kill-switch decision
+
+`ops/recommendation/rollout_decision.py` consumes four privacy-minimized inputs: a passing governed
+offline report, a passing gated Aux load report, rows from `re_engine.aux_shadow_health`, and zero
+hard-guardrail counters. Its evidence document must also contain the full publication hash and all
+product-ratified volume, availability, timeout, comparability, coverage and latency targets.
+
+```bash
+python3 ops/recommendation/rollout_decision.py /path/to/rollout-evidence.json \
+  --output /path/to/rollout-decision.json
+```
+
+Exit code `0` means shadow is eligible for a controlled canary (or Aux is already safely off), `1`
+means remain in shadow / continue collecting evidence, and `2` means an active canary breached an
+operational or hard guardrail and automation must set `AUX_RE_MODE=off`. The evaluator does not
+mutate deployment state; separation keeps evidence production and configuration authority audited.
+
 ## Honesty rules baked into the verdict
 
 - No fabrication: every number comes from a real pytest/JUnit run or a real probe.
