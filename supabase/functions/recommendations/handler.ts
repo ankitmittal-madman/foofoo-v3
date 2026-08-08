@@ -44,10 +44,8 @@ import { callRecommendationEngine, type ReResult } from "./re-client.ts";
 import { buildFallbackResponse } from "./fallback.ts";
 import { recordRecommendationEvent } from "./events.ts";
 import { maybeLogSummary, recordRequest } from "./metrics.ts";
-import {
-  deriveGovernedContextSignals,
-  mergeGovernedContextSignals,
-} from "./governed-context.ts";
+import { deriveGovernedContextSignals, mergeGovernedContextSignals } from "./governed-context.ts";
+import { buildAuxiliaryRequest, callAuxiliaryEngine } from "./aux-client.ts";
 
 const SERVICE_NAME = "recommendations";
 
@@ -83,6 +81,7 @@ export interface RecommendationDeps {
   loadLatestContextFn?: typeof loadLatestContext;
   /** Governed date-to-festival mapping, injectable for deterministic tests. */
   loadFestivalContextFn?: typeof loadFestivalContext;
+  callAux?: typeof callAuxiliaryEngine;
 }
 
 function plateCount(body: Record<string, unknown>): number {
@@ -102,6 +101,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
   const buildExcludeDishIdsFn = deps.buildExcludeDishIdsFn ?? buildExcludeDishIds;
   const loadLatestContextFn = deps.loadLatestContextFn ?? loadLatestContext;
   const loadFestivalContextFn = deps.loadFestivalContextFn ?? loadFestivalContext;
+  const callAux = deps.callAux ?? callAuxiliaryEngine;
   const authorizeHousehold = deps.authorizeHousehold;
 
   return async (req, ctx) => {
@@ -221,8 +221,28 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
     (payload.context as Record<string, unknown>).temporal_class_state = online.temporalClassState;
     (payload.context as Record<string, unknown>).temporal_attribute_state =
       online.temporalAttributeState;
-    (payload.context as Record<string, unknown>).governed_context_signals =
-      governedContextSignals;
+    (payload.context as Record<string, unknown>).governed_context_signals = governedContextSignals;
+
+    // Optional shadow retrieval narrows the scalable publication before Ghar math. Failure is
+    // deliberately fail-open to the unchanged immutable bundle; Aux never becomes final safety.
+    const aux = await callAux(
+      buildAuxiliaryRequest(payload, claims.userId, hid),
+      requestId,
+      ctx.config,
+      log,
+    );
+    if (aux.ok) {
+      if (ctx.config.auxReMode === "active") payload.candidate_dish_ids = aux.candidateIds;
+      log.info("aux_re.candidates_retrieved", {
+        candidate_count: aux.candidateIds.length,
+        publication_version: aux.publicationVersion,
+        latency_ms: aux.latencyMs,
+        mode: ctx.config.auxReMode,
+        applied_to_ghar: ctx.config.auxReMode === "active",
+      });
+    } else if (aux.reason !== "disabled") {
+      log.warn("aux_re.shadow_unavailable", { reason: aux.reason, latency_ms: aux.latencyMs });
+    }
 
     // §0.2: persist the RESOLVED context (same object buildRequest just sent) into
     // household_context, so the household's NEXT call finds real history via loadLatestContext
@@ -290,6 +310,7 @@ export function makeRecommendationsHandler(deps: RecommendationDeps = {}): Handl
             ? result.body.config_version
             : undefined,
           decisionTrace: result.body.decision_trace,
+          catalogueSelection: result.body.catalogue_selection,
           governedContextSignals: derivedGovernedContextSignals,
         });
         recordRequest(outcome);

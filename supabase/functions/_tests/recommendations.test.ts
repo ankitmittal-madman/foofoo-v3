@@ -317,10 +317,11 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
     }]);
     const governed = sentContext.governed_context_signals as Array<Record<string, unknown>>;
     assertEquals(governed.length, 3);
-    assertEquals(governed.find((row) => row.feature_code === "health_objective")?.value,
-      "awesome_taste");
-    assertEquals(governed.find((row) => row.feature_code === "weekday_time_pressure")?.value,
-      0.2);
+    assertEquals(
+      governed.find((row) => row.feature_code === "health_objective")?.value,
+      "awesome_taste",
+    );
+    assertEquals(governed.find((row) => row.feature_code === "weekday_time_pressure")?.value, 0.2);
     assertEquals(
       governed.find((row) => row.feature_code === "weekday_time_pressure")?.correction_state,
       "confirmed",
@@ -329,6 +330,76 @@ Deno.test("POST /v1/recommendations forwards adaptive state and refresh controls
     assertEquals(sentContext.novelty_budget, 0.42);
     assertEquals(sentContext.richness_debt, 0.35);
     assertEquals(sentContext.refresh_generation, 3);
+  });
+});
+
+Deno.test("POST /v1/recommendations passes only bounded Aux canonical IDs into Ghar", async () => {
+  await withEnv({
+    ...REQUIRED_ENV,
+    AUX_RE_MODE: "active",
+    AUX_RE_SERVICE_URL: "http://aux.local",
+    AUX_RE_SERVICE_SECRET: "test-secret",
+  }, async () => {
+    resetConfigCacheForTests();
+    const candidateId = "11111111-1111-4111-8111-111111111111";
+    let auxPayload: Record<string, unknown> | undefined;
+    let gharPayload: Record<string, unknown> | undefined;
+    const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      callAux: (payload) => {
+        auxPayload = payload;
+        return Promise.resolve({
+          ok: true,
+          candidateIds: [candidateId],
+          publicationVersion: `sha256:${"a".repeat(64)}`,
+          latencyMs: 12,
+        });
+      },
+      callRe: (payload, requestId) => {
+        gharPayload = payload;
+        return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
+      },
+    };
+
+    const response = await pipeline(deps)(post());
+
+    assertEquals(response.status, 200);
+    assertEquals(auxPayload?.candidates, []);
+    assertEquals(gharPayload?.candidate_dish_ids, [candidateId]);
+  });
+});
+
+Deno.test("POST /v1/recommendations shadow mode observes Aux without changing Ghar", async () => {
+  await withEnv({
+    ...REQUIRED_ENV,
+    AUX_RE_MODE: "shadow",
+    AUX_RE_SERVICE_URL: "http://aux.local",
+    AUX_RE_SERVICE_SECRET: "test-secret",
+  }, async () => {
+    let gharPayload: Record<string, unknown> | undefined;
+    const deps: RecommendationDeps = {
+      loadHousehold: loadTestHousehold,
+      recordEvent: () => Promise.resolve(),
+      recordContext: () => Promise.resolve(),
+      callAux: () =>
+        Promise.resolve({
+          ok: true,
+          candidateIds: ["11111111-1111-4111-8111-111111111111"],
+          publicationVersion: `sha256:${"a".repeat(64)}`,
+          latencyMs: 12,
+        }),
+      callRe: (payload, requestId) => {
+        gharPayload = payload;
+        return Promise.resolve({ ok: true, status: 200, body: fakeReResponse(requestId) });
+      },
+    };
+
+    const response = await pipeline(deps)(post());
+
+    assertEquals(response.status, 200);
+    assertEquals("candidate_dish_ids" in (gharPayload ?? {}), false);
   });
 });
 

@@ -45,9 +45,10 @@ import { callRecommendationEngine } from "../recommendations/re-client.ts";
 import { loadOnlineRecommendationState } from "../recommendations/personalization.ts";
 import {
   deriveGovernedContextSignals,
-  mergeGovernedContextSignals,
   type GovernedContextSignal,
+  mergeGovernedContextSignals,
 } from "../recommendations/governed-context.ts";
+import { buildAuxiliaryRequest, callAuxiliaryEngine } from "../recommendations/aux-client.ts";
 import { addDishToDate, loadSavedWeek, saveWeek, setSlotLock } from "./state.ts";
 import { recordProductEvent } from "../_shared/analytics/product-events.ts";
 import { loadWeatherContext } from "../_shared/services/weather.ts";
@@ -67,6 +68,12 @@ function plannedDayType(value: unknown): "weekday" | "weekend" | undefined {
 
 export interface PlanDeps {
   authorizeHousehold?: HouseholdRoleLookup;
+  callAux?: typeof callAuxiliaryEngine;
+  loadHousehold?: typeof loadHouseholdRaw;
+  loadOnlineState?: typeof loadOnlineRecommendationState;
+  loadWeather?: typeof loadWeatherContext;
+  loadFestival?: typeof loadFestivalContext;
+  callRe?: typeof callRecommendationEngine;
 }
 
 // surface -> { RE path, whether it needs the composed household }
@@ -83,6 +90,12 @@ const SURFACES: Record<string, { path: string; needsHousehold: boolean }> = {
 
 /** Build the POST /v1/plan handler. */
 export function makePlanHandler(deps: PlanDeps = {}): Handler {
+  const callAux = deps.callAux ?? callAuxiliaryEngine;
+  const loadHousehold = deps.loadHousehold ?? loadHouseholdRaw;
+  const loadOnlineState = deps.loadOnlineState ?? loadOnlineRecommendationState;
+  const loadWeather = deps.loadWeather ?? loadWeatherContext;
+  const loadFestival = deps.loadFestival ?? loadFestivalContext;
+  const callRe = deps.callRe ?? callRecommendationEngine;
   return async (req, ctx) => {
     if (req.method !== "POST") {
       throw new AppError(ERROR_CATALOGUE.METHOD_NOT_ALLOWED);
@@ -232,7 +245,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
         HOUSEHOLD_READ_ROLES,
         deps.authorizeHousehold,
       );
-      const { household, stubbed } = await loadHouseholdRaw(ctx, householdIdForProfile);
+      const { household, stubbed } = await loadHousehold(ctx, householdIdForProfile);
       return jsonContract({ kind: "profile", household, stubbed }, ctx.traceId, 200);
     }
 
@@ -287,7 +300,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
     let governedContextSignals: GovernedContextSignal[] = [];
     let derivedGovernedContextSignals: GovernedContextSignal[] = [];
     if (spec.needsHousehold) {
-      const { household, householdId: hid, stubbed } = await loadHouseholdRaw(ctx, householdId);
+      const { household, householdId: hid, stubbed } = await loadHousehold(ctx, householdId);
       payload.household = household;
       // Cold-start exploration seed (ghar_re_core.meal_planner.cold_start_top15): a stable
       // per-household RNG seed so two households that land on an identical theta (same cohort
@@ -297,13 +310,13 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       derivedGovernedContextSignals = deriveGovernedContextSignals(household);
       resolvedHouseholdId = hid;
       stubbedHousehold = stubbed;
-      const online = await loadOnlineRecommendationState(ctx, hid);
+      const online = await loadOnlineState(ctx, hid);
       governedContextSignals = mergeGovernedContextSignals(
         derivedGovernedContextSignals,
         online.governedContextSignals,
       );
-      const weather = await loadWeatherContext(ctx, household.q4_current_city);
-      const festival = await loadFestivalContext(
+      const weather = await loadWeather(ctx, household.q4_current_city);
+      const festival = await loadFestival(
         ctx,
         typeof body.date === "string" ? body.date : undefined,
       );
@@ -364,8 +377,36 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
       log.info("plan.composed", { household_id: hid, stubbed });
     }
 
+    // Meal episodes are the user-visible dish-composition surface covered by the bounded Ghar
+    // contract. Aux runs only as optional shadow retrieval; all errors preserve bundle serving.
+    if (surface === "meal_episodes" && resolvedHouseholdId) {
+      const aux = await callAux(
+        buildAuxiliaryRequest(payload, claims.userId, resolvedHouseholdId),
+        requestId,
+        ctx.config,
+        log,
+      );
+      if (aux.ok) {
+        if (ctx.config.auxReMode === "active") payload.candidate_dish_ids = aux.candidateIds;
+        log.info("aux_re.candidates_retrieved", {
+          candidate_count: aux.candidateIds.length,
+          publication_version: aux.publicationVersion,
+          latency_ms: aux.latencyMs,
+          surface,
+          mode: ctx.config.auxReMode,
+          applied_to_ghar: ctx.config.auxReMode === "active",
+        });
+      } else if (aux.reason !== "disabled") {
+        log.warn("aux_re.shadow_unavailable", {
+          reason: aux.reason,
+          latency_ms: aux.latencyMs,
+          surface,
+        });
+      }
+    }
+
     const reStart = performance.now();
-    const result = await callRecommendationEngine(payload, requestId, ctx.config, log, {
+    const result = await callRe(payload, requestId, ctx.config, log, {
       path: spec.path,
     });
     const latencyMs = Math.round(performance.now() - reStart);
@@ -419,6 +460,13 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
           configVersion: String(episodeBody.config_version ?? "unknown"),
           catalogVersion: typeof episodeBody.catalog_version === "string"
             ? episodeBody.catalog_version
+            : episodeBody.catalogue_selection &&
+                typeof episodeBody.catalogue_selection === "object" &&
+                typeof (episodeBody.catalogue_selection as Record<string, unknown>)
+                    .publication_version === "string"
+            ? String(
+              (episodeBody.catalogue_selection as Record<string, unknown>).publication_version,
+            )
             : null,
           policyCode: String(episodeBody.policy_code ?? "episode_success_rule_v1"),
           latencyMs,
@@ -505,6 +553,7 @@ export function makePlanHandler(deps: PlanDeps = {}): Handler {
             ? body.model_version
             : undefined,
           configVersion: typeof body.config_version === "string" ? body.config_version : undefined,
+          catalogueSelection: body.catalogue_selection,
           governedContextSignals: derivedGovernedContextSignals,
         });
         await recordProductEvent(ctx, {

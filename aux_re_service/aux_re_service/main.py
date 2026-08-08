@@ -2,17 +2,38 @@
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 
-from . import __version__
+from . import __version__, auth
 from .config import Settings
 from .feedback import FeedbackStoreError, LocalFeedbackStore
 from .observability import metrics, record_feedback
 from .schemas import FeedbackEvent, FeedbackReceipt, RecommendationRequest, RecommendationResponse
 from .service import run
+
+
+async def require_service_signature(request: Request) -> None:
+    """Verify the exact cached request body before endpoint recommendation work begins."""
+    try:
+        settings = Settings.from_env()
+    except ValueError as exc:
+        raise HTTPException(status_code=503, detail="invalid_configuration") from exc
+    if not settings.service_secret:
+        raise HTTPException(status_code=503, detail="service_auth_not_configured")
+    try:
+        auth.verify(
+            await request.body(),
+            request.headers.get(auth.SIGNATURE_HEADER),
+            settings.service_secret,
+            time.time(),
+        )
+    except auth.AuthError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+
 
 app = FastAPI(title="FooFoo Auxiliary Recommender", version=__version__)
 
@@ -59,12 +80,20 @@ def prometheus_metrics() -> str:
     return "\n".join(lines) + "\n"
 
 
-@app.post("/v1/recommendations", response_model=RecommendationResponse)
+@app.post(
+    "/v1/recommendations",
+    response_model=RecommendationResponse,
+    dependencies=[Depends(require_service_signature)],
+)
 def recommendations(payload: RecommendationRequest) -> RecommendationResponse:
     return run(payload)
 
 
-@app.post("/v1/feedback", response_model=FeedbackReceipt)
+@app.post(
+    "/v1/feedback",
+    response_model=FeedbackReceipt,
+    dependencies=[Depends(require_service_signature)],
+)
 def feedback(payload: FeedbackEvent) -> FeedbackReceipt:
     settings = Settings.from_env()
     if not settings.feedback_enabled:

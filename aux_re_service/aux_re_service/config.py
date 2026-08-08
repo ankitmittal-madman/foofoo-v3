@@ -46,6 +46,7 @@ class Settings:
     candidate_pool_path: str | None
     model_artifact_dir: str | None
     catalogue_publication_version: str | None = None
+    service_secret: str | None = None
     knowledge_graph_path: str | None = None
     retrieval_timeout_seconds: float = 1.5
     qdrant_enabled: bool = True
@@ -84,6 +85,7 @@ class Settings:
             catalogue_publication_version=(
                 os.getenv("AUX_REC_CATALOGUE_PUBLICATION_VERSION") or None
             ),
+            service_secret=os.getenv("AUX_REC_SERVICE_SECRET") or None,
             candidate_pool_path=os.getenv("AUX_REC_CANDIDATE_POOL_PATH") or None,
             model_artifact_dir=os.getenv("AUX_REC_MODEL_ARTIFACT_DIR") or None,
             knowledge_graph_path=os.getenv("AUX_REC_KNOWLEDGE_GRAPH_PATH") or None,
@@ -107,6 +109,8 @@ class Settings:
         )
         if settings.feedback_enabled and not settings.feedback_path:
             raise ValueError("AUX_REC_FEEDBACK_PATH is required when feedback is enabled")
+        if settings.enabled and not settings.service_secret:
+            raise ValueError("AUX_REC_SERVICE_SECRET is required when Aux is enabled")
         if re.fullmatch(r"[A-Za-z0-9_-]+", settings.qdrant_collection) is None:
             raise ValueError("AUX_REC_QDRANT_COLLECTION contains unsupported characters")
         if settings.catalogue_publication_version:

@@ -115,6 +115,7 @@ def _published_row(dish_id: str) -> dict:
         "acceptance_rate_30d": 0.8,
         "ontology_confidence": 0.9,
         "meal_slots": ["breakfast"],
+        "meal_classes": [{"class_code": "BF_POHA_UPMA", "slot": "breakfast"}],
         "cuisine": {
             "name": "Maharashtrian",
             "group": "west",
@@ -163,6 +164,7 @@ def test_publication_projection_preserves_canonical_identity_and_safety():
     assert candidate["diet_types"] == ["vegetarian", "jain"]
     assert candidate["allergens"] == ["sesame", "soy"]
     assert candidate["regions"] == ["Maharashtra", "west"]
+    assert candidate["meal_classes"] == ["BF_POHA_UPMA"]
 
 
 def test_publication_points_are_verified_and_streamed(tmp_path):

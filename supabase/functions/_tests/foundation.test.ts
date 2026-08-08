@@ -82,6 +82,28 @@ Deno.test("AI configuration clamps operator values to governed bounds", () => {
   });
 });
 
+Deno.test("Aux orchestration is off by default and enabled modes require credentials", () => {
+  withEnv(REQUIRED_ENV, () => {
+    resetConfigCacheForTests();
+    assertEquals(loadConfig().auxReMode, "off");
+  });
+  withEnv({
+    ...REQUIRED_ENV,
+    AUX_RE_MODE: "shadow",
+    AUX_RE_SERVICE_URL: "http://aux.local",
+    AUX_RE_SERVICE_SECRET: "test-secret",
+  }, () => {
+    resetConfigCacheForTests();
+    const cfg = loadConfig();
+    assertEquals(cfg.auxReMode, "shadow");
+    assertEquals(cfg.auxReServiceUrl, "http://aux.local");
+  });
+  withEnv({ ...REQUIRED_ENV, AUX_RE_MODE: "active" }, () => {
+    resetConfigCacheForTests();
+    assertThrows(() => loadConfig(), Error, "AUX_RE_SERVICE_URL");
+  });
+});
+
 Deno.test("config fails fast on missing required secret", () => {
   withEnv({ SUPABASE_URL: "x", SUPABASE_ANON_KEY: "y" }, () => {
     resetConfigCacheForTests();

@@ -53,6 +53,9 @@ export const ENV_VARS = {
   // MUST be set in staging/production (enforced in config.ts).
   GHAR_RE_SERVICE_URL: { key: "GHAR_RE_SERVICE_URL", required: false, secret: false },
   GHAR_RE_SERVICE_SECRET: { key: "GHAR_RE_SERVICE_SECRET", required: false, secret: true },
+  AUX_RE_SERVICE_URL: { key: "AUX_RE_SERVICE_URL", required: false, secret: false },
+  AUX_RE_SERVICE_SECRET: { key: "AUX_RE_SERVICE_SECRET", required: false, secret: true },
+  AUX_RE_MODE: { key: "AUX_RE_MODE", required: false, secret: false },
   FOOD_ONTOLOGY_SERVICE_URL: {
     key: "FOOD_ONTOLOGY_SERVICE_URL",
     required: false,

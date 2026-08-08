@@ -39,6 +39,25 @@ def _preference_fit(candidate: Candidate, request: RecommendationRequest) -> flo
     return 0.75 * (sum(fits) / len(fits)) + 0.25 * min(fits)
 
 
+def _meal_class_fit(candidate: Candidate, request: RecommendationRequest) -> float:
+    """Give explicit class actions more authority than dish-projected class evidence."""
+    if not candidate.meal_classes:
+        return 0.5
+    has_sourced_state = bool(
+        request.preference_by_direct_class or request.preference_by_projected_class
+    )
+    scores = []
+    for class_code in candidate.meal_classes:
+        if has_sourced_state:
+            score = 0.75 * request.preference_by_direct_class.get(
+                class_code, 0.0
+            ) + 0.25 * request.preference_by_projected_class.get(class_code, 0.0)
+        else:
+            score = request.preference_by_class.get(class_code, 0.0)
+        scores.append(max(-1.0, min(1.0, score)))
+    return 0.5 + 0.5 * max(scores)
+
+
 def _governed_context_adjustment(
     candidate: Candidate, request: RecommendationRequest
 ) -> tuple[float, list[str]]:
@@ -74,11 +93,7 @@ def _governed_context_adjustment(
             if candidate.cook_minutes is not None:
                 minutes = candidate.cook_minutes
                 effort_fit = (
-                    1.0
-                    if minutes <= 35
-                    else -1.0
-                    if minutes >= 60
-                    else 1 - 2 * (minutes - 35) / 25
+                    1.0 if minutes <= 35 else -1.0 if minutes >= 60 else 1 - 2 * (minutes - 35) / 25
                 )
                 confidence = (
                     signal.confidence
@@ -140,6 +155,7 @@ def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str,
     context_adjustment, _ = _governed_context_adjustment(candidate, request)
     return {
         "household_fit": preference_fit,
+        "meal_class_fit": _meal_class_fit(candidate, request),
         "regional_fit": regional_fit,
         "freshness": candidate.freshness,
         "novelty": novelty,
@@ -157,7 +173,8 @@ def _features(candidate: Candidate, request: RecommendationRequest) -> dict[str,
 
 
 WEIGHTS = {
-    "household_fit": 0.16,
+    "household_fit": 0.12,
+    "meal_class_fit": 0.04,
     "regional_fit": 0.10,
     "freshness": 0.07,
     "novelty": 0.09,

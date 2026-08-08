@@ -53,6 +53,8 @@ export interface RecommendationEventInput {
    * include_decision_trace=true on the outgoing request (WP-12). Absent on fallback/error paths,
    * since there was no RE decision to trace. */
   decisionTrace?: unknown;
+  /** Count-only serving source/version returned by Ghar after independent candidate hydration. */
+  catalogueSelection?: unknown;
   /** Authority-labelled request context used for this serving decision. */
   governedContextSignals?: GovernedContextSignal[];
 }
@@ -102,6 +104,7 @@ export async function recordRecommendationEvent(
         engine_version: ev.engineVersion ?? null,
         config_version: ev.configVersion ?? null,
         decision_trace: ev.decisionTrace ?? null,
+        catalogue_selection: ev.catalogueSelection ?? null,
         data_source: "real",
       }).select("id").single(),
       "recommendations.events.record",

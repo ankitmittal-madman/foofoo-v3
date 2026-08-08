@@ -82,6 +82,11 @@ def publication_candidate(row: Mapping[str, Any], publication_version: str) -> d
         for value in _list(row.get("regional_affinities"))
         if isinstance(value, Mapping) and value.get("region_code")
     )
+    meal_classes = [
+        str(value["class_code"])
+        for value in _list(row.get("meal_classes"))
+        if isinstance(value, Mapping) and value.get("class_code")
+    ]
     candidate = {
         "id": str(row["id"]),
         "name": str(row["name"]),
@@ -91,6 +96,7 @@ def publication_candidate(row: Mapping[str, Any], publication_version: str) -> d
         "cuisines": list(dict.fromkeys(cuisine_values)),
         "regions": list(dict.fromkeys(region_values)),
         "meal_slots": [str(value) for value in _list(row.get("meal_slots"))],
+        "meal_classes": list(dict.fromkeys(meal_classes)),
         "dish_categories": [str(value) for value in _list(taxonomy.get("dish_category"))],
         "spice_profiles": [str(value) for value in _list(taxonomy.get("primary_taste"))],
         "spice_level": taxonomy.get("spice_level"),
@@ -159,6 +165,7 @@ def iter_publication_points(
                     "cuisines",
                     "regions",
                     "meal_slots",
+                    "meal_classes",
                     "diet_types",
                     "dish_categories",
                     "spice_profiles",

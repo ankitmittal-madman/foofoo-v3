@@ -11,6 +11,7 @@ def test_safe_environment_defaults(monkeypatch):
         "AUX_REC_MODE",
         "AUX_REC_ALLOW_OVERRIDE",
         "AUX_REC_QDRANT_URL",
+        "AUX_REC_SERVICE_SECRET",
     ):
         monkeypatch.delenv(name, raising=False)
     config = Settings.from_env()
@@ -22,6 +23,7 @@ def test_safe_environment_defaults(monkeypatch):
 
 def test_environment_can_enable_shadow_compare_and_active(monkeypatch):
     monkeypatch.setenv("AUX_REC_ENABLED", "true")
+    monkeypatch.setenv("AUX_REC_SERVICE_SECRET", "test-shared-secret")
     for mode in Mode:
         monkeypatch.setenv("AUX_REC_MODE", mode.value)
         assert Settings.from_env().mode is mode

@@ -9,6 +9,7 @@ import { ENV_VARS } from "./env.ts";
 
 export type Environment = "local" | "staging" | "production";
 export type FoodOntologyReadMode = "legacy" | "shadow" | "service";
+export type AuxReMode = "off" | "shadow" | "active";
 
 export interface AppConfig {
   readonly environment: Environment;
@@ -22,6 +23,9 @@ export interface AppConfig {
   readonly gharReServiceUrl: string;
   /** Shared HMAC secret for the service-to-service call (RE-DOC-10 §9). */
   readonly gharReServiceSecret: string;
+  readonly auxReServiceUrl: string | null;
+  readonly auxReServiceSecret: string | null;
+  readonly auxReMode: AuxReMode;
   readonly foodOntologyServiceUrl: string | null;
   readonly foodOntologyServiceToken: string | null;
   readonly foodOntologyReadMode: FoodOntologyReadMode;
@@ -100,6 +104,18 @@ export function loadConfig(): AppConfig {
       "[config] GHAR_RE_SERVICE_URL and GHAR_RE_SERVICE_SECRET are required in production.",
     );
   }
+  const auxReServiceUrl = read(ENV_VARS.AUX_RE_SERVICE_URL);
+  const auxReServiceSecret = read(ENV_VARS.AUX_RE_SERVICE_SECRET);
+  const auxReModeRaw = (read(ENV_VARS.AUX_RE_MODE) ?? "off").toLowerCase();
+  if (!(["off", "shadow", "active"] as string[]).includes(auxReModeRaw)) {
+    throw new Error("[config] AUX_RE_MODE must be off, shadow, or active.");
+  }
+  const auxReMode = auxReModeRaw as AuxReMode;
+  if (auxReMode !== "off" && (!auxReServiceUrl || !auxReServiceSecret)) {
+    throw new Error(
+      "[config] AUX_RE_SERVICE_URL and AUX_RE_SERVICE_SECRET are required when AUX_RE_MODE is shadow or active.",
+    );
+  }
 
   const ontologyModeRaw = (read(ENV_VARS.FOOD_ONTOLOGY_READ_MODE) ?? "legacy").toLowerCase();
   if (!["legacy", "shadow", "service"].includes(ontologyModeRaw)) {
@@ -134,6 +150,9 @@ export function loadConfig(): AppConfig {
     isProduction,
     gharReServiceUrl: gharReServiceUrl ?? GHAR_RE_DEV_URL,
     gharReServiceSecret: gharReServiceSecret ?? GHAR_RE_DEV_SECRET,
+    auxReServiceUrl,
+    auxReServiceSecret,
+    auxReMode,
     foodOntologyServiceUrl,
     foodOntologyServiceToken,
     foodOntologyReadMode,

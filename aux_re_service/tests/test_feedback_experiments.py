@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from dataclasses import replace
 
 from aux_re_service.config import Mode, Settings
@@ -11,6 +12,8 @@ from aux_re_service.schemas import FeedbackEvent, RecommendationRequest
 from aux_re_service.service import run
 from aux_re_service.training.feedback_pipeline import normalize
 from fastapi.testclient import TestClient
+
+from aux_re_service import auth
 
 
 def feedback_payload(**overrides):
@@ -80,16 +83,33 @@ def test_feedback_store_is_idempotent(tmp_path):
 
 
 def test_feedback_http_is_disabled_by_default_and_writes_when_enabled(monkeypatch, tmp_path):
+    secret = "test-shared-secret"
+    monkeypatch.setenv("AUX_REC_SERVICE_SECRET", secret)
+    raw_body = json.dumps(feedback_payload(), separators=(",", ":")).encode()
+
+    def post(client):
+        timestamp = int(time.time())
+        return client.post(
+            "/v1/feedback",
+            content=raw_body,
+            headers={
+                "content-type": "application/json",
+                auth.SIGNATURE_HEADER: (
+                    f"t={timestamp},v1={auth.signature(secret, timestamp, raw_body)}"
+                ),
+            },
+        )
+
     monkeypatch.setenv("AUX_REC_FEEDBACK_ENABLED", "false")
     with TestClient(app) as client:
-        assert client.post("/v1/feedback", json=feedback_payload()).status_code == 503
+        assert post(client).status_code == 503
 
     path = (tmp_path / "feedback.jsonl").resolve()
     monkeypatch.setenv("AUX_REC_FEEDBACK_ENABLED", "true")
     monkeypatch.setenv("AUX_REC_FEEDBACK_PATH", str(path))
     with TestClient(app) as client:
-        first = client.post("/v1/feedback", json=feedback_payload()).json()
-        second = client.post("/v1/feedback", json=feedback_payload()).json()
+        first = post(client).json()
+        second = post(client).json()
         metrics = client.get("/metrics").text
     assert first == {"accepted": True, "stored": True, "event_id": "feedback-1"}
     assert second == {"accepted": True, "stored": False, "event_id": "feedback-1"}

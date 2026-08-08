@@ -19,6 +19,7 @@ class Candidate(BaseModel):
     cuisines: list[str] = Field(default_factory=list)
     regions: list[str] = Field(default_factory=list)
     meal_slots: list[str] = Field(default_factory=list)
+    meal_classes: list[str] = Field(default_factory=list)
     dish_categories: list[str] = Field(default_factory=list)
     spice_profiles: list[str] = Field(default_factory=list)
     spice_level: int | None = Field(default=None, ge=1, le=5)
@@ -96,6 +97,9 @@ class RecommendationRequest(BaseModel):
     governed_context_signals: list[GovernedContextSignal] = Field(
         default_factory=list, max_length=20
     )
+    preference_by_class: dict[str, float] = Field(default_factory=dict)
+    preference_by_direct_class: dict[str, float] = Field(default_factory=dict)
+    preference_by_projected_class: dict[str, float] = Field(default_factory=dict)
     plan_date: date | None = None
     day_type: Literal["weekday", "weekend"] | None = None
     season: str | None = None
