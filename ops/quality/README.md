@@ -80,6 +80,28 @@ Real-user test fixtures may be supplied to the persona driver through `GHAR_PERS
 must set `user_type: "real"` and a pseudonymous `test_user_id`; credentials and access tokens are
 never written to the workbook or logs.
 
+## Signed network load and soak probes
+
+`runner/network_load_test.py` can measure either Ghar or Aux with the service's raw-body HMAC.
+It is measurement-only unless an operator supplies ratified gates; there are no repository-default
+latency, error-rate, throughput or regression targets.
+
+```bash
+python3 ops/quality/runner/network_load_test.py \
+  --service ghar --url http://127.0.0.1:8000/v1/recommendations \
+  --secret "$GHAR_REC_SERVICE_SECRET" --payload ops/quality/fixtures/load_request.json
+
+python3 ops/quality/runner/network_load_test.py \
+  --service aux --url http://127.0.0.1:8001/v1/recommendations \
+  --secret "$AUX_REC_SERVICE_SECRET" --payload /path/to/privacy-safe-aux-request.json \
+  --baseline /path/to/approved-baseline-report.json --max-p95-regression-pct 10 \
+  --max-error-rate 0.005 --min-throughput-rps 40
+```
+
+The JSON report contains only endpoint origin, status counts and aggregate timings. It never emits
+the secret or request payload. A gated run exits non-zero when any supplied target fails; an
+ungated run records `passed: null` so a measurement cannot be mistaken for launch approval.
+
 ## Honesty rules baked into the verdict
 
 - No fabrication: every number comes from a real pytest/JUnit run or a real probe.
@@ -104,6 +126,7 @@ ops/quality/
   runner/excel_report.py              # validated Excel + ZIP publisher for every test workflow
   runner/orchestrator.py              # Phase 16-19 orchestrator + dashboard
   runner/perf_benchmark.py            # Phase 12
+  runner/network_load_test.py         # signed Ghar/Aux load measurement and ratified gates
   runner/report_reader.py             # Phase 17/20 triage + re-validate
   run_full_quality_suite.sh           # Phase 19 single command
   reports/<timestamp>/                # Phase 17 evidence (summary.*, *.json, junit, artifacts)

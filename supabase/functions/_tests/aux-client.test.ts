@@ -132,3 +132,47 @@ Deno.test("Aux shadow fails open on disabled configuration and malformed lineage
   if (malformed.ok) throw new Error("expected malformed Aux response");
   assertEquals(malformed.reason, "bad_body");
 });
+
+Deno.test("Aux timeout aborts once and fails open without retrying", async () => {
+  let calls = 0;
+  const fetchImpl = (_url: string, init: RequestInit) => {
+    calls += 1;
+    return new Promise<Response>((_resolve, reject) => {
+      init.signal?.addEventListener("abort", () => {
+        reject(new DOMException("aborted", "AbortError"));
+      });
+    });
+  };
+
+  const result = await callAuxiliaryEngine(
+    {},
+    "request-timeout",
+    config(),
+    logger(),
+    fetchImpl,
+  );
+
+  assertEquals(result.ok, false);
+  if (result.ok) throw new Error("expected timeout");
+  assertEquals(result.reason, "timeout");
+  assertEquals(calls, 1);
+});
+
+Deno.test("Aux network failure makes one attempt and fails open", async () => {
+  let calls = 0;
+  const result = await callAuxiliaryEngine(
+    {},
+    "request-network",
+    config(),
+    logger(),
+    () => {
+      calls += 1;
+      return Promise.reject(new TypeError("network unavailable"));
+    },
+  );
+
+  assertEquals(result.ok, false);
+  if (result.ok) throw new Error("expected network failure");
+  assertEquals(result.reason, "network");
+  assertEquals(calls, 1);
+});
