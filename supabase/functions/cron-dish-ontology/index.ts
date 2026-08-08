@@ -10,7 +10,7 @@ import {
 } from "../_shared/middleware/index.ts";
 import { researchDish } from "../dish-ontology/research.ts";
 import { promoteExternalEvidence, storeResearchRecordsForSubject } from "../dish-ontology/store.ts";
-import { generateGroqDishEnrichment } from "../dish-ontology/ai.ts";
+import { ClosedVocabulary, generateGroqDishEnrichment } from "../dish-ontology/ai.ts";
 
 const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
   async (_req, ctx) => {
@@ -121,6 +121,23 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
       );
       if (aiClaimError) throw aiClaimError;
       aiClaimed = aiJobs?.length ?? 0;
+
+      // Fetched once per invocation (not once per dish) so the Groq prompt lists the real
+      // meal_class/cuisine closed vocabulary — see migration 104's ai_enrichment_closed_vocabulary()
+      // and ai.ts's ClosedVocabulary doc comment for why this can't be hardcoded in this file.
+      // Best-effort: if this fails, enrichment still runs for aliases/taxonomy/regional_affinities,
+      // just without meal_class/cuisine candidates for this batch.
+      let vocabulary: ClosedVocabulary | undefined;
+      if (aiClaimed > 0) {
+        const { data: vocabRow } = await db.rpc("ai_enrichment_closed_vocabulary");
+        if (vocabRow && typeof vocabRow === "object") {
+          const raw = vocabRow as Record<string, unknown>;
+          vocabulary = {
+            classCodes: Array.isArray(raw.class_codes) ? raw.class_codes.map(String) : [],
+            cuisineNames: Array.isArray(raw.cuisine_names) ? raw.cuisine_names.map(String) : [],
+          };
+        }
+      }
       for (const aiJob of aiJobs ?? []) {
         // The prompt is ~600 tokens and GPT-OSS may use reasoning tokens. Reserve the full
         // request envelope atomically; settlement replaces it with actual provider usage.
@@ -154,6 +171,9 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
             String(aiJob.query_text),
             ctx.config.groqApiKey,
             ctx.config.groqModel,
+            undefined,
+            undefined,
+            vocabulary,
           );
           aiTokens += generated.usage.totalTokens;
           const stored = await storeResearchRecordsForSubject(ctx, {

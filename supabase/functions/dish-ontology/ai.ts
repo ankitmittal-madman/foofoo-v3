@@ -43,6 +43,20 @@ export interface GroqDishEnrichment {
     affinity_score: number;
     confidence: number;
   }>;
+  // Meal-class and cuisine are structural catalogue-membership facts, not taxonomy descriptors —
+  // kept as separate arrays/fields so the DB promotion policy (record_ai_low_risk_enrichment,
+  // migration 104) can validate each against its own closed vocabulary (public.meal_classes,
+  // public.cuisines) rather than inserting free-text into a foreign-keyed column. Like taxonomy,
+  // this is deliberately non-safety: no diet/Jain/allergen inference, matching the ai.ts header.
+  meal_class: Array<{
+    class_code: string;
+    slot: "breakfast" | "lunch" | "dinner" | "snack";
+    confidence: number;
+  }>;
+  cuisine: {
+    cuisine_name: string;
+    confidence: number;
+  } | null;
 }
 
 export interface GroqEnrichmentResult {
@@ -59,7 +73,7 @@ const GROQ_TIMEOUT_MS = 15_000;
 const OUTPUT_SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["aliases", "taxonomy", "regional_affinities"],
+  required: ["aliases", "taxonomy", "regional_affinities", "meal_class", "cuisine"],
   properties: {
     aliases: {
       type: "array",
@@ -129,6 +143,33 @@ const OUTPUT_SCHEMA = {
         },
       },
     },
+    // class_code/cuisine_name are intentionally NOT enum-constrained here: public.meal_classes
+    // has 131+ rows and public.cuisines is large and grows independently of this file. The closed-
+    // vocabulary check happens in record_ai_low_risk_enrichment (DB-side, always current), not in
+    // this static schema — an unrecognized code is recorded as a candidate but never published.
+    meal_class: {
+      type: "array",
+      maxItems: 3,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["class_code", "slot", "confidence"],
+        properties: {
+          class_code: { type: "string", pattern: "^[A-Z0-9]+(?:_[A-Z0-9]+)*$", maxLength: 80 },
+          slot: { type: "string", enum: ["breakfast", "lunch", "dinner", "snack"] },
+          confidence: { type: "number", minimum: 0, maximum: 1 },
+        },
+      },
+    },
+    cuisine: {
+      type: ["object", "null"],
+      additionalProperties: false,
+      required: ["cuisine_name", "confidence"],
+      properties: {
+        cuisine_name: { type: "string", pattern: "^[a-z0-9]+(?:_[a-z0-9]+)*$", maxLength: 80 },
+        confidence: { type: "number", minimum: 0, maximum: 1 },
+      },
+    },
   },
 } as const;
 
@@ -196,16 +237,43 @@ export function sanitizeGroqEnrichment(
       regionSeen.add(item.region_code);
       return true;
     });
-  return { aliases, taxonomy, regional_affinities: regionalAffinities };
+  const mealClassSeen = new Set<string>();
+  const mealClass = (Array.isArray(enrichment.meal_class) ? enrichment.meal_class : []).filter(
+    (item) => {
+      const key = `${item.class_code}:${item.slot}`;
+      if (mealClassSeen.has(key)) return false;
+      mealClassSeen.add(key);
+      return true;
+    },
+  );
+  const cuisine = enrichment.cuisine && typeof enrichment.cuisine.cuisine_name === "string"
+    ? { ...enrichment.cuisine, cuisine_name: enrichment.cuisine.cuisine_name.toLowerCase() }
+    : null;
+  return { aliases, taxonomy, regional_affinities: regionalAffinities, meal_class: mealClass, cuisine };
 }
 
-/** Generate structured, non-safety ontology candidates for one canonical dish. */
+export interface ClosedVocabulary {
+  /** public.meal_classes.class_code, active rows only. */
+  classCodes: string[];
+  /** public.cuisines.name. */
+  cuisineNames: string[];
+}
+
+/** Generate structured, non-safety ontology candidates for one canonical dish.
+ *
+ * `vocabulary` (when supplied) is listed verbatim in the prompt so the model selects meal_class
+ * and cuisine values from the real closed vocabulary instead of inventing plausible-looking codes
+ * that would never match public.meal_classes/public.cuisines — record_ai_low_risk_enrichment
+ * (migration 104) still re-validates against the live tables regardless, since this list can go
+ * stale between calls, but an unlisted model has near-zero chance of guessing a real class_code.
+ */
 export async function generateGroqDishEnrichment(
   dishName: string,
   apiKey: string,
   model: string,
   fetchImpl: FetchLike = globalThis.fetch as FetchLike,
   timeoutMs = GROQ_TIMEOUT_MS,
+  vocabulary?: ClosedVocabulary,
 ): Promise<GroqEnrichmentResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -226,9 +294,18 @@ export async function generateGroqDishEnrichment(
           {
             role: "system",
             content:
-              "You classify Indian food catalogue names. Return only well-known low-risk aliases, regional affinities and non-safety sensory/context taxonomy. Never infer ingredients, nutrition, allergens, medical suitability, religious suitability, vegetarian status or alcohol. Use empty arrays when uncertain. Confidence must reflect factual certainty, not output fluency.",
+              "You classify Indian food catalogue names. Return only well-known low-risk aliases, regional affinities, non-safety sensory/context taxonomy, meal-class membership (which structural class of dish this is, and which of breakfast/lunch/dinner/snack it is normally eaten in), and cuisine of origin. Never infer ingredients, nutrition, allergens, medical suitability, religious suitability, vegetarian status or alcohol — meal_class and cuisine describe catalogue structure and geographic/culinary origin only, not diet or safety. Use empty arrays or null when uncertain. Confidence must reflect factual certainty, not output fluency.",
           },
-          { role: "user", content: `Canonical dish name: ${dishName}` },
+          {
+            role: "user",
+            content: vocabulary
+              ? `Canonical dish name: ${dishName}\n\nValid meal_class class_code values (pick 0-3, only these — do not invent new ones): ${
+                vocabulary.classCodes.join(", ")
+              }\n\nValid cuisine cuisine_name values (pick 0-1, only these, or null — do not invent new ones): ${
+                vocabulary.cuisineNames.join(", ")
+              }`
+              : `Canonical dish name: ${dishName}\n\n(No meal-class/cuisine vocabulary supplied this call — return empty meal_class and null cuisine.)`,
+          },
         ],
         response_format: {
           type: "json_schema",
@@ -275,6 +352,8 @@ export async function generateGroqDishEnrichment(
       ...sanitized.aliases.map((item) => item.confidence),
       ...sanitized.taxonomy.map((item) => item.confidence),
       ...sanitized.regional_affinities.map((item) => item.confidence),
+      ...sanitized.meal_class.map((item) => item.confidence),
+      ...(sanitized.cuisine ? [sanitized.cuisine.confidence] : []),
     ].filter((value) => typeof value === "number" && Number.isFinite(value));
     const confidence = confidences.length ? Math.max(...confidences) : 0;
     const responseId = typeof payload.id === "string" ? payload.id : null;
