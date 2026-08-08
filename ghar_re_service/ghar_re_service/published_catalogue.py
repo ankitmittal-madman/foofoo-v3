@@ -163,6 +163,9 @@ class PublishedCatalogueStore:
         self.row_count = int(manifest.get("row_count", 0))
         if self.row_count <= 0:
             raise PublishedCatalogueError("published catalogue contains no rows")
+        self.identity_row_count = int(manifest.get("identity_row_count", self.row_count))
+        if self.identity_row_count < self.row_count:
+            raise PublishedCatalogueError("published catalogue identity coverage is incomplete")
 
     def hydrate(self, candidate_ids: list[str]) -> Catalogue:
         """Load exactly the requested canonical candidates and preserve caller retrieval order."""
@@ -193,7 +196,15 @@ class PublishedCatalogueStore:
         """
         uri = f"file:{self.index_path}?mode=ro"
         with sqlite3.connect(uri, uri=True) as database:
-            rows = database.execute("SELECT dish_id, name FROM catalogue").fetchall()
+            has_identity_index = database.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='catalogue_identity'"
+            ).fetchone()
+            source = "catalogue_identity" if has_identity_index else "catalogue"
+            rows = database.execute(f"SELECT dish_id, name FROM {source}").fetchall()  # noqa: S608
+        if len(rows) != self.identity_row_count:
+            raise PublishedCatalogueError(
+                "published catalogue identity count does not match manifest"
+            )
 
         identities: dict[str, str] = {}
         for raw_id, raw_name in rows:

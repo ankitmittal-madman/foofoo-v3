@@ -61,6 +61,14 @@ def build_publication(tmp_path, rows):
                 for row in rows
             ],
         )
+        database.execute(
+            "CREATE TABLE catalogue_identity "
+            "(dish_id TEXT PRIMARY KEY, normalized_name TEXT UNIQUE, name TEXT) WITHOUT ROWID"
+        )
+        database.executemany(
+            "INSERT INTO catalogue_identity VALUES (?, ?, ?)",
+            [(row["id"], " ".join(row["name"].casefold().split()), row["name"]) for row in rows],
+        )
     index_hash = hashlib.sha256(index_path.read_bytes()).hexdigest()
     (directory / "manifest.json").write_text(
         json.dumps(
@@ -68,6 +76,7 @@ def build_publication(tmp_path, rows):
                 "schema_version": "recommendation-catalogue-publication-v1",
                 "publication_version": "sha256:test-publication",
                 "row_count": len(rows),
+                "identity_row_count": len(rows),
                 "catalogue_sqlite_sha256": index_hash,
             }
         )

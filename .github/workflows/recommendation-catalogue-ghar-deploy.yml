@@ -75,6 +75,7 @@ jobs:
           jq --exit-status --arg version "$PUBLICATION_VERSION" '
             .publication_version == $version
             and .row_count > 0
+            and .identity_row_count >= .row_count
             and .coverage.publishable_dishes == .row_count
           ' ghar_re_service/runtime-publication/manifest.json >/dev/null
 
@@ -92,4 +93,5 @@ jobs:
             .published_catalogue.configured == true
             and .published_catalogue.publication_version == $version
             and .published_catalogue.row_count > 0
+            and .published_catalogue.identity_row_count >= .published_catalogue.row_count
           ' "$RUNNER_TEMP/ghar-meta.json" >/dev/null

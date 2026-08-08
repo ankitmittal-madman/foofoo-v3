@@ -48,6 +48,7 @@ jobs:
             .schema_version == "recommendation-catalogue-publication-v1"
             and (.publication_version | test("^sha256:[0-9a-f]{64}$"))
             and .row_count > 0
+            and .identity_row_count >= .row_count
             and .coverage.publishable_dishes == .row_count
             and .coverage.publishable_dishes <= .coverage.class_mapped_dishes
             and .coverage.publishable_dishes <= .coverage.safety_closed_dishes

@@ -148,6 +148,7 @@ def test_meta_returns_versions(client):
         "configured": False,
         "publication_version": None,
         "row_count": 0,
+        "identity_row_count": 0,
     }
 
 
