@@ -58,8 +58,10 @@ findings are retained under `docs/archive/`.
   prove parity; publish one quality-closed immutable generation; ratify and run load gates; then
   collect consented real-outcome and shadow evidence before separately approving any canary. Aux
   remains off until those gates pass. Protected runs `31257431526` and `31257875325` own the
-  current aggregate counts and provenance split; migration 106 is repository-ready but not yet
-  installed in production.
+  current aggregate counts and provenance split. Run `31258906340` installed migration 106 and
+  measured 603 primary-ready, 262 primary-review and 537 component-review dish-slot routes with
+  no accepted component facts. Migration 107 must now extend the report across every active dish
+  before proposals are generated.
 - Add health-condition suitability only with appropriate clinical governance.
 - Activate `s_pref` personalization after real feedback volume meets a defined training threshold.
 - Expand and safety-review the bounded dish/ingredient/substitution graph and its provenance.

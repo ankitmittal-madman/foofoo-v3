@@ -29,13 +29,15 @@ state only; deployment run IDs and rollback instructions live in the active runb
 > cannot be raised mechanically. Aux remains off and no catalogue or mapping changed in either
 > audit.
 
-> **Primary versus component serving model:** the repository now contains migration 106 and its
-> protected audit workflow. It models reviewed, slot-aware compatibility for staples, sides and
-> accompaniments separately from primary meal-class identity, normalizes the legacy `snack` alias
-> to canonical `snacks`, and keeps machine/rule proposals non-serving until reviewed. This is not
-> deployed yet and does not change the 642-row publication gate. The next protected run must first
-> establish the production primary/component readiness baseline; only later runtime and
-> publication changes may consume accepted component facts. Aux remains off.
+> **Primary versus component serving model:** migration 106 is live through protected run
+> `31258906340`. It models reviewed, slot-aware compatibility for staples, sides and accompaniments
+> separately from primary meal-class identity, normalizes the legacy `snack` alias to canonical
+> `snacks`, and keeps machine/rule proposals non-serving until reviewed. The first aggregate
+> baseline found 1,402 canonical dish-slot routes: 603 primary-ready, 262 needing primary-class
+> review and 537 needing component review; there are zero proposals and zero accepted component
+> facts. That v1 report is slot-only and does not reconcile active dishes with no canonical slot,
+> so additive migration 107 and validation 959 are repository-ready to close that measurement gap.
+> Neither migration changes the 642-row publication gate or either engine. Aux remains off.
 
 > **Deployed P0 backend:** migration 053 and its associated RE and Edge changes close
 > the P0 feedback/personalization, suppression, persisted-plan, lock, add-to-date, eight-option,
