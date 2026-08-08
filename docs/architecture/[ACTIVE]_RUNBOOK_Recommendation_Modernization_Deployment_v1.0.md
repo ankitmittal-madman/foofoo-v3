@@ -169,6 +169,50 @@ review. It does not accept a proposal, mutate `public.dishes`, republish the cat
 serving. Product must still approve the mapping policy—particularly `Appetizer` to `snacks`—before
 any reversible application workflow is allowed to run.
 
+### Direct-slot application boundary — prepared, not executed
+
+The repository now contains a count-bound candidate policy and a protected reversible workflow.
+Neither the boundary nor the policy has been installed or applied in production. The exact policy
+identity is `direct-import-course-slot-v1` with SHA-256
+`2dda4d35c8ab9314c89b6e56ab2d637eb9e7ba1fce9d3f113242813bdb01d3db`.
+
+| Exact checked-in source course | Candidate canonical slot |
+|---|---|
+| `Lunch` | `lunch` |
+| `Dinner` | `dinner` |
+| `Snack` | `snacks` |
+| `Appetizer` | `snacks` |
+| `South Indian Breakfast` | `breakfast` |
+| `World Breakfast` | `breakfast` |
+| `North Indian Breakfast` | `breakfast` |
+| `Indian Breakfast` | `breakfast` |
+
+The policy is valid only for exactly 1,802 proposals, 7,222 evidence links, 4,806 direct manifest
+rows and the recorded slot distribution: 275 breakfast, 667 lunch, 294 dinner and 566 snacks. Any
+count, row fingerprint, source identity, slot distribution or policy hash drift aborts before a
+dish write.
+
+Use `Govern direct meal-slot policy application` only from `main` in the protected production
+environment:
+
+1. `install_only` requires confirmation `install-direct-meal-slot-policy-boundary`. It installs
+   migration 116 and validation 968 but changes no proposal or dish.
+2. `apply` requires confirmation `apply-direct-meal-slot-policy-v1`, a durable Product/Founder
+   approval reference and a safe reviewer identifier. The workflow first forces Aux routing off,
+   rebuilds the exact policy-bound manifest, then approves and applies the entire cohort in one
+   transaction. Every prior and resulting `meal_occasion` array is retained in the service-only
+   ledger. This changes database facts but does not alter the existing immutable publication.
+3. `rollback` requires confirmation `rollback-direct-meal-slot-policy-v1` and a durable rollback
+   reference. It restores all 1,802 arrays only when every current dish still exactly equals its
+   recorded applied value. Any later edit makes rollback fail closed. Proposal history remains
+   `applied`; the ledger records the active application as `rolled_back`.
+
+Local evidence covers 55 focused tests, the broader 315-pass recommendation gate (one expected
+skip), SQL/YAML/shell parsing and a disposable PostgreSQL proof
+using the full 1,802/7,222/4,806 cohort. The proof applied exactly, treated the second apply as
+idempotent, rejected rollback after deliberate post-apply drift and restored all original arrays
+after the drift was removed. This is implementation evidence only, not product approval.
+
 ### Phase A stop conditions
 
 Stop and roll back serving if any service is unhealthy, any version/count differs, a safety gate

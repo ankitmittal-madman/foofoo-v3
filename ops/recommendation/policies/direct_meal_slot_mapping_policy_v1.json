@@ -1,0 +1,26 @@
+{
+  "approval_scope": {
+    "evidence_link_count": 7222,
+    "manifest_direct_row_count": 4806,
+    "proposal_count": 1802,
+    "slot_counts": {
+      "breakfast": 275,
+      "dinner": 294,
+      "lunch": 667,
+      "snacks": 566
+    }
+  },
+  "mappings": {
+    "appetizer": "snacks",
+    "dinner": "dinner",
+    "indian breakfast": "breakfast",
+    "lunch": "lunch",
+    "north indian breakfast": "breakfast",
+    "snack": "snacks",
+    "south indian breakfast": "breakfast",
+    "world breakfast": "breakfast"
+  },
+  "policy_version": "direct-import-course-slot-v1",
+  "requires_explicit_approval": true,
+  "schema_version": "direct-meal-slot-mapping-policy-v1"
+}
