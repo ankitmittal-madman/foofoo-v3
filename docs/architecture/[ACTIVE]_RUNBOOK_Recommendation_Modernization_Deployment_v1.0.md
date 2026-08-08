@@ -326,7 +326,7 @@ checked-in manifest; zero failed source identity or fingerprint validation. The 
 records `automatic_acceptance_allowed=false` and zero dish, proposal, publication or serving
 change.
 
-### Final deferred case boundary — prepared, not installed
+### Final deferred case boundary — installed and generated, decisions pending
 
 Migration 123 and validation 975 define a private, RLS-enabled case ledger for the exact 23-dish
 result. The five candidate cases retain proposed slot arrays only as pending review evidence; the 17
@@ -340,8 +340,16 @@ candidate slot distribution and 88 diet-evidence links. It also compares full di
 existing proposal-table signatures before and after. Reconciled local evidence includes 339 passing
 recommendation tests with one expected skip plus a disposable PostgreSQL proof: 23 pending cases,
 92 synthetic evidence links, zero duplicate rows on retry, immutable evidence, unchanged dishes and
-rollback that disabled generation while retaining all case history. Production install/generation
-and every review decision remain pending.
+rollback that disabled generation while retaining all case history.
+
+Protected install-only run `31277318434` installed migration 123 and validation 975, produced
+`cases_generated=false` and recorded zero dish, proposal, publication or serving change. Separate
+generation run `31277357323` then created exactly 23 private `pending_review` cases and 96 immutable
+evidence links: 88 shifted-manifest links and eight direct-conflict links. The stored routes are
+three shifted-direct candidates, two shifted-contextual candidates, 17 food-role reviews and one
+direct conflict; candidate slots remain two breakfast, one dinner and two `lunch,dinner`. The
+artifact records `automatic_acceptance_allowed=false` and zero dish, existing-proposal, publication
+or serving change. Product review and a separately approved reversible application remain pending.
 
 ### Phase A stop conditions
 
