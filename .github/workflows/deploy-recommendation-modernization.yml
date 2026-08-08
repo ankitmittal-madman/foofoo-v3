@@ -1,0 +1,133 @@
+name: Deploy recommendation modernization schema
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type apply-recommendation-modernization
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'apply-recommendation-modernization'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FOOFOO_SUPABASE_URI: ${{ secrets.FOOFOO_SUPABASE_URI }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      PGAPPNAME: foofoo-re-modernization-${{ github.run_id }}
+      PGOPTIONS: -c statement_timeout=10min -c lock_timeout=10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify exact production project and prerequisite schema
+        run: |
+          python -c 'import os; from ops.recommendation.protected_identity import database_identifies_project; assert database_identifies_project(os.environ["FOOFOO_SUPABASE_URI"], os.environ["PRODUCTION_PROJECT_REF"]), "production database identity is missing or ambiguous"'
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 \
+            -f database/validation/938_resolve_canonical_feedback_identity_validation.sql \
+            -f database/validation/943_animal_dish_ingredient_safety_validation.sql
+
+      - name: Classify complete, absent, or unsafe partial state
+        id: state
+        run: |
+          read -r present total <<EOF
+          $(psql "$FOOFOO_SUPABASE_URI" -At -F ' ' -v ON_ERROR_STOP=1 <<'SQL'
+          WITH checks(name, present) AS (VALUES
+            ('092', to_regclass('public.recommendation_interactions_v2') IS NOT NULL),
+            ('093', EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='user_taste_vectors' AND column_name='direct_class_affinity')),
+            ('094', to_regclass('re_engine.meal_class_temporal_state') IS NOT NULL),
+            ('095', to_regclass('re_engine.current_dish_temporal_attributes') IS NOT NULL),
+            ('096', to_regclass('re_engine.governed_context_signals') IS NOT NULL),
+            ('097', to_regprocedure('re_engine.catalogue_publication_rows(uuid,integer)') IS NOT NULL),
+            ('098', EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='recommendation_events' AND column_name='catalogue_selection')),
+            ('099', EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='recommendation_events' AND column_name='aux_shadow_observation')),
+            ('100', to_regprocedure('re_engine.aux_shadow_health(timestamp with time zone,timestamp with time zone)') IS NOT NULL),
+            ('101', to_regprocedure('re_engine.production_guardrail_aggregate(timestamp with time zone,timestamp with time zone,text)') IS NOT NULL)
+          )
+          SELECT count(*) FILTER (WHERE present), count(*) FROM checks;
+          SQL
+          )
+          EOF
+          if [ "$present" = "0" ] && [ "$total" = "10" ]; then
+            echo "action=apply" >> "$GITHUB_OUTPUT"
+          elif [ "$present" = "$total" ] && [ "$total" = "10" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          else
+            echo "unsafe partial modernization state: $present of $total sentinels present" >&2
+            exit 1
+          fi
+
+      - name: Atomically apply migrations and validations
+        if: steps.state.outputs.action == 'apply'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SELECT pg_advisory_xact_lock(hashtext('foofoo-production-schema-migrations'))" \
+            -f database/migrations/092_canonical_recommendation_interactions_v2.sql \
+            -f database/migrations/093_activate_direct_meal_class_learning.sql \
+            -f database/migrations/094_materialize_meal_class_temporal_state.sql \
+            -f database/migrations/095_materialize_meal_attribute_temporal_state.sql \
+            -f database/migrations/096_govern_recommendation_context_signals.sql \
+            -f database/migrations/097_publish_scalable_recommendation_catalogue.sql \
+            -f database/migrations/098_record_recommendation_catalogue_lineage.sql \
+            -f database/migrations/099_record_aux_shadow_observations.sql \
+            -f database/migrations/100_expose_aux_shadow_health.sql \
+            -f database/migrations/101_measure_production_recommendation_guardrails.sql \
+            -f database/validation/944_canonical_recommendation_interactions_v2_validation.sql \
+            -f database/validation/945_activate_direct_meal_class_learning_validation.sql \
+            -f database/validation/946_materialize_meal_class_temporal_state_validation.sql \
+            -f database/validation/947_materialize_meal_attribute_temporal_state_validation.sql \
+            -f database/validation/948_govern_recommendation_context_signals_validation.sql \
+            -f database/validation/949_publish_scalable_recommendation_catalogue_validation.sql \
+            -f database/validation/950_record_recommendation_catalogue_lineage_validation.sql \
+            -f database/validation/951_record_aux_shadow_observations_validation.sql \
+            -f database/validation/952_expose_aux_shadow_health_validation.sql \
+            -f database/validation/953_measure_production_recommendation_guardrails_validation.sql
+
+      - name: Revalidate an already complete schema read-only
+        if: steps.state.outputs.action == 'validate'
+        run: |
+          psql "$FOOFOO_SUPABASE_URI" -v ON_ERROR_STOP=1 --single-transaction \
+            -c "SET TRANSACTION READ ONLY" \
+            -f database/validation/944_canonical_recommendation_interactions_v2_validation.sql \
+            -f database/validation/945_activate_direct_meal_class_learning_validation.sql \
+            -f database/validation/946_materialize_meal_class_temporal_state_validation.sql \
+            -f database/validation/947_materialize_meal_attribute_temporal_state_validation.sql \
+            -f database/validation/948_govern_recommendation_context_signals_validation.sql \
+            -f database/validation/949_publish_scalable_recommendation_catalogue_validation.sql \
+            -f database/validation/950_record_recommendation_catalogue_lineage_validation.sql \
+            -f database/validation/951_record_aux_shadow_observations_validation.sql \
+            -f database/validation/952_expose_aux_shadow_health_validation.sql \
+            -f database/validation/953_measure_production_recommendation_guardrails_validation.sql
+
+      - name: Produce non-identifying deployment evidence
+        env:
+          ACTION_TAKEN: ${{ steps.state.outputs.action }}
+        run: |
+          jq --null-input --arg action "$ACTION_TAKEN" --arg commit "$GITHUB_SHA" \
+            --arg run_id "$GITHUB_RUN_ID" '{
+              schema_version: "recommendation-modernization-schema-deploy-v1",
+              migrations: "092-101",
+              validations: "944-953",
+              action: $action,
+              commit_sha: $commit,
+              workflow_run_id: $run_id,
+              passed: true
+            }' > "$RUNNER_TEMP/recommendation-modernization-schema.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendation-modernization-schema
+          path: ${{ runner.temp }}/recommendation-modernization-schema.json
+          retention-days: 90
+          if-no-files-found: error
