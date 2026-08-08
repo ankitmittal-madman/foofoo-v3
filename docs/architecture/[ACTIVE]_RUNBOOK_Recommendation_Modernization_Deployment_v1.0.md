@@ -8,6 +8,7 @@ Dependencies: `.github/workflows/deploy-recommendation-modernization.yml`,
   `.github/workflows/recommendation-catalogue-qdrant.yml`,
   `.github/workflows/recommendation-catalogue-ghar-deploy.yml`,
   `.github/workflows/aux-re-deploy.yml`,
+  `.github/workflows/aux-re-mode-control.yml`,
   `.github/workflows/deploy-recommendation-edge-functions.yml`,
   `.github/workflows/aux-re-load-report.yml`,
   `.github/workflows/aux-re-offline-report.yml`,
@@ -68,7 +69,7 @@ events in the change record or workflow artifacts.
 |---|---|---|
 | Source | Commit is pushed to `main`; protected `production` environment approval is active | Stop |
 | Project identity | `PRODUCTION_PROJECT_REF` exactly matches the database URL and Supabase CLI target | Stop |
-| User-visible mode | Edge secret is explicitly verified as `AUX_RE_MODE=off` | Set `off`, redeploy Edge if required, then verify |
+| User-visible mode | A successful `Aux RE off and shadow mode control` run records `off` | Run the protected `off` transition, then verify Ghar |
 | Ghar fallback | Current Today/Week request succeeds through Ghar with safety filters intact | Stop and restore last known good Ghar/Edge release |
 | Backups | Supabase point-in-time recovery/backup is healthy; prior images and catalogue remain addressable | Stop |
 | Secrets | Required Supabase, Fly and Qdrant secrets exist in the protected environment | Stop; never print values |
@@ -84,14 +85,15 @@ Run each step separately. Save its successful run ID before continuing.
 
 | Order | Action | Workflow / check | Required result |
 |---:|---|---|---|
-| 1 | Verify/set Edge mode off | Protected Supabase secret operation, then redeploy `Deploy recommendation Edge Functions` if the secret changed | Edge is healthy; Today/Week remains Ghar-visible |
+| 1 | Verify/set Edge mode off | `Aux RE off and shadow mode control` with desired mode `off` | The protected transition artifact records `off`; Today/Week remains Ghar-visible |
 | 2 | Apply schema 092–101 | `Deploy recommendation modernization schema` | One transaction passes validations 944–953; artifact records `apply` or read-only `validate` |
 | 3 | Publish catalogue | `Recommendation catalogue publication` | Exactly three user-free files; manifest has full SHA-256 version, positive row count and closed coverage gates |
 | 4 | Upload same version to Qdrant | `Publish recommendation catalogue to Qdrant` using the publication run ID and full version | New hash-named collection is green; point count equals manifest row count |
 | 5 | Deploy same version to Ghar | `Deploy Ghar with recommendation catalogue` using the same publication run and version | Ghar `/readyz` passes; `/v1/meta` reports the exact version and positive row count |
 | 6 | Deploy Aux shadow service | `Deploy Aux RE in shadow mode` using the Qdrant run ID, same version and exact row count | Aux `/readyz` passes; `/v1/meta` says enabled, shadow and exact version |
-| 7 | Deploy Edge code | `Deploy recommendation Edge Functions` while `AUX_RE_MODE` is still `off` | Both `plan` and `recommendations` deploy; Ghar response remains authoritative |
-| 8 | Smoke test | Authenticated synthetic/test household only | Cold-start and experienced-user requests succeed; hard diet/allergen exclusions hold; canonical IDs, selected date and meal class survive end to end |
+| 7 | Prove signed Aux capacity | `Aux RE deployed load report` for the exact publication | Gated, passing, publication-bound load artifact exists |
+| 8 | Deploy Edge code | `Deploy recommendation Edge Functions` while `AUX_RE_MODE` is still `off` | Both `plan` and `recommendations` deploy; Ghar response remains authoritative |
+| 9 | Smoke test | Authenticated synthetic/test household only | Cold-start and experienced-user requests succeed; hard diet/allergen exclusions hold; canonical IDs, selected date and meal class survive end to end |
 
 The publication artifact is one generation of catalogue facts, not a database replacement. It
 must not contain user profiles, history or events. Edge reads the user's governed database context
@@ -107,9 +109,14 @@ Qdrant collection. Publish a new immutable generation instead.
 
 ## 4. Phase B — shadow observation
 
-Only after Phase A passes, use a protected, audited operation to set Edge `AUX_RE_MODE=shadow` and
-redeploy/verify the Edge functions. Shadow must preserve the Ghar response byte-for-byte at the
-authority boundary while recording privacy-minimized Aux comparison observations.
+Only after Phase A passes, run `Aux RE off and shadow mode control` with desired mode `shadow`, the
+successful Aux/Ghar deploy run IDs, the signed load run ID, full publication version and exact row
+count. The workflow first forces `off`, verifies every source came from `main`, rechecks both live
+engines and only then sets the Supabase Edge secrets to `shadow`. Supabase makes updated Edge
+secrets available immediately, so a code redeploy is not required for this mode transition (see
+[Supabase Environment Variables](https://supabase.com/docs/guides/functions/secrets)).
+Shadow must preserve the Ghar response at the authority boundary while recording privacy-minimized
+Aux comparison observations.
 
 Collect at least the ratified observation window, covering:
 
@@ -124,7 +131,8 @@ Collect at least the ratified observation window, covering:
 
 Then run, in order:
 
-1. `Aux RE deployed load report` against the deployed shadow service.
+1. Retain the passing `Aux RE deployed load report` used by the mode transition; rerun it if the
+   service or catalogue generation changes.
 2. `Aux RE governed offline report` against a consented, household-disjoint, time-split real-outcome
    replay. Synthetic input is supporting evidence only.
 3. The production shadow/guardrail aggregation for the exact observation window.
@@ -160,8 +168,9 @@ shadow directly to broad active serving.
 
 Rollback order is designed to restore the user experience first:
 
-1. Set Edge `AUX_RE_MODE=off` through the protected Supabase operation. The rollout-control
-   workflow must enforce this automatically when its evaluator returns a kill-switch decision.
+1. Run `Aux RE off and shadow mode control` with desired mode `off`. The rollout-control workflow
+   must also enforce this automatically when its evaluator returns a kill-switch decision. Both
+   workflows share one concurrency group, so an off and shadow mutation cannot race.
 2. Verify an authenticated Today/Week request is served successfully by Ghar and hard safety still
    holds.
 3. If Edge itself is faulty, redeploy the last known good Edge commit while keeping mode `off`.
@@ -208,9 +217,9 @@ Until then, describe the state precisely as “implemented”, “deployed off�
 
 ## 9. Critical Self-Review
 
-- The repository currently provides an automated fail-safe path to `off`, but no dedicated
-  protected workflow for a human to move exactly `off -> shadow` or to manage a household-stable
-  canary. That control must be added before live shadow/canary activation.
+- The repository provides one protected, serialized `off`/`shadow` transition and deliberately has
+  no automated user-visible activation path. A separate household-stable canary mechanism and
+  explicit approval design are still required before any active influence.
 - The consented real-outcome replay producer and its privacy approval are not yet present. The
   offline evaluator correctly fails closed, so promotion evidence cannot yet be complete.
 - Numerical targets exist as governed inputs but require a Product/Founder approval reference;

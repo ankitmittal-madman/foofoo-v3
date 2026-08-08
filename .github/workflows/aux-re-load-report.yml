@@ -21,7 +21,9 @@ concurrency:
 
 jobs:
   load:
-    if: inputs.confirm == 'run-aux-load-gate'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'run-aux-load-gate'
     environment: production
     runs-on: ubuntu-latest
     env:

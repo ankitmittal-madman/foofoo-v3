@@ -16,8 +16,12 @@ def test_rollout_workflow_uses_same_repo_successful_artifact_and_production_envi
     text = WORKFLOW.read_text()
 
     assert "environment: production" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "group: production-aux-re-mode-control" in text
     assert '--repo "$GITHUB_REPOSITORY"' in text
     assert 'test "$conclusion" = "success"' in text
+    assert 'test "$workflow_name" = "Aux RE rollout evidence"' in text
+    assert 'test "$head_branch" = "main"' in text
     assert "--name aux-rollout-evidence" in text
     assert 'test "$(find "$RUNNER_TEMP/aux-rollout-evidence" -type f | wc -l)" -eq 1' in text
 

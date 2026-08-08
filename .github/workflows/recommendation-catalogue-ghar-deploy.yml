@@ -26,7 +26,9 @@ concurrency:
 
 jobs:
   deploy:
-    if: inputs.confirm == 'deploy-ghar-catalogue'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'deploy-ghar-catalogue'
     environment: production
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -53,8 +55,11 @@ jobs:
             --json conclusion --jq '.conclusion')"
           workflow_name="$(gh run view "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --json workflowName --jq '.workflowName')"
+          head_branch="$(gh run view "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json headBranch --jq '.headBranch')"
           test "$conclusion" = "success"
           test "$workflow_name" = "Recommendation catalogue publication"
+          test "$head_branch" = "main"
 
       - name: Download exact publication into immutable image context
         env:

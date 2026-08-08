@@ -22,12 +22,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: production-aux-re-rollout-control
+  group: production-aux-re-mode-control
   cancel-in-progress: false
 
 jobs:
   decide:
-    if: inputs.confirm == 'evaluate-aux-rollout'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'evaluate-aux-rollout'
     environment: production
     runs-on: ubuntu-latest
     env:
@@ -46,7 +48,13 @@ jobs:
           esac
           conclusion="$(gh run view "$EVIDENCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --json conclusion --jq '.conclusion')"
+          workflow_name="$(gh run view "$EVIDENCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json workflowName --jq '.workflowName')"
+          head_branch="$(gh run view "$EVIDENCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json headBranch --jq '.headBranch')"
           test "$conclusion" = "success"
+          test "$workflow_name" = "Aux RE rollout evidence"
+          test "$head_branch" = "main"
 
       - name: Download privacy-minimized rollout evidence
         env:

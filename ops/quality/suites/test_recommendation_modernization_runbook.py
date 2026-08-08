@@ -58,7 +58,10 @@ def test_runbook_discloses_unclosed_operational_gaps():
     text = RUNBOOK.read_text()
     normalized = normalized_text()
 
-    assert "no dedicated protected workflow" in normalized
+    assert "Aux RE off and shadow mode control" in text
+    assert "first forces `off`" in text
+    assert "no automated user-visible activation path" in normalized
+    assert "household-stable canary mechanism" in normalized
     assert "consented real-outcome replay producer" in text
     assert "live publishable count is unknown" in text
     assert "## Founder Sign-off" in text

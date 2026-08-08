@@ -1,0 +1,194 @@
+name: Aux RE off and shadow mode control
+
+on:
+  workflow_dispatch:
+    inputs:
+      desired_mode:
+        description: Fail-safe off, or evidence-collecting shadow
+        required: true
+        default: "off"
+        type: choice
+        options:
+          - "off"
+          - shadow
+      aux_deploy_run_id:
+        description: Required for shadow; successful governed Aux deploy run
+        required: false
+        type: string
+      ghar_deploy_run_id:
+        description: Required for shadow; successful same-publication Ghar deploy run
+        required: false
+        type: string
+      load_run_id:
+        description: Required for shadow; successful signed Aux load-gate run
+        required: false
+        type: string
+      publication_version:
+        description: Required for shadow; full sha256 catalogue publication
+        required: false
+        type: string
+      expected_row_count:
+        description: Required for shadow; exact publication manifest row count
+        required: false
+        type: string
+      confirm:
+        description: Type set-aux-off-or-shadow
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: production-aux-re-mode-control
+  cancel-in-progress: false
+
+jobs:
+  transition:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'set-aux-off-or-shadow'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF }}
+      FLY_AUX_APP: ${{ vars.FLY_AUX_APP }}
+      FLY_GHAR_APP: ${{ vars.FLY_GHAR_APP }}
+      AUX_RE_SERVICE_SECRET: ${{ secrets.AUX_RE_SERVICE_SECRET }}
+      DESIRED_MODE: ${{ inputs.desired_mode }}
+      PUBLICATION_VERSION: ${{ inputs.publication_version }}
+      EXPECTED_ROW_COUNT: ${{ inputs.expected_row_count }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Verify protected Supabase target
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$PRODUCTION_PROJECT_REF"
+          case "$PRODUCTION_PROJECT_REF" in
+            *[!a-z0-9]*) echo "invalid production project reference" >&2; exit 1 ;;
+          esac
+
+      - name: Force fail-safe off before evaluating any transition
+        run: |
+          supabase secrets set AUX_RE_MODE=off --project-ref "$PRODUCTION_PROJECT_REF"
+
+      - name: Validate exact shadow evidence lineage
+        if: inputs.desired_mode == 'shadow'
+        env:
+          AUX_DEPLOY_RUN_ID: ${{ inputs.aux_deploy_run_id }}
+          GHAR_DEPLOY_RUN_ID: ${{ inputs.ghar_deploy_run_id }}
+          LOAD_RUN_ID: ${{ inputs.load_run_id }}
+        run: |
+          test -n "$AUX_RE_SERVICE_SECRET"
+          for app in "$FLY_AUX_APP" "$FLY_GHAR_APP"; do
+            case "$app" in
+              ''|*[!a-z0-9-]*) echo "Fly app names must be lowercase DNS labels" >&2; exit 1 ;;
+            esac
+          done
+          case "$PUBLICATION_VERSION" in
+            sha256:????????????????????????????????????????????????????????????????) ;;
+            *) echo "publication_version must be a full sha256 digest" >&2; exit 1 ;;
+          esac
+          digest="${PUBLICATION_VERSION#sha256:}"
+          case "$digest" in *[!0-9a-f]*) echo "publication digest must be lowercase hex" >&2; exit 1 ;; esac
+          case "$EXPECTED_ROW_COUNT" in
+            ''|*[!0-9]*) echo "expected_row_count must be a positive integer" >&2; exit 1 ;;
+          esac
+          test "$EXPECTED_ROW_COUNT" -gt 0
+
+          for run_id in "$AUX_DEPLOY_RUN_ID" "$GHAR_DEPLOY_RUN_ID" "$LOAD_RUN_ID"; do
+            case "$run_id" in
+              ''|*[!0-9]*) echo "all shadow source run IDs must be numeric" >&2; exit 1 ;;
+            esac
+          done
+          test "$(gh run view "$AUX_DEPLOY_RUN_ID" --repo "$GITHUB_REPOSITORY" --json conclusion --jq '.conclusion')" = "success"
+          test "$(gh run view "$AUX_DEPLOY_RUN_ID" --repo "$GITHUB_REPOSITORY" --json workflowName --jq '.workflowName')" = "Deploy Aux RE in shadow mode"
+          test "$(gh run view "$AUX_DEPLOY_RUN_ID" --repo "$GITHUB_REPOSITORY" --json headBranch --jq '.headBranch')" = "main"
+          test "$(gh run view "$GHAR_DEPLOY_RUN_ID" --repo "$GITHUB_REPOSITORY" --json conclusion --jq '.conclusion')" = "success"
+          test "$(gh run view "$GHAR_DEPLOY_RUN_ID" --repo "$GITHUB_REPOSITORY" --json workflowName --jq '.workflowName')" = "Deploy Ghar with recommendation catalogue"
+          test "$(gh run view "$GHAR_DEPLOY_RUN_ID" --repo "$GITHUB_REPOSITORY" --json headBranch --jq '.headBranch')" = "main"
+          test "$(gh run view "$LOAD_RUN_ID" --repo "$GITHUB_REPOSITORY" --json conclusion --jq '.conclusion')" = "success"
+          test "$(gh run view "$LOAD_RUN_ID" --repo "$GITHUB_REPOSITORY" --json workflowName --jq '.workflowName')" = "Aux RE deployed load report"
+          test "$(gh run view "$LOAD_RUN_ID" --repo "$GITHUB_REPOSITORY" --json headBranch --jq '.headBranch')" = "main"
+
+          mkdir -p "$RUNNER_TEMP/load-source"
+          gh run download "$LOAD_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name aux-load-report --dir "$RUNNER_TEMP/load-source"
+          test -f "$RUNNER_TEMP/load-source/load.json"
+          test "$(find "$RUNNER_TEMP/load-source" -type f | wc -l)" -eq 1
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .schema_version == "recommendation-load-report-v2"
+            and .service == "aux"
+            and .publication_versions == [$version]
+            and .evaluation.mode == "gated"
+            and .evaluation.passed == true
+          ' "$RUNNER_TEMP/load-source/load.json" >/dev/null
+
+      - name: Verify both live engines expose the exact publication
+        if: inputs.desired_mode == 'shadow'
+        run: |
+          curl --fail --silent --show-error "https://${FLY_AUX_APP}.fly.dev/v1/meta" \
+            --output "$RUNNER_TEMP/aux-meta.json"
+          curl --fail --silent --show-error "https://${FLY_GHAR_APP}.fly.dev/v1/meta" \
+            --output "$RUNNER_TEMP/ghar-meta.json"
+          jq --exit-status --arg version "$PUBLICATION_VERSION" '
+            .enabled == true
+            and .mode == "shadow"
+            and .catalogue_publication.version == $version
+          ' "$RUNNER_TEMP/aux-meta.json" >/dev/null
+          jq --exit-status --arg version "$PUBLICATION_VERSION" \
+            --argjson count "$EXPECTED_ROW_COUNT" '
+              .published_catalogue.configured == true
+              and .published_catalogue.publication_version == $version
+              and .published_catalogue.row_count == $count
+            ' "$RUNNER_TEMP/ghar-meta.json" >/dev/null
+
+      - name: Enable evidence-only shadow mode
+        if: inputs.desired_mode == 'shadow'
+        run: |
+          supabase secrets set \
+            AUX_RE_MODE=shadow \
+            "AUX_RE_SERVICE_URL=https://${FLY_AUX_APP}.fly.dev" \
+            "AUX_RE_SERVICE_SECRET=$AUX_RE_SERVICE_SECRET" \
+            --project-ref "$PRODUCTION_PROJECT_REF"
+
+      - name: Produce identity-free transition evidence
+        env:
+          AUX_DEPLOY_RUN_ID: ${{ inputs.aux_deploy_run_id }}
+          GHAR_DEPLOY_RUN_ID: ${{ inputs.ghar_deploy_run_id }}
+          LOAD_RUN_ID: ${{ inputs.load_run_id }}
+        run: |
+          jq --null-input \
+            --arg mode "$DESIRED_MODE" \
+            --arg publication "$PUBLICATION_VERSION" \
+            --arg aux_deploy_run_id "$AUX_DEPLOY_RUN_ID" \
+            --arg ghar_deploy_run_id "$GHAR_DEPLOY_RUN_ID" \
+            --arg load_run_id "$LOAD_RUN_ID" \
+            --arg workflow_run_id "$GITHUB_RUN_ID" '{
+              schema_version: "aux-re-mode-transition-v1",
+              mode: $mode,
+              publication_version: (if $mode == "shadow" then $publication else null end),
+              source_runs: (if $mode == "shadow" then {
+                aux_deploy: $aux_deploy_run_id,
+                ghar_deploy: $ghar_deploy_run_id,
+                load: $load_run_id
+              } else null end),
+              workflow_run_id: $workflow_run_id,
+              passed: true
+            }' > "$RUNNER_TEMP/aux-re-mode-transition.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aux-re-mode-transition-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/aux-re-mode-transition.json
+          retention-days: 90
+          if-no-files-found: error

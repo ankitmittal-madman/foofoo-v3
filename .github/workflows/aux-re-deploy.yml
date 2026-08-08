@@ -30,7 +30,9 @@ concurrency:
 
 jobs:
   deploy:
-    if: inputs.confirm == 'deploy-aux-shadow'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'deploy-aux-shadow'
     environment: production
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -60,8 +62,11 @@ jobs:
             --json conclusion --jq '.conclusion')"
           workflow_name="$(gh run view "$QDRANT_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --json workflowName --jq '.workflowName')"
+          head_branch="$(gh run view "$QDRANT_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json headBranch --jq '.headBranch')"
           test "$conclusion" = "success"
           test "$workflow_name" = "Publish recommendation catalogue to Qdrant"
+          test "$head_branch" = "main"
           mkdir -p "$RUNNER_TEMP/qdrant-source"
           gh run download "$QDRANT_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --name recommendation-catalogue-qdrant-report --dir "$RUNNER_TEMP/qdrant-source"

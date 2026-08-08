@@ -14,7 +14,9 @@ concurrency:
 
 jobs:
   deploy:
-    if: inputs.confirm == 'deploy-recommendation-edge'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm == 'deploy-recommendation-edge'
     environment: production
     runs-on: ubuntu-latest
     env:
