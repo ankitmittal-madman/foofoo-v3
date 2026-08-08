@@ -30,5 +30,7 @@ def test_identity_validation_walks_every_page_and_checks_the_full_safety_subset(
     assert "AS published(row_data)" in text
     assert "v_publication_page_max <= v_publication_after" in text
     assert "array_agg(dish_id ORDER BY dish_id DESC)" in text
+    assert "v_identity_page_bad_regional" in text
+    assert "canonical catalogue regional metadata is invalid" in text
     assert "max(dish_id)" not in text
     assert "catalogue_identity_rows(NULL, 2000) identities" not in text

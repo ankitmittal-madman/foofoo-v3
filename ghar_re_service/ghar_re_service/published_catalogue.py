@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any, Protocol
 from uuid import UUID
 
-from ghar_re_core.catalogue import Catalogue, allergens_from_flags
+from ghar_re_core.catalogue import Catalogue, allergens_from_flags, regional_affinity_scores
 
 PUBLICATION_DIR_VAR = "GHAR_RE_PUBLISHED_CATALOGUE_DIR"
 MAX_CANDIDATE_IDS = 500
@@ -145,6 +145,7 @@ def to_ghar_dish(row: Mapping[str, Any]) -> dict[str, Any]:
         "synonyms": aliases,
         "ingredients": ingredient_pairs,
         "allergens": sorted(explicit_allergens),
+        "regional_affinities": list(row.get("regional_affinities") or []),
         "macro": {"calories": row.get("calories")},
     }
 
@@ -194,12 +195,12 @@ class PublishedCatalogueStore:
             )
         return Catalogue([to_ghar_dish(payload_by_id[dish_id]) for dish_id in unique_ids])
 
-    def canonical_ids_by_name(self) -> dict[str, str]:
-        """Return the verified publication's canonical UUID keyed by normalized canonical name.
+    def canonical_identities_by_name(self) -> dict[str, dict[str, Any]]:
+        """Return verified UUID and regional metadata keyed by normalized canonical name.
 
-        This startup-only identity index reads no user data and does not hydrate taxonomy or alter
-        the serving candidate pool. It exists so the immutable fallback can preserve its ranking
-        while emitting the same canonical dish identity as database-backed candidates.
+        This startup-only identity index reads no user data and does not hydrate safety taxonomy or
+        alter the serving candidate pool. It exists so the immutable fallback can emit canonical
+        dish identity and consume confidence-weighted regional soft-ranking evidence.
         """
         uri = f"file:{self.index_path}?mode=ro"
         with sqlite3.connect(uri, uri=True) as database:
@@ -207,14 +208,21 @@ class PublishedCatalogueStore:
                 "SELECT 1 FROM sqlite_master WHERE type='table' AND name='catalogue_identity'"
             ).fetchone()
             source = "catalogue_identity" if has_identity_index else "catalogue"
-            rows = database.execute(f"SELECT dish_id, name FROM {source}").fetchall()  # noqa: S608
+            columns = {
+                str(row[1])
+                for row in database.execute(f"PRAGMA table_info({source})").fetchall()  # noqa: S608
+            }
+            regional_sql = "regional_affinities" if "regional_affinities" in columns else "'[]'"
+            rows = database.execute(  # noqa: S608
+                f"SELECT dish_id, name, {regional_sql} FROM {source}"
+            ).fetchall()
         if len(rows) != self.identity_row_count:
             raise PublishedCatalogueError(
                 "published catalogue identity count does not match manifest"
             )
 
-        identities: dict[str, str] = {}
-        for raw_id, raw_name in rows:
+        identities: dict[str, dict[str, Any]] = {}
+        for raw_id, raw_name, raw_regional_affinities in rows:
             dish_id = str(raw_id)
             try:
                 canonical_id = str(UUID(dish_id))
@@ -229,11 +237,27 @@ class PublishedCatalogueStore:
             name_key = " ".join(str(raw_name).casefold().split())
             if not name_key:
                 raise PublishedCatalogueError("published catalogue contains an empty dish name")
+            try:
+                regional_affinities = json.loads(str(raw_regional_affinities))
+            except json.JSONDecodeError as exc:
+                raise PublishedCatalogueError(
+                    "published catalogue contains invalid regional affinity metadata"
+                ) from exc
             prior = identities.get(name_key)
-            if prior is not None and prior != canonical_id:
+            if prior is not None and prior["dish_id"] != canonical_id:
                 raise PublishedCatalogueError("published catalogue contains a dish-name collision")
-            identities[name_key] = canonical_id
+            identities[name_key] = {
+                "dish_id": canonical_id,
+                "regional_affinities": regional_affinities,
+            }
         return identities
+
+    def canonical_ids_by_name(self) -> dict[str, str]:
+        """Return only canonical UUIDs for callers that do not need regional metadata."""
+        return {
+            name: str(identity["dish_id"])
+            for name, identity in self.canonical_identities_by_name().items()
+        }
 
 
 def reconcile_fallback_identities(
@@ -242,20 +266,22 @@ def reconcile_fallback_identities(
     """Attach exact canonical UUIDs to matching fallback dishes without changing candidates.
 
     Only normalized canonical-name equality is accepted; aliases and fuzzy matching are excluded
-    because either could silently attach feedback to the wrong dish. Unmatched fallback dishes keep
-    their legacy identifiers and remain measurable in the returned aggregate coverage counts.
+    because either could silently attach feedback to the wrong dish. Exact matches receive the UUID
+    and confidence-weighted regional soft evidence. Unmatched dishes keep legacy identifiers and
+    remain measurable in the returned aggregate coverage counts.
     """
     dishes = list(catalogue.dishes)
     if store is None:
         return {"total": len(dishes), "resolved": 0, "unresolved": len(dishes)}
 
-    identities = store.canonical_ids_by_name()
+    identities = store.canonical_identities_by_name()
     resolved = 0
     for dish in dishes:
-        canonical_id = identities.get(" ".join(str(dish.name).casefold().split()))
-        if canonical_id is None:
+        identity = identities.get(" ".join(str(dish.name).casefold().split()))
+        if identity is None:
             continue
-        dish.id = canonical_id
+        dish.id = identity["dish_id"]
+        dish.regional_affinities = regional_affinity_scores(identity["regional_affinities"])
         resolved += 1
 
     # Catalogue constructed this index before publication loading. Rebuild it atomically after all

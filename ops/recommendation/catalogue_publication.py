@@ -128,7 +128,7 @@ def iter_publication_rows(connection: Any, *, page_size: int = 500) -> Iterator[
             return
 
 
-def iter_identity_rows(connection: Any, *, page_size: int = 500) -> Iterator[dict[str, str]]:
+def iter_identity_rows(connection: Any, *, page_size: int = 500) -> Iterator[dict[str, Any]]:
     """Yield deterministic canonical UUID/name pages without asserting serving eligibility."""
     if not 1 <= page_size <= 2000:
         raise ValueError("page_size must be between 1 and 2000")
@@ -136,7 +136,8 @@ def iter_identity_rows(connection: Any, *, page_size: int = 500) -> Iterator[dic
     while True:
         with connection.cursor() as cursor:
             cursor.execute(
-                "select dish_id::text, name from re_engine.catalogue_identity_rows(%s, %s)",
+                "select dish_id::text, name, regional_affinities "
+                "from re_engine.catalogue_identity_rows(%s, %s)",
                 (after, page_size),
             )
             batch = cursor.fetchall()
@@ -146,12 +147,19 @@ def iter_identity_rows(connection: Any, *, page_size: int = 500) -> Iterator[dic
         for row in mapped_batch:
             dish_id = str(row.get("dish_id") or "")
             name = str(row.get("name") or "").strip()
+            regional_affinities = row.get("regional_affinities")
             if not dish_id or not name:
                 raise RuntimeError("Catalogue identity row is incomplete")
             if after is not None and dish_id <= after:
                 raise RuntimeError("Catalogue identity rows are not strictly ordered")
             after = dish_id
-            yield {"dish_id": dish_id, "name": name}
+            if not isinstance(regional_affinities, list):
+                raise RuntimeError("Catalogue identity regional affinities are not an array")
+            yield {
+                "dish_id": dish_id,
+                "name": name,
+                "regional_affinities": regional_affinities,
+            }
         if len(mapped_batch) < page_size:
             return
 
@@ -172,7 +180,8 @@ def _create_hydration_index(path: Path) -> sqlite3.Connection:
         CREATE TABLE catalogue_identity (
           dish_id TEXT PRIMARY KEY,
           normalized_name TEXT NOT NULL UNIQUE,
-          name TEXT NOT NULL
+          name TEXT NOT NULL,
+          regional_affinities TEXT NOT NULL
         ) WITHOUT ROWID;
         CREATE TABLE dish_slots (
           slot TEXT NOT NULL,
@@ -254,15 +263,21 @@ def publish(connection: Any, output_dir: Path, *, page_size: int = 500) -> dict[
                 dish_id = identity["dish_id"]
                 name = identity["name"]
                 normalized_name = " ".join(name.casefold().split())
+                regional_affinities = json.dumps(
+                    identity["regional_affinities"], sort_keys=True, separators=(",", ":")
+                )
                 try:
                     index.execute(
-                        "INSERT INTO catalogue_identity(dish_id, normalized_name, name) "
-                        "VALUES (?, ?, ?)",
-                        (dish_id, normalized_name, name),
+                        "INSERT INTO catalogue_identity"
+                        "(dish_id, normalized_name, name, regional_affinities) "
+                        "VALUES (?, ?, ?, ?)",
+                        (dish_id, normalized_name, name, regional_affinities),
                     )
                 except sqlite3.IntegrityError as exc:
                     raise RuntimeError("Canonical catalogue identity is not unique") from exc
-                identity_encoded = f"{dish_id}\t{normalized_name}\t{name}\n".encode()
+                identity_encoded = (
+                    f"{dish_id}\t{normalized_name}\t{name}\t{regional_affinities}\n".encode()
+                )
                 publication_digest.update(b"identity:")
                 publication_digest.update(identity_encoded)
                 identity_count += 1

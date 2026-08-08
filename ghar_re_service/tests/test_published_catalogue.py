@@ -63,11 +63,20 @@ def build_publication(tmp_path, rows):
         )
         database.execute(
             "CREATE TABLE catalogue_identity "
-            "(dish_id TEXT PRIMARY KEY, normalized_name TEXT UNIQUE, name TEXT) WITHOUT ROWID"
+            "(dish_id TEXT PRIMARY KEY, normalized_name TEXT UNIQUE, name TEXT, "
+            "regional_affinities TEXT NOT NULL) WITHOUT ROWID"
         )
         database.executemany(
-            "INSERT INTO catalogue_identity VALUES (?, ?, ?)",
-            [(row["id"], " ".join(row["name"].casefold().split()), row["name"]) for row in rows],
+            "INSERT INTO catalogue_identity VALUES (?, ?, ?, ?)",
+            [
+                (
+                    row["id"],
+                    " ".join(row["name"].casefold().split()),
+                    row["name"],
+                    json.dumps(row.get("regional_affinities", [])),
+                )
+                for row in rows
+            ],
         )
     index_hash = hashlib.sha256(index_path.read_bytes()).hexdigest()
     (directory / "manifest.json").write_text(
@@ -87,10 +96,19 @@ def build_publication(tmp_path, rows):
 def test_store_hydrates_only_requested_ids_with_canonical_identity(tmp_path):
     first_id = "00000000-0000-0000-0000-000000000001"
     second_id = "00000000-0000-0000-0000-000000000002"
+    second = publication_row(second_id, "Published Idli")
+    second["regional_affinities"] = [
+        {
+            "region_code": "madhya_pradesh",
+            "affinity_score": 0.9,
+            "confidence": 0.8,
+            "review_status": "accepted",
+        }
+    ]
     store = PublishedCatalogueStore(
         build_publication(
             tmp_path,
-            [publication_row(first_id), publication_row(second_id, "Published Idli")],
+            [publication_row(first_id), second],
         )
     )
 
@@ -99,6 +117,7 @@ def test_store_hydrates_only_requested_ids_with_canonical_identity(tmp_path):
     assert [dish.id for dish in catalogue] == [second_id]
     assert catalogue.get("Published Idli").main_ingredients == ["rice"]
     assert catalogue.get("Published Idli").jain_compatible == "Y"
+    assert catalogue.get("Published Idli").regional_affinities == {"madhya_pradesh": 0.72}
     assert dish_allergens(catalogue.get("Published Idli")) >= {"fish", "soy"}
 
 
@@ -156,9 +175,16 @@ def test_request_selection_uses_bounded_publication_when_all_ids_resolve(tmp_pat
 
 def test_fallback_identity_reconciliation_preserves_candidates_and_attaches_exact_uuid(tmp_path):
     canonical_id = "00000000-0000-0000-0000-000000000001"
-    store = PublishedCatalogueStore(
-        build_publication(tmp_path, [publication_row(canonical_id, "Rajma")])
-    )
+    row = publication_row(canonical_id, "Rajma")
+    row["regional_affinities"] = [
+        {
+            "region_code": "madhya_pradesh",
+            "affinity_score": 0.9,
+            "confidence": 0.8,
+            "review_status": "accepted",
+        }
+    ]
+    store = PublishedCatalogueStore(build_publication(tmp_path, [row]))
     fallback = Catalogue()
     before_names = [dish.name for dish in fallback]
 
@@ -166,6 +192,7 @@ def test_fallback_identity_reconciliation_preserves_candidates_and_attaches_exac
 
     assert [dish.name for dish in fallback] == before_names
     assert fallback.get("Rajma").id == canonical_id
+    assert fallback.get("Rajma").regional_affinities == {"madhya_pradesh": 0.72}
     assert fallback.get_dish(canonical_id) is fallback.get("Rajma")
     assert coverage == {
         "total": len(before_names),

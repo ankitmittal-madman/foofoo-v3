@@ -6,6 +6,7 @@ DECLARE
   v_identity_page_count integer;
   v_identity_page_max uuid;
   v_identity_page_invalid integer;
+  v_identity_page_bad_regional integer;
   v_publication_after uuid := NULL;
   v_publication_page_count integer;
   v_publication_page_max uuid;
@@ -38,16 +39,40 @@ BEGIN
   END IF;
 
   LOOP
-    SELECT count(*), (array_agg(dish_id ORDER BY dish_id DESC))[1], count(*) FILTER (
-      WHERE name IS NULL OR btrim(name) = ''
-        OR (v_identity_after IS NOT NULL AND dish_id <= v_identity_after)
-    )
-    INTO v_identity_page_count, v_identity_page_max, v_identity_page_invalid
+    SELECT
+      count(*),
+      (array_agg(dish_id ORDER BY dish_id DESC))[1],
+      count(*) FILTER (
+        WHERE name IS NULL OR btrim(name) = ''
+          OR (v_identity_after IS NOT NULL AND dish_id <= v_identity_after)
+      ),
+      count(*) FILTER (
+        WHERE jsonb_typeof(regional_affinities) <> 'array'
+          OR EXISTS (
+            SELECT 1
+            FROM jsonb_array_elements(
+              CASE WHEN jsonb_typeof(regional_affinities) = 'array'
+                THEN regional_affinities ELSE '[]'::jsonb END
+            ) item
+            WHERE nullif(item->>'region_code', '') IS NULL
+               OR (item->>'affinity_score')::numeric NOT BETWEEN 0 AND 1
+               OR (item->>'confidence')::numeric NOT BETWEEN 0 AND 1
+               OR item->>'review_status' = 'rejected'
+          )
+      )
+    INTO
+      v_identity_page_count,
+      v_identity_page_max,
+      v_identity_page_invalid,
+      v_identity_page_bad_regional
     FROM re_engine.catalogue_identity_rows(v_identity_after, 2000);
     EXIT WHEN v_identity_page_count = 0;
     IF v_identity_page_count > 2000 OR v_identity_page_max IS NULL
        OR v_identity_page_invalid <> 0 THEN
       RAISE EXCEPTION 'canonical catalogue identity page is invalid';
+    END IF;
+    IF v_identity_page_bad_regional <> 0 THEN
+      RAISE EXCEPTION 'canonical catalogue regional metadata is invalid';
     END IF;
     v_identity_seen := v_identity_seen + v_identity_page_count;
     v_identity_after := v_identity_page_max;

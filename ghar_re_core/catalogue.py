@@ -6,6 +6,9 @@ while staying faithful to the seeded schema. Zone is resolved cuisine -> cuisine
 (KB §R1), exactly as the DB would via ghar_re.zone_map.
 """
 
+import re
+from collections.abc import Mapping
+
 from ghar_re_core import fixtures as F
 from ghar_re_core import knowledge as K
 
@@ -34,6 +37,34 @@ _GROUP_ZONE = {z[0]: z[1] for z in K.ZONE_MAP}
 
 def _normalize_name(value):
     return " ".join(str(value).casefold().split())
+
+
+def normalize_region_code(value):
+    """Convert a state/region label to the governed lowercase underscore vocabulary."""
+    return re.sub(r"[^a-z0-9]+", "_", str(value).casefold()).strip("_")
+
+
+def regional_affinity_scores(values):
+    """Return confidence-weighted non-rejected regional affinities keyed by canonical code.
+
+    Governed regional facts are soft evidence, never safety filters. Multiple assertions for the
+    same normalized region retain the strongest confidence-weighted score, while malformed or
+    rejected assertions are ignored rather than guessed.
+    """
+    scores = {}
+    for value in values if isinstance(values, list) else []:
+        if not isinstance(value, Mapping) or value.get("review_status") == "rejected":
+            continue
+        code = normalize_region_code(value.get("region_code", ""))
+        try:
+            affinity = float(value.get("affinity_score"))
+            confidence = float(value.get("confidence", 1.0))
+        except (TypeError, ValueError):
+            continue
+        if not code or not (0 <= affinity <= 1 and 0 <= confidence <= 1):
+            continue
+        scores[code] = max(scores.get(code, 0.0), round(affinity * confidence, 6))
+    return scores
 
 
 class Dish:
@@ -76,6 +107,10 @@ class Dish:
         self.explicit_allergens = {
             canonical_allergen(value) for value in (d.get("allergens") or [])
         }
+        # Database publications carry curated/provisional regional evidence separately from the
+        # cuisine origin heuristic. Confidence-weight it here so scoring can consume one bounded
+        # soft signal and unchanged fixture/bundle rows retain an empty map.
+        self.regional_affinities = regional_affinity_scores(d.get("regional_affinities"))
         # vegan_compatible: computed here (not pre-baked per-dish like jain_compatible/
         # farali_compatible) so both the golden sample and the real catalogue share one derivation,
         # from ingredients_v5.csv's existing is_vegan column (already populated — dairy/honey are
