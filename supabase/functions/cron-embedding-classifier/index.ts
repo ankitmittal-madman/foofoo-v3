@@ -23,34 +23,22 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
   async (_req, ctx) => {
     const db = createServiceRoleClient(ctx.config);
 
-    // Targets completeness directly (missing meal_class mapping or missing cuisine) rather than
-    // ontology_status='pending' -- a dish can already be 'enriched' by Groq (taxonomy/aliases
-    // published) while still lacking meal_class or cuisine, and should still be picked up here.
-    const { data: dishes, error: fetchError } = await db
-      .from("dishes")
-      .select("id, name")
-      .or("cuisine_id.is.null")
-      .limit(BATCH_SIZE);
-    if (fetchError) throw fetchError;
-
-    // Second pass for dishes missing a meal_class mapping specifically (no single SQL NOT EXISTS
-    // filter is expressible through the query builder here) -- kept separate from the cuisine-only
-    // fetch above so a dish needing only one of the two fields isn't skipped for lacking the other.
-    const { data: missingClassRows, error: classFetchError } = await db.rpc(
-      "dishes_missing_meal_class",
+    // migration 131: single RPC that also excludes dishes with an existing embedding_classifier
+    // food_source_records row. The prior two-query selection (cuisine_id IS NULL +
+    // dishes_missing_meal_class) had no memory of a dish already being attempted -- a dish whose
+    // nearest match scored below the 0.55 threshold stays cuisine_id=NULL/mapping-less forever
+    // (embeddings are static, so that outcome never changes), so it kept getting re-selected every
+    // invocation instead of the batch advancing to dishes not yet tried. Confirmed in production:
+    // food_source_records grew by ~300 rows while coverage counts didn't move at all.
+    const { data: rows, error: fetchError } = await db.rpc(
+      "dishes_pending_embedding_classification",
       { p_limit: BATCH_SIZE },
     );
-    if (classFetchError) throw classFetchError;
-
-    const seen = new Set<string>();
-    const targets: Array<{ id: string; name: string }> = [];
-    for (const row of [...(dishes ?? []), ...(missingClassRows ?? [])]) {
-      const id = String((row as Record<string, unknown>).id);
-      if (seen.has(id)) continue;
-      seen.add(id);
-      targets.push({ id, name: String((row as Record<string, unknown>).name) });
-      if (targets.length >= BATCH_SIZE) break;
-    }
+    if (fetchError) throw fetchError;
+    const targets = (rows ?? []).map((row: Record<string, unknown>) => ({
+      id: String(row.id),
+      name: String(row.name),
+    }));
 
     let classified = 0;
     let published = 0;
