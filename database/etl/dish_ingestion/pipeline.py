@@ -438,14 +438,15 @@ def _persist_row(cur, db, run_id: str, o: RowOutcome, counters: Counter, match_m
                     instructions=row.raw.get("Instructions", ""),
                 )
                 prompt_text = assemble_prompt(clean_name, fields)
-                # HF FLUX.1-dev A/B test result: the hf-inference provider route this code hits
-                # returns HTTP 410 Gone ("model deprecated, no longer supported") for every
-                # request -- confirmed via job logs, not a credentials or code-logic issue. Back
-                # to Pollinations as primary; hf_image is still passed as a same-call fallback
-                # (harmless -- it fails fast, no retry loop) in case that changes.
+                # One more Founder-requested HF try: FLUX.1-dev returned HTTP 410 (deprecated on
+                # the hf-inference provider route) on its first real test -- HFImageClient now
+                # tries FLUX.1-dev then FLUX.1-schnell in one call (see images.py
+                # HF_IMAGE_MODEL_CANDIDATES) so this single attempt covers both before falling
+                # back to Pollinations.
                 image_result = images.generate_and_upload(
                     clean_name, prompt_text, fields.source, fields.model_name,
                     image_ctx.pollinations, image_ctx.uploader, image_ctx.hf_image,
+                    primary_backend="huggingface",
                 )
                 logger.info("dish %s: image_result fetch_status=%s storage_path=%s",
                             dish_id, image_result.fetch_status, image_result.storage_path)

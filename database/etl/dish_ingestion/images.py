@@ -67,8 +67,12 @@ CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/{cloud}/image/upload"
 # shapes/compositions for unfamiliar regional dishes despite accurate prompt text; see git
 # history). Overridable via env without another deploy.
 HF_ROUTER_IMAGE_URL = "https://router.huggingface.co/hf-inference/models/{model}"
-HF_IMAGE_MODEL = os.environ.get("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-dev")
-HF_IMAGE_BACKEND_LABEL = "hf_flux_dev"  # image_assets.image_gen_backend CHECK value, migration 089/090
+
+
+def _hf_backend_label(model: str) -> str:
+    """Maps an HF model id to its image_assets.image_gen_backend CHECK value (migration
+    089/090) -- must stay in sync with HF_IMAGE_MODEL_CANDIDATES below."""
+    return "hf_flux_schnell" if "schnell" in model.lower() else "hf_flux_dev"
 
 
 @dataclass
@@ -170,28 +174,53 @@ class PollinationsClient:
         raise RuntimeError(f"pollinations generation failed after {self.max_retries} attempts: {last_exc}")
 
 
+# Candidate models tried in order by HFImageClient.generate_png -- FLUX.1-dev returned HTTP 410
+# "model deprecated, no longer supported by provider hf-inference" on its first real test
+# (confirmed via job logs, not a credentials/code issue). Rather than guess at one replacement
+# without live access to HF's current model catalog (egress to huggingface.co is blocked from
+# this dev environment), try dev first, then schnell (the original, unconfirmed-but-never-
+# actually-tried default) as a same-attempt second try -- one real "try HF" covers both.
+HF_IMAGE_MODEL_CANDIDATES = [
+    os.environ.get("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-dev"),
+    "black-forest-labs/FLUX.1-schnell",
+]
+
+
 class HFImageClient:
     """Fallback real-generation call — Hugging Face Inference Providers router, text-to-image
     task. Only invoked when PollinationsClient.generate_png raises (see generate_and_upload).
     Requires HF_API_KEY or HUGGINGFACE_API_KEY (same credential already used by image_prompt.py's
     prompt-enrichment fallback, so no new secret to provision if that one's already set)."""
 
-    def __init__(self, api_key: str | None = None, model: str = HF_IMAGE_MODEL, timeout: int = 60):
+    def __init__(self, api_key: str | None = None, models: list[str] | None = None, timeout: int = 60):
         self.api_key = api_key if api_key is not None else (os.environ.get("HF_API_KEY") or os.environ.get("HUGGINGFACE_API_KEY"))
-        self.model = model
+        self.models = models if models is not None else HF_IMAGE_MODEL_CANDIDATES
         self.timeout = timeout
+        self.model = self.models[0]  # last-attempted model, for image_gen_backend labeling
 
     def configured(self) -> bool:
         return bool(self.api_key)
 
     def generate_png(self, prompt: str) -> tuple[bytes, str, int]:
         """Returns (image_bytes, request_url, seed=0 -- HF's router API doesn't expose the
-        provider's seed). Raises RuntimeError on any failure, same contract as
+        provider's seed). Tries self.models in order, returning on the first success. Raises
+        RuntimeError only if every candidate fails, same contract as
         PollinationsClient.generate_png so callers can treat both uniformly."""
         if not self.configured():
             raise RuntimeError("HF_API_KEY / HUGGINGFACE_API_KEY not set; cannot use the Hugging Face image fallback.")
 
-        url = HF_ROUTER_IMAGE_URL.format(model=self.model)
+        errors: list[str] = []
+        for model in self.models:
+            self.model = model
+            try:
+                return self._generate_png_one_model(prompt, model)
+            except Exception as exc:
+                errors.append(f"{model}: {exc}")
+                logger.warning("HF model %s failed, trying next candidate: %s", model, exc)
+        raise RuntimeError(f"HF image generation failed for all candidate models: {'; '.join(errors)}")
+
+    def _generate_png_one_model(self, prompt: str, model: str) -> tuple[bytes, str, int]:
+        url = HF_ROUTER_IMAGE_URL.format(model=model)
         payload = json.dumps({"inputs": prompt}).encode("utf-8")
         req = urllib.request.Request(
             url, data=payload, method="POST",
@@ -203,15 +232,15 @@ class HFImageClient:
                 body = resp.read()
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"HF image generation failed: HTTP {exc.code}: {detail}") from exc
+            raise RuntimeError(f"HTTP {exc.code}: {detail}") from exc
 
         # The router returns raw image bytes on success, but a JSON error body (e.g. model still
         # loading, HTTP 200 with an "error" field) on failure -- distinguish by Content-Type
         # rather than assuming any 200 response is a valid image.
         if "image" not in content_type:
-            raise RuntimeError(f"HF image generation returned non-image content-type={content_type!r}: {body[:300]!r}")
+            raise RuntimeError(f"non-image content-type={content_type!r}: {body[:300]!r}")
         if len(body) < MIN_VALID_BYTES:
-            raise ValueError(f"HF response too small to be a real image: {len(body)} bytes")
+            raise ValueError(f"response too small to be a real image: {len(body)} bytes")
         return body, url, 0
 
 
@@ -296,23 +325,25 @@ def generate_and_upload(dish_name: str, prompt_text: str, prompt_backend: str, p
     random_suffix = "".join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=6))
     public_id = f"{slug}_hero_01_{random_suffix}"
 
-    generators = [("pollinations_flux_pro", lambda: pollinations.generate_png(prompt_text))]
+    generators = [("pollinations_flux_pro", lambda: pollinations.generate_png(prompt_text), None)]
     if hf_image is not None and hf_image.configured():
-        generators.append((HF_IMAGE_BACKEND_LABEL, lambda: hf_image.generate_png(prompt_text)))
+        # label resolved after a successful call from hf_image.model (whichever candidate in
+        # HF_IMAGE_MODEL_CANDIDATES actually succeeded), not fixed up front.
+        generators.append((None, lambda: hf_image.generate_png(prompt_text), hf_image))
     if primary_backend == "huggingface":
         generators.reverse()
 
     png_bytes = request_url = seed = None
-    image_gen_backend = generators[0][0]
+    image_gen_backend = "pollinations_flux_pro"
     errors: list[str] = []
-    for backend_label, call in generators:
+    for backend_label, call, hf_client in generators:
         try:
             png_bytes, request_url, seed = call()
-            image_gen_backend = backend_label
+            image_gen_backend = backend_label or _hf_backend_label(hf_client.model)
             break
         except Exception as exc:
-            errors.append(f"{backend_label}={exc}")
-            logger.warning("%s generation failed for %s: %s", backend_label, dish_name, exc)
+            errors.append(f"{backend_label or 'huggingface'}={exc}")
+            logger.warning("%s generation failed for %s: %s", backend_label or "huggingface", dish_name, exc)
 
     if png_bytes is None:
         detail = "; ".join(errors) if errors else "no image backend configured"
