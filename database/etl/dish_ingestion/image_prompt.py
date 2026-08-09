@@ -53,8 +53,18 @@ HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
 # variant was tried and also failed to fix bad results on unfamiliar dishes (see git history,
 # reverted) -- reverting to this exact reference form rather than continuing to improvise
 # variations away from it.
+#
+# One deliberate addition beyond the reference: "(a fully cooked, prepared, plated dish, ready to
+# eat)" right after {dish_name}. Founder-confirmed real failure: Masala Karela rendered as a bowl
+# of RAW, uncut bitter gourd -- the reference's 867 sample dishes are all named after already-
+# cooked concepts ("gravy", "roti", "chicken curry") so this ambiguity never came up for them, but
+# any dish named directly after a raw vegetable/ingredient (karela, methi, etc.) has no built-in
+# "this is cooked" signal otherwise, and the model defaults to its strongest prior: the raw
+# ingredient. This phrase is a fixed, guaranteed anchor independent of what the LLM-generated
+# visual_description says.
 PROMPT_TEMPLATE = (
-    "Generate a high-quality professional food photograph of {dish_name}: {visual_description}. "
+    "Generate a high-quality professional food photograph of {dish_name} (a fully cooked, "
+    "prepared, plated dish, ready to eat -- never raw or uncut ingredients): {visual_description}. "
     "Served in a traditional {vessel_type}. The table surface is a clean warm-toned rustic wooden "
     "board with nothing else on it — no scattered spices, no loose herbs, no cloth, no glass, "
     "no items that are not part of the dish. Only the dish and its actual accompaniments. "
@@ -232,6 +242,12 @@ class ImagePromptGenerator:
 _FIELD_METHOD_INSTRUCTIONS = """You are filling in 4 blanks for a food-photography prompt template. Study this method,
 learned from 867 professionally hand-written examples for this same product, before answering:
 
+0. If the dish name is itself a raw ingredient/vegetable name (karela/bitter gourd, methi/
+   fenugreek, gobi/cauliflower, etc.), visual_description's FIRST WORDS must make cooked state
+   explicit and unmistakable -- "Cooked and stir-fried..." / "Roasted and spiced..." -- never
+   open with a bare color+shape description that could just as easily describe the raw
+   vegetable. Confirmed real failure: "Masala Karela" without this rendered as a bowl of raw,
+   uncut bitter gourd, because nothing in the description ruled that reading out.
 1. visual_description opens with the dish's PHYSICAL FORM (an explicit SHAPE word: round coin-
    shaped slices, whole pods, small cubes, thin strands, a flat disc, individual florets --
    pick the one that actually matches how this ingredient is cut/shaped in this dish) + PRECISE
