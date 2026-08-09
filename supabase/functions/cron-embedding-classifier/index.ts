@@ -14,7 +14,10 @@ import { buildContext, compose, errorBoundary, requestLogging } from "../_shared
 import { embedText, toVectorLiteral } from "../dish-ontology/embeddings.ts";
 import { sha256Json } from "../dish-ontology/research.ts";
 
-const BATCH_SIZE = 30;
+// gte-small cold-start plus sequential per-dish embedding calls hit WORKER_RESOURCE_LIMIT at
+// batch 30 in production testing -- 8 is a conservative size that leaves headroom for the
+// classify_dish_by_embedding RPC round-trip per dish too, not just the embedding call itself.
+const BATCH_SIZE = 8;
 
 const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
   async (_req, ctx) => {
