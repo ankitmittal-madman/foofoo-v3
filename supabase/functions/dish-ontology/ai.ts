@@ -65,6 +65,42 @@ export interface GroqEnrichmentResult {
   usage: GroqUsage;
   responseId: string | null;
   model: string;
+  rateLimit: GroqRateLimitInfo;
+}
+
+/** Groq's own rate-limit headers, captured on every response (success or failure).
+ *
+ * Every prior diagnosis of the persistent 429 was guesswork because this codebase discarded these
+ * headers entirely -- only a bounded error code like `groq_http_429:rate_limit_exceeded` survived.
+ * Retry-After/x-ratelimit-* are the actual, authoritative answer to "what is the real limit and how
+ * long until it resets" instead of inferring it from our own request cadence.
+ */
+export interface GroqRateLimitInfo {
+  limitRequests: number | null;
+  remainingRequests: number | null;
+  resetRequests: string | null;
+  limitTokens: number | null;
+  remainingTokens: number | null;
+  resetTokens: string | null;
+  retryAfterSeconds: number | null;
+}
+
+function extractRateLimitInfo(headers: Headers): GroqRateLimitInfo {
+  const num = (name: string): number | null => {
+    const raw = headers.get(name);
+    if (raw === null) return null;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
+  };
+  return {
+    limitRequests: num("x-ratelimit-limit-requests"),
+    remainingRequests: num("x-ratelimit-remaining-requests"),
+    resetRequests: headers.get("x-ratelimit-reset-requests"),
+    limitTokens: num("x-ratelimit-limit-tokens"),
+    remainingTokens: num("x-ratelimit-remaining-tokens"),
+    resetTokens: headers.get("x-ratelimit-reset-tokens"),
+    retryAfterSeconds: num("retry-after"),
+  };
 }
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -252,6 +288,18 @@ export function sanitizeGroqEnrichment(
   return { aliases, taxonomy, regional_affinities: regionalAffinities, meal_class: mealClass, cuisine };
 }
 
+/** Thrown specifically on a 429 so the caller can inspect the real Groq-reported limit/reset
+ * (rateLimit) instead of only seeing a generic error message, and can decide to stop calling Groq
+ * for the rest of the current batch rather than immediately retrying into the same wall. */
+export class GroqRateLimitedError extends Error {
+  readonly rateLimit: GroqRateLimitInfo;
+  constructor(message: string, rateLimit: GroqRateLimitInfo) {
+    super(message);
+    this.name = "GroqRateLimitedError";
+    this.rateLimit = rateLimit;
+  }
+}
+
 export interface ClosedVocabulary {
   /** public.meal_classes.class_code, active rows only. */
   classCodes: string[];
@@ -314,6 +362,7 @@ export async function generateGroqDishEnrichment(
       }),
       signal: controller.signal,
     });
+    const rateLimit = extractRateLimitInfo(response.headers);
     if (!response.ok) {
       let providerCode = "provider_error";
       try {
@@ -326,7 +375,9 @@ export async function generateGroqDishEnrichment(
       } catch {
         // Never retain provider bodies; only a bounded machine-readable code is diagnostic-safe.
       }
-      throw new Error(`groq_http_${response.status}:${providerCode}`);
+      const message = `groq_http_${response.status}:${providerCode}`;
+      if (response.status === 429) throw new GroqRateLimitedError(message, rateLimit);
+      throw new Error(message);
     }
     const payload = await response.json() as Record<string, unknown>;
     const choices = Array.isArray(payload.choices)
@@ -362,6 +413,7 @@ export async function generateGroqDishEnrichment(
       usage,
       responseId,
       model,
+      rateLimit,
       record: {
         provider: "groq",
         providerRecordId: responseId,

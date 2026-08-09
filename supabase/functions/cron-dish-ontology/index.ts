@@ -11,7 +11,7 @@ import {
 import { researchDish } from "../dish-ontology/research.ts";
 import { promoteExternalEvidence, storeResearchRecordsForSubject } from "../dish-ontology/store.ts";
 import type { ClosedVocabulary } from "../dish-ontology/ai.ts";
-import { generateGroqDishEnrichment } from "../dish-ontology/ai.ts";
+import { generateGroqDishEnrichment, GroqRateLimitedError } from "../dish-ontology/ai.ts";
 import { embedText, toVectorLiteral } from "../dish-ontology/embeddings.ts";
 
 const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
@@ -129,6 +129,7 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
       if (aiClaimError) throw aiClaimError;
       aiClaimed = aiJobs?.length ?? 0;
 
+      let groqRateLimited = false;
       for (const aiJob of aiJobs ?? []) {
         // Fetched per dish (not once per batch) so migration 127's word-overlap filter can trim
         // the class_codes list to what's actually relevant to this dish name, cutting prompt token
@@ -207,6 +208,10 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
             vocabulary,
           );
           aiTokens += generated.usage.totalTokens;
+          ctx.logger.info("groq_call_succeeded", {
+            remainingRequests: generated.rateLimit.remainingRequests,
+            remainingTokens: generated.rateLimit.remainingTokens,
+          });
           const stored = await storeResearchRecordsForSubject(ctx, {
             dishId: String(aiJob.dish_id),
             submissionId: null,
@@ -266,6 +271,22 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
             p_status: "failed",
             p_error: errorCode,
           });
+          if (error instanceof GroqRateLimitedError) {
+            // Real, Groq-reported limit/reset data -- logged so a 429 is finally diagnosable from
+            // fact instead of guessed at from our own request cadence. Also stop calling Groq for
+            // the rest of THIS invocation's batch: retrying immediately into the same 429 just
+            // burns attempts/budget for no chance of success until the window resets.
+            ctx.logger.warn("groq_rate_limited", {
+              limitRequests: error.rateLimit.limitRequests,
+              remainingRequests: error.rateLimit.remainingRequests,
+              resetRequests: error.rateLimit.resetRequests,
+              limitTokens: error.rateLimit.limitTokens,
+              remainingTokens: error.rateLimit.remainingTokens,
+              resetTokens: error.rateLimit.resetTokens,
+              retryAfterSeconds: error.rateLimit.retryAfterSeconds,
+            });
+            groqRateLimited = true;
+          }
         } finally {
           if (budgetReserved) {
             await db.rpc("settle_ai_provider_budget", {
@@ -275,6 +296,7 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
             });
           }
         }
+        if (groqRateLimited) break;
       }
     }
     return jsonOk(
