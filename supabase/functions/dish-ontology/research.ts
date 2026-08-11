@@ -1,12 +1,14 @@
 /** External food-research adapters used by the dish ontology ingestion workflow.
  *
  * FoodOn/OLS supplies ontology identifiers and synonyms. USDA FoodData Central supplies optional
- * food/nutrient matches when an operator configures a key. Neither provider is trusted to assign
- * FooFoo meal classes; provider responses are staged as evidence for later rules/AI/review.
+ * food/nutrient matches when an operator configures a key. AGROVOC (FAO) supplies multilingual
+ * agricultural/regional-vernacular vocabulary FoodOn under-covers for Indian dish/ingredient names
+ * -- alias evidence only, never used for nutrient values. None of these providers is trusted to
+ * assign FooFoo meal classes; provider responses are staged as evidence for later rules/AI/review.
  */
 
 export interface ResearchRecord {
-  provider: "foodon_ols" | "usda_fdc" | "groq";
+  provider: "foodon_ols" | "usda_fdc" | "agrovoc" | "ifct" | "groq";
   providerRecordId: string | null;
   sourceUrl: string;
   payload: Record<string, unknown>;
@@ -55,6 +57,33 @@ async function fetchJson(
   }
 }
 
+/** Best-effort fetch of the top hit's is_a ancestor labels, merged into payload.ancestors.
+ *
+ * Flat top-hit matching (the only lookup this function used before) misses cuisine/meal-class
+ * signal that only shows up a level or two up FoodOn's hierarchy (e.g. a specific dish's ancestor
+ * chain reaching "Indian food product"). A failure here must never fail the base FoodOn match --
+ * ancestors are additive alias evidence, not required for the record to be usable.
+ */
+async function fetchFoodOnAncestors(
+  iri: string,
+  fetchImpl: FetchLike,
+  timeoutMs: number,
+): Promise<string[]> {
+  try {
+    const encodedIri = encodeURIComponent(encodeURIComponent(iri));
+    const url =
+      `https://www.ebi.ac.uk/ols4/api/ontologies/foodon/terms/${encodedIri}/hierarchicalAncestors`;
+    const payload = await fetchJson(url, fetchImpl, timeoutMs);
+    const embedded = payload._embedded as Record<string, unknown> | undefined;
+    const terms = Array.isArray(embedded?.terms) ? embedded.terms as Record<string, unknown>[] : [];
+    return terms
+      .map((term) => (typeof term.label === "string" ? term.label : null))
+      .filter((label): label is string => label !== null);
+  } catch {
+    return [];
+  }
+}
+
 /** Search FoodOn through EMBL-EBI OLS4 and return at most one raw evidence record. */
 export async function searchFoodOn(
   query: string,
@@ -71,9 +100,45 @@ export async function searchFoodOn(
   const first = docs[0];
   if (!first) return null;
   const label = typeof first.label === "string" ? first.label : "";
+  const iri = typeof first.iri === "string" ? first.iri : null;
+  const ancestors = iri ? await fetchFoodOnAncestors(iri, fetchImpl, timeoutMs) : [];
   return {
     provider: "foodon_ols",
-    providerRecordId: typeof first.iri === "string" ? first.iri : null,
+    providerRecordId: iri,
+    sourceUrl: url.toString(),
+    payload: { ...payload, ancestors },
+    confidence: externalMatchConfidence(query, label),
+  };
+}
+
+/** Search AGROVOC (FAO) for regional/agricultural vocabulary FoodOn under-covers.
+ *
+ * Free, keyless REST endpoint. Alias/synonym evidence only -- AGROVOC is a vocabulary, not a
+ * nutrient-composition source, so no normalizer here ever produces an ExternalNutrient.
+ *
+ * Skosmos (the engine behind this endpoint) only matches its index against a query that carries
+ * a trailing wildcard -- a bare term like "okra" returns zero results while "okra*" returns real
+ * concepts. Confirmed empirically: every production job up to this fix silently got zero AGROVOC
+ * evidence regardless of the dish, because the query never carried one. vocab=agrovoc is pinned
+ * explicitly rather than relying on the endpoint's default vocabulary selection.
+ */
+export async function searchAgrovoc(
+  query: string,
+  fetchImpl: FetchLike = globalThis.fetch as FetchLike,
+  timeoutMs = RESEARCH_TIMEOUT_MS,
+): Promise<ResearchRecord | null> {
+  const url = new URL("https://agrovoc.fao.org/browse/rest/v1/search");
+  url.searchParams.set("vocab", "agrovoc");
+  url.searchParams.set("query", `${query}*`);
+  url.searchParams.set("lang", "en");
+  const payload = await fetchJson(url.toString(), fetchImpl, timeoutMs);
+  const results = Array.isArray(payload.results) ? payload.results as Record<string, unknown>[] : [];
+  const first = results[0];
+  if (!first) return null;
+  const label = typeof first.prefLabel === "string" ? first.prefLabel : "";
+  return {
+    provider: "agrovoc",
+    providerRecordId: typeof first.uri === "string" ? first.uri : null,
     sourceUrl: url.toString(),
     payload,
     confidence: externalMatchConfidence(query, label),
@@ -117,6 +182,7 @@ export async function researchDish(
 }> {
   const providers: Array<{ name: string; request: Promise<ResearchRecord | null> }> = [
     { name: "foodon_ols", request: searchFoodOn(query, fetchImpl) },
+    { name: "agrovoc", request: searchAgrovoc(query, fetchImpl) },
   ];
   if (usdaApiKey) {
     providers.push({ name: "usda_fdc", request: searchUsda(query, usdaApiKey, fetchImpl) });

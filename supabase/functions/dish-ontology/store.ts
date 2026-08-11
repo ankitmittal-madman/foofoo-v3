@@ -4,7 +4,7 @@ import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
 import type { ResearchRecord } from "./research.ts";
 import { sha256Json } from "./research.ts";
-import { normalizeFoodOn, normalizeUsda } from "./normalization.ts";
+import { normalizeAgrovoc, normalizeFoodOn, normalizeIfctRow, normalizeUsda } from "./normalization.ts";
 
 export interface StoredResearchRecord {
   id: string;
@@ -134,15 +134,22 @@ export async function storeResearchRecordsForSubject(
   return (data ?? []).map((row, index) => ({ id: String(row.id), record: subject.records[index] }));
 }
 
-/** Promote normalized external evidence into provisional graph/nutrition assertions. */
+/** Promote normalized external evidence into provisional graph/nutrition assertions.
+ *
+ * dishQuery is optional: it is only needed to key the IFCT trigram lookup (match_ifct_nutrients
+ * takes a dish name, not a ResearchRecord, since IFCT has no external provider call of its own --
+ * see normalizeIfctRow's comment). Omitting it simply skips the IFCT nutrient pass.
+ */
 export async function promoteExternalEvidence(
   ctx: RequestContext,
   dishId: string,
   stored: StoredResearchRecord[],
+  dishQuery?: string,
 ): Promise<{ ontologyTerms: number; nutrients: number }> {
   const db = createServiceRoleClient(ctx.config);
   let ontologyTerms = 0;
   let nutrients = 0;
+  let foodOnTermId: string | null = null;
   for (const item of stored) {
     const foodOn = normalizeFoodOn(item.record);
     if (foodOn) {
@@ -192,6 +199,7 @@ export async function promoteExternalEvidence(
       );
       if (assertionError) throw assertionError;
       ontologyTerms++;
+      foodOnTermId = String(term.id);
     }
 
     for (const nutrient of normalizeUsda(item.record)) {
@@ -212,6 +220,58 @@ export async function promoteExternalEvidence(
       nutrients++;
     }
   }
+
+  // AGROVOC is a vocabulary, not its own taxonomy dimension -- its alias only has somewhere useful
+  // to attach when this same batch also produced a FoodOn term for the dish. No FoodOn term means
+  // no attachment point, so the alias is skipped rather than inventing a standalone term for it.
+  if (foodOnTermId) {
+    for (const item of stored) {
+      const agrovoc = normalizeAgrovoc(item.record);
+      if (!agrovoc) continue;
+      const { error: aliasError } = await withTimeout(
+        db.from("taxonomy_term_aliases").upsert({
+          term_id: foodOnTermId,
+          alias: agrovoc.label,
+          language: "en",
+          source_name: "agrovoc",
+          source_url: item.record.sourceUrl,
+          confidence: agrovoc.confidence,
+        }, { onConflict: "term_id,alias,language" }),
+        "dishOntology.promoteAgrovocAlias",
+      );
+      if (aliasError) throw aliasError;
+    }
+  }
+
+  // IFCT (migration 128) is a DB-side trigram lookup, not a per-record external provider --
+  // ifct_nutrient_reference is intentionally empty until real data is seeded, so this resolves to
+  // zero rows (no-op) until then rather than erroring.
+  if (dishQuery) {
+    const { data: ifctRow, error: ifctError } = await withTimeout(
+      db.rpc("match_ifct_nutrients", { p_dish_name: dishQuery }).maybeSingle(),
+      "dishOntology.matchIfctNutrients",
+    );
+    if (ifctError) throw ifctError;
+    for (const nutrient of normalizeIfctRow(ifctRow as Record<string, unknown> | null)) {
+      const { error: assertionError } = await withTimeout(
+        db.rpc("record_external_nutrient_assertion", {
+          p_dish_id: dishId,
+          p_nutrient_code: nutrient.code,
+          p_display_name: nutrient.displayName,
+          p_unit_code: nutrient.unit,
+          p_expected_value: nutrient.value,
+          p_serving_basis: nutrient.servingBasis,
+          p_source_record_id: null,
+          p_confidence: nutrient.confidence,
+          p_source_name: "ifct",
+        }),
+        "dishOntology.promoteIfctAssertion",
+      );
+      if (assertionError) throw assertionError;
+      nutrients++;
+    }
+  }
+
   return { ontologyTerms, nutrients };
 }
 
