@@ -115,6 +115,12 @@ export async function searchFoodOn(
  *
  * Free, keyless REST endpoint. Alias/synonym evidence only -- AGROVOC is a vocabulary, not a
  * nutrient-composition source, so no normalizer here ever produces an ExternalNutrient.
+ *
+ * Skosmos (the engine behind this endpoint) only matches its index against a query that carries
+ * a trailing wildcard -- a bare term like "okra" returns zero results while "okra*" returns real
+ * concepts. Confirmed empirically: every production job up to this fix silently got zero AGROVOC
+ * evidence regardless of the dish, because the query never carried one. vocab=agrovoc is pinned
+ * explicitly rather than relying on the endpoint's default vocabulary selection.
  */
 export async function searchAgrovoc(
   query: string,
@@ -122,7 +128,8 @@ export async function searchAgrovoc(
   timeoutMs = RESEARCH_TIMEOUT_MS,
 ): Promise<ResearchRecord | null> {
   const url = new URL("https://agrovoc.fao.org/browse/rest/v1/search");
-  url.searchParams.set("query", query);
+  url.searchParams.set("vocab", "agrovoc");
+  url.searchParams.set("query", `${query}*`);
   url.searchParams.set("lang", "en");
   const payload = await fetchJson(url.toString(), fetchImpl, timeoutMs);
   const results = Array.isArray(payload.results) ? payload.results as Record<string, unknown>[] : [];
