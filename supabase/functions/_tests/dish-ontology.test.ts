@@ -253,6 +253,8 @@ Deno.test("Groq sanitizer rejects canonical/component aliases and normalizes reg
       { region_code: "in_rajasthan", affinity_score: 0.9, confidence: 0.9 },
       { region_code: "in_rajasthan", affinity_score: 0.8, confidence: 0.8 },
     ],
+    meal_class: [],
+    cuisine: null,
   });
   assertEquals(result.aliases.map((item) => item.name), ["बाती चोखा"]);
   assertEquals(result.regional_affinities.map((item) => item.region_code), ["rajasthan"]);
