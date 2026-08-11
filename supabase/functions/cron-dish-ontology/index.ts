@@ -23,7 +23,7 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
     // invocation so newly-ingested dishes get the same is_jain/diet_type/allergen_flags check as
     // the 2026-08-08 backlog pass, without waiting for a human to notice bad data. Best-effort —
     // a failure here must not block the AI enrichment work below.
-    let safetyFieldCorrections: Record<string, number> = {};
+    const safetyFieldCorrections: Record<string, number> = {};
     let safetyFieldError: string | null = null;
     try {
       const { data: safetyRows, error: safetyError } = await db.rpc(
