@@ -10,7 +10,12 @@
 import { jsonOk } from "../_shared/api/response.ts";
 import { requireServiceRole } from "../_shared/auth/service-role.ts";
 import { createServiceRoleClient } from "../_shared/db/client.ts";
-import { buildContext, compose, errorBoundary, requestLogging } from "../_shared/middleware/index.ts";
+import {
+  buildContext,
+  compose,
+  errorBoundary,
+  requestLogging,
+} from "../_shared/middleware/index.ts";
 import { embedText, toVectorLiteral } from "../dish-ontology/embeddings.ts";
 
 const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
@@ -35,7 +40,9 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
         classesEmbedded++;
       } catch (error) {
         failures.push(
-          `meal_classes:${row.class_code}:${error instanceof Error ? error.message.slice(0, 80) : "error"}`,
+          `meal_classes:${row.class_code}:${
+            error instanceof Error ? error.message.slice(0, 80) : "error"
+          }`,
         );
       }
     }
@@ -60,7 +67,10 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
       }
     }
 
-    return jsonOk({ classesEmbedded, cuisinesEmbedded, remaining: failures.length, failures }, ctx.traceId);
+    return jsonOk(
+      { classesEmbedded, cuisinesEmbedded, remaining: failures.length, failures },
+      ctx.traceId,
+    );
   },
 );
 

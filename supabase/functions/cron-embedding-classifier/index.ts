@@ -10,7 +10,12 @@
 import { jsonOk } from "../_shared/api/response.ts";
 import { requireServiceRole } from "../_shared/auth/service-role.ts";
 import { createServiceRoleClient } from "../_shared/db/client.ts";
-import { buildContext, compose, errorBoundary, requestLogging } from "../_shared/middleware/index.ts";
+import {
+  buildContext,
+  compose,
+  errorBoundary,
+  requestLogging,
+} from "../_shared/middleware/index.ts";
 import { embedText, toVectorLiteral } from "../dish-ontology/embeddings.ts";
 import { sha256Json } from "../dish-ontology/research.ts";
 
@@ -52,7 +57,10 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
         const embedding = await embedText(dish.name);
         const vector = toVectorLiteral(embedding);
 
-        const sourcePayload = { model: "gte-small", note: "dish-name embedding, not a raw vector dump" };
+        const sourcePayload = {
+          model: "gte-small",
+          note: "dish-name embedding, not a raw vector dump",
+        };
         const { data: sourceRow, error: sourceError } = await db
           .from("food_source_records")
           .insert({
@@ -77,7 +85,9 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
         if (classifyError) throw classifyError;
 
         classified++;
-        const counts = result && typeof result === "object" ? result as Record<string, unknown> : {};
+        const counts = result && typeof result === "object"
+          ? result as Record<string, unknown>
+          : {};
         const dishPublished = Number(counts.published ?? 0);
         const dishCandidates = Number(counts.candidates ?? 0);
         published += dishPublished;
@@ -92,7 +102,15 @@ const pipeline = compose([errorBoundary, requestLogging, requireServiceRole()])(
     }
 
     return jsonOk(
-      { claimed: targets.length, classified, published, candidatesOnly, skippedNoEmbeddingMatch, failed, failures },
+      {
+        claimed: targets.length,
+        classified,
+        published,
+        candidatesOnly,
+        skippedNoEmbeddingMatch,
+        failed,
+        failures,
+      },
       ctx.traceId,
     );
   },

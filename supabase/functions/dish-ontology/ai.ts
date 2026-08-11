@@ -285,7 +285,13 @@ export function sanitizeGroqEnrichment(
   const cuisine = enrichment.cuisine && typeof enrichment.cuisine.cuisine_name === "string"
     ? { ...enrichment.cuisine, cuisine_name: enrichment.cuisine.cuisine_name.toLowerCase() }
     : null;
-  return { aliases, taxonomy, regional_affinities: regionalAffinities, meal_class: mealClass, cuisine };
+  return {
+    aliases,
+    taxonomy,
+    regional_affinities: regionalAffinities,
+    meal_class: mealClass,
+    cuisine,
+  };
 }
 
 /** Thrown specifically on a 429 so the caller can inspect the real Groq-reported limit/reset

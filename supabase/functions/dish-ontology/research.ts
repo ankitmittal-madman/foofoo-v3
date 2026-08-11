@@ -132,7 +132,9 @@ export async function searchAgrovoc(
   url.searchParams.set("query", `${query}*`);
   url.searchParams.set("lang", "en");
   const payload = await fetchJson(url.toString(), fetchImpl, timeoutMs);
-  const results = Array.isArray(payload.results) ? payload.results as Record<string, unknown>[] : [];
+  const results = Array.isArray(payload.results)
+    ? payload.results as Record<string, unknown>[]
+    : [];
   const first = results[0];
   if (!first) return null;
   const label = typeof first.prefLabel === "string" ? first.prefLabel : "";

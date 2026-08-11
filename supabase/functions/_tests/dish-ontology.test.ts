@@ -195,7 +195,10 @@ Deno.test("Groq prompt lists the supplied closed vocabulary and sanitizer lowerc
     "openai/gpt-oss-120b",
     fetcher,
     undefined,
-    { classCodes: ["LD_CHICKEN_HOME_CURRY", "LD_FISH_CURRY_RICE"], cuisineNames: ["kerala", "goan"] },
+    {
+      classCodes: ["LD_CHICKEN_HOME_CURRY", "LD_FISH_CURRY_RICE"],
+      cuisineNames: ["kerala", "goan"],
+    },
   );
   assertEquals(sentPrompt.includes("LD_CHICKEN_HOME_CURRY"), true);
   assertEquals(sentPrompt.includes("goan"), true);

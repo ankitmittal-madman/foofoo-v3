@@ -4,7 +4,12 @@ import type { RequestContext } from "../_shared/types/context.ts";
 import { withTimeout } from "../_shared/utils/timeout.ts";
 import type { ResearchRecord } from "./research.ts";
 import { sha256Json } from "./research.ts";
-import { normalizeAgrovoc, normalizeFoodOn, normalizeIfctRow, normalizeUsda } from "./normalization.ts";
+import {
+  normalizeAgrovoc,
+  normalizeFoodOn,
+  normalizeIfctRow,
+  normalizeUsda,
+} from "./normalization.ts";
 
 export interface StoredResearchRecord {
   id: string;

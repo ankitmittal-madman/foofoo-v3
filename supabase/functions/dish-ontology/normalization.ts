@@ -119,7 +119,14 @@ export function normalizeIfctRow(
   ) => {
     const value = Number(rawValue);
     if (Number.isFinite(value) && value >= 0) {
-      results.push({ code, displayName, unit, value, servingBasis: "100 g", confidence: similarity });
+      results.push({
+        code,
+        displayName,
+        unit,
+        value,
+        servingBasis: "100 g",
+        confidence: similarity,
+      });
     }
   };
   push("energy_kcal", "Energy", "kcal", row.energy_kcal);
