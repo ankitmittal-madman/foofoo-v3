@@ -25,6 +25,15 @@
   changes cannot be swept into a commit. Absent ruff, it exits silently and never blocks.
   The scope asymmetry is copied from CI on purpose: lint covers `ghar_re_core`, format does
   not, because that package's maths is golden-master pinned.
+- Extended the same hook to the Deno/TypeScript side, mirroring `backend-ci.yml`: runs from
+  `supabase/` so `deno.json` governs scope, applies `deno fmt` to staged files under
+  `functions/`, and blocks on remaining `deno lint` findings. Two behaviours found by testing:
+  `deno fmt` exits 1 with "No target files found" when every path is filtered away (so a commit
+  touching only the excluded contracts mirror needed an empty-list guard), and `deno lint --fix`
+  does not fix `prefer-const` in deno 2.9.5 — that case blocks with deno's own diagnostic
+  rather than being silently corrected. `supabase/functions/_shared/contracts/` is filtered out
+  explicitly rather than trusting `deno.json`'s exclude, because CI runs `cmp` on that file
+  against the canonical copy and a future deno behaviour change would silently break that gate.
 - `scripts/install-git-hooks.sh` — points `core.hooksPath` at the versioned `.githooks/`.
   Wired into a `SessionStart` hook in `.claude/settings.json` so ephemeral Codespaces /
   Claude Code web containers arm the hook automatically, with no manual step after a clone.
