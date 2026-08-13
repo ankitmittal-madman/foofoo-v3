@@ -65,15 +65,13 @@ DISPLAY_FIELDS: tuple[str, ...] = (
 )
 
 FIELD_SEVERITY: dict[str, str] = {
-    **{name: "safety" for name in SAFETY_FIELDS},
-    **{name: "scoring" for name in SCORING_FIELDS},
-    **{name: "effort" for name in EFFORT_FIELDS},
-    **{name: "display" for name in DISPLAY_FIELDS},
+    **dict.fromkeys(SAFETY_FIELDS, "safety"),
+    **dict.fromkeys(SCORING_FIELDS, "scoring"),
+    **dict.fromkeys(EFFORT_FIELDS, "effort"),
+    **dict.fromkeys(DISPLAY_FIELDS, "display"),
 }
 
-COMPARED_FIELDS: tuple[str, ...] = (
-    SAFETY_FIELDS + SCORING_FIELDS + EFFORT_FIELDS + DISPLAY_FIELDS
-)
+COMPARED_FIELDS: tuple[str, ...] = SAFETY_FIELDS + SCORING_FIELDS + EFFORT_FIELDS + DISPLAY_FIELDS
 
 # Which side lost information, not merely that the two differ. "bundle_richer" is the regression
 # direction a cutover would introduce; "publication_richer" is what a cutover would gain. Reporting
@@ -171,9 +169,7 @@ class ParityReport:
             return []
         counts = self.deltas_by_field()
         return sorted(
-            name
-            for name, count in counts.items()
-            if count / self.matched_count >= threshold
+            name for name, count in counts.items() if count / self.matched_count >= threshold
         )
 
 
@@ -265,12 +261,8 @@ def format_report(report: ParityReport) -> str:
     lines.append(f"Bundle dishes:       {report.bundle_count}")
     lines.append(f"Publication dishes:  {report.publication_count}")
     lines.append(f"Matched by name:     {report.matched_count}")
-    lines.append(
-        f"Bundle-only (lost on cutover):      {len(report.bundle_only_names)}"
-    )
-    lines.append(
-        f"Publication-only (gained):          {len(report.publication_only_names)}"
-    )
+    lines.append(f"Bundle-only (lost on cutover):      {len(report.bundle_only_names)}")
+    lines.append(f"Publication-only (gained):          {len(report.publication_only_names)}")
     lines.append("")
 
     severity_counts = report.deltas_by_severity()
@@ -292,9 +284,7 @@ def format_report(report: ParityReport) -> str:
     field_counts = report.deltas_by_field()
     if field_counts:
         lines.append("All differing fields (count, descending):")
-        for field_name, count in sorted(
-            field_counts.items(), key=lambda item: (-item[1], item[0])
-        ):
+        for field_name, count in sorted(field_counts.items(), key=lambda item: (-item[1], item[0])):
             lines.append(f"  {count:>6}  {field_name} [{FIELD_SEVERITY[field_name]}]")
 
     return "\n".join(lines)
