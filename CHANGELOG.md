@@ -5,6 +5,30 @@
 
 ## [Unreleased]
 
+### Fixed
+- Cleared every `ruff` finding blocking re-ci's Python style stage. `catalogue_gap_query.py`
+  (2 × E501, both inside the SQL query text — SQL ignores line breaks, so the query is
+  unchanged), `catalogue_publish_targets.py` (1 × E501 on the `GharDeployer` protocol stub),
+  and `catalogue_parity.py` (4 × C420, `FIELD_SEVERITY` rebuilt with `dict.fromkeys`; verified
+  identical — 28 entries, all four severities, every `COMPARED_FIELDS` entry covered).
+- Fixed a *separate* pre-existing failure at re-ci's `Format check (ruff)` step, which was
+  already red on `main` before this work started: `catalogue_eligibility.py` and
+  `catalogue_publish_targets.py` held hand-wrapped lines the formatter wanted joined.
+  Confirmed pre-existing by stashing the session's own edits and re-running the check.
+  Style only throughout — no behaviour changed.
+
+### Added
+- `.githooks/pre-commit` — runs ruff at commit time using re-ci.yml's exact scopes, so the
+  two style tools can no longer disagree with CI. Formatting and ruff's *safe* autofixes are
+  applied and re-staged automatically; anything needing a human decision blocks the commit.
+  Files that are only partially staged (`git add -p`) are never rewritten, so held-back
+  changes cannot be swept into a commit. Absent ruff, it exits silently and never blocks.
+  The scope asymmetry is copied from CI on purpose: lint covers `ghar_re_core`, format does
+  not, because that package's maths is golden-master pinned.
+- `scripts/install-git-hooks.sh` — points `core.hooksPath` at the versioned `.githooks/`.
+  Wired into a `SessionStart` hook in `.claude/settings.json` so ephemeral Codespaces /
+  Claude Code web containers arm the hook automatically, with no manual step after a clone.
+
 ### Deployed
 - Published release commit `2e7324e` after all five workflows passed: backend, mobile,
   recommendation-engine, quality gate and Fly production deployment. Fly is ready on engine

@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+# .githooks/pre-commit
+#
+# Keeps Python code in the shape re-ci.yml's two ruff steps demand, at commit
+# time, instead of finding out one CI round-trip later.
+#
+# WHY THIS EXISTS (S171, 2026-08-13)
+# re-ci kept going red at "Lint (ruff)" on trivia — a line two characters over
+# the limit. The underlying reason is that the pipeline runs TWO style tools
+# that pull in opposite directions:
+#   * ruff check (E501) flags lines OVER 100 chars and wants them split.
+#   * ruff format wants short consecutive lines JOINED back up, to that same
+#     100-char limit.
+# So a line hand-wrapped at 85 chars satisfies the first and is immediately
+# reversed by the second. Neither ran locally, so the first signal was always a
+# red pipeline. This hook makes the formatter — not a human guess at where to
+# wrap — decide every line break, before the commit exists.
+#
+# SCOPES ARE COPIED FROM re-ci.yml DELIBERATELY, INCLUDING THE ASYMMETRY.
+# Lint covers ghar_re_core too; format does NOT. That exclusion is intentional
+# and documented in re-ci.yml: ghar_re_core is the frozen, golden-master-locked
+# recommendation maths, and running the formatter over it would rewrite ~150
+# places in code whose output is deliberately pinned, for zero correctness gain.
+# If you change a scope here, change it in re-ci.yml in the same commit — a hook
+# that disagrees with CI is worse than no hook, because it teaches you to trust
+# a green local run that CI will still reject.
+#
+# BEHAVIOUR
+#   * Formatting and ruff's own SAFE autofixes are applied and re-staged for
+#     you — these are deterministic and cannot change what the code does.
+#   * Anything ruff cannot fix by itself BLOCKS the commit, because it needs a
+#     human decision.
+#   * A partially staged file (git add -p) is never rewritten — see below.
+#   * No ruff installed, or no Python files staged: exits silently, commits as
+#     normal. This hook must never be the reason someone cannot commit.
+#
+# Bypass for a genuine emergency:  git commit --no-verify
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT"
+
+# --- Locate ruff -------------------------------------------------------------
+# Prefer the module form for the same reason re-ci.yml invokes mypy that way:
+# it resolves against the running interpreter's own site-packages, so it works
+# regardless of how the environment lays out its Python install.
+if python3 -m ruff --version >/dev/null 2>&1; then
+  RUFF=(python3 -m ruff)
+elif command -v ruff >/dev/null 2>&1; then
+  RUFF=(ruff)
+else
+  echo "ℹ️  pre-commit: ruff not installed, skipping the Python style check."
+  echo "   To enable it:  pip install -e \".[lint]\""
+  exit 0
+fi
+
+# --- Which staged files are in scope? ----------------------------------------
+# ACMR = added / copied / modified / renamed. Deleted files are excluded, since
+# there is nothing left to lint.
+STAGED_PY="$(git diff --name-only --cached --diff-filter=ACMR -- '*.py' 2>/dev/null || true)"
+
+[ -z "$STAGED_PY" ] && exit 0
+
+# Mirrors re-ci.yml's "Lint (ruff)" step.
+LINT_SCOPE='^(ghar_re_core|ghar_re_service|ops/recommendation)/'
+# Mirrors re-ci.yml's "Format check (ruff, service only)" step. ghar_re_core is
+# absent on purpose — see the header note.
+FMT_SCOPE='^(ghar_re_service|ops/recommendation)/'
+
+LINT_FILES="$(echo "$STAGED_PY" | grep -E "$LINT_SCOPE" || true)"
+FMT_FILES="$(echo "$STAGED_PY" | grep -E "$FMT_SCOPE" || true)"
+
+[ -z "$LINT_FILES" ] && [ -z "$FMT_FILES" ] && exit 0
+
+# --- Refuse to rewrite partially staged files --------------------------------
+# If a file has staged AND unstaged changes (git add -p), rewriting it on disk
+# and re-staging would sweep the unstaged half into the commit — silently
+# committing work the author deliberately held back. Those files are reported
+# and left completely alone.
+UNSTAGED="$(git diff --name-only -- '*.py' 2>/dev/null || true)"
+PARTIAL=""
+if [ -n "$UNSTAGED" ]; then
+  PARTIAL="$(comm -12 \
+    <(echo "$STAGED_PY" | sort -u) \
+    <(echo "$UNSTAGED" | sort -u) || true)"
+fi
+
+# Drop partially staged files from the sets this hook is allowed to modify.
+if [ -n "$PARTIAL" ]; then
+  LINT_FILES="$(comm -23 <(echo "$LINT_FILES" | sort -u) <(echo "$PARTIAL" | sort -u) || true)"
+  FMT_FILES="$(comm -23 <(echo "$FMT_FILES" | sort -u) <(echo "$PARTIAL" | sort -u) || true)"
+  echo "⚠️  pre-commit: these files are only partially staged, so they were left"
+  echo "   untouched (fixing them would commit the changes you held back):"
+  echo "$PARTIAL" | sed 's/^/     - /'
+fi
+
+CHANGED_BY_HOOK=""
+
+# --- 1. Formatter (applied, then re-staged) ----------------------------------
+if [ -n "$FMT_FILES" ]; then
+  BEFORE="$(echo "$FMT_FILES" | xargs -r git hash-object 2>/dev/null || true)"
+  echo "$FMT_FILES" | xargs -r "${RUFF[@]}" format --quiet 2>/dev/null || true
+  AFTER="$(echo "$FMT_FILES" | xargs -r git hash-object 2>/dev/null || true)"
+  if [ "$BEFORE" != "$AFTER" ]; then
+    echo "$FMT_FILES" | xargs -r git add --
+    CHANGED_BY_HOOK="yes"
+  fi
+fi
+
+# --- 2. Linter, safe autofixes only (applied, then re-staged) ----------------
+# ruff applies only fixes it classifies as safe unless --unsafe-fixes is passed.
+# It is not passed here on purpose: an unsafe fix can change behaviour, and a
+# commit hook is the wrong place to make that call silently.
+if [ -n "$LINT_FILES" ]; then
+  BEFORE="$(echo "$LINT_FILES" | xargs -r git hash-object 2>/dev/null || true)"
+  echo "$LINT_FILES" | xargs -r "${RUFF[@]}" check --fix --quiet 2>/dev/null || true
+  AFTER="$(echo "$LINT_FILES" | xargs -r git hash-object 2>/dev/null || true)"
+  if [ "$BEFORE" != "$AFTER" ]; then
+    # An autofix can leave the file unformatted, so re-run the formatter over
+    # the format-scope files before re-staging. Ordering matters: CI checks
+    # both, and format is the one that gets the final say on line breaks.
+    [ -n "$FMT_FILES" ] && echo "$FMT_FILES" | xargs -r "${RUFF[@]}" format --quiet 2>/dev/null || true
+    echo "$LINT_FILES" | xargs -r git add --
+    CHANGED_BY_HOOK="yes"
+  fi
+fi
+
+if [ -n "$CHANGED_BY_HOOK" ]; then
+  echo "✅ pre-commit: applied ruff formatting/safe fixes and re-staged them."
+  echo "   These are layout-only changes — review with:  git diff --cached"
+fi
+
+# --- 3. Whatever is left needs a human ---------------------------------------
+# Re-check from scratch. Anything surviving the autofix pass is a real finding.
+FAILED=""
+
+if [ -n "$LINT_FILES" ]; then
+  # --quiet prints violations but stays silent on success, so a clean commit
+  # produces no output at all.
+  if ! echo "$LINT_FILES" | xargs -r "${RUFF[@]}" check --quiet --output-format=concise; then
+    FAILED="yes"
+  fi
+fi
+
+if [ -n "$FMT_FILES" ]; then
+  if ! echo "$FMT_FILES" | xargs -r "${RUFF[@]}" format --check --quiet; then
+    # Only reachable for partially staged files, which step 1 deliberately
+    # skipped — the formatter is otherwise idempotent.
+    echo "   (a staged file still needs formatting — likely one of the partially"
+    echo "    staged files listed above; stage it fully, or run: ruff format .)"
+    FAILED="yes"
+  fi
+fi
+
+if [ -n "$FAILED" ]; then
+  cat <<'EOF'
+
+❌ Commit blocked: ruff found something it cannot fix on its own.
+   re-ci.yml would fail at its "Lint (ruff)" step on exactly this.
+
+   Fix the findings listed above, then commit again.
+   To commit anyway (CI will still reject it):  git commit --no-verify
+EOF
+  exit 1
+fi
+
+exit 0
