@@ -39,12 +39,15 @@ select
       and m.review_status <> 'rejected'
       and m.slot in ('breakfast', 'lunch', 'dinner', 'snack')
   ) as has_meal_slot_mapping,
-  coalesce(array_agg(cur.field_key) filter (where cur.field_key is not null), '{}') as taxonomy_fields
+  coalesce(
+    array_agg(cur.field_key) filter (where cur.field_key is not null), '{}'
+  ) as taxonomy_fields
 from public.dishes d
 left join public.dish_taxonomy_current cur on cur.dish_id = d.id
 left join public.dish_taxonomy_assertions a
   on a.id = cur.assertion_id and a.review_status <> 'rejected'
-group by d.id, d.is_active, d.ontology_status, d.diet_type, d.is_jain, d.allergen_flags, d.cuisine_id
+group by d.id, d.is_active, d.ontology_status, d.diet_type, d.is_jain, d.allergen_flags,
+  d.cuisine_id
 order by d.id
 """
 

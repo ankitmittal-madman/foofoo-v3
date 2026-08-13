@@ -74,9 +74,7 @@ def evaluate_dish(dish: DishRecord) -> EligibilityResult:
     if not dish.is_active:
         reasons.append("inactive")
     if dish.ontology_status != "enriched":
-        reasons.append(
-            f"ontology_status_not_enriched:{dish.ontology_status or 'null'}"
-        )
+        reasons.append(f"ontology_status_not_enriched:{dish.ontology_status or 'null'}")
     if dish.diet_type is None:
         reasons.append("diet_type_missing")
     elif dish.diet_type not in VALID_DIET_TYPES:
@@ -94,9 +92,7 @@ def evaluate_dish(dish: DishRecord) -> EligibilityResult:
     if not dish.has_meal_slot_mapping:
         reasons.append("meal_slot_mapping_missing")
 
-    missing_taxonomy = [
-        f for f in REQUIRED_TAXONOMY_FIELDS if f not in dish.taxonomy_fields
-    ]
+    missing_taxonomy = [f for f in REQUIRED_TAXONOMY_FIELDS if f not in dish.taxonomy_fields]
     if missing_taxonomy:
         reasons.append("taxonomy_incomplete:" + ",".join(missing_taxonomy))
 

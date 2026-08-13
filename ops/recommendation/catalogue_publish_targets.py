@@ -56,9 +56,7 @@ def publish_to_qdrant(
     """
     digest_hex = publication_version.removeprefix("sha256:")
     collection = f"foofoo_recipes__{digest_hex[:12]}"
-    points = [
-        {"id": row["id"], "payload": row, "vector": row.get("genome_vector")} for row in rows
-    ]
+    points = [{"id": row["id"], "payload": row, "vector": row.get("genome_vector")} for row in rows]
     accepted = uploader.upsert_collection(collection, points)
     return PublishTargetResult(
         target="qdrant",
@@ -71,7 +69,9 @@ def publish_to_qdrant(
 class GharDeployer(Protocol):
     """Minimal shape this module needs to hand a version to Ghar — swap in the real deploy call."""
 
-    def deploy_published_catalogue(self, publication_version: str, rows: list[dict[str, Any]]) -> bool: ...
+    def deploy_published_catalogue(
+        self, publication_version: str, rows: list[dict[str, Any]]
+    ) -> bool: ...
 
 
 def publish_to_ghar(
