@@ -1,38 +1,35 @@
 #!/usr/bin/env bash
 # .githooks/pre-commit
 #
-# Keeps Python code in the shape re-ci.yml's two ruff steps demand, at commit
-# time, instead of finding out one CI round-trip later.
+# Keeps code in the shape CI's style steps demand, at commit time, instead of
+# finding out one CI round-trip later. Covers both languages in this repo:
+#   * Python  — ruff, mirroring re-ci.yml
+#   * Deno/TS — deno fmt + deno lint, mirroring backend-ci.yml
 #
 # WHY THIS EXISTS (S171, 2026-08-13)
-# re-ci kept going red at "Lint (ruff)" on trivia — a line two characters over
-# the limit. The underlying reason is that the pipeline runs TWO style tools
-# that pull in opposite directions:
-#   * ruff check (E501) flags lines OVER 100 chars and wants them split.
-#   * ruff format wants short consecutive lines JOINED back up, to that same
-#     100-char limit.
-# So a line hand-wrapped at 85 chars satisfies the first and is immediately
-# reversed by the second. Neither ran locally, so the first signal was always a
-# red pipeline. This hook makes the formatter — not a human guess at where to
-# wrap — decide every line break, before the commit exists.
+# CI kept going red on trivia — a line two characters over the limit, a `let`
+# that should have been `const`. The underlying reason is that each language
+# runs TWO style tools that pull in opposite directions:
+#   * the linter flags lines OVER 100 chars and wants them split;
+#   * the formatter wants short consecutive lines JOINED back up, to that same
+#     100-char limit (ruff line-length 100; deno.json fmt.lineWidth 100).
+# So a line hand-wrapped at 85 chars satisfies one and is immediately reversed
+# by the other. Neither ran locally, so the first signal was always a red
+# pipeline. This hook makes the formatter — not a human guess at where to wrap —
+# decide every line break, before the commit exists.
 #
-# SCOPES ARE COPIED FROM re-ci.yml DELIBERATELY, INCLUDING THE ASYMMETRY.
-# Lint covers ghar_re_core too; format does NOT. That exclusion is intentional
-# and documented in re-ci.yml: ghar_re_core is the frozen, golden-master-locked
-# recommendation maths, and running the formatter over it would rewrite ~150
-# places in code whose output is deliberately pinned, for zero correctness gain.
-# If you change a scope here, change it in re-ci.yml in the same commit — a hook
-# that disagrees with CI is worse than no hook, because it teaches you to trust
-# a green local run that CI will still reject.
+# SCOPES ARE COPIED FROM CI DELIBERATELY, INCLUDING THE ASYMMETRIES.
+# A hook that disagrees with CI is worse than no hook, because it teaches you to
+# trust a green local run that CI will still reject. If a scope changes here it
+# must change in the matching workflow in the same commit.
 #
 # BEHAVIOUR
-#   * Formatting and ruff's own SAFE autofixes are applied and re-staged for
-#     you — these are deterministic and cannot change what the code does.
-#   * Anything ruff cannot fix by itself BLOCKS the commit, because it needs a
-#     human decision.
+#   * Formatting and the linters' SAFE autofixes are applied and re-staged —
+#     these are deterministic and cannot change what the code does.
+#   * Anything the tools cannot fix themselves BLOCKS the commit.
 #   * A partially staged file (git add -p) is never rewritten — see below.
-#   * No ruff installed, or no Python files staged: exits silently, commits as
-#     normal. This hook must never be the reason someone cannot commit.
+#   * A missing tool is skipped, never fatal. This hook must never be the
+#     reason someone cannot commit.
 #
 # Bypass for a genuine emergency:  git commit --no-verify
 
@@ -41,123 +38,190 @@ set -euo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT"
 
-# --- Locate ruff -------------------------------------------------------------
-# Prefer the module form for the same reason re-ci.yml invokes mypy that way:
-# it resolves against the running interpreter's own site-packages, so it works
-# regardless of how the environment lays out its Python install.
-if python3 -m ruff --version >/dev/null 2>&1; then
-  RUFF=(python3 -m ruff)
-elif command -v ruff >/dev/null 2>&1; then
-  RUFF=(ruff)
-else
-  echo "ℹ️  pre-commit: ruff not installed, skipping the Python style check."
-  echo "   To enable it:  pip install -e \".[lint]\""
-  exit 0
-fi
+STAGED="$(git diff --name-only --cached --diff-filter=ACMR 2>/dev/null || true)"
+[ -z "$STAGED" ] && exit 0
 
-# --- Which staged files are in scope? ----------------------------------------
-# ACMR = added / copied / modified / renamed. Deleted files are excluded, since
-# there is nothing left to lint.
-STAGED_PY="$(git diff --name-only --cached --diff-filter=ACMR -- '*.py' 2>/dev/null || true)"
-
-[ -z "$STAGED_PY" ] && exit 0
-
-# Mirrors re-ci.yml's "Lint (ruff)" step.
-LINT_SCOPE='^(ghar_re_core|ghar_re_service|ops/recommendation)/'
-# Mirrors re-ci.yml's "Format check (ruff, service only)" step. ghar_re_core is
-# absent on purpose — see the header note.
-FMT_SCOPE='^(ghar_re_service|ops/recommendation)/'
-
-LINT_FILES="$(echo "$STAGED_PY" | grep -E "$LINT_SCOPE" || true)"
-FMT_FILES="$(echo "$STAGED_PY" | grep -E "$FMT_SCOPE" || true)"
-
-[ -z "$LINT_FILES" ] && [ -z "$FMT_FILES" ] && exit 0
-
-# --- Refuse to rewrite partially staged files --------------------------------
+# --- Files that must never be auto-rewritten ---------------------------------
 # If a file has staged AND unstaged changes (git add -p), rewriting it on disk
 # and re-staging would sweep the unstaged half into the commit — silently
-# committing work the author deliberately held back. Those files are reported
-# and left completely alone.
-UNSTAGED="$(git diff --name-only -- '*.py' 2>/dev/null || true)"
+# committing work the author deliberately held back.
+UNSTAGED="$(git diff --name-only 2>/dev/null || true)"
 PARTIAL=""
 if [ -n "$UNSTAGED" ]; then
-  PARTIAL="$(comm -12 \
-    <(echo "$STAGED_PY" | sort -u) \
-    <(echo "$UNSTAGED" | sort -u) || true)"
+  PARTIAL="$(comm -12 <(echo "$STAGED" | sort -u) <(echo "$UNSTAGED" | sort -u) || true)"
 fi
 
-# Drop partially staged files from the sets this hook is allowed to modify.
+# Removes partially staged entries from a newline-separated list on stdin.
+drop_partial() {
+  if [ -z "$PARTIAL" ]; then cat; else comm -23 <(sort -u) <(echo "$PARTIAL" | sort -u); fi
+}
+
+# Joins newline-separated lists into one de-duplicated list. Using "$A$B"
+# instead would glue the last path of A onto the first path of B and produce a
+# single nonexistent path — which silently defeats the re-stage step below,
+# because git hash-object then reports nothing for both the before and after
+# snapshots and they compare equal.
+join_lists() { printf '%s\n%s\n' "$1" "$2" | grep -v '^$' | sort -u || true; }
+
 if [ -n "$PARTIAL" ]; then
-  LINT_FILES="$(comm -23 <(echo "$LINT_FILES" | sort -u) <(echo "$PARTIAL" | sort -u) || true)"
-  FMT_FILES="$(comm -23 <(echo "$FMT_FILES" | sort -u) <(echo "$PARTIAL" | sort -u) || true)"
   echo "⚠️  pre-commit: these files are only partially staged, so they were left"
   echo "   untouched (fixing them would commit the changes you held back):"
   echo "$PARTIAL" | sed 's/^/     - /'
 fi
 
 CHANGED_BY_HOOK=""
-
-# --- 1. Formatter (applied, then re-staged) ----------------------------------
-if [ -n "$FMT_FILES" ]; then
-  BEFORE="$(echo "$FMT_FILES" | xargs -r git hash-object 2>/dev/null || true)"
-  echo "$FMT_FILES" | xargs -r "${RUFF[@]}" format --quiet 2>/dev/null || true
-  AFTER="$(echo "$FMT_FILES" | xargs -r git hash-object 2>/dev/null || true)"
-  if [ "$BEFORE" != "$AFTER" ]; then
-    echo "$FMT_FILES" | xargs -r git add --
-    CHANGED_BY_HOOK="yes"
-  fi
-fi
-
-# --- 2. Linter, safe autofixes only (applied, then re-staged) ----------------
-# ruff applies only fixes it classifies as safe unless --unsafe-fixes is passed.
-# It is not passed here on purpose: an unsafe fix can change behaviour, and a
-# commit hook is the wrong place to make that call silently.
-if [ -n "$LINT_FILES" ]; then
-  BEFORE="$(echo "$LINT_FILES" | xargs -r git hash-object 2>/dev/null || true)"
-  echo "$LINT_FILES" | xargs -r "${RUFF[@]}" check --fix --quiet 2>/dev/null || true
-  AFTER="$(echo "$LINT_FILES" | xargs -r git hash-object 2>/dev/null || true)"
-  if [ "$BEFORE" != "$AFTER" ]; then
-    # An autofix can leave the file unformatted, so re-run the formatter over
-    # the format-scope files before re-staging. Ordering matters: CI checks
-    # both, and format is the one that gets the final say on line breaks.
-    [ -n "$FMT_FILES" ] && echo "$FMT_FILES" | xargs -r "${RUFF[@]}" format --quiet 2>/dev/null || true
-    echo "$LINT_FILES" | xargs -r git add --
-    CHANGED_BY_HOOK="yes"
-  fi
-fi
-
-if [ -n "$CHANGED_BY_HOOK" ]; then
-  echo "✅ pre-commit: applied ruff formatting/safe fixes and re-staged them."
-  echo "   These are layout-only changes — review with:  git diff --cached"
-fi
-
-# --- 3. Whatever is left needs a human ---------------------------------------
-# Re-check from scratch. Anything surviving the autofix pass is a real finding.
 FAILED=""
 
-if [ -n "$LINT_FILES" ]; then
-  # --quiet prints violations but stays silent on success, so a clean commit
-  # produces no output at all.
-  if ! echo "$LINT_FILES" | xargs -r "${RUFF[@]}" check --quiet --output-format=concise; then
-    FAILED="yes"
+# =============================================================================
+# PYTHON — mirrors re-ci.yml
+# =============================================================================
+# Lint covers ghar_re_core; format does NOT. That exclusion is intentional and
+# documented in re-ci.yml: ghar_re_core is the frozen, golden-master-locked
+# recommendation maths, and formatting it would rewrite ~150 places in code
+# whose output is deliberately pinned, for zero correctness gain.
+PY_LINT_SCOPE='^(ghar_re_core|ghar_re_service|ops/recommendation)/.*\.py$'
+PY_FMT_SCOPE='^(ghar_re_service|ops/recommendation)/.*\.py$'
+
+PY_LINT="$(echo "$STAGED" | grep -E "$PY_LINT_SCOPE" | drop_partial || true)"
+PY_FMT="$(echo "$STAGED" | grep -E "$PY_FMT_SCOPE" | drop_partial || true)"
+
+PY_ALL="$(join_lists "$PY_LINT" "$PY_FMT")"
+
+if [ -n "$PY_ALL" ]; then
+  # Prefer the module form for the same reason re-ci.yml invokes mypy that way:
+  # it resolves against the running interpreter's own site-packages.
+  RUFF=()
+  if python3 -m ruff --version >/dev/null 2>&1; then
+    RUFF=(python3 -m ruff)
+  elif command -v ruff >/dev/null 2>&1; then
+    RUFF=(ruff)
+  else
+    echo "ℹ️  pre-commit: ruff not installed, skipping the Python style check."
+    echo "   To enable it:  pip install -e \".[lint]\""
+  fi
+
+  if [ ${#RUFF[@]} -gt 0 ]; then
+    BEFORE="$(echo "$PY_ALL" | xargs -r git hash-object 2>/dev/null || true)"
+
+    [ -n "$PY_FMT" ] && echo "$PY_FMT" | xargs -r "${RUFF[@]}" format --quiet 2>/dev/null || true
+    # Only ruff's SAFE fixes are applied (--unsafe-fixes is deliberately not
+    # passed): an unsafe fix can change behaviour, and a commit hook is the
+    # wrong place to make that call silently.
+    [ -n "$PY_LINT" ] && echo "$PY_LINT" | xargs -r "${RUFF[@]}" check --fix --quiet 2>/dev/null || true
+    # An autofix can leave a file unformatted, so the formatter runs last —
+    # it gets the final say on line breaks, matching CI's expectations.
+    [ -n "$PY_FMT" ] && echo "$PY_FMT" | xargs -r "${RUFF[@]}" format --quiet 2>/dev/null || true
+
+    AFTER="$(echo "$PY_ALL" | xargs -r git hash-object 2>/dev/null || true)"
+    if [ "$BEFORE" != "$AFTER" ]; then
+      echo "$PY_ALL" | xargs -r git add --
+      CHANGED_BY_HOOK="yes"
+    fi
+
+    # --quiet prints violations but stays silent on success, so a clean commit
+    # produces no output at all.
+    if [ -n "$PY_LINT" ]; then
+      echo "$PY_LINT" | xargs -r "${RUFF[@]}" check --quiet --output-format=concise || FAILED="yes"
+    fi
+    if [ -n "$PY_FMT" ]; then
+      echo "$PY_FMT" | xargs -r "${RUFF[@]}" format --check --quiet || FAILED="yes"
+    fi
   fi
 fi
 
-if [ -n "$FMT_FILES" ]; then
-  if ! echo "$FMT_FILES" | xargs -r "${RUFF[@]}" format --check --quiet; then
-    # Only reachable for partially staged files, which step 1 deliberately
-    # skipped — the formatter is otherwise idempotent.
-    echo "   (a staged file still needs formatting — likely one of the partially"
-    echo "    staged files listed above; stage it fully, or run: ruff format .)"
-    FAILED="yes"
+# =============================================================================
+# DENO / TYPESCRIPT — mirrors backend-ci.yml
+# =============================================================================
+# CI runs these with working-directory: supabase, so deno.json governs scope
+# and paths are relative to supabase/.
+#
+# THE CONTRACTS MIRROR IS FILTERED OUT EXPLICITLY.
+# supabase/functions/_shared/contracts/ is excluded in deno.json's fmt config
+# because CI's contract-check step requires that file to stay BYTE-IDENTICAL to
+# the canonical contracts/ copy (it runs `cmp` on the pair). Reformatting it
+# would break that check. Deno 2.x does honour the config exclude even when a
+# path is passed explicitly, but that is not relied on here — a future version
+# changing that behaviour would silently break the contract gate, so the filter
+# is applied independently.
+DENO_SCOPE='^supabase/functions/'
+DENO_EXCLUDE='^supabase/functions/_shared/contracts/'
+# deno fmt handles these; deno lint only handles the script types.
+DENO_FMT_EXT='\.(ts|tsx|js|jsx|mjs|cjs|json|jsonc|md)$'
+DENO_LINT_EXT='\.(ts|tsx|js|jsx|mjs|cjs)$'
+
+DENO_STAGED="$(echo "$STAGED" | grep -E "$DENO_SCOPE" | grep -Ev "$DENO_EXCLUDE" | drop_partial || true)"
+DENO_FMT="$(echo "$DENO_STAGED" | grep -E "$DENO_FMT_EXT" || true)"
+DENO_LINT="$(echo "$DENO_STAGED" | grep -E "$DENO_LINT_EXT" || true)"
+
+# Empty-list guard is not optional: `deno fmt` exits 1 with "No target files
+# found" when every path it is given has been filtered away, which would block
+# a commit that only touched the excluded contracts mirror.
+DENO_ALL="$(join_lists "$DENO_FMT" "$DENO_LINT")"
+
+if [ -n "$DENO_ALL" ]; then
+  if ! command -v deno >/dev/null 2>&1; then
+    echo "ℹ️  pre-commit: deno not installed, skipping the TypeScript style check."
+    echo "   Install it from https://deno.land, or let CI catch it."
+  else
+    # Paths must be relative to supabase/ because that is where deno.json lives
+    # and where CI invokes deno from.
+    REL_FMT="$(echo "$DENO_FMT" | sed 's|^supabase/||' | grep -v '^$' || true)"
+    REL_LINT="$(echo "$DENO_LINT" | sed 's|^supabase/||' | grep -v '^$' || true)"
+
+    BEFORE="$(echo "$DENO_ALL" | xargs -r git hash-object 2>/dev/null || true)"
+
+    if [ -n "$REL_FMT" ]; then
+      (cd supabase && echo "$REL_FMT" | xargs -r deno fmt --quiet) >/dev/null 2>&1 || true
+    fi
+    if [ -n "$REL_LINT" ]; then
+      # deno lint --fix only rewrites rules that ship a fix, and as of deno
+      # 2.9.5 prefer-const is NOT one of them (verified: --fix leaves `let`
+      # untouched and still exits 1; there is no unstable flag for it). So the
+      # common prefer-const case reaches the blocking check below and is
+      # reported there rather than being silently corrected. That is the
+      # intended outcome — it still catches the problem a full CI round-trip
+      # earlier, which is the point. The call is kept so the hook picks up
+      # newly fixable rules as deno adds them.
+      (cd supabase && echo "$REL_LINT" | xargs -r deno lint --fix) >/dev/null 2>&1 || true
+      # deno lint --fix can leave a file unformatted; formatter gets the last word.
+      [ -n "$REL_FMT" ] && (cd supabase && echo "$REL_FMT" | xargs -r deno fmt --quiet) >/dev/null 2>&1 || true
+    fi
+
+    AFTER="$(echo "$DENO_ALL" | xargs -r git hash-object 2>/dev/null || true)"
+    if [ "$BEFORE" != "$AFTER" ]; then
+      echo "$DENO_ALL" | xargs -r git add --
+      CHANGED_BY_HOOK="yes"
+    fi
+
+    # deno prints a "Checked N files" summary even with --quiet, so output is
+    # captured and only surfaced when the check actually fails — a clean commit
+    # should produce no output at all.
+    if [ -n "$REL_FMT" ]; then
+      if ! OUT="$( (cd supabase && echo "$REL_FMT" | xargs -r deno fmt --check --quiet) 2>&1 )"; then
+        echo "$OUT"
+        FAILED="yes"
+      fi
+    fi
+    if [ -n "$REL_LINT" ]; then
+      if ! OUT="$( (cd supabase && echo "$REL_LINT" | xargs -r deno lint) 2>&1 )"; then
+        echo "$OUT"
+        FAILED="yes"
+      fi
+    fi
   fi
+fi
+
+# =============================================================================
+if [ -n "$CHANGED_BY_HOOK" ]; then
+  echo "✅ pre-commit: applied formatting/safe fixes and re-staged them."
+  echo "   These are layout-only changes — review with:  git diff --cached"
 fi
 
 if [ -n "$FAILED" ]; then
   cat <<'EOF'
 
-❌ Commit blocked: ruff found something it cannot fix on its own.
-   re-ci.yml would fail at its "Lint (ruff)" step on exactly this.
+❌ Commit blocked: a style check found something it cannot fix on its own.
+   CI would fail on exactly this.
 
    Fix the findings listed above, then commit again.
    To commit anyway (CI will still reject it):  git commit --no-verify
